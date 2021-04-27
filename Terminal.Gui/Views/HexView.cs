@@ -325,7 +325,7 @@ namespace Terminal.Gui {
 			case Key.PageUp:
 				MoveUp (bytesPerLine * Frame.Height);
 				break;
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				MoveDown (bytesPerLine * Frame.Height);
 				break;
@@ -394,6 +394,23 @@ namespace Terminal.Gui {
 				source.WriteByte (kv.Value);
 			}
 			edits = new SortedDictionary<long, byte> ();
+		}
+
+		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility DesiredCursorVisibility 
+		{ 
+			get => desiredCursorVisibility; 
+			set {
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				desiredCursorVisibility = value;
+			}
 		}
 	}
 }

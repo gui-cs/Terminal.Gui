@@ -260,6 +260,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.
+		/// </summary>
+		public void Refresh ()
+		{
+			OnSelectedItemChanged (selected, -1);
+		}
+
+		/// <summary>
 		/// Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.
 		/// </summary>
 		/// <param name="selectedItem"></param>
@@ -346,6 +354,14 @@ namespace Terminal.Gui {
 				}
 			}
 			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 

@@ -1,4 +1,7 @@
-﻿using NStack;
+﻿#define DRAW_CONTENT
+//#define BASE_DRAW_CONTENT
+
+using NStack;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,15 +61,20 @@ namespace UICatalog {
 				CreateRadio("End", CharMap.MaxCodePointVal - 16, CharMap.MaxCodePointVal),
 			};
 
-			var jumpList = new RadioGroup (radioItems.Select (t => t.radioLabel).ToArray ());
-			jumpList.X = Pos.X (label);
-			jumpList.Y = Pos.Bottom (label);
-			jumpList.Width = Dim.Fill ();
+			var jumpList = new RadioGroup (radioItems.Select (t => t.radioLabel).ToArray ()) {
+				X = Pos.X (label),
+				Y = Pos.Bottom (label),
+				Width = Dim.Fill (),
+				SelectedItem = 8
+			};
 			jumpList.SelectedItemChanged += (args) => {
-				_charMap.Start = radioItems[args.SelectedItem].start;
+				_charMap.Start = radioItems [args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
+
+			jumpList.Refresh ();
+			jumpList.SetFocus ();
 		}
 
 		public override void Run ()
@@ -91,11 +99,14 @@ namespace UICatalog {
 		}
 		int _start = 0x2500;
 
+		public const int H_SPACE = 2;
+		public const int V_SPACE = 2;
+
 		public static int MaxCodePointVal => 0xE0FFF;
 
 		// Row Header + space + (space + char + space)
 		public static int RowHeaderWidth => $"U+{MaxCodePointVal:x5}".Length;
-		public static int RowWidth => RowHeaderWidth + (" c".Length * 16);
+		public static int RowWidth => RowHeaderWidth + (H_SPACE * 16);
 
 		public CharMap ()
 		{
@@ -109,10 +120,12 @@ namespace UICatalog {
 					ShowHorizontalScrollIndicator = false;
 				}
 			};
+#if DRAW_CONTENT
 
 			DrawContent += CharMap_DrawContent;
+#endif
 		}
-#if true
+
 		private void CharMap_DrawContent (Rect viewport)
 		{
 			//Rune ReplaceNonPrintables (Rune c)
@@ -124,11 +137,13 @@ namespace UICatalog {
 			//	}
 			//}
 
+			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16 + Frame.Height - 1);
+
 			for (int header = 0; header < 16; header++) {
-				Move (viewport.X + RowHeaderWidth + (header * 2), 0);
+				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += 2) {
+			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y+= V_SPACE) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
@@ -137,17 +152,17 @@ namespace UICatalog {
 					var prevColWasWide = false;
 					for (int col = 0; col < 16; col++) {
 						var rune = new Rune ((uint)((uint)(-viewport.Y + row) * 16 + col));
-						Move (viewport.X + RowHeaderWidth + (col * 2) + (prevColWasWide ? 0 : 1), 0 + y + 1);
+						Move (viewport.X + RowHeaderWidth + (col * H_SPACE) + (prevColWasWide ? 0 : 1), y + 1);
 						Driver.AddRune (rune);
-						//prevColWasWide = Rune.ColumnWidth(rune) > 1;
+						//prevColWasWide = Rune.ColumnWidth (rune) > 1;
 					}
 				}
 			}
 		}
-#else
+#if BASE_DRAW_CONTENT
 		public override void OnDrawContent (Rect viewport)
 		{
-			CharMap_DrawContent(this, viewport);
+			CharMap_DrawContent (viewport);
 			base.OnDrawContent (viewport);
 		}
 #endif

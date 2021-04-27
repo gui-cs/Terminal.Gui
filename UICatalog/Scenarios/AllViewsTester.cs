@@ -59,7 +59,7 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Top.SetNeedsDisplay ();
@@ -344,6 +344,20 @@ namespace UICatalog {
 
 		View CreateClass (Type type)
 		{
+			// If we are to create a generic Type
+			if (type.IsGenericType) {
+
+				// For each of the <T> arguments
+				List<Type> typeArguments = new List<Type> ();
+
+				// use <object>
+				foreach (var arg in type.GetGenericArguments ()) {
+					typeArguments.Add (typeof (object));
+				}
+
+				// And change what type we are instantiating from MyClass<T> to MyClass<object>
+				type = type.MakeGenericType (typeArguments.ToArray ());
+			}
 			// Instantiate view
 			var view = (View)Activator.CreateInstance (type);
 

@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 			//}
 
 			Move (0, 0);
-			Driver.SetAttribute (Colors.Menu.Normal);
+			Driver.SetAttribute (ColorScheme.Normal);
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
@@ -214,6 +214,14 @@ namespace Terminal.Gui {
 				}
 				disposedValue = true;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 }

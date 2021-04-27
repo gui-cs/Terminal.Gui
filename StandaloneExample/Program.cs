@@ -141,17 +141,21 @@ class Demo {
 
 	}
 
-	public static Label ml2;
-
 	static void NewFile ()
 	{
-		var d = new Dialog (
-			"New File", 50, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
-		ml2 = new Label (1, 1, "Mouse Debug Line");
-		d.Add (ml2);
-		Application.Run (d);
+		var okButton = new Button ("Ok", is_default: true);
+                okButton.Clicked += () => { Application.RequestStop (); };
+                var cancelButton = new Button ("Cancel");
+                cancelButton.Clicked += () => { Application.RequestStop (); };
+
+                var d = new Dialog (
+                    "New File", 50, 20,
+                    okButton,
+                    cancelButton);
+
+                var ml2 = new Label (1, 1, "Mouse Debug Line");
+                d.Add (ml2);
+                Application.Run (d);
 	}
 
 	static bool Quit ()

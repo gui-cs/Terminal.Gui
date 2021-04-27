@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel)"/>. 
+	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. 
 	///     They return control to the caller when <see cref="Application.RequestStop()"/> has 
 	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
 	///   </para>
@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-	///     call <see cref="Application.Run(Toplevel)"/>.
+	///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 	///   </para>
 	///   <para>
 	///     Toplevels can also opt-in to more sophisticated initialization
@@ -49,18 +49,46 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
+		/// Fired once the Toplevel's <see cref="Application.RunState"/> has begin loaded.
+		/// A Loaded event handler is a good place to finalize initialization before calling `<see cref="Application.RunLoop(Application.RunState, bool)"/>.
+		/// </summary>
+		public event Action Loaded;
+
+		/// <summary>
+		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run(Func{Exception, bool})"/>(topLevel)`.
 		/// </summary>
 		public event Action Ready;
 
 		/// <summary>
-		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// Fired once the Toplevel's <see cref="Application.RunState"/> has begin unloaded.
+		/// A Unloaded event handler is a good place to disposing after calling `<see cref="Application.End(Application.RunState)"/>.
+		/// </summary>
+		public event Action Unloaded;
+
+		/// <summary>
+		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> is redraws for the first time.
+		/// </summary>
+		internal virtual void OnLoaded ()
+		{
+			Loaded?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop.
 		/// </summary>
 		internal virtual void OnReady ()
 		{
 			Ready?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.End(Application.RunState)"/> before the <see cref="Toplevel"/> is disposed.
+		/// </summary>
+		internal virtual void OnUnloaded ()
+		{
+			Unloaded?.Invoke ();
 		}
 
 		/// <summary>
@@ -130,6 +158,8 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
 				if (MenuBar != null && MenuBar.OnKeyDown (keyEvent)) {
 					return true;
 				}
@@ -148,6 +178,8 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
 				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
 					return true;
 				}
@@ -163,12 +195,12 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (keyEvent.Key) {
-			case Key.ControlQ:
+			switch (ShortcutHelper.GetModifiersKey (keyEvent)) {
+			case Key.Q | Key.CtrlMask:
 				// FIXED: stop current execution of this container
 				Application.RequestStop ();
 				break;
-			case Key.ControlZ:
+			case Key.Z | Key.CtrlMask:
 				Driver.Suspend ();
 				return true;
 
@@ -181,33 +213,51 @@ namespace Terminal.Gui {
 			case Key.Tab:
 			case Key.CursorRight:
 			case Key.CursorDown:
-			case Key.ControlI: // Unix
+			case Key.I | Key.CtrlMask: // Unix
 				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (true));
+					FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
 				}
 				return true;
+			case Key.BackTab | Key.ShiftMask:
 			case Key.CursorLeft:
 			case Key.CursorUp:
-			case Key.BackTab:
 				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (false));
+					FocusNearestView (SuperView?.TabIndexes?.Reverse(), Direction.Backward);
 				}
 				return true;
-
-			case Key.ControlL:
+			case Key.Tab | Key.CtrlMask:
+				Application.Top.FocusNext ();
+				return true;
+			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
+				Application.Top.FocusPrev ();
+				return true;
+			case Key.L | Key.CtrlMask:
 				Application.Refresh ();
+				return true;
+			}
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortcutHelper.FindAndOpenByShortcut(keyEvent, this)) {
 				return true;
 			}
 			return false;
@@ -227,39 +277,34 @@ namespace Terminal.Gui {
 			return view;
 		}
 
-		IEnumerable<View> GetToplevelSubviews (bool isForward)
-		{
-			if (SuperView == null) {
-				return null;
-			}
-
-			HashSet<View> views = new HashSet<View> ();
-
-			foreach (var v in SuperView.Subviews) {
-				views.Add (v);
-			}
-
-			return isForward ? views : views.Reverse ();
-		}
-
-		void FocusNearestView (IEnumerable<View> views)
+		void FocusNearestView (IEnumerable<View> views, Direction direction)
 		{
 			if (views == null) {
 				return;
 			}
 
 			bool found = false;
+			bool focusProcessed = false;
+			int idx = 0;
 
 			foreach (var v in views) {
 				if (v == this) {
 					found = true;
 				}
 				if (found && v != this) {
-					v.EnsureFocus ();
+					if (direction == Direction.Forward) {
+						SuperView?.FocusNext ();
+					} else {
+						SuperView?.FocusPrev ();
+					}
+					focusProcessed = true;
 					if (SuperView.Focused != null && SuperView.Focused != this) {
 						return;
 					}
+				} else if (found && !focusProcessed && idx == views.Count () - 1) {
+					views.ToList () [0].SetFocus ();
 				}
+				idx++;
 			}
 		}
 
@@ -318,14 +363,24 @@ namespace Terminal.Gui {
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
 		{
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
+			int l;
+			if (SuperView == null || SuperView is Toplevel) {
+				l = Driver.Cols;
+			} else {
+				l = SuperView.Frame.Width;
+			}
+			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+			SetWidth (top.Frame.Width, out int rWidth);
+			if (rWidth < 0 && nx >= top.Frame.X) {
+				nx = Math.Max (top.Frame.Right - 2, 0);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
 			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
 				m = Application.Top.MenuBar != null;
 			} else {
 				m = ((Toplevel)SuperView).MenuBar != null;
 			}
-			int l;
 			if (SuperView == null || SuperView is Toplevel) {
 				l = m ? 1 : 0;
 			} else {
@@ -344,6 +399,11 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			SetHeight (top.Frame.Height, out int rHeight);
+			if (rHeight < 0 && ny >= top.Frame.Y) {
+				ny = Math.Max (top.Frame.Bottom - 2, 0);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 		}
 
 		internal void PositionToplevels ()
@@ -360,10 +420,10 @@ namespace Terminal.Gui {
 		{
 			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
 			if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
-				if (top.X is Pos.PosAbsolute && top.Bounds.X != nx) {
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
 				}
-				if (top.Y is Pos.PosAbsolute && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
 					top.Y = ny;
 				}
 			}
@@ -383,10 +443,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Application.CurrentView = this;
-
 			if (IsCurrentTop || this == Application.Top) {
-				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
+				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 
 					// This is the Application.Top. Clear just the region we're being asked to redraw 
@@ -394,22 +452,24 @@ namespace Terminal.Gui {
 					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
 					PositionToplevels ();
-				}
-				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (bounds)) {
-						view.SetNeedsLayout ();
-						view.SetNeedsDisplay (view.Bounds);
-					}
-				}
 
-				ClearNeedsDisplay ();
+					foreach (var view in Subviews) {
+						if (view.Frame.IntersectsWith (bounds)) {
+							view.SetNeedsLayout ();
+							view.SetNeedsDisplay (view.Bounds);
+						}
+					}
+
+					ClearLayoutNeeded ();
+					ClearNeedsDisplay ();
+				}
 			}
 
 			base.Redraw (base.Bounds);
 		}
 
 		/// <summary>
-		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel)"/> after
+		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> after
 		/// the views have been laid out, and before the views are drawn for the first time.
 		/// </summary>
 		public virtual void WillPresent ()

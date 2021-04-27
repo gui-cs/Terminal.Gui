@@ -279,16 +279,16 @@ namespace Terminal.Gui {
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorUp:
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 				MoveUp ();
 				return true;
 
 			case Key.CursorDown:
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 				MoveDown ();
 				return true;
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				var n = (selected + Frame.Height);
 				if (n > infos.Count)
@@ -325,7 +325,7 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Space:
-			case Key.ControlT:
+			case Key.T | Key.CtrlMask:
 				PerformMultipleSelection ();
 				return true;
 
@@ -465,6 +465,14 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>
@@ -472,7 +480,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
-		Label nameFieldLabel, message, dirLabel;
+		Label nameFieldLabel, message, nameDirLabel;
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
 
@@ -486,24 +494,45 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message)
+			: this (title, prompt, ustring.Empty, nameFieldLabel, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="message">The message.</param>
+
+		public FileDialog (ustring title, ustring prompt, ustring message) : this (title, prompt, ustring.Empty, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="nameDirLabel">The name of the directory field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
+		/// <param name="message">The message.</param>
+		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
-			this.message = new Label (message) { 
+			this.message = new Label (message) {
 				X = 1,
 				Y = 0,
 			};
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			dirLabel = new Label ("Directory: ") {
+			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
 				X = 1,
-				Y = 1 + msgLines
+				Y = 1 + msgLines,
+				AutoSize = true
 			};
 
 			dirEntry = new TextField ("") {
-				X = Pos.Right (dirLabel),
+				X = Pos.Right (this.nameDirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1,
 			};
@@ -511,11 +540,12 @@ namespace Terminal.Gui {
 				DirectoryPath = dirEntry.Text;
 				nameEntry.Text = ustring.Empty;
 			};
-			Add (dirLabel, dirEntry);
+			Add (this.nameDirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
-				X = 6,
+			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? "File: " : $"{nameFieldLabel}: ") {
+				X = 1,
 				Y = 3 + msgLines,
+				AutoSize = true
 			};
 			nameEntry = new TextField ("") {
 				X = Pos.Left (dirEntry),
@@ -542,14 +572,23 @@ namespace Terminal.Gui {
 			};
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt) {
+			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
+				CanFocus = nameEntry.Text.IsEmpty ? false : true
 			};
 			this.prompt.Clicked += () => {
 				canceled = false;
 				Application.RequestStop ();
 			};
 			AddButton (this.prompt);
+
+			nameEntry.TextChanged += (e) => {
+				if (nameEntry.Text.IsEmpty) {
+					this.prompt.CanFocus = false;
+				} else {
+					this.prompt.CanFocus = true;
+				}
+			};
 
 			Width = Dim.Percent (80);
 			Height = Dim.Percent (80);
@@ -585,13 +624,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the name of the directory field label.
+		/// </summary>
+		/// <value>The name of the directory field label.</value>
+		public ustring NameDirLabel {
+			get => nameDirLabel.Text;
+			set {
+				nameDirLabel.Text = $"{value}: ";
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the name field label.
 		/// </summary>
 		/// <value>The name field label.</value>
 		public ustring NameFieldLabel {
 			get => nameFieldLabel.Text;
 			set {
-				nameFieldLabel.Text = value;
+				nameFieldLabel.Text = $"{value}: ";
 			}
 		}
 
@@ -670,7 +720,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   To use, create an instance of <see cref="SaveDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally,
 	///   and when this returns, the <see cref="FileName"/>property will contain the selected file name or 
 	///   null if the user canceled. 
 	/// </para>
@@ -713,7 +763,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally,
 	///   and when this returns, the list of filds will be available on the <see cref="FilePaths"/> property.
 	/// </para>
 	/// <para>

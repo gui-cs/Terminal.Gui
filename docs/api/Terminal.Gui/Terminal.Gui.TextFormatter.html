@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TextFormatter
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.7.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -84,7 +84,7 @@
   <h1 id="Terminal_Gui_TextFormatter" data-uid="Terminal.Gui.TextFormatter" class="text-break">Class TextFormatter
   </h1>
   <div class="markdown level0 summary">
-Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
+Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multiple lines, and word-based line wrap.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -153,6 +153,60 @@ Controls the horizontal text-alignment property.
   </table>
   
   
+  <a id="Terminal_Gui_TextFormatter_CursorPosition_" data-uid="Terminal.Gui.TextFormatter.CursorPosition*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_CursorPosition" data-uid="Terminal.Gui.TextFormatter.CursorPosition">CursorPosition</h4>
+  <div class="markdown level1 summary">
+Gets the cursor position from <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKey">HotKey</a>. If the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKey">HotKey</a> is defined, the cursor will be positioned over it.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int CursorPosition { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_Direction_" data-uid="Terminal.Gui.TextFormatter.Direction*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_Direction" data-uid="Terminal.Gui.TextFormatter.Direction">Direction</h4>
+  <div class="markdown level1 summary">
+Controls the text-direction property. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextDirection Direction { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td>The text vertical alignment.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_TextFormatter_HotKey_" data-uid="Terminal.Gui.TextFormatter.HotKey*"></a>
   <h4 id="Terminal_Gui_TextFormatter_HotKey" data-uid="Terminal.Gui.TextFormatter.HotKey">HotKey</h4>
   <div class="markdown level1 summary">
@@ -210,7 +264,7 @@ The position in the text of the hotkey. The hotkey will be rendered using the ho
   <a id="Terminal_Gui_TextFormatter_HotKeySpecifier_" data-uid="Terminal.Gui.TextFormatter.HotKeySpecifier*"></a>
   <h4 id="Terminal_Gui_TextFormatter_HotKeySpecifier" data-uid="Terminal.Gui.TextFormatter.HotKeySpecifier">HotKeySpecifier</h4>
   <div class="markdown level1 summary">
-The specifier character for the hotkey (e.g. &apos;_&apos;). Set to &apos;\xffff&apos; to disable hotkey support for this View instance. The default is &apos;\xffff&apos;. 
+The specifier character for the hotkey (e.g. &apos;_&apos;). Set to &apos;\xffff&apos; to disable hotkey support for this View instance. The default is &apos;\xffff&apos;.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -265,7 +319,7 @@ the underlying Rune to be identified as a &quot;private use&quot; Unicode charac
   <a id="Terminal_Gui_TextFormatter_Lines_" data-uid="Terminal.Gui.TextFormatter.Lines*"></a>
   <h4 id="Terminal_Gui_TextFormatter_Lines" data-uid="Terminal.Gui.TextFormatter.Lines">Lines</h4>
   <div class="markdown level1 summary">
-Gets the formatted lines. 
+Gets the formatted lines.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -291,7 +345,7 @@ Gets the formatted lines.
   <div class="markdown level1 remarks">
 <p>
 Upon a &apos;get&apos; of this property, if the text needs to be formatted (if <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat">NeedsFormat</a> is <code>true</code>)
-<a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_">Format(ustring, Int32, TextAlignment, Boolean)</a> will be called internally. 
+<a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_">Format(ustring, Int32, Boolean, Boolean, Boolean)</a> will be called internally. 
 </p>
 </div>
   
@@ -299,7 +353,7 @@ Upon a &apos;get&apos; of this property, if the text needs to be formatted (if <
   <a id="Terminal_Gui_TextFormatter_NeedsFormat_" data-uid="Terminal.Gui.TextFormatter.NeedsFormat*"></a>
   <h4 id="Terminal_Gui_TextFormatter_NeedsFormat" data-uid="Terminal.Gui.TextFormatter.NeedsFormat">NeedsFormat</h4>
   <div class="markdown level1 summary">
-Gets or sets whether the <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> needs to format the text when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">Draw(Rect, Attribute, Attribute)</a> is called. 
+Gets or sets whether the <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> needs to format the text when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">Draw(Rect, Attribute, Attribute)</a> is called.
 If it is <code>false</code> when Draw is called, the Draw call will be faster.
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -325,7 +379,7 @@ If it is <code>false</code> when Draw is called, the Draw call will be faster.
   <h5 id="Terminal_Gui_TextFormatter_NeedsFormat_remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
-This is set to true when the properties of <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> are set. 
+This is set to true when the properties of <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> are set.
 </p>
 </div>
   
@@ -333,7 +387,7 @@ This is set to true when the properties of <a class="xref" href="Terminal.Gui.Te
   <a id="Terminal_Gui_TextFormatter_Size_" data-uid="Terminal.Gui.TextFormatter.Size*"></a>
   <h4 id="Terminal_Gui_TextFormatter_Size" data-uid="Terminal.Gui.TextFormatter.Size">Size</h4>
   <div class="markdown level1 summary">
-Gets or sets the size of the area the text will be constrainted to when formatted. 
+Gets or sets the size of the area the text will be constrained to when formatted.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -379,6 +433,33 @@ The text to be displayed. This text is never modified.
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_VerticalAlignment_" data-uid="Terminal.Gui.TextFormatter.VerticalAlignment*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_VerticalAlignment" data-uid="Terminal.Gui.TextFormatter.VerticalAlignment">VerticalAlignment</h4>
+  <div class="markdown level1 summary">
+Controls the vertical text-alignment property. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public VerticalTextAlignment VerticalAlignment { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.VerticalTextAlignment.html">VerticalTextAlignment</a></td>
+        <td>The text vertical alignment.</td>
       </tr>
     </tbody>
   </table>
@@ -435,6 +516,60 @@ Calculates the rectangle required to hold text, assuming no word wrapping.
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_ClipAndJustify_" data-uid="Terminal.Gui.TextFormatter.ClipAndJustify*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_ClipAndJustify_NStack_ustring_System_Int32_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,System.Boolean)">ClipAndJustify(ustring, Int32, Boolean)</h4>
+  <div class="markdown level1 summary">
+Justifies text within a specified width. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ustring ClipAndJustify(ustring text, int width, bool justify)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td>The text to justify.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td>If the text length is greater that <code>width</code> it will be clipped.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">justify</span></td>
+        <td>Justify.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td>Justified and clipped text.</td>
       </tr>
     </tbody>
   </table>
@@ -566,8 +701,8 @@ Finds the hotkey and its location in text.
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">firstUpperCase</span></td>
-        <td>If <code>true</code> the legacy behavior of identifying the first upper case character as the hotkey will be eanbled. 
-Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes precidence.</td>
+        <td>If <code>true</code> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
+Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes precedence.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
@@ -599,14 +734,90 @@ Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes pr
   
   
   <a id="Terminal_Gui_TextFormatter_Format_" data-uid="Terminal.Gui.TextFormatter.Format*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean)">Format(ustring, Int32, TextAlignment, Boolean)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)">Format(ustring, Int32, Boolean, Boolean, Boolean)</h4>
   <div class="markdown level1 summary">
 Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td>The width to bound the text to for word wrapping and clipping.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">justify</span></td>
+        <td>Specifies whether the text should be justified.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">wordWrap</span></td>
+        <td>If <code>true</code>, the text will be wrapped to new lines as need. If <code>false</code>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <code>width</code></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">preserveTrailingSpaces</span></td>
+        <td>If <code>true</code> and &apos;wordWrap&apos; also true, the wrapped text will keep the trailing spaces. If <code>false</code>, the trailing spaces will be trimmed.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">NStack.ustring</span>&gt;</td>
+        <td>A list of word wrapped lines.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+An empty <code>text</code> string will result in one empty line.
+</p>
+<p>
+If <code>width</code> is 0, a single, empty line will be returned.
+</p>
+<p>
+If <code>width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
+</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_Format_" data-uid="Terminal.Gui.TextFormatter.Format*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)">Format(ustring, Int32, TextAlignment, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary">
+Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -638,6 +849,11 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
         <td><span class="parametername">wordWrap</span></td>
         <td>If <code>true</code>, the text will be wrapped to new lines as need. If <code>false</code>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <code>width</code></td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">preserveTrailingSpaces</span></td>
+        <td>If <code>true</code> and &apos;wordWrap&apos; also true, the wrapped text will keep the trailing spaces. If <code>false</code>, the trailing spaces will be trimmed.</td>
+      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -655,7 +871,7 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 An empty <code>text</code> string will result in one empty line.
@@ -667,6 +883,182 @@ If <code>width</code> is 0, a single, empty line will be returned.
 If <code>width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
 </p>
 </div>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_IsHorizontalDirection_" data-uid="Terminal.Gui.TextFormatter.IsHorizontalDirection*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_IsHorizontalDirection_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)">IsHorizontalDirection(TextDirection)</h4>
+  <div class="markdown level1 summary">
+Check if it is a horizontal direction
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsHorizontalDirection(TextDirection textDirection)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">textDirection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_IsLeftToRight_" data-uid="Terminal.Gui.TextFormatter.IsLeftToRight*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_IsLeftToRight_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)">IsLeftToRight(TextDirection)</h4>
+  <div class="markdown level1 summary">
+Check if it is Left to Right direction
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsLeftToRight(TextDirection textDirection)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">textDirection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_IsTopToBottom_" data-uid="Terminal.Gui.TextFormatter.IsTopToBottom*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_IsTopToBottom_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)">IsTopToBottom(TextDirection)</h4>
+  <div class="markdown level1 summary">
+Check if it is Top to Bottom direction
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsTopToBottom(TextDirection textDirection)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">textDirection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_IsVerticalDirection_" data-uid="Terminal.Gui.TextFormatter.IsVerticalDirection*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_IsVerticalDirection_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)">IsVerticalDirection(TextDirection)</h4>
+  <div class="markdown level1 summary">
+Check if it is a vertical direction
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsVerticalDirection(TextDirection textDirection)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">textDirection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_TextFormatter_Justify_" data-uid="Terminal.Gui.TextFormatter.Justify*"></a>
@@ -718,7 +1110,7 @@ make the text just fit <code>width</code>. Spaces will not be added to the ends.
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td>The justifed text.</td>
+        <td>The justified text.</td>
       </tr>
     </tbody>
   </table>
@@ -776,7 +1168,7 @@ Computes the number of lines needed to render the specified text given the width
   <a id="Terminal_Gui_TextFormatter_MaxWidth_" data-uid="Terminal.Gui.TextFormatter.MaxWidth*"></a>
   <h4 id="Terminal_Gui_TextFormatter_MaxWidth_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.TextFormatter.MaxWidth(NStack.ustring,System.Int32)">MaxWidth(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Computes the maximum width needed to render the text (single line or multple lines) given a minimum width.
+Computes the maximum width needed to render the text (single line or multiple lines) given a minimum width.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -879,8 +1271,8 @@ Removes the hotkey specifier from text.
   <a id="Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_" data-uid="Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag*"></a>
   <h4 id="Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(NStack.ustring,System.Int32)">ReplaceHotKeyWithTag(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Replaces the Rune at the index specfiied by the <code>hotPos</code> parameter with a tag identifying 
-it as the hotkey. 
+Replaces the Rune at the index specified by the <code>hotPos</code> parameter with a tag identifying 
+it as the hotkey.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -932,14 +1324,14 @@ Runes with a bitmask of <code>otKeyTagMask</code> and remove that bitmask.
   
   
   <a id="Terminal_Gui_TextFormatter_WordWrap_" data-uid="Terminal.Gui.TextFormatter.WordWrap*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32)">WordWrap(ustring, Int32)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)">WordWrap(ustring, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
 Formats the provided text to fit within the width provided using word wrapping.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width, bool preserveTrailingSpaces = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -959,7 +1351,13 @@ Formats the provided text to fit within the width provided using word wrapping.
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">width</span></td>
-        <td>The width to contrain the text to</td>
+        <td>The width to contain the text to</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">preserveTrailingSpaces</span></td>
+        <td>If <code>true</code>, the wrapped text will keep the trailing spaces.
+ If <code>false</code>, the trailing spaces will be trimmed.</td>
       </tr>
     </tbody>
   </table>
@@ -978,7 +1376,7 @@ Formats the provided text to fit within the width provided using word wrapping.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 This method does not do any justification.
@@ -997,7 +1395,8 @@ This method strips Newline (&apos;\n&apos; and &apos;\r\n&apos;) sequences befor
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

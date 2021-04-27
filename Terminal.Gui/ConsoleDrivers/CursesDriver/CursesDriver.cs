@@ -17,9 +17,13 @@ namespace Terminal.Gui {
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
 	internal class CursesDriver : ConsoleDriver {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
+		public override int Top => 0;
+		public override bool HeightAsBuffer { get; set; }
+
+		CursorVisibility? initialCursorVisibility = null;
+		CursorVisibility? currentCursorVisibility = null;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -39,14 +43,14 @@ namespace Terminal.Gui {
 		}
 
 		static bool sync = false;
-		public override void AddRune (Rune rune) 
+		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch ((int)(uint)MakePrintable(rune));
+				Curses.addch ((int)(uint)MakePrintable (rune));
 			} else
 				needMove = true;
 			if (sync)
@@ -71,21 +75,43 @@ namespace Terminal.Gui {
 		{
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
 				TerminalResized?.Invoke ();
 			}
 		}
 
 		public override void UpdateCursor () => Refresh ();
+
 		public override void End ()
 		{
-			//Set cursor key to cursor.
-			Console.Out.Write ("\x1b[?1l");
-			Console.Out.Flush ();
+			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition)) {
+				StopReportingMouseMoves ();
+			}
+
+			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
+			// Clear and reset entire screen.
+			Console.Out.Write ("\x1b[2J");
+			Console.Out.Flush ();
+			Console.Out.Write ("\x1b[1;25r");
+			Console.Out.Flush ();
+
+			//Set cursor key to cursor.
+			Console.Out.Write("\x1b[?1l");
+			Console.Out.Flush();
 		}
+
 		public override void UpdateScreen () => window.redrawwin ();
-		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
+
+		int currentAttribute;
+
+		public override void SetAttribute (Attribute c)
+		{
+			currentAttribute = c.Value;
+			Curses.attrset (currentAttribute);
+		}
+
 		public Curses.Window window;
 
 		static short last_color_pair = 16;
@@ -99,7 +125,11 @@ namespace Terminal.Gui {
 		public static Attribute MakeColor (short foreground, short background)
 		{
 			Curses.InitColorPair (++last_color_pair, foreground, background);
-			return new Attribute () { value = Curses.ColorPair (last_color_pair) };
+			return new Attribute (
+				value: Curses.ColorPair (last_color_pair),
+				foreground: (Color)foreground,
+				background: (Color)background
+				);
 		}
 
 		int [,] colorPairs = new int [16, 16];
@@ -191,6 +221,18 @@ namespace Terminal.Gui {
 			case Curses.ShiftCtrlKeyEnd: return Key.End | Key.ShiftMask | Key.CtrlMask;
 			case Curses.ShiftCtrlKeyNPage: return Key.PageDown | Key.ShiftMask | Key.CtrlMask;
 			case Curses.ShiftCtrlKeyPPage: return Key.PageUp | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftAltKeyUp: return Key.CursorUp | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyDown: return Key.CursorDown | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyLeft: return Key.CursorLeft | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyRight: return Key.CursorRight | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyNPage: return Key.PageDown | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyPPage: return Key.PageUp | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyHome: return Key.Home | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyEnd: return Key.End | Key.ShiftMask | Key.AltMask;
+			case Curses.AltCtrlKeyNPage: return Key.PageDown | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyPPage: return Key.PageUp | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyHome: return Key.Home | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyEnd: return Key.End | Key.AltMask | Key.CtrlMask;
 			default: return Key.Unknown;
 			}
 		}
@@ -198,7 +240,6 @@ namespace Terminal.Gui {
 		Curses.Event? LastMouseButtonPressed;
 		bool IsButtonPressed;
 		bool cancelButtonClicked;
-		bool canWheeledDown;
 		bool isReportMousePosition;
 		Point point;
 
@@ -223,16 +264,16 @@ namespace Terminal.Gui {
 				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
 				IsButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
 
-				mouseFlag = (MouseFlags)cev.ButtonState;
+				mouseFlag = MapCursesButton (cev.ButtonState);
 				if (cev.ButtonState != Curses.Event.ReportMousePosition)
 					LastMouseButtonPressed = cev.ButtonState;
 				IsButtonPressed = true;
 				isReportMousePosition = false;
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
+					mouseFlag = MapCursesButton ((Curses.Event)LastMouseButtonPressed) | MouseFlags.ReportMousePosition;
 					point = new Point ();
-					//cancelButtonClicked = true;
+					cancelButtonClicked = true;
 				} else {
 					point = new Point () {
 						X = cev.X,
@@ -241,24 +282,7 @@ namespace Terminal.Gui {
 				}
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Task.Run (async () => {
-						while (IsButtonPressed && LastMouseButtonPressed != null) {
-							await Task.Delay (100);
-							var me = new MouseEvent () {
-								X = cev.X,
-								Y = cev.Y,
-								Flags = mouseFlag
-							};
-
-							var view = Application.wantContinuousButtonPressedView;
-							if (view == null)
-								break;
-							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-								mouseHandler (me);
-								//mainLoop.Driver.Wakeup ();
-							}
-						}
-					});
+					ProcessContinuousButtonPressedAsync (cev, mouseFlag).ConfigureAwait (false);
 				}
 
 
@@ -267,31 +291,39 @@ namespace Terminal.Gui {
 
 				mouseFlag = ProcessButtonReleasedEvent (cev);
 				IsButtonPressed = false;
-				canWheeledDown = false;
 
-			} else if (cev.ButtonState == Curses.Event.Button4Pressed) {
+			} else if (cev.ButtonState == Curses.Event.ButtonWheeledUp) {
 
 				mouseFlag = MouseFlags.WheeledUp;
 
-			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y &&
-				canWheeledDown) {
+			} else if (cev.ButtonState == Curses.Event.ButtonWheeledDown) {
 
 				mouseFlag = MouseFlags.WheeledDown;
-				canWheeledDown = true;
 
-			}
-			else if (cev.ButtonState == Curses.Event.ReportMousePosition && !canWheeledDown) {
+			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledUp & Curses.Event.ButtonShift)) != 0) {
+
+				mouseFlag = MouseFlags.WheeledLeft;
+
+			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledDown & Curses.Event.ButtonShift)) != 0) {
+
+				mouseFlag = MouseFlags.WheeledRight;
+
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 
 				mouseFlag = MouseFlags.ReportMousePosition;
-				canWheeledDown = true;
 				isReportMousePosition = true;
 
 			} else {
-				mouseFlag = (MouseFlags)cev.ButtonState;
-				canWheeledDown = false;
-				if (cev.ButtonState == Curses.Event.ReportMousePosition)
-					isReportMousePosition = true;
+				mouseFlag = 0;
+				var eFlags = cev.ButtonState;
+				foreach (Enum value in Enum.GetValues (eFlags.GetType ())) {
+					if (eFlags.HasFlag (value)) {
+						mouseFlag |= MapCursesButton ((Curses.Event)value);
+					}
+				}
 			}
+
+			mouseFlag = SetControlKeyStates (cev, mouseFlag);
 
 			point = new Point () {
 				X = cev.X,
@@ -301,12 +333,12 @@ namespace Terminal.Gui {
 			return new MouseEvent () {
 				X = cev.X,
 				Y = cev.Y,
-				//Flags = (MouseFlags)cev.ButtonState
+				//Flags = MapCursesButton (cev.ButtonState)
 				Flags = mouseFlag
 			};
 		}
 
-		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
+		MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
 		{
 			LastMouseButtonPressed = cev.ButtonState;
 			var mf = GetButtonState (cev, true);
@@ -315,17 +347,16 @@ namespace Terminal.Gui {
 				mf = GetButtonState (cev, false);
 				mouseHandler (ProcessButtonState (cev, mf));
 				if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
-					mf = (MouseFlags)cev.ButtonState;
+					mf = MapCursesButton (cev.ButtonState);
 				}
 			}
 			LastMouseButtonPressed = null;
-			canWheeledDown = false;
 			return mf;
 		}
 
-		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
+		MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
 		{
-			var mf = (MouseFlags)cev.ButtonState;
+			var mf = MapCursesButton (cev.ButtonState);
 			if (!cancelButtonClicked && LastMouseButtonPressed == null && !isReportMousePosition) {
 				mouseHandler (ProcessButtonState (cev, mf));
 				mf = GetButtonState (cev);
@@ -333,8 +364,27 @@ namespace Terminal.Gui {
 				mf = MouseFlags.ReportMousePosition;
 			}
 			cancelButtonClicked = false;
-			canWheeledDown = false;
 			return mf;
+		}
+
+		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		{
+			while (IsButtonPressed && LastMouseButtonPressed != null) {
+				await Task.Delay (100);
+				var me = new MouseEvent () {
+					X = cev.X,
+					Y = cev.Y,
+					Flags = mouseFlag
+				};
+
+				var view = Application.wantContinuousButtonPressedView;
+				if (view == null)
+					break;
+				if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					mouseHandler (me);
+					//mainLoop.Driver.Wakeup ();
+				}
+			}
 		}
 
 		MouseFlags GetButtonState (Curses.MouseEvent cev, bool pressed = false)
@@ -388,6 +438,54 @@ namespace Terminal.Gui {
 			};
 		}
 
+		MouseFlags MapCursesButton (Curses.Event cursesButton)
+		{
+			switch (cursesButton) {
+			case Curses.Event.Button1Pressed: return MouseFlags.Button1Pressed;
+			case Curses.Event.Button1Released: return MouseFlags.Button1Released;
+			case Curses.Event.Button1Clicked: return MouseFlags.Button1Clicked;
+			case Curses.Event.Button1DoubleClicked: return MouseFlags.Button1DoubleClicked;
+			case Curses.Event.Button1TripleClicked: return MouseFlags.Button1TripleClicked;
+			case Curses.Event.Button2Pressed: return MouseFlags.Button2Pressed;
+			case Curses.Event.Button2Released: return MouseFlags.Button2Released;
+			case Curses.Event.Button2Clicked: return MouseFlags.Button2Clicked;
+			case Curses.Event.Button2DoubleClicked: return MouseFlags.Button2DoubleClicked;
+			case Curses.Event.Button2TrippleClicked: return MouseFlags.Button2TripleClicked;
+			case Curses.Event.Button3Pressed: return MouseFlags.Button3Pressed;
+			case Curses.Event.Button3Released: return MouseFlags.Button3Released;
+			case Curses.Event.Button3Clicked: return MouseFlags.Button3Clicked;
+			case Curses.Event.Button3DoubleClicked: return MouseFlags.Button3DoubleClicked;
+			case Curses.Event.Button3TripleClicked: return MouseFlags.Button3TripleClicked;
+			case Curses.Event.ButtonWheeledUp: return MouseFlags.WheeledUp;
+			case Curses.Event.ButtonWheeledDown: return MouseFlags.WheeledDown;
+			case Curses.Event.Button4Pressed: return MouseFlags.Button4Pressed;
+			case Curses.Event.Button4Released: return MouseFlags.Button4Released;
+			case Curses.Event.Button4Clicked: return MouseFlags.Button4Clicked;
+			case Curses.Event.Button4DoubleClicked: return MouseFlags.Button4DoubleClicked;
+			case Curses.Event.Button4TripleClicked: return MouseFlags.Button4TripleClicked;
+			case Curses.Event.ButtonShift: return MouseFlags.ButtonShift;
+			case Curses.Event.ButtonCtrl: return MouseFlags.ButtonCtrl;
+			case Curses.Event.ButtonAlt: return MouseFlags.ButtonAlt;
+			case Curses.Event.ReportMousePosition: return MouseFlags.ReportMousePosition;
+			case Curses.Event.AllEvents: return MouseFlags.AllEvents;
+			default: return 0;
+			}
+		}
+
+		static MouseFlags SetControlKeyStates (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		{
+			if ((cev.ButtonState & Curses.Event.ButtonCtrl) != 0 && (mouseFlag & MouseFlags.ButtonCtrl) == 0)
+				mouseFlag |= MouseFlags.ButtonCtrl;
+
+			if ((cev.ButtonState & Curses.Event.ButtonShift) != 0 && (mouseFlag & MouseFlags.ButtonShift) == 0)
+				mouseFlag |= MouseFlags.ButtonShift;
+
+			if ((cev.ButtonState & Curses.Event.ButtonAlt) != 0 && (mouseFlag & MouseFlags.ButtonAlt) == 0)
+				mouseFlag |= MouseFlags.ButtonAlt;
+			return mouseFlag;
+		}
+
+
 		KeyModifiers keyModifiers;
 
 		KeyModifiers MapKeyModifiers (Key key)
@@ -395,11 +493,11 @@ namespace Terminal.Gui {
 			if (keyModifiers == null)
 				keyModifiers = new KeyModifiers ();
 
-			if (!keyModifiers.Shift && key.HasFlag (Key.ShiftMask))
+			if (!keyModifiers.Shift && (key & Key.ShiftMask) != 0)
 				keyModifiers.Shift = true;
-			if (!keyModifiers.Alt && key.HasFlag (Key.AltMask))
+			if (!keyModifiers.Alt && (key & Key.AltMask) != 0)
 				keyModifiers.Alt = true;
-			if (!keyModifiers.Ctrl && key.HasFlag (Key.CtrlMask))
+			if (!keyModifiers.Ctrl && (key & Key.CtrlMask) != 0)
 				keyModifiers.Ctrl = true;
 
 			return keyModifiers;
@@ -413,7 +511,7 @@ namespace Terminal.Gui {
 				return;
 
 			keyModifiers = new KeyModifiers ();
-			Key k;
+			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
@@ -423,13 +521,31 @@ namespace Terminal.Gui {
 					}
 				}
 				if (wch == Curses.KeyMouse) {
-					Curses.MouseEvent ev;
-					Curses.getmouse (out ev);
+					Curses.getmouse (out Curses.MouseEvent ev);
+					//System.Diagnostics.Debug.WriteLine ($"ButtonState: {ev.ButtonState}; ID: {ev.ID}; X: {ev.X}; Y: {ev.Y}; Z: {ev.Z}");
 					mouseHandler (ToDriverMouse (ev));
 					return;
 				}
-				keyHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
-				keyUpHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
+				k = MapCursesKey (wch);
+				if (wch >= 277 && wch <= 288) { // Shift+(F1 - F12)
+					wch -= 12;
+					k = Key.ShiftMask | MapCursesKey (wch);
+				} else if (wch >= 289 && wch <= 300) { // Ctrl+(F1 - F12)
+					wch -= 24;
+					k = Key.CtrlMask | MapCursesKey (wch);
+				} else if (wch >= 301 && wch <= 312) { // Ctrl+Shift+(F1 - F12)
+					wch -= 36;
+					k = Key.CtrlMask | Key.ShiftMask | MapCursesKey (wch);
+				} else if (wch >= 313 && wch <= 324) { // Alt+(F1 - F12)
+					wch -= 48;
+					k = Key.AltMask | MapCursesKey (wch);
+				} else if (wch >= 325 && wch <= 327) { // Shift+Alt+(F1 - F3)
+					wch -= 60;
+					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
+				}
+				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				return;
 			}
 
@@ -441,7 +557,6 @@ namespace Terminal.Gui {
 
 				if (code == Curses.KEY_CODE_YES) {
 					k = Key.AltMask | MapCursesKey (wch);
-					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 				if (code == 0) {
 					KeyEvent key;
@@ -450,23 +565,80 @@ namespace Terminal.Gui {
 					// Simulates the AltMask itself by pressing Alt + Space.
 					if (wch2 == (int)Key.Space) {
 						k = Key.AltMask;
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z') {
+					} else if (wch2 - (int)Key.Space >= (uint)Key.A && wch2 - (int)Key.Space <= (uint)Key.Z) {
 						k = (Key)((uint)Key.AltMask + (wch2 - (int)Key.Space));
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 >= '1' && wch <= '9') {
-						k = (Key)((int)Key.F1 + (wch2 - '0' - 1));
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 == '0') {
-						k = Key.F10;
-						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 >= (uint)Key.A - 64 && wch2 <= (uint)Key.Z - 64) {
+						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + (wch2 + 64));
+					} else if (wch2 >= (uint)Key.D0 && wch2 <= (uint)Key.D9) {
+						k = (Key)((uint)Key.AltMask + (uint)Key.D0 + (wch2 - (uint)Key.D0));
 					} else if (wch2 == 27) {
 						k = (Key)wch2;
-						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 == Curses.KEY_CODE_SEQ) {
+						int [] c = null;
+						while (code == 0) {
+							code = Curses.get_wch (out wch2);
+							if (wch2 > 0) {
+								Array.Resize (ref c, c == null ? 1 : c.Length + 1);
+								c [c.Length - 1] = wch2;
+							}
+						}
+						if (c [0] == 49 && c [1] == 59 && c [2] == 55 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Alt+(F1 - F4)
+							wch2 = c [3] + 185;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Alt+(F5 - F8)
+							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) { // Ctrl+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Shift+Alt+(F1 - F4)
+							wch2 = c [3] + 185;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Shift+Alt+(F5 - F8)
+							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Ctrl+Shift+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 52 && c [3] == 83) {  // Shift+Alt+(F4)
+							wch2 = 268;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) {  // Shift+Alt+(F5 - F8)
+							wch2 = c [1] < 55 ? c [1] + 216 : c [1] + 215;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Shift+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 54 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyNPage
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageDown;
+						} else if (c [0] == 53 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyPPage
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageUp;
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 72) {  // Shift+Ctrl+Alt+KeyHome
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Home;
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 70) {  // Shift+Ctrl+Alt+KeyEnd
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.End;
+						} else {
+							k = MapCursesKey (wch2);
+						}
 					} else {
-						k = Key.AltMask | (Key)wch2;
-						key = new KeyEvent (k, MapKeyModifiers (k));
+						// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
+						if (((Key)wch2 & Key.CtrlMask) != 0) {
+							keyModifiers.Ctrl = true;
+						}
+						if (wch2 == 0) {
+							k = Key.CtrlMask | Key.AltMask | Key.Space;
+						} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
+							keyModifiers.Shift = true;
+							keyModifiers.Alt = true;
+						} else if (wch2 < 256) {
+							k = (Key)wch2;
+							keyModifiers.Alt = true;
+						} else {
+							k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
+						}
 					}
+					key = new KeyEvent (k, MapKeyModifiers (k));
+					keyDownHandler (key);
 					keyHandler (key);
 				} else {
 					k = Key.Esc;
@@ -477,9 +649,20 @@ namespace Terminal.Gui {
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			} else {
+				// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 				k = (Key)wch;
+				if (wch == 0) {
+					k = Key.CtrlMask | Key.Space;
+				} else if (wch >= (uint)Key.A - 64 && wch <= (uint)Key.Z - 64) {
+					if ((Key)(wch + 64) != Key.J) {
+						k = Key.CtrlMask | (Key)(wch + 64);
+					}
+				} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
+					keyModifiers.Shift = true;
+				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
@@ -492,16 +675,16 @@ namespace Terminal.Gui {
 		}
 
 		Action<MouseEvent> mouseHandler;
-		MainLoop mainLoop;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.mouseHandler = mouseHandler;
-			this.mainLoop = mainLoop;
 
-			(mainLoop.Driver as UnixMainLoop).AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+			var mLoop = mainLoop.Driver as UnixMainLoop;
+
+			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
 				return true;
 			});
@@ -523,6 +706,30 @@ namespace Terminal.Gui {
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
 			}
+
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+			case 0:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;
+				break;
+
+			case 1:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;
+				Curses.curs_set (1);
+				break;
+
+			case 2:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;
+				Curses.curs_set (2);
+				break;
+
+			default:
+				currentCursorVisibility = initialCursorVisibility = null;
+				break;
+			}
+
 			Curses.raw ();
 			Curses.noecho ();
 
@@ -532,22 +739,22 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			HLine = Curses.ACS_HLINE;
-			VLine = Curses.ACS_VLINE;
-			Stipple = Curses.ACS_CKBOARD;
-			Diamond = Curses.ACS_DIAMOND;
-			ULCorner = Curses.ACS_ULCORNER;
-			LLCorner = Curses.ACS_LLCORNER;
-			URCorner = Curses.ACS_URCORNER;
-			LRCorner = Curses.ACS_LRCORNER;
-			LeftTee = Curses.ACS_LTEE;
-			RightTee = Curses.ACS_RTEE;
-			TopTee = Curses.ACS_TTEE;
-			BottomTee = Curses.ACS_BTEE;
-			RightArrow = Curses.ACS_RARROW;
-			LeftArrow = Curses.ACS_LARROW;
-			UpArrow = Curses.ACS_UARROW;
-			DownArrow = Curses.ACS_DARROW;
+			//HLine = Curses.ACS_HLINE;
+			//VLine = Curses.ACS_VLINE;
+			//Stipple = Curses.ACS_CKBOARD;
+			//Diamond = Curses.ACS_DIAMOND;
+			//ULCorner = Curses.ACS_ULCORNER;
+			//LLCorner = Curses.ACS_LLCORNER;
+			//URCorner = Curses.ACS_URCORNER;
+			//LRCorner = Curses.ACS_LRCORNER;
+			//LeftTee = Curses.ACS_LTEE;
+			//RightTee = Curses.ACS_RTEE;
+			//TopTee = Curses.ACS_TTEE;
+			//BottomTee = Curses.ACS_BTEE;
+			//RightArrow = Curses.ACS_RARROW;
+			//LeftArrow = Curses.ACS_LARROW;
+			//UpArrow = Curses.ACS_UARROW;
+			//DownArrow = Curses.ACS_DARROW;
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -638,7 +845,7 @@ namespace Terminal.Gui {
 				return Curses.COLOR_BLUE | Curses.A_BOLD;
 			case Color.BrightGreen:
 				return Curses.COLOR_GREEN | Curses.A_BOLD;
-			case Color.BrighCyan:
+			case Color.BrightCyan:
 				return Curses.COLOR_CYAN | Curses.A_BOLD;
 			case Color.BrightRed:
 				return Curses.COLOR_RED | Curses.A_BOLD;
@@ -696,6 +903,48 @@ namespace Terminal.Gui {
 		{
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
+		}
+
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
+		}
+
+		/// <inheritdoc/>
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = CursorVisibility.Invisible;
+
+			if (!currentCursorVisibility.HasValue)
+				return false;
+
+			visibility = currentCursorVisibility.Value;
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			if (initialCursorVisibility.HasValue == false)
+				return false;
+
+			Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+
+			if (visibility != CursorVisibility.Invisible) {
+				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
+				Console.Out.Flush ();
+			}
+
+			currentCursorVisibility = visibility;
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool EnsureCursorVisibility ()
+		{
+			return false;
 		}
 	}
 
@@ -758,7 +1007,5 @@ namespace Terminal.Gui {
 			killpg (0, signal);
 			return true;
 		}
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
-
 }

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FakeDriver
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.7.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -231,9 +231,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver__ctor_" data-uid="Terminal.Gui.FakeDriver.#ctor*"></a>
   <h4 id="Terminal_Gui_FakeDriver__ctor" data-uid="Terminal.Gui.FakeDriver.#ctor">FakeDriver()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -245,9 +243,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_Cols_" data-uid="Terminal.Gui.FakeDriver.Cols*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Cols" data-uid="Terminal.Gui.FakeDriver.Cols">Cols</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -272,11 +268,36 @@ Implements a mock ConsoleDriver for unit testing
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols">ConsoleDriver.Cols</a></div>
   
   
+  <a id="Terminal_Gui_FakeDriver_HeightAsBuffer_" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_HeightAsBuffer" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer">HeightAsBuffer</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool HeightAsBuffer { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HeightAsBuffer">ConsoleDriver.HeightAsBuffer</a></div>
+  
+  
   <a id="Terminal_Gui_FakeDriver_Rows_" data-uid="Terminal.Gui.FakeDriver.Rows*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Rows" data-uid="Terminal.Gui.FakeDriver.Rows">Rows</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -299,15 +320,40 @@ Implements a mock ConsoleDriver for unit testing
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Rows">ConsoleDriver.Rows</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_Top_" data-uid="Terminal.Gui.FakeDriver.Top*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Top" data-uid="Terminal.Gui.FakeDriver.Top">Top</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int Top { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Top">ConsoleDriver.Top</a></div>
   <h3 id="methods">Methods
   </h3>
   
   
   <a id="Terminal_Gui_FakeDriver_AddRune_" data-uid="Terminal.Gui.FakeDriver.AddRune*"></a>
   <h4 id="Terminal_Gui_FakeDriver_AddRune_System_Rune_" data-uid="Terminal.Gui.FakeDriver.AddRune(System.Rune)">AddRune(Rune)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -336,9 +382,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_AddStr_" data-uid="Terminal.Gui.FakeDriver.AddStr*"></a>
   <h4 id="Terminal_Gui_FakeDriver_AddStr_NStack_ustring_" data-uid="Terminal.Gui.FakeDriver.AddStr(NStack.ustring)">AddStr(ustring)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -367,9 +411,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_CookMouse_" data-uid="Terminal.Gui.FakeDriver.CookMouse*"></a>
   <h4 id="Terminal_Gui_FakeDriver_CookMouse" data-uid="Terminal.Gui.FakeDriver.CookMouse">CookMouse()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -381,9 +423,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_End_" data-uid="Terminal.Gui.FakeDriver.End*"></a>
   <h4 id="Terminal_Gui_FakeDriver_End" data-uid="Terminal.Gui.FakeDriver.End">End()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -393,11 +433,111 @@ Implements a mock ConsoleDriver for unit testing
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_End">ConsoleDriver.End()</a></div>
   
   
+  <a id="Terminal_Gui_FakeDriver_EnsureCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_EnsureCursorVisibility" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility">EnsureCursorVisibility()</h4>
+  <div class="markdown level1 summary">
+Ensure the cursor visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool EnsureCursorVisibility()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_EnsureCursorVisibility">ConsoleDriver.EnsureCursorVisibility()</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_GetAttribute_" data-uid="Terminal.Gui.FakeDriver.GetAttribute*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_GetAttribute" data-uid="Terminal.Gui.FakeDriver.GetAttribute">GetAttribute()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override Attribute GetAttribute()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetAttribute">ConsoleDriver.GetAttribute()</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_GetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)">GetCursorVisibility(out CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Retreive the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool GetCursorVisibility(out CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The current <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__">ConsoleDriver.GetCursorVisibility(out CursorVisibility)</a></div>
+  
+  
   <a id="Terminal_Gui_FakeDriver_Init_" data-uid="Terminal.Gui.FakeDriver.Init*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Init_System_Action_" data-uid="Terminal.Gui.FakeDriver.Init(System.Action)">Init(Action)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -426,9 +566,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_MakeAttribute_" data-uid="Terminal.Gui.FakeDriver.MakeAttribute*"></a>
   <h4 id="Terminal_Gui_FakeDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)">MakeAttribute(Color, Color)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -477,9 +615,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_Move_" data-uid="Terminal.Gui.FakeDriver.Move*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Move_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.Move(System.Int32,System.Int32)">Move(Int32, Int32)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -513,9 +649,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_PrepareToRun_" data-uid="Terminal.Gui.FakeDriver.PrepareToRun*"></a>
   <h4 id="Terminal_Gui_FakeDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__" data-uid="Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})">PrepareToRun(MainLoop, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;MouseEvent&gt;)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -564,9 +698,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_Refresh_" data-uid="Terminal.Gui.FakeDriver.Refresh*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Refresh" data-uid="Terminal.Gui.FakeDriver.Refresh">Refresh()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -578,9 +710,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_SetAttribute_" data-uid="Terminal.Gui.FakeDriver.SetAttribute*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetAttribute_Terminal_Gui_Attribute_" data-uid="Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)">SetAttribute(Attribute)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -609,9 +739,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_SetColors_" data-uid="Terminal.Gui.FakeDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetColors_System_ConsoleColor_System_ConsoleColor_" data-uid="Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor,System.ConsoleColor)">SetColors(ConsoleColor, ConsoleColor)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -645,9 +773,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_SetColors_" data-uid="Terminal.Gui.FakeDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetColors_System_Int16_System_Int16_" data-uid="Terminal.Gui.FakeDriver.SetColors(System.Int16,System.Int16)">SetColors(Int16, Int16)</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -679,11 +805,55 @@ Implements a mock ConsoleDriver for unit testing
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetColors_System_Int16_System_Int16_">ConsoleDriver.SetColors(Int16, Int16)</a></div>
   
   
+  <a id="Terminal_Gui_FakeDriver_SetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)">SetCursorVisibility(CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Change the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool SetCursorVisibility(CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The wished <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_">ConsoleDriver.SetCursorVisibility(CursorVisibility)</a></div>
+  
+  
   <a id="Terminal_Gui_FakeDriver_StartReportingMouseMoves_" data-uid="Terminal.Gui.FakeDriver.StartReportingMouseMoves*"></a>
   <h4 id="Terminal_Gui_FakeDriver_StartReportingMouseMoves" data-uid="Terminal.Gui.FakeDriver.StartReportingMouseMoves">StartReportingMouseMoves()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -695,9 +865,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_StopReportingMouseMoves_" data-uid="Terminal.Gui.FakeDriver.StopReportingMouseMoves*"></a>
   <h4 id="Terminal_Gui_FakeDriver_StopReportingMouseMoves" data-uid="Terminal.Gui.FakeDriver.StopReportingMouseMoves">StopReportingMouseMoves()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -709,9 +877,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_Suspend_" data-uid="Terminal.Gui.FakeDriver.Suspend*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Suspend" data-uid="Terminal.Gui.FakeDriver.Suspend">Suspend()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -723,9 +889,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_UncookMouse_" data-uid="Terminal.Gui.FakeDriver.UncookMouse*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UncookMouse" data-uid="Terminal.Gui.FakeDriver.UncookMouse">UncookMouse()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -737,9 +901,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_UpdateCursor_" data-uid="Terminal.Gui.FakeDriver.UpdateCursor*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UpdateCursor" data-uid="Terminal.Gui.FakeDriver.UpdateCursor">UpdateCursor()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -751,9 +913,7 @@ Implements a mock ConsoleDriver for unit testing
   
   <a id="Terminal_Gui_FakeDriver_UpdateScreen_" data-uid="Terminal.Gui.FakeDriver.UpdateScreen*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UpdateScreen" data-uid="Terminal.Gui.FakeDriver.UpdateScreen">UpdateScreen()</h4>
-  <div class="markdown level1 summary">
-
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -771,7 +931,8 @@ Implements a mock ConsoleDriver for unit testing
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

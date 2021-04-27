@@ -61,22 +61,14 @@ The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-u
 > 
 > ✔️ DO name event handlers (delegates used as types of events) with the "EventHandler" suffix, as shown in the following example:
 > 
-> public delegate void ClickedEventHandler(object sender, ClickedEventArgs e);
-> 
-> ✔️ DO use two parameters named sender and e in event handlers.
-> 
-> The sender parameter represents the object that raised the event. The sender parameter is typically of type object, even if it is possible to employ a more specific type.
-> 
 > ✔️ DO name event argument classes with the "EventArgs" suffix.
 
-We are not currently consistent along these lines in `Terminal.Gui` at all. This leads to friction for adopters and bugs. As we take on fixing this we use the following guidelines:
-
 1. We follow the naming guidelines provided in https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN
-2. We use the `Action<T>` idiom for internal APIs, not for public APIs. For public APIs we use the `event/EventHandler` model.
+2. We use the `event Action<T>` idiom.
 3. For public APIs, the class that can raise the event will implement:
    - A `virtual` event raising function, named as `OnEventToRaise`. Typical implementations will simply do a `EventToRaise?.Invoke(this, eventArgs)`.
-   - An `event` as in `public event EventHandler<EventToRaiseArgs> EventToRaise`
-   - Consumers of the event can do `theobject.EventToRaise += (sender, e) => {};`
+   - An `event` as in `public event Action<EventArgs> EventToRaise`
+   - Consumers of the event can do `theobject.EventToRaise += (args) => {};`
    - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 

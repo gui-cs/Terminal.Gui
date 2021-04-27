@@ -250,6 +250,7 @@ namespace Unix.Terminal {
 		//static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => methods.wredrawwin (win, beg_line, num_lines);
 		static public int wnoutrefresh (IntPtr win) => methods.wnoutrefresh (win);
 		static public int move (int line, int col) => methods.move (line, col);
+		static public int curs_set (int visibility) => methods.curs_set (visibility);
 		//static public int addch (int ch) => methods.addch (ch);
 		static public int addwstr (string s) => methods.addwstr (s);
 		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
@@ -271,7 +272,9 @@ namespace Unix.Terminal {
 		static public int mouseinterval (int interval) => methods.mouseinterval (interval);
 	}
 
+#pragma warning disable RCS1102 // Make class static.
 	internal class Delegates {
+#pragma warning restore RCS1102 // Make class static.
 		public delegate IntPtr initscr ();
 		public delegate int endwin ();
 		public delegate bool isendwin ();
@@ -308,6 +311,7 @@ namespace Unix.Terminal {
 		//public delegate int wredrawwin (IntPtr win, int beg_line, int num_lines);
 		public delegate int wnoutrefresh (IntPtr win);
 		public delegate int move (int line, int col);
+		public delegate int curs_set (int visibility);
 		public delegate int addch (int ch);
 		public delegate int addwstr([MarshalAs(UnmanagedType.LPWStr)]string s);
 		public delegate int wmove (IntPtr win, int line, int col);
@@ -367,6 +371,7 @@ namespace Unix.Terminal {
 		//public readonly Delegates.wredrawwin wredrawwin;
 		public readonly Delegates.wnoutrefresh wnoutrefresh;
 		public readonly Delegates.move move;
+		public readonly Delegates.curs_set curs_set;
 		public readonly Delegates.addch addch;
 		public readonly Delegates.addwstr addwstr;
 		public readonly Delegates.wmove wmove;
@@ -428,6 +433,7 @@ namespace Unix.Terminal {
 			//wredrawwin = lib.GetNativeMethodDelegate<Delegates.wredrawwin> ("wredrawwin");
 			wnoutrefresh = lib.GetNativeMethodDelegate<Delegates.wnoutrefresh> ("wnoutrefresh");
 			move = lib.GetNativeMethodDelegate<Delegates.move> ("move");
+			curs_set = lib.GetNativeMethodDelegate<Delegates.curs_set> ("curs_set");
 			addch = lib.GetNativeMethodDelegate<Delegates.addch>("addch");
 			addwstr = lib.GetNativeMethodDelegate<Delegates.addwstr> ("addwstr");
 			wmove = lib.GetNativeMethodDelegate<Delegates.wmove> ("wmove");

@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// or more <see cref="Button"/>s. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.
 	/// </summary>
 	/// <remarks>
-	///  To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to <see cref="Application.Run()"/>. 
+	///  To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to <see cref="Application.Run(Func{Exception, bool})"/>. 
 	///  This will execute the dialog until it terminates via the [ESC] or [CTRL-Q] key, or when one of the views
 	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
 		/// container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
 		/// <remarks>
 		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
@@ -73,7 +73,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </para>
 		/// <para>
 		/// Use <see cref="AddButton(Button)"/> to add buttons to the dialog.
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		/// <remarks>
 		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
 		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
 
@@ -104,6 +104,7 @@ namespace Terminal.Gui {
 
 			buttons.Add (button);
 			Add (button);
+			SetNeedsDisplay ();
 			LayoutSubviews ();
 		}
 
@@ -112,7 +113,7 @@ namespace Terminal.Gui {
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
+			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count - 1;
 		}
 
 		void LayoutStartedHandler ()

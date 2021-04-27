@@ -8,7 +8,7 @@
     <title>To Generate the Docs </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="To Generate the Docs ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.7.0">
     
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="styles/docfx.vendor.css">
@@ -59,11 +59,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -71,13 +71,14 @@
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
 
-<p>This folder generates the API docs for Terminal.Gui</p>
+<p>This folder generates the API docs for Terminal.Gui. </p>
+<p>The API documentation is generated using the <a href="https://github.com/dotnet/docfx">DocFX tool</a>. The output of docfx gets put into the <code>./docs</code> folder which is then checked in. The <code>./docs</code> folder is then picked up by Github Pages and published to Miguel&#39;s Github Pages (<a href="https://migueldeicaza.github.io/gui.cs/">https://migueldeicaza.github.io/gui.cs/</a>).</p>
 <h2 id="to-generate-the-docs">To Generate the Docs</h2>
 <ol>
-<li>Do a <code>Release</code> build on <code>master</code>. This will cause all <code>/// &lt;inheritdoc/&gt;</code> references to be updated.</li>
-<li>Change in to the <code>docfx/</code> directory.</li>
-<li>Type <code>docfx --metadata</code> to generate metadata</li>
-<li>Type <code>docfx --serve</code> to generate the docs and start a local webserver for testing.</li>
+<li>Install DotFX <a href="https://dotnet.github.io/docfx/tutorial/docfx_getting_started.html">https://dotnet.github.io/docfx/tutorial/docfx_getting_started.html</a></li>
+<li>Change to the <code>./docfx</code> folder and run <code>./build.ps1</code></li>
+<li>Browse to <a href="http://localhost:8080">http://localhost:8080</a> and verify everything looks good.</li>
+<li>Hit ctrl-c to stop the script.</li>
 </ol>
 <p>If <code>docfx</code> fails with a <code>Stackoverflow</code> error. Just run it again. And again. Sometimes it takes a few times. If that doesn&#39;t work, create a fresh clone or delete the <code>docfx/api</code>, <code>docfx/obj</code>, and <code>docs/</code> folders and run the steps above again.</p>
 </article>
@@ -90,7 +91,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

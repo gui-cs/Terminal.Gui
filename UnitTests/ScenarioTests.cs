@@ -43,10 +43,14 @@ namespace Terminal.Gui {
 			Assert.NotEmpty (scenarioClasses);
 
 			foreach (var scenarioClass in scenarioClasses) {
+
 				// Setup some fake keypresses 
 				// Passing empty string will cause just a ctrl-q to be fired
 				Console.MockKeyPresses.Clear ();
 				int stackSize = CreateInput ("");
+
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
 				int iterations = 0;
 				Application.Iteration = () => {
 					iterations++;
@@ -55,7 +59,6 @@ namespace Terminal.Gui {
 						Application.RequestStop ();
 					}
 				};
-				Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
 				var ms = 1000;
 				var abortCount = 0;
@@ -99,6 +102,8 @@ namespace Terminal.Gui {
 			// Passing empty string will cause just a ctrl-q to be fired
 			int stackSize = CreateInput ("");
 
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
 			int iterations = 0;
 			Application.Iteration = () => {
 				iterations++;
@@ -107,7 +112,6 @@ namespace Terminal.Gui {
 					Application.RequestStop ();
 				}
 			};
-			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var ms = 1000;
 			var abortCount = 0;
@@ -119,7 +123,7 @@ namespace Terminal.Gui {
 			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
 			Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
-				Assert.Equal (Key.ControlQ, args.KeyEvent.Key);
+				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
 			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
@@ -132,8 +136,9 @@ namespace Terminal.Gui {
 
 			Assert.Equal (0, abortCount);
 			// # of key up events should match # of iterations
-			//Assert.Equal (1, iterations);
-			Assert.Equal (stackSize, iterations);
+			Assert.Equal (1, iterations);
+			// Using variable in the left side of Assert.Equal/NotEqual give error. Must be used literals values.
+			//Assert.Equal (stackSize, iterations);
 
 #if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {

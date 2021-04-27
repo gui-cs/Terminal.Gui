@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.DeleteChar:
-			case Key.ControlD:
+			case Key.D | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
@@ -235,28 +235,28 @@ namespace Terminal.Gui {
 
 			// Home, C-A
 			case Key.Home:
-			case Key.ControlA:
+			case Key.A | Key.CtrlMask:
 				CursorPosition = 1;
 				break;
 
 			case Key.CursorLeft:
-			case Key.ControlB:
+			case Key.B | Key.CtrlMask:
 				DecCursorPosition ();
 				break;
 
 			case Key.End:
-			case Key.ControlE: // End
+			case Key.E | Key.CtrlMask: // End
 				CursorPosition = FieldLen;
 				break;
 
 			case Key.CursorRight:
-			case Key.ControlF:
+			case Key.F | Key.CtrlMask:
 				IncCursorPosition ();
 				break;
 
 			default:
 				// Ignore non-numeric characters.
-				if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9'))
+				if (kb.Key < (Key)((int)Key.D0) || kb.Key > (Key)((int)Key.D9))
 					return false;
 
 				if (ReadOnly)

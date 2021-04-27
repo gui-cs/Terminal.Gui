@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuBarItem
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.7.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -99,7 +99,10 @@ A <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> contains 
       <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_HotKey">MenuItem.HotKey</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_ShortCut">MenuItem.ShortCut</a>
+      <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Shortcut">MenuItem.Shortcut</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_ShortcutTag">MenuItem.ShortcutTag</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Title">MenuItem.Title</a>
@@ -214,6 +217,45 @@ Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarIt
         <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
         <td><span class="parametername">canExecute</span></td>
         <td>Function to determine if the action can currently be executed.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">parent</span></td>
+        <td>The parent <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> of this if exist, otherwise is null.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuBarItem__ctor_" data-uid="Terminal.Gui.MenuBarItem.#ctor*"></a>
+  <h4 id="Terminal_Gui_MenuBarItem__ctor_NStack_ustring_System_Collections_Generic_List_Terminal_Gui_MenuItem____Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.Collections.Generic.List{Terminal.Gui.MenuItem[]},Terminal.Gui.MenuItem)">MenuBarItem(ustring, List&lt;MenuItem[]&gt;, MenuItem)</h4>
+  <div class="markdown level1 summary">
+Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> with separate list of items.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuBarItem(ustring title, List&lt;MenuItem[]&gt; children, MenuItem parent = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the menu item.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>[]&gt;</td>
+        <td><span class="parametername">children</span></td>
+        <td>The list of items in the current menu.</td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
@@ -463,7 +505,8 @@ Check if the children parameter is a <a class="xref" href="Terminal.Gui.MenuBarI
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

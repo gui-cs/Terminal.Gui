@@ -93,6 +93,12 @@ namespace UICatalog {
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);
 
+			void Top_Loaded ()
+			{
+				_btnActionCancel.SetFocus ();
+				Top.Loaded -= Top_Loaded;
+			}
+			Top.Loaded += Top_Loaded;
 		}
 
 		private async void LoadData ()
@@ -127,6 +133,7 @@ namespace UICatalog {
 			await Task.Delay (3000);
 			LogJob ("Returning from task method");
 			await _itemsList.SetSourceAsync (items);
+			_itemsList.SetNeedsDisplay ();
 		}
 
 		private CancellationTokenSource cancellationTokenSource;

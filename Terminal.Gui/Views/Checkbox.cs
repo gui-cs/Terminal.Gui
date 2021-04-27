@@ -100,8 +100,11 @@ namespace Terminal.Gui {
 				hot_pos = -1;
 				hot_key = (char)0;
 				foreach (Rune c in text) {
-					if (Rune.IsUpper (c)) {
-						hot_key = c;
+					//if (Rune.IsUpper (c)) {
+					if (c == '_') {
+						hot_key = text [i + 1];
+						HotKey = (Key)(char)hot_key.ToString ().ToUpper () [0];
+						text = text.ToString ().Replace ("_", "");
 						hot_pos = i;
 						break;
 					}
@@ -146,6 +149,21 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				SetFocus ();
+				var previousChecked = Checked;
+				Checked = !Checked;
+				OnToggled (previousChecked);
+				SetNeedsDisplay ();
+				return true;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
@@ -158,6 +176,14 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 
 			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 }

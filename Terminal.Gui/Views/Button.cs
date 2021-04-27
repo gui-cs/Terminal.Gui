@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
-		public Button (ustring text, bool is_default = false) : base ()
+		public Button (ustring text, bool is_default = false) : base (text)
 		{
 			Init (text, is_default);
 		}
@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
 		public Button (int x, int y, ustring text, bool is_default)
-		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1))
+		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1), text)
 		{
 			Init (text, is_default);
 		}
@@ -107,8 +107,9 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
-			this.IsDefault = is_default;
-			Text = text ?? string.Empty;
+			this.is_default = is_default;
+			this.text = text ?? string.Empty;
+			Update ();
 		}
 
 		/// <summary>
@@ -145,8 +146,25 @@ namespace Terminal.Gui {
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			Width = w;
+			GetCurrentWidth (out int cWidth);
+			var canSetWidth = SetWidth (w, out int rWidth);
+			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
+				Width = rWidth;
+				w = rWidth;
+			} else if (!canSetWidth || !AutoSize) {
+				w = cWidth;
+			}
+			var layout = LayoutStyle;
+			bool layoutChanged = false;
+			if (!(Height is Dim.DimAbsolute)) {
+				// The height is always equal to 1 and must be Dim.DimAbsolute.
+				layoutChanged = true;
+				LayoutStyle = LayoutStyle.Absolute;
+			}
 			Height = 1;
+			if (layoutChanged) {
+				LayoutStyle = layout;
+			}
 			Frame = new Rect (Frame.Location, new Size (w, 1));
 			SetNeedsDisplay ();
 		}
@@ -233,6 +251,14 @@ namespace Terminal.Gui {
 				}
 			}
 			base.PositionCursor ();
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 }

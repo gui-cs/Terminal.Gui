@@ -15,15 +15,12 @@ namespace Terminal.Gui {
 	/// Implements a mock ConsoleDriver for unit testing
 	/// </summary>
 	public class FakeDriver : ConsoleDriver {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		int cols, rows;
-		/// <summary>
-		/// 
-		/// </summary>
 		public override int Cols => cols;
-		/// <summary>
-		/// 
-		/// </summary>
 		public override int Rows => rows;
+		public override int Top => 0;
+		public override bool HeightAsBuffer { get; set; }
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -49,9 +46,6 @@ namespace Terminal.Gui {
 
 		static bool sync = false;
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public FakeDriver ()
 		{
 			cols = FakeConsole.WindowWidth;
@@ -62,11 +56,6 @@ namespace Terminal.Gui {
 		bool needMove;
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="col"></param>
-		/// <param name="row"></param>
 		public override void Move (int col, int row)
 		{
 			ccol = col;
@@ -84,10 +73,6 @@ namespace Terminal.Gui {
 
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="rune"></param>
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
@@ -113,19 +98,12 @@ namespace Terminal.Gui {
 				UpdateScreen ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="str"></param>
 		public override void AddStr (ustring str)
 		{
 			foreach (var rune in str)
 				AddRune (rune);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void End ()
 		{
 			FakeConsole.ResetColor ();
@@ -135,13 +113,13 @@ namespace Terminal.Gui {
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+			return new Attribute (
+				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
+				foreground: (Color)f,
+				background: (Color)b
+				);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="terminalResized"></param>
 		public override void Init (Action terminalResized)
 		{
 			Colors.TopLevel = new ColorScheme ();
@@ -185,12 +163,6 @@ namespace Terminal.Gui {
 			//MockConsole.Clear ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="fore"></param>
-		/// <param name="back"></param>
-		/// <returns></returns>
 		public override Attribute MakeAttribute (Color fore, Color back)
 		{
 			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
@@ -211,9 +183,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void UpdateScreen ()
 		{
 			int rows = Rows;
@@ -233,9 +202,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void Refresh ()
 		{
 			int rows = Rows;
@@ -267,76 +233,62 @@ namespace Terminal.Gui {
 			FakeConsole.CursorLeft = savedCol;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void UpdateCursor ()
 		{
 			//
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void StartReportingMouseMoves ()
 		{
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void StopReportingMouseMoves ()
 		{
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void Suspend ()
 		{
 		}
 
 		int currentAttribute;
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="c"></param>
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c.Value;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
-				return Key.Esc;
+				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
-				return Key.End;
+				return MapKeyModifiers (keyInfo, Key.End);
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return MapKeyModifiers (keyInfo, Key.CursorLeft);
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return MapKeyModifiers (keyInfo, Key.CursorRight);
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return MapKeyModifiers (keyInfo, Key.CursorUp);
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return MapKeyModifiers (keyInfo, Key.CursorDown);
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return MapKeyModifiers (keyInfo, Key.PageUp);
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return MapKeyModifiers (keyInfo, Key.PageDown);
 			case ConsoleKey.Enter:
-				return Key.Enter;
+				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return Key.Space;
+				return MapKeyModifiers (keyInfo, Key.Space);
 			case ConsoleKey.Backspace:
-				return Key.Backspace;
+				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			case ConsoleKey.Insert:
+				return MapKeyModifiers (keyInfo, Key.InsertChar);
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -351,91 +303,142 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
+				if (keyInfo.KeyChar == 0)
+					return Key.Unknown;
+
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 
 			var key = keyInfo.Key;
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.ControlA + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)'A' + delta);
-				else
-					return (Key)((uint)'a' + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+				}
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0) {
+						return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.A + delta));
+					} else {
+						return (Key)((uint)keyInfo.KeyChar);
+					}
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)keyInfo.KeyChar);
-				return (Key)((uint)'0' + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				}
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				}
 
-				return (Key)((int)Key.F1 + delta);
+				return (Key)((uint)Key.F1 + delta);
 			}
+
 			return (Key)(0xffffffff);
 		}
 
-		KeyModifiers keyModifiers = new KeyModifiers ();
+		KeyModifiers keyModifiers;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="mainLoop"></param>
-		/// <param name="keyHandler"></param>
-		/// <param name="keyDownHandler"></param>
-		/// <param name="keyUpHandler"></param>
-		/// <param name="mouseHandler"></param>
+		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		{
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+				keyMod = Key.ShiftMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+				keyMod |= Key.CtrlMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+				keyMod |= Key.AltMask;
+
+			return keyMod != Key.Null ? keyMod | key : key;
+		}
+
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as NetMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+			(mainLoop.Driver as FakeMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
+
+				if (keyModifiers == null)
+					keyModifiers = new KeyModifiers ();
+				switch (consoleKey.Modifiers) {
+				case ConsoleModifiers.Alt:
+					keyModifiers.Alt = true;
+					break;
+				case ConsoleModifiers.Shift:
+					keyModifiers.Shift = true;
+					break;
+				case ConsoleModifiers.Control:
+					keyModifiers.Ctrl = true;
+					break;
+				}
+
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
+				keyModifiers = new KeyModifiers ();
 			};
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="foreground"></param>
-		/// <param name="background"></param>
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		public override Attribute GetAttribute ()
 		{
-			throw new NotImplementedException ();
+			return currentAttribute;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="foregroundColorId"></param>
-		/// <param name="backgroundColorId"></param>
+		#region Unused
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		{
+		}
+
 		public override void SetColors (short foregroundColorId, short backgroundColorId)
 		{
 			throw new NotImplementedException ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void CookMouse ()
 		{
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
 		public override void UncookMouse ()
 		{
 		}
+
+		/// <inheritdoc/>
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = CursorVisibility.Default;
+
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public override bool EnsureCursorVisibility ()
+		{
+			return false;
+		}
+
+		#endregion
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 }
