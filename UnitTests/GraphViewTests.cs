@@ -5,6 +5,7 @@ using Terminal.Gui;
 using Xunit;
 using Terminal.Gui.Graphs;
 using Point = Terminal.Gui.Point;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace UnitTests {
 		
@@ -457,6 +458,129 @@ namespace UnitTests {
 				drawSeries (graph, bounds, graphBounds);
 			}
 		}
+	}
+
+	public class MultiBarSeriesTests{
+
+		private void InitFakeDriver ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+		}
+
+		[Fact]
+		public void MultiBarSeries_BarSpacing(){
+			
+			// Creates clusters of 5 adjacent bars with 2 spaces between clusters
+			var series = new MultiBarSeries(5,7,1);
+
+			Assert.Equal(5,series.SubSeries.Count);
+
+			Assert.Equal(0,series.SubSeries.ElementAt(0).Offset);
+			Assert.Equal(1,series.SubSeries.ElementAt(1).Offset);
+			Assert.Equal(2,series.SubSeries.ElementAt(2).Offset);
+			Assert.Equal(3,series.SubSeries.ElementAt(3).Offset);
+			Assert.Equal(4,series.SubSeries.ElementAt(4).Offset);
+		}
+
+
+		[Fact]
+		public void MultiBarSeriesColors_WrongNumber(){
+			
+			var colors = new []{
+				new Attribute(Color.Green,Color.Black)
+			};
+
+			// user passes 1 color only but asks for 5 bars
+			var ex = Assert.Throws<ArgumentException>(()=>new MultiBarSeries(5,7,1,colors));
+			Assert.Equal("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",ex.Message);
+		}
+
+
+		[Fact]
+		public void MultiBarSeriesColors_RightNumber(){
+			
+			var colors = new []{
+				new Attribute(Color.Green,Color.Black),
+				new Attribute(Color.Green,Color.White),
+				new Attribute(Color.BrightYellow,Color.White)
+			};
+
+			// user passes 3 colors and asks for 3 bars
+			var series = new MultiBarSeries(3,7,1,colors);
+
+			Assert.Equal(series.SubSeries.ElementAt(0).OverrideBarColor,colors[0]);
+			Assert.Equal(series.SubSeries.ElementAt(1).OverrideBarColor,colors[1]);
+			Assert.Equal(series.SubSeries.ElementAt(2).OverrideBarColor,colors[2]);
+		}
+
+
+		[Fact]
+		public void MultiBarSeriesAddValues_WrongNumber(){
+			
+			// user asks for 3 bars per category
+			var series = new MultiBarSeries(3,7,1);
+
+			var ex = Assert.Throws<ArgumentException>(()=>series.AddBars("Cars",'#',1));
+
+			Assert.Equal("Number of values must match the number of bars per category (Parameter 'values')",ex.Message);
+		}
+
+
+
+		[Fact]
+		public void TestRendering_MultibarSeries(){
+
+			InitFakeDriver();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+
+			// y axis goes from 0.1 to 1 across 10 console rows
+			// x axis goes from 0 to 10 across 20 console columns
+			gv.Bounds = new Rect (0, 0, 20, 10);
+			gv.CellSize = new PointF(0.5f,0.1f);
+
+			var multibarSeries = new MultiBarSeries (2,4,1);
+
+			gv.Series.Add (multibarSeries);
+
+			FakeHAxis fakeXAxis;
+
+			// don't show axis labels that means any labels
+			// that appaer are explicitly from the bars
+			gv.AxisX = fakeXAxis = new FakeHAxis(){Increment=0};
+			gv.AxisY = new FakeVAxis(){Increment=0};
+
+			gv.Redraw(gv.Bounds);
+
+			// Since bar series has no bars yet no labels should be displayed
+			Assert.Empty(fakeXAxis.LabelPoints);
+
+			multibarSeries.AddBars("hey",'M',10,20);
+			fakeXAxis.LabelPoints.Clear();
+			gv.Redraw(gv.Bounds);
+	
+			// Bar spacing is 4f but 2 screen units per 1 graph unit (cell size X is 0.5f)
+			Assert.Equal(8,fakeXAxis.LabelPoints.Single());
+
+			multibarSeries.AddBars("there",'M',11,21);
+			multibarSeries.AddBars("bob",'M',1,2);
+			fakeXAxis.LabelPoints.Clear();
+			gv.Redraw(gv.Bounds);
+
+			// there is only space for 2 bars to be rendered (width = 20)
+			Assert.Equal(2,fakeXAxis.LabelPoints.Count);
+			Assert.Equal(8,fakeXAxis.LabelPoints[0]);
+			Assert.Equal(16,fakeXAxis.LabelPoints[1]);
+
+			
+
+
+		}
+
+				
 	}
 
 	public class BarSeriesTests{
