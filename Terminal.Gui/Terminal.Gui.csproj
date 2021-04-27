@@ -40,6 +40,10 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.0.0-rc.10
+      * Fixes #931. Fixed the limit 25 lines issue
+      * Fixes #1251. Fixes TextValidateProvider exception on the All View Tester scenario.
+
       v1.0.0-rc.9
       * Fixes #1210. Added AllowsReturn, AllowsTab and Multiline into the TextView.
       * Fixes #1241. Added SendKeys feature to the ConsoleDriver.
