@@ -40,7 +40,7 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
-      v1.0.0-rc.11
+      v1.0.0-rc.12
       * Fixes #1257 - ListView's ProcessKey should return false if no OpenSelectedItem handler is defined
 
       v1.0.0-rc.10
