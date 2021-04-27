@@ -6,6 +6,7 @@ using Xunit;
 using Terminal.Gui.Graphs;
 using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
+using System.Text;
 
 namespace UnitTests {
 		
@@ -538,11 +539,18 @@ namespace UnitTests {
 			gv.ColorScheme = new ColorScheme ();
 
 			// y axis goes from 0.1 to 1 across 10 console rows
-			// x axis goes from 0 to 10 across 20 console columns
+			// x axis goes from 0 to 20 across 20 console columns
 			gv.Bounds = new Rect (0, 0, 20, 10);
-			gv.CellSize = new PointF(0.5f,0.1f);
+			gv.CellSize = new PointF(1f,0.1f);
+			gv.MarginBottom = 1;
+			gv.MarginLeft = 1;
 
 			var multibarSeries = new MultiBarSeries (2,4,1);
+			
+			//nudge them left to avoid float rounding errors at the boundaries of cells
+			foreach(var sub in multibarSeries.SubSeries) {
+				sub.Offset -= 0.001f;
+			}
 
 			gv.Series.Add (multibarSeries);
 
@@ -558,29 +566,65 @@ namespace UnitTests {
 			// Since bar series has no bars yet no labels should be displayed
 			Assert.Empty(fakeXAxis.LabelPoints);
 
-			multibarSeries.AddBars("hey",'M',10,20);
+			multibarSeries.AddBars("hey",'M',0.5001f, 0.5001f);
 			fakeXAxis.LabelPoints.Clear();
 			gv.Redraw(gv.Bounds);
 	
-			// Bar spacing is 4f but 2 screen units per 1 graph unit (cell size X is 0.5f)
-			Assert.Equal(8,fakeXAxis.LabelPoints.Single());
+			Assert.Equal(4,fakeXAxis.LabelPoints.Single());
 
-			multibarSeries.AddBars("there",'M',11,21);
+			multibarSeries.AddBars("there",'M',0.24999f,0.74999f);
 			multibarSeries.AddBars("bob",'M',1,2);
 			fakeXAxis.LabelPoints.Clear();
 			gv.Redraw(gv.Bounds);
 
-			// there is only space for 2 bars to be rendered (width = 20)
-			Assert.Equal(2,fakeXAxis.LabelPoints.Count);
-			Assert.Equal(8,fakeXAxis.LabelPoints[0]);
-			Assert.Equal(16,fakeXAxis.LabelPoints[1]);
+			Assert.Equal(3,fakeXAxis.LabelPoints.Count);
+			Assert.Equal(4,fakeXAxis.LabelPoints[0]);
+			Assert.Equal(8,fakeXAxis.LabelPoints[1]);
+			Assert.Equal (12, fakeXAxis.LabelPoints [2]);
 
-			
-
-
+			string looksLike =
+@" 
+ │          MM                                                                  
+ │       M  MM                                                                  
+ │       M  MM                                                                  
+ │  MM   M  MM                                                                  
+ │  MM   M  MM                                                                  
+ │  MM   M  MM                                                                  
+ │  MM  MM  MM                                                                  
+ │  MM  MM  MM                                                                  
+ ┼──┬M──┬M──┬M──────                                                            
+   heytherebob  ";
+			AssertDriverContentsAre (looksLike);
 		}
 
-				
+		private void AssertDriverContentsAre (string expectedLook)
+		{
+
+			var sb = new StringBuilder ();
+			var driver = ((FakeDriver)Application.Driver);
+
+			var contents = driver.Contents;
+
+			for (int r = 0; r < driver.Rows; r++) {
+				for (int c = 0; c < driver.Cols; c++) {
+					sb.Append ((char)contents [r, c, 0]);
+				}
+				sb.AppendLine ();
+			}
+
+			var look = sb.ToString ();
+
+			if(!string.Equals(expectedLook,look)) {
+
+				expectedLook = expectedLook.Trim ().Replace("\r\n","\n");
+				look = look.Trim ().Replace ("\r\n", "\n");
+
+				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				Console.WriteLine ("But Was:" + Environment.NewLine + look);
+
+				Assert.Equal (expectedLook, look);
+			}
+		}
 	}
 
 	public class BarSeriesTests{
