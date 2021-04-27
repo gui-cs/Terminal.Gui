@@ -26,14 +26,14 @@ namespace UICatalog.Scenarios {
 			Top.LayoutSubviews ();
 
 			graphs = new Action [] {
-				 ()=>SetupPeriodicTableScatterPlot(),   //0
-				 ()=>SetupLifeExpectancyBarGraph(true), //1
-				 ()=>SetupLifeExpectancyBarGraph(false),//2
-				 ()=>SetupPopulationPyramid(),          //3
-				 ()=>SetupLineGraph(),                  //4
-				 ()=>SetupSineWave(),                   //5
-				 ()=>SetupDisco(),                      //6
-				 ()=>MultiBarGraph()                    //7
+				 ()=>SetupPeriodicTableScatterPlot(),    //0
+				 ()=>SetupLifeExpectancyBarGraph(true),  //1
+				 ()=>SetupLifeExpectancyBarGraph(false), //2
+				 ()=>SetupPopulationPyramid(),           //3
+				 ()=>SetupLineGraph(),                   //4
+				 ()=>SetupSineWave(),                    //5
+				 ()=>SetupDisco(),                       //6
+				 ()=>MultiBarGraph()                     //7
 			};
 
 
