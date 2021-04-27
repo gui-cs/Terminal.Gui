@@ -392,17 +392,15 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		public void Empty_Mask_Validates_Everything ()
+		public void Empty_Mask_Does_Not_Validate ()
 		{
-			// Maybe it's not the right behaviour.
-
 			var field = new TextValidateField<TextRegexProvider> () {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
-			Assert.Equal ("1", field.Text);
-			Assert.True (field.IsValid);
+			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers ()));
+			Assert.Equal ("", field.Text);
+			Assert.False (field.IsValid);
 		}
 
 		[Fact]

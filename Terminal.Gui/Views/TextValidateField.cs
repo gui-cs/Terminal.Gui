@@ -350,7 +350,7 @@ namespace Terminal.Gui {
 	/// Text field that validates input through a  <see cref="ITextValidateProvider"/>
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TextValidateField<T> : View where T : ITextValidateProvider {
+	public class TextValidateField<T> : View, ITextValidateProvider where T : class {
 
 		ITextValidateProvider provider;
 		int cursorPosition = 0;
@@ -358,7 +358,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField{T}"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TextValidateField () : this (ustring.Empty)
+		public TextValidateField ()
 		{
 		}
 
@@ -373,7 +373,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="mask"></param>
 		/// <param name="text">Initial Value</param>
-		public TextValidateField (ustring mask, ustring text) : base ()
+		public TextValidateField (ustring mask, ustring text)
 		{
 			provider = Activator.CreateInstance (typeof (T)) as ITextValidateProvider;
 
@@ -408,9 +408,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public new ustring Text {
 			get {
+				if (provider == null) {
+					return ustring.Empty;
+				}
+
 				return provider.Text;
 			}
 			set {
+				if (provider == null) {
+					return;
+				}
 				provider.Text = value;
 
 				SetNeedsDisplay ();
@@ -472,6 +479,12 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			if (provider == null) {
+				Move (0, 0);
+				Driver.AddStr ("Error: ITextValidateProvider not set!");
+				return;
+			}
+
 			var bgcolor = !IsValid ? Color.BrightRed : ColorScheme.Focus.Background;
 			var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
@@ -571,6 +584,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (provider == null) {
+				return true;
+			}
+
 			switch (kb.Key) {
 			case Key.Home: HomeKeyHandler (); break;
 			case Key.End: EndKeyHandler (); break;
@@ -599,12 +616,87 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Set Cursor position to <paramref name="pos" />.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>Return first valid position.</returns>
+		public int Cursor (int pos)
+		{
+			return provider.Cursor (pos);
+		}
+
+		/// <summary>
+		/// First valid position before <paramref name="pos" />.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>New cursor position if any, otherwise returns <paramref name="pos" /></returns>
+		public int CursorLeft (int pos)
+		{
+			return provider.CursorLeft (pos);
+		}
+
+		/// <summary>
+		/// First valid position after <paramref name="pos" />.
+		/// </summary>
+		/// <param name="pos">Current position.</param>
+		/// <returns>New cursor position if any, otherwise returns <paramref name="pos" /></returns>
+		public int CursorRight (int pos)
+		{
+			return provider.CursorRight (pos);
+		}
+
+		/// <summary>
+		/// Find the first valid character position.
+		/// </summary>
+		/// <returns>New cursor position.</returns>
+		public int CursorStart ()
+		{
+			return provider.CursorStart ();
+		}
+
+		/// <summary>
+		/// Find the last valid character position.
+		/// </summary>
+		/// <returns>New cursor position.</returns>
+		public int CursorEnd ()
+		{
+			return provider.CursorEnd ();
+		}
+
+		/// <summary>
+		/// Deletes the current character in <paramref name="pos" />.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>true if the character was successfully removed, otherwise false.</returns>
+		public bool Delete (int pos)
+		{
+			return provider.Delete (pos);
+		}
+
+		/// <summary>
+		/// Insert character <paramref name="ch" /> in position <paramref name="pos" />.
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <param name="pos"></param>
+		/// <returns>true if the character was successfully inserted, otherwise false.</returns>
+		public bool InsertAt (char ch, int pos)
+		{
+			return provider.InsertAt (ch, pos);
+		}
+
+		/// <summary>
 		/// This property returns true if the input is valid.
 		/// </summary>
 		public virtual bool IsValid {
 			get {
+				if (provider == null) {
+					return false;
+				}
+
 				return provider.IsValid;
 			}
 		}
+
+		public bool Fixed => throw new NotImplementedException ();
 	}
 }
