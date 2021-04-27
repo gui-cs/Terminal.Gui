@@ -26,7 +26,7 @@ jobs:
           echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
 
       #- name: Install dependencies
-      #  run: dotnet restore
+      #   run: dotnet restore
 
       #- name: Build
       #  run: dotnet build --configuration Release --no-restore
@@ -74,7 +74,7 @@ jobs:
 
       - name: Test to generate Code Coverage Report
         run: |
-          dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+          dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
           mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
       - name: Create Test Coverage Badge

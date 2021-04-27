@@ -186,7 +186,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If set to true allows more than one item to be selected. If false only allow one item selected.
 		/// </summary>
-		public bool AllowsMultipleSelection { get => allowsMultipleSelection;
+		public bool AllowsMultipleSelection {
+			get => allowsMultipleSelection;
 			set {
 				allowsMultipleSelection = value;
 				if (Source != null && !allowsMultipleSelection) {
@@ -392,8 +393,7 @@ namespace Terminal.Gui {
 					break;
 
 			case Key.Enter:
-				OnOpenSelectedItem ();
-				break;
+				return OnOpenSelectedItem ();
 
 			case Key.End:
 				return MoveEnd ();
@@ -650,8 +650,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnOpenSelectedItem ()
 		{
-			if (source.Count <= selected || selected < 0) return false;
+			if (source.Count <= selected || selected < 0 || OpenSelectedItem == null) {
+				return false;
+			}
+
 			var value = source.ToList () [selected];
+
 			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
 
 			return true;
