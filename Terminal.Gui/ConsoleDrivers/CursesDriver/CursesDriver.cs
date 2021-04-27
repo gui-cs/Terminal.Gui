@@ -79,6 +79,7 @@ namespace Terminal.Gui {
 				TerminalResized?.Invoke ();
 			}
 		}
+
 		public override void UpdateCursor () => Refresh ();
 
 		public override void End ()
@@ -95,6 +96,10 @@ namespace Terminal.Gui {
 			Console.Out.Flush ();
 			Console.Out.Write ("\x1b[1;25r");
 			Console.Out.Flush ();
+
+			//Set cursor key to cursor.
+			Console.Out.Write("\x1b[?1l");
+			Console.Out.Flush();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -693,6 +698,10 @@ namespace Terminal.Gui {
 				return;
 
 			try {
+				//Set cursor key to application.
+				Console.Out.Write ("\x1b[?1h");
+				Console.Out.Flush ();
+
 				window = Curses.initscr ();
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
