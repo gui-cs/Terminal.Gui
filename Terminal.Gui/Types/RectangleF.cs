@@ -151,6 +151,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override bool Equals (object obj) => obj is RectangleF && Equals ((RectangleF)obj);
 
+		/// <summary>
+		/// Returns true if two <see cref='Terminal.Gui.RectangleF'/> objects have equal location and size.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
 		public bool Equals (RectangleF other) => this == other;
 
 		/// <summary>

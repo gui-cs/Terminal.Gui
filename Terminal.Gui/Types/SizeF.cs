@@ -136,15 +136,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override bool Equals (object obj) => obj is SizeF && Equals ((SizeF)obj);
 
+
+		/// <summary>
+		/// Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are identical.
+		/// </summary>
 		public bool Equals (SizeF other) => this == other;
 
+		/// <summary>
+		/// Generates a hashcode from the width and height
+		/// </summary>
+		/// <returns></returns>
 		public override int GetHashCode ()
 		{
 			return width.GetHashCode() ^ height.GetHashCode ();
 		}
-		public PointF ToPointF () => (PointF)this;
-
-
+		
 		/// <summary>
 		/// Creates a human-readable string that represents this <see cref='Terminal.Gui.SizeF'/>.
 		/// </summary>
