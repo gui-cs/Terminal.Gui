@@ -116,23 +116,23 @@ namespace Terminal.Gui {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
-				}				
+				}
 				visibility = Gui.CursorVisibility.Default;
 
 				return false;
 			}
 
-			if (!info.bVisible)        
+			if (!info.bVisible)
 				visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50) 
+			else if (info.dwSize > 50)
 				visibility = CursorVisibility.Box;
-			else                       
+			else
 				visibility = CursorVisibility.Underline;
 
 			return true;
 		}
 
-		public bool EnsureCursorVisibility () 
+		public bool EnsureCursorVisibility ()
 		{
 			if (initialCursorVisibility.HasValue && pendingCursorVisibility.HasValue && SetCursorVisibility (pendingCursorVisibility.Value)) {
 				pendingCursorVisibility = null;
@@ -161,11 +161,11 @@ namespace Terminal.Gui {
 
 			if (currentCursorVisibility.HasValue == false || currentCursorVisibility.Value != visibility) {
 				ConsoleCursorInfo info = new ConsoleCursorInfo {
-					dwSize   =  (uint) visibility & 0x00FF,
-					bVisible = ((uint) visibility & 0xFF00) != 0
+					dwSize = (uint)visibility & 0x00FF,
+					bVisible = ((uint)visibility & 0xFF00) != 0
 				};
 
-				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) 
+				if (!SetConsoleCursorInfo (ScreenBuffer, ref info))
 					return false;
 
 				currentCursorVisibility = visibility;
@@ -1063,7 +1063,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Enter:
 				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return MapKeyModifiers (keyInfo, Key.Space);
+				return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 			case ConsoleKey.Backspace:
 				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
@@ -1154,7 +1154,7 @@ namespace Terminal.Gui {
 				return (Key)((uint)Key.F1 + delta);
 			}
 			if (keyInfo.KeyChar != 0) {
-				return (Key)((uint)keyInfo.KeyChar);
+				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 			}
 
 			return (Key)(0xffffffff);
@@ -1418,6 +1418,60 @@ namespace Terminal.Gui {
 
 		public override void CookMouse ()
 		{
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			WindowsConsole.InputRecord input = new WindowsConsole.InputRecord ();
+			input.EventType = WindowsConsole.EventType.Key;
+
+			WindowsConsole.KeyEventRecord keyEvent = new WindowsConsole.KeyEventRecord ();
+			keyEvent.bKeyDown = true;
+			WindowsConsole.ControlKeyState controlKey = new WindowsConsole.ControlKeyState ();
+			if (shift) {
+				controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 16;
+			}
+			if (alt) {
+				controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
+				controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 18;
+			}
+			if (control) {
+				controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
+				controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 17;
+			}
+			keyEvent.dwControlKeyState = controlKey;
+
+			input.KeyEvent = keyEvent;
+
+			if (shift || alt || control) {
+				ProcessInput (input);
+			}
+
+			keyEvent.UnicodeChar = keyChar;
+			if ((shift || alt || control)
+				&& (key >= ConsoleKey.A && key <= ConsoleKey.Z
+				|| key >= ConsoleKey.D0 && key <= ConsoleKey.D9)) {
+				keyEvent.wVirtualKeyCode = (ushort)key;
+			} else {
+				keyEvent.wVirtualKeyCode = '\0';
+			}
+
+			input.KeyEvent = keyEvent;
+
+			try {
+				ProcessInput (input);
+			} catch (OverflowException) { }
+			finally {
+				keyEvent.bKeyDown = false;
+				input.KeyEvent = keyEvent;
+				ProcessInput (input);
+			}
 		}
 		#endregion
 	}

@@ -273,7 +273,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
-		/// <see cref="Format(ustring, int, bool, bool, bool)"/> will be called internally. 
+		/// <see cref="Format(ustring, int, bool, bool, bool, int)"/> will be called internally. 
 		/// </para>
 		/// </remarks>
 		public List<ustring> Lines {
@@ -371,6 +371,7 @@ namespace Terminal.Gui {
 		/// <param name="width">The width to contain the text to</param>
 		/// <param name="preserveTrailingSpaces">If <c>true</c>, the wrapped text will keep the trailing spaces.
 		///  If <c>false</c>, the trailing spaces will be trimmed.</param>
+		/// <param name="tabWidth">The tab width.</param>
 		/// <returns>Returns a list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -380,7 +381,7 @@ namespace Terminal.Gui {
 		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
 		/// </para>
 		/// </remarks>
-		public static List<ustring> WordWrap (ustring text, int width, bool preserveTrailingSpaces = false)
+		public static List<ustring> WordWrap (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
@@ -394,16 +395,58 @@ namespace Terminal.Gui {
 			}
 
 			var runes = StripCRLF (text).ToRuneList ();
+			if (!preserveTrailingSpaces) {
+				while ((end = start + width) < runes.Count) {
+					while (runes [end] != ' ' && end > start)
+						end--;
+					if (end == start)
+						end = start + width;
+					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+					start = end;
+					if (runes [end] == ' ') {
+						start++;
+					}
+				}
+			} else {
+				while ((end = start) < runes.Count) {
+					end = GetNextWhiteSpace (start, width);
+					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+					start = end;
+				}
+			}
 
-			while ((end = start + width) < runes.Count) {
-				while (runes [end] != ' ' && end > start)
-					end -= 1;
-				if (end == start)
-					end = start + width;
-				lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-				start = end;
-				if (runes [end] == ' ' && !preserveTrailingSpaces) {
-					start++;
+			int GetNextWhiteSpace (int from, int cWidth, int cLength = 0)
+			{
+				var to = from;
+				var length = cLength;
+
+				while (length < cWidth && to < runes.Count) {
+					var rune = runes [to];
+					length += Rune.ColumnWidth (rune);
+					if (rune == ' ') {
+						if (length == cWidth) {
+							return to + 1;
+						} else if (length > cWidth) {
+							return to;
+						} else {
+							return GetNextWhiteSpace (to + 1, cWidth, length);
+						}
+					} else if (rune == '\t') {
+						length += tabWidth + 1;
+						if (length == tabWidth && tabWidth > cWidth) {
+							return to + 1;
+						} else if (length > cWidth && tabWidth > cWidth) {
+							return to;
+						} else {
+							return GetNextWhiteSpace (to + 1, cWidth, length);
+						}
+					}
+					to++;
+				}
+				if (cLength > 0 && to < runes.Count && runes [to] != ' ') {
+					return from;
+				} else {
+					return to;
 				}
 			}
 
@@ -502,6 +545,7 @@ namespace Terminal.Gui {
 		/// <param name="talign">Specifies how the text will be aligned horizontally.</param>
 		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
 		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
+		/// <param name="tabWidth">The tab width.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -514,9 +558,9 @@ namespace Terminal.Gui {
 		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
 		/// </para>
 		/// </remarks>
-		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false)
+		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0)
 		{
-			return Format (text, width, talign == TextAlignment.Justified, wordWrap, preserveTrailingSpaces);
+			return Format (text, width, talign == TextAlignment.Justified, wordWrap, preserveTrailingSpaces, tabWidth);
 		}
 
 		/// <summary>
@@ -527,6 +571,7 @@ namespace Terminal.Gui {
 		/// <param name="justify">Specifies whether the text should be justified.</param>
 		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
 		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
+		/// <param name="tabWidth">The tab width.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -539,7 +584,8 @@ namespace Terminal.Gui {
 		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
 		/// </para>
 		/// </remarks>
-		public static List<ustring> Format (ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false)
+		public static List<ustring> Format (ustring text, int width, bool justify, bool wordWrap,
+			bool preserveTrailingSpaces = false, int tabWidth = 0)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("width cannot be negative");
@@ -566,7 +612,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = runes [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces);
+					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, justify));
 					}
@@ -576,7 +622,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces)) {
+			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth)) {
 				lineResult.Add (ClipAndJustify (line, width, justify));
 			}
 
