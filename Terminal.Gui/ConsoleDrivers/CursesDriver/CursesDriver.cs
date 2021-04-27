@@ -91,11 +91,15 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
+
+			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
 			// Clear and reset entire screen.
-			Console.Out.Write ("\x1b[2J");
-			Console.Out.Flush ();
-			Console.Out.Write ("\x1b[1;25r");
-			Console.Out.Flush ();
+			//Console.Out.Write ("\x1b[2J");
+			//Console.Out.Flush ();
+
+			// Reports current cursor line and column.
+			//Console.Out.Write ("\x1b[1;25r");
+			//Console.Out.Flush ();
 
 			//Set cursor key to cursor.
 			Console.Out.Write("\x1b[?1l");
