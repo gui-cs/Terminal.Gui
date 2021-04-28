@@ -1,0 +1,468 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class BarSeries
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class BarSeries
+   ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Graphs.BarSeries">
+  
+  
+  <h1 id="Terminal_Gui_Graphs_BarSeries" data-uid="Terminal.Gui.Graphs.BarSeries" class="text-break">Class BarSeries
+  </h1>
+  <div class="markdown level0 summary">
+Series of bars positioned at regular intervals
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">BarSeries</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Terminal.Gui.Graphs.ISeries.html">ISeries</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Graphs.html">Terminal.Gui.Graphs</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Graphs_BarSeries_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class BarSeries : ISeries</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_BarEvery_" data-uid="Terminal.Gui.Graphs.BarSeries.BarEvery*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_BarEvery" data-uid="Terminal.Gui.Graphs.BarSeries.BarEvery">BarEvery</h4>
+  <div class="markdown level1 summary">
+Determines the spacing of bars along the axis. Defaults to 1 i.e. 
+every 1 unit of graph space a bar is rendered.  Note that you should
+also consider <a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_CellSize">CellSize</a> when changing this.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float BarEvery { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_Bars_" data-uid="Terminal.Gui.Graphs.BarSeries.Bars*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_Bars" data-uid="Terminal.Gui.Graphs.BarSeries.Bars">Bars</h4>
+  <div class="markdown level1 summary">
+Ordered collection of graph bars to position along axis
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;BarSeries.Bar&gt; Bars { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Terminal.Gui.Graphs.BarSeries.Bar.html">BarSeries.Bar</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_DrawLabels_" data-uid="Terminal.Gui.Graphs.BarSeries.DrawLabels*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_DrawLabels" data-uid="Terminal.Gui.Graphs.BarSeries.DrawLabels">DrawLabels</h4>
+  <div class="markdown level1 summary">
+True to draw <a class="xref" href="Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Text">Text</a> along the axis under the bar.  Defaults
+to true.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool DrawLabels { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_Offset_" data-uid="Terminal.Gui.Graphs.BarSeries.Offset*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_Offset" data-uid="Terminal.Gui.Graphs.BarSeries.Offset">Offset</h4>
+  <div class="markdown level1 summary">
+The number of units of graph space along the axis before rendering the first bar
+(and subsequent bars - see <a class="xref" href="Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_BarEvery">BarEvery</a>).  Defaults to 0
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float Offset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_Orientation_" data-uid="Terminal.Gui.Graphs.BarSeries.Orientation*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_Orientation" data-uid="Terminal.Gui.Graphs.BarSeries.Orientation">Orientation</h4>
+  <div class="markdown level1 summary">
+Direction bars protrude from the corresponding axis.
+Defaults to vertical
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Orientation Orientation { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Graphs.Orientation.html">Orientation</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_OverrideBarColor_" data-uid="Terminal.Gui.Graphs.BarSeries.OverrideBarColor*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_OverrideBarColor" data-uid="Terminal.Gui.Graphs.BarSeries.OverrideBarColor">OverrideBarColor</h4>
+  <div class="markdown level1 summary">
+Overrides the <a class="xref" href="Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Fill">Fill</a> with a fixed color
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute? OverrideBarColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_AdjustColor_" data-uid="Terminal.Gui.Graphs.BarSeries.AdjustColor*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_AdjustColor_Terminal_Gui_Graphs_GraphCellToRender_" data-uid="Terminal.Gui.Graphs.BarSeries.AdjustColor(Terminal.Gui.Graphs.GraphCellToRender)">AdjustColor(GraphCellToRender)</h4>
+  <div class="markdown level1 summary">
+Applies any color overriding
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual GraphCellToRender AdjustColor(GraphCellToRender graphCellToRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Graphs.GraphCellToRender.html">GraphCellToRender</a></td>
+        <td><span class="parametername">graphCellToRender</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Graphs.GraphCellToRender.html">GraphCellToRender</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_DrawBarLine_" data-uid="Terminal.Gui.Graphs.BarSeries.DrawBarLine*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_DrawBarLine_Terminal_Gui_GraphView_Terminal_Gui_Point_Terminal_Gui_Point_Terminal_Gui_Graphs_BarSeries_Bar_" data-uid="Terminal.Gui.Graphs.BarSeries.DrawBarLine(Terminal.Gui.GraphView,Terminal.Gui.Point,Terminal.Gui.Point,Terminal.Gui.Graphs.BarSeries.Bar)">DrawBarLine(GraphView, Point, Point, BarSeries.Bar)</h4>
+  <div class="markdown level1 summary">
+Override to do custom drawing of the bar e.g. to apply varying color or changing the fill
+symbol mid bar.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void DrawBarLine(GraphView graph, Point start, Point end, BarSeries.Bar beingDrawn)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></td>
+        <td><span class="parametername">graph</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">start</span></td>
+        <td>Screen position of the start of the bar</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">end</span></td>
+        <td>Screen position of the end of the bar</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Graphs.BarSeries.Bar.html">BarSeries.Bar</a></td>
+        <td><span class="parametername">beingDrawn</span></td>
+        <td>The Bar that occupies this space and is being drawn</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Graphs_BarSeries_DrawSeries_" data-uid="Terminal.Gui.Graphs.BarSeries.DrawSeries*"></a>
+  <h4 id="Terminal_Gui_Graphs_BarSeries_DrawSeries_Terminal_Gui_GraphView_Terminal_Gui_Rect_Terminal_Gui_RectangleF_" data-uid="Terminal.Gui.Graphs.BarSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)">DrawSeries(GraphView, Rect, RectangleF)</h4>
+  <div class="markdown level1 summary">
+Draws bars that are currently in the <code data-dev-comment-type="paramref" class="paramref">drawBounds</code>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void DrawSeries(GraphView graph, Rect drawBounds, RectangleF graphBounds)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></td>
+        <td><span class="parametername">graph</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">drawBounds</span></td>
+        <td>Screen area of the graph excluding margins</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a></td>
+        <td><span class="parametername">graphBounds</span></td>
+        <td>Graph space area that should be drawn into <code data-dev-comment-type="paramref" class="paramref">drawBounds</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Terminal.Gui.Graphs.ISeries.html">ISeries</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
