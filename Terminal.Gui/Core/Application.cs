@@ -550,7 +550,7 @@ namespace Terminal.Gui {
 			Driver?.End ();
 			Driver = null;
 			Iteration = null;
-			UseSystemConsole = false;
+			//UseSystemConsole = false;
 			RootMouseEvent = null;
 			Resized = null;
 			_initialized = false;
