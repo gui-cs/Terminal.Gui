@@ -7,7 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 
-namespace UnitTests {
+namespace Terminal.Gui {
 	public class TabViewTests {
 		private TabView GetTabView ()
 		{

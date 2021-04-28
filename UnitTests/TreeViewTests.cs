@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
 
-namespace UnitTests {
+namespace Terminal.Gui {
 	public class TreeViewTests {
 		#region Test Setup Methods
 		class Factory {
