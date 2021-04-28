@@ -8,6 +8,7 @@ using Terminal.Gui.Trees;
 using Xunit;
 
 namespace Terminal.Gui.Views {
+
 	public class TreeViewTests {
 		#region Test Setup Methods
 		class Factory {

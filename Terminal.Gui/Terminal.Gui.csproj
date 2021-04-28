@@ -43,6 +43,13 @@
       v1.0.0
       * Version 1.0 Release!!! - Thank you to @migueldeicaza, @tig, @bdisp, @tznind, @jmprricone, and many more!
       
+      v1.0.0-rc.13
+      * NEW CONTROL: GraphView - thanks @tznind!
+      * Fixes #1256 - OutConsoleGridView no longer works - ENTER does not work
+
+      v1.0.0-rc.12
+      * Fixes #1257 - ListView's ProcessKey should return false if no OpenSelectedItem handler is defined
+
       v1.0.0-rc.10
       * Fixes #931. Fixed the limit 25 lines issue
       * Fixes #1251. Fixes TextValidateProvider exception on the All View Tester scenario.
