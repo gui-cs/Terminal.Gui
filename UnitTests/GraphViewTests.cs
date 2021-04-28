@@ -50,11 +50,43 @@ namespace Terminal.Gui.Views {
 	public class GraphViewTests {
 
 
-		private void InitFakeDriver ()
+		public static FakeDriver InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
 			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			driver.Init (() => { });
+			return driver;
+		}
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
+		public static void AssertDriverContentsAre (string expectedLook)
+		{
+#pragma warning restore xUnit1013 // Public method should be marked as test
+
+			var sb = new StringBuilder ();
+			var driver = ((FakeDriver)Application.Driver);
+
+			var contents = driver.Contents;
+
+			for (int r = 0; r < driver.Rows; r++) {
+				for (int c = 0; c < driver.Cols; c++) {
+					sb.Append ((char)contents [r, c, 0]);
+				}
+				sb.AppendLine ();
+			}
+
+			var look = sb.ToString ();
+
+			if (!string.Equals (expectedLook, look)) {
+
+				expectedLook = expectedLook.Trim ().Replace ("\r\n", "\n");
+				look = look.Trim ().Replace ("\r\n", "\n");
+
+				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				Console.WriteLine ("But Was:" + Environment.NewLine + look);
+
+				Assert.Equal (expectedLook, look);
+			}
 		}
 
 		#region Screen to Graph Tests
@@ -354,17 +386,10 @@ namespace Terminal.Gui.Views {
 
 	public class SeriesTests {
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
-		}
-
 		[Fact]
 		public void Series_GetsPassedCorrectBounds_AllAtOnce ()
 		{
-			InitFakeDriver ();
+			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
 			gv.ColorScheme = new ColorScheme ();
@@ -406,7 +431,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
 		{
-			InitFakeDriver ();
+			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
 			gv.ColorScheme = new ColorScheme ();
@@ -463,12 +488,6 @@ namespace Terminal.Gui.Views {
 
 	public class MultiBarSeriesTests{
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
-		}
 
 		[Fact]
 		public void MultiBarSeries_BarSpacing(){
@@ -537,7 +556,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestRendering_MultibarSeries(){
 
-			InitFakeDriver();
+			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
 			gv.ColorScheme = new ColorScheme ();
@@ -598,51 +617,16 @@ namespace Terminal.Gui.Views {
  │  MM  MM  MM                                                                  
  ┼──┬M──┬M──┬M──────                                                            
    heytherebob  ";
-			AssertDriverContentsAre (looksLike);
-		}
-
-		private void AssertDriverContentsAre (string expectedLook)
-		{
-
-			var sb = new StringBuilder ();
-			var driver = ((FakeDriver)Application.Driver);
-
-			var contents = driver.Contents;
-
-			for (int r = 0; r < driver.Rows; r++) {
-				for (int c = 0; c < driver.Cols; c++) {
-					sb.Append ((char)contents [r, c, 0]);
-				}
-				sb.AppendLine ();
-			}
-
-			var look = sb.ToString ();
-
-			if(!string.Equals(expectedLook,look)) {
-
-				expectedLook = expectedLook.Trim ().Replace("\r\n","\n");
-				look = look.Trim ().Replace ("\r\n", "\n");
-
-				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-				Console.WriteLine ("But Was:" + Environment.NewLine + look);
-
-				Assert.Equal (expectedLook, look);
-			}
+			GraphViewTests.AssertDriverContentsAre (looksLike);
 		}
 	}
 
 	public class BarSeriesTests{
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
-		}
 
 		private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
 		{
-			InitFakeDriver ();
+			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
 			gv.ColorScheme = new ColorScheme ();
@@ -829,12 +813,6 @@ namespace Terminal.Gui.Views {
 
 	public class AxisTests {
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
-		}
 
 		private GraphView GetGraph (out FakeHAxis axis)
 		{
@@ -846,7 +824,7 @@ namespace Terminal.Gui.Views {
 		}
 		private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
 		{
-			InitFakeDriver ();
+			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
 			gv.ColorScheme = new ColorScheme ();
