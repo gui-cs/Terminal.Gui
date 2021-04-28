@@ -345,7 +345,7 @@ Gets the formatted lines.
   <div class="markdown level1 remarks">
 <p>
 Upon a &apos;get&apos; of this property, if the text needs to be formatted (if <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat">NeedsFormat</a> is <code>true</code>)
-<a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_">Format(ustring, Int32, Boolean, Boolean, Boolean)</a> will be called internally. 
+<a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32_">Format(ustring, Int32, Boolean, Boolean, Boolean, Int32)</a> will be called internally. 
 </p>
 </div>
   
@@ -734,14 +734,14 @@ Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes pr
   
   
   <a id="Terminal_Gui_TextFormatter_Format_" data-uid="Terminal.Gui.TextFormatter.Format*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)">Format(ustring, Int32, Boolean, Boolean, Boolean)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32)">Format(ustring, Int32, Boolean, Boolean, Boolean, Int32)</h4>
   <div class="markdown level1 summary">
 Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -778,6 +778,11 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
         <td><span class="parametername">preserveTrailingSpaces</span></td>
         <td>If <code>true</code> and &apos;wordWrap&apos; also true, the wrapped text will keep the trailing spaces. If <code>false</code>, the trailing spaces will be trimmed.</td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">tabWidth</span></td>
+        <td>The tab width.</td>
+      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -795,7 +800,7 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 An empty <code>text</code> string will result in one empty line.
@@ -810,14 +815,14 @@ If <code>width</code> is int.MaxValue, the text will be formatted to the maximum
   
   
   <a id="Terminal_Gui_TextFormatter_Format_" data-uid="Terminal.Gui.TextFormatter.Format*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)">Format(ustring, Int32, TextAlignment, Boolean, Boolean)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_System_Int32_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32)">Format(ustring, Int32, TextAlignment, Boolean, Boolean, Int32)</h4>
   <div class="markdown level1 summary">
 Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -854,6 +859,11 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
         <td><span class="parametername">preserveTrailingSpaces</span></td>
         <td>If <code>true</code> and &apos;wordWrap&apos; also true, the wrapped text will keep the trailing spaces. If <code>false</code>, the trailing spaces will be trimmed.</td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">tabWidth</span></td>
+        <td>The tab width.</td>
+      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -871,7 +881,7 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_System_Int32__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 An empty <code>text</code> string will result in one empty line.
@@ -1324,14 +1334,14 @@ Runes with a bitmask of <code>otKeyTagMask</code> and remove that bitmask.
   
   
   <a id="Terminal_Gui_TextFormatter_WordWrap_" data-uid="Terminal.Gui.TextFormatter.WordWrap*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_" data-uid="Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)">WordWrap(ustring, Int32, Boolean)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_" data-uid="Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean,System.Int32)">WordWrap(ustring, Int32, Boolean, Int32)</h4>
   <div class="markdown level1 summary">
 Formats the provided text to fit within the width provided using word wrapping.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width, bool preserveTrailingSpaces = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1359,6 +1369,11 @@ Formats the provided text to fit within the width provided using word wrapping.
         <td>If <code>true</code>, the wrapped text will keep the trailing spaces.
  If <code>false</code>, the trailing spaces will be trimmed.</td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">tabWidth</span></td>
+        <td>The tab width.</td>
+      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -1376,7 +1391,7 @@ Formats the provided text to fit within the width provided using word wrapping.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 This method does not do any justification.

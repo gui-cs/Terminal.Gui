@@ -268,6 +268,33 @@ Implements a mock ConsoleDriver for unit testing
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols">ConsoleDriver.Cols</a></div>
   
   
+  <a id="Terminal_Gui_FakeDriver_Contents_" data-uid="Terminal.Gui.FakeDriver.Contents*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Contents" data-uid="Terminal.Gui.FakeDriver.Contents">Contents</h4>
+  <div class="markdown level1 summary">
+Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int[,, ] Contents { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span>[,,]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_FakeDriver_HeightAsBuffer_" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer*"></a>
   <h4 id="Terminal_Gui_FakeDriver_HeightAsBuffer" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer">HeightAsBuffer</h4>
   <div class="markdown level1 summary"></div>
@@ -702,6 +729,55 @@ Implements a mock ConsoleDriver for unit testing
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh">ConsoleDriver.Refresh()</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_SendKeys_" data-uid="Terminal.Gui.FakeDriver.SendKeys*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)">SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void SendKeys(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Char</span></td>
+        <td><span class="parametername">keyChar</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.ConsoleKey</span></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">shift</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">alt</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">control</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_">ConsoleDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</a></div>
   
   
   <a id="Terminal_Gui_FakeDriver_SetAttribute_" data-uid="Terminal.Gui.FakeDriver.SetAttribute*"></a>
