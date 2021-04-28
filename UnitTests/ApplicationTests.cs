@@ -47,7 +47,6 @@ namespace Terminal.Gui.Core {
 			Assert.False (Application.AlwaysSetPosition);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
-			Assert.False (Application.UseSystemConsole);
 			Assert.Null (Application.RootMouseEvent);
 			Assert.Null (Application.Resized);
 		}
@@ -61,7 +60,6 @@ namespace Terminal.Gui.Core {
 			Assert.False (Application.AlwaysSetPosition);
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
-			Assert.False (Application.UseSystemConsole);
 			Assert.Null (Application.RootMouseEvent);
 			Assert.Null (Application.Resized);
 		}
