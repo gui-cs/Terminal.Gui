@@ -59,6 +59,23 @@ namespace Terminal.Gui.Views {
 			return driver;
 		}
 
+		/// <summary>
+		/// Returns a basic very small graph (10 x 5)
+		/// </summary>
+		/// <returns></returns>
+		public static GraphView GetGraph ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.MarginBottom = 1;
+			gv.MarginLeft = 1;
+			gv.Bounds = new Rect (0, 0, 10, 5);
+
+			return gv;
+		}
+
 #pragma warning disable xUnit1013 // Public method should be marked as test
 		public static void AssertDriverContentsAre (string expectedLook)
 		{
@@ -992,22 +1009,10 @@ namespace Terminal.Gui.Views {
 
 	public class TextAnnotationTests {
 
-		private GraphView GetGraph ()
-		{
-			GraphViewTests.InitFakeDriver ();
-
-			var gv = new GraphView ();
-			gv.ColorScheme = new ColorScheme ();
-			gv.MarginBottom = 1;
-			gv.MarginLeft = 1;
-			gv.Bounds = new Rect (0, 0, 10, 5);
-
-			return gv;
-		}
 		[Fact]
 		public void TestTextAnnotation_ScreenUnits()
 		{
-			var gv = GetGraph ();
+			var gv = GraphViewTests.GetGraph ();
 
 			gv.Annotations.Add (new TextAnnotation () {
 				Text = "hey!",
@@ -1048,7 +1053,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestTextAnnotation_GraphUnits ()
 		{
-			var gv = GetGraph ();
+			var gv = GraphViewTests.GetGraph ();
 
 			gv.Annotations.Add (new TextAnnotation () {
 				Text = "hey!",
@@ -1089,7 +1094,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestTextAnnotation_LongText ()
 		{
-			var gv = GetGraph ();
+			var gv = GraphViewTests.GetGraph ();
 
 			gv.Annotations.Add (new TextAnnotation () {
 				Text = "hey there partner hows it going boy its great",
@@ -1118,7 +1123,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestTextAnnotation_Offscreen ()
 		{
-			var gv = GetGraph ();
+			var gv = GraphViewTests.GetGraph ();
 
 			gv.Annotations.Add (new TextAnnotation () {
 				Text = "hey there partner hows it going boy its great",
@@ -1146,7 +1151,7 @@ namespace Terminal.Gui.Views {
 		[InlineData ("\t\t")]
 		public void TestTextAnnotation_EmptyText (string whitespace)
 		{
-			var gv = GetGraph ();
+			var gv = GraphViewTests.GetGraph ();
 
 			gv.Annotations.Add (new TextAnnotation () {
 				Text = whitespace,
@@ -1161,7 +1166,6 @@ namespace Terminal.Gui.Views {
 
 			gv.Redraw (gv.Bounds);
 
-			// Text is off the screen (graph x axis runs to 8 not 9)
 			var expected =
 @"
  │
@@ -1175,7 +1179,121 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
-	public class AxisIncrementToRenderTests {
+	public class LegendTests {
+
+		[Fact]
+		public void LegendNormalUsage_WithBorder ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+			var legend = new LegendAnnotation(new Rect(2,0,5,3));
+			legend.AddEntry (new GraphCellToRender ('A'), "Ant");
+			legend.AddEntry (new GraphCellToRender ('B'), "Bat");
+
+			gv.Annotations.Add (legend);
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │┌───┐
+ ┤│AAn│
+ ┤└───┘
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+
+		[Fact]
+		public void LegendNormalUsage_WithoutBorder ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+			var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
+			legend.AddEntry (new GraphCellToRender ('A'), "Ant");
+			legend.AddEntry (new GraphCellToRender ('B'), "?"); // this will exercise pad
+			legend.AddEntry (new GraphCellToRender ('C'), "Cat");
+			legend.AddEntry (new GraphCellToRender ('H'), "Hattter"); // not enough space for this oen
+			legend.Border = false;
+
+			gv.Annotations.Add (legend);
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │AAnt
+ ┤B?
+ ┤CCat
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+	}
+
+	public class PathAnnotationTests {
+
+		[Fact]
+		public void PathAnnotation_Box()
+		{
+			var gv = GraphViewTests.GetGraph ();
+
+			var path = new PathAnnotation ();
+			path.Points.Add (new PointF (1, 1));
+			path.Points.Add (new PointF (1, 3));
+			path.Points.Add (new PointF (6, 3));
+			path.Points.Add (new PointF (6, 1));
+
+			// list the starting point again so that it draws a complete square
+			// (otherwise it will miss out the last line along the bottom)
+			path.Points.Add (new PointF (1, 1));
+
+			gv.Annotations.Add (path);
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │......
+ ┤.    .
+ ┤......
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+
+		[Fact]
+		public void PathAnnotation_Diamond ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+
+			var path = new PathAnnotation ();
+			path.Points.Add (new PointF (1, 2));
+			path.Points.Add (new PointF (3, 3));
+			path.Points.Add (new PointF (6, 2));
+			path.Points.Add (new PointF (3, 1));
+
+			// list the starting point again to close the shape
+			path.Points.Add (new PointF (1, 2));
+
+			gv.Annotations.Add (path);
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │  ..
+ ┤..  ..
+ ┤ ...
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+	}
+
+		public class AxisIncrementToRenderTests {
 		[Fact]
 		public void AxisIncrementToRenderTests_Constructor ()
 		{

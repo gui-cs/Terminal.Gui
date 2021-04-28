@@ -228,7 +228,7 @@ namespace Terminal.Gui.Graphs {
 			}
 
 			// value is too wide
-			return new string (text.TakeWhile (c => (width -= Rune.ColumnWidth (c)) > 0).ToArray ());
+			return new string (text.TakeWhile (c => (width -= Rune.ColumnWidth (c)) >= 0).ToArray ());
 		}
 
 		/// <summary>
