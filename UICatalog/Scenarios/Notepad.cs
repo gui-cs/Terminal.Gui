@@ -73,7 +73,7 @@ namespace UICatalog.Scenarios {
 			New ();
 		}
 
-		private void UpdateStatus (Tab newTab)
+		private void UpdateStatus (TabView.Tab newTab)
 		{
 			lblStatus.Text = $"Len:{(newTab?.View?.Text?.Length ?? 0)}";
 		}
@@ -212,7 +212,7 @@ namespace UICatalog.Scenarios {
 			return true;
 		}
 
-		private class OpenedFile : Tab {
+		private class OpenedFile : TabView.Tab {
 
 
 			public FileInfo File { get; set; }

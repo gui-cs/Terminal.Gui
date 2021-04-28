@@ -79,6 +79,7 @@ namespace Terminal.Gui {
 				TerminalResized?.Invoke ();
 			}
 		}
+
 		public override void UpdateCursor () => Refresh ();
 
 		public override void End ()
@@ -90,11 +91,19 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
+
+			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
 			// Clear and reset entire screen.
-			Console.Out.Write ("\x1b[2J");
-			Console.Out.Flush ();
-			Console.Out.Write ("\x1b[1;25r");
-			Console.Out.Flush ();
+			//Console.Out.Write ("\x1b[2J");
+			//Console.Out.Flush ();
+
+			// Reports current cursor line and column.
+			//Console.Out.Write ("\x1b[1;25r");
+			//Console.Out.Flush ();
+
+			//Set cursor key to cursor.
+			Console.Out.Write("\x1b[?1l");
+			Console.Out.Flush();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -669,12 +678,14 @@ namespace Terminal.Gui {
 			//}
 		}
 
+		Action<KeyEvent> keyHandler;
 		Action<MouseEvent> mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
+			this.keyHandler = keyHandler;
 			this.mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as UnixMainLoop;
@@ -693,6 +704,10 @@ namespace Terminal.Gui {
 				return;
 
 			try {
+				//Set cursor key to application.
+				Console.Out.Write ("\x1b[?1h");
+				Console.Out.Flush ();
+
 				window = Curses.initscr ();
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
@@ -936,6 +951,28 @@ namespace Terminal.Gui {
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			Key k;
+
+			if ((shift || alt || control)
+				&& keyChar - (int)Key.Space >= (uint)Key.A && keyChar - (int)Key.Space <= (uint)Key.Z) {
+				k = (Key)(keyChar - (uint)Key.Space);
+			} else {
+				k = (Key)keyChar;
+			}
+			if (shift) {
+				k |= Key.ShiftMask;
+			}
+			if (alt) {
+				k |= Key.AltMask;
+			}
+			if (control) {
+				k |= Key.CtrlMask;
+			}
+			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 		}
 	}
 

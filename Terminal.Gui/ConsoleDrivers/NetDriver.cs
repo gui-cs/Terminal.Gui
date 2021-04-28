@@ -226,7 +226,7 @@ namespace Terminal.Gui {
 		void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
 		{
 			InputResult inputResult = new InputResult {
-				EventType = EventType.key
+				EventType = EventType.Key
 			};
 			ConsoleKeyInfo newConsoleKeyInfo = consoleKeyInfo;
 			ConsoleKey key = 0;
@@ -255,10 +255,18 @@ namespace Terminal.Gui {
 			case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
-				while (Console.KeyAvailable) {
-					var result = Console.ReadKey (true);
-					Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
-					cki [cki.Length - 1] = result;
+				int delay = 0;
+				while (delay < 100) {
+					if (Console.KeyAvailable) {
+						do {
+							var result = Console.ReadKey (true);
+							Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+							cki [cki.Length - 1] = result;
+						} while (Console.KeyAvailable);
+						break;
+					}
+					Thread.Sleep (50);
+					delay += 50;
 				}
 				SplitCSI (cki, ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, ref mod);
 				return;
@@ -272,7 +280,7 @@ namespace Terminal.Gui {
 				newConsoleKeyInfo = consoleKeyInfo;
 				break;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -432,7 +440,7 @@ namespace Terminal.Gui {
 				GetMouseEvent (cki);
 				return;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -744,7 +752,8 @@ namespace Terminal.Gui {
 				MouseEvent = mouseEvent
 			});
 
-			if (!isButtonClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+			if (!isButtonClicked && !lastMouseEvent.ButtonState.HasFlag (MouseButtonState.ReportMousePosition)
+				&& lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Released) != 0
 				|| (buttonState & MouseButtonState.Button2Released) != 0
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
@@ -960,6 +969,9 @@ namespace Terminal.Gui {
 			case '1':
 				key = ConsoleKey.F10;
 				break;
+			case '2':
+				key = ConsoleKey.Insert;
+				break;
 			case '3':
 				if (length == 5) {
 					key = ConsoleKey.F11;
@@ -998,7 +1010,7 @@ namespace Terminal.Gui {
 		}
 
 		public enum EventType {
-			key = 1,
+			Key = 1,
 			Mouse = 2,
 			WindowSize = 3,
 			WindowPosition = 4
@@ -1429,7 +1441,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Enter:
 				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return MapKeyModifiers (keyInfo, Key.Space);
+				return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 			case ConsoleKey.Backspace:
 				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
@@ -1494,7 +1506,7 @@ namespace Terminal.Gui {
 				return (Key)((uint)Key.F1 + delta);
 			}
 			if (keyInfo.KeyChar != 0) {
-				return (Key)((uint)keyInfo.KeyChar);
+				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 			}
 
 			return (Key)(0xffffffff);
@@ -1545,7 +1557,7 @@ namespace Terminal.Gui {
 		void ProcessInput (NetEvents.InputResult inputEvent)
 		{
 			switch (inputEvent.EventType) {
-			case NetEvents.EventType.key:
+			case NetEvents.EventType.Key:
 				var map = MapKey (inputEvent.ConsoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
@@ -1731,6 +1743,23 @@ namespace Terminal.Gui {
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			NetEvents.InputResult input = new NetEvents.InputResult ();
+			ConsoleKey ck;
+			if (char.IsLetter (keyChar)) {
+				ck = key;
+			} else {
+				ck = (ConsoleKey)'\0';
+			}
+			input.EventType = NetEvents.EventType.Key;
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, ck, shift, alt, control);
+
+			try {
+				ProcessInput (input);
+			} catch (OverflowException) { }
 		}
 		#endregion
 

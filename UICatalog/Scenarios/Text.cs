@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.TextValidateProviders;
+
+
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
@@ -50,6 +53,13 @@ namespace UICatalog {
 			textView.TextChanged += () => {
 				labelMirroringTextView.Text = textView.Text;
 			};
+
+			var btnMultiline = new Button ("Toggle Multiline") {
+				X = Pos.Right (textView) + 1,
+				Y = Pos.Top (textView) + 1
+			};
+			btnMultiline.Clicked += () => textView.Multiline = !textView.Multiline;
+			Win.Add (btnMultiline);
 
 			// BUGBUG: 531 - TAB doesn't go to next control from HexView
 			var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (s))) {
@@ -101,6 +111,38 @@ namespace UICatalog {
 
 			_timeField.TimeChanged += TimeChanged;
 
+			// MaskedTextProvider
+			var netProvider = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+				X = Pos.Left (dateField),
+				Y = Pos.Bottom (dateField) + 1
+			};
+			Win.Add (netProvider);
+
+			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL| AAA aaa") {
+				X = Pos.Right (netProvider) + 1,
+				Y = Pos.Y (netProvider),
+				Width = 40,
+				TextAlignment = TextAlignment.Centered
+			};
+			Win.Add (netProviderField);
+
+			// TextRegexProvider
+			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+				X = Pos.Left (netProvider),
+				Y = Pos.Bottom (netProvider) + 1
+			};
+			Win.Add (regexProvider);
+
+			var regexProviderField = new TextValidateField<TextRegexProvider> ("^([0-9]?[0-9]?[0-9]|1000)$") {
+				X = Pos.Right (regexProvider) + 1,
+				Y = Pos.Y (regexProvider),
+				Width = 40,
+				TextAlignment = TextAlignment.Centered
+			};
+			// Access the inner Provider to configure.
+			regexProviderField.Provider.ValidateOnInput = false;
+
+			Win.Add (regexProviderField);
 		}
 
 		TimeField _timeField;
@@ -109,7 +151,6 @@ namespace UICatalog {
 		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
 		{
 			_labelMirroringTimeField.Text = _timeField.Text;
-
 		}
 	}
 }

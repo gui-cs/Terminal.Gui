@@ -7,16 +7,16 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Core {
 	public class TextFormatterTests {
 
 		[Fact]
 		public void Basic_Usage ()
 		{
-			var testText = ustring.Make("test");
+			var testText = ustring.Make ("test");
 			var expectedSize = new Size ();
 			var testBounds = new Rect (0, 0, 100, 1);
 			var tf = new TextFormatter ();
@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 			Assert.Equal (testText, tf.Text);
 			Assert.Equal (TextAlignment.Left, tf.Alignment);
 			Assert.Equal (expectedSize, tf.Size);
-			tf.Draw (testBounds, new Attribute(), new Attribute());
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
 			Assert.Equal (expectedSize, tf.Size);
 			Assert.NotEmpty (tf.Lines);
 
@@ -76,7 +76,7 @@ namespace Terminal.Gui {
 			Assert.False (tf.NeedsFormat);
 
 			tf.Size = new Size (1, 1);
-			Assert.True (tf.NeedsFormat); 
+			Assert.True (tf.NeedsFormat);
 			Assert.NotEmpty (tf.Lines);
 			Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 
@@ -1861,8 +1861,156 @@ namespace Terminal.Gui {
 			Assert.Equal ("e", wrappedLines [2].ToString ());
 			Assert.Equal ("n", wrappedLines [3].ToString ());
 			Assert.Equal (".", wrappedLines [^1].ToString ());
-
 		}
+
+		[Fact]
+		public void WordWrap_preserveTrailingSpaces ()
+		{
+			var text = ustring.Empty;
+			int maxWidth = 1;
+			int expectedClippedWidth = 1;
+
+			List<ustring> wrappedLines;
+
+			text = "A sentence has words.";
+			maxWidth = 14;
+			expectedClippedWidth = 14;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A sentence has", wrappedLines [0].ToString ());
+			Assert.Equal (" words.", wrappedLines [1].ToString ());
+			Assert.True (wrappedLines.Count == 2);
+
+			maxWidth = 3;
+			expectedClippedWidth = 3;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("sen", wrappedLines [1].ToString ());
+			Assert.Equal ("ten", wrappedLines [2].ToString ());
+			Assert.Equal ("ce ", wrappedLines [3].ToString ());
+			Assert.Equal ("has", wrappedLines [4].ToString ());
+			Assert.Equal (" ", wrappedLines [5].ToString ());
+			Assert.Equal ("wor", wrappedLines [6].ToString ());
+			Assert.Equal ("ds.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 8);
+
+			maxWidth = 2;
+			expectedClippedWidth = 2;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("se", wrappedLines [1].ToString ());
+			Assert.Equal ("nt", wrappedLines [2].ToString ());
+			Assert.Equal ("en", wrappedLines [3].ToString ());
+			Assert.Equal ("ce", wrappedLines [4].ToString ());
+			Assert.Equal (" ", wrappedLines [5].ToString ());
+			Assert.Equal ("ha", wrappedLines [6].ToString ());
+			Assert.Equal ("s ", wrappedLines [7].ToString ());
+			Assert.Equal ("wo", wrappedLines [8].ToString ());
+			Assert.Equal ("rd", wrappedLines [9].ToString ());
+			Assert.Equal ("s.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 11);
+
+			maxWidth = 1;
+			expectedClippedWidth = 1;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A", wrappedLines [0].ToString ());
+			Assert.Equal (" ", wrappedLines [1].ToString ());
+			Assert.Equal ("s", wrappedLines [2].ToString ());
+			Assert.Equal ("e", wrappedLines [3].ToString ());
+			Assert.Equal ("n", wrappedLines [4].ToString ());
+			Assert.Equal ("t", wrappedLines [5].ToString ());
+			Assert.Equal ("e", wrappedLines [6].ToString ());
+			Assert.Equal ("n", wrappedLines [7].ToString ());
+			Assert.Equal ("c", wrappedLines [8].ToString ());
+			Assert.Equal ("e", wrappedLines [9].ToString ());
+			Assert.Equal (" ", wrappedLines [10].ToString ());
+			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == text.Length);
+		}
+
+		[Fact]
+		public void WordWrap_preserveTrailingSpaces_With_Tab ()
+		{
+			var text = ustring.Empty;
+			int maxWidth = 1;
+			int expectedClippedWidth = 1;
+
+			List<ustring> wrappedLines;
+
+			text = "A sentence\t\t\t has words.";
+			var tabWidth = 4;
+			maxWidth = 14;
+			expectedClippedWidth = 11;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true, tabWidth);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A sentence\t", wrappedLines [0].ToString ());
+			Assert.Equal ("\t\t has ", wrappedLines [1].ToString ());
+			Assert.Equal ("words.", wrappedLines [2].ToString ());
+			Assert.True (wrappedLines.Count == 3);
+
+			maxWidth = 3;
+			expectedClippedWidth = 3;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true, tabWidth);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("sen", wrappedLines [1].ToString ());
+			Assert.Equal ("ten", wrappedLines [2].ToString ());
+			Assert.Equal ("ce", wrappedLines [3].ToString ());
+			Assert.Equal ("\t", wrappedLines [4].ToString ());
+			Assert.Equal ("\t", wrappedLines [5].ToString ());
+			Assert.Equal ("\t", wrappedLines [6].ToString ());
+			Assert.Equal (" ", wrappedLines [7].ToString ());
+			Assert.Equal ("has", wrappedLines [8].ToString ());
+			Assert.Equal (" ", wrappedLines [9].ToString ());
+			Assert.Equal ("wor", wrappedLines [10].ToString ());
+			Assert.Equal ("ds.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 12);
+
+			maxWidth = 2;
+			expectedClippedWidth = 2;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true, tabWidth);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("se", wrappedLines [1].ToString ());
+			Assert.Equal ("nt", wrappedLines [2].ToString ());
+			Assert.Equal ("en", wrappedLines [3].ToString ());
+			Assert.Equal ("ce", wrappedLines [4].ToString ());
+			Assert.Equal ("\t", wrappedLines [5].ToString ());
+			Assert.Equal ("\t", wrappedLines [6].ToString ());
+			Assert.Equal ("\t", wrappedLines [7].ToString ());
+			Assert.Equal (" ", wrappedLines [8].ToString ());
+			Assert.Equal ("ha", wrappedLines [9].ToString ());
+			Assert.Equal ("s ", wrappedLines [10].ToString ());
+			Assert.Equal ("wo", wrappedLines [11].ToString ());
+			Assert.Equal ("rd", wrappedLines [12].ToString ());
+			Assert.Equal ("s.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 14);
+
+			maxWidth = 1;
+			expectedClippedWidth = 1;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true, tabWidth);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A", wrappedLines [0].ToString ());
+			Assert.Equal (" ", wrappedLines [1].ToString ());
+			Assert.Equal ("s", wrappedLines [2].ToString ());
+			Assert.Equal ("e", wrappedLines [3].ToString ());
+			Assert.Equal ("n", wrappedLines [4].ToString ());
+			Assert.Equal ("t", wrappedLines [5].ToString ());
+			Assert.Equal ("e", wrappedLines [6].ToString ());
+			Assert.Equal ("n", wrappedLines [7].ToString ());
+			Assert.Equal ("c", wrappedLines [8].ToString ());
+			Assert.Equal ("e", wrappedLines [9].ToString ());
+			Assert.Equal ("\t", wrappedLines [10].ToString ());
+			Assert.Equal ("\t", wrappedLines [11].ToString ());
+			Assert.Equal ("\t", wrappedLines [12].ToString ());
+			Assert.Equal (" ", wrappedLines [13].ToString ());
+			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == text.Length);
+		}
+
 		[Fact]
 		public void ReplaceHotKeyWithTag ()
 		{
@@ -1961,7 +2109,7 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list[0]);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = text.RuneCount - 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
@@ -2011,10 +2159,10 @@ namespace Terminal.Gui {
 			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth); 
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace("\n", " "), list [0]);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
 
 			// no clip
 			maxWidth = text.RuneCount + 0;
@@ -2051,7 +2199,7 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth) + 1;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " ").ToString(), list [0].ToString());
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " ").ToString (), list [0].ToString ());
 
 			// no clip
 			maxWidth = text.RuneCount + 0;
@@ -2145,7 +2293,6 @@ namespace Terminal.Gui {
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89 end", list [0]);
-		
 		}
 
 		[Fact]
@@ -2295,128 +2442,65 @@ namespace Terminal.Gui {
 			Assert.Equal (1, c.Utf8SequenceLength);
 
 			c = new System.Text.Rune ('\u1150');
-			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1150	ᅐ	Unicode Technical Report #11
+			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1150	ᅐ	Unicode Technical Report #11
 
 			c = new System.Text.Rune ('\u1161');
-			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1161	ᅡ	column width of 0
+			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1161	ᅡ	column width of 0
 
 			c = new System.Text.Rune (31);
-			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
 
 			c = new System.Text.Rune (127);
-			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
 		}
 
 		[Fact]
-		public void Format_WordWrap_Keep_End_Spaces ()
+		public void Format_WordWrap_preserveTrailingSpaces ()
 		{
 			ustring text = " A sentence has words. \n This is the second Line - 2. ";
 
 			// With preserveTrailingSpaces = false by default.
 			var list1 = TextFormatter.Format (text, 4, TextAlignment.Left, true);
 			ustring wrappedText1 = ustring.Empty;
-			var idx = 0;
+			Assert.Equal (" A", list1 [0].ToString ());
+			Assert.Equal ("sent", list1 [1].ToString ());
+			Assert.Equal ("ence", list1 [2].ToString ());
+			Assert.Equal ("has", list1 [3].ToString ());
+			Assert.Equal ("word", list1 [4].ToString ());
+			Assert.Equal ("s. ", list1 [5].ToString ());
+			Assert.Equal (" Thi", list1 [6].ToString ());
+			Assert.Equal ("s is", list1 [7].ToString ());
+			Assert.Equal ("the", list1 [8].ToString ());
+			Assert.Equal ("seco", list1 [9].ToString ());
+			Assert.Equal ("nd", list1 [10].ToString ());
+			Assert.Equal ("Line", list1 [11].ToString ());
+			Assert.Equal ("- 2.", list1 [^1].ToString ());
 			foreach (var txt in list1) {
 				wrappedText1 += txt;
-				switch (idx) {
-				case 0:
-					Assert.Equal (" A", txt);
-					break;
-				case 1:
-					Assert.Equal ("sent", txt);
-					break;
-				case 2:
-					Assert.Equal ("ence", txt);
-					break;
-				case 3:
-					Assert.Equal ("has", txt);
-					break;
-				case 4:
-					Assert.Equal ("word", txt);
-					break;
-				case 5:
-					Assert.Equal ("s. ", txt);
-					break;
-				case 6:
-					Assert.Equal (" Thi", txt);
-					break;
-				case 7:
-					Assert.Equal ("s is", txt);
-					break;
-				case 8:
-					Assert.Equal ("the", txt);
-					break;
-				case 9:
-					Assert.Equal ("seco", txt);
-					break;
-				case 10:
-					Assert.Equal ("nd", txt);
-					break;
-				case 11:
-					Assert.Equal ("Line", txt);
-					break;
-				case 12:
-					Assert.Equal ("- 2.", txt);
-					break;
-				}
-				idx++;
 			}
 			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1);
 
 			// With preserveTrailingSpaces = true.
 			var list2 = TextFormatter.Format (text, 4, TextAlignment.Left, true, true);
 			ustring wrappedText2 = ustring.Empty;
-			idx = 0;
+			Assert.Equal (" A ", list2 [0].ToString ());
+			Assert.Equal ("sent", list2 [1].ToString ());
+			Assert.Equal ("ence", list2 [2].ToString ());
+			Assert.Equal (" has", list2 [3].ToString ());
+			Assert.Equal (" ", list2 [4].ToString ());
+			Assert.Equal ("word", list2 [5].ToString ());
+			Assert.Equal ("s. ", list2 [6].ToString ());
+			Assert.Equal (" ", list2 [7].ToString ());
+			Assert.Equal ("This", list2 [8].ToString ());
+			Assert.Equal (" is ", list2 [9].ToString ());
+			Assert.Equal ("the ", list2 [10].ToString ());
+			Assert.Equal ("seco", list2 [11].ToString ());
+			Assert.Equal ("nd ", list2 [12].ToString ());
+			Assert.Equal ("Line", list2 [13].ToString ());
+			Assert.Equal (" - ", list2 [14].ToString ());
+			Assert.Equal ("2. ", list2 [^1].ToString ());
 			foreach (var txt in list2) {
 				wrappedText2 += txt;
-				switch (idx) {
-				case 0:
-					Assert.Equal (" A", txt);
-					break;
-				case 1:
-					Assert.Equal (" sen", txt);
-					break;
-				case 2:
-					Assert.Equal ("tenc", txt);
-					break;
-				case 3:
-					Assert.Equal ("e", txt);
-					break;
-				case 4:
-					Assert.Equal (" has", txt);
-					break;
-				case 5:
-					Assert.Equal (" wor", txt);
-					break;
-				case 6:
-					Assert.Equal ("ds. ", txt);
-					break;
-				case 7:
-					Assert.Equal (" Thi", txt);
-					break;
-				case 8:
-					Assert.Equal ("s is", txt);
-					break;
-				case 9:
-					Assert.Equal (" the", txt);
-					break;
-				case 10:
-					Assert.Equal (" sec", txt);
-					break;
-				case 11:
-					Assert.Equal ("ond", txt);
-					break;
-				case 12:
-					Assert.Equal (" Lin", txt);
-					break;
-				case 13:
-					Assert.Equal ("e -", txt);
-					break;
-				case 14:
-					Assert.Equal (" 2. ", txt);
-					break;
-				}
-				idx++;
 			}
 			Assert.Equal (" A sentence has words.  This is the second Line - 2. ", wrappedText2);
 		}
@@ -2425,6 +2509,58 @@ namespace Terminal.Gui {
 		public void Format_Throw_ArgumentException_With_WordWrap_As_False_And_Keep_End_Spaces_As_True ()
 		{
 			Assert.Throws<ArgumentException> (() => TextFormatter.Format ("Some text", 4, TextAlignment.Left, false, true));
+		}
+
+		[Fact]
+		public void Draw_Horizontal_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("view") { X = -2 };
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.X);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
+		}
+
+		[Fact]
+		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("view") {
+				Y = -2,
+				Height = 10,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.Y);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
 		}
 	}
 }

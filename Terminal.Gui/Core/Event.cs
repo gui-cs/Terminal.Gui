@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The key code representing null or empty
 		/// </summary>
-		Null = 0,
+		Null = '\0',
 
 		/// <summary>
 		/// The key code for the user pressing the return key.

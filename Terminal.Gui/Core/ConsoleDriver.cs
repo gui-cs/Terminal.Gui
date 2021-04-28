@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			Value = (int)foreground | ((int)background << 4);
+			Value = Make (foreground, background).Value;
 			Foreground = foreground;
 			Background = background;
 		}
@@ -738,6 +738,16 @@ namespace Terminal.Gui {
 		/// <param name="foregroundColorId">Foreground color identifier.</param>
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
+
+		/// <summary>
+		/// Allows sending keys without typing on a keyboard.
+		/// </summary>
+		/// <param name="keyChar">The character key.</param>
+		/// <param name="key">The key.</param>
+		/// <param name="shift">If shift key is sending.</param>
+		/// <param name="alt">If alt key is sending.</param>
+		/// <param name="control">If control key is sending.</param>
+		public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control);
 
 		/// <summary>
 		/// Set the handler when the terminal is resized.

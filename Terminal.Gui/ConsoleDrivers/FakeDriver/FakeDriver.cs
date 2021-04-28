@@ -287,7 +287,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Enter:
 				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return MapKeyModifiers (keyInfo, Key.Space);
+				return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 			case ConsoleKey.Backspace:
 				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
@@ -353,6 +353,9 @@ namespace Terminal.Gui {
 
 				return (Key)((uint)Key.F1 + delta);
 			}
+			if (keyInfo.KeyChar != 0) {
+				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			}
 
 			return (Key)(0xffffffff);
 		}
@@ -372,55 +375,46 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
+		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyUpHandler;
+
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			this.keyHandler = keyHandler;
+			this.keyUpHandler = keyUpHandler;
+
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as FakeMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
-				var map = MapKey (consoleKey);
-				if (map == (Key)0xffffffff)
-					return;
+			(mainLoop.Driver as FakeMainLoop).KeyPressed += (consoleKey) => ProcessInput (consoleKey);
+		}
 
-				if (keyModifiers == null)
-					keyModifiers = new KeyModifiers ();
-				switch (consoleKey.Modifiers) {
-				case ConsoleModifiers.Alt:
-					keyModifiers.Alt = true;
-					break;
-				case ConsoleModifiers.Shift:
-					keyModifiers.Shift = true;
-					break;
-				case ConsoleModifiers.Control:
-					keyModifiers.Ctrl = true;
-					break;
-				}
+		void ProcessInput (ConsoleKeyInfo consoleKey)
+		{
+			var map = MapKey (consoleKey);
+			if (map == (Key)0xffffffff)
+				return;
 
-				keyHandler (new KeyEvent (map, keyModifiers));
-				keyUpHandler (new KeyEvent (map, keyModifiers));
+			if (keyModifiers == null) {
 				keyModifiers = new KeyModifiers ();
-			};
+			}
+
+			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+				keyModifiers.Alt = true;
+			}
+			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
+				keyModifiers.Shift = true;
+			}
+			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Control)) {
+				keyModifiers.Ctrl = true;
+			}
+
+			keyHandler (new KeyEvent (map, keyModifiers));
+			keyUpHandler (new KeyEvent (map, keyModifiers));
+			keyModifiers = new KeyModifiers ();
 		}
 
 		public override Attribute GetAttribute ()
 		{
 			return currentAttribute;
-		}
-
-		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void CookMouse ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
 		}
 
 		/// <inheritdoc/>
@@ -441,6 +435,29 @@ namespace Terminal.Gui {
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			ProcessInput (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
+		}
+
+		#region Unused
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		{
+		}
+
+		public override void SetColors (short foregroundColorId, short backgroundColorId)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override void CookMouse ()
+		{
+		}
+
+		public override void UncookMouse ()
+		{
 		}
 
 		#endregion

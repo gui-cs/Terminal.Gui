@@ -1,18 +1,16 @@
 ![.NET Core](https://github.com/migueldeicaza/gui.cs/workflows/.NET%20Core/badge.svg?branch=master)
 ![Code scanning - action](https://github.com/migueldeicaza/gui.cs/workflows/Code%20scanning%20-%20action/badge.svg)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
+![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
+![Bugs](https://img.shields.io/github/issues/migueldeicaza/gui.cs/bug)
 
-# Terminal.Gui - Terminal GUI toolkit for .NET
+# Terminal.Gui - Cross Platform Terminal GUI toolkit for .NET
 
-A simple toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
-
-The most recent released [Nuget package is version `0.90.x`](https://www.nuget.org/packages/Terminal.Gui) which is the "Stable, Feature Complete" pre-release of 1.0.
-
-Nuget also contains pre-release versions of 1.0; they are identified with `-pre` or `-beta` in the version number (e.g. `1.0.0-pre.1`)
 
 ## Controls & Features
 
@@ -35,6 +33,7 @@ Nuget also contains pre-release versions of 1.0; they are identified with `-pre`
 * [TableView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html)
 * [Time & Date Fields](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html)
 * [TextField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [TextValidateField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html)
 * [TextView (Text Editor)](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)
 * [TreeView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html)
 * [ScrollView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html)
@@ -71,7 +70,7 @@ To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or
 
 ### Driver model
 
-**Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/WindowsDriver.cs) front-end.
+**Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/CursesDriver/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/WindowsDriver.cs) front-end.
 
 `ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
 
@@ -79,7 +78,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Showcase & Examples
 
-* **[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* **[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
 * **[Reactive Example](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
 * **[Example (aka `demo.cs`)](https://github.com/migueldeicaza/gui.cs/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the simple demo.
 * **[Standalone Example](https://github.com/migueldeicaza/gui.cs/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
@@ -203,7 +202,7 @@ dotnet add package Terminal.Gui
 
 ## Running and Building
 
-* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet ./UICatalog/bin/Debug/net5.0/UICatalog.dll` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project ./UICatalog` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
 ## Contributing
@@ -222,4 +221,4 @@ A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Eve
 
 Release history can be found in the [Terminal.Gui.csproj](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
 
-In 2019 and 2020, Charlie Kindel (https://github.com/tig) and @BDisp (https://github.com/BDisp) vastly extended, improved, polished and fixed gui.cs to what it is today.
+In 2019, 2020, and 2021, Charlie Kindel (https://github.com/tig), @BDisp (https://github.com/BDisp), and Thomas Nind (https://github.com/tznind) vastly extended, improved, polished and fixed gui.cs to what it is today.

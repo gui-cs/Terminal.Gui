@@ -7,7 +7,8 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
+
 	public class TableViewTests 
 	{
 
@@ -297,7 +298,7 @@ namespace Terminal.Gui {
 
             // select the last row
             tableView.MultiSelectedRegions.Clear();
-            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(0,3), new Rect(0,3,4,1)));
+            tableView.MultiSelectedRegions.Push(new TableView.TableSelection (new Point(0,3), new Rect(0,3,4,1)));
 
             Assert.Equal(4,tableView.GetAllSelectedCells().Count());
 
@@ -399,8 +400,8 @@ namespace Terminal.Gui {
             */
 
             tableView.MultiSelectedRegions.Clear();
-            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(1,1),new Rect(1,1,2,2)));
-            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(7,3),new Rect(7,3,2,1)));
+            tableView.MultiSelectedRegions.Push(new TableView.TableSelection(new Point(1,1),new Rect(1,1,2,2)));
+            tableView.MultiSelectedRegions.Push(new TableView.TableSelection (new Point(7,3),new Rect(7,3,2,1)));
             
             tableView.SelectedColumn = 8;
             tableView.SelectedRow = 3;

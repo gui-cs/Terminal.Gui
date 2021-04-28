@@ -208,6 +208,9 @@ namespace Terminal.Gui {
 //			System.Diagnostics.Debugger.Break ();
 //#endif
 
+			// Reset all class variables (Application is a singleton).
+			ResetState ();
+
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
 				if (mainLoopDriver == null) {
@@ -523,6 +526,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Shutdown ()
 		{
+			ResetState ();
+		}
+
+		// Encapsulate all setting of initial state for Application; Having
+		// this in a function like this ensures we don't make mistakes in
+		// guranteeing that the state of this singleton is deterministic when Init
+		// starts running and after Shutdown returns.
+		static void ResetState () {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
@@ -538,6 +549,10 @@ namespace Terminal.Gui {
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
+			Iteration = null;
+			UseSystemConsole = false;
+			RootMouseEvent = null;
+			Resized = null;
 			_initialized = false;
 
 			// Reset synchronization context to allow the user to run async/await,
@@ -546,6 +561,7 @@ namespace Terminal.Gui {
 			// (https://github.com/migueldeicaza/gui.cs/issues/1084).
 			SynchronizationContext.SetSynchronizationContext (syncContext: null);
 		}
+
 
 		static void Redraw (View view)
 		{
@@ -760,6 +776,9 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Top.Frame = full;
+			Top.Width = full.Width;
+			Top.Height = full.Height;
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {

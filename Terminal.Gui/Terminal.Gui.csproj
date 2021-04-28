@@ -1,23 +1,83 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
+    <PackageReference Include="NStack.Core" Version="0.16.0" />
+    <PackageReference Include="MinVer" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>  
+    <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
+  </ItemGroup>
+  
   <PropertyGroup>
+    <!-- See Terminal.Gui/README.md for how version numbering works -->
+    <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+
     <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
     <Description>Console user interface toolkit for .NET applications.</Description>
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
+
     <PackageReleaseNotes>
-      v1.0.0-beta.9
+      v1.0.0-rc.10
+      * Fixes #931. Fixed the limit 25 lines issue
+      * Fixes #1251. Fixes TextValidateProvider exception on the All View Tester scenario.
+
+      v1.0.0-rc.9
+      * Fixes #1210. Added AllowsReturn, AllowsTab and Multiline into the TextView.
+      * Fixes #1241. Added SendKeys feature to the ConsoleDriver.
+      * Fixes #418 and #931. Unix terminal hangs after exit.
+
+      v1.0.0-rc.2
+      * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
+      * Refactored TreeView and TabView to reduce api surface area
+      * Added code coverage reporting
+
+      v1.0.0-rc.1
+      * Added Dependabot support and updated dependencies
+      * Renamed master branch to main
+      * Fixes #1211. Added support to TextView for word based operations Ctrl+Del and Ctrl+Backspace
+      * Fixes #1208. Now the selected text is overwritten if SelectedStart is greater than CursorPosition.
+      * Fixes #1206. NetDriver now print the selected text. Attribute struct now create a valid Value for the current driver. Insert key is detected by NetDriver.
+      * Fixes #1202. CheckBox now deals with a functional '_' underscore hotkey.
+      * Fixes #1199. Normalize views constructors and did some typo fixing.
+      * Fixes #1197. Prevents width negative value if added directly to the A
+      * Added Vertical Alignment and Text Direction + UICatalog Demo (thanks @jmprricone!)
+      * Fixes #1193. A non auto size default Button now preserves his width and thus the text alignment now work.
+      * Fixes #1187. Prevents WordBackward throwing an exception if point is greater than the text length
+      * Fixes #1185. Button click is only processed if there are no mouse mov
+      * Fixes #1183. ListView now return true on the handled keys
+      * Fixes #1179. TextView does not copy to the clipboard on deleting
+      * Fixes #1177. Now is possible to copy or cut on the TextView with the...
+      * Fixes #1175. demo.cs editor now implement "Copy", "Cut" and "Paste".
+      * Fixes #1173. TextField only need to handle a single line.
+      * Fixes #1171. Delete and Backspace now deletes the selected text
+      * Fixes #1167. Application.Run method with #DEBUG can be simplified.
+      * Fixes #1165. Changing the directory name label or the field name crashes
+      * Fixes #1159. Dialog must have a default button if none is provided.
+
+      v1.0.0-beta.11
       * NEW CONTROL: Tabview - thanks @tznind!
       * UI Catalog now shows correct Terminal.gui.dll version
       * Fixes #939 - README sample does not compile - thanks @buzzfrog!
@@ -189,34 +249,4 @@
       * Fixes #838. Added a Visible property to the View. (Thanks @bidsp!)
     </PackageReleaseNotes>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
-    <PackageReference Include="NStack.Core" Version="0.16.0" />
-    <PackageReference Include="MinVer" Version="2.4.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>  
-  </ItemGroup>
-
-  <PropertyGroup>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
-  </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
 	public class ScrollBarViewTests {
 		public class HostView : View {
 			public int Top { get; set; }

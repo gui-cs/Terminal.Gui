@@ -44,7 +44,7 @@ In the example above, you can see that we have initialized the runtime by callin
 [`Init`](../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init) method in the Application class - this sets up the environment, initializes the color
 schemes available for your application and clears the screen to start your application.
 
-The [`Application`](../api/Terminal.Gui/Terminal.Gui.Application.html) class, additionally creates an instance of the [Toplevel]((../api/Terminal.Gui/Terminal.Gui.Toplevel.html) class that is ready to be consumed, 
+The [`Application`](../api/Terminal.Gui/Terminal.Gui.Application.html) class, additionally creates an instance of the [`Toplevel`](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) class that is ready to be consumed, 
 this instance is available in the `Application.Top` property, and can be used like this:
 
 ```csharp
@@ -425,4 +425,4 @@ label.TextColor = myColor
 MainLoop, Threads and Input Handling
 ====================================
 
-Detailed description of the mainlop is described on the [Event Processing and the Application Main Loop](mainloop.html) document.
+Detailed description of the mainloop is described on the [Event Processing and the Application Main Loop](mainloop.html) document.
