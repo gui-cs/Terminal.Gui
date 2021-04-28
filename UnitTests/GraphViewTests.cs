@@ -8,7 +8,7 @@ using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
 		
 		#region Helper Classes
 		class FakeHAxis : HorizontalAxis {
