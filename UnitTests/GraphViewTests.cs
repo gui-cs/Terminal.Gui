@@ -7,6 +7,7 @@ using Terminal.Gui.Graphs;
 using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views {
 		
@@ -75,17 +76,25 @@ namespace Terminal.Gui.Views {
 				sb.AppendLine ();
 			}
 
-			var look = sb.ToString ();
+			var actualLook = sb.ToString ();
 
-			if (!string.Equals (expectedLook, look)) {
+			if (!string.Equals (expectedLook, actualLook)) {
 
-				expectedLook = expectedLook.Trim ().Replace ("\r\n", "\n");
-				look = look.Trim ().Replace ("\r\n", "\n");
+				// ignore trailing whitespace on each line
+				var trailingWhitespace = new Regex (@"\s+$",RegexOptions.Multiline);
+				
+				// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
+				expectedLook =  trailingWhitespace.Replace(expectedLook,"").Trim();
+				actualLook = trailingWhitespace.Replace (actualLook, "").Trim ();
+
+				// standardise line endings for the comparison
+				expectedLook = expectedLook.Replace ("\r\n", "\n");
+				actualLook = actualLook.Replace ("\r\n", "\n");
 
 				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-				Console.WriteLine ("But Was:" + Environment.NewLine + look);
+				Console.WriteLine ("But Was:" + Environment.NewLine + actualLook);
 
-				Assert.Equal (expectedLook, look);
+				Assert.Equal (expectedLook, actualLook);
 			}
 		}
 
@@ -979,6 +988,103 @@ namespace Terminal.Gui.Views {
 
 
 		
+	}
+
+	public class TextAnnotationTests {
+
+		private GraphView GetGraph ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.MarginBottom = 1;
+			gv.MarginLeft = 1;
+			gv.Bounds = new Rect (0, 0, 10, 5);
+
+			return gv;
+		}
+		[Fact]
+		public void TestTextAnnotation_ScreenUnits()
+		{
+			var gv = GetGraph ();
+
+			gv.Annotations.Add (new TextAnnotation () {
+				Text = "hey!",
+				ScreenPosition = new Point (3, 1)
+			});
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │
+ ┤ hey!
+ ┤
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+			// user scrolls up one unit of graph space
+			gv.ScrollOffset = new PointF (0, 1f);
+			gv.Redraw (gv.Bounds); 
+			
+			// we expect no change in the location of the annotation (only the axis label changes)
+			// this is because screen units are constant and do not change as the viewport into
+			// graph space scrolls to different areas of the graph
+			expected =
+@"
+ │
+ ┤ hey!
+ ┤
+1┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+		}
+
+
+		[Fact]
+		public void TestTextAnnotation_GraphUnits ()
+		{
+			var gv = GetGraph ();
+
+			gv.Annotations.Add (new TextAnnotation () {
+				Text = "hey!",
+				GraphPosition = new PointF (2, 2)
+			});
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │
+ ┤ hey!
+ ┤
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+			// user scrolls up one unit of graph space
+			gv.ScrollOffset = new PointF (0, 1f);
+			gv.Redraw (gv.Bounds);
+
+			// we expect the text annotation to go down one line since
+			// the scroll offset means that that point of graph space is 
+			// lower down in the view.  Note the 1 on the axis too, our viewport
+			// (excluding margins) now shows y of 1 to 4 (previously 0 to 5)
+			expected =
+@"
+ │
+ ┤ 
+ ┤ hey!
+1┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+		}
 	}
 
 	public class AxisIncrementToRenderTests {
