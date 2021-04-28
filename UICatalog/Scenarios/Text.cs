@@ -112,35 +112,37 @@ namespace UICatalog {
 			_timeField.TimeChanged += TimeChanged;
 
 			// MaskedTextProvider
-			var netProvider = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+			var netProviderLabel = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
 				X = Pos.Left (dateField),
 				Y = Pos.Bottom (dateField) + 1
 			};
-			Win.Add (netProvider);
+			Win.Add (netProviderLabel);
 
-			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL| AAA aaa") {
-				X = Pos.Right (netProvider) + 1,
-				Y = Pos.Y (netProvider),
-				Width = 40,
+			var netProvider = new NetMaskedTextProvider ("--(0000)--");// ("999 000 LLL > LLL | AAA aaa");
+
+			var netProviderField = new TextValidateField (netProvider) {
+				X = Pos.Right (netProviderLabel) + 1,
+				Y = Pos.Y (netProviderLabel),
+				Width = 20,
 				TextAlignment = TextAlignment.Centered
 			};
+
 			Win.Add (netProviderField);
 
 			// TextRegexProvider
 			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
-				X = Pos.Left (netProvider),
-				Y = Pos.Bottom (netProvider) + 1
+				X = Pos.Left (netProviderLabel),
+				Y = Pos.Bottom (netProviderLabel) + 1
 			};
 			Win.Add (regexProvider);
 
-			var regexProviderField = new TextValidateField<TextRegexProvider> ("^([0-9]?[0-9]?[0-9]|1000)$") {
+			var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+			var regexProviderField = new TextValidateField (provider2) {
 				X = Pos.Right (regexProvider) + 1,
 				Y = Pos.Y (regexProvider),
-				Width = 40,
+				Width = 30,
 				TextAlignment = TextAlignment.Centered
 			};
-			// Access the inner Provider to configure.
-			regexProviderField.Provider.ValidateOnInput = false;
 
 			Win.Add (regexProviderField);
 		}
