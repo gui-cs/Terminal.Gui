@@ -8,6 +8,7 @@ using Xunit;
 using System.Globalization;
 
 namespace Terminal.Gui.Views {
+  
 	public class TabViewTests {
 		private TabView GetTabView ()
 		{

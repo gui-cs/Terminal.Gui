@@ -26,6 +26,11 @@ namespace Terminal.Gui {
 		int [,,] contents;
 		bool [] dirtyLine;
 
+		/// <summary>
+		/// Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public int [,,] Contents => contents;
+
 		void UpdateOffscreen ()
 		{
 			int cols = Cols;
