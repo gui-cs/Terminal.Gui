@@ -40,6 +40,10 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.0.0-rc.13
+      * NEW CONTROL: GraphView - thanks @tznind!
+      * Fixes #1256 - OutConsoleGridView no longer works - ENTER does not work
+
       v1.0.0-rc.12
       * Fixes #1257 - ListView's ProcessKey should return false if no OpenSelectedItem handler is defined
 
