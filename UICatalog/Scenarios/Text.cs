@@ -118,13 +118,11 @@ namespace UICatalog {
 			};
 			Win.Add (netProviderLabel);
 
-			var netProvider = new NetMaskedTextProvider ("--(0000)--");// ("999 000 LLL > LLL | AAA aaa");
+			var netProvider = new NetMaskedTextProvider ("999 000 LLL > LLL | AAA aaa");
 
 			var netProviderField = new TextValidateField (netProvider) {
 				X = Pos.Right (netProviderLabel) + 1,
-				Y = Pos.Y (netProviderLabel),
-				Width = 20,
-				TextAlignment = TextAlignment.Centered
+				Y = Pos.Y (netProviderLabel)
 			};
 
 			Win.Add (netProviderField);
