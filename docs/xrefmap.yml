@@ -1717,6 +1717,19 @@ references:
   commentId: F:Terminal.Gui.ConsoleDriver.Selected
   fullName: Terminal.Gui.ConsoleDriver.Selected
   nameWithType: ConsoleDriver.Selected
+- uid: Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  name: SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_
+  commentId: M:Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.SendKeys(System.Char, System.ConsoleKey, System.Boolean, System.Boolean, System.Boolean)
+  nameWithType: ConsoleDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+- uid: Terminal.Gui.ConsoleDriver.SendKeys*
+  name: SendKeys
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SendKeys_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.SendKeys
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.SendKeys
+  nameWithType: ConsoleDriver.SendKeys
 - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
   name: SetAttribute(Attribute)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_
@@ -3311,6 +3324,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FakeDriver.Cols
   nameWithType: FakeDriver.Cols
+- uid: Terminal.Gui.FakeDriver.Contents
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Contents
+  commentId: P:Terminal.Gui.FakeDriver.Contents
+  fullName: Terminal.Gui.FakeDriver.Contents
+  nameWithType: FakeDriver.Contents
+- uid: Terminal.Gui.FakeDriver.Contents*
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Contents_
+  commentId: Overload:Terminal.Gui.FakeDriver.Contents
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Contents
+  nameWithType: FakeDriver.Contents
 - uid: Terminal.Gui.FakeDriver.CookMouse
   name: CookMouse()
   href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_CookMouse
@@ -3473,6 +3499,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FakeDriver.Rows
   nameWithType: FakeDriver.Rows
+- uid: Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  name: SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_
+  commentId: M:Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  fullName: Terminal.Gui.FakeDriver.SendKeys(System.Char, System.ConsoleKey, System.Boolean, System.Boolean, System.Boolean)
+  nameWithType: FakeDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+- uid: Terminal.Gui.FakeDriver.SendKeys*
+  name: SendKeys
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SendKeys_
+  commentId: Overload:Terminal.Gui.FakeDriver.SendKeys
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.SendKeys
+  nameWithType: FakeDriver.SendKeys
 - uid: Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)
   name: SetAttribute(Attribute)
   href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetAttribute_Terminal_Gui_Attribute_
@@ -4042,6 +4081,1333 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FrameView.Title
   nameWithType: FrameView.Title
+- uid: Terminal.Gui.Graphs
+  name: Terminal.Gui.Graphs
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.html
+  commentId: N:Terminal.Gui.Graphs
+  fullName: Terminal.Gui.Graphs
+  nameWithType: Terminal.Gui.Graphs
+- uid: Terminal.Gui.Graphs.Axis
+  name: Axis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html
+  commentId: T:Terminal.Gui.Graphs.Axis
+  fullName: Terminal.Gui.Graphs.Axis
+  nameWithType: Axis
+- uid: Terminal.Gui.Graphs.Axis.#ctor(Terminal.Gui.Graphs.Orientation)
+  name: Axis(Orientation)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis__ctor_Terminal_Gui_Graphs_Orientation_
+  commentId: M:Terminal.Gui.Graphs.Axis.#ctor(Terminal.Gui.Graphs.Orientation)
+  fullName: Terminal.Gui.Graphs.Axis.Axis(Terminal.Gui.Graphs.Orientation)
+  nameWithType: Axis.Axis(Orientation)
+- uid: Terminal.Gui.Graphs.Axis.#ctor*
+  name: Axis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Axis
+  nameWithType: Axis.Axis
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  name: DrawAxisLabel(GraphView, Int32, String)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLabel_Terminal_Gui_GraphView_System_Int32_System_String_
+  commentId: M:Terminal.Gui.Graphs.Axis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLabel(Terminal.Gui.GraphView, System.Int32, System.String)
+  nameWithType: Axis.DrawAxisLabel(GraphView, Int32, String)
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLabel*
+  name: DrawAxisLabel
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLabel_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.DrawAxisLabel
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLabel
+  nameWithType: Axis.DrawAxisLabel
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLabels(Terminal.Gui.GraphView)
+  name: DrawAxisLabels(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLabels_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.Axis.DrawAxisLabels(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLabels(Terminal.Gui.GraphView)
+  nameWithType: Axis.DrawAxisLabels(GraphView)
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLabels*
+  name: DrawAxisLabels
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLabels_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.DrawAxisLabels
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLabels
+  nameWithType: Axis.DrawAxisLabels
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView)
+  name: DrawAxisLine(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLine_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView)
+  nameWithType: Axis.DrawAxisLine(GraphView)
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  name: DrawAxisLine(GraphView, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLine_Terminal_Gui_GraphView_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLine(Terminal.Gui.GraphView, System.Int32, System.Int32)
+  nameWithType: Axis.DrawAxisLine(GraphView, Int32, Int32)
+- uid: Terminal.Gui.Graphs.Axis.DrawAxisLine*
+  name: DrawAxisLine
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_DrawAxisLine_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.DrawAxisLine
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.DrawAxisLine
+  nameWithType: Axis.DrawAxisLine
+- uid: Terminal.Gui.Graphs.Axis.Increment
+  name: Increment
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Increment
+  commentId: P:Terminal.Gui.Graphs.Axis.Increment
+  fullName: Terminal.Gui.Graphs.Axis.Increment
+  nameWithType: Axis.Increment
+- uid: Terminal.Gui.Graphs.Axis.Increment*
+  name: Increment
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Increment_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.Increment
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Increment
+  nameWithType: Axis.Increment
+- uid: Terminal.Gui.Graphs.Axis.LabelGetter
+  name: LabelGetter
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_LabelGetter
+  commentId: F:Terminal.Gui.Graphs.Axis.LabelGetter
+  fullName: Terminal.Gui.Graphs.Axis.LabelGetter
+  nameWithType: Axis.LabelGetter
+- uid: Terminal.Gui.Graphs.Axis.Minimum
+  name: Minimum
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Minimum
+  commentId: P:Terminal.Gui.Graphs.Axis.Minimum
+  fullName: Terminal.Gui.Graphs.Axis.Minimum
+  nameWithType: Axis.Minimum
+- uid: Terminal.Gui.Graphs.Axis.Minimum*
+  name: Minimum
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Minimum_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.Minimum
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Minimum
+  nameWithType: Axis.Minimum
+- uid: Terminal.Gui.Graphs.Axis.Orientation
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Orientation
+  commentId: P:Terminal.Gui.Graphs.Axis.Orientation
+  fullName: Terminal.Gui.Graphs.Axis.Orientation
+  nameWithType: Axis.Orientation
+- uid: Terminal.Gui.Graphs.Axis.Orientation*
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Orientation_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.Orientation
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Orientation
+  nameWithType: Axis.Orientation
+- uid: Terminal.Gui.Graphs.Axis.Reset
+  name: Reset()
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Reset
+  commentId: M:Terminal.Gui.Graphs.Axis.Reset
+  fullName: Terminal.Gui.Graphs.Axis.Reset()
+  nameWithType: Axis.Reset()
+- uid: Terminal.Gui.Graphs.Axis.Reset*
+  name: Reset
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Reset_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.Reset
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Reset
+  nameWithType: Axis.Reset
+- uid: Terminal.Gui.Graphs.Axis.ShowLabelsEvery
+  name: ShowLabelsEvery
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_ShowLabelsEvery
+  commentId: P:Terminal.Gui.Graphs.Axis.ShowLabelsEvery
+  fullName: Terminal.Gui.Graphs.Axis.ShowLabelsEvery
+  nameWithType: Axis.ShowLabelsEvery
+- uid: Terminal.Gui.Graphs.Axis.ShowLabelsEvery*
+  name: ShowLabelsEvery
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_ShowLabelsEvery_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.ShowLabelsEvery
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.ShowLabelsEvery
+  nameWithType: Axis.ShowLabelsEvery
+- uid: Terminal.Gui.Graphs.Axis.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Text
+  commentId: F:Terminal.Gui.Graphs.Axis.Text
+  fullName: Terminal.Gui.Graphs.Axis.Text
+  nameWithType: Axis.Text
+- uid: Terminal.Gui.Graphs.Axis.Visible
+  name: Visible
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Visible
+  commentId: P:Terminal.Gui.Graphs.Axis.Visible
+  fullName: Terminal.Gui.Graphs.Axis.Visible
+  nameWithType: Axis.Visible
+- uid: Terminal.Gui.Graphs.Axis.Visible*
+  name: Visible
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Axis.html#Terminal_Gui_Graphs_Axis_Visible_
+  commentId: Overload:Terminal.Gui.Graphs.Axis.Visible
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.Axis.Visible
+  nameWithType: Axis.Visible
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender
+  name: AxisIncrementToRender
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html
+  commentId: T:Terminal.Gui.Graphs.AxisIncrementToRender
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender
+  nameWithType: AxisIncrementToRender
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.#ctor(Terminal.Gui.Graphs.Orientation,System.Int32,System.Single)
+  name: AxisIncrementToRender(Orientation, Int32, Single)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender__ctor_Terminal_Gui_Graphs_Orientation_System_Int32_System_Single_
+  commentId: M:Terminal.Gui.Graphs.AxisIncrementToRender.#ctor(Terminal.Gui.Graphs.Orientation,System.Int32,System.Single)
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.AxisIncrementToRender(Terminal.Gui.Graphs.Orientation, System.Int32, System.Single)
+  nameWithType: AxisIncrementToRender.AxisIncrementToRender(Orientation, Int32, Single)
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.#ctor*
+  name: AxisIncrementToRender
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.AxisIncrementToRender.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.AxisIncrementToRender
+  nameWithType: AxisIncrementToRender.AxisIncrementToRender
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.Orientation
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_Orientation
+  commentId: P:Terminal.Gui.Graphs.AxisIncrementToRender.Orientation
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.Orientation
+  nameWithType: AxisIncrementToRender.Orientation
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.Orientation*
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_Orientation_
+  commentId: Overload:Terminal.Gui.Graphs.AxisIncrementToRender.Orientation
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.Orientation
+  nameWithType: AxisIncrementToRender.Orientation
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation
+  name: ScreenLocation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_ScreenLocation
+  commentId: P:Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation
+  nameWithType: AxisIncrementToRender.ScreenLocation
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation*
+  name: ScreenLocation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_ScreenLocation_
+  commentId: Overload:Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.ScreenLocation
+  nameWithType: AxisIncrementToRender.ScreenLocation
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.Value
+  name: Value
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_Value
+  commentId: P:Terminal.Gui.Graphs.AxisIncrementToRender.Value
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.Value
+  nameWithType: AxisIncrementToRender.Value
+- uid: Terminal.Gui.Graphs.AxisIncrementToRender.Value*
+  name: Value
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.AxisIncrementToRender.html#Terminal_Gui_Graphs_AxisIncrementToRender_Value_
+  commentId: Overload:Terminal.Gui.Graphs.AxisIncrementToRender.Value
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.AxisIncrementToRender.Value
+  nameWithType: AxisIncrementToRender.Value
+- uid: Terminal.Gui.Graphs.BarSeries
+  name: BarSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html
+  commentId: T:Terminal.Gui.Graphs.BarSeries
+  fullName: Terminal.Gui.Graphs.BarSeries
+  nameWithType: BarSeries
+- uid: Terminal.Gui.Graphs.BarSeries.AdjustColor(Terminal.Gui.Graphs.GraphCellToRender)
+  name: AdjustColor(GraphCellToRender)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_AdjustColor_Terminal_Gui_Graphs_GraphCellToRender_
+  commentId: M:Terminal.Gui.Graphs.BarSeries.AdjustColor(Terminal.Gui.Graphs.GraphCellToRender)
+  fullName: Terminal.Gui.Graphs.BarSeries.AdjustColor(Terminal.Gui.Graphs.GraphCellToRender)
+  nameWithType: BarSeries.AdjustColor(GraphCellToRender)
+- uid: Terminal.Gui.Graphs.BarSeries.AdjustColor*
+  name: AdjustColor
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_AdjustColor_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.AdjustColor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.AdjustColor
+  nameWithType: BarSeries.AdjustColor
+- uid: Terminal.Gui.Graphs.BarSeries.Bar
+  name: BarSeries.Bar
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html
+  commentId: T:Terminal.Gui.Graphs.BarSeries.Bar
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar
+  nameWithType: BarSeries.Bar
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.#ctor(System.String,Terminal.Gui.Graphs.GraphCellToRender,System.Single)
+  name: Bar(String, GraphCellToRender, Single)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar__ctor_System_String_Terminal_Gui_Graphs_GraphCellToRender_System_Single_
+  commentId: M:Terminal.Gui.Graphs.BarSeries.Bar.#ctor(System.String,Terminal.Gui.Graphs.GraphCellToRender,System.Single)
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Bar(System.String, Terminal.Gui.Graphs.GraphCellToRender, System.Single)
+  nameWithType: BarSeries.Bar.Bar(String, GraphCellToRender, Single)
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.#ctor*
+  name: Bar
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Bar.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Bar
+  nameWithType: BarSeries.Bar.Bar
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Fill
+  name: Fill
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Fill
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Bar.Fill
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Fill
+  nameWithType: BarSeries.Bar.Fill
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Fill*
+  name: Fill
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Fill_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Bar.Fill
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Fill
+  nameWithType: BarSeries.Bar.Fill
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Text
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Bar.Text
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Text
+  nameWithType: BarSeries.Bar.Text
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Text_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Bar.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Text
+  nameWithType: BarSeries.Bar.Text
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Value
+  name: Value
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Value
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Bar.Value
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Value
+  nameWithType: BarSeries.Bar.Value
+- uid: Terminal.Gui.Graphs.BarSeries.Bar.Value*
+  name: Value
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.Bar.html#Terminal_Gui_Graphs_BarSeries_Bar_Value_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Bar.Value
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Bar.Value
+  nameWithType: BarSeries.Bar.Value
+- uid: Terminal.Gui.Graphs.BarSeries.BarEvery
+  name: BarEvery
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_BarEvery
+  commentId: P:Terminal.Gui.Graphs.BarSeries.BarEvery
+  fullName: Terminal.Gui.Graphs.BarSeries.BarEvery
+  nameWithType: BarSeries.BarEvery
+- uid: Terminal.Gui.Graphs.BarSeries.BarEvery*
+  name: BarEvery
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_BarEvery_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.BarEvery
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.BarEvery
+  nameWithType: BarSeries.BarEvery
+- uid: Terminal.Gui.Graphs.BarSeries.Bars
+  name: Bars
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Bars
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Bars
+  fullName: Terminal.Gui.Graphs.BarSeries.Bars
+  nameWithType: BarSeries.Bars
+- uid: Terminal.Gui.Graphs.BarSeries.Bars*
+  name: Bars
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Bars_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Bars
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Bars
+  nameWithType: BarSeries.Bars
+- uid: Terminal.Gui.Graphs.BarSeries.DrawBarLine(Terminal.Gui.GraphView,Terminal.Gui.Point,Terminal.Gui.Point,Terminal.Gui.Graphs.BarSeries.Bar)
+  name: DrawBarLine(GraphView, Point, Point, BarSeries.Bar)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawBarLine_Terminal_Gui_GraphView_Terminal_Gui_Point_Terminal_Gui_Point_Terminal_Gui_Graphs_BarSeries_Bar_
+  commentId: M:Terminal.Gui.Graphs.BarSeries.DrawBarLine(Terminal.Gui.GraphView,Terminal.Gui.Point,Terminal.Gui.Point,Terminal.Gui.Graphs.BarSeries.Bar)
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawBarLine(Terminal.Gui.GraphView, Terminal.Gui.Point, Terminal.Gui.Point, Terminal.Gui.Graphs.BarSeries.Bar)
+  nameWithType: BarSeries.DrawBarLine(GraphView, Point, Point, BarSeries.Bar)
+- uid: Terminal.Gui.Graphs.BarSeries.DrawBarLine*
+  name: DrawBarLine
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawBarLine_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.DrawBarLine
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawBarLine
+  nameWithType: BarSeries.DrawBarLine
+- uid: Terminal.Gui.Graphs.BarSeries.DrawLabels
+  name: DrawLabels
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawLabels
+  commentId: P:Terminal.Gui.Graphs.BarSeries.DrawLabels
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawLabels
+  nameWithType: BarSeries.DrawLabels
+- uid: Terminal.Gui.Graphs.BarSeries.DrawLabels*
+  name: DrawLabels
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawLabels_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.DrawLabels
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawLabels
+  nameWithType: BarSeries.DrawLabels
+- uid: Terminal.Gui.Graphs.BarSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawSeries_Terminal_Gui_GraphView_Terminal_Gui_Rect_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.Graphs.BarSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  nameWithType: BarSeries.DrawSeries(GraphView, Rect, RectangleF)
+- uid: Terminal.Gui.Graphs.BarSeries.DrawSeries*
+  name: DrawSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_DrawSeries_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.DrawSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.DrawSeries
+  nameWithType: BarSeries.DrawSeries
+- uid: Terminal.Gui.Graphs.BarSeries.Offset
+  name: Offset
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Offset
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Offset
+  fullName: Terminal.Gui.Graphs.BarSeries.Offset
+  nameWithType: BarSeries.Offset
+- uid: Terminal.Gui.Graphs.BarSeries.Offset*
+  name: Offset
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Offset_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Offset
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Offset
+  nameWithType: BarSeries.Offset
+- uid: Terminal.Gui.Graphs.BarSeries.Orientation
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Orientation
+  commentId: P:Terminal.Gui.Graphs.BarSeries.Orientation
+  fullName: Terminal.Gui.Graphs.BarSeries.Orientation
+  nameWithType: BarSeries.Orientation
+- uid: Terminal.Gui.Graphs.BarSeries.Orientation*
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_Orientation_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.Orientation
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.Orientation
+  nameWithType: BarSeries.Orientation
+- uid: Terminal.Gui.Graphs.BarSeries.OverrideBarColor
+  name: OverrideBarColor
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_OverrideBarColor
+  commentId: P:Terminal.Gui.Graphs.BarSeries.OverrideBarColor
+  fullName: Terminal.Gui.Graphs.BarSeries.OverrideBarColor
+  nameWithType: BarSeries.OverrideBarColor
+- uid: Terminal.Gui.Graphs.BarSeries.OverrideBarColor*
+  name: OverrideBarColor
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.BarSeries.html#Terminal_Gui_Graphs_BarSeries_OverrideBarColor_
+  commentId: Overload:Terminal.Gui.Graphs.BarSeries.OverrideBarColor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.BarSeries.OverrideBarColor
+  nameWithType: BarSeries.OverrideBarColor
+- uid: Terminal.Gui.Graphs.GraphCellToRender
+  name: GraphCellToRender
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html
+  commentId: T:Terminal.Gui.Graphs.GraphCellToRender
+  fullName: Terminal.Gui.Graphs.GraphCellToRender
+  nameWithType: GraphCellToRender
+- uid: Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune)
+  name: GraphCellToRender(Rune)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender__ctor_System_Rune_
+  commentId: M:Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune)
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.GraphCellToRender(System.Rune)
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune)
+- uid: Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune,System.Nullable{Terminal.Gui.Attribute})
+  name: GraphCellToRender(Rune, Nullable<Attribute>)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender__ctor_System_Rune_System_Nullable_Terminal_Gui_Attribute__
+  commentId: M:Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune,System.Nullable{Terminal.Gui.Attribute})
+  name.vb: GraphCellToRender(Rune, Nullable(Of Attribute))
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.GraphCellToRender(System.Rune, System.Nullable<Terminal.Gui.Attribute>)
+  fullName.vb: Terminal.Gui.Graphs.GraphCellToRender.GraphCellToRender(System.Rune, System.Nullable(Of Terminal.Gui.Attribute))
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune, Nullable<Attribute>)
+  nameWithType.vb: GraphCellToRender.GraphCellToRender(Rune, Nullable(Of Attribute))
+- uid: Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune,Terminal.Gui.Attribute)
+  name: GraphCellToRender(Rune, Attribute)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender__ctor_System_Rune_Terminal_Gui_Attribute_
+  commentId: M:Terminal.Gui.Graphs.GraphCellToRender.#ctor(System.Rune,Terminal.Gui.Attribute)
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.GraphCellToRender(System.Rune, Terminal.Gui.Attribute)
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune, Attribute)
+- uid: Terminal.Gui.Graphs.GraphCellToRender.#ctor*
+  name: GraphCellToRender
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.GraphCellToRender.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.GraphCellToRender
+  nameWithType: GraphCellToRender.GraphCellToRender
+- uid: Terminal.Gui.Graphs.GraphCellToRender.Color
+  name: Color
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender_Color
+  commentId: P:Terminal.Gui.Graphs.GraphCellToRender.Color
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.Color
+  nameWithType: GraphCellToRender.Color
+- uid: Terminal.Gui.Graphs.GraphCellToRender.Color*
+  name: Color
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender_Color_
+  commentId: Overload:Terminal.Gui.Graphs.GraphCellToRender.Color
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.Color
+  nameWithType: GraphCellToRender.Color
+- uid: Terminal.Gui.Graphs.GraphCellToRender.Rune
+  name: Rune
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender_Rune
+  commentId: P:Terminal.Gui.Graphs.GraphCellToRender.Rune
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.Rune
+  nameWithType: GraphCellToRender.Rune
+- uid: Terminal.Gui.Graphs.GraphCellToRender.Rune*
+  name: Rune
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.GraphCellToRender.html#Terminal_Gui_Graphs_GraphCellToRender_Rune_
+  commentId: Overload:Terminal.Gui.Graphs.GraphCellToRender.Rune
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.GraphCellToRender.Rune
+  nameWithType: GraphCellToRender.Rune
+- uid: Terminal.Gui.Graphs.HorizontalAxis
+  name: HorizontalAxis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html
+  commentId: T:Terminal.Gui.Graphs.HorizontalAxis
+  fullName: Terminal.Gui.Graphs.HorizontalAxis
+  nameWithType: HorizontalAxis
+- uid: Terminal.Gui.Graphs.HorizontalAxis.#ctor
+  name: HorizontalAxis()
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis__ctor
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.#ctor
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.HorizontalAxis()
+  nameWithType: HorizontalAxis.HorizontalAxis()
+- uid: Terminal.Gui.Graphs.HorizontalAxis.#ctor*
+  name: HorizontalAxis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.HorizontalAxis.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.HorizontalAxis
+  nameWithType: HorizontalAxis.HorizontalAxis
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  name: DrawAxisLabel(GraphView, Int32, String)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLabel_Terminal_Gui_GraphView_System_Int32_System_String_
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel(Terminal.Gui.GraphView, System.Int32, System.String)
+  nameWithType: HorizontalAxis.DrawAxisLabel(GraphView, Int32, String)
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel*
+  name: DrawAxisLabel
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLabel_
+  commentId: Overload:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabel
+  nameWithType: HorizontalAxis.DrawAxisLabel
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  name: DrawAxisLabels(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLabels_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  nameWithType: HorizontalAxis.DrawAxisLabels(GraphView)
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels*
+  name: DrawAxisLabels
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLabels_
+  commentId: Overload:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLabels
+  nameWithType: HorizontalAxis.DrawAxisLabels
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  name: DrawAxisLine(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLine_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  nameWithType: HorizontalAxis.DrawAxisLine(GraphView)
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  name: DrawAxisLine(GraphView, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLine_Terminal_Gui_GraphView_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine(Terminal.Gui.GraphView, System.Int32, System.Int32)
+  nameWithType: HorizontalAxis.DrawAxisLine(GraphView, Int32, Int32)
+- uid: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine*
+  name: DrawAxisLine
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_DrawAxisLine_
+  commentId: Overload:Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.DrawAxisLine
+  nameWithType: HorizontalAxis.DrawAxisLine
+- uid: Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition(Terminal.Gui.GraphView)
+  name: GetAxisYPosition(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_GetAxisYPosition_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition(Terminal.Gui.GraphView)
+  nameWithType: HorizontalAxis.GetAxisYPosition(GraphView)
+- uid: Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition*
+  name: GetAxisYPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.HorizontalAxis.html#Terminal_Gui_Graphs_HorizontalAxis_GetAxisYPosition_
+  commentId: Overload:Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.HorizontalAxis.GetAxisYPosition
+  nameWithType: HorizontalAxis.GetAxisYPosition
+- uid: Terminal.Gui.Graphs.IAnnotation
+  name: IAnnotation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.IAnnotation.html
+  commentId: T:Terminal.Gui.Graphs.IAnnotation
+  fullName: Terminal.Gui.Graphs.IAnnotation
+  nameWithType: IAnnotation
+- uid: Terminal.Gui.Graphs.IAnnotation.BeforeSeries
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.IAnnotation.html#Terminal_Gui_Graphs_IAnnotation_BeforeSeries
+  commentId: P:Terminal.Gui.Graphs.IAnnotation.BeforeSeries
+  fullName: Terminal.Gui.Graphs.IAnnotation.BeforeSeries
+  nameWithType: IAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.IAnnotation.BeforeSeries*
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.IAnnotation.html#Terminal_Gui_Graphs_IAnnotation_BeforeSeries_
+  commentId: Overload:Terminal.Gui.Graphs.IAnnotation.BeforeSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.IAnnotation.BeforeSeries
+  nameWithType: IAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.IAnnotation.Render(Terminal.Gui.GraphView)
+  name: Render(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.IAnnotation.html#Terminal_Gui_Graphs_IAnnotation_Render_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.IAnnotation.Render(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.IAnnotation.Render(Terminal.Gui.GraphView)
+  nameWithType: IAnnotation.Render(GraphView)
+- uid: Terminal.Gui.Graphs.IAnnotation.Render*
+  name: Render
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.IAnnotation.html#Terminal_Gui_Graphs_IAnnotation_Render_
+  commentId: Overload:Terminal.Gui.Graphs.IAnnotation.Render
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.IAnnotation.Render
+  nameWithType: IAnnotation.Render
+- uid: Terminal.Gui.Graphs.ISeries
+  name: ISeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ISeries.html
+  commentId: T:Terminal.Gui.Graphs.ISeries
+  fullName: Terminal.Gui.Graphs.ISeries
+  nameWithType: ISeries
+- uid: Terminal.Gui.Graphs.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ISeries.html#Terminal_Gui_Graphs_ISeries_DrawSeries_Terminal_Gui_GraphView_Terminal_Gui_Rect_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.Graphs.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.Graphs.ISeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  nameWithType: ISeries.DrawSeries(GraphView, Rect, RectangleF)
+- uid: Terminal.Gui.Graphs.ISeries.DrawSeries*
+  name: DrawSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ISeries.html#Terminal_Gui_Graphs_ISeries_DrawSeries_
+  commentId: Overload:Terminal.Gui.Graphs.ISeries.DrawSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.ISeries.DrawSeries
+  nameWithType: ISeries.DrawSeries
+- uid: Terminal.Gui.Graphs.LabelGetterDelegate
+  name: LabelGetterDelegate
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LabelGetterDelegate.html
+  commentId: T:Terminal.Gui.Graphs.LabelGetterDelegate
+  fullName: Terminal.Gui.Graphs.LabelGetterDelegate
+  nameWithType: LabelGetterDelegate
+- uid: Terminal.Gui.Graphs.LegendAnnotation
+  name: LegendAnnotation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html
+  commentId: T:Terminal.Gui.Graphs.LegendAnnotation
+  fullName: Terminal.Gui.Graphs.LegendAnnotation
+  nameWithType: LegendAnnotation
+- uid: Terminal.Gui.Graphs.LegendAnnotation.#ctor(Terminal.Gui.Rect)
+  name: LegendAnnotation(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation__ctor_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.Graphs.LegendAnnotation.#ctor(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.LegendAnnotation(Terminal.Gui.Rect)
+  nameWithType: LegendAnnotation.LegendAnnotation(Rect)
+- uid: Terminal.Gui.Graphs.LegendAnnotation.#ctor*
+  name: LegendAnnotation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.LegendAnnotation
+  nameWithType: LegendAnnotation.LegendAnnotation
+- uid: Terminal.Gui.Graphs.LegendAnnotation.AddEntry(Terminal.Gui.Graphs.GraphCellToRender,System.String)
+  name: AddEntry(GraphCellToRender, String)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_AddEntry_Terminal_Gui_Graphs_GraphCellToRender_System_String_
+  commentId: M:Terminal.Gui.Graphs.LegendAnnotation.AddEntry(Terminal.Gui.Graphs.GraphCellToRender,System.String)
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.AddEntry(Terminal.Gui.Graphs.GraphCellToRender, System.String)
+  nameWithType: LegendAnnotation.AddEntry(GraphCellToRender, String)
+- uid: Terminal.Gui.Graphs.LegendAnnotation.AddEntry*
+  name: AddEntry
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_AddEntry_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.AddEntry
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.AddEntry
+  nameWithType: LegendAnnotation.AddEntry
+- uid: Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_BeforeSeries
+  commentId: P:Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries
+  nameWithType: LegendAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries*
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_BeforeSeries_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.BeforeSeries
+  nameWithType: LegendAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Border
+  name: Border
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Border
+  commentId: P:Terminal.Gui.Graphs.LegendAnnotation.Border
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Border
+  nameWithType: LegendAnnotation.Border
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Border*
+  name: Border
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Border_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.Border
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Border
+  nameWithType: LegendAnnotation.Border
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Bounds
+  name: Bounds
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Bounds
+  commentId: P:Terminal.Gui.Graphs.LegendAnnotation.Bounds
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Bounds
+  nameWithType: LegendAnnotation.Bounds
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Bounds*
+  name: Bounds
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Bounds_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.Bounds
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Bounds
+  nameWithType: LegendAnnotation.Bounds
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Render(Terminal.Gui.GraphView)
+  name: Render(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Render_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.LegendAnnotation.Render(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Render(Terminal.Gui.GraphView)
+  nameWithType: LegendAnnotation.Render(GraphView)
+- uid: Terminal.Gui.Graphs.LegendAnnotation.Render*
+  name: Render
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.LegendAnnotation.html#Terminal_Gui_Graphs_LegendAnnotation_Render_
+  commentId: Overload:Terminal.Gui.Graphs.LegendAnnotation.Render
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.LegendAnnotation.Render
+  nameWithType: LegendAnnotation.Render
+- uid: Terminal.Gui.Graphs.MultiBarSeries
+  name: MultiBarSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html
+  commentId: T:Terminal.Gui.Graphs.MultiBarSeries
+  fullName: Terminal.Gui.Graphs.MultiBarSeries
+  nameWithType: MultiBarSeries
+- uid: Terminal.Gui.Graphs.MultiBarSeries.#ctor(System.Int32,System.Single,System.Single,Terminal.Gui.Attribute[])
+  name: MultiBarSeries(Int32, Single, Single, Attribute[])
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries__ctor_System_Int32_System_Single_System_Single_Terminal_Gui_Attribute___
+  commentId: M:Terminal.Gui.Graphs.MultiBarSeries.#ctor(System.Int32,System.Single,System.Single,Terminal.Gui.Attribute[])
+  name.vb: MultiBarSeries(Int32, Single, Single, Attribute())
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.MultiBarSeries(System.Int32, System.Single, System.Single, Terminal.Gui.Attribute[])
+  fullName.vb: Terminal.Gui.Graphs.MultiBarSeries.MultiBarSeries(System.Int32, System.Single, System.Single, Terminal.Gui.Attribute())
+  nameWithType: MultiBarSeries.MultiBarSeries(Int32, Single, Single, Attribute[])
+  nameWithType.vb: MultiBarSeries.MultiBarSeries(Int32, Single, Single, Attribute())
+- uid: Terminal.Gui.Graphs.MultiBarSeries.#ctor*
+  name: MultiBarSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.MultiBarSeries.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.MultiBarSeries
+  nameWithType: MultiBarSeries.MultiBarSeries
+- uid: Terminal.Gui.Graphs.MultiBarSeries.AddBars(System.String,System.Rune,System.Single[])
+  name: AddBars(String, Rune, Single[])
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_AddBars_System_String_System_Rune_System_Single___
+  commentId: M:Terminal.Gui.Graphs.MultiBarSeries.AddBars(System.String,System.Rune,System.Single[])
+  name.vb: AddBars(String, Rune, Single())
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.AddBars(System.String, System.Rune, System.Single[])
+  fullName.vb: Terminal.Gui.Graphs.MultiBarSeries.AddBars(System.String, System.Rune, System.Single())
+  nameWithType: MultiBarSeries.AddBars(String, Rune, Single[])
+  nameWithType.vb: MultiBarSeries.AddBars(String, Rune, Single())
+- uid: Terminal.Gui.Graphs.MultiBarSeries.AddBars*
+  name: AddBars
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_AddBars_
+  commentId: Overload:Terminal.Gui.Graphs.MultiBarSeries.AddBars
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.AddBars
+  nameWithType: MultiBarSeries.AddBars
+- uid: Terminal.Gui.Graphs.MultiBarSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_DrawSeries_Terminal_Gui_GraphView_Terminal_Gui_Rect_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.Graphs.MultiBarSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  nameWithType: MultiBarSeries.DrawSeries(GraphView, Rect, RectangleF)
+- uid: Terminal.Gui.Graphs.MultiBarSeries.DrawSeries*
+  name: DrawSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_DrawSeries_
+  commentId: Overload:Terminal.Gui.Graphs.MultiBarSeries.DrawSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.DrawSeries
+  nameWithType: MultiBarSeries.DrawSeries
+- uid: Terminal.Gui.Graphs.MultiBarSeries.Spacing
+  name: Spacing
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_Spacing
+  commentId: P:Terminal.Gui.Graphs.MultiBarSeries.Spacing
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.Spacing
+  nameWithType: MultiBarSeries.Spacing
+- uid: Terminal.Gui.Graphs.MultiBarSeries.Spacing*
+  name: Spacing
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_Spacing_
+  commentId: Overload:Terminal.Gui.Graphs.MultiBarSeries.Spacing
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.Spacing
+  nameWithType: MultiBarSeries.Spacing
+- uid: Terminal.Gui.Graphs.MultiBarSeries.SubSeries
+  name: SubSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_SubSeries
+  commentId: P:Terminal.Gui.Graphs.MultiBarSeries.SubSeries
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.SubSeries
+  nameWithType: MultiBarSeries.SubSeries
+- uid: Terminal.Gui.Graphs.MultiBarSeries.SubSeries*
+  name: SubSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.MultiBarSeries.html#Terminal_Gui_Graphs_MultiBarSeries_SubSeries_
+  commentId: Overload:Terminal.Gui.Graphs.MultiBarSeries.SubSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.MultiBarSeries.SubSeries
+  nameWithType: MultiBarSeries.SubSeries
+- uid: Terminal.Gui.Graphs.Orientation
+  name: Orientation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Orientation.html
+  commentId: T:Terminal.Gui.Graphs.Orientation
+  fullName: Terminal.Gui.Graphs.Orientation
+  nameWithType: Orientation
+- uid: Terminal.Gui.Graphs.Orientation.Horizontal
+  name: Horizontal
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Orientation.html#Terminal_Gui_Graphs_Orientation_Horizontal
+  commentId: F:Terminal.Gui.Graphs.Orientation.Horizontal
+  fullName: Terminal.Gui.Graphs.Orientation.Horizontal
+  nameWithType: Orientation.Horizontal
+- uid: Terminal.Gui.Graphs.Orientation.Vertical
+  name: Vertical
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.Orientation.html#Terminal_Gui_Graphs_Orientation_Vertical
+  commentId: F:Terminal.Gui.Graphs.Orientation.Vertical
+  fullName: Terminal.Gui.Graphs.Orientation.Vertical
+  nameWithType: Orientation.Vertical
+- uid: Terminal.Gui.Graphs.PathAnnotation
+  name: PathAnnotation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html
+  commentId: T:Terminal.Gui.Graphs.PathAnnotation
+  fullName: Terminal.Gui.Graphs.PathAnnotation
+  nameWithType: PathAnnotation
+- uid: Terminal.Gui.Graphs.PathAnnotation.BeforeSeries
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_BeforeSeries
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.BeforeSeries
+  fullName: Terminal.Gui.Graphs.PathAnnotation.BeforeSeries
+  nameWithType: PathAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.PathAnnotation.BeforeSeries*
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_BeforeSeries_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.BeforeSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.BeforeSeries
+  nameWithType: PathAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineColor
+  name: LineColor
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_LineColor
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.LineColor
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineColor
+  nameWithType: PathAnnotation.LineColor
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineColor*
+  name: LineColor
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_LineColor_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.LineColor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineColor
+  nameWithType: PathAnnotation.LineColor
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF
+  name: PathAnnotation.LineF
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html
+  commentId: T:Terminal.Gui.Graphs.PathAnnotation.LineF
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF
+  nameWithType: PathAnnotation.LineF
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.#ctor(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  name: LineF(PointF, PointF)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF__ctor_Terminal_Gui_PointF_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.Graphs.PathAnnotation.LineF.#ctor(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.LineF(Terminal.Gui.PointF, Terminal.Gui.PointF)
+  nameWithType: PathAnnotation.LineF.LineF(PointF, PointF)
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.#ctor*
+  name: LineF
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.LineF.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.LineF
+  nameWithType: PathAnnotation.LineF.LineF
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.End
+  name: End
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF_End
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.LineF.End
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.End
+  nameWithType: PathAnnotation.LineF.End
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.End*
+  name: End
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF_End_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.LineF.End
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.End
+  nameWithType: PathAnnotation.LineF.End
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.Start
+  name: Start
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF_Start
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.LineF.Start
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.Start
+  nameWithType: PathAnnotation.LineF.Start
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineF.Start*
+  name: Start
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.LineF.html#Terminal_Gui_Graphs_PathAnnotation_LineF_Start_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.LineF.Start
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineF.Start
+  nameWithType: PathAnnotation.LineF.Start
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineRune
+  name: LineRune
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_LineRune
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.LineRune
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineRune
+  nameWithType: PathAnnotation.LineRune
+- uid: Terminal.Gui.Graphs.PathAnnotation.LineRune*
+  name: LineRune
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_LineRune_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.LineRune
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.LineRune
+  nameWithType: PathAnnotation.LineRune
+- uid: Terminal.Gui.Graphs.PathAnnotation.Points
+  name: Points
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_Points
+  commentId: P:Terminal.Gui.Graphs.PathAnnotation.Points
+  fullName: Terminal.Gui.Graphs.PathAnnotation.Points
+  nameWithType: PathAnnotation.Points
+- uid: Terminal.Gui.Graphs.PathAnnotation.Points*
+  name: Points
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_Points_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.Points
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.Points
+  nameWithType: PathAnnotation.Points
+- uid: Terminal.Gui.Graphs.PathAnnotation.Render(Terminal.Gui.GraphView)
+  name: Render(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_Render_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.PathAnnotation.Render(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.PathAnnotation.Render(Terminal.Gui.GraphView)
+  nameWithType: PathAnnotation.Render(GraphView)
+- uid: Terminal.Gui.Graphs.PathAnnotation.Render*
+  name: Render
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.PathAnnotation.html#Terminal_Gui_Graphs_PathAnnotation_Render_
+  commentId: Overload:Terminal.Gui.Graphs.PathAnnotation.Render
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.PathAnnotation.Render
+  nameWithType: PathAnnotation.Render
+- uid: Terminal.Gui.Graphs.ScatterSeries
+  name: ScatterSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html
+  commentId: T:Terminal.Gui.Graphs.ScatterSeries
+  fullName: Terminal.Gui.Graphs.ScatterSeries
+  nameWithType: ScatterSeries
+- uid: Terminal.Gui.Graphs.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_DrawSeries_Terminal_Gui_GraphView_Terminal_Gui_Rect_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.Graphs.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.Graphs.ScatterSeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  nameWithType: ScatterSeries.DrawSeries(GraphView, Rect, RectangleF)
+- uid: Terminal.Gui.Graphs.ScatterSeries.DrawSeries*
+  name: DrawSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_DrawSeries_
+  commentId: Overload:Terminal.Gui.Graphs.ScatterSeries.DrawSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.ScatterSeries.DrawSeries
+  nameWithType: ScatterSeries.DrawSeries
+- uid: Terminal.Gui.Graphs.ScatterSeries.Fill
+  name: Fill
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_Fill
+  commentId: P:Terminal.Gui.Graphs.ScatterSeries.Fill
+  fullName: Terminal.Gui.Graphs.ScatterSeries.Fill
+  nameWithType: ScatterSeries.Fill
+- uid: Terminal.Gui.Graphs.ScatterSeries.Fill*
+  name: Fill
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_Fill_
+  commentId: Overload:Terminal.Gui.Graphs.ScatterSeries.Fill
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.ScatterSeries.Fill
+  nameWithType: ScatterSeries.Fill
+- uid: Terminal.Gui.Graphs.ScatterSeries.Points
+  name: Points
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_Points
+  commentId: P:Terminal.Gui.Graphs.ScatterSeries.Points
+  fullName: Terminal.Gui.Graphs.ScatterSeries.Points
+  nameWithType: ScatterSeries.Points
+- uid: Terminal.Gui.Graphs.ScatterSeries.Points*
+  name: Points
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.ScatterSeries.html#Terminal_Gui_Graphs_ScatterSeries_Points_
+  commentId: Overload:Terminal.Gui.Graphs.ScatterSeries.Points
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.ScatterSeries.Points
+  nameWithType: ScatterSeries.Points
+- uid: Terminal.Gui.Graphs.TextAnnotation
+  name: TextAnnotation
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html
+  commentId: T:Terminal.Gui.Graphs.TextAnnotation
+  fullName: Terminal.Gui.Graphs.TextAnnotation
+  nameWithType: TextAnnotation
+- uid: Terminal.Gui.Graphs.TextAnnotation.BeforeSeries
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_BeforeSeries
+  commentId: P:Terminal.Gui.Graphs.TextAnnotation.BeforeSeries
+  fullName: Terminal.Gui.Graphs.TextAnnotation.BeforeSeries
+  nameWithType: TextAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.TextAnnotation.BeforeSeries*
+  name: BeforeSeries
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_BeforeSeries_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.BeforeSeries
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.BeforeSeries
+  nameWithType: TextAnnotation.BeforeSeries
+- uid: Terminal.Gui.Graphs.TextAnnotation.DrawText(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  name: DrawText(GraphView, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_DrawText_Terminal_Gui_GraphView_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.Graphs.TextAnnotation.DrawText(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  fullName: Terminal.Gui.Graphs.TextAnnotation.DrawText(Terminal.Gui.GraphView, System.Int32, System.Int32)
+  nameWithType: TextAnnotation.DrawText(GraphView, Int32, Int32)
+- uid: Terminal.Gui.Graphs.TextAnnotation.DrawText*
+  name: DrawText
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_DrawText_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.DrawText
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.DrawText
+  nameWithType: TextAnnotation.DrawText
+- uid: Terminal.Gui.Graphs.TextAnnotation.GraphPosition
+  name: GraphPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_GraphPosition
+  commentId: P:Terminal.Gui.Graphs.TextAnnotation.GraphPosition
+  fullName: Terminal.Gui.Graphs.TextAnnotation.GraphPosition
+  nameWithType: TextAnnotation.GraphPosition
+- uid: Terminal.Gui.Graphs.TextAnnotation.GraphPosition*
+  name: GraphPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_GraphPosition_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.GraphPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.GraphPosition
+  nameWithType: TextAnnotation.GraphPosition
+- uid: Terminal.Gui.Graphs.TextAnnotation.Render(Terminal.Gui.GraphView)
+  name: Render(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_Render_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.TextAnnotation.Render(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.TextAnnotation.Render(Terminal.Gui.GraphView)
+  nameWithType: TextAnnotation.Render(GraphView)
+- uid: Terminal.Gui.Graphs.TextAnnotation.Render*
+  name: Render
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_Render_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.Render
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.Render
+  nameWithType: TextAnnotation.Render
+- uid: Terminal.Gui.Graphs.TextAnnotation.ScreenPosition
+  name: ScreenPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_ScreenPosition
+  commentId: P:Terminal.Gui.Graphs.TextAnnotation.ScreenPosition
+  fullName: Terminal.Gui.Graphs.TextAnnotation.ScreenPosition
+  nameWithType: TextAnnotation.ScreenPosition
+- uid: Terminal.Gui.Graphs.TextAnnotation.ScreenPosition*
+  name: ScreenPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_ScreenPosition_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.ScreenPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.ScreenPosition
+  nameWithType: TextAnnotation.ScreenPosition
+- uid: Terminal.Gui.Graphs.TextAnnotation.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_Text
+  commentId: P:Terminal.Gui.Graphs.TextAnnotation.Text
+  fullName: Terminal.Gui.Graphs.TextAnnotation.Text
+  nameWithType: TextAnnotation.Text
+- uid: Terminal.Gui.Graphs.TextAnnotation.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.TextAnnotation.html#Terminal_Gui_Graphs_TextAnnotation_Text_
+  commentId: Overload:Terminal.Gui.Graphs.TextAnnotation.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.TextAnnotation.Text
+  nameWithType: TextAnnotation.Text
+- uid: Terminal.Gui.Graphs.VerticalAxis
+  name: VerticalAxis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html
+  commentId: T:Terminal.Gui.Graphs.VerticalAxis
+  fullName: Terminal.Gui.Graphs.VerticalAxis
+  nameWithType: VerticalAxis
+- uid: Terminal.Gui.Graphs.VerticalAxis.#ctor
+  name: VerticalAxis()
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis__ctor
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.#ctor
+  fullName: Terminal.Gui.Graphs.VerticalAxis.VerticalAxis()
+  nameWithType: VerticalAxis.VerticalAxis()
+- uid: Terminal.Gui.Graphs.VerticalAxis.#ctor*
+  name: VerticalAxis
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis__ctor_
+  commentId: Overload:Terminal.Gui.Graphs.VerticalAxis.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.VerticalAxis.VerticalAxis
+  nameWithType: VerticalAxis.VerticalAxis
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  name: DrawAxisLabel(GraphView, Int32, String)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLabel_Terminal_Gui_GraphView_System_Int32_System_String_
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel(Terminal.Gui.GraphView,System.Int32,System.String)
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel(Terminal.Gui.GraphView, System.Int32, System.String)
+  nameWithType: VerticalAxis.DrawAxisLabel(GraphView, Int32, String)
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel*
+  name: DrawAxisLabel
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLabel_
+  commentId: Overload:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabel
+  nameWithType: VerticalAxis.DrawAxisLabel
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  name: DrawAxisLabels(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLabels_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels(Terminal.Gui.GraphView)
+  nameWithType: VerticalAxis.DrawAxisLabels(GraphView)
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels*
+  name: DrawAxisLabels
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLabels_
+  commentId: Overload:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLabels
+  nameWithType: VerticalAxis.DrawAxisLabels
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  name: DrawAxisLine(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLine_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView)
+  nameWithType: VerticalAxis.DrawAxisLine(GraphView)
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  name: DrawAxisLine(GraphView, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLine_Terminal_Gui_GraphView_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView,System.Int32,System.Int32)
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine(Terminal.Gui.GraphView, System.Int32, System.Int32)
+  nameWithType: VerticalAxis.DrawAxisLine(GraphView, Int32, Int32)
+- uid: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine*
+  name: DrawAxisLine
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_DrawAxisLine_
+  commentId: Overload:Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.VerticalAxis.DrawAxisLine
+  nameWithType: VerticalAxis.DrawAxisLine
+- uid: Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition(Terminal.Gui.GraphView)
+  name: GetAxisXPosition(GraphView)
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_GetAxisXPosition_Terminal_Gui_GraphView_
+  commentId: M:Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition(Terminal.Gui.GraphView)
+  fullName: Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition(Terminal.Gui.GraphView)
+  nameWithType: VerticalAxis.GetAxisXPosition(GraphView)
+- uid: Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition*
+  name: GetAxisXPosition
+  href: api/Terminal.Gui/Terminal.Gui.Graphs.VerticalAxis.html#Terminal_Gui_Graphs_VerticalAxis_GetAxisXPosition_
+  commentId: Overload:Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.Graphs.VerticalAxis.GetAxisXPosition
+  nameWithType: VerticalAxis.GetAxisXPosition
+- uid: Terminal.Gui.GraphView
+  name: GraphView
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html
+  commentId: T:Terminal.Gui.GraphView
+  fullName: Terminal.Gui.GraphView
+  nameWithType: GraphView
+- uid: Terminal.Gui.GraphView.#ctor
+  name: GraphView()
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView__ctor
+  commentId: M:Terminal.Gui.GraphView.#ctor
+  fullName: Terminal.Gui.GraphView.GraphView()
+  nameWithType: GraphView.GraphView()
+- uid: Terminal.Gui.GraphView.#ctor*
+  name: GraphView
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView__ctor_
+  commentId: Overload:Terminal.Gui.GraphView.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.GraphView
+  nameWithType: GraphView.GraphView
+- uid: Terminal.Gui.GraphView.Annotations
+  name: Annotations
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Annotations
+  commentId: P:Terminal.Gui.GraphView.Annotations
+  fullName: Terminal.Gui.GraphView.Annotations
+  nameWithType: GraphView.Annotations
+- uid: Terminal.Gui.GraphView.Annotations*
+  name: Annotations
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Annotations_
+  commentId: Overload:Terminal.Gui.GraphView.Annotations
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.Annotations
+  nameWithType: GraphView.Annotations
+- uid: Terminal.Gui.GraphView.AxisX
+  name: AxisX
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_AxisX
+  commentId: P:Terminal.Gui.GraphView.AxisX
+  fullName: Terminal.Gui.GraphView.AxisX
+  nameWithType: GraphView.AxisX
+- uid: Terminal.Gui.GraphView.AxisX*
+  name: AxisX
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_AxisX_
+  commentId: Overload:Terminal.Gui.GraphView.AxisX
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.AxisX
+  nameWithType: GraphView.AxisX
+- uid: Terminal.Gui.GraphView.AxisY
+  name: AxisY
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_AxisY
+  commentId: P:Terminal.Gui.GraphView.AxisY
+  fullName: Terminal.Gui.GraphView.AxisY
+  nameWithType: GraphView.AxisY
+- uid: Terminal.Gui.GraphView.AxisY*
+  name: AxisY
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_AxisY_
+  commentId: Overload:Terminal.Gui.GraphView.AxisY
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.AxisY
+  nameWithType: GraphView.AxisY
+- uid: Terminal.Gui.GraphView.CellSize
+  name: CellSize
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_CellSize
+  commentId: P:Terminal.Gui.GraphView.CellSize
+  fullName: Terminal.Gui.GraphView.CellSize
+  nameWithType: GraphView.CellSize
+- uid: Terminal.Gui.GraphView.CellSize*
+  name: CellSize
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_CellSize_
+  commentId: Overload:Terminal.Gui.GraphView.CellSize
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.CellSize
+  nameWithType: GraphView.CellSize
+- uid: Terminal.Gui.GraphView.DrawLine(Terminal.Gui.Point,Terminal.Gui.Point,System.Rune)
+  name: DrawLine(Point, Point, Rune)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_DrawLine_Terminal_Gui_Point_Terminal_Gui_Point_System_Rune_
+  commentId: M:Terminal.Gui.GraphView.DrawLine(Terminal.Gui.Point,Terminal.Gui.Point,System.Rune)
+  fullName: Terminal.Gui.GraphView.DrawLine(Terminal.Gui.Point, Terminal.Gui.Point, System.Rune)
+  nameWithType: GraphView.DrawLine(Point, Point, Rune)
+- uid: Terminal.Gui.GraphView.DrawLine*
+  name: DrawLine
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_DrawLine_
+  commentId: Overload:Terminal.Gui.GraphView.DrawLine
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.DrawLine
+  nameWithType: GraphView.DrawLine
+- uid: Terminal.Gui.GraphView.GraphColor
+  name: GraphColor
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_GraphColor
+  commentId: P:Terminal.Gui.GraphView.GraphColor
+  fullName: Terminal.Gui.GraphView.GraphColor
+  nameWithType: GraphView.GraphColor
+- uid: Terminal.Gui.GraphView.GraphColor*
+  name: GraphColor
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_GraphColor_
+  commentId: Overload:Terminal.Gui.GraphView.GraphColor
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.GraphColor
+  nameWithType: GraphView.GraphColor
+- uid: Terminal.Gui.GraphView.GraphSpaceToScreen(Terminal.Gui.PointF)
+  name: GraphSpaceToScreen(PointF)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_GraphSpaceToScreen_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.GraphView.GraphSpaceToScreen(Terminal.Gui.PointF)
+  fullName: Terminal.Gui.GraphView.GraphSpaceToScreen(Terminal.Gui.PointF)
+  nameWithType: GraphView.GraphSpaceToScreen(PointF)
+- uid: Terminal.Gui.GraphView.GraphSpaceToScreen*
+  name: GraphSpaceToScreen
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_GraphSpaceToScreen_
+  commentId: Overload:Terminal.Gui.GraphView.GraphSpaceToScreen
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.GraphSpaceToScreen
+  nameWithType: GraphView.GraphSpaceToScreen
+- uid: Terminal.Gui.GraphView.MarginBottom
+  name: MarginBottom
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_MarginBottom
+  commentId: P:Terminal.Gui.GraphView.MarginBottom
+  fullName: Terminal.Gui.GraphView.MarginBottom
+  nameWithType: GraphView.MarginBottom
+- uid: Terminal.Gui.GraphView.MarginBottom*
+  name: MarginBottom
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_MarginBottom_
+  commentId: Overload:Terminal.Gui.GraphView.MarginBottom
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.MarginBottom
+  nameWithType: GraphView.MarginBottom
+- uid: Terminal.Gui.GraphView.MarginLeft
+  name: MarginLeft
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_MarginLeft
+  commentId: P:Terminal.Gui.GraphView.MarginLeft
+  fullName: Terminal.Gui.GraphView.MarginLeft
+  nameWithType: GraphView.MarginLeft
+- uid: Terminal.Gui.GraphView.MarginLeft*
+  name: MarginLeft
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_MarginLeft_
+  commentId: Overload:Terminal.Gui.GraphView.MarginLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.MarginLeft
+  nameWithType: GraphView.MarginLeft
+- uid: Terminal.Gui.GraphView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.GraphView.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.GraphView.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: GraphView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.GraphView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ProcessKey_
+  commentId: Overload:Terminal.Gui.GraphView.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.ProcessKey
+  nameWithType: GraphView.ProcessKey
+- uid: Terminal.Gui.GraphView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.GraphView.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.GraphView.Redraw(Terminal.Gui.Rect)
+  nameWithType: GraphView.Redraw(Rect)
+- uid: Terminal.Gui.GraphView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Redraw_
+  commentId: Overload:Terminal.Gui.GraphView.Redraw
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.Redraw
+  nameWithType: GraphView.Redraw
+- uid: Terminal.Gui.GraphView.Reset
+  name: Reset()
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Reset
+  commentId: M:Terminal.Gui.GraphView.Reset
+  fullName: Terminal.Gui.GraphView.Reset()
+  nameWithType: GraphView.Reset()
+- uid: Terminal.Gui.GraphView.Reset*
+  name: Reset
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Reset_
+  commentId: Overload:Terminal.Gui.GraphView.Reset
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.Reset
+  nameWithType: GraphView.Reset
+- uid: Terminal.Gui.GraphView.ScreenToGraphSpace(System.Int32,System.Int32)
+  name: ScreenToGraphSpace(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScreenToGraphSpace_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.GraphView.ScreenToGraphSpace(System.Int32,System.Int32)
+  fullName: Terminal.Gui.GraphView.ScreenToGraphSpace(System.Int32, System.Int32)
+  nameWithType: GraphView.ScreenToGraphSpace(Int32, Int32)
+- uid: Terminal.Gui.GraphView.ScreenToGraphSpace(Terminal.Gui.Rect)
+  name: ScreenToGraphSpace(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScreenToGraphSpace_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.GraphView.ScreenToGraphSpace(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.GraphView.ScreenToGraphSpace(Terminal.Gui.Rect)
+  nameWithType: GraphView.ScreenToGraphSpace(Rect)
+- uid: Terminal.Gui.GraphView.ScreenToGraphSpace*
+  name: ScreenToGraphSpace
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScreenToGraphSpace_
+  commentId: Overload:Terminal.Gui.GraphView.ScreenToGraphSpace
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.ScreenToGraphSpace
+  nameWithType: GraphView.ScreenToGraphSpace
+- uid: Terminal.Gui.GraphView.ScrollOffset
+  name: ScrollOffset
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScrollOffset
+  commentId: P:Terminal.Gui.GraphView.ScrollOffset
+  fullName: Terminal.Gui.GraphView.ScrollOffset
+  nameWithType: GraphView.ScrollOffset
+- uid: Terminal.Gui.GraphView.ScrollOffset*
+  name: ScrollOffset
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScrollOffset_
+  commentId: Overload:Terminal.Gui.GraphView.ScrollOffset
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.ScrollOffset
+  nameWithType: GraphView.ScrollOffset
+- uid: Terminal.Gui.GraphView.Series
+  name: Series
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Series
+  commentId: P:Terminal.Gui.GraphView.Series
+  fullName: Terminal.Gui.GraphView.Series
+  nameWithType: GraphView.Series
+- uid: Terminal.Gui.GraphView.Series*
+  name: Series
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Series_
+  commentId: Overload:Terminal.Gui.GraphView.Series
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.Series
+  nameWithType: GraphView.Series
+- uid: Terminal.Gui.GraphView.SetDriverColorToGraphColor
+  name: SetDriverColorToGraphColor()
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_SetDriverColorToGraphColor
+  commentId: M:Terminal.Gui.GraphView.SetDriverColorToGraphColor
+  fullName: Terminal.Gui.GraphView.SetDriverColorToGraphColor()
+  nameWithType: GraphView.SetDriverColorToGraphColor()
+- uid: Terminal.Gui.GraphView.SetDriverColorToGraphColor*
+  name: SetDriverColorToGraphColor
+  href: api/Terminal.Gui/Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_SetDriverColorToGraphColor_
+  commentId: Overload:Terminal.Gui.GraphView.SetDriverColorToGraphColor
+  isSpec: "True"
+  fullName: Terminal.Gui.GraphView.SetDriverColorToGraphColor
+  nameWithType: GraphView.SetDriverColorToGraphColor
 - uid: Terminal.Gui.HexView
   name: HexView
   href: api/Terminal.Gui/Terminal.Gui.HexView.html
@@ -7047,6 +8413,217 @@ references:
   commentId: F:Terminal.Gui.Point.Y
   fullName: Terminal.Gui.Point.Y
   nameWithType: Point.Y
+- uid: Terminal.Gui.PointF
+  name: PointF
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html
+  commentId: T:Terminal.Gui.PointF
+  fullName: Terminal.Gui.PointF
+  nameWithType: PointF
+- uid: Terminal.Gui.PointF.#ctor(System.Single,System.Single)
+  name: PointF(Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF__ctor_System_Single_System_Single_
+  commentId: M:Terminal.Gui.PointF.#ctor(System.Single,System.Single)
+  fullName: Terminal.Gui.PointF.PointF(System.Single, System.Single)
+  nameWithType: PointF.PointF(Single, Single)
+- uid: Terminal.Gui.PointF.#ctor*
+  name: PointF
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF__ctor_
+  commentId: Overload:Terminal.Gui.PointF.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.PointF
+  nameWithType: PointF.PointF
+- uid: Terminal.Gui.PointF.Add(Terminal.Gui.PointF,Terminal.Gui.Size)
+  name: Add(PointF, Size)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Add_Terminal_Gui_PointF_Terminal_Gui_Size_
+  commentId: M:Terminal.Gui.PointF.Add(Terminal.Gui.PointF,Terminal.Gui.Size)
+  fullName: Terminal.Gui.PointF.Add(Terminal.Gui.PointF, Terminal.Gui.Size)
+  nameWithType: PointF.Add(PointF, Size)
+- uid: Terminal.Gui.PointF.Add(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  name: Add(PointF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Add_Terminal_Gui_PointF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.PointF.Add(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.PointF.Add(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  nameWithType: PointF.Add(PointF, SizeF)
+- uid: Terminal.Gui.PointF.Add*
+  name: Add
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Add_
+  commentId: Overload:Terminal.Gui.PointF.Add
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Add
+  nameWithType: PointF.Add
+- uid: Terminal.Gui.PointF.Empty
+  name: Empty
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Empty
+  commentId: F:Terminal.Gui.PointF.Empty
+  fullName: Terminal.Gui.PointF.Empty
+  nameWithType: PointF.Empty
+- uid: Terminal.Gui.PointF.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Equals_System_Object_
+  commentId: M:Terminal.Gui.PointF.Equals(System.Object)
+  fullName: Terminal.Gui.PointF.Equals(System.Object)
+  nameWithType: PointF.Equals(Object)
+- uid: Terminal.Gui.PointF.Equals(Terminal.Gui.PointF)
+  name: Equals(PointF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Equals_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.PointF.Equals(Terminal.Gui.PointF)
+  fullName: Terminal.Gui.PointF.Equals(Terminal.Gui.PointF)
+  nameWithType: PointF.Equals(PointF)
+- uid: Terminal.Gui.PointF.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Equals_
+  commentId: Overload:Terminal.Gui.PointF.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Equals
+  nameWithType: PointF.Equals
+- uid: Terminal.Gui.PointF.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_GetHashCode
+  commentId: M:Terminal.Gui.PointF.GetHashCode
+  fullName: Terminal.Gui.PointF.GetHashCode()
+  nameWithType: PointF.GetHashCode()
+- uid: Terminal.Gui.PointF.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_GetHashCode_
+  commentId: Overload:Terminal.Gui.PointF.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.GetHashCode
+  nameWithType: PointF.GetHashCode
+- uid: Terminal.Gui.PointF.IsEmpty
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_IsEmpty
+  commentId: P:Terminal.Gui.PointF.IsEmpty
+  fullName: Terminal.Gui.PointF.IsEmpty
+  nameWithType: PointF.IsEmpty
+- uid: Terminal.Gui.PointF.IsEmpty*
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_IsEmpty_
+  commentId: Overload:Terminal.Gui.PointF.IsEmpty
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.IsEmpty
+  nameWithType: PointF.IsEmpty
+- uid: Terminal.Gui.PointF.op_Addition(Terminal.Gui.PointF,Terminal.Gui.Size)
+  name: Addition(PointF, Size)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Addition_Terminal_Gui_PointF_Terminal_Gui_Size_
+  commentId: M:Terminal.Gui.PointF.op_Addition(Terminal.Gui.PointF,Terminal.Gui.Size)
+  fullName: Terminal.Gui.PointF.Addition(Terminal.Gui.PointF, Terminal.Gui.Size)
+  nameWithType: PointF.Addition(PointF, Size)
+- uid: Terminal.Gui.PointF.op_Addition(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  name: Addition(PointF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Addition_Terminal_Gui_PointF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.PointF.op_Addition(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.PointF.Addition(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  nameWithType: PointF.Addition(PointF, SizeF)
+- uid: Terminal.Gui.PointF.op_Addition*
+  name: Addition
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Addition_
+  commentId: Overload:Terminal.Gui.PointF.op_Addition
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Addition
+  nameWithType: PointF.Addition
+- uid: Terminal.Gui.PointF.op_Equality(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  name: Equality(PointF, PointF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Equality_Terminal_Gui_PointF_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.PointF.op_Equality(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  fullName: Terminal.Gui.PointF.Equality(Terminal.Gui.PointF, Terminal.Gui.PointF)
+  nameWithType: PointF.Equality(PointF, PointF)
+- uid: Terminal.Gui.PointF.op_Equality*
+  name: Equality
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Equality_
+  commentId: Overload:Terminal.Gui.PointF.op_Equality
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Equality
+  nameWithType: PointF.Equality
+- uid: Terminal.Gui.PointF.op_Inequality(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  name: Inequality(PointF, PointF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Inequality_Terminal_Gui_PointF_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.PointF.op_Inequality(Terminal.Gui.PointF,Terminal.Gui.PointF)
+  fullName: Terminal.Gui.PointF.Inequality(Terminal.Gui.PointF, Terminal.Gui.PointF)
+  nameWithType: PointF.Inequality(PointF, PointF)
+- uid: Terminal.Gui.PointF.op_Inequality*
+  name: Inequality
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Inequality_
+  commentId: Overload:Terminal.Gui.PointF.op_Inequality
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Inequality
+  nameWithType: PointF.Inequality
+- uid: Terminal.Gui.PointF.op_Subtraction(Terminal.Gui.PointF,Terminal.Gui.Size)
+  name: Subtraction(PointF, Size)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Subtraction_Terminal_Gui_PointF_Terminal_Gui_Size_
+  commentId: M:Terminal.Gui.PointF.op_Subtraction(Terminal.Gui.PointF,Terminal.Gui.Size)
+  fullName: Terminal.Gui.PointF.Subtraction(Terminal.Gui.PointF, Terminal.Gui.Size)
+  nameWithType: PointF.Subtraction(PointF, Size)
+- uid: Terminal.Gui.PointF.op_Subtraction(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  name: Subtraction(PointF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Subtraction_Terminal_Gui_PointF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.PointF.op_Subtraction(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.PointF.Subtraction(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  nameWithType: PointF.Subtraction(PointF, SizeF)
+- uid: Terminal.Gui.PointF.op_Subtraction*
+  name: Subtraction
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_op_Subtraction_
+  commentId: Overload:Terminal.Gui.PointF.op_Subtraction
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Subtraction
+  nameWithType: PointF.Subtraction
+- uid: Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF,Terminal.Gui.Size)
+  name: Subtract(PointF, Size)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Subtract_Terminal_Gui_PointF_Terminal_Gui_Size_
+  commentId: M:Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF,Terminal.Gui.Size)
+  fullName: Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF, Terminal.Gui.Size)
+  nameWithType: PointF.Subtract(PointF, Size)
+- uid: Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  name: Subtract(PointF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Subtract_Terminal_Gui_PointF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  nameWithType: PointF.Subtract(PointF, SizeF)
+- uid: Terminal.Gui.PointF.Subtract*
+  name: Subtract
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Subtract_
+  commentId: Overload:Terminal.Gui.PointF.Subtract
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Subtract
+  nameWithType: PointF.Subtract
+- uid: Terminal.Gui.PointF.ToString
+  name: ToString()
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_ToString
+  commentId: M:Terminal.Gui.PointF.ToString
+  fullName: Terminal.Gui.PointF.ToString()
+  nameWithType: PointF.ToString()
+- uid: Terminal.Gui.PointF.ToString*
+  name: ToString
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_ToString_
+  commentId: Overload:Terminal.Gui.PointF.ToString
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.ToString
+  nameWithType: PointF.ToString
+- uid: Terminal.Gui.PointF.X
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_X
+  commentId: P:Terminal.Gui.PointF.X
+  fullName: Terminal.Gui.PointF.X
+  nameWithType: PointF.X
+- uid: Terminal.Gui.PointF.X*
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_X_
+  commentId: Overload:Terminal.Gui.PointF.X
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.X
+  nameWithType: PointF.X
+- uid: Terminal.Gui.PointF.Y
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Y
+  commentId: P:Terminal.Gui.PointF.Y
+  fullName: Terminal.Gui.PointF.Y
+  nameWithType: PointF.Y
+- uid: Terminal.Gui.PointF.Y*
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.PointF.html#Terminal_Gui_PointF_Y_
+  commentId: Overload:Terminal.Gui.PointF.Y
+  isSpec: "True"
+  fullName: Terminal.Gui.PointF.Y
+  nameWithType: PointF.Y
 - uid: Terminal.Gui.Pos
   name: Pos
   href: api/Terminal.Gui/Terminal.Gui.Pos.html
@@ -7910,6 +9487,397 @@ references:
   commentId: F:Terminal.Gui.Rect.Y
   fullName: Terminal.Gui.Rect.Y
   nameWithType: Rect.Y
+- uid: Terminal.Gui.RectangleF
+  name: RectangleF
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html
+  commentId: T:Terminal.Gui.RectangleF
+  fullName: Terminal.Gui.RectangleF
+  nameWithType: RectangleF
+- uid: Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  name: RectangleF(Single, Single, Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF__ctor_System_Single_System_Single_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.RectangleF(System.Single, System.Single, System.Single, System.Single)
+  nameWithType: RectangleF.RectangleF(Single, Single, Single, Single)
+- uid: Terminal.Gui.RectangleF.#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  name: RectangleF(PointF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF__ctor_Terminal_Gui_PointF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.RectangleF.#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.RectangleF.RectangleF(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  nameWithType: RectangleF.RectangleF(PointF, SizeF)
+- uid: Terminal.Gui.RectangleF.#ctor*
+  name: RectangleF
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF__ctor_
+  commentId: Overload:Terminal.Gui.RectangleF.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.RectangleF
+  nameWithType: RectangleF.RectangleF
+- uid: Terminal.Gui.RectangleF.Bottom
+  name: Bottom
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Bottom
+  commentId: P:Terminal.Gui.RectangleF.Bottom
+  fullName: Terminal.Gui.RectangleF.Bottom
+  nameWithType: RectangleF.Bottom
+- uid: Terminal.Gui.RectangleF.Bottom*
+  name: Bottom
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Bottom_
+  commentId: Overload:Terminal.Gui.RectangleF.Bottom
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Bottom
+  nameWithType: RectangleF.Bottom
+- uid: Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  name: Contains(Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Contains_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.Contains(System.Single, System.Single)
+  nameWithType: RectangleF.Contains(Single, Single)
+- uid: Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  name: Contains(PointF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Contains_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  fullName: Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  nameWithType: RectangleF.Contains(PointF)
+- uid: Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  name: Contains(RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Contains_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Contains(RectangleF)
+- uid: Terminal.Gui.RectangleF.Contains*
+  name: Contains
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Contains_
+  commentId: Overload:Terminal.Gui.RectangleF.Contains
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Contains
+  nameWithType: RectangleF.Contains
+- uid: Terminal.Gui.RectangleF.Empty
+  name: Empty
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Empty
+  commentId: F:Terminal.Gui.RectangleF.Empty
+  fullName: Terminal.Gui.RectangleF.Empty
+  nameWithType: RectangleF.Empty
+- uid: Terminal.Gui.RectangleF.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Equals_System_Object_
+  commentId: M:Terminal.Gui.RectangleF.Equals(System.Object)
+  fullName: Terminal.Gui.RectangleF.Equals(System.Object)
+  nameWithType: RectangleF.Equals(Object)
+- uid: Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  name: Equals(RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Equals_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Equals(RectangleF)
+- uid: Terminal.Gui.RectangleF.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Equals_
+  commentId: Overload:Terminal.Gui.RectangleF.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Equals
+  nameWithType: RectangleF.Equals
+- uid: Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  name: FromLTRB(Single, Single, Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_FromLTRB_System_Single_System_Single_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.FromLTRB(System.Single, System.Single, System.Single, System.Single)
+  nameWithType: RectangleF.FromLTRB(Single, Single, Single, Single)
+- uid: Terminal.Gui.RectangleF.FromLTRB*
+  name: FromLTRB
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_FromLTRB_
+  commentId: Overload:Terminal.Gui.RectangleF.FromLTRB
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.FromLTRB
+  nameWithType: RectangleF.FromLTRB
+- uid: Terminal.Gui.RectangleF.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_GetHashCode
+  commentId: M:Terminal.Gui.RectangleF.GetHashCode
+  fullName: Terminal.Gui.RectangleF.GetHashCode()
+  nameWithType: RectangleF.GetHashCode()
+- uid: Terminal.Gui.RectangleF.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_GetHashCode_
+  commentId: Overload:Terminal.Gui.RectangleF.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.GetHashCode
+  nameWithType: RectangleF.GetHashCode
+- uid: Terminal.Gui.RectangleF.Height
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Height
+  commentId: P:Terminal.Gui.RectangleF.Height
+  fullName: Terminal.Gui.RectangleF.Height
+  nameWithType: RectangleF.Height
+- uid: Terminal.Gui.RectangleF.Height*
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Height_
+  commentId: Overload:Terminal.Gui.RectangleF.Height
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Height
+  nameWithType: RectangleF.Height
+- uid: Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  name: Inflate(Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Inflate_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.Inflate(System.Single, System.Single)
+  nameWithType: RectangleF.Inflate(Single, Single)
+- uid: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  name: Inflate(RectangleF, Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Inflate_Terminal_Gui_RectangleF_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF, System.Single, System.Single)
+  nameWithType: RectangleF.Inflate(RectangleF, Single, Single)
+- uid: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  name: Inflate(SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Inflate_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  nameWithType: RectangleF.Inflate(SizeF)
+- uid: Terminal.Gui.RectangleF.Inflate*
+  name: Inflate
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Inflate_
+  commentId: Overload:Terminal.Gui.RectangleF.Inflate
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Inflate
+  nameWithType: RectangleF.Inflate
+- uid: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  name: Intersect(RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Intersect_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Intersect(RectangleF)
+- uid: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: Intersect(RectangleF, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Intersect_Terminal_Gui_RectangleF_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Intersect(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.Intersect*
+  name: Intersect
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Intersect_
+  commentId: Overload:Terminal.Gui.RectangleF.Intersect
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Intersect
+  nameWithType: RectangleF.Intersect
+- uid: Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  name: IntersectsWith(RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_IntersectsWith_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.IntersectsWith(RectangleF)
+- uid: Terminal.Gui.RectangleF.IntersectsWith*
+  name: IntersectsWith
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_IntersectsWith_
+  commentId: Overload:Terminal.Gui.RectangleF.IntersectsWith
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.IntersectsWith
+  nameWithType: RectangleF.IntersectsWith
+- uid: Terminal.Gui.RectangleF.IsEmpty
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_IsEmpty
+  commentId: P:Terminal.Gui.RectangleF.IsEmpty
+  fullName: Terminal.Gui.RectangleF.IsEmpty
+  nameWithType: RectangleF.IsEmpty
+- uid: Terminal.Gui.RectangleF.IsEmpty*
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_IsEmpty_
+  commentId: Overload:Terminal.Gui.RectangleF.IsEmpty
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.IsEmpty
+  nameWithType: RectangleF.IsEmpty
+- uid: Terminal.Gui.RectangleF.Left
+  name: Left
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Left
+  commentId: P:Terminal.Gui.RectangleF.Left
+  fullName: Terminal.Gui.RectangleF.Left
+  nameWithType: RectangleF.Left
+- uid: Terminal.Gui.RectangleF.Left*
+  name: Left
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Left_
+  commentId: Overload:Terminal.Gui.RectangleF.Left
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Left
+  nameWithType: RectangleF.Left
+- uid: Terminal.Gui.RectangleF.Location
+  name: Location
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Location
+  commentId: P:Terminal.Gui.RectangleF.Location
+  fullName: Terminal.Gui.RectangleF.Location
+  nameWithType: RectangleF.Location
+- uid: Terminal.Gui.RectangleF.Location*
+  name: Location
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Location_
+  commentId: Overload:Terminal.Gui.RectangleF.Location
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Location
+  nameWithType: RectangleF.Location
+- uid: Terminal.Gui.RectangleF.Offset(System.Single,System.Single)
+  name: Offset(Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Offset_System_Single_System_Single_
+  commentId: M:Terminal.Gui.RectangleF.Offset(System.Single,System.Single)
+  fullName: Terminal.Gui.RectangleF.Offset(System.Single, System.Single)
+  nameWithType: RectangleF.Offset(Single, Single)
+- uid: Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  name: Offset(PointF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Offset_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  fullName: Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  nameWithType: RectangleF.Offset(PointF)
+- uid: Terminal.Gui.RectangleF.Offset*
+  name: Offset
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Offset_
+  commentId: Overload:Terminal.Gui.RectangleF.Offset
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Offset
+  nameWithType: RectangleF.Offset
+- uid: Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: Equality(RectangleF, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Equality_Terminal_Gui_RectangleF_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Equality(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Equality(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Equality*
+  name: Equality
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Equality_
+  commentId: Overload:Terminal.Gui.RectangleF.op_Equality
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Equality
+  nameWithType: RectangleF.Equality
+- uid: Terminal.Gui.RectangleF.op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  name: Implicit(Rect to RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Implicit_Terminal_Gui_Rect__Terminal_Gui_RectangleF
+  commentId: M:Terminal.Gui.RectangleF.op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  name.vb: Widening(Rect to RectangleF)
+  fullName: Terminal.Gui.RectangleF.Implicit(Terminal.Gui.Rect to Terminal.Gui.RectangleF)
+  fullName.vb: Terminal.Gui.RectangleF.Widening(Terminal.Gui.Rect to Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Implicit(Rect to RectangleF)
+  nameWithType.vb: RectangleF.Widening(Rect to RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Implicit*
+  name: Implicit
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Implicit_
+  commentId: Overload:Terminal.Gui.RectangleF.op_Implicit
+  isSpec: "True"
+  name.vb: Widening
+  fullName: Terminal.Gui.RectangleF.Implicit
+  fullName.vb: Terminal.Gui.RectangleF.Widening
+  nameWithType: RectangleF.Implicit
+  nameWithType.vb: RectangleF.Widening
+- uid: Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: Inequality(RectangleF, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Inequality_Terminal_Gui_RectangleF_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Inequality(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Inequality(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Inequality*
+  name: Inequality
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_op_Inequality_
+  commentId: Overload:Terminal.Gui.RectangleF.op_Inequality
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Inequality
+  nameWithType: RectangleF.Inequality
+- uid: Terminal.Gui.RectangleF.Right
+  name: Right
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Right
+  commentId: P:Terminal.Gui.RectangleF.Right
+  fullName: Terminal.Gui.RectangleF.Right
+  nameWithType: RectangleF.Right
+- uid: Terminal.Gui.RectangleF.Right*
+  name: Right
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Right_
+  commentId: Overload:Terminal.Gui.RectangleF.Right
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Right
+  nameWithType: RectangleF.Right
+- uid: Terminal.Gui.RectangleF.Size
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Size
+  commentId: P:Terminal.Gui.RectangleF.Size
+  fullName: Terminal.Gui.RectangleF.Size
+  nameWithType: RectangleF.Size
+- uid: Terminal.Gui.RectangleF.Size*
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Size_
+  commentId: Overload:Terminal.Gui.RectangleF.Size
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Size
+  nameWithType: RectangleF.Size
+- uid: Terminal.Gui.RectangleF.Top
+  name: Top
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Top
+  commentId: P:Terminal.Gui.RectangleF.Top
+  fullName: Terminal.Gui.RectangleF.Top
+  nameWithType: RectangleF.Top
+- uid: Terminal.Gui.RectangleF.Top*
+  name: Top
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Top_
+  commentId: Overload:Terminal.Gui.RectangleF.Top
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Top
+  nameWithType: RectangleF.Top
+- uid: Terminal.Gui.RectangleF.ToString
+  name: ToString()
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_ToString
+  commentId: M:Terminal.Gui.RectangleF.ToString
+  fullName: Terminal.Gui.RectangleF.ToString()
+  nameWithType: RectangleF.ToString()
+- uid: Terminal.Gui.RectangleF.ToString*
+  name: ToString
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_ToString_
+  commentId: Overload:Terminal.Gui.RectangleF.ToString
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.ToString
+  nameWithType: RectangleF.ToString
+- uid: Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: Union(RectangleF, RectangleF)
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Union_Terminal_Gui_RectangleF_Terminal_Gui_RectangleF_
+  commentId: M:Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  fullName: Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  nameWithType: RectangleF.Union(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.Union*
+  name: Union
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Union_
+  commentId: Overload:Terminal.Gui.RectangleF.Union
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Union
+  nameWithType: RectangleF.Union
+- uid: Terminal.Gui.RectangleF.Width
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Width
+  commentId: P:Terminal.Gui.RectangleF.Width
+  fullName: Terminal.Gui.RectangleF.Width
+  nameWithType: RectangleF.Width
+- uid: Terminal.Gui.RectangleF.Width*
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Width_
+  commentId: Overload:Terminal.Gui.RectangleF.Width
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Width
+  nameWithType: RectangleF.Width
+- uid: Terminal.Gui.RectangleF.X
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_X
+  commentId: P:Terminal.Gui.RectangleF.X
+  fullName: Terminal.Gui.RectangleF.X
+  nameWithType: RectangleF.X
+- uid: Terminal.Gui.RectangleF.X*
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_X_
+  commentId: Overload:Terminal.Gui.RectangleF.X
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.X
+  nameWithType: RectangleF.X
+- uid: Terminal.Gui.RectangleF.Y
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Y
+  commentId: P:Terminal.Gui.RectangleF.Y
+  fullName: Terminal.Gui.RectangleF.Y
+  nameWithType: RectangleF.Y
+- uid: Terminal.Gui.RectangleF.Y*
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.RectangleF.html#Terminal_Gui_RectangleF_Y_
+  commentId: Overload:Terminal.Gui.RectangleF.Y
+  isSpec: "True"
+  fullName: Terminal.Gui.RectangleF.Y
+  nameWithType: RectangleF.Y
 - uid: Terminal.Gui.Responder
   name: Responder
   href: api/Terminal.Gui/Terminal.Gui.Responder.html
@@ -8964,6 +10932,256 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Size.Width
   nameWithType: Size.Width
+- uid: Terminal.Gui.SizeF
+  name: SizeF
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html
+  commentId: T:Terminal.Gui.SizeF
+  fullName: Terminal.Gui.SizeF
+  nameWithType: SizeF
+- uid: Terminal.Gui.SizeF.#ctor(System.Single,System.Single)
+  name: SizeF(Single, Single)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF__ctor_System_Single_System_Single_
+  commentId: M:Terminal.Gui.SizeF.#ctor(System.Single,System.Single)
+  fullName: Terminal.Gui.SizeF.SizeF(System.Single, System.Single)
+  nameWithType: SizeF.SizeF(Single, Single)
+- uid: Terminal.Gui.SizeF.#ctor(Terminal.Gui.PointF)
+  name: SizeF(PointF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF__ctor_Terminal_Gui_PointF_
+  commentId: M:Terminal.Gui.SizeF.#ctor(Terminal.Gui.PointF)
+  fullName: Terminal.Gui.SizeF.SizeF(Terminal.Gui.PointF)
+  nameWithType: SizeF.SizeF(PointF)
+- uid: Terminal.Gui.SizeF.#ctor(Terminal.Gui.SizeF)
+  name: SizeF(SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF__ctor_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.#ctor(Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.SizeF(Terminal.Gui.SizeF)
+  nameWithType: SizeF.SizeF(SizeF)
+- uid: Terminal.Gui.SizeF.#ctor*
+  name: SizeF
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF__ctor_
+  commentId: Overload:Terminal.Gui.SizeF.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.SizeF
+  nameWithType: SizeF.SizeF
+- uid: Terminal.Gui.SizeF.Add(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Add(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Add_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.Add(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Add(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Add(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.Add*
+  name: Add
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Add_
+  commentId: Overload:Terminal.Gui.SizeF.Add
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Add
+  nameWithType: SizeF.Add
+- uid: Terminal.Gui.SizeF.Empty
+  name: Empty
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Empty
+  commentId: F:Terminal.Gui.SizeF.Empty
+  fullName: Terminal.Gui.SizeF.Empty
+  nameWithType: SizeF.Empty
+- uid: Terminal.Gui.SizeF.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Equals_System_Object_
+  commentId: M:Terminal.Gui.SizeF.Equals(System.Object)
+  fullName: Terminal.Gui.SizeF.Equals(System.Object)
+  nameWithType: SizeF.Equals(Object)
+- uid: Terminal.Gui.SizeF.Equals(Terminal.Gui.SizeF)
+  name: Equals(SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Equals_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.Equals(Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Equals(Terminal.Gui.SizeF)
+  nameWithType: SizeF.Equals(SizeF)
+- uid: Terminal.Gui.SizeF.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Equals_
+  commentId: Overload:Terminal.Gui.SizeF.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Equals
+  nameWithType: SizeF.Equals
+- uid: Terminal.Gui.SizeF.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_GetHashCode
+  commentId: M:Terminal.Gui.SizeF.GetHashCode
+  fullName: Terminal.Gui.SizeF.GetHashCode()
+  nameWithType: SizeF.GetHashCode()
+- uid: Terminal.Gui.SizeF.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_GetHashCode_
+  commentId: Overload:Terminal.Gui.SizeF.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.GetHashCode
+  nameWithType: SizeF.GetHashCode
+- uid: Terminal.Gui.SizeF.Height
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Height
+  commentId: P:Terminal.Gui.SizeF.Height
+  fullName: Terminal.Gui.SizeF.Height
+  nameWithType: SizeF.Height
+- uid: Terminal.Gui.SizeF.Height*
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Height_
+  commentId: Overload:Terminal.Gui.SizeF.Height
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Height
+  nameWithType: SizeF.Height
+- uid: Terminal.Gui.SizeF.IsEmpty
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_IsEmpty
+  commentId: P:Terminal.Gui.SizeF.IsEmpty
+  fullName: Terminal.Gui.SizeF.IsEmpty
+  nameWithType: SizeF.IsEmpty
+- uid: Terminal.Gui.SizeF.IsEmpty*
+  name: IsEmpty
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_IsEmpty_
+  commentId: Overload:Terminal.Gui.SizeF.IsEmpty
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.IsEmpty
+  nameWithType: SizeF.IsEmpty
+- uid: Terminal.Gui.SizeF.op_Addition(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Addition(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Addition_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.op_Addition(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Addition(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Addition(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.op_Addition*
+  name: Addition
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Addition_
+  commentId: Overload:Terminal.Gui.SizeF.op_Addition
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Addition
+  nameWithType: SizeF.Addition
+- uid: Terminal.Gui.SizeF.op_Division(Terminal.Gui.SizeF,System.Single)
+  name: Division(SizeF, Single)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Division_Terminal_Gui_SizeF_System_Single_
+  commentId: M:Terminal.Gui.SizeF.op_Division(Terminal.Gui.SizeF,System.Single)
+  fullName: Terminal.Gui.SizeF.Division(Terminal.Gui.SizeF, System.Single)
+  nameWithType: SizeF.Division(SizeF, Single)
+- uid: Terminal.Gui.SizeF.op_Division*
+  name: Division
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Division_
+  commentId: Overload:Terminal.Gui.SizeF.op_Division
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Division
+  nameWithType: SizeF.Division
+- uid: Terminal.Gui.SizeF.op_Equality(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Equality(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Equality_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.op_Equality(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Equality(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Equality(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.op_Equality*
+  name: Equality
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Equality_
+  commentId: Overload:Terminal.Gui.SizeF.op_Equality
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Equality
+  nameWithType: SizeF.Equality
+- uid: Terminal.Gui.SizeF.op_Explicit(Terminal.Gui.SizeF)~Terminal.Gui.PointF
+  name: Explicit(SizeF to PointF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Explicit_Terminal_Gui_SizeF__Terminal_Gui_PointF
+  commentId: M:Terminal.Gui.SizeF.op_Explicit(Terminal.Gui.SizeF)~Terminal.Gui.PointF
+  name.vb: Narrowing(SizeF to PointF)
+  fullName: Terminal.Gui.SizeF.Explicit(Terminal.Gui.SizeF to Terminal.Gui.PointF)
+  fullName.vb: Terminal.Gui.SizeF.Narrowing(Terminal.Gui.SizeF to Terminal.Gui.PointF)
+  nameWithType: SizeF.Explicit(SizeF to PointF)
+  nameWithType.vb: SizeF.Narrowing(SizeF to PointF)
+- uid: Terminal.Gui.SizeF.op_Explicit*
+  name: Explicit
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Explicit_
+  commentId: Overload:Terminal.Gui.SizeF.op_Explicit
+  isSpec: "True"
+  name.vb: Narrowing
+  fullName: Terminal.Gui.SizeF.Explicit
+  fullName.vb: Terminal.Gui.SizeF.Narrowing
+  nameWithType: SizeF.Explicit
+  nameWithType.vb: SizeF.Narrowing
+- uid: Terminal.Gui.SizeF.op_Inequality(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Inequality(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Inequality_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.op_Inequality(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Inequality(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Inequality(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.op_Inequality*
+  name: Inequality
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Inequality_
+  commentId: Overload:Terminal.Gui.SizeF.op_Inequality
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Inequality
+  nameWithType: SizeF.Inequality
+- uid: Terminal.Gui.SizeF.op_Multiply(System.Single,Terminal.Gui.SizeF)
+  name: Multiply(Single, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Multiply_System_Single_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.op_Multiply(System.Single,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Multiply(System.Single, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Multiply(Single, SizeF)
+- uid: Terminal.Gui.SizeF.op_Multiply(Terminal.Gui.SizeF,System.Single)
+  name: Multiply(SizeF, Single)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Multiply_Terminal_Gui_SizeF_System_Single_
+  commentId: M:Terminal.Gui.SizeF.op_Multiply(Terminal.Gui.SizeF,System.Single)
+  fullName: Terminal.Gui.SizeF.Multiply(Terminal.Gui.SizeF, System.Single)
+  nameWithType: SizeF.Multiply(SizeF, Single)
+- uid: Terminal.Gui.SizeF.op_Multiply*
+  name: Multiply
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Multiply_
+  commentId: Overload:Terminal.Gui.SizeF.op_Multiply
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Multiply
+  nameWithType: SizeF.Multiply
+- uid: Terminal.Gui.SizeF.op_Subtraction(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Subtraction(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Subtraction_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.op_Subtraction(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Subtraction(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Subtraction(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.op_Subtraction*
+  name: Subtraction
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_op_Subtraction_
+  commentId: Overload:Terminal.Gui.SizeF.op_Subtraction
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Subtraction
+  nameWithType: SizeF.Subtraction
+- uid: Terminal.Gui.SizeF.Subtract(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  name: Subtract(SizeF, SizeF)
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Subtract_Terminal_Gui_SizeF_Terminal_Gui_SizeF_
+  commentId: M:Terminal.Gui.SizeF.Subtract(Terminal.Gui.SizeF,Terminal.Gui.SizeF)
+  fullName: Terminal.Gui.SizeF.Subtract(Terminal.Gui.SizeF, Terminal.Gui.SizeF)
+  nameWithType: SizeF.Subtract(SizeF, SizeF)
+- uid: Terminal.Gui.SizeF.Subtract*
+  name: Subtract
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Subtract_
+  commentId: Overload:Terminal.Gui.SizeF.Subtract
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Subtract
+  nameWithType: SizeF.Subtract
+- uid: Terminal.Gui.SizeF.ToString
+  name: ToString()
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_ToString
+  commentId: M:Terminal.Gui.SizeF.ToString
+  fullName: Terminal.Gui.SizeF.ToString()
+  nameWithType: SizeF.ToString()
+- uid: Terminal.Gui.SizeF.ToString*
+  name: ToString
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_ToString_
+  commentId: Overload:Terminal.Gui.SizeF.ToString
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.ToString
+  nameWithType: SizeF.ToString
+- uid: Terminal.Gui.SizeF.Width
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Width
+  commentId: P:Terminal.Gui.SizeF.Width
+  fullName: Terminal.Gui.SizeF.Width
+  nameWithType: SizeF.Width
+- uid: Terminal.Gui.SizeF.Width*
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.SizeF.html#Terminal_Gui_SizeF_Width_
+  commentId: Overload:Terminal.Gui.SizeF.Width
+  isSpec: "True"
+  fullName: Terminal.Gui.SizeF.Width
+  nameWithType: SizeF.Width
 - uid: Terminal.Gui.StatusBar
   name: StatusBar
   href: api/Terminal.Gui/Terminal.Gui.StatusBar.html
@@ -10891,18 +13109,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.FindHotKey
   nameWithType: TextFormatter.FindHotKey
-- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)
-  name: Format(ustring, Int32, Boolean, Boolean, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_
-  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)
-  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, System.Boolean, System.Boolean, System.Boolean)
-  nameWithType: TextFormatter.Format(ustring, Int32, Boolean, Boolean, Boolean)
-- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)
-  name: Format(ustring, Int32, TextAlignment, Boolean, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_
-  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)
-  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment, System.Boolean, System.Boolean)
-  nameWithType: TextFormatter.Format(ustring, Int32, TextAlignment, Boolean, Boolean)
+- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32)
+  name: Format(ustring, Int32, Boolean, Boolean, Boolean, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, System.Boolean, System.Boolean, System.Boolean, System.Int32)
+  nameWithType: TextFormatter.Format(ustring, Int32, Boolean, Boolean, Boolean, Int32)
+- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32)
+  name: Format(ustring, Int32, TextAlignment, Boolean, Boolean, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment, System.Boolean, System.Boolean, System.Int32)
+  nameWithType: TextFormatter.Format(ustring, Int32, TextAlignment, Boolean, Boolean, Int32)
 - uid: Terminal.Gui.TextFormatter.Format*
   name: Format
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_
@@ -11144,12 +13362,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.VerticalAlignment
   nameWithType: TextFormatter.VerticalAlignment
-- uid: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)
-  name: WordWrap(ustring, Int32, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_
-  commentId: M:Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)
-  fullName: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring, System.Int32, System.Boolean)
-  nameWithType: TextFormatter.WordWrap(ustring, Int32, Boolean)
+- uid: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean,System.Int32)
+  name: WordWrap(ustring, Int32, Boolean, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring, System.Int32, System.Boolean, System.Int32)
+  nameWithType: TextFormatter.WordWrap(ustring, Int32, Boolean, Int32)
 - uid: Terminal.Gui.TextFormatter.WordWrap*
   name: WordWrap
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_
@@ -11157,184 +13375,122 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.WordWrap
   nameWithType: TextFormatter.WordWrap
-- uid: Terminal.Gui.TextValidateField`1
-  name: TextValidateField<T>
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html
-  commentId: T:Terminal.Gui.TextValidateField`1
-  name.vb: TextValidateField(Of T)
-  fullName: Terminal.Gui.TextValidateField<T>
-  fullName.vb: Terminal.Gui.TextValidateField(Of T)
-  nameWithType: TextValidateField<T>
-  nameWithType.vb: TextValidateField(Of T)
-- uid: Terminal.Gui.TextValidateField`1.#ctor
-  name: TextValidateField()
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor
-  commentId: M:Terminal.Gui.TextValidateField`1.#ctor
-  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField()
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField()
-  nameWithType: TextValidateField<T>.TextValidateField()
-  nameWithType.vb: TextValidateField(Of T).TextValidateField()
-- uid: Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring)
-  name: TextValidateField(ustring)
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_NStack_ustring_
-  commentId: M:Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring)
-  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField(NStack.ustring)
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField(NStack.ustring)
-  nameWithType: TextValidateField<T>.TextValidateField(ustring)
-  nameWithType.vb: TextValidateField(Of T).TextValidateField(ustring)
-- uid: Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring,NStack.ustring)
-  name: TextValidateField(ustring, ustring)
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_NStack_ustring_NStack_ustring_
-  commentId: M:Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring,NStack.ustring)
-  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField(NStack.ustring, NStack.ustring)
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField(NStack.ustring, NStack.ustring)
-  nameWithType: TextValidateField<T>.TextValidateField(ustring, ustring)
-  nameWithType.vb: TextValidateField(Of T).TextValidateField(ustring, ustring)
-- uid: Terminal.Gui.TextValidateField`1.#ctor*
+- uid: Terminal.Gui.TextValidateField
   name: TextValidateField
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.#ctor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html
+  commentId: T:Terminal.Gui.TextValidateField
+  fullName: Terminal.Gui.TextValidateField
+  nameWithType: TextValidateField
+- uid: Terminal.Gui.TextValidateField.#ctor
+  name: TextValidateField()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField__ctor
+  commentId: M:Terminal.Gui.TextValidateField.#ctor
+  fullName: Terminal.Gui.TextValidateField.TextValidateField()
+  nameWithType: TextValidateField.TextValidateField()
+- uid: Terminal.Gui.TextValidateField.#ctor(Terminal.Gui.TextValidateProviders.ITextValidateProvider)
+  name: TextValidateField(ITextValidateProvider)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField__ctor_Terminal_Gui_TextValidateProviders_ITextValidateProvider_
+  commentId: M:Terminal.Gui.TextValidateField.#ctor(Terminal.Gui.TextValidateProviders.ITextValidateProvider)
+  fullName: Terminal.Gui.TextValidateField.TextValidateField(Terminal.Gui.TextValidateProviders.ITextValidateProvider)
+  nameWithType: TextValidateField.TextValidateField(ITextValidateProvider)
+- uid: Terminal.Gui.TextValidateField.#ctor*
+  name: TextValidateField
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField__ctor_
+  commentId: Overload:Terminal.Gui.TextValidateField.#ctor
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField
-  nameWithType: TextValidateField<T>.TextValidateField
-  nameWithType.vb: TextValidateField(Of T).TextValidateField
-- uid: Terminal.Gui.TextValidateField`1.IsValid
+  fullName: Terminal.Gui.TextValidateField.TextValidateField
+  nameWithType: TextValidateField.TextValidateField
+- uid: Terminal.Gui.TextValidateField.IsValid
   name: IsValid
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_IsValid
-  commentId: P:Terminal.Gui.TextValidateField`1.IsValid
-  fullName: Terminal.Gui.TextValidateField<T>.IsValid
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).IsValid
-  nameWithType: TextValidateField<T>.IsValid
-  nameWithType.vb: TextValidateField(Of T).IsValid
-- uid: Terminal.Gui.TextValidateField`1.IsValid*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_IsValid
+  commentId: P:Terminal.Gui.TextValidateField.IsValid
+  fullName: Terminal.Gui.TextValidateField.IsValid
+  nameWithType: TextValidateField.IsValid
+- uid: Terminal.Gui.TextValidateField.IsValid*
   name: IsValid
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_IsValid_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_IsValid_
+  commentId: Overload:Terminal.Gui.TextValidateField.IsValid
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.IsValid
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).IsValid
-  nameWithType: TextValidateField<T>.IsValid
-  nameWithType.vb: TextValidateField(Of T).IsValid
-- uid: Terminal.Gui.TextValidateField`1.Mask
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Mask
-  commentId: P:Terminal.Gui.TextValidateField`1.Mask
-  fullName: Terminal.Gui.TextValidateField<T>.Mask
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Mask
-  nameWithType: TextValidateField<T>.Mask
-  nameWithType.vb: TextValidateField(Of T).Mask
-- uid: Terminal.Gui.TextValidateField`1.Mask*
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Mask_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.Mask
-  isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.Mask
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Mask
-  nameWithType: TextValidateField<T>.Mask
-  nameWithType.vb: TextValidateField(Of T).Mask
-- uid: Terminal.Gui.TextValidateField`1.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.TextValidateField.IsValid
+  nameWithType: TextValidateField.IsValid
+- uid: Terminal.Gui.TextValidateField.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_MouseEvent_Terminal_Gui_MouseEvent_
-  commentId: M:Terminal.Gui.TextValidateField`1.MouseEvent(Terminal.Gui.MouseEvent)
-  fullName: Terminal.Gui.TextValidateField<T>.MouseEvent(Terminal.Gui.MouseEvent)
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).MouseEvent(Terminal.Gui.MouseEvent)
-  nameWithType: TextValidateField<T>.MouseEvent(MouseEvent)
-  nameWithType.vb: TextValidateField(Of T).MouseEvent(MouseEvent)
-- uid: Terminal.Gui.TextValidateField`1.MouseEvent*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_MouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.TextValidateField.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.TextValidateField.MouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: TextValidateField.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.TextValidateField.MouseEvent*
   name: MouseEvent
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_MouseEvent_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_MouseEvent_
+  commentId: Overload:Terminal.Gui.TextValidateField.MouseEvent
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.MouseEvent
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).MouseEvent
-  nameWithType: TextValidateField<T>.MouseEvent
-  nameWithType.vb: TextValidateField(Of T).MouseEvent
-- uid: Terminal.Gui.TextValidateField`1.PositionCursor
+  fullName: Terminal.Gui.TextValidateField.MouseEvent
+  nameWithType: TextValidateField.MouseEvent
+- uid: Terminal.Gui.TextValidateField.PositionCursor
   name: PositionCursor()
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_PositionCursor
-  commentId: M:Terminal.Gui.TextValidateField`1.PositionCursor
-  fullName: Terminal.Gui.TextValidateField<T>.PositionCursor()
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).PositionCursor()
-  nameWithType: TextValidateField<T>.PositionCursor()
-  nameWithType.vb: TextValidateField(Of T).PositionCursor()
-- uid: Terminal.Gui.TextValidateField`1.PositionCursor*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_PositionCursor
+  commentId: M:Terminal.Gui.TextValidateField.PositionCursor
+  fullName: Terminal.Gui.TextValidateField.PositionCursor()
+  nameWithType: TextValidateField.PositionCursor()
+- uid: Terminal.Gui.TextValidateField.PositionCursor*
   name: PositionCursor
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_PositionCursor_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_PositionCursor_
+  commentId: Overload:Terminal.Gui.TextValidateField.PositionCursor
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.PositionCursor
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).PositionCursor
-  nameWithType: TextValidateField<T>.PositionCursor
-  nameWithType.vb: TextValidateField(Of T).PositionCursor
-- uid: Terminal.Gui.TextValidateField`1.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TextValidateField.PositionCursor
+  nameWithType: TextValidateField.PositionCursor
+- uid: Terminal.Gui.TextValidateField.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_ProcessKey_Terminal_Gui_KeyEvent_
-  commentId: M:Terminal.Gui.TextValidateField`1.ProcessKey(Terminal.Gui.KeyEvent)
-  fullName: Terminal.Gui.TextValidateField<T>.ProcessKey(Terminal.Gui.KeyEvent)
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).ProcessKey(Terminal.Gui.KeyEvent)
-  nameWithType: TextValidateField<T>.ProcessKey(KeyEvent)
-  nameWithType.vb: TextValidateField(Of T).ProcessKey(KeyEvent)
-- uid: Terminal.Gui.TextValidateField`1.ProcessKey*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.TextValidateField.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TextValidateField.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: TextValidateField.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.TextValidateField.ProcessKey*
   name: ProcessKey
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_ProcessKey_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_ProcessKey_
+  commentId: Overload:Terminal.Gui.TextValidateField.ProcessKey
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.ProcessKey
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).ProcessKey
-  nameWithType: TextValidateField<T>.ProcessKey
-  nameWithType.vb: TextValidateField(Of T).ProcessKey
-- uid: Terminal.Gui.TextValidateField`1.Provider
+  fullName: Terminal.Gui.TextValidateField.ProcessKey
+  nameWithType: TextValidateField.ProcessKey
+- uid: Terminal.Gui.TextValidateField.Provider
   name: Provider
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Provider
-  commentId: P:Terminal.Gui.TextValidateField`1.Provider
-  fullName: Terminal.Gui.TextValidateField<T>.Provider
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Provider
-  nameWithType: TextValidateField<T>.Provider
-  nameWithType.vb: TextValidateField(Of T).Provider
-- uid: Terminal.Gui.TextValidateField`1.Provider*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Provider
+  commentId: P:Terminal.Gui.TextValidateField.Provider
+  fullName: Terminal.Gui.TextValidateField.Provider
+  nameWithType: TextValidateField.Provider
+- uid: Terminal.Gui.TextValidateField.Provider*
   name: Provider
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Provider_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.Provider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Provider_
+  commentId: Overload:Terminal.Gui.TextValidateField.Provider
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.Provider
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Provider
-  nameWithType: TextValidateField<T>.Provider
-  nameWithType.vb: TextValidateField(Of T).Provider
-- uid: Terminal.Gui.TextValidateField`1.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.TextValidateField.Provider
+  nameWithType: TextValidateField.Provider
+- uid: Terminal.Gui.TextValidateField.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Redraw_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.TextValidateField`1.Redraw(Terminal.Gui.Rect)
-  fullName: Terminal.Gui.TextValidateField<T>.Redraw(Terminal.Gui.Rect)
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Redraw(Terminal.Gui.Rect)
-  nameWithType: TextValidateField<T>.Redraw(Rect)
-  nameWithType.vb: TextValidateField(Of T).Redraw(Rect)
-- uid: Terminal.Gui.TextValidateField`1.Redraw*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.TextValidateField.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.TextValidateField.Redraw(Terminal.Gui.Rect)
+  nameWithType: TextValidateField.Redraw(Rect)
+- uid: Terminal.Gui.TextValidateField.Redraw*
   name: Redraw
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Redraw_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.Redraw
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Redraw_
+  commentId: Overload:Terminal.Gui.TextValidateField.Redraw
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.Redraw
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Redraw
-  nameWithType: TextValidateField<T>.Redraw
-  nameWithType.vb: TextValidateField(Of T).Redraw
-- uid: Terminal.Gui.TextValidateField`1.Text
+  fullName: Terminal.Gui.TextValidateField.Redraw
+  nameWithType: TextValidateField.Redraw
+- uid: Terminal.Gui.TextValidateField.Text
   name: Text
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Text
-  commentId: P:Terminal.Gui.TextValidateField`1.Text
-  fullName: Terminal.Gui.TextValidateField<T>.Text
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Text
-  nameWithType: TextValidateField<T>.Text
-  nameWithType.vb: TextValidateField(Of T).Text
-- uid: Terminal.Gui.TextValidateField`1.Text*
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Text
+  commentId: P:Terminal.Gui.TextValidateField.Text
+  fullName: Terminal.Gui.TextValidateField.Text
+  nameWithType: TextValidateField.Text
+- uid: Terminal.Gui.TextValidateField.Text*
   name: Text
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Text_
-  commentId: Overload:Terminal.Gui.TextValidateField`1.Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField.html#Terminal_Gui_TextValidateField_Text_
+  commentId: Overload:Terminal.Gui.TextValidateField.Text
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateField<T>.Text
-  fullName.vb: Terminal.Gui.TextValidateField(Of T).Text
-  nameWithType: TextValidateField<T>.Text
-  nameWithType.vb: TextValidateField(Of T).Text
+  fullName: Terminal.Gui.TextValidateField.Text
+  nameWithType: TextValidateField.Text
 - uid: Terminal.Gui.TextValidateProviders
   name: Terminal.Gui.TextValidateProviders
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.html
@@ -11425,6 +13581,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete
   nameWithType: ITextValidateProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_DisplayText
+  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText
+  nameWithType: ITextValidateProvider.DisplayText
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText*
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_DisplayText_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.DisplayText
+  nameWithType: ITextValidateProvider.DisplayText
 - uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
   name: Fixed
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Fixed
@@ -11464,19 +13633,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
   nameWithType: ITextValidateProvider.IsValid
-- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Mask
-  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
-  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
-  nameWithType: ITextValidateProvider.Mask
-- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask*
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Mask_
-  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
-  isSpec: "True"
-  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
-  nameWithType: ITextValidateProvider.Mask
 - uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Text
@@ -11496,12 +13652,12 @@ references:
   commentId: T:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
   fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
   nameWithType: NetMaskedTextProvider
-- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor
-  name: NetMaskedTextProvider()
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider__ctor
-  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor
-  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.NetMaskedTextProvider()
-  nameWithType: NetMaskedTextProvider.NetMaskedTextProvider()
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor(System.String)
+  name: NetMaskedTextProvider(String)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider__ctor_System_String_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor(System.String)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.NetMaskedTextProvider(System.String)
+  nameWithType: NetMaskedTextProvider.NetMaskedTextProvider(String)
 - uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor*
   name: NetMaskedTextProvider
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider__ctor_
@@ -11587,6 +13743,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete
   nameWithType: NetMaskedTextProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_DisplayText
+  commentId: P:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText
+  nameWithType: NetMaskedTextProvider.DisplayText
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText*
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_DisplayText_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.DisplayText
+  nameWithType: NetMaskedTextProvider.DisplayText
 - uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
   name: Fixed
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Fixed
@@ -11658,12 +13827,12 @@ references:
   commentId: T:Terminal.Gui.TextValidateProviders.TextRegexProvider
   fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider
   nameWithType: TextRegexProvider
-- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor
-  name: TextRegexProvider()
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider__ctor
-  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor
-  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.TextRegexProvider()
-  nameWithType: TextRegexProvider.TextRegexProvider()
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor(System.String)
+  name: TextRegexProvider(String)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider__ctor_System_String_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor(System.String)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.TextRegexProvider(System.String)
+  nameWithType: TextRegexProvider.TextRegexProvider(String)
 - uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor*
   name: TextRegexProvider
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider__ctor_
@@ -11749,6 +13918,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete
   nameWithType: TextRegexProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_DisplayText
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText
+  nameWithType: TextRegexProvider.DisplayText
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText*
+  name: DisplayText
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_DisplayText_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.DisplayText
+  nameWithType: TextRegexProvider.DisplayText
 - uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
   name: Fixed
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Fixed
@@ -11788,19 +13970,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
   nameWithType: TextRegexProvider.IsValid
-- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Mask
-  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
-  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
-  nameWithType: TextRegexProvider.Mask
-- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask*
-  name: Mask
-  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Mask_
-  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern
+  name: Pattern
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Pattern
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern
+  nameWithType: TextRegexProvider.Pattern
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern*
+  name: Pattern
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Pattern_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern
   isSpec: "True"
-  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
-  nameWithType: TextRegexProvider.Mask
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Pattern
+  nameWithType: TextRegexProvider.Pattern
 - uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Text
@@ -11852,6 +14034,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.TextView
   nameWithType: TextView.TextView
+- uid: Terminal.Gui.TextView.AllowsReturn
+  name: AllowsReturn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_AllowsReturn
+  commentId: P:Terminal.Gui.TextView.AllowsReturn
+  fullName: Terminal.Gui.TextView.AllowsReturn
+  nameWithType: TextView.AllowsReturn
+- uid: Terminal.Gui.TextView.AllowsReturn*
+  name: AllowsReturn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_AllowsReturn_
+  commentId: Overload:Terminal.Gui.TextView.AllowsReturn
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.AllowsReturn
+  nameWithType: TextView.AllowsReturn
+- uid: Terminal.Gui.TextView.AllowsTab
+  name: AllowsTab
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_AllowsTab
+  commentId: P:Terminal.Gui.TextView.AllowsTab
+  fullName: Terminal.Gui.TextView.AllowsTab
+  nameWithType: TextView.AllowsTab
+- uid: Terminal.Gui.TextView.AllowsTab*
+  name: AllowsTab
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_AllowsTab_
+  commentId: Overload:Terminal.Gui.TextView.AllowsTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.AllowsTab
+  nameWithType: TextView.AllowsTab
 - uid: Terminal.Gui.TextView.BottomOffset
   name: BottomOffset
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_BottomOffset
@@ -12131,6 +14339,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.MoveHome
   nameWithType: TextView.MoveHome
+- uid: Terminal.Gui.TextView.Multiline
+  name: Multiline
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Multiline
+  commentId: P:Terminal.Gui.TextView.Multiline
+  fullName: Terminal.Gui.TextView.Multiline
+  nameWithType: TextView.Multiline
+- uid: Terminal.Gui.TextView.Multiline*
+  name: Multiline
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Multiline_
+  commentId: Overload:Terminal.Gui.TextView.Multiline
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Multiline
+  nameWithType: TextView.Multiline
 - uid: Terminal.Gui.TextView.OnEnter(Terminal.Gui.View)
   name: OnEnter(View)
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnEnter_Terminal_Gui_View_
@@ -12352,6 +14573,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.SelectionStartRow
   nameWithType: TextView.SelectionStartRow
+- uid: Terminal.Gui.TextView.TabWidth
+  name: TabWidth
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_TabWidth
+  commentId: P:Terminal.Gui.TextView.TabWidth
+  fullName: Terminal.Gui.TextView.TabWidth
+  nameWithType: TextView.TabWidth
+- uid: Terminal.Gui.TextView.TabWidth*
+  name: TabWidth
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_TabWidth_
+  commentId: Overload:Terminal.Gui.TextView.TabWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.TabWidth
+  nameWithType: TextView.TabWidth
 - uid: Terminal.Gui.TextView.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Text

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class FileDialog
+    <title>Class GraphView
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class FileDialog
+    <meta name="title" content="Class GraphView
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,13 +78,13 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.FileDialog">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.GraphView">
   
   
-  <h1 id="Terminal_Gui_FileDialog" data-uid="Terminal.Gui.FileDialog" class="text-break">Class FileDialog
+  <h1 id="Terminal_Gui_GraphView" data-uid="Terminal.Gui.GraphView" class="text-break">Class GraphView
   </h1>
   <div class="markdown level0 summary">
-Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a> and the <a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a>
+Control for rendering graphs (bar, scatter etc)
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -92,12 +92,7 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></div>
     <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
-    <div class="level3"><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></div>
-    <div class="level4"><a class="xref" href="Terminal.Gui.Window.html">Window</a></div>
-    <div class="level5"><a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a></div>
-    <div class="level6"><span class="xref">FileDialog</span></div>
-      <div class="level7"><a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a></div>
-      <div class="level7"><a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a></div>
+    <div class="level3"><span class="xref">GraphView</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -107,72 +102,6 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_">Dialog.AddButton(Button)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_">Dialog.ProcessKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Window.Title</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Add_Terminal_Gui_View_">Window.Add(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Remove_Terminal_Gui_View_">Window.Remove(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_RemoveAll">Window.RemoveAll()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_">Window.Redraw(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_Terminal_Gui_MouseEvent_">Window.MouseEvent(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Text">Window.Text</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_TextAlignment">Window.TextAlignment</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Toplevel.Running</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Loaded">Toplevel.Loaded</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Ready">Toplevel.Ready</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Unloaded">Toplevel.Unloaded</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Create">Toplevel.Create()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_CanFocus">Toplevel.CanFocus</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Modal">Toplevel.Modal</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_MenuBar">Toplevel.MenuBar</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_StatusBar">Toplevel.StatusBar</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_">Toplevel.OnKeyDown(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_">Toplevel.OnKeyUp(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessColdKey(KeyEvent)</a>
-    </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
     </div>
@@ -228,6 +157,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TabStop">View.TabStop</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocus">View.CanFocus</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
     </div>
     <div>
@@ -276,7 +208,16 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">View.RemoveAll()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
@@ -366,10 +307,19 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyDown_Terminal_Gui_KeyEvent_">View.OnKeyDown(KeyEvent)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
@@ -399,7 +349,13 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
@@ -450,6 +406,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -473,169 +432,37 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_FileDialog_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_GraphView_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FileDialog : Dialog, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class GraphView : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
-  <h4 id="Terminal_Gui_FileDialog__ctor" data-uid="Terminal.Gui.FileDialog.#ctor">FileDialog()</h4>
+  <a id="Terminal_Gui_GraphView__ctor_" data-uid="Terminal.Gui.GraphView.#ctor*"></a>
+  <h4 id="Terminal_Gui_GraphView__ctor" data-uid="Terminal.Gui.GraphView.#ctor">GraphView()</h4>
   <div class="markdown level1 summary">
-Initializes a new <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>.
+Creates a new graph with a 1 to 1 graph space with absolute layout
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FileDialog()</code></pre>
+    <pre><code class="lang-csharp hljs">public GraphView()</code></pre>
   </div>
-  
-  
-  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
-  <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring)</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FileDialog(ustring title, ustring prompt, ustring message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td>The title.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">prompt</span></td>
-        <td>The prompt.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">message</span></td>
-        <td>The message.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
-  <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring, ustring)</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FileDialog(ustring title, ustring prompt, ustring nameFieldLabel, ustring message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td>The title.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">prompt</span></td>
-        <td>The prompt.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">nameFieldLabel</span></td>
-        <td>The name of the file field label..</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">message</span></td>
-        <td>The message.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
-  <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring, ustring, ustring)</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FileDialog(ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td>The title.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">prompt</span></td>
-        <td>The prompt.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">nameDirLabel</span></td>
-        <td>The name of the directory field label.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">nameFieldLabel</span></td>
-        <td>The name of the file field label..</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">message</span></td>
-        <td>The message.</td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_FileDialog_AllowedFileTypes_" data-uid="Terminal.Gui.FileDialog.AllowedFileTypes*"></a>
-  <h4 id="Terminal_Gui_FileDialog_AllowedFileTypes" data-uid="Terminal.Gui.FileDialog.AllowedFileTypes">AllowedFileTypes</h4>
+  <a id="Terminal_Gui_GraphView_Annotations_" data-uid="Terminal.Gui.GraphView.Annotations*"></a>
+  <h4 id="Terminal_Gui_GraphView_Annotations" data-uid="Terminal.Gui.GraphView.Annotations">Annotations</h4>
   <div class="markdown level1 summary">
-The array of filename extensions allowed, or null if all file extensions are allowed.
+Elements drawn into graph after series have been drawn e.g. Legends etc
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string[] AllowedFileTypes { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public List&lt;IAnnotation&gt; Annotations { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -647,22 +474,22 @@ The array of filename extensions allowed, or null if all file extensions are all
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span>[]</td>
-        <td>The allowed file types.</td>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Terminal.Gui.Graphs.IAnnotation.html">IAnnotation</a>&gt;</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_FileDialog_AllowsOtherFileTypes_" data-uid="Terminal.Gui.FileDialog.AllowsOtherFileTypes*"></a>
-  <h4 id="Terminal_Gui_FileDialog_AllowsOtherFileTypes" data-uid="Terminal.Gui.FileDialog.AllowsOtherFileTypes">AllowsOtherFileTypes</h4>
+  <a id="Terminal_Gui_GraphView_AxisX_" data-uid="Terminal.Gui.GraphView.AxisX*"></a>
+  <h4 id="Terminal_Gui_GraphView_AxisX" data-uid="Terminal.Gui.GraphView.AxisX">AxisX</h4>
   <div class="markdown level1 summary">
-Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a> allows the file to be saved with a different extension
+Horizontal axis
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool AllowsOtherFileTypes { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public HorizontalAxis AxisX { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -674,24 +501,320 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code> if allows other file types; otherwise, <code>false</code>.</td>
+        <td><a class="xref" href="Terminal.Gui.Graphs.HorizontalAxis.html">HorizontalAxis</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_FileDialog_Canceled_" data-uid="Terminal.Gui.FileDialog.Canceled*"></a>
-  <h4 id="Terminal_Gui_FileDialog_Canceled" data-uid="Terminal.Gui.FileDialog.Canceled">Canceled</h4>
+  <a id="Terminal_Gui_GraphView_AxisY_" data-uid="Terminal.Gui.GraphView.AxisY*"></a>
+  <h4 id="Terminal_Gui_GraphView_AxisY" data-uid="Terminal.Gui.GraphView.AxisY">AxisY</h4>
   <div class="markdown level1 summary">
-Check if the dialog was or not canceled.
+Vertical axis
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool Canceled { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public VerticalAxis AxisY { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Graphs.VerticalAxis.html">VerticalAxis</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_CellSize_" data-uid="Terminal.Gui.GraphView.CellSize*"></a>
+  <h4 id="Terminal_Gui_GraphView_CellSize" data-uid="Terminal.Gui.GraphView.CellSize">CellSize</h4>
+  <div class="markdown level1 summary">
+Translates console width/height into graph space. Defaults
+to 1 row/col of console space being 1 unit of graph space. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PointF CellSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.PointF.html">PointF</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_GraphColor_" data-uid="Terminal.Gui.GraphView.GraphColor*"></a>
+  <h4 id="Terminal_Gui_GraphView_GraphColor" data-uid="Terminal.Gui.GraphView.GraphColor">GraphColor</h4>
+  <div class="markdown level1 summary">
+The color of the background of the graph and axis/labels
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute? GraphColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_MarginBottom_" data-uid="Terminal.Gui.GraphView.MarginBottom*"></a>
+  <h4 id="Terminal_Gui_GraphView_MarginBottom" data-uid="Terminal.Gui.GraphView.MarginBottom">MarginBottom</h4>
+  <div class="markdown level1 summary">
+Amount of space to leave on bottom of control.  Graph content (<a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Series">Series</a>)
+will not be rendered in margins but axis labels may be
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint MarginBottom { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.UInt32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_MarginLeft_" data-uid="Terminal.Gui.GraphView.MarginLeft*"></a>
+  <h4 id="Terminal_Gui_GraphView_MarginLeft" data-uid="Terminal.Gui.GraphView.MarginLeft">MarginLeft</h4>
+  <div class="markdown level1 summary">
+Amount of space to leave on left of control.  Graph content (<a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_Series">Series</a>)
+will not be rendered in margins but axis labels may be
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public uint MarginLeft { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.UInt32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_ScrollOffset_" data-uid="Terminal.Gui.GraphView.ScrollOffset*"></a>
+  <h4 id="Terminal_Gui_GraphView_ScrollOffset" data-uid="Terminal.Gui.GraphView.ScrollOffset">ScrollOffset</h4>
+  <div class="markdown level1 summary">
+The graph space position of the bottom left of the control.
+Changing this scrolls the viewport around in the graph
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PointF ScrollOffset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.PointF.html">PointF</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_Series_" data-uid="Terminal.Gui.GraphView.Series*"></a>
+  <h4 id="Terminal_Gui_GraphView_Series" data-uid="Terminal.Gui.GraphView.Series">Series</h4>
+  <div class="markdown level1 summary">
+Collection of data series that are rendered in the graph
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;ISeries&gt; Series { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Terminal.Gui.Graphs.ISeries.html">ISeries</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_GraphView_DrawLine_" data-uid="Terminal.Gui.GraphView.DrawLine*"></a>
+  <h4 id="Terminal_Gui_GraphView_DrawLine_Terminal_Gui_Point_Terminal_Gui_Point_System_Rune_" data-uid="Terminal.Gui.GraphView.DrawLine(Terminal.Gui.Point,Terminal.Gui.Point,System.Rune)">DrawLine(Point, Point, Rune)</h4>
+  <div class="markdown level1 summary">
+Draws a line between two points in screen space.  Can be diagonals.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DrawLine(Point start, Point end, Rune symbol)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">start</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">end</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td><span class="parametername">symbol</span></td>
+        <td>The symbol to use for the line</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_GraphSpaceToScreen_" data-uid="Terminal.Gui.GraphView.GraphSpaceToScreen*"></a>
+  <h4 id="Terminal_Gui_GraphView_GraphSpaceToScreen_Terminal_Gui_PointF_" data-uid="Terminal.Gui.GraphView.GraphSpaceToScreen(Terminal.Gui.PointF)">GraphSpaceToScreen(PointF)</h4>
+  <div class="markdown level1 summary">
+Calculates the screen location for a given point in graph space.
+Bear in mind these be off screen
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Point GraphSpaceToScreen(PointF location)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.PointF.html">PointF</a></td>
+        <td><span class="parametername">location</span></td>
+        <td>Point in graph space that may or may not be represented in the
+visible area of graph currently presented.  E.g. 0,0 for origin</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td>Screen position (Column/Row) which would be used to render the graph <code data-dev-comment-type="paramref" class="paramref">location</code>.
+Note that this can be outside the current client area of the control</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_ProcessKey_" data-uid="Terminal.Gui.GraphView.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_GraphView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.GraphView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessKey(KeyEvent keyEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -706,236 +829,157 @@ Check if the dialog was or not canceled.
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
   
   
-  <a id="Terminal_Gui_FileDialog_CanCreateDirectories_" data-uid="Terminal.Gui.FileDialog.CanCreateDirectories*"></a>
-  <h4 id="Terminal_Gui_FileDialog_CanCreateDirectories" data-uid="Terminal.Gui.FileDialog.CanCreateDirectories">CanCreateDirectories</h4>
-  <div class="markdown level1 summary">
-Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a> can create directories.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool CanCreateDirectories { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code> if can create directories; otherwise, <code>false</code>.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_DirectoryPath_" data-uid="Terminal.Gui.FileDialog.DirectoryPath*"></a>
-  <h4 id="Terminal_Gui_FileDialog_DirectoryPath" data-uid="Terminal.Gui.FileDialog.DirectoryPath">DirectoryPath</h4>
-  <div class="markdown level1 summary">
-Gets or sets the directory path for this panel
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring DirectoryPath { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The directory path.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_FilePath_" data-uid="Terminal.Gui.FileDialog.FilePath*"></a>
-  <h4 id="Terminal_Gui_FileDialog_FilePath" data-uid="Terminal.Gui.FileDialog.FilePath">FilePath</h4>
-  <div class="markdown level1 summary">
-The File path that is currently shown on the panel
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring FilePath { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The absolute file path for the file path entered.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_IsExtensionHidden_" data-uid="Terminal.Gui.FileDialog.IsExtensionHidden*"></a>
-  <h4 id="Terminal_Gui_FileDialog_IsExtensionHidden" data-uid="Terminal.Gui.FileDialog.IsExtensionHidden">IsExtensionHidden</h4>
-  <div class="markdown level1 summary">
-Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a> is extension hidden.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsExtensionHidden { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code> if is extension hidden; otherwise, <code>false</code>.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_Message_" data-uid="Terminal.Gui.FileDialog.Message*"></a>
-  <h4 id="Terminal_Gui_FileDialog_Message" data-uid="Terminal.Gui.FileDialog.Message">Message</h4>
-  <div class="markdown level1 summary">
-Gets or sets the message displayed to the user, defaults to nothing
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring Message { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The message.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_NameDirLabel_" data-uid="Terminal.Gui.FileDialog.NameDirLabel*"></a>
-  <h4 id="Terminal_Gui_FileDialog_NameDirLabel" data-uid="Terminal.Gui.FileDialog.NameDirLabel">NameDirLabel</h4>
-  <div class="markdown level1 summary">
-Gets or sets the name of the directory field label.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring NameDirLabel { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The name of the directory field label.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_NameFieldLabel_" data-uid="Terminal.Gui.FileDialog.NameFieldLabel*"></a>
-  <h4 id="Terminal_Gui_FileDialog_NameFieldLabel" data-uid="Terminal.Gui.FileDialog.NameFieldLabel">NameFieldLabel</h4>
-  <div class="markdown level1 summary">
-Gets or sets the name field label.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring NameFieldLabel { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The name field label.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FileDialog_Prompt_" data-uid="Terminal.Gui.FileDialog.Prompt*"></a>
-  <h4 id="Terminal_Gui_FileDialog_Prompt" data-uid="Terminal.Gui.FileDialog.Prompt">Prompt</h4>
-  <div class="markdown level1 summary">
-Gets or sets the prompt label for the <a class="xref" href="Terminal.Gui.Button.html">Button</a> displayed to the user
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring Prompt { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td>The prompt.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
-  <a id="Terminal_Gui_FileDialog_WillPresent_" data-uid="Terminal.Gui.FileDialog.WillPresent*"></a>
-  <h4 id="Terminal_Gui_FileDialog_WillPresent" data-uid="Terminal.Gui.FileDialog.WillPresent">WillPresent()</h4>
+  <a id="Terminal_Gui_GraphView_Redraw_" data-uid="Terminal.Gui.GraphView.Redraw*"></a>
+  <h4 id="Terminal_Gui_GraphView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.GraphView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void WillPresent()</code></pre>
+    <pre><code class="lang-csharp hljs">public override void Redraw(Rect bounds)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">bounds</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent">Toplevel.WillPresent()</a></div>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  
+  
+  <a id="Terminal_Gui_GraphView_Reset_" data-uid="Terminal.Gui.GraphView.Reset*"></a>
+  <h4 id="Terminal_Gui_GraphView_Reset" data-uid="Terminal.Gui.GraphView.Reset">Reset()</h4>
+  <div class="markdown level1 summary">
+Clears all settings configured on the graph and resets all properties
+to default values (<a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_CellSize">CellSize</a>, <a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_ScrollOffset">ScrollOffset</a> etc) 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Reset()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_GraphView_ScreenToGraphSpace_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace*"></a>
+  <h4 id="Terminal_Gui_GraphView_ScreenToGraphSpace_System_Int32_System_Int32_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace(System.Int32,System.Int32)">ScreenToGraphSpace(Int32, Int32)</h4>
+  <div class="markdown level1 summary">
+Returns the section of the graph that is represented by the given
+screen position
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RectangleF ScreenToGraphSpace(int col, int row)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">col</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">row</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_ScreenToGraphSpace_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace*"></a>
+  <h4 id="Terminal_Gui_GraphView_ScreenToGraphSpace_Terminal_Gui_Rect_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace(Terminal.Gui.Rect)">ScreenToGraphSpace(Rect)</h4>
+  <div class="markdown level1 summary">
+Returns the section of the graph that is represented by the screen area
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RectangleF ScreenToGraphSpace(Rect screenArea)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">screenArea</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_GraphView_SetDriverColorToGraphColor_" data-uid="Terminal.Gui.GraphView.SetDriverColorToGraphColor*"></a>
+  <h4 id="Terminal_Gui_GraphView_SetDriverColorToGraphColor" data-uid="Terminal.Gui.GraphView.SetDriverColorToGraphColor">SetDriverColorToGraphColor()</h4>
+  <div class="markdown level1 summary">
+Sets the color attribute of <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Driver">Driver</a> to the <a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gui_GraphView_GraphColor">GraphColor</a>
+(if defined) or <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> otherwise.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetDriverColorToGraphColor()</code></pre>
+  </div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
