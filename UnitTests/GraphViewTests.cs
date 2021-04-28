@@ -11,41 +11,41 @@ using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views {
 		
-		#region Helper Classes
-		class FakeHAxis : HorizontalAxis {
+	#region Helper Classes
+	class FakeHAxis : HorizontalAxis {
 
-			public List<Point> DrawAxisLinePoints = new List<Point> ();
-			public List<int> LabelPoints = new List<int>();
+		public List<Point> DrawAxisLinePoints = new List<Point> ();
+		public List<int> LabelPoints = new List<int>();
 
-			protected override void DrawAxisLine (GraphView graph, int x, int y)
-			{
-				base.DrawAxisLine (graph, x, y);
-				DrawAxisLinePoints.Add (new Point(x, y));
-			}
-
-			public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
-			{
-				base.DrawAxisLabel (graph, screenPosition, text);
-				LabelPoints.Add(screenPosition);
-			}
+		protected override void DrawAxisLine (GraphView graph, int x, int y)
+		{
+			base.DrawAxisLine (graph, x, y);
+			DrawAxisLinePoints.Add (new Point(x, y));
 		}
 
-		class FakeVAxis : VerticalAxis {
-
-			public List<Point> DrawAxisLinePoints = new List<Point> ();
-			public List<int> LabelPoints = new List<int>();
-
-			protected override void DrawAxisLine (GraphView graph, int x, int y)
-			{
-				base.DrawAxisLine (graph, x, y);
-				DrawAxisLinePoints.Add (new Point(x, y));
-			}
-			public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
-			{
-				base.DrawAxisLabel (graph, screenPosition, text);
-				LabelPoints.Add(screenPosition);
-			}
+		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
+		{
+			base.DrawAxisLabel (graph, screenPosition, text);
+			LabelPoints.Add(screenPosition);
 		}
+	}
+
+	class FakeVAxis : VerticalAxis {
+
+		public List<Point> DrawAxisLinePoints = new List<Point> ();
+		public List<int> LabelPoints = new List<int>();
+
+		protected override void DrawAxisLine (GraphView graph, int x, int y)
+		{
+			base.DrawAxisLine (graph, x, y);
+			DrawAxisLinePoints.Add (new Point(x, y));
+		}
+		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
+		{
+			base.DrawAxisLabel (graph, screenPosition, text);
+			LabelPoints.Add(screenPosition);
+		}
+	}
 	#endregion
 
 	public class GraphViewTests {
@@ -616,15 +616,15 @@ namespace Terminal.Gui.Views {
 
 			string looksLike =
 @" 
- │          MM                                                                  
- │       M  MM                                                                  
- │       M  MM                                                                  
- │  MM   M  MM                                                                  
- │  MM   M  MM                                                                  
- │  MM   M  MM                                                                  
- │  MM  MM  MM                                                                  
- │  MM  MM  MM                                                                  
- ┼──┬M──┬M──┬M──────                                                            
+ │          MM
+ │       M  MM
+ │       M  MM
+ │  MM   M  MM
+ │  MM   M  MM
+ │  MM   M  MM
+ │  MM  MM  MM
+ │  MM  MM  MM
+ ┼──┬M──┬M──┬M──────
    heytherebob  ";
 			GraphViewTests.AssertDriverContentsAre (looksLike);
 		}
@@ -1084,6 +1084,94 @@ namespace Terminal.Gui.Views {
  0    5";
 
 			GraphViewTests.AssertDriverContentsAre (expected);
+		}
+
+		[Fact]
+		public void TestTextAnnotation_LongText ()
+		{
+			var gv = GetGraph ();
+
+			gv.Annotations.Add (new TextAnnotation () {
+				Text = "hey there partner hows it going boy its great",
+				GraphPosition = new PointF (2, 2)
+			});
+
+			gv.Redraw (gv.Bounds);
+
+			// long text should get truncated
+			// margin takes up 1 units
+			// the GraphPosition of the anntation is 2
+			// Leaving 7 characters of the annotation renderable (including space)
+			var expected =
+@"
+ │
+ ┤ hey the
+ ┤
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+
+
+		[Fact]
+		public void TestTextAnnotation_Offscreen ()
+		{
+			var gv = GetGraph ();
+
+			gv.Annotations.Add (new TextAnnotation () {
+				Text = "hey there partner hows it going boy its great",
+				GraphPosition = new PointF (9, 2)
+			});
+
+			gv.Redraw (gv.Bounds);
+
+			// Text is off the screen (graph x axis runs to 8 not 9)
+			var expected =
+@"
+ │
+ ┤
+ ┤
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
+		}
+
+		[Theory]
+		[InlineData(null)]
+		[InlineData ("  ")]
+		[InlineData ("\t\t")]
+		public void TestTextAnnotation_EmptyText (string whitespace)
+		{
+			var gv = GetGraph ();
+
+			gv.Annotations.Add (new TextAnnotation () {
+				Text = whitespace,
+				GraphPosition = new PointF (4, 2)
+			});
+
+			// add a point a bit further along the graph so if the whitespace were rendered
+			// the test would pick it up (AssertDriverContentsAre ignores trailing whitespace on lines)
+			var points = new ScatterSeries ();
+			points.Points.Add(new PointF(7, 2));
+			gv.Series.Add (points);
+
+			gv.Redraw (gv.Bounds);
+
+			// Text is off the screen (graph x axis runs to 8 not 9)
+			var expected =
+@"
+ │
+ ┤      x
+ ┤
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			GraphViewTests.AssertDriverContentsAre (expected);
+
 		}
 	}
 
