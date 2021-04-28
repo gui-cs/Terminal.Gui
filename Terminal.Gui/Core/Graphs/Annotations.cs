@@ -187,7 +187,7 @@ namespace Terminal.Gui.Graphs {
 				// add the text
 				graph.Move (x + 1, y + linesDrawn);
 
-				string str = TruncateOrPad (entry.Item2, availableWidth - 1, TextAlignment.Left);
+				string str = TruncateOrPad (entry.Item2, availableWidth - 1);
 				Application.Driver.AddStr (str);
 
 				linesDrawn++;
@@ -199,7 +199,7 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
-		private string TruncateOrPad (string text, int width, TextAlignment alignment)
+		private string TruncateOrPad (string text, int width)
 		{
 			if (string.IsNullOrEmpty (text))
 				return text;
@@ -210,21 +210,7 @@ namespace Terminal.Gui.Graphs {
 				// pad it out with spaces to the given alignment
 				int toPad = width - (text.Sum (c => Rune.ColumnWidth (c)));
 
-				switch (alignment) {
-
-				case TextAlignment.Left:
-					return text + new string (' ', toPad);
-				case TextAlignment.Right:
-					return new string (' ', toPad) + text;
-
-				// TODO: With single line cells, centered and justified are the same right?
-				case TextAlignment.Centered:
-				case TextAlignment.Justified:
-					return
-						new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
-						text +
-						 new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
-				}
+				return text + new string (' ', toPad);
 			}
 
 			// value is too wide
