@@ -1260,6 +1260,7 @@ namespace Terminal.Gui {
 
 			if (Clip.Contains (ccol, crow)) {
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
+				OutputBuffer [position].Attributes |= (ushort)(currentUnderlineAttribute ? 0x8000 : 0);
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
@@ -1287,10 +1288,12 @@ namespace Terminal.Gui {
 		}
 
 		int currentAttribute;
+		bool currentUnderlineAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
 			currentAttribute = c.Value;
+			currentUnderlineAttribute = c.UnderLine;
 		}
 
 		Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -1303,9 +1306,11 @@ namespace Terminal.Gui {
 			);
 		}
 
-		public override Attribute MakeAttribute (Color fore, Color back)
+		public override Attribute MakeAttribute (Color fore, Color back, bool underline = false)
 		{
-			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
+			var attr = MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
+			attr.UnderLine = underline;
+			return attr;
 		}
 
 		public override void Refresh ()
@@ -1466,8 +1471,7 @@ namespace Terminal.Gui {
 
 			try {
 				ProcessInput (input);
-			} catch (OverflowException) { }
-			finally {
+			} catch (OverflowException) { } finally {
 				keyEvent.bKeyDown = false;
 				input.KeyEvent = keyEvent;
 				ProcessInput (input);
