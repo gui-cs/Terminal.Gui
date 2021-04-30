@@ -37,6 +37,7 @@ namespace Terminal.Gui.Views {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 			// Empty Rect
 			r = new View (Rect.Empty);
@@ -60,6 +61,7 @@ namespace Terminal.Gui.Views {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 			// Rect with values
 			r = new View (new Rect (1, 2, 3, 4));
@@ -83,6 +85,32 @@ namespace Terminal.Gui.Views {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
+
+			// Initializes a view with a vertical direction
+			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
+			Assert.NotNull (r);
+			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
+			Assert.Equal ("View()({X=0,Y=0,Width=1,Height=13})", r.ToString ());
+			Assert.False (r.CanFocus);
+			Assert.False (r.HasFocus);
+			Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
+			Assert.Equal (new Rect (0, 0, 1, 13), r.Frame);
+			Assert.Null (r.Focused);
+			Assert.Null (r.ColorScheme);
+			Assert.NotNull (r.Width);       // All view Dim are initialized now,
+			Assert.NotNull (r.Height);      // avoiding Dim errors.
+			Assert.NotNull (r.X);           // All view Pos are initialized now,
+			Assert.NotNull (r.Y);           // avoiding Pos errors.
+			Assert.False (r.IsCurrentTop);
+			Assert.Empty (r.Id);
+			Assert.Empty (r.Subviews);
+			Assert.False (r.WantContinuousButtonPressed);
+			Assert.False (r.WantMousePositionReports);
+			Assert.Null (r.SuperView);
+			Assert.Null (r.MostFocused);
+			Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
+
 		}
 
 		[Fact]
@@ -1020,7 +1048,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		public void View_Difference_Between_An_Object_Initializer_And_A_Constructor ()
+		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
 		{
 			// Object Initializer
 			var view = new View () {
@@ -1033,8 +1061,10 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (2, view.Y);
 			Assert.Equal (3, view.Width);
 			Assert.Equal (4, view.Height);
-			Assert.True (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+			Assert.False (view.Bounds.IsEmpty);
+			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
 
 			view.LayoutSubviews ();
 
@@ -1073,8 +1103,10 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (2, view.Y);
 			Assert.Equal (3, view.Width);
 			Assert.Equal (4, view.Height);
-			Assert.True (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+			Assert.False (view.Bounds.IsEmpty);
+			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
 		}
 
 		[Fact]
