@@ -1357,16 +1357,18 @@ namespace Terminal.Gui {
 		bool redrawUnderline = false;
 		void SetUnderline (bool state)
 		{
-			redrawUnderline = state;
-			var OutputHandle = NetWinVTConsole.GetStdHandle (NetWinVTConsole.STD_OUTPUT_HANDLE);
-			var success = NetWinVTConsole.GetConsoleScreenBufferInfo (OutputHandle, out var csbi);
-			if (success) {
-				if (state == true) {
-					csbi.wAttributes |= 0x8000;
-				} else {
-					csbi.wAttributes &= 0x7FFF;
+			if (IsWinPlatform == true) {
+				redrawUnderline = state;
+				var OutputHandle = NetWinVTConsole.GetStdHandle (NetWinVTConsole.STD_OUTPUT_HANDLE);
+				var success = NetWinVTConsole.GetConsoleScreenBufferInfo (OutputHandle, out var csbi);
+				if (success) {
+					if (state == true) {
+						csbi.wAttributes |= 0x8000;
+					} else {
+						csbi.wAttributes &= 0x7FFF;
+					}
+					NetWinVTConsole.SetConsoleTextAttribute (OutputHandle, csbi.wAttributes);
 				}
-				NetWinVTConsole.SetConsoleTextAttribute (OutputHandle, csbi.wAttributes);
 			}
 		}
 
