@@ -1467,9 +1467,6 @@ namespace Terminal.Gui {
 		{
 			currentAttribute = c.Value;
 			currentUnderlineAttribute = c.UnderLine ? 1 : 0;
-			if (c.UnderLine == true) {
-				var i = 0;
-			}
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
