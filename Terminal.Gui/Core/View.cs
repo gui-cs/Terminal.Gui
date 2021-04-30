@@ -2048,8 +2048,7 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => textFormatter.Direction;
 			set {
-				if (TextFormatter.IsHorizontalDirection (textFormatter.Direction)
-					!= TextFormatter.IsHorizontalDirection (value)) {
+				if (textFormatter.Direction != value) {
 					textFormatter.Direction = value;
 					if (IsInitialized && AutoSize) {
 						ResizeView (true);
