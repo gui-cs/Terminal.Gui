@@ -114,6 +114,7 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
+		/// <param name="underline">Underline</param>
 		public Attribute (int value, Color foreground = new Color (), Color background = new Color (), bool underline = false)
 		{
 			Value = value;
@@ -127,6 +128,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
+		/// <param name="underline">Underline</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color (), bool underline = false)
 		{
 			Value = Make (foreground, background).Value;
@@ -1163,6 +1165,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="fore">Foreground.</param>
 		/// <param name="back">Background.</param>
+		/// <param name="underline">Underline.</param>
 		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back, bool underline = false);
 
