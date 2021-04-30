@@ -1357,8 +1357,8 @@ namespace Terminal.Gui {
 		bool redrawUnderline = false;
 		void SetUnderline (bool state)
 		{
+			redrawUnderline = state;
 			if (IsWinPlatform == true) {
-				redrawUnderline = state;
 				var OutputHandle = NetWinVTConsole.GetStdHandle (NetWinVTConsole.STD_OUTPUT_HANDLE);
 				var success = NetWinVTConsole.GetConsoleScreenBufferInfo (OutputHandle, out var csbi);
 				if (success) {
