@@ -13,9 +13,9 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = 1,
-				Width = Dim.Percent(75),
+				Width = Dim.Percent (75),
 				Height = 10
 			};
 			Win.Add (frame);
@@ -72,7 +72,7 @@ namespace UICatalog {
 			var titleEdit = new TextField ("Title") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
-				Width = Dim.Fill(),
+				Width = Dim.Fill (),
 				Height = 1
 			};
 			frame.Add (titleEdit);
@@ -93,8 +93,13 @@ namespace UICatalog {
 			};
 			frame.Add (numButtonsEdit);
 
-			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-				+ Dim.Height (numButtonsEdit) + 2;
+			void Top_Loaded ()
+			{
+				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
+					+ Dim.Height (numButtonsEdit) + 2;
+				Top.Loaded -= Top_Loaded;
+			}
+			Top.Loaded += Top_Loaded;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
@@ -113,7 +118,7 @@ namespace UICatalog {
 
 			//var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 			var showDialogButton = new Button ("Show Dialog") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
@@ -129,7 +134,7 @@ namespace UICatalog {
 						var buttonId = i;
 						//var button = new Button (btnText [buttonId % 10],
 						//	is_default: buttonId == 0);
-						var button = new Button (NumberToWords.Convert(buttonId),
+						var button = new Button (NumberToWords.Convert (buttonId),
 							is_default: buttonId == 0);
 						button.Clicked += () => {
 							clicked = buttonId;

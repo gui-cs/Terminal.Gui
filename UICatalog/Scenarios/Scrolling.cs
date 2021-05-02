@@ -129,6 +129,7 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Height = 2,
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (horizontalRuler);
@@ -143,12 +144,13 @@ namespace UICatalog {
 			};
 			scrollView.Add (verticalRuler);
 
-			void Top_Loaded()  {
+			void Top_Loaded ()
+			{
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 				Top.Loaded -= Top_Loaded;
-			};
+			}
 			Top.Loaded += Top_Loaded;
 
 			var pressMeButton = new Button ("Press me!") {
@@ -204,8 +206,8 @@ namespace UICatalog {
 			scrollView.Add (anchorButton);
 
 			var hCheckBox = new CheckBox ("Horizontal Scrollbar", scrollView.ShowHorizontalScrollIndicator) {
-				X = Pos.X(scrollView),
-				Y = Pos.Bottom(scrollView) + 1,
+				X = Pos.X (scrollView),
+				Y = Pos.Bottom (scrollView) + 1,
 			};
 			Win.Add (hCheckBox);
 
@@ -273,7 +275,7 @@ namespace UICatalog {
 
 			int count = 0;
 			var mousePos = new Label ("Mouse: ");
-			mousePos.X = Pos.Right(scrollView) + 1;
+			mousePos.X = Pos.Right (scrollView) + 1;
 			mousePos.Y = Pos.AnchorEnd (1);
 			mousePos.Width = 50;
 			Application.RootMouseEvent += delegate (MouseEvent me) {

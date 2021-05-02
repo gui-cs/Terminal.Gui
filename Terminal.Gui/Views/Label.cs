@@ -13,7 +13,8 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
+	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by newline characters.
+	/// Multi-line Labels support word wrap.
 	/// </summary>
 	/// <remarks>
 	/// The <see cref="Label"/> view is functionality identical to <see cref="View"/> and is included for API backwards compatibility.
@@ -41,6 +42,12 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc/>
 		public Label (int x, int y, ustring text) : base (x, y, text)
+		{
+		}
+
+		/// <inheritdoc/>
+		public Label (ustring text, TextDirection direction)
+			: base (text, direction)
 		{
 		}
 
@@ -83,7 +90,6 @@ namespace Terminal.Gui {
 				return true;
 			if (MouseEvent (mouseEvent))
 				return true;
-
 
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
 				if (!HasFocus && SuperView != null) {

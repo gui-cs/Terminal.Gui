@@ -29,7 +29,6 @@ namespace Terminal.Gui.Types {
 			action = () => new Rect (1, 2, -3, -4);
 			ex = Assert.Throws<ArgumentException> (action);
 			Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
-
 		}
 
 		[Fact]
@@ -109,6 +108,44 @@ namespace Terminal.Gui.Types {
 			rect1 = new Rect (1, 2, 3, 4);
 			rect2 = new Rect (-1, 2, 3, 4);
 			Assert.NotEqual (rect1, rect2);
+		}
+
+		[Fact]
+		public void Positive_X_Y_Positions ()
+		{
+			var rect = new Rect (10, 5, 100, 50);
+			int yCount = 0, xCount = 0, yxCount = 0;
+
+			for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+				yCount++;
+				xCount = 0;
+				for (int col = rect.X; col < rect.X + rect.Width; col++) {
+					xCount++;
+					yxCount++;
+				}
+			}
+			Assert.Equal (yCount, rect.Height);
+			Assert.Equal (xCount, rect.Width);
+			Assert.Equal (yxCount, rect.Height * rect.Width);
+		}
+
+		[Fact]
+		public void Negative_X_Y_Positions ()
+		{
+			var rect = new Rect (-10, -5, 100, 50);
+			int yCount = 0, xCount = 0, yxCount = 0;
+
+			for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+				yCount++;
+				xCount = 0;
+				for (int col = rect.X; col < rect.X + rect.Width; col++) {
+					xCount++;
+					yxCount++;
+				}
+			}
+			Assert.Equal (yCount, rect.Height);
+			Assert.Equal (xCount, rect.Width);
+			Assert.Equal (yxCount, rect.Height * rect.Width);
 		}
 	}
 }

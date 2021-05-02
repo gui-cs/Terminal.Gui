@@ -87,9 +87,9 @@ namespace UICatalog {
 			var labelKeypress = new Label ("") {
 				X = Pos.Left (edit),
 				Y = Pos.Top (keyPressedLabel),
-				Width = 20,
 				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Error,
+				AutoSize = true
 			};
 			Win.Add (labelKeypress);
 
