@@ -1944,6 +1944,25 @@ namespace Terminal.Gui {
 			int restCount;
 			List<Rune> rest;
 
+			// if the user presses Left (without any control keys) and they are at the start of the text
+			if(kb.Key == Key.CursorLeft && currentColumn == 0 && currentRow == 0) {
+				// do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
+				return false;
+			}
+
+			// if the user presses Right (without any control keys)
+			if (kb.Key == Key.CursorRight) {
+
+				// determine where the last cursor position in the text is
+				var lastRow = model.Count - 1;
+				var lastCol = model.GetLine (lastRow).Count;
+
+				// if they are at the very end of all the text do not respond (this lets the key press fall through to navigation system - which usually changes focus forward)
+				if (currentColumn == lastCol && currentRow == lastRow) {
+					return false;
+				}
+			}
+
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
 			switch (kb.Key) {
