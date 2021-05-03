@@ -74,10 +74,10 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			Curses.refresh ();
-			if (Curses.CheckWinChange ()) {
-				Clip = new Rect (0, 0, Cols, Rows);
-				TerminalResized?.Invoke ();
-			}
+			//if (Curses.CheckWinChange ()) {
+			//	Clip = new Rect (0, 0, Cols, Rows);
+			//	TerminalResized?.Invoke ();
+			//}
 		}
 
 		public override void UpdateCursor () => Refresh ();
@@ -97,13 +97,13 @@ namespace Terminal.Gui {
 			//Console.Out.Write ("\x1b[2J");
 			//Console.Out.Flush ();
 
-			// Reports current cursor line and column.
+			// Set top and bottom lines of a window.
 			//Console.Out.Write ("\x1b[1;25r");
 			//Console.Out.Flush ();
 
 			//Set cursor key to cursor.
-			Console.Out.Write("\x1b[?1l");
-			Console.Out.Flush();
+			Console.Out.Write ("\x1b[?1l");
+			Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -695,6 +695,12 @@ namespace Terminal.Gui {
 				return true;
 			});
 
+			mLoop.WinChanged += () => {
+				if (Curses.CheckWinChange ()) {
+					Clip = new Rect (0, 0, Cols, Rows);
+					TerminalResized?.Invoke ();
+				}
+			};
 		}
 
 		Curses.Event oldMouseEvents, reportableMouseEvents;
