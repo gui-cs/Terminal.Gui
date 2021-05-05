@@ -858,19 +858,19 @@ namespace Terminal.Gui {
 				//return Curses.COLOR_BLACK | Curses.A_BOLD;
 				return Curses.COLOR_GRAY;
 			case Color.BrightBlue:
-				return Curses.COLOR_BLUE | Curses.A_BOLD;
+				return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.BrightGreen:
-				return Curses.COLOR_GREEN | Curses.A_BOLD;
+				return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.BrightCyan:
-				return Curses.COLOR_CYAN | Curses.A_BOLD;
+				return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.BrightRed:
-				return Curses.COLOR_RED | Curses.A_BOLD;
+				return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.BrightMagenta:
-				return Curses.COLOR_MAGENTA | Curses.A_BOLD;
+				return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.BrightYellow:
-				return Curses.COLOR_YELLOW | Curses.A_BOLD;
+				return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.White:
-				return Curses.COLOR_WHITE | Curses.A_BOLD;
+				return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
 			throw new ArgumentException ("Invalid color code");
 		}
