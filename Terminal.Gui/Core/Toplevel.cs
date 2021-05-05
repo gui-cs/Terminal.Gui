@@ -238,9 +238,11 @@ namespace Terminal.Gui {
 				}
 				return true;
 			case Key.Tab | Key.CtrlMask:
+			case Key.PageDown | Key.CtrlMask: // Needed on Unix
 				Application.Top.FocusNext ();
 				return true;
 			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
+			case Key.PageUp | Key.CtrlMask: // Needed on Unix
 				Application.Top.FocusPrev ();
 				return true;
 			case Key.L | Key.CtrlMask:
