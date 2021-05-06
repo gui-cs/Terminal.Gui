@@ -68,35 +68,43 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum TextDirection {
 		/// <summary>
-		/// Normal Horizontal
+		/// Normal horizontal direction.
+		/// <code>HELLO<br/>WORLD</code>
 		/// </summary>
 		LeftRight_TopBottom,
 		/// <summary>
-		/// Normal Vertical
+		/// Normal vertical direction.
+		/// <code>H W<br/>E O<br/>L R<br/>L L<br/>O D</code>
 		/// </summary>
 		TopBottom_LeftRight,
 		/// <summary>
-		/// 
+		/// This is a horizontal direction. <br/> RTL
+		/// <code>OLLEH<br/>DLROW</code>
 		/// </summary>
 		RightLeft_TopBottom,
 		/// <summary>
-		/// 
+		/// This is a vertical direction.
+		/// <code>W H<br/>O E<br/>R L<br/>L L<br/>D O</code>
 		/// </summary>
 		TopBottom_RightLeft,
 		/// <summary>
-		/// 
+		/// This is a horizontal direction.
+		/// <code>WORLD<br/>HELLO</code>
 		/// </summary>
 		LeftRight_BottomTop,
 		/// <summary>
-		/// 
+		/// This is a vertical direction.
+		/// <code>O D<br/>L L<br/>L R<br/>E O<br/>H W</code>
 		/// </summary>
 		BottomTop_LeftRight,
 		/// <summary>
-		/// 
+		/// This is a horizontal direction.
+		/// <code>DLROW<br/>OLLEH</code>
 		/// </summary>
 		RightLeft_BottomTop,
 		/// <summary>
-		/// 
+		/// This is a vertical direction.
+		/// <code>D O<br/>L L<br/>R L<br/>O E<br/>W H</code>
 		/// </summary>
 		BottomTop_RightLeft
 	}
@@ -132,6 +140,14 @@ namespace Terminal.Gui {
 				NeedsFormat = true;
 			}
 		}
+
+		/// <summary>
+		/// Used by <see cref="Text"/> to resize the view's <see cref="View.Bounds"/> with the <see cref="Size"/>.
+		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="View.Width"/> and <see cref="View.Height"/> are null or
+		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
+		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// </summary>
+		public bool AutoSize { get; set; }
 
 		// TODO: Add Vertical Text Alignment
 		/// <summary>
@@ -298,8 +314,14 @@ namespace Terminal.Gui {
 
 					if (IsVerticalDirection (textDirection)) {
 						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1);
+						if (!AutoSize && lines.Count > Size.Width) {
+							lines.RemoveRange (Size.Width, lines.Count - Size.Width);
+						}
 					} else {
 						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1);
+						if (!AutoSize && lines.Count > Size.Height) {
+							lines.RemoveRange (Size.Height, lines.Count - Size.Height);
+						}
 					}
 
 					NeedsFormat = false;
@@ -667,40 +689,77 @@ namespace Terminal.Gui {
 		/// <param name="x">The x location of the rectangle</param>
 		/// <param name="y">The y location of the rectangle</param>
 		/// <param name="text">The text to measure</param>
+		/// <param name="direction">The text direction.</param>
 		/// <returns></returns>
-		public static Rect CalcRect (int x, int y, ustring text)
+		public static Rect CalcRect (int x, int y, ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom)
 		{
 			if (ustring.IsNullOrEmpty (text)) {
 				return new Rect (new Point (x, y), Size.Empty);
 			}
 
-			int mw = 0;
-			int ml = 1;
+			int w, h;
 
-			int cols = 0;
-			foreach (var rune in text) {
-				if (rune == '\n') {
-					ml++;
-					if (cols > mw) {
-						mw = cols;
-					}
-					cols = 0;
-				} else {
-					if (rune != '\r') {
-						cols++;
-						var rw = Rune.ColumnWidth (rune);
-						if (rw > 0) {
-							rw--;
+			if (IsHorizontalDirection (direction)) {
+				int mw = 0;
+				int ml = 1;
+
+				int cols = 0;
+				foreach (var rune in text) {
+					if (rune == '\n') {
+						ml++;
+						if (cols > mw) {
+							mw = cols;
 						}
-						cols += rw;
+						cols = 0;
+					} else {
+						if (rune != '\r') {
+							cols++;
+							var rw = Rune.ColumnWidth (rune);
+							if (rw > 0) {
+								rw--;
+							}
+							cols += rw;
+						}
 					}
 				}
-			}
-			if (cols > mw) {
-				mw = cols;
+				if (cols > mw) {
+					mw = cols;
+				}
+				w = mw;
+				h = ml;
+			} else {
+				int vw = 0;
+				int vh = 0;
+
+				int rows = 0;
+				foreach (var rune in text) {
+					if (rune == '\n') {
+						vw++;
+						if (rows > vh) {
+							vh = rows;
+						}
+						rows = 0;
+					} else {
+						if (rune != '\r') {
+							rows++;
+							var rw = Rune.ColumnWidth (rune);
+							if (rw < 0) {
+								rw++;
+							}
+							if (rw > vw) {
+								vw = rw;
+							}
+						}
+					}
+				}
+				if (rows > vh) {
+					vh = rows;
+				}
+				w = vw;
+				h = vh;
 			}
 
-			return new Rect (x, y, mw, ml);
+			return new Rect (x, y, w, h);
 		}
 
 		/// <summary>
@@ -924,6 +983,7 @@ namespace Terminal.Gui {
 				var current = start;
 				for (var idx = start; idx < start + size; idx++) {
 					if (idx < 0) {
+						current++;
 						continue;
 					}
 					var rune = (Rune)' ';

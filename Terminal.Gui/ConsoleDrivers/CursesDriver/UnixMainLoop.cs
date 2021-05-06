@@ -38,6 +38,8 @@ namespace Terminal.Gui {
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
 	internal class UnixMainLoop : IMainLoopDriver {
+		public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
+
 		[StructLayout (LayoutKind.Sequential)]
 		struct Pollfd {
 			public int fd;
@@ -84,10 +86,10 @@ namespace Terminal.Gui {
 		Dictionary<int, Watch> descriptorWatchers = new Dictionary<int, Watch> ();
 
 		[DllImport ("libc")]
-		extern static int poll ([In, Out]Pollfd [] ufds, uint nfds, int timeout);
+		extern static int poll ([In, Out] Pollfd [] ufds, uint nfds, int timeout);
 
 		[DllImport ("libc")]
-		extern static int pipe ([In, Out]int [] pipes);
+		extern static int pipe ([In, Out] int [] pipes);
 
 		[DllImport ("libc")]
 		extern static int read (int fd, IntPtr buf, IntPtr n);
@@ -100,13 +102,17 @@ namespace Terminal.Gui {
 		int [] wakeupPipes = new int [2];
 		static IntPtr ignore = Marshal.AllocHGlobal (1);
 		MainLoop mainLoop;
+		bool winChanged;
+
+		public Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			write (wakeupPipes [1], ignore, (IntPtr) 1);
+			write (wakeupPipes [1], ignore, (IntPtr)1);
 		}
 
-		void IMainLoopDriver.Setup (MainLoop mainLoop) {
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
 			this.mainLoop = mainLoop;
 			pipe (wakeupPipes);
 			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
@@ -143,7 +149,7 @@ namespace Terminal.Gui {
 		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
 		{
 			if (callback == null)
-				throw new ArgumentNullException (nameof(callback));
+				throw new ArgumentNullException (nameof (callback));
 
 			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
 			descriptorWatchers [fileDescriptor] = watch;
@@ -175,8 +181,11 @@ namespace Terminal.Gui {
 			UpdatePollMap ();
 
 			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
-			
-			return n > 0 || CheckTimers (wait, out pollTimeout);
+
+			if (n == KEY_RESIZE) {
+				winChanged = true;
+			}
+			return n >= KEY_RESIZE || CheckTimers (wait, out pollTimeout);
 		}
 
 		bool CheckTimers (bool wait, out int pollTimeout)
@@ -204,6 +213,10 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
+			if (winChanged) {
+				winChanged = false;
+				WinChanged?.Invoke ();
+			}
 			if (pollmap != null) {
 				foreach (var p in pollmap) {
 					Watch watch;
