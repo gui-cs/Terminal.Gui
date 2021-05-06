@@ -1963,24 +1963,6 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// if the user presses CursorUp with control key and they are at the start of the text
-			if (kb.Key == (Key.PageUp & Key.CtrlMask) && currentColumn == 0 && currentRow == 0) {
-				// do not respond (this lets the key press fall through windows navigation system - which usually changes focus backward)
-				return false;
-			}
-
-			// if the user presses CursorDown with control key)
-			if (kb.Key == (Key.PageDown & Key.CtrlMask)) {
-				// determine where the last cursor position in the text is
-				var lastRow = model.Count - 1;
-				var lastCol = model.GetLine (lastRow).Count;
-
-				// if they are at the very end of all the text do not respond (this lets the key press fall through windows navigation system - which usually changes focus forward)
-				if (currentColumn == lastCol && currentRow == lastRow) {
-					return false;
-				}
-			}
-
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
 			switch (kb.Key) {
