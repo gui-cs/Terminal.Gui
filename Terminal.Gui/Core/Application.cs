@@ -111,6 +111,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
+		/// </summary>
+		public static Key AlternateForwardKey { get; set; } = Key.PageDown | Key.CtrlMask;
+		/// <summary>
+		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
+		/// </summary>
+		public static Key AlternateBackwardKey { get; set; } = Key.PageUp | Key.CtrlMask;
+
+		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
 		/// </summary>
 		/// <value>The main loop.</value>
