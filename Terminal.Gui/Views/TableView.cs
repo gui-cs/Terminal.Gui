@@ -302,7 +302,8 @@ namespace Terminal.Gui {
 						rune = Driver.TopTee;
 					}
 					// if the next console column is the lastcolumns end
-					else if (columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
+					else if ( Style.EnforceMaxWidthOnLastColumn &&
+						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
 						rune = Driver.TopTee;
 					} else if(c == availableWidth -1){
 						rune = Driver.URCorner;
@@ -337,7 +338,7 @@ namespace Terminal.Gui {
 				
 				Driver.AddStr(TruncateOrPad(colName,colName,current.Width ,colStyle));
 
-				if (current.IsVeryLast) {
+				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
 					RenderSeparator (current.X + current.Width, row, true);
 				}
 			}
@@ -367,7 +368,8 @@ namespace Terminal.Gui {
 						rune = Style.ShowVerticalCellLines ? '┼' :Driver.BottomTee;
 					}
 					// if the next console column is the lastcolumns end
-					else if (columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
+					else if (Style.EnforceMaxWidthOnLastColumn &&
+							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if(c == availableWidth -1){
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
@@ -417,7 +419,7 @@ namespace Terminal.Gui {
 
 				RenderSeparator(current.X-1,row,false);
 
-				if (current.IsVeryLast) {
+				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
 					RenderSeparator (current.X + current.Width, row, false);
 				}
 			}
@@ -1215,6 +1217,17 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
 
+
+			/// <summary>
+			/// Determines rendering when the last column in the table is visible but it's
+			/// content or <see cref="ColumnStyle.MaxWidth"/> is less than the remaining 
+			/// space in the control.  True will draw a column ending line and leave a blank
+			/// column that cannot be selected in the remaining space.  False (the default) 
+			/// will expand the column to fill the remaining bounds of the control
+			/// </summary>
+			/// <value></value>
+			public bool EnforceMaxWidthOnLastColumn {get;set;} = false;
+			
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
 			/// </summary>
