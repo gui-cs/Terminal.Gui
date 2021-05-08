@@ -384,6 +384,11 @@ namespace Terminal.Gui {
 			if(style.ShowVerticalCellLines)
 				AddRune(0,row,Driver.VLine);
 
+			//start by clearing the entire line
+			Move (0,row);
+			Driver.SetAttribute (FullRowSelect &&  IsSelected(0,rowToRender) ? ColorScheme.HotFocus : ColorScheme.Normal);
+			Driver.AddStr (new string(' ',Bounds.Width));
+
 			// Render cells for each visible header for the current row
 			for(int i=0;i< columnsToRender.Length ;i++) {
 
