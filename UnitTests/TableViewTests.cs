@@ -456,7 +456,8 @@ namespace Terminal.Gui.Views {
 ";
             GraphViewTests.AssertDriverContentsAre(expected);
         }
-                [Fact]
+
+        [Fact]
         public void TableView_EnforceMaxWidthOnLastColumn_True_ExactBounds()
         {
             var tv = SetUpMiniTable();

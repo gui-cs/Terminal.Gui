@@ -300,7 +300,8 @@ namespace Terminal.Gui {
 					// if the next column is the start of a header
 					else if(columnsToRender.Any(r=>r.X == c+1)){
 						rune = Driver.TopTee;
-					} else if(c == availableWidth -1){
+					} 
+					else if(c == availableWidth -1){
 						rune = Driver.URCorner;
 					}
 					// if the next console column is the lastcolumns end
@@ -366,7 +367,8 @@ namespace Terminal.Gui {
 					
 						/*TODO: is ┼ symbol in Driver?*/ 
 						rune = Style.ShowVerticalCellLines ? '┼' :Driver.BottomTee;
-					}else if(c == availableWidth -1){
+					}
+					else if(c == availableWidth -1){
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
 					}
 					// if the next console column is the lastcolumns end
@@ -1268,7 +1270,8 @@ namespace Terminal.Gui {
 			public int X { get; set; }
 
 			/// <summary>
-			/// The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>
+			/// The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note that this includes
+			/// space for padding i.e. the separator between columns.
 			/// </summary>
 			public int Width { get; }
 
