@@ -300,13 +300,13 @@ namespace Terminal.Gui {
 					// if the next column is the start of a header
 					else if(columnsToRender.Any(r=>r.X == c+1)){
 						rune = Driver.TopTee;
+					} else if(c == availableWidth -1){
+						rune = Driver.URCorner;
 					}
 					// if the next console column is the lastcolumns end
 					else if ( Style.EnforceMaxWidthOnLastColumn &&
 						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Driver.TopTee;
-					} else if(c == availableWidth -1){
-						rune = Driver.URCorner;
 					}
 				}
 
@@ -366,14 +366,14 @@ namespace Terminal.Gui {
 					
 						/*TODO: is ┼ symbol in Driver?*/ 
 						rune = Style.ShowVerticalCellLines ? '┼' :Driver.BottomTee;
+					}else if(c == availableWidth -1){
+						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
 					}
 					// if the next console column is the lastcolumns end
 					else if (Style.EnforceMaxWidthOnLastColumn &&
 							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
-					} else if(c == availableWidth -1){
-						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
-					}
+					} 
 				}
 
 				AddRuneAt(Driver,c,row,rune);

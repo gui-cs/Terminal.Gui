@@ -456,6 +456,26 @@ namespace Terminal.Gui.Views {
 ";
             GraphViewTests.AssertDriverContentsAre(expected);
         }
+                [Fact]
+        public void TableView_EnforceMaxWidthOnLastColumn_True_ExactBounds()
+        {
+            var tv = SetUpMiniTable();
+            
+            // the thing we are testing
+            tv.Style.EnforceMaxWidthOnLastColumn = true;
+            // width exactly matches the max col widths
+            tv.Bounds = new Rect(0,0,5,4);
+
+            tv.Redraw(tv.Bounds);
+            
+            string expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│2│
+";
+            GraphViewTests.AssertDriverContentsAre(expected);
+        }
 
 		private TableView SetUpMiniTable ()
 		{
