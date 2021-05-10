@@ -2017,7 +2017,7 @@ namespace Terminal.Gui {
 					StopSelecting ();
 				}
 				int nPageDnShift = Frame.Height - 1;
-				if (currentRow > 0 && currentRow < model.Count) {
+				if (currentRow >= 0 && currentRow < model.Count) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
 					currentRow = (currentRow + nPageDnShift) > model.Count

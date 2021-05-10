@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
@@ -19,7 +19,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Init_Shutdown_Cleans_Up ()
 		{
-			// Verify inital state is per spec
+			// Verify initial state is per spec
 			Pre_Init_State ();
 
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
@@ -175,7 +175,7 @@ namespace Terminal.Gui.Core {
 			// Setup Mock driver
 			Init ();
 
-			// Setup some fake kepresses (This)
+			// Setup some fake keypresses (This)
 			var input = "Tests";
 
 			// Put a control-q in at the end
@@ -267,6 +267,107 @@ namespace Terminal.Gui.Core {
 			Init ();
 			Application.Shutdown ();
 			Assert.Null (SynchronizationContext.Current);
+		}
+
+		[Fact]
+		public void AlternateForwardKey_AlternateBackwardKey_Tests ()
+		{
+			Init ();
+
+			var top = Application.Top;
+			var w1 = new Window ();
+			var v1 = new TextField ();
+			var v2 = new TextView ();
+			w1.Add (v1, v2);
+
+			var w2 = new Window ();
+			var v3 = new CheckBox ();
+			var v4 = new Button ();
+			w2.Add (v3, v4);
+
+			top.Add (w1, w2);
+
+			Application.Iteration += () => {
+				Assert.True (v1.HasFocus);
+				// Using default keys.
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v1.HasFocus);
+
+				top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Shift = true, Ctrl = true }));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Shift = true, Ctrl = true }));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Shift = true, Ctrl = true }));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+					new KeyModifiers () { Shift = true, Ctrl = true }));
+				Assert.True (v1.HasFocus);
+
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v1.HasFocus);
+
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+					new KeyModifiers () { Ctrl = true }));
+				Assert.True (v1.HasFocus);
+
+				// Using another's alternate keys.
+				Application.AlternateForwardKey = Key.F7;
+				Application.AlternateBackwardKey = Key.F6;
+
+				top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+				Assert.True (v1.HasFocus);
+
+				top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+				Assert.True (v4.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+				Assert.True (v3.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+				Assert.True (v2.HasFocus);
+				top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+				Assert.True (v1.HasFocus);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run (top);
 		}
 	}
 }
