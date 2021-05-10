@@ -419,12 +419,12 @@ namespace Terminal.Gui.Views {
         }
 
         [Fact]
-        public void TableView_EnforceMaxWidthOnLastColumn_False()
+        public void TableView_ExpandLastColumn_True()
         {
             var tv = SetUpMiniTable();
             
             // the thing we are testing
-            tv.Style.EnforceMaxWidthOnLastColumn = false;
+            tv.Style.ExpandLastColumn = true;
 
             tv.Redraw(tv.Bounds);
             
@@ -439,12 +439,12 @@ namespace Terminal.Gui.Views {
 
 
         [Fact]
-        public void TableView_EnforceMaxWidthOnLastColumn_True()
+        public void TableView_ExpandLastColumn_False()
         {
             var tv = SetUpMiniTable();
             
             // the thing we are testing
-            tv.Style.EnforceMaxWidthOnLastColumn = true;
+            tv.Style.ExpandLastColumn = false;
 
             tv.Redraw(tv.Bounds);
             
@@ -458,12 +458,12 @@ namespace Terminal.Gui.Views {
         }
 
         [Fact]
-        public void TableView_EnforceMaxWidthOnLastColumn_True_ExactBounds()
+        public void TableView_ExpandLastColumn_False_ExactBounds()
         {
             var tv = SetUpMiniTable();
             
             // the thing we are testing
-            tv.Style.EnforceMaxWidthOnLastColumn = true;
+            tv.Style.ExpandLastColumn = false;
             // width exactly matches the max col widths
             tv.Bounds = new Rect(0,0,5,4);
 

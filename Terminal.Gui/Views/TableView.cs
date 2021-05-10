@@ -305,7 +305,7 @@ namespace Terminal.Gui {
 						rune = Driver.URCorner;
 					}
 					// if the next console column is the lastcolumns end
-					else if ( Style.EnforceMaxWidthOnLastColumn &&
+					else if ( Style.ExpandLastColumn == false &&
 						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Driver.TopTee;
 					}
@@ -339,7 +339,7 @@ namespace Terminal.Gui {
 				
 				Driver.AddStr(TruncateOrPad(colName,colName,current.Width ,colStyle));
 
-				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
+				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
 					RenderSeparator (current.X + current.Width-1, row, true);
 				}
 			}
@@ -372,7 +372,7 @@ namespace Terminal.Gui {
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
 					}
 					// if the next console column is the lastcolumns end
-					else if (Style.EnforceMaxWidthOnLastColumn &&
+					else if (Style.ExpandLastColumn == false &&
 							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} 
@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 
 				RenderSeparator(current.X-1,row,false);
 
-				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
+				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
 					RenderSeparator (current.X + current.Width-1, row, false);
 				}
 			}
@@ -1223,12 +1223,12 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Determines rendering when the last column in the table is visible but it's
 			/// content or <see cref="ColumnStyle.MaxWidth"/> is less than the remaining 
-			/// space in the control.  True will draw a column ending line and leave a blank
-			/// column that cannot be selected in the remaining space.  False (the default) 
-			/// will expand the column to fill the remaining bounds of the control
+			/// space in the control.  True (the default) will expand the column to fill
+			/// the remaining bounds of the control.  False will draw a column ending line
+			/// and leave a blank column that cannot be selected in the remaining space.  
 			/// </summary>
 			/// <value></value>
-			public bool EnforceMaxWidthOnLastColumn {get;set;} = false;
+			public bool ExpandLastColumn {get;set;} = true;
 			
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
