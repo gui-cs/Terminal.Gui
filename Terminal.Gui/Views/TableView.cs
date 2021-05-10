@@ -303,7 +303,7 @@ namespace Terminal.Gui {
 					}
 					// if the next console column is the lastcolumns end
 					else if ( Style.EnforceMaxWidthOnLastColumn &&
-						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
+						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Driver.TopTee;
 					} else if(c == availableWidth -1){
 						rune = Driver.URCorner;
@@ -339,7 +339,7 @@ namespace Terminal.Gui {
 				Driver.AddStr(TruncateOrPad(colName,colName,current.Width ,colStyle));
 
 				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
-					RenderSeparator (current.X + current.Width, row, true);
+					RenderSeparator (current.X + current.Width-1, row, true);
 				}
 			}
 
@@ -369,7 +369,7 @@ namespace Terminal.Gui {
 					}
 					// if the next console column is the lastcolumns end
 					else if (Style.EnforceMaxWidthOnLastColumn &&
-							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width == c)) {
+							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if(c == availableWidth -1){
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
@@ -420,7 +420,7 @@ namespace Terminal.Gui {
 				RenderSeparator(current.X-1,row,false);
 
 				if (Style.EnforceMaxWidthOnLastColumn && current.IsVeryLast) {
-					RenderSeparator (current.X + current.Width, row, false);
+					RenderSeparator (current.X + current.Width-1, row, false);
 				}
 			}
 

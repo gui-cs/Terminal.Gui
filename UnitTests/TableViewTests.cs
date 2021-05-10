@@ -418,7 +418,71 @@ namespace Terminal.Gui.Views {
             Assert.Equal(new Point(8,3),selected[5]);
         }
 
-        /// <summary>
+        [Fact]
+        public void TableView_EnforceMaxWidthOnLastColumn_False()
+        {
+            var tv = SetUpMiniTable();
+            
+            // the thing we are testing
+            tv.Style.EnforceMaxWidthOnLastColumn = false;
+
+            tv.Redraw(tv.Bounds);
+            
+            string expected = @"
+┌─┬──────┐
+│A│B     │
+├─┼──────┤
+│1│2     │
+";
+            GraphViewTests.AssertDriverContentsAre(expected);
+        }
+
+
+        [Fact]
+        public void TableView_EnforceMaxWidthOnLastColumn_True()
+        {
+            var tv = SetUpMiniTable();
+            
+            // the thing we are testing
+            tv.Style.EnforceMaxWidthOnLastColumn = true;
+
+            tv.Redraw(tv.Bounds);
+            
+            string expected = @"
+┌─┬─┬────┐
+│A│B│    │
+├─┼─┼────┤
+│1│2│    │
+";
+            GraphViewTests.AssertDriverContentsAre(expected);
+        }
+
+		private TableView SetUpMiniTable ()
+		{
+			
+            var tv = new TableView();
+            tv.Bounds = new Rect(0,0,10,4);
+
+            var dt = new DataTable();
+            var colA = dt.Columns.Add("A");
+            var colB = dt.Columns.Add("B");
+            dt.Rows.Add(1,2);
+
+            tv.Table = dt;
+            tv.Style.GetOrCreateColumnStyle(colA).MinWidth=1;
+            tv.Style.GetOrCreateColumnStyle(colA).MinWidth=1;
+            tv.Style.GetOrCreateColumnStyle(colB).MaxWidth=1;
+            tv.Style.GetOrCreateColumnStyle(colB).MaxWidth=1;
+
+            GraphViewTests.InitFakeDriver();
+            tv.ColorScheme = new ColorScheme(){
+                Normal = Application.Driver.MakeAttribute(Color.White,Color.Black),
+                HotFocus = Application.Driver.MakeAttribute(Color.White,Color.Black)
+                };
+            return tv;
+		}
+
+		/// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
 		/// </summary>
 		/// <param name="cols"></param>

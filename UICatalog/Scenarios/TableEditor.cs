@@ -22,6 +22,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miHeaderUnderline;
 		private MenuItem miCellLines;
 		private MenuItem miFullRowSelect;
+		private MenuItem miEnforceLastColumnMaxLength;
 
 		public override void Setup ()
 		{
@@ -51,6 +52,7 @@ namespace UICatalog.Scenarios {
 					miHeaderUnderline =new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
 					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					miEnforceLastColumnMaxLength = new MenuItem ("_EnforceMaxWidthOnLastColumn", "", () => ToggleEnforceMaxWidthOnLastColumn()){Checked = tableView.Style.EnforceMaxWidthOnLastColumn, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
@@ -180,6 +182,15 @@ namespace UICatalog.Scenarios {
 			miFullRowSelect.Checked = !miFullRowSelect.Checked;
 			tableView.FullRowSelect= miFullRowSelect.Checked;
 			tableView.Update();
+		}
+
+		private void ToggleEnforceMaxWidthOnLastColumn()
+		{
+			miEnforceLastColumnMaxLength.Checked = !miEnforceLastColumnMaxLength.Checked;
+			tableView.Style.EnforceMaxWidthOnLastColumn = miEnforceLastColumnMaxLength.Checked;
+
+			tableView.Update();
+
 		}
 		private void ToggleCellLines()
 		{
