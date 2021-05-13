@@ -300,9 +300,14 @@ namespace Terminal.Gui {
 					// if the next column is the start of a header
 					else if(columnsToRender.Any(r=>r.X == c+1)){
 						rune = Driver.TopTee;
-					}
+					} 
 					else if(c == availableWidth -1){
 						rune = Driver.URCorner;
+					}
+					// if the next console column is the lastcolumns end
+					else if ( Style.ExpandLastColumn == false &&
+						 columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
+						rune = Driver.TopTee;
 					}
 				}
 
@@ -324,45 +329,26 @@ namespace Terminal.Gui {
 			for(int i =0 ; i<columnsToRender.Length;i++) {
 				
 				var current =  columnsToRender[i];
-				var availableWidthForCell = GetCellWidth(columnsToRender,i);
 
 				var colStyle = Style.GetColumnStyleIfAny(current.Column);
 				var colName = current.Column.ColumnName;
 
 				RenderSeparator(current.X-1,row,true);
-									
+
 				Move (current.X, row);
 				
-				Driver.AddStr(TruncateOrPad(colName,colName,availableWidthForCell ,colStyle));
+				Driver.AddStr(TruncateOrPad(colName,colName,current.Width ,colStyle));
 
+				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
+					RenderSeparator (current.X + current.Width-1, row, true);
+				}
 			}
 
 			//render end of line
-			if(style.ShowVerticalHeaderLines)
+			if (style.ShowVerticalHeaderLines)
 				AddRune(Bounds.Width-1,row,Driver.VLine);
 		}
-
-		/// <summary>
-		/// Calculates how much space is available to render index <paramref name="i"/> of the <paramref name="columnsToRender"/> given the remaining horizontal space
-		/// </summary>
-		/// <param name="columnsToRender"></param>
-		/// <param name="i"></param>
-		private int GetCellWidth (ColumnToRender [] columnsToRender, int i)
-		{
-			var current =  columnsToRender[i];
-			var next = i+1 < columnsToRender.Length ? columnsToRender[i+1] : null;
-
-			if(next == null) {
-				// cell can fill to end of the line
-				return Bounds.Width - current.X;
-			}
-			else {
-				// cell can fill up to next cell start				
-				return next.X - current.X;
-			}
-
-		}
-
+	
 		private void RenderHeaderUnderline(int row,int availableWidth, ColumnToRender[] columnsToRender)
 		{
 			// Renders a line below the table headers (when visible) like:
@@ -385,6 +371,11 @@ namespace Terminal.Gui {
 					else if(c == availableWidth -1){
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
 					}
+					// if the next console column is the lastcolumns end
+					else if (Style.ExpandLastColumn == false &&
+							columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width-1 == c)) {
+						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
+					} 
 				}
 
 				AddRuneAt(Driver,c,row,rune);
@@ -397,11 +388,15 @@ namespace Terminal.Gui {
 			if(style.ShowVerticalCellLines)
 				AddRune(0,row,Driver.VLine);
 
+			//start by clearing the entire line
+			Move (0,row);
+			Driver.SetAttribute (FullRowSelect &&  IsSelected(0,rowToRender) ? ColorScheme.HotFocus : ColorScheme.Normal);
+			Driver.AddStr (new string(' ',Bounds.Width));
+
 			// Render cells for each visible header for the current row
 			for(int i=0;i< columnsToRender.Length ;i++) {
 
 				var current = columnsToRender[i];
-				var availableWidthForCell = GetCellWidth(columnsToRender,i);
 
 				var colStyle = Style.GetColumnStyleIfAny(current.Column);
 
@@ -418,13 +413,17 @@ namespace Terminal.Gui {
 				// Render the (possibly truncated) cell value
 				var representation = GetRepresentation(val,colStyle);
 				
-				Driver.AddStr (TruncateOrPad(val,representation,availableWidthForCell,colStyle));
+				Driver.AddStr (TruncateOrPad(val,representation, current.Width, colStyle));
 				
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
 				if(!FullRowSelect)
 					Driver.SetAttribute (ColorScheme.Normal);
 
 				RenderSeparator(current.X-1,row,false);
+
+				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
+					RenderSeparator (current.X + current.Width-1, row, false);
+				}
 			}
 
 			//render end of line
@@ -1019,21 +1018,26 @@ namespace Terminal.Gui {
 				rowsToRender -= GetHeaderHeight(); 
 
 			bool first = true;
+			var lastColumn = Table.Columns.Cast<DataColumn> ().Last ();
 
 			foreach (var col in Table.Columns.Cast<DataColumn>().Skip (ColumnOffset)) {
 
 				int startingIdxForCurrentHeader = usedSpace;
 				var colStyle = Style.GetColumnStyleIfAny(col);
+				int colWidth;
 
 				// is there enough space for this column (and it's data)?
-				usedSpace += CalculateMaxCellWidth (col, rowsToRender,colStyle) + padding;
+				usedSpace += colWidth = CalculateMaxCellWidth (col, rowsToRender,colStyle) + padding;
 
 				// no (don't render it) unless its the only column we are render (that must be one massively wide column!)
 				if (!first && usedSpace > availableHorizontalSpace)
 					yield break;
 
 				// there is space
-				yield return new ColumnToRender(col, startingIdxForCurrentHeader);
+				yield return new ColumnToRender(col, startingIdxForCurrentHeader, 
+					// required for if we end up here because first == true i.e. we have a single massive width (overspilling bounds) column to present
+					Math.Min(availableHorizontalSpace,colWidth),
+					lastColumn == col);
 				first=false;
 			}
 		}
@@ -1215,6 +1219,17 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
 
+
+			/// <summary>
+			/// Determines rendering when the last column in the table is visible but it's
+			/// content or <see cref="ColumnStyle.MaxWidth"/> is less than the remaining 
+			/// space in the control.  True (the default) will expand the column to fill
+			/// the remaining bounds of the control.  False will draw a column ending line
+			/// and leave a blank column that cannot be selected in the remaining space.  
+			/// </summary>
+			/// <value></value>
+			public bool ExpandLastColumn {get;set;} = true;
+			
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
 			/// </summary>
@@ -1254,11 +1269,25 @@ namespace Terminal.Gui {
 			/// </summary>
 			public int X { get; set; }
 
-			public ColumnToRender (DataColumn col, int x)
+			/// <summary>
+			/// The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note that this includes
+			/// space for padding i.e. the separator between columns.
+			/// </summary>
+			public int Width { get; }
+
+			/// <summary>
+			/// True if this column is the very last column in the <see cref="Table"/> (not just the last visible column)
+			/// </summary>
+			public bool IsVeryLast { get; }
+
+			public ColumnToRender (DataColumn col, int x, int width, bool isVeryLast)
 			{
 				Column = col;
 				X = x;
+				Width = width;
+				IsVeryLast = isVeryLast;
 			}
+
 		}
 
 		/// <summary>
