@@ -8,6 +8,7 @@ using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 		
@@ -77,7 +78,7 @@ namespace Terminal.Gui.Views {
 		}
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
-		public static void AssertDriverContentsAre (string expectedLook)
+		public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output)
 		{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
@@ -108,8 +109,8 @@ namespace Terminal.Gui.Views {
 				expectedLook = expectedLook.Replace ("\r\n", "\n");
 				actualLook = actualLook.Replace ("\r\n", "\n");
 
-				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-				Console.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
 
 				Assert.Equal (expectedLook, actualLook);
 			}
@@ -514,6 +515,12 @@ namespace Terminal.Gui.Views {
 
 	public class MultiBarSeriesTests{
 
+		readonly ITestOutputHelper output;
+
+		public MultiBarSeriesTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void MultiBarSeries_BarSpacing(){
@@ -643,7 +650,7 @@ namespace Terminal.Gui.Views {
  │  MM  MM  MM
  ┼──┬M──┬M──┬M──────
    heytherebob  ";
-			GraphViewTests.AssertDriverContentsAre (looksLike);
+			GraphViewTests.AssertDriverContentsAre (looksLike, output);
 		}
 	}
 
@@ -1008,6 +1015,12 @@ namespace Terminal.Gui.Views {
 	}
 
 	public class TextAnnotationTests {
+		readonly ITestOutputHelper output;
+
+		public TextAnnotationTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void TestTextAnnotation_ScreenUnits()
@@ -1029,7 +1042,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
@@ -1046,7 +1059,7 @@ namespace Terminal.Gui.Views {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 		}
 
 
@@ -1070,7 +1083,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
@@ -1088,7 +1101,7 @@ namespace Terminal.Gui.Views {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact]
@@ -1115,7 +1128,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -1141,7 +1154,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -1174,12 +1187,18 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 	}
 
 	public class LegendTests {
+		readonly ITestOutputHelper output;
+
+		public LegendTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void LegendNormalUsage_WithBorder ()
@@ -1200,7 +1219,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -1226,12 +1245,18 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 	}
 
 	public class PathAnnotationTests {
+		readonly ITestOutputHelper output;
+
+		public PathAnnotationTests( ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void PathAnnotation_Box()
@@ -1259,7 +1284,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -1288,7 +1313,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected,output);
 
 		}
 	}
