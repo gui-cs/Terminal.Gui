@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 
 	public class TableViewTests 
 	{
+		readonly ITestOutputHelper output;
 
-        [Fact]
+		public TableViewTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+	[Fact]
         public void EnsureValidScrollOffsets_WithNoCells()
         {
             var tableView = new TableView();
@@ -434,7 +440,7 @@ namespace Terminal.Gui.Views {
 ├─┼──────┤
 │1│2     │
 ";
-            GraphViewTests.AssertDriverContentsAre(expected);
+            GraphViewTests.AssertDriverContentsAre(expected, output);
         }
 
 
@@ -454,7 +460,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┼────┤
 │1│2│    │
 ";
-            GraphViewTests.AssertDriverContentsAre(expected);
+            GraphViewTests.AssertDriverContentsAre(expected, output);
         }
 
         [Fact]
@@ -475,7 +481,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-            GraphViewTests.AssertDriverContentsAre(expected);
+            GraphViewTests.AssertDriverContentsAre(expected, output);
         }
 
 		private TableView SetUpMiniTable ()
