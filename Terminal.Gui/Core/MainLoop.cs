@@ -171,8 +171,9 @@ namespace Terminal.Gui {
 			long now = DateTime.UtcNow.Ticks;
 			var copy = timeouts;
 			timeouts = new SortedList<long, Timeout> ();
-			foreach (var k in copy.Keys) {
-				var timeout = copy [k];
+			foreach (var t in copy) {
+				var k = t.Key;
+				var timeout = t.Value;
 				if (k < now) {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);

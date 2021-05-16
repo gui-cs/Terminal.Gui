@@ -299,6 +299,35 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (2, callbackCount);
 		}
 
+		[Fact]
+		public void AddTimer_In_Parallel_Wont_Throw ()
+		{
+			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			const int ms = 100;
+			object token1 = null, token2 = null;
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (MainLoop loop) => {
+				callbackCount++;
+				if (callbackCount == 2) {
+					ml.Stop ();
+				}
+				return true;
+			};
+
+			Parallel.Invoke (
+				() => token1 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback),
+				() => token2 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback)
+			);
+			ml.Run ();
+			Assert.NotNull (token1);
+			Assert.NotNull (token2);
+			Assert.True (ml.RemoveTimeout (token1));
+			Assert.True (ml.RemoveTimeout (token2));
+
+			Assert.Equal (2, callbackCount);
+		}
+
 
 		class MillisecondTolerance : IEqualityComparer<TimeSpan> {
 			int _tolerance = 0;
