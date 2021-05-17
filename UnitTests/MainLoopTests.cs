@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
+using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
 using Xunit.Sdk;
@@ -33,28 +34,31 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnFalse);
 
-			ml.RemoveIdle (fnTrue);
+			Assert.True (ml.RemoveIdle (fnTrue));
 
-			// BUGBUG: This doens't throw or indicate an error. Ideally RemoveIdle would either 
-			// trhow an exception in this case, or return an error.
-			ml.RemoveIdle (fnTrue);
+			// BUGBUG: This doesn't throw or indicate an error. Ideally RemoveIdle would either 
+			// throw an exception in this case, or return an error.
+			// No. Only need to return a boolean.
+			Assert.False (ml.RemoveIdle (fnTrue));
 
-			ml.RemoveIdle (fnFalse);
+			Assert.True (ml.RemoveIdle (fnFalse));
 
 			// BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
-			// trhow an exception in this case, or return an error.
-			ml.RemoveIdle (fnFalse);
+			// throw an exception in this case, or return an error.
+			// No. Only need to return a boolean.
+			Assert.False (ml.RemoveIdle (fnFalse));
 
 			// Add again, but with dupe
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnTrue);
 
-			ml.RemoveIdle (fnTrue);
-			ml.RemoveIdle (fnTrue);
+			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.True (ml.RemoveIdle (fnTrue));
 
 			// BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
-			// trhow an exception in this case, or return an error.
-			ml.RemoveIdle (fnTrue);
+			// throw an exception in this case, or return an error.
+			// No. Only need to return a boolean.
+			Assert.False (ml.RemoveIdle (fnTrue));
 		}
 
 		[Fact]
@@ -84,8 +88,7 @@ namespace Terminal.Gui.Core {
 				return true;
 			};
 
-			functionCalled = 0;
-			ml.RemoveIdle (fn);
+			Assert.False (ml.RemoveIdle (fn));
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
 		}
@@ -101,9 +104,8 @@ namespace Terminal.Gui.Core {
 				return true;
 			};
 
-			functionCalled = 0;
 			ml.AddIdle (fn);
-			ml.RemoveIdle (fn);
+			Assert.True (ml.RemoveIdle (fn));
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
 		}
@@ -119,21 +121,21 @@ namespace Terminal.Gui.Core {
 				return true;
 			};
 
-			functionCalled = 0;
 			ml.AddIdle (fn);
 			ml.AddIdle (fn);
 			ml.MainIteration ();
 			Assert.Equal (2, functionCalled);
 
 			functionCalled = 0;
-			ml.RemoveIdle (fn);
+			Assert.True (ml.RemoveIdle (fn));
 			ml.MainIteration ();
 			Assert.Equal (1, functionCalled);
 
 			functionCalled = 0;
-			ml.RemoveIdle (fn);
+			Assert.True (ml.RemoveIdle (fn));
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
+			Assert.False (ml.RemoveIdle (fn));
 		}
 
 		[Fact]
@@ -163,10 +165,11 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fnStop);
 			ml.AddIdle (fn1);
 			ml.Run ();
-			ml.RemoveIdle (fnStop);
-			ml.RemoveIdle (fn1);
+			Assert.True (ml.RemoveIdle (fnStop));
+			Assert.False (ml.RemoveIdle (fn1));
 
 			Assert.Equal (10, functionCalled);
+			Assert.Equal (20, stopCount);
 		}
 
 		[Fact]
@@ -194,9 +197,9 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fn1);
 			ml.AddIdle (fn1);
 			ml.Run ();
-			ml.RemoveIdle (fnStop);
-			ml.RemoveIdle (fn1);
-			ml.RemoveIdle (fn1);
+			Assert.True (ml.RemoveIdle (fnStop));
+			Assert.False (ml.RemoveIdle (fn1));
+			Assert.False (ml.RemoveIdle (fn1));
 
 			Assert.Equal (2, functionCalled);
 		}
@@ -217,7 +220,7 @@ namespace Terminal.Gui.Core {
 
 			ml.AddIdle (fn);
 			ml.Run ();
-			ml.RemoveIdle (fn);
+			Assert.True (ml.RemoveIdle (fn));
 
 			Assert.Equal (10, functionCalled);
 		}
@@ -237,10 +240,11 @@ namespace Terminal.Gui.Core {
 
 			var token = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
 
-			ml.RemoveTimeout (token);
+			Assert.True (ml.RemoveTimeout (token));
 
 			// BUGBUG: This should probably fault?
-			ml.RemoveTimeout (token);
+			// Must return a boolean.
+			Assert.False (ml.RemoveTimeout (token));
 		}
 
 		[Fact]
@@ -258,9 +262,70 @@ namespace Terminal.Gui.Core {
 
 			var token = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
 			ml.Run ();
-			ml.RemoveTimeout (token);
+			Assert.True (ml.RemoveTimeout (token));
 
 			Assert.Equal (1, callbackCount);
+		}
+
+		[Fact]
+		public async Task AddTimer_Duplicate_Keys_Not_Allowed ()
+		{
+			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			const int ms = 100;
+			object token1 = null, token2 = null;
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (MainLoop loop) => {
+				callbackCount++;
+				if (callbackCount == 2) {
+					ml.Stop ();
+				}
+				return true;
+			};
+
+			var task1 = new Task (() => token1 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback));
+			var task2 = new Task (() => token2 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback));
+			Assert.Null (token1);
+			Assert.Null (token2);
+			task1.Start ();
+			task2.Start ();
+			ml.Run ();
+			Assert.NotNull (token1);
+			Assert.NotNull (token2);
+			await Task.WhenAll (task1, task2);
+			Assert.True (ml.RemoveTimeout (token1));
+			Assert.True (ml.RemoveTimeout (token2));
+
+			Assert.Equal (2, callbackCount);
+		}
+
+		[Fact]
+		public void AddTimer_In_Parallel_Wont_Throw ()
+		{
+			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			const int ms = 100;
+			object token1 = null, token2 = null;
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (MainLoop loop) => {
+				callbackCount++;
+				if (callbackCount == 2) {
+					ml.Stop ();
+				}
+				return true;
+			};
+
+			Parallel.Invoke (
+				() => token1 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback),
+				() => token2 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback)
+			);
+			ml.Run ();
+			Assert.NotNull (token1);
+			Assert.NotNull (token2);
+			Assert.True (ml.RemoveTimeout (token1));
+			Assert.True (ml.RemoveTimeout (token2));
+
+			Assert.Equal (2, callbackCount);
 		}
 
 
@@ -293,7 +358,7 @@ namespace Terminal.Gui.Core {
 			// https://github.com/xunit/assert.xunit/pull/25
 			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
-			ml.RemoveTimeout (token);
+			Assert.True (ml.RemoveTimeout (token));
 			Assert.Equal (1, callbackCount);
 		}
 
@@ -321,7 +386,7 @@ namespace Terminal.Gui.Core {
 			// https://github.com/xunit/assert.xunit/pull/25
 			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
-			ml.RemoveTimeout (token);
+			Assert.True (ml.RemoveTimeout (token));
 			Assert.Equal (2, callbackCount);
 		}
 
@@ -349,7 +414,7 @@ namespace Terminal.Gui.Core {
 			};
 
 			var token = ml.AddTimeout (ms, callback);
-			ml.RemoveTimeout (token);
+			Assert.True (ml.RemoveTimeout (token));
 			ml.Run ();
 			Assert.Equal (0, callbackCount);
 		}
@@ -363,7 +428,7 @@ namespace Terminal.Gui.Core {
 			// Force stop if 10 iterations
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
-				Thread.Sleep (10); // Sleep to enable timeer to fire
+				Thread.Sleep (10); // Sleep to enable timer to fire
 				stopCount++;
 				if (stopCount == 10) {
 					ml.Stop ();
@@ -382,7 +447,7 @@ namespace Terminal.Gui.Core {
 			ml.Run ();
 			Assert.Equal (1, callbackCount);
 			Assert.Equal (10, stopCount);
-			ml.RemoveTimeout (token);
+			Assert.False (ml.RemoveTimeout (token));
 		}
 
 		// Invoke Tests

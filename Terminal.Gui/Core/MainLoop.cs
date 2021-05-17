@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		bool EventsPending (bool wait);
 
 		/// <summary>
-		/// The interation function.
+		/// The iteration function.
 		/// </summary>
 		void MainIteration ();
 	}
@@ -107,22 +107,30 @@ namespace Terminal.Gui {
 		///   Removes an idle handler added with <see cref="AddIdle(Func{bool})"/> from processing.
 		/// </summary>
 		/// <param name="token">A token returned by <see cref="AddIdle(Func{bool})"/></param>
-		public void RemoveIdle (Func<bool> token)
+		/// Returns <c>true</c>if the idle handler is successfully removed; otherwise, <c>false</c>.
+		///  This method also returns <c>false</c> if the idle handler is not found.
+		public bool RemoveIdle (Func<bool> token)
 		{
 			lock (token)
-				idleHandlers.Remove (token);
+				return idleHandlers.Remove (token);
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			timeouts.Add ((DateTime.UtcNow + time).Ticks, timeout);
+			var k = (DateTime.UtcNow + time).Ticks;
+			lock (timeouts) {
+				while (timeouts.ContainsKey (k)) {
+					k = (DateTime.UtcNow + time).Ticks;
+				}
+			}
+			timeouts.Add (k, timeout);
 		}
 
 		/// <summary>
 		///   Adds a timeout to the mainloop.
 		/// </summary>
 		/// <remarks>
-		///   When time time specified passes, the callback will be invoked.
+		///   When time specified passes, the callback will be invoked.
 		///   If the callback returns true, the timeout will be reset, repeating
 		///   the invocation. If it returns false, the timeout will stop and be removed.
 		///
@@ -147,12 +155,15 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The token parameter is the value returned by AddTimeout.
 		/// </remarks>
-		public void RemoveTimeout (object token)
+		/// Returns <c>true</c>if the timeout is successfully removed; otherwise, <c>false</c>.
+		/// This method also returns <c>false</c> if the timeout is not found.
+		public bool RemoveTimeout (object token)
 		{
 			var idx = timeouts.IndexOfValue (token as Timeout);
 			if (idx == -1)
-				return;
+				return false;
 			timeouts.RemoveAt (idx);
+			return true;
 		}
 
 		void RunTimers ()
@@ -160,8 +171,9 @@ namespace Terminal.Gui {
 			long now = DateTime.UtcNow.Ticks;
 			var copy = timeouts;
 			timeouts = new SortedList<long, Timeout> ();
-			foreach (var k in copy.Keys) {
-				var timeout = copy [k];
+			foreach (var t in copy) {
+				var k = t.Key;
+				var timeout = t.Value;
 				if (k < now) {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);
