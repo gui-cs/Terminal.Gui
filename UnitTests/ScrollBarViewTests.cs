@@ -1,8 +1,51 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Reflection;
 using Xunit;
 
 namespace Terminal.Gui.Views {
 	public class ScrollBarViewTests {
+
+		// This class enables test functions annoated with the [InitShutdown] attribute
+		// to have a function called before the test function is called and after.
+		// 
+		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
+		// as a pair, and b) all unit test functions should be atomic.
+		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+
+			public override void Before (MethodInfo methodUnderTest)
+			{
+				Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
+				if (_hostView != null) {
+					throw new InvalidOperationException ("After did not run.");
+				}
+
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+				var top = Application.Top;
+
+				ScrollBarViewTests._hostView = new HostView () {
+					Width = Dim.Fill (),
+					Height = Dim.Fill (),
+					Top = 0,
+					Lines = 30,
+					Left = 0,
+					Cols = 100
+				};
+
+				top.Add (ScrollBarViewTests._hostView);
+			}
+
+			public override void After (MethodInfo methodUnderTest)
+			{
+				Debug.WriteLine ($"After: {methodUnderTest.Name}");
+				ScrollBarViewTests._hostView = null;
+				Application.Shutdown ();
+			}
+		}
+
 		public class HostView : View {
 			public int Top { get; set; }
 			public int Lines { get; set; }
@@ -10,27 +53,9 @@ namespace Terminal.Gui.Views {
 			public int Cols { get; set; }
 		}
 
-		private HostView _hostView;
+		private static HostView _hostView;
 		private ScrollBarView _scrollBar;
-		private bool _added;
-
-		public ScrollBarViewTests ()
-		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
-			var top = Application.Top;
-
-			_hostView = new HostView () {
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				Top = 0,
-				Lines = 30,
-				Left = 0,
-				Cols = 100
-			};
-
-			top.Add (_hostView);
-		}
+		private  bool _added;
 
 		private void AddHandlers ()
 		{
@@ -80,6 +105,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Hosting_A_Null_View_To_A_ScrollBarView_Throws_ArgumentNullException ()
 		{
 			Assert.Throws<ArgumentNullException> ("The host parameter can't be null.",
@@ -89,6 +115,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Hosting_A_Null_SuperView_View_To_A_ScrollBarView_Throws_ArgumentNullException ()
 		{
 			Assert.Throws<ArgumentNullException> ("The host SuperView parameter can't be null.",
@@ -98,6 +125,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
 		{
 			var top = new Toplevel ();
@@ -111,6 +139,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
 		{
 			var top = new Toplevel ();
@@ -124,6 +153,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
 		{
 			var sbv = new ScrollBarView {
@@ -134,6 +164,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Hosting_A_View_To_A_ScrollBarView ()
 		{
 			RemoveHandlers ();
@@ -159,6 +190,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void ChangedPosition_Update_The_Hosted_View ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -173,6 +205,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void ChangedPosition_Scrolling ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -199,6 +232,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void ChangedPosition_Negative_Value ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -215,6 +249,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void DrawContent_Update_The_ScrollBarView_Position ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -231,6 +266,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void OtherScrollBarView_Not_Null ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -243,6 +279,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void ShowScrollIndicator_Check ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -254,6 +291,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void KeepContentAlwaysInViewport_True ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -293,6 +331,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void KeepContentAlwaysInViewport_False ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -314,6 +353,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void AutoHideScrollBars_Check ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();

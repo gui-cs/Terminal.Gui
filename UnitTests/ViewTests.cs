@@ -1166,6 +1166,9 @@ namespace Terminal.Gui.Views {
 			};
 
 			Application.Run ();
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }

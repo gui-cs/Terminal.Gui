@@ -255,10 +255,10 @@ namespace Terminal.Gui {
 		{
 		}
 
-		int currentAttribute;
+		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.Value;
+			currentAttribute = c;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
