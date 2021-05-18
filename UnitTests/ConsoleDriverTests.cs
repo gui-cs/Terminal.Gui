@@ -23,6 +23,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (Console.BufferWidth, driver.Cols);
 			Assert.Equal (Console.BufferHeight, driver.Rows);
 			driver.End ();
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -46,6 +49,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (0, Console.CursorTop);
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -67,6 +73,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 			driver.End ();
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -94,6 +103,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run ();
 
 			Assert.False (wasKeyPressed);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -133,6 +145,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run ();
 
 			Assert.Equal ("MockKeyPresses", rText);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -226,6 +241,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run ();
 
 			Assert.Equal (key, lastKey);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }

@@ -77,6 +77,9 @@ namespace Terminal.Gui {
 
 				Application.End (rs);
 
+				// Shutdown must be called to safely clean up Application if Init has been called
+				Application.Shutdown ();
+
 				Assert.Equal (0, abortCount);
 				// # of key up events should match # of iterations
 				Assert.Equal (1, iterations);
@@ -139,6 +142,9 @@ namespace Terminal.Gui {
 			Assert.Equal (1, iterations);
 			// Using variable in the left side of Assert.Equal/NotEqual give error. Must be used literals values.
 			//Assert.Equal (stackSize, iterations);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {

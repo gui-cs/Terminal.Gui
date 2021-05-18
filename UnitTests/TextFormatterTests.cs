@@ -2533,6 +2533,9 @@ namespace Terminal.Gui.Core {
 				// After the fix this exception will not be caught.
 				Assert.IsType<IndexOutOfRangeException> (ex);
 			}
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -2561,6 +2564,9 @@ namespace Terminal.Gui.Core {
 				// After the fix this exception will not be caught.
 				Assert.IsType<IndexOutOfRangeException> (ex);
 			}
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }
