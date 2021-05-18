@@ -7,30 +7,10 @@ using Xunit;
 
 namespace Terminal.Gui.Views {
 
-	// This class enables test functions annoated with the [InitShutdown] attribute
-	// to have a function called before the test function is called and after.
-	// 
-	// This is necessary because a) Application is a singleton and Init/Shutdown must be called
-	// as a pair, and b) all unit test functions should be atomic.
-	[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-	public class TextValidateFieldInitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
-
-		public override void Before (MethodInfo methodUnderTest)
-		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-		}
-
-		public override void After (MethodInfo methodUnderTest)
-		{
-			Application.Shutdown ();
-		}
-	}
-
 	public class TextValidateField_NET_Provider_Tests {
 
-
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Initialized_With_Cursor_On_First_Editable_Character ()
 		{
 			//                                                            *
@@ -47,7 +27,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Input_Ilegal_Character ()
 		{
 			//                                                            *
@@ -65,7 +45,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Home_Key_First_Editable_Character ()
 		{
 			//                                                            *
@@ -87,7 +67,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void End_Key_Last_Editable_Character ()
 		{
 			//                                                               *
@@ -107,7 +87,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Right_Key_Stops_In_Last_Editable_Character ()
 		{
 			//                                                               *
@@ -128,7 +108,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Left_Key_Stops_In_First_Editable_Character ()
 		{
 			//                                                            *
@@ -149,7 +129,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void When_Valid_Is_Valid_True ()
 		{
 			//                                                            ****
@@ -177,7 +157,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Insert_Skips_Non_Editable_Characters ()
 		{
 			//                                                            ** **
@@ -206,7 +186,7 @@ namespace Terminal.Gui.Views {
 
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Initial_Value_Exact_Valid ()
 		{
 			//                                                            ****
@@ -221,7 +201,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Initial_Value_Bigger_Than_Mask_Discarded ()
 		{
 			//                                                            ****
@@ -237,7 +217,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Initial_Value_Smaller_Than_Mask_Accepted ()
 		{
 			//                                                            ****
@@ -253,7 +233,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Delete_Key_Dosent_Move_Cursor ()
 		{
 			//                                                            ****
@@ -285,7 +265,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Backspace_Key_Deletes_Previous_Character ()
 		{
 			//                                                            ****
@@ -318,7 +298,7 @@ namespace Terminal.Gui.Views {
 
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Set_Text_After_Initialization ()
 		{
 			//                                                            ****
@@ -335,7 +315,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Changing_The_Mask_Tries_To_Keep_The_Previous_Text ()
 		{
 			//                                                            ****
@@ -356,7 +336,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void MouseClick_Right_X_Greater_Than_Text_Width_Goes_To_Last_Editable_Position ()
 		{
 			//                                                            ****
@@ -383,7 +363,7 @@ namespace Terminal.Gui.Views {
 	public class TextValidateField_Regex_Provider_Tests {
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Input_Without_Validate_On_Input ()
 		{
 			var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }) {
@@ -408,7 +388,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Input_With_Validate_On_Input_Set_Text ()
 		{
 			var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$")) {
@@ -432,7 +412,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Text_With_All_Charset ()
 		{
 			var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$")) {
@@ -450,7 +430,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Mask_With_Invalid_Pattern_Exception ()
 		{
 			// Regex Exception
@@ -473,7 +453,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Home_Key_First_Editable_Character ()
 		{
 			// Range 0 to 1000
@@ -501,7 +481,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void End_Key_End_Of_Input ()
 		{
 			// Exactly 5 numbers
@@ -536,7 +516,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Right_Key_Stops_At_End_And_Insert ()
 		{
 			var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }) {
@@ -561,7 +541,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[TextValidateFieldInitShutdown]
+		[AutoInitShutdown]
 		public void Left_Key_Stops_At_Start_And_Insert ()
 		{
 			var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }) {
