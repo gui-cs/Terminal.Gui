@@ -19,11 +19,14 @@ namespace Terminal.Gui {
 	internal class CursesDriver : ConsoleDriver {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
+		public override int Left => 0;
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
+		public override IClipboard Clipboard { get => clipboard; }
 
 		CursorVisibility? initialCursorVisibility = null;
 		CursorVisibility? currentCursorVisibility = null;
+		IClipboard clipboard;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -102,8 +105,8 @@ namespace Terminal.Gui {
 			//Console.Out.Flush ();
 
 			//Set cursor key to cursor.
-			Console.Out.Write ("\x1b[?1l");
-			Console.Out.Flush ();
+			//Console.Out.Write ("\x1b[?1l");
+			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -714,8 +717,8 @@ namespace Terminal.Gui {
 
 			try {
 				//Set cursor key to application.
-				Console.Out.Write ("\x1b[?1h");
-				Console.Out.Flush ();
+				//Console.Out.Write ("\x1b[?1h");
+				//Console.Out.Flush ();
 
 				window = Curses.initscr ();
 			} catch (Exception e) {
@@ -743,6 +746,12 @@ namespace Terminal.Gui {
 			default:
 				currentCursorVisibility = initialCursorVisibility = null;
 				break;
+			}
+
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				clipboard = new MacOSXClipboard ();
+			} else {
+				clipboard = new CursesClipboard ();
 			}
 
 			Curses.raw ();
@@ -1045,5 +1054,140 @@ namespace Terminal.Gui {
 			killpg (0, signal);
 			return true;
 		}
+	}
+
+	class CursesClipboard : IClipboard {
+		public string GetClipboardData ()
+		{
+			var tempFileName = System.IO.Path.GetTempFileName ();
+			try {
+				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
+				BashRunner.Run ($"xclip -o > {tempFileName}");
+				return System.IO.File.ReadAllText (tempFileName);
+			} finally {
+				System.IO.File.Delete (tempFileName);
+			}
+		}
+
+		public void SetClipboardData (string text)
+		{
+			var tempFileName = System.IO.Path.GetTempFileName ();
+			System.IO.File.WriteAllText (tempFileName, text);
+			try {
+				// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
+				BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
+			} finally {
+				System.IO.File.Delete (tempFileName);
+			}
+		}
+	}
+
+	static class BashRunner {
+		public static string Run (string commandLine)
+		{
+			var errorBuilder = new System.Text.StringBuilder ();
+			var outputBuilder = new System.Text.StringBuilder ();
+			var arguments = $"-c \"{commandLine}\"";
+			using (var process = new System.Diagnostics.Process {
+				StartInfo = new System.Diagnostics.ProcessStartInfo {
+					FileName = "bash",
+					Arguments = arguments,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					UseShellExecute = false,
+					CreateNoWindow = false,
+				}
+			}) {
+				process.Start ();
+				process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
+				process.BeginOutputReadLine ();
+				process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
+				process.BeginErrorReadLine ();
+				if (!process.DoubleWaitForExit ()) {
+					var timeoutError = $@"Process timed out. Command line: bash {arguments}.
+						Output: {outputBuilder}
+						Error: {errorBuilder}";
+					throw new Exception (timeoutError);
+				}
+				if (process.ExitCode == 0) {
+					return outputBuilder.ToString ();
+				}
+
+				var error = $@"Could not execute process. Command line: bash {arguments}.
+					Output: {outputBuilder}
+					Error: {errorBuilder}";
+				throw new Exception (error);
+			}
+		}
+
+		static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+		{
+			var result = process.WaitForExit (500);
+			if (result) {
+				process.WaitForExit ();
+			}
+			return result;
+		}
+	}
+
+	class MacOSXClipboard : IClipboard {
+		IntPtr nsString = objc_getClass ("NSString");
+		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
+		IntPtr utfTextType;
+		IntPtr generalPasteboard;
+		IntPtr initWithUtf8Register = sel_registerName ("initWithUTF8String:");
+		IntPtr allocRegister = sel_registerName ("alloc");
+		IntPtr setStringRegister = sel_registerName ("setString:forType:");
+		IntPtr stringForTypeRegister = sel_registerName ("stringForType:");
+		IntPtr utf8Register = sel_registerName ("UTF8String");
+		IntPtr nsStringPboardType;
+		IntPtr generalPasteboardRegister = sel_registerName ("generalPasteboard");
+		IntPtr clearContentsRegister = sel_registerName ("clearContents");
+
+		public MacOSXClipboard ()
+		{
+			utfTextType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "public.utf8-plain-text");
+			nsStringPboardType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "NSStringPboardType");
+			generalPasteboard = objc_msgSend (nsPasteboard, generalPasteboardRegister);
+		}
+
+		public string GetClipboardData ()
+		{
+			var ptr = objc_msgSend (generalPasteboard, stringForTypeRegister, nsStringPboardType);
+			var charArray = objc_msgSend (ptr, utf8Register);
+			return Marshal.PtrToStringAnsi (charArray);
+		}
+
+		public void SetClipboardData (string text)
+		{
+			IntPtr str = default;
+			try {
+				str = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, text);
+				objc_msgSend (generalPasteboard, clearContentsRegister);
+				objc_msgSend (generalPasteboard, setStringRegister, str, utfTextType);
+			} finally {
+				if (str != default) {
+					objc_msgSend (str, sel_registerName ("release"));
+				}
+			}
+		}
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_getClass (string className);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, string arg1);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr sel_registerName (string selectorName);
 	}
 }

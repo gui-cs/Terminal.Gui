@@ -5,7 +5,7 @@ using Xunit;
 namespace Terminal.Gui.Views {
 	public class TextFieldTests {
 
-		// This class enables test functions annoated with the [InitShutdown] attribute
+		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
 		// 
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
@@ -17,8 +17,8 @@ namespace Terminal.Gui.Views {
 			{
 				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-				//                                     1         2         3 
-				//                           01234567890123456789012345678901=32 (Length)
+				//                                                    1         2         3 
+				//                                          01234567890123456789012345678901=32 (Length)
 				TextFieldTests._textField = new TextField ("TAB to jump between text fields.");
 			}
 
