@@ -1662,7 +1662,7 @@ namespace Terminal.Gui {
 				int lineRuneCount = line.Count;
 				var col = 0;
 
-				Move (0, idxRow);
+				Move (0, row);
 				for (int idxCol = leftColumn; idxCol < lineRuneCount; idxCol++) {
 					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);

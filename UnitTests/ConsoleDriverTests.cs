@@ -245,5 +245,173 @@ namespace Terminal.Gui.ConsoleDrivers {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void TerminalResized_Simulation ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var wasTerminalResized = false;
+			Application.Resized = (e) => {
+				wasTerminalResized = true;
+				Assert.Equal (120, e.Cols);
+				Assert.Equal (40, e.Rows);
+			};
+
+			Assert.Equal (80, Console.BufferWidth);
+			Assert.Equal (25, Console.BufferHeight);
+
+			// MockDriver is by default 80x25
+			Assert.Equal (Console.BufferWidth, driver.Cols);
+			Assert.Equal (Console.BufferHeight, driver.Rows);
+			Assert.False (wasTerminalResized);
+
+			// MockDriver will now be sets to 120x40
+			driver.SetBufferSize (120, 40);
+			Assert.Equal (120, Application.Driver.Cols);
+			Assert.Equal (40, Application.Driver.Rows);
+			Assert.True (wasTerminalResized);
+
+			// MockDriver will still be 120x40
+			wasTerminalResized = false;
+			Application.HeightAsBuffer = true;
+			driver.SetWindowSize (40, 20);
+			Assert.Equal (120, Application.Driver.Cols);
+			Assert.Equal (40, Application.Driver.Rows);
+			Assert.Equal (120, Console.BufferWidth);
+			Assert.Equal (40, Console.BufferHeight);
+			Assert.Equal (40, Console.WindowWidth);
+			Assert.Equal (20, Console.WindowHeight);
+			Assert.True (wasTerminalResized);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Assert.False (Application.HeightAsBuffer);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			driver.SetWindowPosition (5, 5);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.HeightAsBuffer = true;
+			Assert.True (Application.HeightAsBuffer);
+
+			driver.SetWindowPosition (81, 25);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.HeightAsBuffer = true;
+			Assert.True (Application.HeightAsBuffer);
+
+			driver.SetWindowPosition (81, 25);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			// MockDriver will now be sets to 120x25
+			driver.SetBufferSize (120, 25);
+			Assert.Equal (120, Application.Driver.Cols);
+			Assert.Equal (25, Application.Driver.Rows);
+			Assert.Equal (120, Console.BufferWidth);
+			Assert.Equal (25, Console.BufferHeight);
+			Assert.Equal (120, Console.WindowWidth);
+			Assert.Equal (25, Console.WindowHeight);
+			driver.SetWindowPosition (121, 25);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			driver.SetWindowSize (90, 25);
+			Assert.Equal (120, Application.Driver.Cols);
+			Assert.Equal (25, Application.Driver.Rows);
+			Assert.Equal (120, Console.BufferWidth);
+			Assert.Equal (25, Console.BufferHeight);
+			Assert.Equal (90, Console.WindowWidth);
+			Assert.Equal (25, Console.WindowHeight);
+			driver.SetWindowPosition (121, 25);
+			Assert.Equal (30, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.HeightAsBuffer = true;
+			Assert.True (Application.HeightAsBuffer);
+
+			driver.SetWindowPosition (80, 26);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.HeightAsBuffer = true;
+			Assert.True (Application.HeightAsBuffer);
+
+			driver.SetWindowPosition (80, 26);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			// MockDriver will now be sets to 120x25
+			driver.SetBufferSize (80, 40);
+			Assert.Equal (80, Application.Driver.Cols);
+			Assert.Equal (40, Application.Driver.Rows);
+			Assert.Equal (80, Console.BufferWidth);
+			Assert.Equal (40, Console.BufferHeight);
+			Assert.Equal (80, Console.WindowWidth);
+			Assert.Equal (40, Console.WindowHeight);
+			driver.SetWindowPosition (80, 40);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (0, Console.WindowTop);
+
+			driver.SetWindowSize (80, 20);
+			Assert.Equal (80, Application.Driver.Cols);
+			Assert.Equal (40, Application.Driver.Rows);
+			Assert.Equal (80, Console.BufferWidth);
+			Assert.Equal (40, Console.BufferHeight);
+			Assert.Equal (80, Console.WindowWidth);
+			Assert.Equal (20, Console.WindowHeight);
+			driver.SetWindowPosition (80, 41);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (20, Console.WindowTop);
+
+			Application.Shutdown ();
+		}
 	}
 }

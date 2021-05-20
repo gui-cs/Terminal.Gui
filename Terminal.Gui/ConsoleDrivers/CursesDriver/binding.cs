@@ -48,13 +48,13 @@ namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public partial class Curses {
-		[StructLayout (LayoutKind.Sequential)]
-		public struct winsize {
-			public ushort ws_row;
-			public ushort ws_col;
-			public ushort ws_xpixel;   /* unused */
-			public ushort ws_ypixel;   /* unused */
-		};
+		//[StructLayout (LayoutKind.Sequential)]
+		//public struct winsize {
+		//	public ushort ws_row;
+		//	public ushort ws_col;
+		//	public ushort ws_xpixel;   /* unused */
+		//	public ushort ws_ypixel;   /* unused */
+		//};
 
 		[StructLayout (LayoutKind.Sequential)]
 		public struct MouseEvent {
@@ -77,8 +77,8 @@ namespace Unix.Terminal {
 		[DllImport ("libc")]
 		public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
 
-		[DllImport ("libc")]
-		public extern static int ioctl (int fd, int cmd, out winsize argp);
+		//[DllImport ("libc")]
+		//public extern static int ioctl (int fd, int cmd, out winsize argp);
 
 		static void LoadMethods ()
 		{
@@ -142,11 +142,11 @@ namespace Unix.Terminal {
 			if (l == 1 || l != lines || c != cols) {
 				lines = l;
 				cols = c;
-				if (l <= 0 || c <= 0) {
-					Console.Out.Write ($"\x1b[8;50;{c}t");
-					Console.Out.Flush ();
-					return false;
-				}
+				//if (l <= 0 || c <= 0) {
+				//	Console.Out.Write ($"\x1b[8;50;{c}t");
+				//	Console.Out.Flush ();
+				//	return false;
+				//}
 				return true;
 			}
 			return false;
@@ -200,29 +200,29 @@ namespace Unix.Terminal {
 
 		internal static void console_sharp_get_dims (out int lines, out int cols)
 		{
-			//lines = Marshal.ReadInt32 (lines_ptr);
-			//cols = Marshal.ReadInt32 (cols_ptr);
+			lines = Marshal.ReadInt32 (lines_ptr);
+			cols = Marshal.ReadInt32 (cols_ptr);
 
-			int cmd;
-			if (UnmanagedLibrary.IsMacOSPlatform) {
-				cmd = TIOCGWINSZ_MAC;
-			} else {
-				cmd = TIOCGWINSZ;
-			}
+			//int cmd;
+			//if (UnmanagedLibrary.IsMacOSPlatform) {
+			//	cmd = TIOCGWINSZ_MAC;
+			//} else {
+			//	cmd = TIOCGWINSZ;
+			//}
 
-			if (ioctl (1, cmd, out winsize ws) == 0) {
-				lines = ws.ws_row;
-				cols = ws.ws_col;
+			//if (ioctl (1, cmd, out winsize ws) == 0) {
+			//	lines = ws.ws_row;
+			//	cols = ws.ws_col;
 
-				if (lines == Lines && cols == Cols) {
-					return;
-				}
+			//	if (lines == Lines && cols == Cols) {
+			//		return;
+			//	}
 
-				resizeterm (lines, cols);
-			} else {
-				lines = Lines;
-				cols = Cols;
-			}
+			//	resizeterm (lines, cols);
+			//} else {
+			//	lines = Lines;
+			//	cols = Cols;
+			//}
 		}
 
 		public static Event mousemask (Event newmask, out Event oldmask)
@@ -233,7 +233,6 @@ namespace Unix.Terminal {
 			return ret;
 		}
 
-
 		// We encode ESC + char (what Alt-char generates) as 0x2000 + char
 		public const int KeyAlt = 0x2000;
 
@@ -243,6 +242,7 @@ namespace Unix.Terminal {
 				return key & ~KeyAlt;
 			return 0;
 		}
+
 		public static int StartColor () => methods.start_color ();
 		public static bool HasColors => methods.has_colors ();
 		public static int InitColorPair (short pair, short foreground, short background) => methods.init_pair (pair, foreground, background);

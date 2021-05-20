@@ -613,14 +613,26 @@ namespace Terminal.Gui {
 		/// The current number of columns in the terminal.
 		/// </summary>
 		public abstract int Cols { get; }
+
 		/// <summary>
 		/// The current number of rows in the terminal.
 		/// </summary>
 		public abstract int Rows { get; }
+
+		/// <summary>
+		/// The current left in the terminal.
+		/// </summary>
+		public abstract int Left { get; }
+
 		/// <summary>
 		/// The current top in the terminal.
 		/// </summary>
 		public abstract int Top { get; }
+
+		/// <summary>
+		/// Get the operation system clipboard.
+		/// </summary>
+		public abstract IClipboard Clipboard { get; }
 
 		/// <summary>
 		/// If false height is measured by the window height and thus no scrolling.
@@ -1165,5 +1177,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The current attribute.</returns>
 		public abstract Attribute GetAttribute ();
+	}
+
+	/// <summary>
+	/// Definition to interact with the OS clipboard.
+	/// </summary>
+	public interface IClipboard {
+		/// <summary>
+		/// Sets the operation system clipboard.
+		/// </summary>
+		/// <param name="text"></param>
+		void SetClipboardData (string text);
+		/// <summary>
+		/// Get the operation system clipboard.
+		/// </summary>
+		/// <returns></returns>
+		string GetClipboardData ();
 	}
 }
