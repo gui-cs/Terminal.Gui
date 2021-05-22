@@ -22,6 +22,7 @@ namespace Terminal.Gui.Core {
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var clipText = "This is a clipboard unit test to get clipboard from OS.";
+			var exit = false;
 
 			Application.Iteration += () => {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
@@ -62,6 +63,11 @@ namespace Terminal.Gui.Core {
 						copy.WaitForExit ();
 					}
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					if (exit = xclipExists () == false) {
+						// xclip doesn't exist then exit.
+						Application.RequestStop ();
+					}
+
 					using (Process bash = new Process {
 						StartInfo = new ProcessStartInfo {
 							FileName = "bash",
@@ -81,7 +87,9 @@ namespace Terminal.Gui.Core {
 
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents);
+			if (!exit) {
+				Assert.Equal (clipText, Clipboard.Contents);
+			}
 
 			Application.Shutdown ();
 		}
@@ -93,6 +101,7 @@ namespace Terminal.Gui.Core {
 
 			var clipText = "This is a clipboard unit test to set the OS clipboard.";
 			var clipReadText = "";
+			var exit = false;
 
 			Application.Iteration += () => {
 				Clipboard.Contents = clipText;
@@ -123,6 +132,11 @@ namespace Terminal.Gui.Core {
 						paste.WaitForExit ();
 					}
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					if (exit = xclipExists () == false) {
+						// xclip doesn't exist then exit.
+						Application.RequestStop ();
+					}
+
 					using (Process bash = new Process {
 						StartInfo = new ProcessStartInfo {
 							RedirectStandardOutput = true,
@@ -142,9 +156,31 @@ namespace Terminal.Gui.Core {
 
 			Application.Run ();
 
-			Assert.Equal (clipText, clipReadText);
+			if (!exit) {
+				Assert.Equal (clipText, clipReadText);
+			}
 
 			Application.Shutdown ();
+		}
+
+		bool xclipExists ()
+		{
+			using (Process bash = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = "bash",
+					Arguments = $"-c \"which xclip\"",
+					RedirectStandardOutput = true,
+				}
+			}) {
+				bash.Start ();
+				bool exist = bash.StandardOutput.ReadToEnd ().TrimEnd () != "";
+				bash.StandardOutput.Close ();
+				bash.WaitForExit ();
+				if (exist) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }
