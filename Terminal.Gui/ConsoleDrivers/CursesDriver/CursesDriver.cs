@@ -1062,7 +1062,7 @@ namespace Terminal.Gui {
 			var tempFileName = System.IO.Path.GetTempFileName ();
 			try {
 				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
-				BashRunner.Run ($"xclip -o > {tempFileName}");
+				BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
 				return System.IO.File.ReadAllText (tempFileName);
 			} finally {
 				System.IO.File.Delete (tempFileName);
@@ -1071,52 +1071,78 @@ namespace Terminal.Gui {
 
 		public void SetClipboardData (string text)
 		{
-			var tempFileName = System.IO.Path.GetTempFileName ();
-			System.IO.File.WriteAllText (tempFileName, text);
+			// var tempFileName = System.IO.Path.GetTempFileName ();
+			// System.IO.File.WriteAllText (tempFileName, text);
+			// try {
+			// 	// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
+			// 	BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
+			// } finally {
+			// 	System.IO.File.Delete (tempFileName);
+			// }
+
 			try {
-				// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
-				BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
-			} finally {
-				System.IO.File.Delete (tempFileName);
+				BashRunner.Run ("xclip -selection clipboard -i", false, text);
+			} catch (Exception ex) {
+				throw new Exception (ex.Message);
 			}
 		}
 	}
 
 	static class BashRunner {
-		public static string Run (string commandLine)
+		public static string Run (string commandLine, bool output = true, string inputText = "")
 		{
-			var errorBuilder = new System.Text.StringBuilder ();
-			var outputBuilder = new System.Text.StringBuilder ();
 			var arguments = $"-c \"{commandLine}\"";
-			using (var process = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					FileName = "bash",
-					Arguments = arguments,
-					RedirectStandardOutput = true,
-					RedirectStandardError = true,
-					UseShellExecute = false,
-					CreateNoWindow = false,
-				}
-			}) {
-				process.Start ();
-				process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
-				process.BeginOutputReadLine ();
-				process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
-				process.BeginErrorReadLine ();
-				if (!process.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {arguments}.
+
+			if (output) {
+				var errorBuilder = new System.Text.StringBuilder ();
+				var outputBuilder = new System.Text.StringBuilder ();
+
+				using (var process = new System.Diagnostics.Process {
+					StartInfo = new System.Diagnostics.ProcessStartInfo {
+						FileName = "bash",
+						Arguments = arguments,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true,
+						UseShellExecute = false,
+						CreateNoWindow = false,
+					}
+				}) {
+					process.Start ();
+					process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
+					process.BeginOutputReadLine ();
+					process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
+					process.BeginErrorReadLine ();
+					if (!process.DoubleWaitForExit ()) {
+						var timeoutError = $@"Process timed out. Command line: bash {arguments}.
+							Output: {outputBuilder}
+							Error: {errorBuilder}";
+						throw new Exception (timeoutError);
+					}
+					if (process.ExitCode == 0) {
+						return outputBuilder.ToString ();
+					}
+
+					var error = $@"Could not execute process. Command line: bash {arguments}.
 						Output: {outputBuilder}
 						Error: {errorBuilder}";
-					throw new Exception (timeoutError);
+					throw new Exception (error);
 				}
-				if (process.ExitCode == 0) {
-					return outputBuilder.ToString ();
+			} else {
+				using (var process = new System.Diagnostics.Process {
+					StartInfo = new System.Diagnostics.ProcessStartInfo {
+						FileName = "bash",
+						Arguments = arguments,
+						RedirectStandardInput = true,
+						UseShellExecute = false,
+						CreateNoWindow = false
+					}
+				}) {
+					process.Start ();
+					process.StandardInput.Write (inputText);
+					process.StandardInput.Close ();
+					process.WaitForExit ();
+					return inputText;
 				}
-
-				var error = $@"Could not execute process. Command line: bash {arguments}.
-					Output: {outputBuilder}
-					Error: {errorBuilder}";
-				throw new Exception (error);
 			}
 		}
 
