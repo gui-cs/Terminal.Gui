@@ -26,7 +26,11 @@ namespace Terminal.Gui.Core {
 		{
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-			Assert.True (Clipboard.IsSupported);
+			if (Clipboard.IsSupported) {
+				Assert.True (Clipboard.IsSupported);
+			} else {
+				Assert.False (Clipboard.IsSupported);
+			}
 
 			Application.Shutdown ();
 		}
@@ -66,7 +70,11 @@ namespace Terminal.Gui.Core {
 
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents);
+			if (Clipboard.IsSupported) {
+				Assert.Equal (clipText, Clipboard.Contents);
+			} else {
+				Assert.NotEqual (clipText, Clipboard.Contents);
+			}
 
 			Application.Shutdown ();
 		}
@@ -278,22 +286,26 @@ namespace Terminal.Gui.Core {
 
 		bool xclipExists ()
 		{
-			using (Process bash = new Process {
-				StartInfo = new ProcessStartInfo {
-					FileName = "bash",
-					Arguments = $"-c \"which xclip\"",
-					RedirectStandardOutput = true,
+			try {
+				using (Process bash = new Process {
+					StartInfo = new ProcessStartInfo {
+						FileName = "bash",
+						Arguments = $"-c \"which xclip\"",
+						RedirectStandardOutput = true,
+					}
+				}) {
+					bash.Start ();
+					bool exist = bash.StandardOutput.ReadToEnd ().TrimEnd () != "";
+					bash.StandardOutput.Close ();
+					bash.WaitForExit ();
+					if (exist) {
+						return true;
+					}
 				}
-			}) {
-				bash.Start ();
-				bool exist = bash.StandardOutput.ReadToEnd ().TrimEnd () != "";
-				bash.StandardOutput.Close ();
-				bash.WaitForExit ();
-				if (exist) {
-					return true;
-				}
+				return false;
+			} catch (System.Exception) {
+				return false;
 			}
-			return false;
 		}
 	}
 }
