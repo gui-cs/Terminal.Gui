@@ -1109,11 +1109,7 @@ namespace Terminal.Gui {
 			// 	System.IO.File.Delete (tempFileName);
 			// }
 
-			try {
-				BashRunner.Run ("xclip -selection clipboard -i", false, text);
-			} catch (Exception ex) {
-				throw new NotSupportedException ("Write to clipboard failed", ex);
-			}
+			BashRunner.Run ("xclip -selection clipboard -i", false, text);
 		}
 	}
 

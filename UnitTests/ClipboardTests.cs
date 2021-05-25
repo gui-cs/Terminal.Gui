@@ -64,7 +64,11 @@ namespace Terminal.Gui.Core {
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var clipText = "Trying to set the OS clipboard.";
-			Assert.True (Clipboard.TrySetClipboardData (clipText));
+			if (Clipboard.IsSupported) {
+				Assert.True (Clipboard.TrySetClipboardData (clipText));
+			} else {
+				Assert.False (Clipboard.TrySetClipboardData (clipText));
+			}
 
 			Application.Iteration += () => Application.RequestStop ();
 
