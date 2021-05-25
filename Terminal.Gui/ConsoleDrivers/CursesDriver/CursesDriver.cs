@@ -1074,11 +1074,16 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which xclip");
-			if (string.IsNullOrEmpty (result) || result.Contains ("not found")) {
+			try {
+				var result = BashRunner.Run ("which xclip");
+				if (string.IsNullOrEmpty (result) || result.Contains ("not found")) {
+					return false;
+				}
+				return true;
+			} catch (Exception) {
+				// Permissions issue.
 				return false;
 			}
-			return true;
 		}
 
 		protected override string GetClipboardDataImpl ()
