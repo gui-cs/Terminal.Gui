@@ -43,8 +43,13 @@ namespace Terminal.Gui.Core {
 
 			Application.Run ();
 
-			Assert.True (Clipboard.TryGetClipboardData (out string result));
-			Assert.Equal (clipText, result);
+			if (Clipboard.IsSupported) {
+				Assert.True (Clipboard.TryGetClipboardData (out string result));
+				Assert.Equal (clipText, result);
+			} else {
+				Assert.False (Clipboard.TryGetClipboardData (out string result));
+				Assert.NotEqual (clipText, result);
+			}
 
 			Application.Shutdown ();
 		}
