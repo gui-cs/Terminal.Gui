@@ -11,6 +11,56 @@ namespace Terminal.Gui.Core {
 
 			var clipText = "This is a clipboard unit test.";
 			Clipboard.Contents = clipText;
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+
+			Assert.Equal (clipText, Clipboard.Contents);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void IsSupported_Get ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Assert.True (Clipboard.IsSupported);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void TryGetClipboardData_Gets_From_OS_Clipboard ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var clipText = "Trying to get from the OS clipboard.";
+			Clipboard.Contents = clipText;
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+
+			Assert.True (Clipboard.TryGetClipboardData (out string result));
+			Assert.Equal (clipText, result);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var clipText = "Trying to set the OS clipboard.";
+			Assert.True (Clipboard.TrySetClipboardData (clipText));
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+
 			Assert.Equal (clipText, Clipboard.Contents);
 
 			Application.Shutdown ();
@@ -63,9 +113,27 @@ namespace Terminal.Gui.Core {
 						copy.WaitForExit ();
 					}
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					if (Is_WSL_Platform ()) {
+						try {
+							using (Process bash = new Process {
+								StartInfo = new ProcessStartInfo {
+									FileName = "powershell.exe",
+									Arguments = $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
+								}
+							}) {
+								bash.Start ();
+								bash.WaitForExit ();
+							}
+						} catch {
+							exit = true;
+						}
+						Application.RequestStop ();
+						return;
+					}
 					if (exit = xclipExists () == false) {
 						// xclip doesn't exist then exit.
 						Application.RequestStop ();
+						return;
 					}
 
 					using (Process bash = new Process {
@@ -132,6 +200,25 @@ namespace Terminal.Gui.Core {
 						paste.WaitForExit ();
 					}
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					if (Is_WSL_Platform ()) {
+						try {
+							using (Process bash = new Process {
+								StartInfo = new ProcessStartInfo {
+									RedirectStandardOutput = true,
+									FileName = "powershell.exe",
+									Arguments = "-command \"Get-Clipboard\""
+								}
+							}) {
+								bash.Start ();
+								clipReadText = bash.StandardOutput.ReadToEnd ();
+								bash.StandardOutput.Close ();
+								bash.WaitForExit ();
+							}
+						} catch {
+							exit = true;
+						}
+						Application.RequestStop ();
+					}
 					if (exit = xclipExists () == false) {
 						// xclip doesn't exist then exit.
 						Application.RequestStop ();
@@ -161,6 +248,27 @@ namespace Terminal.Gui.Core {
 			}
 
 			Application.Shutdown ();
+		}
+
+		bool Is_WSL_Platform ()
+		{
+			using (Process bash = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = "bash",
+					Arguments = $"-c \"uname -a\"",
+					RedirectStandardOutput = true,
+				}
+			}) {
+				bash.Start ();
+				var result = bash.StandardOutput.ReadToEnd ();
+				var isWSL = false;
+				if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+					isWSL = true;
+				}
+				bash.StandardOutput.Close ();
+				bash.WaitForExit ();
+				return isWSL;
+			}
 		}
 
 		bool xclipExists ()

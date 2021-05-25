@@ -1640,11 +1640,13 @@ namespace Terminal.Gui {
 		}
 	}
 
-	class WindowsClipboard : IClipboard {
-		public string GetClipboardData ()
+	class WindowsClipboard : ClipboardBase {
+		public override bool IsSupported => IsClipboardFormatAvailable (cfUnicodeText) ? true : false;
+
+		protected override string GetClipboardDataImpl ()
 		{
-			if (!IsClipboardFormatAvailable (cfUnicodeText))
-				return null;
+			//if (!IsClipboardFormatAvailable (cfUnicodeText))
+			//	return null;
 
 			try {
 				if (!OpenClipboard (IntPtr.Zero))
@@ -1678,7 +1680,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public void SetClipboardData (string text)
+		protected override void SetClipboardDataImpl (string text)
 		{
 			OpenClipboard ();
 

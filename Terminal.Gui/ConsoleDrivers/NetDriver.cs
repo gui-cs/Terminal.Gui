@@ -1100,7 +1100,11 @@ namespace Terminal.Gui {
 			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 				Clipboard = new MacOSXClipboard ();
 			} else {
-				Clipboard = new CursesClipboard ();
+				if (CursesDriver.Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				}else{
+					Clipboard = new CursesClipboard ();
+				}
 			}
 		}
 
