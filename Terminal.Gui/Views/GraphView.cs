@@ -115,7 +115,7 @@ namespace Terminal.Gui {
 			}
 
 			// Draw 'before' annotations
-			foreach (var a in Annotations.Where (a => a.BeforeSeries)) {
+			foreach (var a in Annotations.ToArray().Where (a => a.BeforeSeries)) {
 				a.Render (this);
 			}
 
@@ -141,7 +141,7 @@ namespace Terminal.Gui {
 			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
 			RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
-			foreach (var s in Series) {
+			foreach (var s in Series.ToArray ()) {
 
 				s.DrawSeries (this, drawBounds, graphSpace);
 
@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 			SetDriverColorToGraphColor ();
 
 			// Draw 'after' annotations
-			foreach (var a in Annotations.Where (a => !a.BeforeSeries)) {
+			foreach (var a in Annotations.ToArray ().Where (a => !a.BeforeSeries)) {
 				a.Render (this);
 			}
 
