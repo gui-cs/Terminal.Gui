@@ -183,7 +183,8 @@ namespace Terminal.Gui {
 						return;
 					}
 				} else {
-					largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					largestWindowHeight = Console.BufferHeight;
 					if (Console.BufferWidth != consoleDriver.Cols || largestWindowHeight != consoleDriver.Rows
 						|| Console.WindowHeight != lastWindowHeight) {
 						lastWindowHeight = Console.WindowHeight;
@@ -1094,7 +1095,8 @@ namespace Terminal.Gui {
 				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
 			}
-			largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			largestWindowHeight = Console.BufferHeight;
 			if (IsWinPlatform) {
 				Clipboard = new WindowsClipboard ();
 			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
@@ -1604,7 +1606,8 @@ namespace Terminal.Gui {
 					Console.WindowHeight);
 				top = 0;
 			} else {
-				largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				largestWindowHeight = Console.BufferHeight;
 				size = new Size (Console.BufferWidth, largestWindowHeight);
 			}
 			cols = size.Width;
