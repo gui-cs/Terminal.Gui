@@ -135,12 +135,28 @@ namespace Terminal.Gui.Core {
 							using (Process bash = new Process {
 								StartInfo = new ProcessStartInfo {
 									FileName = "powershell.exe",
-									Arguments = $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
+									Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
 								}
 							}) {
 								bash.Start ();
 								bash.WaitForExit ();
 							}
+
+							//using (Process clipExe = new Process {
+							//	StartInfo = new ProcessStartInfo {
+							//		RedirectStandardInput = true,
+							//		FileName = "clip.exe"
+							//	}
+							//}) {
+							//	clipExe.Start ();
+							//	clipExe.StandardInput.Write (clipText);
+							//	clipExe.StandardInput.Close ();
+							//	clipExe.WaitForExit ();
+							//	//var result = clipExe.WaitForExit (500);
+							//	//if (result) {
+							//	//	clipExe.WaitForExit ();
+							//	//}
+							//}
 						} catch {
 							exit = true;
 						}
@@ -196,7 +212,7 @@ namespace Terminal.Gui.Core {
 						StartInfo = new ProcessStartInfo {
 							RedirectStandardOutput = true,
 							FileName = "powershell.exe",
-							Arguments = "-command \"Get-Clipboard\""
+							Arguments = "-noprofile -command \"Get-Clipboard\""
 						}
 					}) {
 						pwsh.Start ();
@@ -223,7 +239,7 @@ namespace Terminal.Gui.Core {
 								StartInfo = new ProcessStartInfo {
 									RedirectStandardOutput = true,
 									FileName = "powershell.exe",
-									Arguments = "-command \"Get-Clipboard\""
+									Arguments = "-noprofile -command \"Get-Clipboard\""
 								}
 							}) {
 								bash.Start ();

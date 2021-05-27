@@ -1076,10 +1076,7 @@ namespace Terminal.Gui {
 		{
 			try {
 				var result = BashRunner.Run ("which xclip");
-				if (string.IsNullOrEmpty (result) || result.Contains ("not found")) {
-					return false;
-				}
-				return true;
+				return BashRunner.FileExists (result);
 			} catch (Exception) {
 				// Permissions issue.
 				return false;
@@ -1179,6 +1176,11 @@ namespace Terminal.Gui {
 			}
 			return result;
 		}
+
+		public static bool FileExists (string value)
+		{
+			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
+		}
 	}
 
 	class MacOSXClipboard : ClipboardBase {
@@ -1200,23 +1202,11 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			var result = BashRunner.Run ("which pbcopy");
-			if (!FileExists (result)) {
+			if (!BashRunner.FileExists (result)) {
 				return false;
 			}
 			result = BashRunner.Run ("which pbpaste");
-			if (!FileExists (result)) {
-				return false;
-			}
-
-			bool FileExists (string value)
-			{
-				if (string.IsNullOrEmpty (value) || value.Contains ("not found")) {
-					return false;
-				}
-				return true;
-			}
-
-			return true;
+			return BashRunner.FileExists (result);
 		}
 
 		public MacOSXClipboard ()
@@ -1272,10 +1262,14 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			var result = BashRunner.Run ("which powershell.exe");
-			if (string.IsNullOrEmpty (result) || result.Contains ("not found")) {
-				return false;
-			}
-			return true;
+			return BashRunner.FileExists (result);
+
+			//var result = BashRunner.Run ("which powershell.exe");
+			//if (!BashRunner.FileExists (result)) {
+			//	return false;
+			//}
+			//result = BashRunner.Run ("which clip.exe");
+			//return BashRunner.FileExists (result);
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1284,7 +1278,7 @@ namespace Terminal.Gui {
 				StartInfo = new System.Diagnostics.ProcessStartInfo {
 					RedirectStandardOutput = true,
 					FileName = "powershell.exe",
-					Arguments = "-command \"Get-Clipboard\""
+					Arguments = "-noprofile -command \"Get-Clipboard\""
 				}
 			}) {
 				powershell.Start ();
@@ -1300,12 +1294,24 @@ namespace Terminal.Gui {
 			using (var powershell = new System.Diagnostics.Process {
 				StartInfo = new System.Diagnostics.ProcessStartInfo {
 					FileName = "powershell.exe",
-					Arguments = $"-command \"Set-Clipboard -Value \\\"{text}\\\"\""
+					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
 				}
 			}) {
 				powershell.Start ();
 				powershell.WaitForExit ();
 			}
+
+			//using (var clipExe = new System.Diagnostics.Process {
+			//	StartInfo = new System.Diagnostics.ProcessStartInfo {
+			//		FileName = "clip.exe",
+			//		RedirectStandardInput = true
+			//	}
+			//}) {
+			//	clipExe.Start ();
+			//	clipExe.StandardInput.Write (text);
+			//	clipExe.StandardInput.Close ();
+			//	clipExe.WaitForExit ();
+			//}
 		}
 	}
 }
