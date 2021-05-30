@@ -635,19 +635,27 @@ namespace UICatalog {
 		private static void OpenUrl (string url)
 		{
 			try {
-				Process.Start (url);
-			} catch {
-				// hack because of this: https://github.com/dotnet/corefx/issues/10361
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					url = url.Replace ("&", "^&");
 					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
-					Process.Start ("xdg-open", url);
+					using (var process = new Process {
+						StartInfo = new ProcessStartInfo {
+							FileName = "xdg-open",
+							Arguments = url,
+							RedirectStandardError = true,
+							RedirectStandardOutput = true,
+							CreateNoWindow = true,
+							UseShellExecute = false
+						}
+					}) {
+						process.Start ();
+					}
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					Process.Start ("open", url);
-				} else {
-					throw;
 				}
+			} catch {
+				throw;
 			}
 		}
 	}

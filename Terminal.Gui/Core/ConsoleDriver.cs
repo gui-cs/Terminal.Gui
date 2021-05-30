@@ -1178,20 +1178,4 @@ namespace Terminal.Gui {
 		/// <returns>The current attribute.</returns>
 		public abstract Attribute GetAttribute ();
 	}
-
-	/// <summary>
-	/// Definition to interact with the OS clipboard.
-	/// </summary>
-	public interface IClipboard {
-		/// <summary>
-		/// Sets the operation system clipboard.
-		/// </summary>
-		/// <param name="text"></param>
-		void SetClipboardData (string text);
-		/// <summary>
-		/// Get the operation system clipboard.
-		/// </summary>
-		/// <returns></returns>
-		string GetClipboardData ();
-	}
 }
