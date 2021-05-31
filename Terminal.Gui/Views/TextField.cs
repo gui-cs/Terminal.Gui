@@ -143,6 +143,9 @@ namespace Terminal.Gui {
 
 				var newText = OnTextChanging (value.Split ("\n") [0]);
 				if (newText.Cancel) {
+					if (point > text.Count) {
+						point = text.Count;
+					}
 					return;
 				}
 				text = TextModel.ToRunes (newText.NewText);
@@ -347,7 +350,11 @@ namespace Terminal.Gui {
 						return true;
 
 					point--;
-					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
+					if (oldCursorPos < text.Count) {
+						SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
+					} else {
+						SetText (text.GetRange (0, oldCursorPos - 1));
+					}
 					Adjust ();
 				} else {
 					DeleteSelectedText ();
