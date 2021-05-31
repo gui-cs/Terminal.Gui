@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 		public virtual bool MovePageDown ()
 		{
 			var n = (selected + Frame.Height);
-			if (n > source.Count)
+			if (n >= source.Count)
 				n = source.Count - 1;
 			if (n != selected) {
 				selected = n;
