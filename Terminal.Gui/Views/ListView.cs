@@ -557,7 +557,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			if (selected != source.Count - 1) {
+			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
 				top = selected;
 				OnSelectedChanged ();
