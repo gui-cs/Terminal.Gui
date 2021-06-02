@@ -559,7 +559,9 @@ namespace Terminal.Gui {
 		{
 			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
-				top = selected;
+				if (top + selected > Frame.Height - 1) {
+					top = selected;
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
