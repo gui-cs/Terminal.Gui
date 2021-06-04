@@ -2266,15 +2266,13 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool CanSetWidth (int desiredWidth, out int resultWidth, out int currentWidth)
+		bool CanSetWidth (int desiredWidth, out int resultWidth)
 		{
 			int w = desiredWidth;
-			currentWidth = Width != null ? Width.Anchor (0) : 0;
 			bool canSetWidth;
 			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
 				w = Width.Anchor (w);
-				currentWidth = Width.Anchor (w);
 				canSetWidth = false;
 			} else if (Width is Dim.DimFactor factor) {
 				// Tries to get the SuperView width otherwise the view width.
@@ -2283,7 +2281,6 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
-				currentWidth = Width.Anchor (sw);
 				canSetWidth = false;
 			} else {
 				canSetWidth = true;
@@ -2293,15 +2290,13 @@ namespace Terminal.Gui {
 			return canSetWidth;
 		}
 
-		bool CanSetHeight (int desiredHeight, out int resultHeight, out int currentHeight)
+		bool CanSetHeight (int desiredHeight, out int resultHeight)
 		{
 			int h = desiredHeight;
-			currentHeight = Height != null ? Height.Anchor (0) : 0;
 			bool canSetHeight;
 			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
-				currentHeight = Height.Anchor (h);
 				canSetHeight = false;
 			} else if (Height is Dim.DimFactor factor) {
 				// Tries to get the SuperView height otherwise the view height.
@@ -2310,7 +2305,6 @@ namespace Terminal.Gui {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
-				currentHeight = Height.Anchor (sh);
 				canSetHeight = false;
 			} else {
 				canSetHeight = true;
@@ -2328,7 +2322,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
 		public bool SetWidth (int desiredWidth, out int resultWidth)
 		{
-			return CanSetWidth (desiredWidth, out resultWidth, out _);
+			return CanSetWidth (desiredWidth, out resultWidth);
 		}
 
 		/// <summary>
@@ -2339,7 +2333,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
 		public bool SetHeight (int desiredHeight, out int resultHeight)
 		{
-			return CanSetHeight (desiredHeight, out resultHeight, out _);
+			return CanSetHeight (desiredHeight, out resultHeight);
 		}
 
 		/// <summary>
@@ -2349,7 +2343,10 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
 		public bool GetCurrentWidth (out int currentWidth)
 		{
-			return CanSetWidth (0, out _, out currentWidth);
+			SetRelativeLayout (SuperView == null ? Frame : SuperView.Frame);
+			currentWidth = Frame.Width;
+
+			return CanSetWidth (0, out _);
 		}
 
 		/// <summary>
@@ -2359,7 +2356,10 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
 		public bool GetCurrentHeight (out int currentHeight)
 		{
-			return CanSetHeight (0, out _, out currentHeight);
+			SetRelativeLayout (SuperView == null ? Frame : SuperView.Frame);
+			currentHeight = Frame.Height;
+
+			return CanSetHeight (0, out _);
 		}
 	}
 }

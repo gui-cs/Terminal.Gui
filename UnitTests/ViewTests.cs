@@ -1170,5 +1170,117 @@ namespace Terminal.Gui.Views {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void SetWidth_CanSetWidth ()
+		{
+			var top = new View () {
+				X = 0,
+				Y = 0,
+				Width = 80,
+			};
+
+			var v = new View () {
+				Width = Dim.Fill ()
+			};
+			top.Add (v);
+
+			Assert.False (v.SetWidth (70, out int rWidth));
+			Assert.Equal (70, rWidth);
+
+			v.Width = Dim.Fill (1);
+			Assert.False (v.SetWidth (70, out rWidth));
+			Assert.Equal (69, rWidth);
+
+			v.Width = null;
+			Assert.True (v.SetWidth (70, out rWidth));
+			Assert.Equal (70, rWidth);
+
+			v.IsInitialized = true;
+			v.Width = Dim.Fill (1);
+			Assert.Throws<ArgumentException> (() => v.Width = 75);
+			v.LayoutStyle = LayoutStyle.Absolute;
+			v.Width = 75;
+			Assert.True (v.SetWidth (60, out rWidth));
+			Assert.Equal (60, rWidth);
+		}
+
+		[Fact]
+		public void SetHeight_CanSetHeight ()
+		{
+			var top = new View () {
+				X = 0,
+				Y = 0,
+				Height = 20
+			};
+
+			var v = new View () {
+				Height = Dim.Fill ()
+			};
+			top.Add (v);
+
+			Assert.False (v.SetHeight (10, out int rHeight));
+			Assert.Equal (10, rHeight);
+
+			v.Height = Dim.Fill (1);
+			Assert.False (v.SetHeight (10, out rHeight));
+			Assert.Equal (9, rHeight);
+
+			v.Height = null;
+			Assert.True (v.SetHeight (10, out rHeight));
+			Assert.Equal (10, rHeight);
+
+			v.IsInitialized = true;
+			v.Height = Dim.Fill (1);
+			Assert.Throws<ArgumentException> (() => v.Height = 15);
+			v.LayoutStyle = LayoutStyle.Absolute;
+			v.Height = 15;
+			Assert.True (v.SetHeight (5, out rHeight));
+			Assert.Equal (5, rHeight);
+		}
+
+		[Fact]
+		public void GetCurrentWidth_CanSetWidth ()
+		{
+			var top = new View () {
+				X = 0,
+				Y = 0,
+				Width = 80,
+			};
+
+			var v = new View () {
+				Width = Dim.Fill ()
+			};
+			top.Add (v);
+
+			Assert.False (v.GetCurrentWidth (out int cWidth));
+			Assert.Equal (80, cWidth);
+
+			v.Width = Dim.Fill (1);
+			Assert.False (v.GetCurrentWidth (out cWidth));
+			Assert.Equal (79, cWidth);
+		}
+
+		[Fact]
+		public void GetCurrentHeight_CanSetHeight ()
+		{
+			var top = new View () {
+				X = 0,
+				Y = 0,
+				Height = 20
+			};
+
+			var v = new View () {
+				Height = Dim.Fill ()
+			};
+			top.Add (v);
+
+			Assert.False (v.GetCurrentHeight (out int cHeight));
+			Assert.Equal (20, cHeight);
+
+			v.Height = Dim.Fill (1);
+			Assert.False (v.GetCurrentHeight (out cHeight));
+			Assert.Equal (19, cHeight);
+		}
 	}
 }
