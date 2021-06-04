@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 
 		void Initialize ()
 		{
-			ColorScheme = Colors.Base;
+			ColorScheme = Colors.TopLevel;
 		}
 
 		/// <summary>
@@ -142,12 +142,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the menu for this Toplevel
 		/// </summary>
-		public MenuBar MenuBar { get; set; }
+		public virtual MenuBar MenuBar { get; set; }
 
 		/// <summary>
 		/// Gets or sets the status bar for this Toplevel
 		/// </summary>
-		public StatusBar StatusBar { get; set; }
+		public virtual StatusBar StatusBar { get; set; }
 
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -234,7 +234,7 @@ namespace Terminal.Gui {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (SuperView?.TabIndexes?.Reverse(), Direction.Backward);
+					FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
 				}
 				return true;
 			case Key.Tab | Key.CtrlMask:
@@ -265,7 +265,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (ShortcutHelper.FindAndOpenByShortcut(keyEvent, this)) {
+			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
 				return true;
 			}
 			return false;
@@ -319,9 +319,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
-			if (this == Application.Top) {
-				AddMenuStatusBar (view);
-			}
+			AddMenuStatusBar (view);
 			base.Add (view);
 		}
 
@@ -424,10 +422,14 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void PositionToplevel (Toplevel top)
+		/// <summary>
+		/// Virtual method which allow to be overridden to implement specific positions for inherited <see cref="Toplevel"/>.
+		/// </summary>
+		/// <param name="top">The toplevel.</param>
+		public virtual void PositionToplevel (Toplevel top)
 		{
 			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-			if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+			if (top?.SuperView != null && (nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
 				}
@@ -435,11 +437,18 @@ namespace Terminal.Gui {
 					top.Y = ny;
 				}
 			}
-			if (top.StatusBar != null) {
-				if (ny + top.Frame.Height > top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
-					if (top.Height is Dim.DimFill)
-						top.Height = Dim.Fill () - (top.StatusBar.Visible ? 1 : 0);
+			var statusBar = top?.SuperView != null && top.SuperView is Toplevel toplevel
+				? toplevel.StatusBar : null;
+
+			if (statusBar != null) {
+				if (ny + top.Frame.Height != top.SuperView.Frame.Height - (statusBar.Visible ? 1 : 0)) {
+					if (top.Height is Dim.DimFill) {
+						top.Height = Dim.Fill (statusBar.Visible ? 1 : 0);
+					}
 				}
+				top.SuperView.LayoutSubviews ();
+			}
+			if (top.StatusBar != null) {
 				if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
 					top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
 					top.LayoutSubviews ();
@@ -451,13 +460,14 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (IsCurrentTop || this == Application.Top) {
+			if (IsCurrentTop || this == Application.Top || Application.Current.GetType ().BaseType == typeof (Toplevel)) {
 				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 
 					// This is the Application.Top. Clear just the region we're being asked to redraw 
 					// (the bounds passed to us).
-					Clear (bounds);
+					// Must be the screen-relative region to clear, not the bounds.
+					Clear (Frame);
 					Driver.SetAttribute (Colors.Base.Normal);
 					PositionToplevels ();
 

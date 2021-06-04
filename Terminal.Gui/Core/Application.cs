@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// The current <see cref="ConsoleDriver"/> in use.
 		/// </summary>
 		public static ConsoleDriver Driver;
-		
+
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
 		/// </summary>
@@ -508,6 +508,7 @@ namespace Terminal.Gui {
 			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
+			SetCurrentAsTop ();
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
@@ -544,9 +545,10 @@ namespace Terminal.Gui {
 
 		// Encapsulate all setting of initial state for Application; Having
 		// this in a function like this ensures we don't make mistakes in
-		// guranteeing that the state of this singleton is deterministic when Init
+		// guaranteeing that the state of this singleton is deterministic when Init
 		// starts running and after Shutdown returns.
-		static void ResetState () {
+		static void ResetState ()
+		{
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
@@ -613,6 +615,7 @@ namespace Terminal.Gui {
 				Current = null;
 			} else {
 				Current = toplevels.Peek ();
+				SetCurrentAsTop ();
 				Refresh ();
 			}
 		}
@@ -644,7 +647,7 @@ namespace Terminal.Gui {
 
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
-					
+
 					if (Driver.EnsureCursorVisibility ()) {
 						state.Toplevel.SetNeedsDisplay ();
 					}
@@ -692,7 +695,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Run<T> (Func<Exception, bool> errorHandler = null) where T : Toplevel, new()
 		{
-			Init (() => new T ());
+			if (_initialized && Driver != null) {
+				var top = new T ();
+				if (top.GetType ().BaseType == typeof (Toplevel)) {
+					Top = top;
+				} else {
+					throw new ArgumentException (top.GetType ().BaseType.Name);
+				}
+			} else {
+				Init (() => new T ());
+			}
 			Run (Top, errorHandler);
 		}
 
@@ -788,9 +800,7 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			Top.Frame = full;
-			Top.Width = full.Width;
-			Top.Height = full.Height;
+			SetToplevelsSize (full);
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
@@ -799,6 +809,26 @@ namespace Terminal.Gui {
 				t.LayoutSubviews ();
 			}
 			Refresh ();
+		}
+
+		static void SetToplevelsSize (Rect full)
+		{
+			foreach (var t in toplevels) {
+				if (t?.SuperView == null && !t.Modal) {
+					t.Frame = full;
+					t.Width = full.Width;
+					t.Height = full.Height;
+				}
+			}
+		}
+
+		static bool SetCurrentAsTop ()
+		{
+			if (Current != Top && Current?.SuperView == null && !Current.Modal) {
+				Top = Current;
+				return true;
+			}
+			return false;
 		}
 	}
 }

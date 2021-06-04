@@ -366,8 +366,10 @@ namespace UICatalog {
 			view.Width = Dim.Percent(75);
 			view.Height = Dim.Percent (75);
 
-			// Set the colorscheme to make it stand out
-			view.ColorScheme = Colors.Base;
+			// Set the colorscheme to make it stand out if is null by default
+			if (view.ColorScheme == null) {
+				view.ColorScheme = Colors.Base;
+			}
 
 			// If the view supports a Text property, set it so we have something to look at
 			if (view.GetType ().GetProperty ("Text") != null) {
