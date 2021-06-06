@@ -117,8 +117,14 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 			Win.Add (removeLabel);
-			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeLabel.Clicked += () => Win.Remove (removeLabel);
+			// This in interesting test case because `moveBtn` and below are laid out relative to this one!
+			removeLabel.Clicked += () => {
+				// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+				//Win.Remove (removeLabel);
+
+				removeLabel.Visible = false;
+				Win.SetNeedsDisplay ();
+			};
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
