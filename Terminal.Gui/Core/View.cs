@@ -2098,17 +2098,20 @@ namespace Terminal.Gui {
 
 		bool SetWidthHeight (Rect nBounds)
 		{
-			bool aSize;
+			bool aSize = false;
 			var canSizeW = SetWidth (nBounds.Width, out int rW);
 			var canSizeH = SetHeight (nBounds.Height, out int rH);
-			if (canSizeW && canSizeH) {
+			if (canSizeW) {
 				aSize = true;
-				Bounds = nBounds;
 				width = rW;
+			}
+			if (canSizeH) {
+				aSize = true;
 				height = rH;
+			}
+			if (aSize) {
+				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
 				textFormatter.Size = Bounds.Size;
-			} else {
-				aSize = false;
 			}
 
 			return aSize;

@@ -1282,5 +1282,55 @@ namespace Terminal.Gui.Views {
 			Assert.False (v.GetCurrentHeight (out cHeight));
 			Assert.Equal (19, cHeight);
 		}
+
+		[Fact]
+		public void AutoSize_False_ResizeView_Is_Always_False ()
+		{
+			var label = new Label () { AutoSize = false };
+
+			label.Text = "New text";
+
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
+		}
+
+		[Fact]
+		public void AutoSize_True_ResizeView_With_Dim_Absolute ()
+		{
+			var label = new Label ();
+
+			label.Text = "New text";
+
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=8,Height=1}", label.Bounds.ToString ());
+		}
+
+		[Fact]
+		public void AutoSize_True_ResizeView_With_Dim_Fill ()
+		{
+			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var label = new Label () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (label);
+
+			label.Text = "New text\nNew line";
+			win.LayoutSubviews ();
+
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
+		}
+
+		[Fact]
+		public void AutoSize_True_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute ()
+		{
+			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var label = new Label () { Width = Dim.Fill () };
+			win.Add (label);
+
+			label.Text = "New text\nNew line";
+			win.LayoutSubviews ();
+
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+		}
 	}
 }
