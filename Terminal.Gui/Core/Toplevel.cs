@@ -238,10 +238,18 @@ namespace Terminal.Gui {
 				}
 				return true;
 			case Key.Tab | Key.CtrlMask:
+			case Key key when key == Application.AlternateForwardKey: // Needed on Unix
 				Application.Top.FocusNext ();
+				if (Application.Top.Focused == null) {
+					Application.Top.FocusNext ();
+				}
 				return true;
 			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
+			case Key key when key == Application.AlternateBackwardKey: // Needed on Unix
 				Application.Top.FocusPrev ();
+				if (Application.Top.Focused == null) {
+					Application.Top.FocusPrev ();
+				}
 				return true;
 			case Key.L | Key.CtrlMask:
 				Application.Refresh ();
