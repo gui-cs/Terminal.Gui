@@ -77,10 +77,10 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			Curses.refresh ();
-			//if (Curses.CheckWinChange ()) {
-			//	Clip = new Rect (0, 0, Cols, Rows);
-			//	TerminalResized?.Invoke ();
-			//}
+			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
+				TerminalResized?.Invoke ();
+			}
 		}
 
 		public override void UpdateCursor () => Refresh ();
