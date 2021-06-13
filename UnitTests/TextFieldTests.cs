@@ -1,19 +1,38 @@
-﻿using Xunit;
+﻿using System;
+using System.Reflection;
+using Xunit;
 
 namespace Terminal.Gui.Views {
 	public class TextFieldTests {
-		private TextField _textField;
 
-		public TextFieldTests ()
-		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+		// This class enables test functions annotated with the [InitShutdown] attribute
+		// to have a function called before the test function is called and after.
+		// 
+		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
+		// as a pair, and b) all unit test functions should be atomic.
+		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
 
-			//                                     1         2         3 
-			//                           01234567890123456789012345678901=32 (Length)
-			_textField = new TextField ("TAB to jump between text fields.");
+			public override void Before (MethodInfo methodUnderTest)
+			{
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+				//                                                    1         2         3 
+				//                                          01234567890123456789012345678901=32 (Length)
+				TextFieldTests._textField = new TextField ("TAB to jump between text fields.");
+			}
+
+			public override void After (MethodInfo methodUnderTest)
+			{
+				TextFieldTests._textField = null;
+				Application.Shutdown ();
+			}
 		}
 
+		private static TextField _textField;
+
 		[Fact]
+		[InitShutdown]
 		public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
 		{
 			_textField.SelectedStart = 2;
@@ -27,6 +46,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void SelectedStart_With_Value_Less_Than_Minus_One_Changes_To_Minus_One ()
 		{
 			_textField.SelectedStart = -2;
@@ -36,6 +56,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 2;
@@ -46,6 +67,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -57,6 +79,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
 		{
 			_textField.SelectedStart = 19;
@@ -67,6 +90,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textField.CursorPosition = -1;
@@ -76,6 +100,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -85,6 +110,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordForward_With_No_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -135,6 +161,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordBackward_With_No_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -185,6 +212,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordForward_With_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -236,6 +264,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordBackward_With_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -287,6 +316,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -326,6 +356,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -359,6 +390,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -436,6 +468,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -519,6 +552,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Copy_Or_Cut_Null_If_No_Selection ()
 		{
 			_textField.SelectedStart = -1;
@@ -529,6 +563,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -540,6 +575,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -556,6 +592,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_No_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -576,6 +613,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Copy_Or_Cut__Not_Allowed_If_Secret_Is_True ()
 		{
 			_textField.Secret = true;
@@ -593,6 +631,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Paste_Always_Clear_The_SelectedText ()
 		{
 			_textField.SelectedStart = 20;
@@ -604,6 +643,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void TextChanging_Event ()
 		{
 			bool cancel = true;
@@ -623,6 +663,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void TextChanged_Event ()
 		{
 			_textField.TextChanged += (e) => {
@@ -634,6 +675,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Used_Is_True_By_Default ()
 		{
 			_textField.CursorPosition = 10;
@@ -649,6 +691,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[InitShutdown]
 		public void Used_Is_False ()
 		{
 			_textField.Used = false;
@@ -662,6 +705,73 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("TAB to jumuseetween text fields.", _textField.Text);
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text);
+		}
+
+		[Fact]
+		public void ProcessKey_Backspace_From_End ()
+		{
+			var tf = new TextField ("ABC");
+			tf.EnsureFocus ();
+			Assert.Equal ("ABC", tf.Text);
+
+			// now delete the C
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("AB", tf.Text);
+
+			// then delete the B
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("A", tf.Text);
+
+			// then delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("", tf.Text);
+		}
+
+		[Fact]
+		public void ProcessKey_Backspace_From_Middle ()
+		{
+			var tf = new TextField ("ABC");
+			tf.EnsureFocus ();
+			tf.CursorPosition = 2;
+			Assert.Equal ("ABC", tf.Text);
+
+			// now delete the B
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("AC", tf.Text);
+
+			// then delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("C", tf.Text);
+
+			// then delete nothing
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("C", tf.Text);
+
+			// now delete the C
+			tf.CursorPosition = 1;
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("", tf.Text);
+		}
+
+		[Fact]
+		public void Cancel_TextChanging_ThenBackspace ()
+		{
+			var tf = new TextField ();
+			tf.EnsureFocus ();
+			tf.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ()));
+			Assert.Equal ("A", tf.Text);
+
+			// cancel the next keystroke
+			tf.TextChanging += (e) => e.Cancel = e.NewText == "AB";
+			tf.ProcessKey (new KeyEvent (Key.B, new KeyModifiers ()));
+
+			// B was canceled so should just be A
+			Assert.Equal ("A", tf.Text);
+
+			// now delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+
+			Assert.Equal ("", tf.Text);
 		}
 	}
 }

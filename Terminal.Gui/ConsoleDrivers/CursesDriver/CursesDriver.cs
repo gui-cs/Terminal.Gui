@@ -19,11 +19,14 @@ namespace Terminal.Gui {
 	internal class CursesDriver : ConsoleDriver {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
+		public override int Left => 0;
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
+		public override IClipboard Clipboard { get => clipboard; }
 
 		CursorVisibility? initialCursorVisibility = null;
 		CursorVisibility? currentCursorVisibility = null;
+		IClipboard clipboard;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -74,10 +77,10 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			Curses.refresh ();
-			//if (Curses.CheckWinChange ()) {
-			//	Clip = new Rect (0, 0, Cols, Rows);
-			//	TerminalResized?.Invoke ();
-			//}
+			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
+				TerminalResized?.Invoke ();
+			}
 		}
 
 		public override void UpdateCursor () => Refresh ();
@@ -102,8 +105,8 @@ namespace Terminal.Gui {
 			//Console.Out.Flush ();
 
 			//Set cursor key to cursor.
-			Console.Out.Write ("\x1b[?1l");
-			Console.Out.Flush ();
+			//Console.Out.Write ("\x1b[?1l");
+			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -714,8 +717,8 @@ namespace Terminal.Gui {
 
 			try {
 				//Set cursor key to application.
-				Console.Out.Write ("\x1b[?1h");
-				Console.Out.Flush ();
+				//Console.Out.Write ("\x1b[?1h");
+				//Console.Out.Flush ();
 
 				window = Curses.initscr ();
 			} catch (Exception e) {
@@ -743,6 +746,16 @@ namespace Terminal.Gui {
 			default:
 				currentCursorVisibility = initialCursorVisibility = null;
 				break;
+			}
+
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				clipboard = new MacOSXClipboard ();
+			} else {
+				if (Is_WSL_Platform ()) {
+					clipboard = new WSLClipboard ();
+				} else {
+					clipboard = new CursesClipboard ();
+				}
 			}
 
 			Curses.raw ();
@@ -833,6 +846,15 @@ namespace Terminal.Gui {
 				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 			}
+		}
+
+		public static bool Is_WSL_Platform ()
+		{
+			var result = BashRunner.Run ("uname -a");
+			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+				return true;
+			}
+			return false;
 		}
 
 		static int MapColor (Color color)
@@ -1044,6 +1066,252 @@ namespace Terminal.Gui {
 				return false;
 			killpg (0, signal);
 			return true;
+		}
+	}
+
+	class CursesClipboard : ClipboardBase {
+		public override bool IsSupported => CheckSupport ();
+
+		bool CheckSupport ()
+		{
+			try {
+				var result = BashRunner.Run ("which xclip");
+				return BashRunner.FileExists (result);
+			} catch (Exception) {
+				// Permissions issue.
+				return false;
+			}
+		}
+
+		protected override string GetClipboardDataImpl ()
+		{
+			var tempFileName = System.IO.Path.GetTempFileName ();
+			try {
+				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
+				BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
+				return System.IO.File.ReadAllText (tempFileName);
+			} finally {
+				System.IO.File.Delete (tempFileName);
+			}
+		}
+
+		protected override void SetClipboardDataImpl (string text)
+		{
+			// var tempFileName = System.IO.Path.GetTempFileName ();
+			// System.IO.File.WriteAllText (tempFileName, text);
+			// try {
+			// 	// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
+			// 	BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
+			// } finally {
+			// 	System.IO.File.Delete (tempFileName);
+			// }
+
+			BashRunner.Run ("xclip -selection clipboard -i", false, text);
+		}
+	}
+
+	static class BashRunner {
+		public static string Run (string commandLine, bool output = true, string inputText = "")
+		{
+			var arguments = $"-c \"{commandLine}\"";
+
+			if (output) {
+				var errorBuilder = new System.Text.StringBuilder ();
+				var outputBuilder = new System.Text.StringBuilder ();
+
+				using (var process = new System.Diagnostics.Process {
+					StartInfo = new System.Diagnostics.ProcessStartInfo {
+						FileName = "bash",
+						Arguments = arguments,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true,
+						UseShellExecute = false,
+						CreateNoWindow = false,
+					}
+				}) {
+					process.Start ();
+					process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
+					process.BeginOutputReadLine ();
+					process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
+					process.BeginErrorReadLine ();
+					if (!process.DoubleWaitForExit ()) {
+						var timeoutError = $@"Process timed out. Command line: bash {arguments}.
+							Output: {outputBuilder}
+							Error: {errorBuilder}";
+						throw new Exception (timeoutError);
+					}
+					if (process.ExitCode == 0) {
+						return outputBuilder.ToString ();
+					}
+
+					var error = $@"Could not execute process. Command line: bash {arguments}.
+						Output: {outputBuilder}
+						Error: {errorBuilder}";
+					throw new Exception (error);
+				}
+			} else {
+				using (var process = new System.Diagnostics.Process {
+					StartInfo = new System.Diagnostics.ProcessStartInfo {
+						FileName = "bash",
+						Arguments = arguments,
+						RedirectStandardInput = true,
+						UseShellExecute = false,
+						CreateNoWindow = false
+					}
+				}) {
+					process.Start ();
+					process.StandardInput.Write (inputText);
+					process.StandardInput.Close ();
+					process.WaitForExit ();
+					return inputText;
+				}
+			}
+		}
+
+		static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+		{
+			var result = process.WaitForExit (500);
+			if (result) {
+				process.WaitForExit ();
+			}
+			return result;
+		}
+
+		public static bool FileExists (string value)
+		{
+			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
+		}
+	}
+
+	class MacOSXClipboard : ClipboardBase {
+		IntPtr nsString = objc_getClass ("NSString");
+		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
+		IntPtr utfTextType;
+		IntPtr generalPasteboard;
+		IntPtr initWithUtf8Register = sel_registerName ("initWithUTF8String:");
+		IntPtr allocRegister = sel_registerName ("alloc");
+		IntPtr setStringRegister = sel_registerName ("setString:forType:");
+		IntPtr stringForTypeRegister = sel_registerName ("stringForType:");
+		IntPtr utf8Register = sel_registerName ("UTF8String");
+		IntPtr nsStringPboardType;
+		IntPtr generalPasteboardRegister = sel_registerName ("generalPasteboard");
+		IntPtr clearContentsRegister = sel_registerName ("clearContents");
+
+		public override bool IsSupported => CheckSupport ();
+
+		bool CheckSupport ()
+		{
+			var result = BashRunner.Run ("which pbcopy");
+			if (!BashRunner.FileExists (result)) {
+				return false;
+			}
+			result = BashRunner.Run ("which pbpaste");
+			return BashRunner.FileExists (result);
+		}
+
+		public MacOSXClipboard ()
+		{
+			utfTextType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "public.utf8-plain-text");
+			nsStringPboardType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "NSStringPboardType");
+			generalPasteboard = objc_msgSend (nsPasteboard, generalPasteboardRegister);
+		}
+
+		protected override string GetClipboardDataImpl ()
+		{
+			var ptr = objc_msgSend (generalPasteboard, stringForTypeRegister, nsStringPboardType);
+			var charArray = objc_msgSend (ptr, utf8Register);
+			return Marshal.PtrToStringAnsi (charArray);
+		}
+
+		protected override void SetClipboardDataImpl (string text)
+		{
+			IntPtr str = default;
+			try {
+				str = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, text);
+				objc_msgSend (generalPasteboard, clearContentsRegister);
+				objc_msgSend (generalPasteboard, setStringRegister, str, utfTextType);
+			} finally {
+				if (str != default) {
+					objc_msgSend (str, sel_registerName ("release"));
+				}
+			}
+		}
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_getClass (string className);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, string arg1);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		static extern IntPtr sel_registerName (string selectorName);
+	}
+
+	class WSLClipboard : ClipboardBase {
+		public override bool IsSupported => CheckSupport ();
+
+		bool CheckSupport ()
+		{
+			var result = BashRunner.Run ("which powershell.exe");
+			return BashRunner.FileExists (result);
+
+			//var result = BashRunner.Run ("which powershell.exe");
+			//if (!BashRunner.FileExists (result)) {
+			//	return false;
+			//}
+			//result = BashRunner.Run ("which clip.exe");
+			//return BashRunner.FileExists (result);
+		}
+
+		protected override string GetClipboardDataImpl ()
+		{
+			using (var powershell = new System.Diagnostics.Process {
+				StartInfo = new System.Diagnostics.ProcessStartInfo {
+					RedirectStandardOutput = true,
+					FileName = "powershell.exe",
+					Arguments = "-noprofile -command \"Get-Clipboard\""
+				}
+			}) {
+				powershell.Start ();
+				var result = powershell.StandardOutput.ReadToEnd ();
+				powershell.StandardOutput.Close ();
+				powershell.WaitForExit ();
+				return result.TrimEnd ();
+			}
+		}
+
+		protected override void SetClipboardDataImpl (string text)
+		{
+			using (var powershell = new System.Diagnostics.Process {
+				StartInfo = new System.Diagnostics.ProcessStartInfo {
+					FileName = "powershell.exe",
+					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
+				}
+			}) {
+				powershell.Start ();
+				powershell.WaitForExit ();
+			}
+
+			//using (var clipExe = new System.Diagnostics.Process {
+			//	StartInfo = new System.Diagnostics.ProcessStartInfo {
+			//		FileName = "clip.exe",
+			//		RedirectStandardInput = true
+			//	}
+			//}) {
+			//	clipExe.Start ();
+			//	clipExe.StandardInput.Write (text);
+			//	clipExe.StandardInput.Close ();
+			//	clipExe.WaitForExit ();
+			//}
 		}
 	}
 }

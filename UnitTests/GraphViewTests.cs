@@ -8,6 +8,7 @@ using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 		
@@ -77,7 +78,7 @@ namespace Terminal.Gui.Views {
 		}
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
-		public static void AssertDriverContentsAre (string expectedLook)
+		public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output)
 		{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
@@ -108,8 +109,8 @@ namespace Terminal.Gui.Views {
 				expectedLook = expectedLook.Replace ("\r\n", "\n");
 				actualLook = actualLook.Replace ("\r\n", "\n");
 
-				Console.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-				Console.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
 
 				Assert.Equal (expectedLook, actualLook);
 			}
@@ -354,6 +355,9 @@ namespace Terminal.Gui.Views {
 			var ex = Assert.Throws<Exception>(()=>gv.Redraw (gv.Bounds));
 
 			Assert.Equal ("CellSize cannot be 0", ex.Message);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		
@@ -446,6 +450,9 @@ namespace Terminal.Gui.Views {
 			// The screen space the graph will be rendered into should
 			// not overspill the margins
 			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		/// <summary>
@@ -492,6 +499,9 @@ namespace Terminal.Gui.Views {
 			// The screen space the graph will be rendered into should
 			// not overspill the margins
 			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		private class FakeSeries : ISeries {
@@ -514,6 +524,12 @@ namespace Terminal.Gui.Views {
 
 	public class MultiBarSeriesTests{
 
+		readonly ITestOutputHelper output;
+
+		public MultiBarSeriesTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void MultiBarSeries_BarSpacing(){
@@ -543,6 +559,9 @@ namespace Terminal.Gui.Views {
 			// user passes 1 color only but asks for 5 bars
 			var ex = Assert.Throws<ArgumentException>(()=>new MultiBarSeries(5,7,1,colors));
 			Assert.Equal("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",ex.Message);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -563,6 +582,9 @@ namespace Terminal.Gui.Views {
 			Assert.Equal(series.SubSeries.ElementAt(0).OverrideBarColor,colors[0]);
 			Assert.Equal(series.SubSeries.ElementAt(1).OverrideBarColor,colors[1]);
 			Assert.Equal(series.SubSeries.ElementAt(2).OverrideBarColor,colors[2]);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -643,7 +665,10 @@ namespace Terminal.Gui.Views {
  │  MM  MM  MM
  ┼──┬M──┬M──┬M──────
    heytherebob  ";
-			GraphViewTests.AssertDriverContentsAre (looksLike);
+			GraphViewTests.AssertDriverContentsAre (looksLike, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 
@@ -700,6 +725,9 @@ namespace Terminal.Gui.Views {
 			// Screen position x=2 because bars are drawn every 1f of
 			// graph space and CellSize.X is 0.5f
 			Assert.Contains(2, axisX.LabelPoints);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -750,9 +778,10 @@ namespace Terminal.Gui.Views {
 			Assert.Equal(0,barSeries.BarScreenEnds[0].Y);
 			Assert.Equal(9,barSeries.BarScreenStarts[1].Y);
 			Assert.Equal(0,barSeries.BarScreenEnds[1].Y);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
-
-
 
 		[Fact]
 		public void TestOneLongOneShortHorizontalBars_WithOffset(){
@@ -812,6 +841,9 @@ namespace Terminal.Gui.Views {
 			// labels should align with the bars (same screen y axis point)
 			Assert.Contains(4, axisY.LabelPoints);
 			Assert.Contains(1, axisY.LabelPoints);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		private class FakeBarSeries : BarSeries{
@@ -889,6 +921,9 @@ namespace Terminal.Gui.Views {
 
 			Assert.InRange(axis.LabelPoints.Max(),0,49);
 			Assert.InRange(axis.LabelPoints.Min(),0,49);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -909,6 +944,9 @@ namespace Terminal.Gui.Views {
 
 			Assert.InRange(axis.LabelPoints.Max(),0,49);
 			Assert.InRange(axis.LabelPoints.Min(),0,49);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -930,6 +968,9 @@ namespace Terminal.Gui.Views {
 			// Axis lables should not be drawn in the margin
 			Assert.InRange(axis.LabelPoints.Max(),5,49);
 			Assert.InRange(axis.LabelPoints.Min(),5,49);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		#endregion
@@ -958,6 +999,9 @@ namespace Terminal.Gui.Views {
 
 			Assert.InRange(axis.LabelPoints.Max(),0,29);
 			Assert.InRange(axis.LabelPoints.Min(),0,29);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -979,6 +1023,9 @@ namespace Terminal.Gui.Views {
 			// Labels should not be drawn into the axis
 			Assert.InRange(axis.LabelPoints.Max(),0,19);
 			Assert.InRange(axis.LabelPoints.Min(),0,19);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -999,15 +1046,21 @@ namespace Terminal.Gui.Views {
 
 			Assert.InRange(axis.LabelPoints.Max(),0,29);
 			Assert.InRange(axis.LabelPoints.Min(),0,29);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		#endregion
-
-
-		
 	}
 
 	public class TextAnnotationTests {
+		readonly ITestOutputHelper output;
+
+		public TextAnnotationTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void TestTextAnnotation_ScreenUnits()
@@ -1029,7 +1082,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
@@ -1046,7 +1099,10 @@ namespace Terminal.Gui.Views {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -1070,7 +1126,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
@@ -1088,7 +1144,10 @@ namespace Terminal.Gui.Views {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -1115,8 +1174,11 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -1141,8 +1203,10 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Theory]
@@ -1174,12 +1238,21 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 
 	public class LegendTests {
+		readonly ITestOutputHelper output;
+
+		public LegendTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void LegendNormalUsage_WithBorder ()
@@ -1200,8 +1273,11 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -1226,12 +1302,21 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 
 	public class PathAnnotationTests {
+		readonly ITestOutputHelper output;
+
+		public PathAnnotationTests( ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void PathAnnotation_Box()
@@ -1259,8 +1344,11 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -1288,8 +1376,11 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected);
+			GraphViewTests.AssertDriverContentsAre (expected,output);
 
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 

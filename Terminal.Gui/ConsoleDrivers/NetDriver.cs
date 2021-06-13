@@ -183,7 +183,8 @@ namespace Terminal.Gui {
 						return;
 					}
 				} else {
-					largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					largestWindowHeight = Console.BufferHeight;
 					if (Console.BufferWidth != consoleDriver.Cols || largestWindowHeight != consoleDriver.Rows
 						|| Console.WindowHeight != lastWindowHeight) {
 						lastWindowHeight = Console.WindowHeight;
@@ -1076,12 +1077,14 @@ namespace Terminal.Gui {
 		int cols, rows, top;
 		public override int Cols => cols;
 		public override int Rows => rows;
+		public override int Left => 0;
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
 		public bool AlwaysSetPosition { get; set; }
+		public override IClipboard Clipboard { get; }
 
 		int largestWindowHeight;
 
@@ -1092,7 +1095,19 @@ namespace Terminal.Gui {
 				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
 			}
-			largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			largestWindowHeight = Console.BufferHeight;
+			if (IsWinPlatform) {
+				Clipboard = new WindowsClipboard ();
+			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				Clipboard = new MacOSXClipboard ();
+			} else {
+				if (CursesDriver.Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				}else{
+					Clipboard = new CursesClipboard ();
+				}
+			}
 		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
@@ -1595,7 +1610,8 @@ namespace Terminal.Gui {
 					Console.WindowHeight);
 				top = 0;
 			} else {
-				largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				largestWindowHeight = Console.BufferHeight;
 				size = new Size (Console.BufferWidth, largestWindowHeight);
 			}
 			cols = size.Width;

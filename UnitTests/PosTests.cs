@@ -288,6 +288,8 @@ namespace Terminal.Gui.Core {
 			{
 				// Cleanup
 				Application.End (rs);
+				// Shutdown must be called to safely clean up Application if Init has been called
+				Application.Shutdown ();
 			}
 
 			// Test cases:
@@ -326,7 +328,6 @@ namespace Terminal.Gui.Core {
 			rs = Application.Begin (Application.Top);
 			Application.Run ();
 			cleanup (rs);
-
 		}
 
 		[Fact]
@@ -581,6 +582,9 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (20, count);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -638,6 +642,9 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (0, count);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }

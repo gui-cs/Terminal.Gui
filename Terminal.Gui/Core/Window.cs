@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 	public class Window : Toplevel {
 		View contentView;
 		ustring title;
+		int padding;
 
 		/// <summary>
 		/// The title to be displayed for this window.
@@ -52,7 +53,7 @@ namespace Terminal.Gui {
 		/// <param name="frame">Superview-relative rectangle specifying the location and size</param>
 		/// <param name="title">Title</param>
 		/// <remarks>
-		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// This constructor initializes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
 		/// that do not take <c>Rect</c> parameters to initialize a Window with <see cref="LayoutStyle.Computed"/>. 
 		/// </remarks>
 		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
@@ -64,7 +65,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">Title.</param>
 		/// <remarks>
-		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initializes a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
 		/// </remarks>
 		public Window (ustring title = null) : this (title, padding: 0)
@@ -76,7 +77,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Window () : this (title: null) { }
 
-		int padding;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
 		/// and an optional title.
@@ -85,40 +85,48 @@ namespace Terminal.Gui {
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title</param>
 		/// <remarks>
-		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// This constructor initializes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
 		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
 		/// </remarks>
 		public Window (Rect frame, ustring title = null, int padding = 0) : base (frame)
 		{
-			this.Title = title;
-			int wb = 2 * (1 + padding);
-			this.padding = padding;
-			var cFrame = new Rect (1 + padding, 1 + padding, frame.Width - wb, frame.Height - wb);
-			contentView = new ContentView (cFrame);
-			base.Add (contentView);
+			Initialize (title, frame, padding);
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
+		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Computed"/> positioning,
 		/// and an optional title.
 		/// </summary>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title.</param>
 		/// <remarks>
-		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initializes a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
 		/// </remarks>
 		public Window (ustring title = null, int padding = 0) : base ()
 		{
-			this.Title = title;
-			int wb = 1 + padding;
+			Initialize (title, Rect.Empty, padding);
+		}
+
+		void Initialize (ustring title, Rect frame, int padding = 0)
+		{
+			ColorScheme = Colors.Base;
+			Title = title;
+			int wb;
+			if (frame == Rect.Empty) {
+				wb = 1 + padding;
+				contentView = new ContentView () {
+					X = wb,
+					Y = wb,
+					Width = Dim.Fill (wb),
+					Height = Dim.Fill (wb)
+				};
+			} else {
+				wb = 2 * (1 + padding);
+				var cFrame = new Rect (1 + padding, 1 + padding, frame.Width - wb, frame.Height - wb);
+				contentView = new ContentView (cFrame);
+			}
 			this.padding = padding;
-			contentView = new ContentView () {
-				X = wb,
-				Y = wb,
-				Width = Dim.Fill (wb),
-				Height = Dim.Fill (wb)
-			};
 			base.Add (contentView);
 		}
 
@@ -179,7 +187,7 @@ namespace Terminal.Gui {
 
 			var savedClip = ClipToBounds ();
 
-			// Redraw our contenetView
+			// Redraw our contentView
 			// TODO: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
 			contentView.Redraw (contentView.Bounds);
 			Driver.Clip = savedClip;
@@ -216,7 +224,8 @@ namespace Terminal.Gui {
 			// a pending mouse event activated.
 
 			int nx, ny;
-			if (!dragPosition.HasValue && mouseEvent.Flags == (MouseFlags.Button1Pressed)) {
+			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
+				|| mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				// Only start grabbing if the user clicks on the title bar.
 				if (mouseEvent.Y == 0) {
 					start = new Point (mouseEvent.X, mouseEvent.Y);

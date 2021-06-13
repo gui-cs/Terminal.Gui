@@ -38,6 +38,8 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (2, tv.Tabs.Count);
 			Assert.Equal (tab2, tv.SelectedTab);
+
+			Application.Shutdown ();
 		}
 
 
@@ -55,6 +57,8 @@ namespace Terminal.Gui.Views {
 
 			Assert.Null (tv.SelectedTab);
 			Assert.Equal (0, tv.TabScrollOffset);
+
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -73,6 +77,9 @@ namespace Terminal.Gui.Views {
 			// Asking to show tab2 should automatically move scroll offset accordingly
 			tv.SelectedTab = tab2;
 			Assert.Equal (1, tv.TabScrollOffset);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -98,6 +105,9 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, called);
 			Assert.Equal (tab1, oldTab);
 			Assert.Equal (tab2, newTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 		[Fact]
 		public void RemoveTab_ChangesSelection ()
@@ -108,6 +118,9 @@ namespace Terminal.Gui.Views {
 			tv.RemoveTab (tab1);
 
 			Assert.Equal (tab2, tv.SelectedTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -125,6 +138,9 @@ namespace Terminal.Gui.Views {
 			tv.RemoveTab (tab1);
 
 			Assert.Equal (tab2, tv.SelectedTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -137,6 +153,9 @@ namespace Terminal.Gui.Views {
 			tv.RemoveTab (tab2);
 
 			Assert.Null (tv.SelectedTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -171,6 +190,9 @@ namespace Terminal.Gui.Views {
 			// even though we go right 2 indexes the event should only be called once
 			Assert.Equal (1, called);
 			Assert.Equal (tab4, tv.SelectedTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -187,6 +209,9 @@ namespace Terminal.Gui.Views {
 			tv.AddTab (tab1, false);
 
 			Assert.Equal (2, tv.Tabs.Count);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 
@@ -204,6 +229,9 @@ namespace Terminal.Gui.Views {
 			tv.SwitchTabBy (-500);
 
 			Assert.Equal (tab1, tv.SelectedTab);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 
 		}
 

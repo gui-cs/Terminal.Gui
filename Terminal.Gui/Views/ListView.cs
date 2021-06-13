@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 		public virtual bool MovePageDown ()
 		{
 			var n = (selected + Frame.Height);
-			if (n > source.Count)
+			if (n >= source.Count)
 				n = source.Count - 1;
 			if (n != selected) {
 				selected = n;
@@ -557,9 +557,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			if (selected != source.Count - 1) {
+			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
-				top = selected;
+				if (top + selected > Frame.Height - 1) {
+					top = selected;
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}

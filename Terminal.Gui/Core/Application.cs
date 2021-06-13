@@ -208,14 +208,18 @@ namespace Terminal.Gui {
 		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
 			if (_initialized && driver == null) return;
-			
+
+			if (_initialized) {
+				throw new InvalidOperationException ("Init must be bracketed by Shutdown");
+			}
+
 			// Used only for start debugging on Unix.
-//#if DEBUG
-//			while (!System.Diagnostics.Debugger.IsAttached) {
-//				System.Threading.Thread.Sleep (100);
-//			}
-//			System.Diagnostics.Debugger.Break ();
-//#endif
+			//#if DEBUG
+			//			while (!System.Diagnostics.Debugger.IsAttached) {
+			//				System.Threading.Thread.Sleep (100);
+			//			}
+			//			System.Diagnostics.Debugger.Break ();
+			//#endif
 
 			// Reset all class variables (Application is a singleton).
 			ResetState ();
