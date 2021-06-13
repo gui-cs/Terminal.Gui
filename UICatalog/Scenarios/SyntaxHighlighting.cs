@@ -62,6 +62,7 @@ namespace UICatalog.Scenarios {
 			private HashSet<string> keywords = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
 			private Attribute blue;
 			private Attribute white;
+			private Attribute magenta;
 
 
 			public void Init()
@@ -70,7 +71,41 @@ namespace UICatalog.Scenarios {
 				keywords.Add("distinct");
 				keywords.Add("top");
 				keywords.Add("from");
+				keywords.Add ("create");
+				keywords.Add ("primary");
+				keywords.Add ("key");
+				keywords.Add ("insert");
+				keywords.Add ("alter");
+				keywords.Add ("add");
+				keywords.Add ("update");
+				keywords.Add ("set");
+				keywords.Add ("delete");
+				keywords.Add ("truncate");
+				keywords.Add ("as");
+				keywords.Add ("order");
+				keywords.Add ("by");
+				keywords.Add ("asc");
+				keywords.Add ("desc");
+				keywords.Add ("between");
+				keywords.Add ("where");
+				keywords.Add ("and");
+				keywords.Add ("or");
+				keywords.Add ("not");
+				keywords.Add ("limit");
+				keywords.Add ("null");
+				keywords.Add ("is");
+				keywords.Add ("drop");
+				keywords.Add ("database");
+				keywords.Add ("column");
+				keywords.Add ("table");
+				keywords.Add ("having");
+				keywords.Add ("in");
+				keywords.Add ("join");
+				keywords.Add ("on");
+				keywords.Add ("union");
+				keywords.Add ("exists");
 
+				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);
 				white = Driver.MakeAttribute (Color.White, Color.Black);
 			}
@@ -82,6 +117,10 @@ namespace UICatalog.Scenarios {
 
 			protected override void ColorNormal (List<System.Rune> line, int idx)
 			{
+				if(IsInStringLiteral(line,idx)) {
+					Driver.SetAttribute (magenta);
+				}
+				else
 				if(IsKeyword(line,idx))
 				{
 					Driver.SetAttribute (blue);
@@ -89,6 +128,19 @@ namespace UICatalog.Scenarios {
 				else{
 					Driver.SetAttribute (white);
 				}
+			}
+
+			private bool IsInStringLiteral (List<System.Rune> line, int idx)
+			{
+				string strLine = new string (line.Select (r => (char)r).ToArray ());
+				
+				foreach(Match m in Regex.Matches(strLine, "'[^']*'")) {
+					if(idx >= m.Index && idx < m.Index+m.Length) {
+						return true;
+					}
+				}
+
+				return false;
 			}
 
 			private bool IsKeyword(List<System.Rune> line, int idx)
@@ -106,7 +158,7 @@ namespace UICatalog.Scenarios {
 			{
 				var words = Regex.Split(
 					new string(line.Select(r=>(char)r).ToArray()),
-					"\b");
+					"\\b");
 
 
 				int count = 0;
@@ -116,12 +168,12 @@ namespace UICatalog.Scenarios {
 				{
 					current = word;
 					count+= word.Length;
-					if(count >= idx){
+					if(count > idx){
 						break;
 					}
 				}
 
-				return current;
+				return current?.Trim();
 			}
 		}
 	}
