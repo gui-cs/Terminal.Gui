@@ -1333,17 +1333,46 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void ColorNormal ()
+		/// <summary>
+		/// Sets the driver to the default color for the control where no text is being rendered.  Defaults to <see cref="ColorScheme.Normal"/>.
+		/// </summary>
+		protected virtual void ColorNormal ()
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 		}
 
-		void ColorSelection ()
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Normal"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void ColorNormal (List<Rune> line, int idx)
+		{
+			Driver.SetAttribute (ColorScheme.Normal);
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void ColorSelection (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
 		}
 
-		void ColorUsed ()
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.HotFocus"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void ColorUsed (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
@@ -1667,12 +1696,12 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);
 					if (idxCol < line.Count && selecting && PointInSelection (idxCol, idxRow)) {
-						ColorSelection ();
+						ColorSelection (line, idxCol);
 					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						ColorUsed ();
+						ColorUsed (line, idxCol);
 					} else {
-						ColorNormal ();
+						ColorNormal (line,idxCol);
 					}
 
 					if (rune == '\t' && TabWidth > 0) {
