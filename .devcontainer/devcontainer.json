@@ -20,3 +20,5 @@
 	],
 	"postCreateCommand": "dotnet restore && dotnet build --configuration Release --no-restore && dotnet test --configuration Debug --no-restore --verbosity normal --collect:'XPlat Code Coverage' --settings UnitTests/coverlet.runsettings",
 }
+
+// Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
