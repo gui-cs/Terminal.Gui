@@ -1,6 +1,9 @@
 {
 	"name": "Terminal.Gui Codespace",
 	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:0.201.7-5.0",
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "pwsh"
+	},
 	"extensions": [
 		"eamodio.gitlens",
 		"ms-dotnettools.csharp",
