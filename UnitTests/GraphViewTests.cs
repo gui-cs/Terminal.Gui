@@ -1382,6 +1382,56 @@ namespace Terminal.Gui.Views {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+
+		[Theory]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void LabelChangeText_RendersCorrectly (bool useFill)
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+
+			// create a wide window
+			var mount = new View () {
+				Width = 100,
+				Height = 100
+			};
+
+			try {
+				// Create a label with a short text 
+				var lbl1 = new Label ("ff");
+
+				// Specify that the label should be very wide
+				if (useFill) {
+					lbl1.Width = Dim.Fill ();
+				} else {
+					lbl1.Width = 100;
+				}
+
+				//put label into view
+				mount.Add (lbl1);
+
+				// render view
+				lbl1.ColorScheme = new ColorScheme ();
+				Assert.Equal (1, lbl1.Height);
+				mount.Redraw (mount.Bounds);
+
+				// should have the initial text
+				GraphViewTests.AssertDriverContentsAre ("ff", null);
+
+				// change the text and redraw
+				lbl1.Text = "ff1234";
+				mount.Redraw (mount.Bounds);
+
+				// should have the new text rendered
+				GraphViewTests.AssertDriverContentsAre ("ff1234", null);
+
+
+			} finally {
+				Application.Shutdown ();
+			}
+		}
 	}
 
 		public class AxisIncrementToRenderTests {
