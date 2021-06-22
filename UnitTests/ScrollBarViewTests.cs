@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
@@ -6,7 +7,7 @@ using Xunit;
 namespace Terminal.Gui.Views {
 	public class ScrollBarViewTests {
 
-		// This class enables test functions annoated with the [InitShutdown] attribute
+		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
 		// 
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
@@ -55,7 +56,7 @@ namespace Terminal.Gui.Views {
 
 		private static HostView _hostView;
 		private ScrollBarView _scrollBar;
-		private  bool _added;
+		private bool _added;
 
 		private void AddHandlers ()
 		{
@@ -443,6 +444,76 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Dim.Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
+		}
+
+		[Fact]
+		public void Constructor_ShowBothScrollIndicator_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
+		{
+			var exception = Record.Exception (() => {
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+				var top = Application.Top;
+
+				var win = new Window () {
+					X = 0,
+					Y = 0,
+					Width = Dim.Fill (),
+					Height = Dim.Fill ()
+				};
+
+				List<string> source = new List<string> ();
+
+				for (int i = 0; i < 50; i++) {
+					source.Add ($"item {i}");
+				}
+
+				var listView = new ListView (source) {
+					X = 0,
+					Y = 0,
+					Width = Dim.Fill (),
+					Height = Dim.Fill ()
+				};
+				win.Add (listView);
+
+				var newScrollBarView = new ScrollBarView (listView, true, false) {
+					KeepContentAlwaysInViewport = true
+				};
+				win.Add (newScrollBarView);
+
+				newScrollBarView.ChangedPosition += () => {
+					listView.TopItem = newScrollBarView.Position;
+					if (listView.TopItem != newScrollBarView.Position) {
+						newScrollBarView.Position = listView.TopItem;
+					}
+					Assert.Equal (newScrollBarView.Position, listView.TopItem);
+					listView.SetNeedsDisplay ();
+				};
+
+				listView.DrawContent += (e) => {
+					newScrollBarView.Size = listView.Source.Count - 1;
+					Assert.Equal (newScrollBarView.Size, listView.Source.Count);
+					newScrollBarView.Position = listView.TopItem;
+					Assert.Equal (newScrollBarView.Position, listView.TopItem);
+					newScrollBarView.Refresh ();
+				};
+
+				top.Ready += () => {
+					newScrollBarView.Position = 45;
+					Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.TopItem + (listView.TopItem - listView.Bounds.Height));
+					Assert.Equal (newScrollBarView.Position, listView.TopItem);
+					Assert.Equal (27, newScrollBarView.Position);
+					Assert.Equal (27, listView.TopItem);
+					Application.RequestStop ();
+				};
+
+				top.Add (win);
+
+				Application.Run ();
+
+				Application.Shutdown ();
+
+			});
+			Assert.Null (exception);
 		}
 	}
 }
