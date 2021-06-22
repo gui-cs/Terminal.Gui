@@ -1988,8 +1988,10 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
-				ResizeView (autoSize);
-				if (textFormatter.Size != Bounds.Size) {
+				var canResize = ResizeView (autoSize);
+				if (canResize && textFormatter.Size != Bounds.Size) {
+					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
+				} else if (!canResize && textFormatter.Size != Bounds.Size) {
 					textFormatter.Size = Bounds.Size;
 				}
 				SetNeedsLayout ();
@@ -2085,7 +2087,9 @@ namespace Terminal.Gui {
 
 			var aSize = autoSize;
 			Rect nBounds = TextFormatter.CalcRect (Bounds.X, Bounds.Y, Text, textFormatter.Direction);
-
+			if (textFormatter.Size != nBounds.Size) {
+				textFormatter.Size = nBounds.Size;
+			}
 			if ((textFormatter.Size != Bounds.Size || textFormatter.Size != nBounds.Size)
 				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != nBounds.Width))
