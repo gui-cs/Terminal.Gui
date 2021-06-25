@@ -706,5 +706,72 @@ namespace Terminal.Gui.Views {
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text);
 		}
+
+		[Fact]
+		public void ProcessKey_Backspace_From_End ()
+		{
+			var tf = new TextField ("ABC");
+			tf.EnsureFocus ();
+			Assert.Equal ("ABC", tf.Text);
+
+			// now delete the C
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("AB", tf.Text);
+
+			// then delete the B
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("A", tf.Text);
+
+			// then delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("", tf.Text);
+		}
+
+		[Fact]
+		public void ProcessKey_Backspace_From_Middle ()
+		{
+			var tf = new TextField ("ABC");
+			tf.EnsureFocus ();
+			tf.CursorPosition = 2;
+			Assert.Equal ("ABC", tf.Text);
+
+			// now delete the B
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("AC", tf.Text);
+
+			// then delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("C", tf.Text);
+
+			// then delete nothing
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("C", tf.Text);
+
+			// now delete the C
+			tf.CursorPosition = 1;
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+			Assert.Equal ("", tf.Text);
+		}
+
+		[Fact]
+		public void Cancel_TextChanging_ThenBackspace ()
+		{
+			var tf = new TextField ();
+			tf.EnsureFocus ();
+			tf.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ()));
+			Assert.Equal ("A", tf.Text);
+
+			// cancel the next keystroke
+			tf.TextChanging += (e) => e.Cancel = e.NewText == "AB";
+			tf.ProcessKey (new KeyEvent (Key.B, new KeyModifiers ()));
+
+			// B was canceled so should just be A
+			Assert.Equal ("A", tf.Text);
+
+			// now delete the A
+			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
+
+			Assert.Equal ("", tf.Text);
+		}
 	}
 }

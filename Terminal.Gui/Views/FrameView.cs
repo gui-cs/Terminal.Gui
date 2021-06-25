@@ -9,6 +9,7 @@
 //  - Does not support IEnumerable
 // Any udpates done here should probably be done in Window as well; TODO: Merge these classes
 
+using System;
 using System.Linq;
 using NStack;
 
@@ -50,7 +51,7 @@ namespace Terminal.Gui {
 		/// <param name="title">Title.</param>
 		public FrameView (Rect frame, ustring title = null) : base (frame)
 		{
-			var cFrame = new Rect (1, 1, frame.Width - 2, frame.Height - 2);
+			var cFrame = new Rect (1, 1, Math.Max (frame.Width - 2, 0), Math.Max (frame.Height - 2, 0));
 			this.title = title;
 			contentView = new ContentView (cFrame);
 			Initialize ();

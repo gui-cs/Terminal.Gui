@@ -298,11 +298,15 @@ namespace Terminal.Gui {
 			}
 
 			var pending = CheckBothScrollBars (this);
-			CheckBothScrollBars (otherScrollBarView, pending);
+			if (otherScrollBarView != null) {
+				CheckBothScrollBars (otherScrollBarView, pending);
+			}
 
 			SetWidthHeight ();
 			SetRelativeLayout (Bounds);
-			OtherScrollBarView.SetRelativeLayout (OtherScrollBarView.Bounds);
+			if (otherScrollBarView != null) {
+				OtherScrollBarView.SetRelativeLayout (OtherScrollBarView.Bounds);
+			}
 
 			if (showBothScrollIndicator) {
 				if (contentBottomRightCorner != null) {
@@ -321,7 +325,7 @@ namespace Terminal.Gui {
 			if (showScrollIndicator) {
 				Redraw (Bounds);
 			}
-			if (otherScrollBarView.showScrollIndicator) {
+			if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
 				otherScrollBarView.Redraw (otherScrollBarView.Bounds);
 			}
 		}

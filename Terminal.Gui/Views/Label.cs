@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public Label ()
 		{
+			Initialize ();
 		}
 
 		/// <inheritdoc/>
@@ -33,6 +34,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public Label (ustring text) : base (text)
 		{
+			Initialize ();
 		}
 
 		/// <inheritdoc/>
@@ -43,12 +45,19 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public Label (int x, int y, ustring text) : base (x, y, text)
 		{
+			Initialize ();
 		}
 
 		/// <inheritdoc/>
 		public Label (ustring text, TextDirection direction)
 			: base (text, direction)
 		{
+			Initialize ();
+		}
+
+		void Initialize ()
+		{
+			AutoSize = true;
 		}
 
 		/// <summary>
