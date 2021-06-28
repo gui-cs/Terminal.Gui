@@ -415,9 +415,14 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (isSelectedCell ? scheme.HotFocus : scheme.Normal);
 				
 				Driver.AddStr (TruncateOrPad(val,representation, current.Width, colStyle));
-				
+
+				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
+				if(scheme != ColorScheme) {
+					Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
+				}
+
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
-				if(!FullRowSelect)
+				if (!FullRowSelect)
 					Driver.SetAttribute (ColorScheme.Normal);
 
 				RenderSeparator(current.X-1,row,false);
