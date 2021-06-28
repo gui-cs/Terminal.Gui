@@ -23,8 +23,11 @@ namespace UICatalog.Scenarios {
 		private MenuItem miCellLines;
 		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
+		private MenuItem miAlternatingColors;
 
 		ColorScheme redColorScheme;
+		ColorScheme redColorSchemeAlt;
+		ColorScheme alternatingColorScheme;
 
 		public override void Setup ()
 		{
@@ -57,6 +60,7 @@ namespace UICatalog.Scenarios {
 					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
+					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 				}),
 			});
@@ -94,6 +98,21 @@ namespace UICatalog.Scenarios {
 				HotFocus = Colors.Base.HotFocus,
 				Focus = Colors.Base.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.Red,Color.Blue)
+			};
+
+			alternatingColorScheme = new ColorScheme(){
+
+				Disabled = Colors.Base.Disabled,
+				HotFocus = Colors.Base.HotFocus,
+				Focus = Colors.Base.Focus,
+				Normal = Application.Driver.MakeAttribute(Color.White,Color.BrightBlue)
+			};
+			redColorSchemeAlt = new ColorScheme(){
+
+				Disabled = Colors.Base.Disabled,
+				HotFocus = Colors.Base.HotFocus,
+				Focus = Colors.Base.Focus,
+				Normal = Application.Driver.MakeAttribute(Color.Red,Color.BrightBlue)
 			};
 		}
 
@@ -233,6 +252,21 @@ namespace UICatalog.Scenarios {
 
 			tableView.Update();
 		}
+
+		private void ToggleAlternatingColors()
+		{
+			//toggle menu item
+			miAlternatingColors.Checked = !miAlternatingColors.Checked;
+
+			if(miAlternatingColors.Checked){
+				tableView.Style.RowColorGetter = (i,r)=> {return i%2==0 ? alternatingColorScheme : null;};
+			}
+			else
+			{
+				tableView.Style.RowColorGetter = null;
+			}
+			tableView.SetNeedsDisplay();
+		}
 		
 
 		private void CloseExample ()
@@ -277,9 +311,9 @@ namespace UICatalog.Scenarios {
 								// not a double
 								TextAlignment.Left,
 				
-				ColorGetter = (v)=>v is double d ? 
+				ColorGetter = (i,v)=>v is double d ? 
 								// color 0 and negative values red
-								d <= 0.0000001 ? redColorScheme : 
+								d <= 0.0000001 ? i%2==0 && miAlternatingColors.Checked ? redColorSchemeAlt: redColorScheme : 
 								// use normal scheme for positive values
 								null:
 								// not a double

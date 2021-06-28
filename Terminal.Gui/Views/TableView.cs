@@ -384,13 +384,15 @@ namespace Terminal.Gui {
 		}
 		private void RenderRow(int row, int rowToRender, ColumnToRender[] columnsToRender)
 		{
+			var rowScheme = (Style.RowColorGetter?.Invoke(rowToRender,Table.Rows[rowToRender])) ?? ColorScheme;
+
 			//render start of line
 			if(style.ShowVerticalCellLines)
 				AddRune(0,row,Driver.VLine);
 
 			//start by clearing the entire line
 			Move (0,row);
-			Driver.SetAttribute (FullRowSelect &&  IsSelected(0,rowToRender) ? ColorScheme.HotFocus : ColorScheme.Normal);
+			Driver.SetAttribute (FullRowSelect &&  IsSelected(0,rowToRender) ? rowScheme.HotFocus : rowScheme.Normal);
 			Driver.AddStr (new string(' ',Bounds.Width));
 
 			// Render cells for each visible header for the current row
@@ -410,20 +412,20 @@ namespace Terminal.Gui {
 
 				// Render the (possibly truncated) cell value
 				var representation = GetRepresentation(val,colStyle);
-				var scheme = (colStyle?.ColorGetter?.Invoke(val)) ?? ColorScheme;
+				var scheme = (colStyle?.ColorGetter?.Invoke(rowToRender,val)) ?? rowScheme;
 
 				Driver.SetAttribute (isSelectedCell ? scheme.HotFocus : scheme.Normal);
 				
 				Driver.AddStr (TruncateOrPad(val,representation, current.Width, colStyle));
 
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
-				if(scheme != ColorScheme) {
-					Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
+				if(scheme != rowScheme) {
+					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus : rowScheme.Normal);
 				}
 
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
 				if (!FullRowSelect)
-					Driver.SetAttribute (ColorScheme.Normal);
+					Driver.SetAttribute (rowScheme.Normal);
 
 				RenderSeparator(current.X-1,row,false);
 
@@ -1115,6 +1117,14 @@ namespace Terminal.Gui {
 			return colStyle != null ? colStyle.GetRepresentation(value): value.ToString();
 		}
 
+		/// <summary>
+		/// Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered
+		/// </summary>
+		/// <param name="rowIdx">The row index of <see cref="DataTable.Rows"/> collection being rendered</param>
+		/// <param name="value">The full value in the table being rendered in this cell</param>
+		/// <returns></returns>
+		public delegate ColorScheme CellColorGetterDelegate(int rowIdx, object value);
+
 
 		#region Nested Types
 		/// <summary>
@@ -1144,7 +1154,7 @@ namespace Terminal.Gui {
 			/// Defines a delegate for returning a custom color scheme per cell based on cell values.
 			/// Return null for the default
 			/// </summary>
-			public Func<object, ColorScheme> ColorGetter;
+			public CellColorGetterDelegate ColorGetter;
 
 			/// <summary>
 			/// Defines the format for values e.g. "yyyy-MM-dd" for dates
@@ -1231,6 +1241,11 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
 
+			/// <summary>
+			/// Delegate for coloring specific rows in a different color.  For cell color <see cref="ColumnStyle.ColorGetter"/>
+			/// </summary>
+			/// <value></value>
+			public Func<int,DataRow,ColorScheme> RowColorGetter {get;set;}
 
 			/// <summary>
 			/// Determines rendering when the last column in the table is visible but it's
