@@ -406,12 +406,13 @@ namespace Terminal.Gui {
 				// Set color scheme based on whether the current cell is the selected one
 				bool isSelectedCell = IsSelected(current.Column.Ordinal,rowToRender);
 
-				Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
-
 				var val = Table.Rows [rowToRender][current.Column];
 
 				// Render the (possibly truncated) cell value
 				var representation = GetRepresentation(val,colStyle);
+				var scheme = (colStyle?.ColorGetter?.Invoke(val)) ?? ColorScheme;
+
+				Driver.SetAttribute (isSelectedCell ? scheme.HotFocus : scheme.Normal);
 				
 				Driver.AddStr (TruncateOrPad(val,representation, current.Width, colStyle));
 				
@@ -1133,6 +1134,12 @@ namespace Terminal.Gui {
 			/// Defines a delegate for returning custom representations of cell values.  If not set then <see cref="object.ToString()"/> is used.  Return values from your delegate may be truncated e.g. based on <see cref="MaxWidth"/>
 			/// </summary>
 			public Func<object, string> RepresentationGetter;
+
+			/// <summary>
+			/// Defines a delegate for returning a custom color scheme per cell based on cell values.
+			/// Return null for the default
+			/// </summary>
+			public Func<object, ColorScheme> ColorGetter;
 
 			/// <summary>
 			/// Defines the format for values e.g. "yyyy-MM-dd" for dates

@@ -24,6 +24,8 @@ namespace UICatalog.Scenarios {
 		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
 
+		ColorScheme redColorScheme;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName();
@@ -60,8 +62,6 @@ namespace UICatalog.Scenarios {
 			});
 			Top.Add (menu);
 
-
-
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
 				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
@@ -88,6 +88,13 @@ namespace UICatalog.Scenarios {
 			tableView.KeyPress += TableViewKeyPress;
 
 			SetupScrollBar();
+
+			redColorScheme = new ColorScheme(){
+				Disabled = Colors.Base.Disabled,
+				HotFocus = Colors.Base.HotFocus,
+				Focus = Colors.Base.Focus,
+				Normal = Application.Driver.MakeAttribute(Color.Red,Color.Blue)
+			};
 		}
 
 		private void SetupScrollBar ()
@@ -268,7 +275,15 @@ namespace UICatalog.Scenarios {
 								// align positive values left
 								TextAlignment.Left:
 								// not a double
-								TextAlignment.Left
+								TextAlignment.Left,
+				
+				ColorGetter = (v)=>v is double d ? 
+								// color 0 and negative values red
+								d <= 0.0000001 ? redColorScheme : 
+								// use normal scheme for positive values
+								null:
+								// not a double
+								null
 			};
 			
 			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["DateCol"],dateFormatStyle);
