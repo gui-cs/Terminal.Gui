@@ -24,6 +24,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
 		private MenuItem miAlternatingColors;
+		private MenuItem miCursor;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -61,6 +62,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
 					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
+					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 				}),
 			});
@@ -267,8 +269,14 @@ namespace UICatalog.Scenarios {
 			}
 			tableView.SetNeedsDisplay();
 		}
-		
 
+		private void ToggleInvertSelectedCellFirstCharacter ()
+		{
+			//toggle menu item
+			miCursor.Checked = !miCursor.Checked;
+			tableView.Style.InvertSelectedCellFirstCharacter = miCursor.Checked;
+			tableView.SetNeedsDisplay ();
+		}
 		private void CloseExample ()
 		{
 			tableView.Table = null;

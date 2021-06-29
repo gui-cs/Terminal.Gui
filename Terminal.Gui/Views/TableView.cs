@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 				// If the cell is the selected col/row then draw the first rune in inverted colors
 				// this allows the user to track which cell is the active one during a multi cell
 				// selection or in full row select mode
-				if(current.Column.Ordinal == selectedColumn && rowToRender == selectedRow) {
+				if(Style.InvertSelectedCellFirstCharacter && current.Column.Ordinal == selectedColumn && rowToRender == selectedRow) {
 
 					if (render.Length > 0) {
 						// invert the color of the current cell for the first character
@@ -1256,6 +1256,13 @@ namespace Terminal.Gui {
 			/// True to render a solid line vertical line between headers
 			/// </summary>
 			public bool ShowVerticalHeaderLines { get; set; } = true;
+
+			/// <summary>
+			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
+			/// This gives the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show
+			/// this
+			/// </summary>
+			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)

@@ -500,8 +500,9 @@ namespace Terminal.Gui.Views {
 		{
 			var tv = SetUpMiniTable ();
 
-			// the thing we are testing
 			tv.Style.ExpandLastColumn = false;
+			tv.Style.InvertSelectedCellFirstCharacter = true;
+
 			// width exactly matches the max col widths
 			tv.Bounds = new Rect (0, 0, 5, 4);
 			
