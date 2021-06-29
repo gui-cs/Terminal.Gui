@@ -94,24 +94,24 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar();
 
 			redColorScheme = new ColorScheme(){
-				Disabled = Colors.Base.Disabled,
-				HotFocus = Colors.Base.HotFocus,
-				Focus = Colors.Base.Focus,
-				Normal = Application.Driver.MakeAttribute(Color.Red,Color.Blue)
+				Disabled = Win.ColorScheme.Disabled,
+				HotFocus = Win.ColorScheme.HotFocus,
+				Focus = Win.ColorScheme.Focus,
+				Normal = Application.Driver.MakeAttribute(Color.Red,Win.ColorScheme.Normal.Background)
 			};
 
 			alternatingColorScheme = new ColorScheme(){
 
-				Disabled = Colors.Base.Disabled,
-				HotFocus = Colors.Base.HotFocus,
-				Focus = Colors.Base.Focus,
+				Disabled = Win.ColorScheme.Disabled,
+				HotFocus = Win.ColorScheme.HotFocus,
+				Focus = Win.ColorScheme.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.White,Color.BrightBlue)
 			};
 			redColorSchemeAlt = new ColorScheme(){
 
-				Disabled = Colors.Base.Disabled,
-				HotFocus = Colors.Base.HotFocus,
-				Focus = Colors.Base.Focus,
+				Disabled = Win.ColorScheme.Disabled,
+				HotFocus = Win.ColorScheme.HotFocus,
+				Focus = Win.ColorScheme.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.Red,Color.BrightBlue)
 			};
 		}
