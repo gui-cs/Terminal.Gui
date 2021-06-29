@@ -428,8 +428,10 @@ namespace Terminal.Gui {
 						Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
 						Driver.AddRune (render [0]);
 
-						Driver.SetAttribute (cellColor);
-						Driver.AddStr (render.Substring (1));
+						if (render.Length > 1) {
+							Driver.SetAttribute (cellColor);
+							Driver.AddStr (render.Substring (1));
+						}
 					}
 				}
 				else {
