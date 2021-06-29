@@ -414,9 +414,28 @@ namespace Terminal.Gui {
 				var representation = GetRepresentation(val,colStyle);
 				var scheme = (colStyle?.ColorGetter?.Invoke(rowToRender,val)) ?? rowScheme;
 
-				Driver.SetAttribute (isSelectedCell ? scheme.HotFocus : scheme.Normal);
+				var cellColor = isSelectedCell? scheme.HotFocus: scheme.Normal;
+
+				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 				
-				Driver.AddStr (TruncateOrPad(val,representation, current.Width, colStyle));
+				// If the cell is the selected col/row then draw the first rune in inverted colors
+				// this allows the user to track which cell is the active one during a multi cell
+				// selection or in full row select mode
+				if(current.Column.Ordinal == selectedColumn && rowToRender == selectedRow) {
+
+					if (render.Length > 0) {
+						// invert the color of the current cell for the first character
+						Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
+						Driver.AddRune (render [0]);
+
+						Driver.SetAttribute (cellColor);
+						Driver.AddStr (render.Substring (1));
+					}
+				}
+				else {
+					Driver.SetAttribute (cellColor);
+					Driver.AddStr (render);
+				}
 
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if(scheme != rowScheme) {
