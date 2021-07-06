@@ -1,4 +1,7 @@
-﻿using Terminal.Gui;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Terminal.Gui;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Invert Colors", Description: "Invert the foreground and the background colors.")]
@@ -8,23 +11,38 @@ namespace UICatalog {
 		{
 			Win.ColorScheme = Colors.TopLevel;
 
-			var color = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
+			List<Label> labels = new List<Label> ();
+			var foreColors = Enum.GetValues (typeof (Color)).Cast<Color> ().ToArray ();
+			for (int y = 0; y < foreColors.Length; y++) {
 
-			var label = new Label ("Test") {
-				ColorScheme = new ColorScheme()
-			};
-			label.ColorScheme.Normal = color;
-			Win.Add (label);
+				var fore = foreColors [y];
+				var back = foreColors [(y + 1) % foreColors.Length];
+				var color = Application.Driver.MakeAttribute (fore, back);
+
+				var label = new Label ($"{fore} on {back}") {
+					ColorScheme = new ColorScheme (),
+					Y = y
+				};
+				label.ColorScheme.Normal = color;
+				Win.Add (label);
+				labels.Add (label);
+			}
 
 			var button = new Button ("Invert color!") {
 				X = Pos.Center (),
-				Y = Pos.Center (),
+				Y = foreColors.Length + 1,
 			};
 			button.Clicked += () => {
-				color = Application.Driver.MakeAttribute (color.Background, color.Foreground);
 
-				label.ColorScheme.Normal = color;
-				label.SetNeedsDisplay ();
+				foreach (var label in labels) {
+					var color = label.ColorScheme.Normal;
+					color = Application.Driver.MakeAttribute (color.Background, color.Foreground);
+
+					label.ColorScheme.Normal = color;
+					label.Text = $"{color.Foreground} on {color.Background}";
+					label.SetNeedsDisplay ();
+
+				}
 			};
 			Win.Add (button);
 		}
