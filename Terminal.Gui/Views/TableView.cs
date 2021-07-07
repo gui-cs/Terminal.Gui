@@ -382,7 +382,8 @@ namespace Terminal.Gui {
 		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
-			var rowScheme = (Style.RowColorGetter?.Invoke (rowToRender, Table.Rows [rowToRender])) ?? ColorScheme;
+			var rowScheme = (Style.RowColorGetter?.Invoke (
+				new RowColorGetterArgs(Table,rowToRender))) ?? ColorScheme;
 
 			//render start of line
 			if (style.ShowVerticalCellLines)
@@ -434,26 +435,11 @@ namespace Terminal.Gui {
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
-				// If the cell is the selected col/row then draw the first rune in inverted colors
-				// this allows the user to track which cell is the active one during a multi cell
-				// selection or in full row select mode
-				if (Style.InvertSelectedCellFirstCharacter && current.Column.Ordinal == selectedColumn && rowToRender == selectedRow) {
-
-					if (render.Length > 0) {
-						// invert the color of the current cell for the first character
-						Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
-						Driver.AddRune (render [0]);
-
-						if (render.Length > 1) {
-							Driver.SetAttribute (cellColor);
-							Driver.AddStr (render.Substring (1));
-						}
-					}
-				} else {
-					Driver.SetAttribute (cellColor);
-					Driver.AddStr (render);
-				}
-
+				// While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
+				bool isPrimaryCell = current.Column.Ordinal == selectedColumn && rowToRender == selectedRow;
+				
+				RenderCell (cellColor,render,isPrimaryCell);
+								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
 					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus : rowScheme.Normal);
@@ -473,6 +459,39 @@ namespace Terminal.Gui {
 			//render end of line
 			if (style.ShowVerticalCellLines)
 				AddRune (Bounds.Width - 1, row, Driver.VLine);
+		}
+
+		/// <summary>
+		/// Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to
+		/// with <see cref="ConsoleDriver.AddStr(ustring)"/>.  The driver will already be
+		/// in the correct place when rendering and you must render the full <paramref name="render"/>
+		/// or the view will not look right.  For simpler provision of color use <see cref="ColumnStyle.ColorGetter"/>
+		/// For changing the content that is rendered use <see cref="ColumnStyle.RepresentationGetter"/>
+		/// </summary>
+		/// <param name="cellColor"></param>
+		/// <param name="render"></param>
+		/// <param name="isPrimaryCell"></param>
+		protected virtual void RenderCell (Attribute cellColor, string render,bool isPrimaryCell)
+		{
+			// If the cell is the selected col/row then draw the first rune in inverted colors
+			// this allows the user to track which cell is the active one during a multi cell
+			// selection or in full row select mode
+			if (Style.InvertSelectedCellFirstCharacter && isPrimaryCell) {
+
+				if (render.Length > 0) {
+					// invert the color of the current cell for the first character
+					Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
+					Driver.AddRune (render [0]);
+
+					if (render.Length > 1) {
+						Driver.SetAttribute (cellColor);
+						Driver.AddStr (render.Substring (1));
+					}
+				}
+			} else {
+				Driver.SetAttribute (cellColor);
+				Driver.AddStr (render);
+			}
 		}
 
 		private void RenderSeparator (int col, int row, bool isHeader)
@@ -1148,6 +1167,13 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public delegate ColorScheme CellColorGetterDelegate (CellColorGetterArgs args);
 
+		/// <summary>
+		/// Delegate for providing color for a whole row of a <see cref="TableView"/>
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		public delegate ColorScheme RowColorGetterDelegate (RowColorGetterArgs args);
+
 		#region Nested Types
 		/// <summary>
 		/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
@@ -1274,7 +1300,7 @@ namespace Terminal.Gui {
 			/// Delegate for coloring specific rows in a different color.  For cell color <see cref="ColumnStyle.ColorGetter"/>
 			/// </summary>
 			/// <value></value>
-			public Func<int,DataRow,ColorScheme> RowColorGetter {get;set;}
+			public RowColorGetterDelegate RowColorGetter {get;set;}
 
 			/// <summary>
 			/// Determines rendering when the last column in the table is visible but it's
@@ -1392,6 +1418,29 @@ namespace Terminal.Gui {
 				RowScheme = rowScheme;
 			}
 
+		}
+
+		/// <summary>
+		/// Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="DataTable"/>
+		/// for which <see cref="ColorScheme"/> is sought.
+		/// </summary>
+		public class RowColorGetterArgs {
+
+			/// <summary>
+			/// The data table hosted by the <see cref="TableView"/> control.
+			/// </summary>
+			public DataTable Table { get; }
+
+			/// <summary>
+			/// The index of the row in <see cref="Table"/> for which color is needed
+			/// </summary>
+			public int RowIndex { get; }
+
+			internal RowColorGetterArgs (DataTable table, int rowIdx)
+			{
+				Table = table;
+				RowIndex = rowIdx;
+			}
 		}
 
 		/// <summary>

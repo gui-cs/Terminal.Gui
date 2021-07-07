@@ -261,7 +261,7 @@ namespace UICatalog.Scenarios {
 			miAlternatingColors.Checked = !miAlternatingColors.Checked;
 
 			if(miAlternatingColors.Checked){
-				tableView.Style.RowColorGetter = (i,r)=> {return i%2==0 ? alternatingColorScheme : null;};
+				tableView.Style.RowColorGetter = (a)=> {return a.RowIndex%2==0 ? alternatingColorScheme : null;};
 			}
 			else
 			{
