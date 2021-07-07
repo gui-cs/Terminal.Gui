@@ -55,7 +55,7 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.Gray, Color.Black)
+				Normal = Application.Driver.MakeAttribute (Color.DarkGray, Color.Black)
 			};
 
 			tableView.Table = dt;
