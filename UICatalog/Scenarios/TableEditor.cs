@@ -319,9 +319,9 @@ namespace UICatalog.Scenarios {
 								// not a double
 								TextAlignment.Left,
 				
-				ColorGetter = (i,v)=>v is double d ? 
+				ColorGetter = (a)=> a.CellValue is double d ? 
 								// color 0 and negative values red
-								d <= 0.0000001 ? i%2==0 && miAlternatingColors.Checked ? redColorSchemeAlt: redColorScheme : 
+								d <= 0.0000001 ? a.RowIndex%2==0 && miAlternatingColors.Checked ? redColorSchemeAlt: redColorScheme : 
 								// use normal scheme for positive values
 								null:
 								// not a double

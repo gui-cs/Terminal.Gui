@@ -511,7 +511,7 @@ namespace Terminal.Gui.Views {
 
 			// when B is 2 use the custom highlight colour
 			ColorScheme cellHighlight = new ColorScheme () { Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray) };
-			bStyle.ColorGetter = (rowIdx, value) => Convert.ToInt32(value) == 2 ? cellHighlight : null;
+			bStyle.ColorGetter = (a) => Convert.ToInt32(a.CellValue) == 2 ? cellHighlight : null;
 
 			tv.Redraw (tv.Bounds);
 
