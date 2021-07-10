@@ -268,7 +268,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private int GetTabIndex (int idx)
+		int GetTabIndex (int idx)
 		{
 			int i = 0;
 			foreach (var v in SuperView.tabIndexes) {
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 			return Math.Min (i, idx);
 		}
 
-		private void SetTabIndex ()
+		void SetTabIndex ()
 		{
 			int i = 0;
 			foreach (var v in SuperView.tabIndexes) {
@@ -989,8 +989,8 @@ namespace Terminal.Gui {
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + frame.Y;
-			rcol = col + frame.X;
+			rrow = Math.Max (row + frame.Y, 0);
+			rcol = Math.Max (col + frame.X, 0);
 			var ccontainer = container;
 			while (ccontainer != null) {
 				rrow += ccontainer.frame.Y;
@@ -1338,18 +1338,7 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			}
-
-			if (!ustring.IsNullOrEmpty (Text)) {
-				Clear ();
-				// Draw any Text
-				if (textFormatter != null) {
-					textFormatter.NeedsFormat = true;
-				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-			}
+			DrawText ();
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
@@ -1375,6 +1364,33 @@ namespace Terminal.Gui {
 			}
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		void DrawText ()
+		{
+			if (ColorScheme != null) {
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
+
+			if (!ustring.IsNullOrEmpty (Text)) {
+				var savedClip = ClipToBounds ();
+				Rect viewBounds = Bounds;
+				if (SuperView != null && viewBounds.Width > SuperView.Bounds.Width) {
+					viewBounds.Width = SuperView.Bounds.Width;
+				}
+				if (SuperView != null && viewBounds.Height > SuperView.Bounds.Height) {
+					viewBounds.Height = SuperView.Bounds.Height;
+				}
+				var viewFrame = ViewToScreen (viewBounds);
+				Clear (viewFrame);
+				// Draw any Text
+				if (textFormatter != null) {
+					textFormatter.NeedsFormat = true;
+				}
+				textFormatter?.Draw (viewFrame, HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+
+				Driver.Clip = savedClip;
+			}
 		}
 
 		/// <summary>
@@ -1957,8 +1973,9 @@ namespace Terminal.Gui {
 				v.LayoutNeeded = false;
 			}
 
-			if (SuperView == Application.Top && LayoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				SetRelativeLayout (Frame);
+			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
+				&& ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+				SetRelativeLayout (SuperView.Frame);
 			}
 
 			LayoutNeeded = false;
@@ -2259,7 +2276,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Visible { get; set; } = true;
 
-		bool CanBeVisible (View view)
+		internal bool CanBeVisible (View view)
 		{
 			if (!view.Visible) {
 				return false;
