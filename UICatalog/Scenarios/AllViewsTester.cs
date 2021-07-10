@@ -236,7 +236,12 @@ namespace UICatalog {
 			if (view == null) {
 				return;
 			}
+
+			var layout = view.LayoutStyle;
+
 			try {
+				view.LayoutStyle = LayoutStyle.Absolute;
+
 				switch (_xRadioGroup.SelectedItem) {
 				case 0:
 					view.X = Pos.Percent (_xVal);
@@ -292,6 +297,8 @@ namespace UICatalog {
 				}
 			} catch (Exception e) {
 				MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+			} finally {
+				view.LayoutStyle = layout;
 			}
 			UpdateTitle (view);
 		}
