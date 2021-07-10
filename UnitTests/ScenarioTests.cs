@@ -72,10 +72,12 @@ namespace Terminal.Gui {
 				var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 				scenario.Init (Application.Top, Colors.Base);
 				scenario.Setup ();
-				var rs = Application.Begin (Application.Top);
+				// There is no need to call Application.Begin because Init already creates the Application.Top
+				// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
+				//var rs = Application.Begin (Application.Top);
 				scenario.Run ();
 
-				Application.End (rs);
+				//Application.End (rs);
 
 				// Shutdown must be called to safely clean up Application if Init has been called
 				Application.Shutdown ();
@@ -100,7 +102,7 @@ namespace Terminal.Gui {
 			Assert.NotEmpty (scenarioClasses);
 
 			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Generic", StringComparison.OrdinalIgnoreCase));
-			var scenarioClass = scenarioClasses[item];
+			var scenarioClass = scenarioClasses [item];
 			// Setup some fake keypresses 
 			// Passing empty string will cause just a ctrl-q to be fired
 			int stackSize = CreateInput ("");
@@ -132,10 +134,12 @@ namespace Terminal.Gui {
 			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 			scenario.Init (Application.Top, Colors.Base);
 			scenario.Setup ();
-			var rs = Application.Begin (Application.Top);
+			// There is no need to call Application.Begin because Init already creates the Application.Top
+			// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
+			//var rs = Application.Begin (Application.Top);
 			scenario.Run ();
 
-			Application.End (rs);
+			//Application.End (rs);
 
 			Assert.Equal (0, abortCount);
 			// # of key up events should match # of iterations
