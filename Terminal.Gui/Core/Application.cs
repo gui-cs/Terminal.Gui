@@ -1223,5 +1223,13 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Wakes up the mainloop that might be waiting on input, must be thread safe.
+		/// </summary>
+		public static void DoEvents ()
+		{
+			MainLoop.Driver.Wakeup ();
+		}
 	}
 }
