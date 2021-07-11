@@ -38,14 +38,8 @@ namespace Terminal.Gui {
 
 		public bool LoadFile (string file)
 		{
-			if (file == null)
-				throw new ArgumentNullException (nameof (file));
-			try {
-				FilePath = file;
-				var stream = File.OpenRead (file);
-			} catch {
-				return false;
-			}
+			FilePath = file ?? throw new ArgumentNullException (nameof (file));
+
 			LoadStream (File.OpenRead (file));
 			return true;
 		}
@@ -54,12 +48,9 @@ namespace Terminal.Gui {
 		{
 			if (FilePath == null)
 				throw new ArgumentNullException (nameof (FilePath));
-			try {
-				FilePath = null;
-				lines = new List<List<Rune>> ();
-			} catch {
-				return false;
-			}
+
+			FilePath = null;
+			lines = new List<List<Rune>> ();
 			return true;
 		}
 
@@ -1241,10 +1232,8 @@ namespace Terminal.Gui {
 		/// <param name="path">Path to the file to load.</param>
 		public bool LoadFile (string path)
 		{
-			if (path == null)
-				throw new ArgumentNullException (nameof (path));
-			ResetPosition ();
 			var res = model.LoadFile (path);
+			ResetPosition ();
 			SetNeedsDisplay ();
 			return res;
 		}
@@ -1269,8 +1258,8 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 		public bool CloseFile ()
 		{
-			ResetPosition ();
 			var res = model.CloseFile ();
+			ResetPosition ();
 			SetNeedsDisplay ();
 			return res;
 		}
@@ -1701,7 +1690,7 @@ namespace Terminal.Gui {
 						&& HasFocus && idxCol < lineRuneCount) {
 						ColorUsed (line, idxCol);
 					} else {
-						ColorNormal (line,idxCol);
+						ColorNormal (line, idxCol);
 					}
 
 					if (rune == '\t' && TabWidth > 0) {
@@ -1974,7 +1963,7 @@ namespace Terminal.Gui {
 			List<Rune> rest;
 
 			// if the user presses Left (without any control keys) and they are at the start of the text
-			if(kb.Key == Key.CursorLeft && currentColumn == 0 && currentRow == 0) {
+			if (kb.Key == Key.CursorLeft && currentColumn == 0 && currentRow == 0) {
 				// do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
 				return false;
 			}

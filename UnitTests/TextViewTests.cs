@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views {
 	public class TextViewTests {
 		private static TextView _textView;
 
-		// This class enables test functions annoated with the [InitShutdown] attribute
+		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
 		// 
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
@@ -1751,5 +1751,27 @@ namespace Terminal.Gui.Views {
 
 			return col;
 		}
+
+		[Fact]
+		public void LoadFile_Throws_If_File_Is_Null ()
+		{
+			var tv = new TextView ();
+			Assert.Throws<ArgumentNullException> (() => tv.LoadFile (null));
+		}
+
+		[Fact]
+		public void LoadFile_Throws_If_File_Is_Empty ()
+		{
+			var tv = new TextView ();
+			Assert.Throws<ArgumentException> (() => tv.LoadFile (""));
+		}
+
+		[Fact]
+		public void CloseFile_Throws_If_FilePath_Is_Null ()
+		{
+			var tv = new TextView ();
+			Assert.Throws<ArgumentNullException> (() => tv.CloseFile ());
+		}
+
 	}
 }
