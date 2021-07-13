@@ -35,7 +35,7 @@ namespace UICatalog {
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("_Save As", "", () => SaveAs()),
-					new MenuItem ("_Close", "", () => Close()),
+					new MenuItem ("_Close", "", () => CloseFile()),
 					null,
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -136,6 +136,9 @@ namespace UICatalog {
 				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
 					|| e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
+				} else if (e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask)) {
+					Quit ();
+					e.Handled = true;
 				}
 			};
 		}
@@ -371,13 +374,18 @@ namespace UICatalog {
 			return true;
 		}
 
-		private void Close ()
+		private void CloseFile ()
 		{
-			if (!CanCloseFile () || _fileName == null) {
+			if (!CanCloseFile ()) {
 				return;
 			}
 
-			New (false);
+			try {
+				_textView.CloseFile ();
+				New (false);
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery ("Error", ex.Message, "Ok");
+			}
 		}
 
 		private void Quit ()
