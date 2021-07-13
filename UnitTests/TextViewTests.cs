@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class TextViewTests {
 		private static TextView _textView;
+		readonly ITestOutputHelper output;
+
+		public TextViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
@@ -1871,6 +1878,55 @@ namespace Terminal.Gui.Views {
 		{
 			var tv = new TextView ();
 			Assert.Throws<ArgumentNullException> (() => tv.CloseFile ());
+		}
+
+		[Fact]
+		public void WordWrap_Gets_Sets ()
+		{
+			var tv = new TextView () { WordWrap = true };
+			Assert.True (tv.WordWrap);
+			tv.WordWrap = false;
+			Assert.False (tv.WordWrap);
+		}
+
+		[Fact]
+		public void WordWrap_True_Text_Always_Returns_Unwrapped ()
+		{
+			var text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () { Width = 10 };
+			tv.Text = text;
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+			tv.WordWrap = true;
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void WordWrap_WrapModel_Output ()
+		{
+			//          0123456789
+			var text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () { Width = 10, Height = 10 };
+			tv.Text = text;
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+			tv.WordWrap = true;
+
+			Application.Top.Add (tv);
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+This is 
+the 
+first 
+line.
+This is 
+the 
+second 
+line.
+";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 		}
 	}
 }
