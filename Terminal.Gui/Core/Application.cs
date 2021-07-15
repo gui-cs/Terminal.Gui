@@ -83,7 +83,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup which <see cref="Toplevel.IsMdiContainer"/> is true.
 		/// </summary>
-		public static Toplevel MdiTop { get; private set; }
+		public static Toplevel MdiTop {
+			get {
+				if (Top.IsMdiContainer) {
+					return Top;
+				}
+				return null;
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -275,9 +282,6 @@ namespace Terminal.Gui {
 				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			}
 			Top = topLevelFactory ();
-			if (Top.IsMdiContainer) {
-				MdiTop = Top;
-			}
 			Current = Top;
 			_initialized = true;
 		}
@@ -699,8 +703,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (toplevel.IsMdiContainer) {
-				MdiTop = toplevel;
-				Top = MdiTop;
+				Top = toplevel;
 			}
 
 			var refreshDriver = true;
@@ -783,7 +786,6 @@ namespace Terminal.Gui {
 			toplevels.Clear ();
 			Current = null;
 			Top = null;
-			MdiTop = null;
 
 			MainLoop = null;
 			Driver?.End ();
@@ -843,18 +845,15 @@ namespace Terminal.Gui {
 				MdiTop.OnChildClosed (view as Toplevel);
 			}
 
-			if (toplevels.Count == 1 && Current == MdiTop) {
-				MdiTop.OnAllChildClosed ();
-				if (!MdiTop.IsMdiContainer) {
-					MdiTop = null;
-				}
-			}
-
 			if (toplevels.Count == 0) {
 				Current = null;
 			} else {
 				Current = toplevels.Peek ();
-				SetCurrentAsTop ();
+				if (toplevels.Count == 1 && Current == MdiTop) {
+					MdiTop.OnAllChildClosed ();
+				} else {
+					SetCurrentAsTop ();
+				}
 				Refresh ();
 			}
 		}
@@ -980,11 +979,7 @@ namespace Terminal.Gui {
 		{
 			if (_initialized && Driver != null) {
 				var top = new T ();
-				if (top.GetType ().BaseType == typeof (Toplevel)) {
-					if (MdiTop == null) {
-						Top = top;
-					}
-				} else {
+				if (top.GetType ().BaseType != typeof (Toplevel)) {
 					throw new ArgumentException (top.GetType ().BaseType.Name);
 				}
 				Run (top, errorHandler);
