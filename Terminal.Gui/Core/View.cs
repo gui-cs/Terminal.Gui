@@ -1338,7 +1338,18 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			DrawText ();
+			if (ColorScheme != null) {
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
+
+			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
+				Clear ();
+				// Draw any Text
+				if (textFormatter != null) {
+					textFormatter.NeedsFormat = true;
+				}
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+			}
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
@@ -1364,33 +1375,6 @@ namespace Terminal.Gui {
 			}
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-		}
-
-		void DrawText ()
-		{
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			}
-
-			if (!ustring.IsNullOrEmpty (Text)) {
-				var savedClip = ClipToBounds ();
-				Rect viewBounds = Bounds;
-				if (SuperView != null && viewBounds.Width > SuperView.Bounds.Width) {
-					viewBounds.Width = SuperView.Bounds.Width;
-				}
-				if (SuperView != null && viewBounds.Height > SuperView.Bounds.Height) {
-					viewBounds.Height = SuperView.Bounds.Height;
-				}
-				var viewFrame = ViewToScreen (viewBounds);
-				Clear (viewFrame);
-				// Draw any Text
-				if (textFormatter != null) {
-					textFormatter.NeedsFormat = true;
-				}
-				textFormatter?.Draw (viewFrame, HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-
-				Driver.Clip = savedClip;
-			}
 		}
 
 		/// <summary>
@@ -2276,7 +2260,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Visible { get; set; } = true;
 
-		internal bool CanBeVisible (View view)
+		bool CanBeVisible (View view)
 		{
 			if (!view.Visible) {
 				return false;
