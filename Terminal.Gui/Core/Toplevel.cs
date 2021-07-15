@@ -495,7 +495,7 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
 			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				m = Application.MdiTop?.MenuBar != null || Application.Top.MenuBar != null;
+				m = Application.Top.MenuBar != null;
 			} else {
 				m = ((Toplevel)SuperView).MenuBar != null;
 			}
@@ -506,9 +506,7 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Max (y, l);
 			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				s = (Application.MdiTop != null && Application.MdiTop.StatusBar != null
-					&& Application.MdiTop.StatusBar.Visible)
-					|| (Application.Top.StatusBar != null && Application.Top.StatusBar.Visible);
+				s = Application.Top.StatusBar != null && Application.Top.StatusBar.Visible;
 			} else {
 				s = ((Toplevel)SuperView).StatusBar != null && ((Toplevel)SuperView).StatusBar.Visible;
 			}
@@ -543,7 +541,7 @@ namespace Terminal.Gui {
 		public virtual void PositionToplevel (Toplevel top)
 		{
 			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-			if ((top?.SuperView != null || Application.MdiTop != null && top != Application.MdiTop)
+			if ((top?.SuperView != null || top != Application.Top)
 				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
@@ -556,9 +554,9 @@ namespace Terminal.Gui {
 			View superView = null;
 			StatusBar statusBar = null;
 
-			if (top != Application.MdiTop && Application.MdiTop != null && Application.MdiTop.StatusBar != null) {
-				superView = Application.MdiTop;
-				statusBar = Application.MdiTop.StatusBar;
+			if (top != Application.Top && Application.Top.StatusBar != null) {
+				superView = Application.Top;
+				statusBar = Application.Top.StatusBar;
 			} else if (top?.SuperView != null && top.SuperView is Toplevel toplevel) {
 				superView = top.SuperView;
 				statusBar = toplevel.StatusBar;
@@ -569,7 +567,7 @@ namespace Terminal.Gui {
 						top.Height = Dim.Fill (statusBar.Visible ? 1 : 0);
 					}
 				}
-				if (superView == Application.MdiTop) {
+				if (superView == Application.Top) {
 					top.SetRelativeLayout (superView.Frame);
 				} else {
 					superView.LayoutSubviews ();
@@ -587,52 +585,17 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (this == Application.MdiTop) {
-				RedrawMdi (bounds);
-			} else {
-				if (!CanBeVisible (this)) {
-					return;
-				}
-
-				if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
-					Driver.SetAttribute (ColorScheme.Normal);
-
-					// This is the Application.Top. Clear just the region we're being asked to redraw 
-					// (the bounds passed to us).
-					// Must be the screen-relative region to clear, not the bounds.
-					Clear (Frame);
-					Driver.SetAttribute (Colors.Base.Normal);
-				}
-			}
-
-			if (LayoutStyle == LayoutStyle.Computed)
-				SetRelativeLayout (Bounds);
-			PositionToplevels ();
-			LayoutSubviews ();
-
-			foreach (var view in Subviews) {
-				if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
-					view.SetNeedsLayout ();
-					view.SetNeedsDisplay (view.Bounds);
-					view.Redraw (view.Bounds);
-				}
-			}
-
-			ClearLayoutNeeded ();
-			ClearNeedsDisplay ();
-		}
-
-		void RedrawMdi (Rect bounds)
-		{
-			if (!IsMdiContainer) {
+			if (!Visible) {
 				return;
 			}
 
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (ColorScheme.Normal);
 
+				// This is the Application.Top. Clear just the region we're being asked to redraw 
+				// (the bounds passed to us).
+				// Must be the screen-relative region to clear, not the bounds.
 				Clear (Frame);
-
 				Driver.SetAttribute (Colors.Base.Normal);
 
 				if (LayoutStyle == LayoutStyle.Computed)
@@ -640,19 +603,31 @@ namespace Terminal.Gui {
 				PositionToplevels ();
 				LayoutSubviews ();
 
-				foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
-					if (top.Frame.IntersectsWith (bounds)) {
-						if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
-							top.SetNeedsLayout ();
-							top.SetNeedsDisplay (top.Bounds);
-							top.Redraw (top.Bounds);
+				if (this == Application.MdiTop) {
+					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+						if (top.Frame.IntersectsWith (bounds)) {
+							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+								top.SetNeedsLayout ();
+								top.SetNeedsDisplay (top.Bounds);
+								top.Redraw (top.Bounds);
+							}
 						}
+					}
+				}
+
+				foreach (var view in Subviews) {
+					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
+						view.SetNeedsLayout ();
+						view.SetNeedsDisplay (view.Bounds);
+						//view.Redraw (view.Bounds);
 					}
 				}
 
 				ClearLayoutNeeded ();
 				ClearNeedsDisplay ();
 			}
+
+			base.Redraw (Bounds);
 		}
 
 		bool OutsideTopFrame (Toplevel top)
