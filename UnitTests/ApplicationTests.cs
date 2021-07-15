@@ -976,5 +976,156 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void AllChildClosed_Event_Test ()
+		{
+			Init ();
+
+			var mdi = new Mdi ();
+			var c1 = new Toplevel ();
+			var c2 = new Window ();
+			var c3 = new Window ();
+
+			// MdiChild = c1, c2, c3
+			var iterations = 3;
+
+			mdi.Ready += () => {
+				Assert.Empty (Application.MdiChildes);
+				Application.Run (c1);
+			};
+			c1.Ready += () => {
+				Assert.Single (Application.MdiChildes);
+				Application.Run (c2);
+			};
+			c2.Ready += () => {
+				Assert.Equal (2, Application.MdiChildes.Count);
+				Application.Run (c3);
+			};
+			c3.Ready += () => {
+				Assert.Equal (3, Application.MdiChildes.Count);
+				c3.RequestStop ();
+				c2.RequestStop ();
+				c1.RequestStop ();
+			};
+			// Now this will close the MdiContainer when all MdiChildes was closed
+			mdi.AllChildClosed += () => {
+				mdi.RequestStop ();
+			};
+			Application.Iteration += () => {
+				if (iterations == 3) {
+					// The Current still is c3 because Current.Running is false.
+					Assert.True (Application.Current == c3);
+					Assert.False (Application.Current.Running);
+					// But the childes order were reorder by Running = false
+					Assert.True (Application.MdiChildes [0] == c3);
+					Assert.True (Application.MdiChildes [1] == c2);
+					Assert.True (Application.MdiChildes [^1] == c1);
+				} else if (iterations == 2) {
+					// The Current is c2 and Current.Running is false.
+					Assert.True (Application.Current == c2);
+					Assert.False (Application.Current.Running);
+					Assert.True (Application.MdiChildes [0] == c2);
+					Assert.True (Application.MdiChildes [^1] == c1);
+				} else if (iterations == 1) {
+					// The Current is c1 and Current.Running is false.
+					Assert.True (Application.Current == c1);
+					Assert.False (Application.Current.Running);
+					Assert.True (Application.MdiChildes [^1] == c1);
+				} else {
+					// The Current is mdi.
+					Assert.True (Application.Current == mdi);
+					Assert.False (Application.Current.Running);
+					Assert.Empty (Application.MdiChildes);
+				}
+				iterations--;
+			};
+
+			Application.Run (mdi);
+
+			Assert.Empty (Application.MdiChildes);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
+		{
+			Init ();
+
+			var t1 = new Toplevel ();
+			var t2 = new Toplevel ();
+			var t3 = new Toplevel ();
+			var d = new Dialog ();
+			var t4 = new Toplevel ();
+
+			// t1, t2, t3, d, t4
+			var iterations = 5;
+
+			t1.Ready += () => {
+				Assert.Equal (t1, Application.Top);
+				Application.Run (t2);
+			};
+			t2.Ready += () => {
+				Assert.Equal (t2, Application.Top);
+				Application.Run (t3);
+			};
+			t3.Ready += () => {
+				Assert.Equal (t3, Application.Top);
+				Application.Run (d);
+			};
+			d.Ready += () => {
+				Assert.Equal (t3, Application.Top);
+				Application.Run (t4);
+			};
+			t4.Ready += () => {
+				Assert.Equal (t4, Application.Top);
+				t4.RequestStop ();
+				d.RequestStop ();
+				t3.RequestStop ();
+				t2.RequestStop ();
+			};
+			// Now this will close the MdiContainer when all MdiChildes was closed
+			t2.Closed += (_) => {
+				t1.RequestStop ();
+			};
+			Application.Iteration += () => {
+				if (iterations == 5) {
+					// The Current still is t4 because Current.Running is false.
+					Assert.Equal (t4, Application.Current);
+					Assert.False (Application.Current.Running);
+					Assert.Equal (t4, Application.Top);
+				} else if (iterations == 4) {
+					// The Current is d and Current.Running is false.
+					Assert.Equal (d, Application.Current);
+					Assert.False (Application.Current.Running);
+					Assert.Equal (t4, Application.Top);
+				} else if (iterations == 3) {
+					// The Current is t3 and Current.Running is false.
+					Assert.Equal (t3, Application.Current);
+					Assert.False (Application.Current.Running);
+					Assert.Equal (t3, Application.Top);
+				} else if (iterations == 2) {
+					// The Current is t2 and Current.Running is false.
+					Assert.Equal (t2, Application.Current);
+					Assert.False (Application.Current.Running);
+					Assert.Equal (t2, Application.Top);
+				} else {
+					// The Current is t1.
+					Assert.Equal (t1, Application.Current);
+					Assert.False (Application.Current.Running);
+					Assert.Equal (t1, Application.Top);
+				}
+				iterations--;
+			};
+
+			Application.Run (t1);
+
+			Assert.Equal (t1, Application.Top);
+
+			Application.Shutdown ();
+
+			Assert.Null (Application.Top);
+		}
 	}
 }
