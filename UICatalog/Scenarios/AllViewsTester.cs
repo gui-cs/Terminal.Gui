@@ -228,7 +228,8 @@ namespace UICatalog {
 
 			Top.Add (_leftPane, _settingsPane, _hostPane);
 
-			_curView = CreateClass (_viewClasses.First ().Value);
+			// This is not needed because ListView always run the SelectedItemChanged event at first time
+			//_curView = CreateClass (_viewClasses.First ().Value);
 		}
 
 		void DimPosChanged (View view)
