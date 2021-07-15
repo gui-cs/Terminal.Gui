@@ -113,7 +113,11 @@ namespace UICatalog {
 				item.Action += () => {
 					var top = Application.MdiChildes.Find ((x) => x.Data.ToString () == "WorkerApp");
 					item.Checked = top.Visible = !item.Checked;
-					Application.MdiTop.SetNeedsDisplay ();
+					if (top.Visible) {
+						top.ShowChild ();
+					} else {
+						Application.MdiTop.SetNeedsDisplay ();
+					}
 				};
 				menuItems.Add (item);
 				return new MenuBarItem ("_View",
