@@ -363,8 +363,9 @@ namespace Terminal.Gui {
 
 			Top.Add (_leftPane, _settingsPane, _hostPane);
 
-			// This is not needed because ListView always run the SelectedItemChanged event at first time
-			//_curView = CreateClass (_viewClasses.First ().Value);
+			Top.LayoutSubviews ();
+
+			_curView = CreateClass (_viewClasses.First ().Value);
 
 			int iterations = 0;
 
