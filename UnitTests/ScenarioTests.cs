@@ -373,6 +373,8 @@ namespace Terminal.Gui {
 
 				if (iterations < _viewClasses.Count) {
 					_classListView.MoveDown ();
+					Assert.Equal (_curView.GetType ().Name,
+						_viewClasses.Values.ToArray () [_classListView.SelectedItem].Name);
 				} else {
 					Application.RequestStop ();
 				}
