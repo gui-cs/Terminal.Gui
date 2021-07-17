@@ -40,7 +40,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Creates a horizontal or line based on
+		/// Creates a horizontal or vertical line based on <paramref name="orientation"/>
 		/// </summary>
 		public LineView (Orientation orientation)
 		{
