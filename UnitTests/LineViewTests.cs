@@ -7,6 +7,7 @@ namespace UnitTests {
 	public class LineViewTests {
 
 		[Fact]
+		[AutoInitShutdown]
 		public void LineView_DefaultConstructor()
 		{
 			var horizontal = new LineView();
@@ -16,6 +17,7 @@ namespace UnitTests {
 			Assert.Equal (1, horizontal.Height);
 		}
 		[Fact]
+		[AutoInitShutdown]
 		public void LineView_Horizontal ()
 		{
 			var horizontal = new LineView (Orientation.Horizontal);
@@ -25,13 +27,14 @@ namespace UnitTests {
 			Assert.Equal (1, horizontal.Height);
 		}
 		[Fact]
+		[AutoInitShutdown]
 		public void LineView_Vertical ()
 		{
 			var vert = new LineView (Orientation.Vertical);
 
 			Assert.Equal (Orientation.Vertical, vert.Orientation);
-			Assert.Equal (Dim.Fill (), vert.Width);
-			Assert.Equal (1, vert.Height);
+			Assert.Equal (Dim.Fill(), vert.Height);
+			Assert.Equal (1, vert.Width);
 		}
 	}
 }
