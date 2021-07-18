@@ -1282,8 +1282,10 @@ namespace Terminal.Gui {
 				return colorScheme;
 			}
 			set {
-				colorScheme = value;
-				SetNeedsDisplay ();
+				if (colorScheme != value) {
+					colorScheme = value;
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
