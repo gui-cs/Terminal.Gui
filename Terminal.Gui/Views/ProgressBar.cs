@@ -1,5 +1,54 @@
-﻿using System;
+﻿using NStack;
+using System;
 namespace Terminal.Gui {
+	/// <summary>
+	/// Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.
+	/// </summary>
+	public enum ProgressBarStyle {
+		/// <summary>
+		/// Indicates progress by increasing the number of segmented blocks in a <see cref="ProgressBar"/>.
+		/// </summary>
+		Blocks,
+		/// <summary>
+		/// Indicates progress by increasing the size of a smooth, continuous bar in a <see cref="ProgressBar"/>.
+		/// </summary>
+		Continuous,
+		/// <summary>
+		/// Indicates progress by continuously scrolling a block across a <see cref="ProgressBar"/> in a marquee fashion.
+		/// </summary>
+		MarqueeBlocks,
+		/// <summary>
+		/// Indicates progress by continuously scrolling a block across a <see cref="ProgressBar"/> in a marquee fashion.
+		/// </summary>
+		MarqueeContinuous
+
+	}
+
+	/// <summary>
+	///Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.
+	/// </summary>
+	public enum ProgressBarFormat {
+		/// <summary>
+		/// A simple visual presentation showing only the progress bar.
+		/// </summary>
+		Simple,
+		/// <summary>
+		/// A simple visual presentation showing the progress bar and the percentage.
+		/// </summary>
+		SimplePlusPercentage,
+		/// <summary>
+		/// A framed visual presentation showing only the progress bar.
+		/// </summary>
+		Framed,
+		/// <summary>
+		/// A framed visual presentation showing the progress bar and the percentage.
+		/// </summary>
+		FramedPlusPercentage,
+		/// <summary>
+		/// A framed visual presentation showing all with the progress bar padded.
+		/// </summary>
+		FramedProgressPadded
+	}
 
 	/// <summary>
 	/// A Progress Bar view that can indicate progress of an activity visually.
@@ -16,7 +65,8 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class ProgressBar : View {
 		bool isActivity;
-		int activityPos, delta;
+		int [] activityPos;
+		int delta, padding;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode with an absolute position and size.
@@ -24,8 +74,7 @@ namespace Terminal.Gui {
 		/// <param name="rect">Rect.</param>
 		public ProgressBar (Rect rect) : base (rect)
 		{
-			CanFocus = false;
-			fraction = 0;
+			Initialize (rect);
 		}
 
 		/// <summary>
@@ -33,8 +82,20 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ProgressBar () : base ()
 		{
+			Initialize (Rect.Empty);
+		}
+
+		void Initialize (Rect rect)
+		{
 			CanFocus = false;
 			fraction = 0;
+			ColorScheme = new ColorScheme () {
+				Normal = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Gray),
+				HotNormal = Colors.Base.Normal
+			};
+			if (rect.IsEmpty) {
+				Height = 1;
+			}
 		}
 
 		float fraction;
@@ -46,32 +107,158 @@ namespace Terminal.Gui {
 		public float Fraction {
 			get => fraction;
 			set {
-				fraction = value;
+				fraction = Math.Min (value, 1);
 				isActivity = false;
 				SetNeedsDisplay ();
 			}
+		}
+
+		ProgressBarStyle progressBarStyle;
+
+		/// <summary>
+		/// Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/>
+		/// </summary>
+		public ProgressBarStyle ProgressBarStyle {
+			get => progressBarStyle;
+			set {
+				progressBarStyle = value;
+				switch (value) {
+				case ProgressBarStyle.Blocks:
+					SegmentCharacter = Driver.BlocksMeterSegment;
+					break;
+				case ProgressBarStyle.Continuous:
+					SegmentCharacter = Driver.ContinuousMeterSegment;
+					break;
+				case ProgressBarStyle.MarqueeBlocks:
+					SegmentCharacter = Driver.BlocksMeterSegment;
+					break;
+				case ProgressBarStyle.MarqueeContinuous:
+					SegmentCharacter = Driver.ContinuousMeterSegment;
+					break;
+				}
+				SetNeedsDisplay ();
+			}
+		}
+
+		private ProgressBarFormat progressBarFormat;
+
+		/// <summary>
+		/// Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.
+		/// </summary>
+		public ProgressBarFormat ProgressBarFormat {
+			get => progressBarFormat;
+			set {
+				progressBarFormat = GetProgressBarFormat (value);
+				switch (progressBarFormat) {
+				case ProgressBarFormat.Simple:
+					Height = 1;
+					break;
+				case ProgressBarFormat.SimplePlusPercentage:
+					Height = 2;
+					break;
+				case ProgressBarFormat.Framed:
+					Height = 3;
+					break;
+				case ProgressBarFormat.FramedPlusPercentage:
+					Height = 4;
+					break;
+				case ProgressBarFormat.FramedProgressPadded:
+					Height = 6;
+					break;
+				}
+				SetNeedsDisplay ();
+			}
+		}
+
+		private Rune segmentCharacter = Driver.BlocksMeterSegment;
+
+		/// <summary>
+		/// Segment indicator for meter views.
+		/// </summary>
+		public Rune SegmentCharacter {
+			get => segmentCharacter;
+			set {
+				segmentCharacter = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		///<inheritdoc/>
+		public override ustring Text {
+			get => GetPercentageText ();
+			set {
+				base.Text = GetPercentageText ();
+			}
+		}
+
+		ProgressBarFormat GetProgressBarFormat (ProgressBarFormat pbf)
+		{
+			if (progressBarStyle == ProgressBarStyle.MarqueeBlocks
+				|| progressBarStyle == ProgressBarStyle.MarqueeContinuous) {
+
+				switch (pbf) {
+				case ProgressBarFormat.Simple:
+					break;
+				case ProgressBarFormat.SimplePlusPercentage:
+					return ProgressBarFormat.Simple;
+				case ProgressBarFormat.Framed:
+					break;
+				case ProgressBarFormat.FramedPlusPercentage:
+					return ProgressBarFormat.Framed;
+				case ProgressBarFormat.FramedProgressPadded:
+					return ProgressBarFormat.Framed;
+				}
+			}
+			return pbf;
+		}
+
+		ustring GetPercentageText ()
+		{
+			if (progressBarStyle != ProgressBarStyle.MarqueeBlocks
+				&& progressBarStyle != ProgressBarStyle.MarqueeContinuous) {
+				switch (progressBarFormat) {
+				case ProgressBarFormat.Simple:
+				case ProgressBarFormat.Framed:
+					break;
+				case ProgressBarFormat.SimplePlusPercentage:
+				case ProgressBarFormat.FramedPlusPercentage:
+				case ProgressBarFormat.FramedProgressPadded:
+					return $"{fraction * 100:F0}%";
+				}
+			}
+
+			return "";
 		}
 
 		/// <summary>
 		/// Notifies the <see cref="ProgressBar"/> that some progress has taken place.
 		/// </summary>
 		/// <remarks>
-		/// If the <see cref="ProgressBar"/> is is percentage mode, it switches to activity
-		/// mode.   If is in activity mode, the marker is moved.
+		/// If the <see cref="ProgressBar"/> is percentage mode, it switches to activity
+		/// mode. If is in activity mode, the marker is moved.
 		/// </remarks>
 		public void Pulse ()
 		{
+			if (activityPos == null) {
+				PopulateActivityPos ();
+			}
 			if (!isActivity) {
 				isActivity = true;
-				activityPos = 0;
 				delta = 1;
 			} else {
-				activityPos += delta;
-				if (activityPos < 0) {
-					activityPos = 1;
+				for (int i = 0; i < activityPos.Length; i++) {
+					activityPos [i] += delta;
+				}
+				int fWidth = GetFrameWidth ();
+				if (activityPos [activityPos.Length - 1] < 0) {
+					for (int i = 0; i < activityPos.Length; i++) {
+						activityPos [i] = i - activityPos.Length + 2;
+					}
 					delta = 1;
-				} else if (activityPos >= Frame.Width) {
-					activityPos = Frame.Width - 2;
+				} else if (activityPos [0] >= fWidth) {
+					for (int i = 0; i < activityPos.Length; i++) {
+						activityPos [i] = fWidth + i - 2;
+					}
 					delta = -1;
 				}
 			}
@@ -80,26 +267,95 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw(Rect region)
+		public override void Redraw (Rect region)
 		{
+			DrawFrame ();
+
 			Driver.SetAttribute (ColorScheme.Normal);
 
-			int top = Frame.Width;
+			int fWidth = GetFrameWidth ();
 			if (isActivity) {
-				Move (0, 0);
-				for (int i = 0; i < top; i++)
-					if (i == activityPos)
-						Driver.AddRune (Driver.Stipple);
+				Move (padding, padding);
+				for (int i = 0; i < fWidth; i++)
+					if (Array.IndexOf (activityPos, i) != -1)
+						Driver.AddRune (SegmentCharacter);
 					else
 						Driver.AddRune (' ');
 			} else {
-				Move (0, 0);
-				int mid = (int)(fraction * top);
+				Move (padding, padding);
+				int mid = (int)(fraction * fWidth);
 				int i;
-				for (i = 0; i < mid; i++)
-					Driver.AddRune (Driver.Stipple);
-				for (; i < top; i++)
+				for (i = 0; i < mid & i < fWidth; i++)
+					Driver.AddRune (SegmentCharacter);
+				for (; i < fWidth; i++)
 					Driver.AddRune (' ');
+				DrawText (fWidth);
+			}
+		}
+
+		int GetFrameWidth ()
+		{
+			switch (progressBarFormat) {
+			case ProgressBarFormat.Simple:
+			case ProgressBarFormat.SimplePlusPercentage:
+				break;
+			case ProgressBarFormat.Framed:
+			case ProgressBarFormat.FramedPlusPercentage:
+				return Frame.Width - 2;
+			case ProgressBarFormat.FramedProgressPadded:
+				return Frame.Width - 2 - padding;
+			}
+
+			return Frame.Width;
+		}
+
+		void DrawText (int fWidth)
+		{
+			switch (progressBarFormat) {
+			case ProgressBarFormat.Simple:
+			case ProgressBarFormat.Framed:
+				break;
+			case ProgressBarFormat.SimplePlusPercentage:
+			case ProgressBarFormat.FramedPlusPercentage:
+			case ProgressBarFormat.FramedProgressPadded:
+				var tf = new TextFormatter () {
+					Alignment = TextAlignment.Centered,
+					Text = Text
+				};
+				var row = padding + (progressBarFormat == ProgressBarFormat.FramedProgressPadded
+					? 2 : 1);
+				Move (padding, row);
+				var rect = new Rect (padding, row, fWidth, Frame.Height);
+				tf?.Draw (ViewToScreen (rect), ColorScheme.HotNormal, ColorScheme.HotNormal);
+				break;
+			}
+		}
+
+		void DrawFrame ()
+		{
+			switch (progressBarFormat) {
+			case ProgressBarFormat.Simple:
+			case ProgressBarFormat.SimplePlusPercentage:
+				padding = 0;
+				break;
+			case ProgressBarFormat.Framed:
+			case ProgressBarFormat.FramedPlusPercentage:
+				padding = 1;
+				Application.Driver.DrawWindowFrame (ViewToScreen (Bounds), padding, padding, padding, padding, true);
+				break;
+			case ProgressBarFormat.FramedProgressPadded:
+				padding = 2;
+				Application.Driver.DrawWindowFrame (ViewToScreen (Bounds), padding, padding, padding, padding + 1, true);
+				Application.Driver.DrawWindowFrame (ViewToScreen (Bounds), padding - 1, padding - 1, padding - 1, padding - 1, true);
+				break;
+			}
+		}
+
+		void PopulateActivityPos ()
+		{
+			activityPos = new int [Math.Min (Frame.Width / 3, 5)];
+			for (int i = 0; i < activityPos.Length; i++) {
+				activityPos [i] = i - activityPos.Length + 1;
 			}
 		}
 
