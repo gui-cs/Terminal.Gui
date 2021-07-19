@@ -15,7 +15,7 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			const float fractionStep = 0.01F;
-			const int pbWidth = 15;
+			const int pbWidth = 20;
 
 			var pbFormatEnum = Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
 
@@ -54,7 +54,7 @@ namespace UICatalog {
 
 			var button = new Button ("Start timer") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (continuousPB) + 2
+				Y = Pos.Bottom (continuousPB) + 1
 			};
 			button.Clicked += () => {
 				if (_fractionTimer == null) {
@@ -79,7 +79,7 @@ namespace UICatalog {
 
 			label = new Label ("Marquee Blocks") {
 				X = Pos.Center (),
-				Y = Pos.Y (button) + 2
+				Y = Pos.Y (button) + 3
 			};
 			Win.Add (label);
 
@@ -106,13 +106,14 @@ namespace UICatalog {
 			Win.Add (marqueesContinuousPB);
 
 			rbPBFormat.SelectedItemChanged += (e) => {
-				blocksPB.ProgressBarFormat =(ProgressBarFormat) e.SelectedItem;
-				continuousPB.ProgressBarFormat =(ProgressBarFormat) e.SelectedItem;
-				marqueesBlocksPB.ProgressBarFormat =(ProgressBarFormat) e.SelectedItem;
-				marqueesContinuousPB.ProgressBarFormat =(ProgressBarFormat) e.SelectedItem;
+				blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
+				continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
+				marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
+				marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 			};
 
 			_pulseTimer = new Timer ((_) => {
+				marqueesBlocksPB.Text = marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
 				marqueesBlocksPB.Pulse ();
 				marqueesContinuousPB.Pulse ();
 				Application.MainLoop.Driver.Wakeup ();

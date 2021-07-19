@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 		public ProgressBarFormat ProgressBarFormat {
 			get => progressBarFormat;
 			set {
-				progressBarFormat = GetProgressBarFormat (value);
+				progressBarFormat = value;
 				switch (progressBarFormat) {
 				case ProgressBarFormat.Simple:
 					Height = 1;
@@ -187,47 +187,36 @@ namespace Terminal.Gui {
 		public override ustring Text {
 			get => GetPercentageText ();
 			set {
-				base.Text = GetPercentageText ();
+				base.Text = SetPercentageText (value);
 			}
-		}
-
-		ProgressBarFormat GetProgressBarFormat (ProgressBarFormat pbf)
-		{
-			if (progressBarStyle == ProgressBarStyle.MarqueeBlocks
-				|| progressBarStyle == ProgressBarStyle.MarqueeContinuous) {
-
-				switch (pbf) {
-				case ProgressBarFormat.Simple:
-					break;
-				case ProgressBarFormat.SimplePlusPercentage:
-					return ProgressBarFormat.Simple;
-				case ProgressBarFormat.Framed:
-					break;
-				case ProgressBarFormat.FramedPlusPercentage:
-					return ProgressBarFormat.Framed;
-				case ProgressBarFormat.FramedProgressPadded:
-					return ProgressBarFormat.Framed;
-				}
-			}
-			return pbf;
 		}
 
 		ustring GetPercentageText ()
 		{
-			if (progressBarStyle != ProgressBarStyle.MarqueeBlocks
-				&& progressBarStyle != ProgressBarStyle.MarqueeContinuous) {
-				switch (progressBarFormat) {
-				case ProgressBarFormat.Simple:
-				case ProgressBarFormat.Framed:
-					break;
-				case ProgressBarFormat.SimplePlusPercentage:
-				case ProgressBarFormat.FramedPlusPercentage:
-				case ProgressBarFormat.FramedProgressPadded:
-					return $"{fraction * 100:F0}%";
-				}
+			switch (progressBarStyle) {
+			case ProgressBarStyle.Blocks:
+			case ProgressBarStyle.Continuous:
+				return $"{fraction * 100:F0}%";
+			case ProgressBarStyle.MarqueeBlocks:
+			case ProgressBarStyle.MarqueeContinuous:
+				break;
 			}
 
-			return "";
+			return base.Text;
+		}
+
+		ustring SetPercentageText (ustring value)
+		{
+			switch (progressBarStyle) {
+			case ProgressBarStyle.Blocks:
+			case ProgressBarStyle.Continuous:
+				return $"{fraction * 100:F0}%";
+			case ProgressBarStyle.MarqueeBlocks:
+			case ProgressBarStyle.MarqueeContinuous:
+				break;
+			}
+
+			return value;
 		}
 
 		/// <summary>
@@ -289,8 +278,9 @@ namespace Terminal.Gui {
 					Driver.AddRune (SegmentCharacter);
 				for (; i < fWidth; i++)
 					Driver.AddRune (' ');
-				DrawText (fWidth);
 			}
+
+			DrawText (fWidth);
 		}
 
 		int GetFrameWidth ()

@@ -84,11 +84,11 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, pb2.Height);
 
 			pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (ProgressBarFormat.Simple, pb1.ProgressBarFormat);
-			Assert.Equal (1, pb1.Height);
+			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
+			Assert.Equal (2, pb1.Height);
 			pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (ProgressBarFormat.Simple, pb2.ProgressBarFormat);
-			Assert.Equal (1, pb2.Height);
+			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
+			Assert.Equal (2, pb2.Height);
 
 			pb1.ProgressBarFormat = ProgressBarFormat.Framed;
 			Assert.Equal (ProgressBarFormat.Framed, pb1.ProgressBarFormat);
@@ -98,42 +98,66 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (3, pb2.Height);
 
 			pb1.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.Framed, pb1.ProgressBarFormat);
-			Assert.Equal (3, pb1.Height);
+			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb1.ProgressBarFormat);
+			Assert.Equal (4, pb1.Height);
 			pb2.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.Framed, pb2.ProgressBarFormat);
-			Assert.Equal (3, pb2.Height);
+			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb2.ProgressBarFormat);
+			Assert.Equal (4, pb2.Height);
 
 			pb1.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.Framed, pb1.ProgressBarFormat);
-			Assert.Equal (3, pb1.Height);
+			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb1.ProgressBarFormat);
+			Assert.Equal (6, pb1.Height);
 			pb2.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.Framed, pb2.ProgressBarFormat);
-			Assert.Equal (3, pb2.Height);
+			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb2.ProgressBarFormat);
+			Assert.Equal (6, pb2.Height);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Text_Setter ()
+		public void Text_Setter_Not_Marquee ()
 		{
 			var pb = new ProgressBar () { Fraction = 0.25F};
 
 			pb.ProgressBarFormat = ProgressBarFormat.Simple;
 			pb.Text = "blabla";
-			Assert.Equal ("", pb.Text);
+			Assert.Equal ("25%", pb.Text);
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			pb.Text = "blabla";
+			pb.Text = "bleble";
 			Assert.Equal ("25%", pb.Text);
 
 			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal ("", pb.Text);
+			Assert.Equal ("25%", pb.Text);
 
 			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
 			Assert.Equal ("25%", pb.Text);
 
 			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
 			Assert.Equal ("25%", pb.Text);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Text_Setter_Marquee ()
+		{
+			var pb = new ProgressBar () { Fraction = 0.25F, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
+
+			pb.ProgressBarFormat = ProgressBarFormat.Simple;
+			pb.Text = "blabla";
+			Assert.Equal ("blabla", pb.Text);
+
+			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+			pb.Text = "bleble";
+			Assert.Equal ("bleble", pb.Text);
+
+			pb.ProgressBarFormat = ProgressBarFormat.Framed;
+			Assert.Equal ("bleble", pb.Text);
+
+			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
+			Assert.Equal ("bleble", pb.Text);
+
+			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
+			Assert.Equal ("bleble", pb.Text);
 		}
 
 		[Fact]
