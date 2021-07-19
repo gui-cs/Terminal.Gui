@@ -137,9 +137,9 @@ namespace UICatalog {
 
 			Win.KeyPress += (e) => {
 				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
-					|| e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask))) {
+					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
-				} else if (e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask)) {
+				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
 					e.Handled = true;
 				}
