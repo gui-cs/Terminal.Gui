@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 			last = last < lines.Count ? last : lines.Count;
 			for (int i = first; i < last; i++) {
 				var line = GetLine (i);
-				var tabSum = line.Sum (r => r == '\t' ? tabWidth - 1 : 0);
+				var tabSum = line.Sum (r => r == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
 				var l = line.Count + tabSum;
 				if (l > maxLength) {
 					maxLength = l;
@@ -236,7 +236,7 @@ namespace Terminal.Gui {
 			for (int i = start; i < t.Count; i++) {
 				var r = t [i];
 				size += Rune.ColumnWidth (r);
-				if (r == '\t' && tabWidth > 0) {
+				if (r == '\t') {
 					size += tabWidth + 1;
 				}
 				if (i == pX || (size > pX)) {
@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 				var rune = t [i];
 				size += Rune.ColumnWidth (rune);
 				len += Rune.RuneLen (rune);
-				if (rune == '\t' && tabWidth > 0) {
+				if (rune == '\t') {
 					size += tabWidth + 1;
 					len += tabWidth - 1;
 				}
@@ -276,7 +276,7 @@ namespace Terminal.Gui {
 			{
 				s = Rune.ColumnWidth (r);
 				l = Rune.RuneLen (r);
-				if (r == '\t' && tWidth > 0) {
+				if (r == '\t') {
 					s += tWidth + 1;
 					l += tWidth - 1;
 				}
@@ -1132,6 +1132,7 @@ namespace Terminal.Gui {
 					Multiline = false;
 					AllowsTab = false;
 				}
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1149,12 +1150,10 @@ namespace Terminal.Gui {
 				if (allowsTab && !multiline) {
 					Multiline = true;
 				}
-				if (!allowsTab && multiline) {
-					Multiline = false;
-				}
 				if (!allowsTab && tabWidth > 0) {
 					tabWidth = 0;
 				}
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1165,12 +1164,10 @@ namespace Terminal.Gui {
 			get => tabWidth;
 			set {
 				tabWidth = Math.Max (value, 0);
-				if (tabWidth == 0 && AllowsTab) {
-					AllowsTab = false;
-				}
 				if (tabWidth > 0 && !AllowsTab) {
 					AllowsTab = true;
 				}
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1306,7 +1303,7 @@ namespace Terminal.Gui {
 					if (idx >= currentColumn)
 						break;
 					var cols = Rune.ColumnWidth (line [idx]);
-					if (line [idx] == '\t' && TabWidth > 0) {
+					if (line [idx] == '\t') {
 						cols += TabWidth + 1;
 					}
 					TextModel.SetCol (ref col, Frame.Width, cols);
@@ -1701,7 +1698,7 @@ namespace Terminal.Gui {
 						ColorNormal (line, idxCol);
 					}
 
-					if (rune == '\t' && TabWidth > 0) {
+					if (rune == '\t') {
 						cols += TabWidth + 1;
 						if (col + cols > right) {
 							cols = right - col;

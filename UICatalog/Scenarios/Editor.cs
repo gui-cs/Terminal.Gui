@@ -68,7 +68,10 @@ namespace UICatalog {
 					new MenuItem ("  B_ox Fix", "", () => SetCursor(CursorVisibility.BoxFix)),
 					new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
 				}),
-				new MenuBarItem ("Forma_t", CreateWrapChecked ())
+				new MenuBarItem ("Forma_t", new MenuItem [] {
+					CreateWrapChecked (),
+					CreateAllowsTabChecked ()
+				})
 			});
 			Top.Add (menu);
 
@@ -423,10 +426,11 @@ namespace UICatalog {
 			return new MenuItem [] { item };
 		}
 
-		private MenuItem [] CreateWrapChecked ()
+		private MenuItem CreateWrapChecked ()
 		{
-			var item = new MenuItem ();
-			item.Title = "Word Wrap";
+			var item = new MenuItem {
+				Title = "Word Wrap"
+			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = false;
 			item.Action += () => {
@@ -441,7 +445,21 @@ namespace UICatalog {
 				}
 			};
 
-			return new MenuItem [] { item };
+			return item;
+		}
+
+		private MenuItem CreateAllowsTabChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Allows Tab"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = true;
+			item.Action += () => {
+				_textView.AllowsTab = item.Checked = !item.Checked;
+			};
+
+			return item;
 		}
 
 		private void CreateFindReplace (bool isFind = true)

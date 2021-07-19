@@ -1418,7 +1418,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[InitShutdown]
-		public void TabWidth_Setting_To_Zero_Changes_AllowsTab_To_False_If_True ()
+		public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
 		{
 			Assert.Equal (4, _textView.TabWidth);
 			Assert.True (_textView.AllowsTab);
@@ -1426,11 +1426,11 @@ namespace Terminal.Gui.Views {
 			Assert.True (_textView.Multiline);
 			_textView.TabWidth = -1;
 			Assert.Equal (0, _textView.TabWidth);
-			Assert.False (_textView.AllowsTab);
-			Assert.False (_textView.AllowsReturn);
-			Assert.False (_textView.Multiline);
+			Assert.True (_textView.AllowsTab);
+			Assert.True (_textView.AllowsReturn);
+			Assert.True (_textView.Multiline);
 			_textView.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
 			_textView.ProcessKey (new KeyEvent (Key.BackTab, new KeyModifiers ()));
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
@@ -1441,9 +1441,9 @@ namespace Terminal.Gui.Views {
 		{
 			_textView.TabWidth = 0;
 			Assert.Equal (0, _textView.TabWidth);
-			Assert.False (_textView.AllowsTab);
-			Assert.False (_textView.AllowsReturn);
-			Assert.False (_textView.Multiline);
+			Assert.True (_textView.AllowsTab);
+			Assert.True (_textView.AllowsReturn);
+			Assert.True (_textView.Multiline);
 			_textView.AllowsTab = true;
 			Assert.True (_textView.AllowsTab);
 			Assert.Equal (4, _textView.TabWidth);
@@ -1759,6 +1759,20 @@ namespace Terminal.Gui.Views {
 			};
 
 			Application.Run ();
+		}
+
+		[Fact]
+		public void TextView_MultiLine_But_Without_Tabs ()
+		{
+			var view = new TextView ();
+
+			// the default for TextView
+			Assert.True (view.Multiline);
+
+			view.AllowsTab = false;
+			Assert.False (view.AllowsTab);
+
+			Assert.True (view.Multiline);
 		}
 
 		private int GetLeftCol (int start)
