@@ -303,10 +303,7 @@ namespace Terminal.Gui {
 				if (rune == '\t') {
 					size += tabWidth + 1;
 				}
-				if (size > width) {
-					if (end == t.Count) {
-						col++;
-					}
+				if (size >= width) {
 					break;
 				} else if (end < t.Count && col > 0 && start < end && col == start) {
 					break;
@@ -879,6 +876,7 @@ namespace Terminal.Gui {
 		bool wordWrap;
 		WordWrapManager wrapManager;
 		bool continuousFind;
+		int bottomOffset, rightOffset;
 		int tabWidth = 4;
 		bool allowsTab = true;
 		bool allowsReturn = true;
@@ -1109,13 +1107,31 @@ namespace Terminal.Gui {
 		/// The bottom offset needed to use a horizontal scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int BottomOffset { get; set; }
+		public int BottomOffset {
+			get => bottomOffset;
+			set {
+				if (currentRow == Lines - 1 && bottomOffset > 0 && value == 0) {
+					topRow = Math.Max (topRow - bottomOffset, 0);
+				}
+				bottomOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// The right offset needed to use a vertical scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int RightOffset { get; set; }
+		public int RightOffset {
+			get => rightOffset;
+			set {
+				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+					leftColumn = Math.Max (leftColumn - rightOffset, 0);
+				}
+				rightOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>

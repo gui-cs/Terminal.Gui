@@ -1801,10 +1801,7 @@ namespace Terminal.Gui.Views {
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
-				if (sumLength > width) {
-					if (cCol == line.Length) {
-						col++;
-					}
+				if (sumLength >= width) {
 					break;
 				} else if (cCol < line.Length && col > 0 && start < cCol && col == start) {
 					break;
@@ -1941,6 +1938,66 @@ line.
 ";
 
 			GraphViewTests.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void BottomOffset_Sets_To_Zero_Adjust_TopRow ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"This is the line {i}\n";
+			}
+			var tv = new TextView () { Width = 10, Height = 10, BottomOffset = 1 };
+			tv.Text = text;
+
+			tv.ProcessKey (new KeyEvent (Key.CtrlMask | Key.End, null));
+
+			Assert.Equal (4, tv.TopRow);
+			Assert.Equal (1, tv.BottomOffset);
+
+			tv.BottomOffset = 0;
+			Assert.Equal (3, tv.TopRow);
+			Assert.Equal (0, tv.BottomOffset);
+
+			tv.BottomOffset = 2;
+			Assert.Equal (5, tv.TopRow);
+			Assert.Equal (2, tv.BottomOffset);
+
+			tv.BottomOffset = 0;
+			Assert.Equal (3, tv.TopRow);
+			Assert.Equal (0, tv.BottomOffset);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void RightOffset_Sets_To_Zero_Adjust_leftColumn ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"{i.ToString ().Substring (0, 1)}";
+			}
+			var tv = new TextView () { Width = 10, Height = 10, RightOffset = 1 };
+			tv.Text = text;
+
+			tv.ProcessKey (new KeyEvent (Key.End, null));
+
+			Assert.Equal (4, tv.LeftColumn);
+			Assert.Equal (1, tv.RightOffset);
+
+			tv.RightOffset = 0;
+			Assert.Equal (3, tv.LeftColumn);
+			Assert.Equal (0, tv.RightOffset);
+
+			tv.RightOffset = 2;
+			Assert.Equal (5, tv.LeftColumn);
+			Assert.Equal (2, tv.RightOffset);
+
+			tv.RightOffset = 0;
+			Assert.Equal (3, tv.LeftColumn);
+			Assert.Equal (0, tv.RightOffset);
 		}
 	}
 }

@@ -164,6 +164,10 @@ namespace Terminal.Gui {
 		public event Action<MouseEventArgs> MouseClick;
 
 		/// <summary>
+		/// Event fired when the visible value is being changed.
+		/// </summary>
+		public event Action VisibleChanged;
+		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
 		public Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
@@ -1271,6 +1275,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		ColorScheme colorScheme;
+
 		/// <summary>
 		/// The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s
 		/// color scheme.
@@ -1288,8 +1294,6 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-
-		ColorScheme colorScheme;
 
 		/// <summary>
 		/// Displays the specified character in the specified column and row of the View.
@@ -2213,6 +2217,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected void OnMouseClick (MouseEventArgs args) => MouseClick?.Invoke (args);
 
+		/// <summary>
+		/// Invokes the <see cref="VisibleChanged"/> event.
+		/// </summary>
+		protected void OnVisibleChanged () => VisibleChanged?.Invoke ();
+
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
@@ -2258,10 +2267,18 @@ namespace Terminal.Gui {
 			Initialized?.Invoke (this, EventArgs.Empty);
 		}
 
+		bool visible = true;
+
 		/// <summary>
 		/// Gets or sets the view visibility.
 		/// </summary>
-		public bool Visible { get; set; } = true;
+		public bool Visible {
+			get => visible;
+			set {
+				visible = value;
+				OnVisibleChanged ();
+			}
+		}
 
 		bool CanBeVisible (View view)
 		{

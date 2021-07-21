@@ -125,6 +125,22 @@ namespace UICatalog {
 				_textView.SetNeedsDisplay ();
 			};
 
+			_scrollBar.VisibleChanged += () => {
+				if (_scrollBar.Visible && _textView.RightOffset == 0) {
+					_textView.RightOffset = 1;
+				} else if (!_scrollBar.Visible && _textView.RightOffset == 1) {
+					_textView.RightOffset = 0;
+				}
+			};
+
+			_scrollBar.OtherScrollBarView.VisibleChanged += () => {
+				if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0) {
+					_textView.BottomOffset = 1;
+				} else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1) {
+					_textView.BottomOffset = 0;
+				}
+			};
+
 			_textView.DrawContent += (e) => {
 				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
