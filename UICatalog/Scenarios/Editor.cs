@@ -35,6 +35,7 @@ namespace UICatalog {
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("_Save As", "", () => SaveAs()),
+					new MenuItem ("_Close", "", () => CloseFile()),
 					null,
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -67,7 +68,10 @@ namespace UICatalog {
 					new MenuItem ("  B_ox Fix", "", () => SetCursor(CursorVisibility.BoxFix)),
 					new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
 				}),
-				new MenuBarItem ("Forma_t", CreateWrapChecked ())
+				new MenuBarItem ("Forma_t", new MenuItem [] {
+					CreateWrapChecked (),
+					CreateAllowsTabChecked ()
+				})
 			});
 			Top.Add (menu);
 
@@ -134,8 +138,11 @@ namespace UICatalog {
 
 			Win.KeyPress += (e) => {
 				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
-					|| e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask))) {
+					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
+				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					Quit ();
+					e.Handled = true;
 				}
 			};
 		}
@@ -151,9 +158,9 @@ namespace UICatalog {
 		{
 		}
 
-		private void New ()
+		private void New (bool checkChanges = true)
 		{
-			if (!CanCloseFile ()) {
+			if (checkChanges && !CanCloseFile ()) {
 				return;
 			}
 
@@ -166,9 +173,9 @@ namespace UICatalog {
 		private void LoadFile ()
 		{
 			if (_fileName != null) {
-				// BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
-				//_textView.LoadFile(_fileName);
-				_textView.Text = System.IO.File.ReadAllText (_fileName);
+				// FIXED: BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
+				_textView.LoadFile (_fileName);
+				//_textView.Text = System.IO.File.ReadAllText (_fileName);
 				_originalText = _textView.Text.ToByteArray ();
 				Win.Title = _fileName;
 				_saved = true;
@@ -312,7 +319,7 @@ namespace UICatalog {
 			var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = false };
 			Application.Run (d);
 
-			if (!d.Canceled) {
+			if (!d.Canceled && d.FilePaths.Count > 0) {
 				_fileName = d.FilePaths [0];
 				LoadFile ();
 			}
@@ -321,7 +328,7 @@ namespace UICatalog {
 		private bool Save ()
 		{
 			if (_fileName != null) {
-				// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
+				// FIXED: BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
 				// As a result files saved on Windows and then read back will show invalid chars.
 				return SaveFile (Win.Title.ToString (), _fileName);
 			} else {
@@ -359,6 +366,7 @@ namespace UICatalog {
 				Win.Title = title;
 				_fileName = file;
 				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
+				_originalText = _textView.Text.ToByteArray ();
 				_saved = true;
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
 
@@ -370,15 +378,33 @@ namespace UICatalog {
 			return true;
 		}
 
+		private void CloseFile ()
+		{
+			if (!CanCloseFile ()) {
+				return;
+			}
+
+			try {
+				_textView.CloseFile ();
+				New (false);
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery ("Error", ex.Message, "Ok");
+			}
+		}
+
 		private void Quit ()
 		{
+			if (!CanCloseFile ()) {
+				return;
+			}
+
 			Application.RequestStop ();
 		}
 
 		private void CreateDemoFile (string fileName)
 		{
 			var sb = new StringBuilder ();
-			// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r
+			// FIXED: BUGBUG: #279 TextView does not know how to deal with \r\n, only \r
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
@@ -401,10 +427,11 @@ namespace UICatalog {
 			return new MenuItem [] { item };
 		}
 
-		private MenuItem [] CreateWrapChecked ()
+		private MenuItem CreateWrapChecked ()
 		{
-			var item = new MenuItem ();
-			item.Title = "Word Wrap";
+			var item = new MenuItem {
+				Title = "Word Wrap"
+			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = false;
 			item.Action += () => {
@@ -419,7 +446,21 @@ namespace UICatalog {
 				}
 			};
 
-			return new MenuItem [] { item };
+			return item;
+		}
+
+		private MenuItem CreateAllowsTabChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Allows Tab"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = true;
+			item.Action += () => {
+				_textView.AllowsTab = item.Checked = !item.Checked;
+			};
+
+			return item;
 		}
 
 		private void CreateFindReplace (bool isFind = true)
@@ -673,11 +714,6 @@ namespace UICatalog {
 			d.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
 
 			return d;
-		}
-
-		public override void Run ()
-		{
-			base.Run ();
 		}
 	}
 }
