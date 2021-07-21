@@ -268,7 +268,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private int GetTabIndex (int idx)
+		int GetTabIndex (int idx)
 		{
 			int i = 0;
 			foreach (var v in SuperView.tabIndexes) {
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 			return Math.Min (i, idx);
 		}
 
-		private void SetTabIndex ()
+		void SetTabIndex ()
 		{
 			int i = 0;
 			foreach (var v in SuperView.tabIndexes) {
@@ -989,8 +989,8 @@ namespace Terminal.Gui {
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + frame.Y;
-			rcol = col + frame.X;
+			rrow = Math.Max (row + frame.Y, 0);
+			rcol = Math.Max (col + frame.X, 0);
 			var ccontainer = container;
 			while (ccontainer != null) {
 				rrow += ccontainer.frame.Y;
@@ -1342,7 +1342,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
-			if (!ustring.IsNullOrEmpty (Text)) {
+			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
 				Clear ();
 				// Draw any Text
 				if (textFormatter != null) {
@@ -1957,8 +1957,9 @@ namespace Terminal.Gui {
 				v.LayoutNeeded = false;
 			}
 
-			if (SuperView == Application.Top && LayoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				SetRelativeLayout (Frame);
+			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
+				&& ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+				SetRelativeLayout (SuperView.Frame);
 			}
 
 			LayoutNeeded = false;
@@ -1988,8 +1989,10 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
-				ResizeView (autoSize);
-				if (textFormatter.Size != Bounds.Size) {
+				var canResize = ResizeView (autoSize);
+				if (canResize && textFormatter.Size != Bounds.Size) {
+					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
+				} else if (!canResize && textFormatter.Size != Bounds.Size) {
 					textFormatter.Size = Bounds.Size;
 				}
 				SetNeedsLayout ();
@@ -2085,7 +2088,9 @@ namespace Terminal.Gui {
 
 			var aSize = autoSize;
 			Rect nBounds = TextFormatter.CalcRect (Bounds.X, Bounds.Y, Text, textFormatter.Direction);
-
+			if (textFormatter.Size != nBounds.Size) {
+				textFormatter.Size = nBounds.Size;
+			}
 			if ((textFormatter.Size != Bounds.Size || textFormatter.Size != nBounds.Size)
 				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != nBounds.Width))

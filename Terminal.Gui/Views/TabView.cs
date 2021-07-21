@@ -179,6 +179,7 @@ namespace Terminal.Gui {
 
 			if (Tabs.Any ()) {
 				tabsBar.Redraw (tabsBar.Bounds);
+				contentView.SetNeedsDisplay();
 				contentView.Redraw (contentView.Bounds);
 			}
 		}
