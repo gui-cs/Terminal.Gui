@@ -511,8 +511,8 @@ namespace Terminal.Gui.Views {
 				Application.Run ();
 
 				Application.Shutdown ();
-
 			});
+
 			Assert.Null (exception);
 		}
 
@@ -586,8 +586,8 @@ namespace Terminal.Gui.Views {
 				Application.Run ();
 
 				Application.Shutdown ();
-
 			});
+
 			Assert.Null (exception);
 		}
 	}
