@@ -206,6 +206,8 @@ dotnet add package Terminal.Gui
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project ./UICatalog` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
+Building in Release requires the [git command line tool](https://git-scm.com/) (a dependency of the [MinVer](https://github.com/adamralph/minver#can-i-disable-minver) build tool)
+
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).
