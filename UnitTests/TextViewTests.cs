@@ -1977,7 +1977,7 @@ line.
 			string text = "";
 
 			for (int i = 0; i < 12; i++) {
-				text += $"{i.ToString ().Substring (0, 1)}";
+				text += $"{i.ToString () [^1]}";
 			}
 			var tv = new TextView () { Width = 10, Height = 10, RightOffset = 1 };
 			tv.Text = text;
