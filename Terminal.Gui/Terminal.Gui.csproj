@@ -15,6 +15,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
+	  <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>UnitTests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
   <PropertyGroup>
       <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>

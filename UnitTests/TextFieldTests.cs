@@ -773,5 +773,17 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal ("", tf.Text);
 		}
+
+		[Fact]
+		[InitShutdown]
+		public void Text_Replaces_Tabs_With_Empty_String ()
+		{
+			_textField.Text = "\t\tTAB to jump between text fields.";
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			_textField.Text = "";
+			Clipboard.Contents = "\t\tTAB to jump between text fields.";
+			_textField.Paste ();
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+		}
 	}
 }

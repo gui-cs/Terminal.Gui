@@ -694,7 +694,7 @@ namespace Terminal.Gui {
 
 		internal bool CanScroll (int n, out int max, bool isVertical = false)
 		{
-			if (Host == null) {
+			if (Host?.Bounds.IsEmpty != false) {
 				max = 0;
 				return false;
 			}
@@ -709,7 +709,7 @@ namespace Terminal.Gui {
 
 		int GetBarsize (bool isVertical)
 		{
-			if (Host == null) {
+			if (Host?.Bounds.IsEmpty != false) {
 				return 0;
 			}
 			return isVertical ?

@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value.Split ("\n") [0]);
+				var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 				if (newText.Cancel) {
 					if (point > text.Count) {
 						point = text.Count;

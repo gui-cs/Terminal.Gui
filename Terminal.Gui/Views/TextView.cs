@@ -345,7 +345,8 @@ namespace Terminal.Gui {
 			if (toFind.found) {
 				toFind.currentPointToFind.X++;
 			}
-			var foundPos = GetFoundPreviousTextPoint (text, toFind.currentPointToFind.Y, matchCase, matchWholeWord, toFind.currentPointToFind);
+			var linesCount = toFind.currentPointToFind.IsEmpty ? lines.Count - 1 : toFind.currentPointToFind.Y;
+			var foundPos = GetFoundPreviousTextPoint (text, linesCount, matchCase, matchWholeWord, toFind.currentPointToFind);
 			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
 				foundPos = GetFoundPreviousTextPoint (text, lines.Count - 1, matchCase, matchWholeWord,
 					new Point (lines [lines.Count - 1].Count, lines.Count));
@@ -362,23 +363,41 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < lines.Count; i++) {
 				var x = lines [i];
+				var txt = GetText (x);
+				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var col = txt.IndexOf (matchText);
+				while (col > -1) {
+					if (matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
+						if (col + 1 > txt.Length) {
+							break;
+						}
+						col = txt.IndexOf (matchText, col + 1);
+						continue;
+					}
+					if (col > -1) {
+						if (!found) {
+							found = true;
+						}
+						lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
+						x = lines [i];
+						txt = GetText (x);
+						pos = new Point (col, i);
+						col += (textToReplace.Length - matchText.Length);
+					}
+					if (col + 1 > txt.Length) {
+						break;
+					}
+					col = txt.IndexOf (matchText, col + 1);
+				}
+			}
+
+			string GetText (List<Rune> x)
+			{
 				var txt = ustring.Make (x).ToString ();
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
-				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
-				var col = txt.IndexOf (matchText);
-				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
-					continue;
-				}
-				if (col > -1) {
-					if (!found) {
-						found = true;
-					}
-					pos = new Point (col, i);
-					lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
-					i--;
-				}
+				return txt;
 			}
 
 			return (pos, found);
@@ -450,11 +469,11 @@ namespace Terminal.Gui {
 					start.X = Math.Max (x.Count - 1, 0);
 				}
 				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
-				var col = txt.LastIndexOf (matchText, start.X);
+				var col = txt.LastIndexOf (matchText, toFind.found ? start.X - 1 : start.X);
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;
 				}
-				if (col > -1 && ((i == linesCount && col <= start.X)
+				if (col > -1 && ((i <= linesCount && col <= start.X)
 					|| i < start.Y)
 					&& txt.Contains (matchText)) {
 					return (new Point (col, i), true);

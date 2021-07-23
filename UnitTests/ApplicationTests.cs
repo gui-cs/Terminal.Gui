@@ -1127,5 +1127,20 @@ namespace Terminal.Gui.Core {
 
 			Assert.Null (Application.Top);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Internal_Tests ()
+		{
+			Assert.True (Application._initialized);
+			Assert.NotNull (Application.Top);
+			var rs = Application.Begin (Application.Top);
+			Assert.Equal (Application.Top, rs.Toplevel);
+			Assert.Null (Application.mouseGrabView);
+			Assert.Null (Application.wantContinuousButtonPressedView);
+			Assert.False (Application.DebugDrawBounds);
+			Assert.False (Application.ShowChild (Application.Top));
+			Application.End (Application.Top);
+		}
 	}
 }
