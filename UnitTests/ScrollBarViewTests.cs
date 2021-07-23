@@ -590,5 +590,50 @@ namespace Terminal.Gui.Views {
 
 			Assert.Null (exception);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Internal_Tests ()
+		{
+			var top = Application.Top;
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Bounds);
+			var view = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			top.Add (view);
+			var sbv = new ScrollBarView (view, true);
+			top.Add (sbv);
+			Assert.Equal (view, sbv.Host);
+			sbv.Size = 40;
+			sbv.Position = 0;
+			sbv.OtherScrollBarView.Size = 100;
+			sbv.OtherScrollBarView.Position = 0;
+			// Host bounds is empty.
+			Assert.False (sbv.CanScroll (10, out int max, sbv.IsVertical));
+			Assert.Equal (0, max);
+			Assert.False (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
+			Assert.Equal (0, max);
+			// They are visible but are not drawn.
+			Assert.True (sbv.Visible);
+			Assert.True (sbv.OtherScrollBarView.Visible);
+			top.LayoutSubviews ();
+			// Now the host bounds is not empty.
+			Assert.True (sbv.CanScroll (10, out max, sbv.IsVertical));
+			Assert.Equal (10, max);
+			Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
+			Assert.Equal (10, max);
+			Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
+			Assert.Equal (17, max); // 17+23=40
+			Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
+			Assert.Equal (22, max); // 22+78=100
+			Assert.True (sbv.Visible);
+			Assert.True (sbv.OtherScrollBarView.Visible);
+			sbv.KeepContentAlwaysInViewport = false;
+			sbv.OtherScrollBarView.KeepContentAlwaysInViewport = false;
+			Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
+			Assert.Equal (40, max);
+			Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
+			Assert.Equal (100, max);
+			Assert.True (sbv.Visible);
+			Assert.True (sbv.OtherScrollBarView.Visible);
+		}
 	}
 }

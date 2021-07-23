@@ -1370,5 +1370,47 @@ namespace Terminal.Gui.Views {
 				Application.Shutdown ();
 			}
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Internal_Tests ()
+		{
+			Assert.Equal (new [] { View.Direction.Forward, View.Direction.Backward },
+				Enum.GetValues (typeof (View.Direction)));
+
+			var rect = new Rect (1, 1, 10, 1);
+			var view = new View (rect);
+			var top = Application.Top;
+			top.Add (view);
+			Assert.Equal (View.Direction.Forward, view.FocusDirection);
+			view.FocusDirection = View.Direction.Backward;
+			Assert.Equal (View.Direction.Backward, view.FocusDirection);
+			Assert.Empty (view.InternalSubviews);
+			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view.NeedDisplay);
+			Assert.True (view.LayoutNeeded);
+			Assert.False (view.ChildNeedsDisplay);
+			Assert.False (view.addingView);
+			view.addingView = true;
+			Assert.True (view.addingView);
+			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			Assert.Equal (1, rcol);
+			Assert.Equal (1, rrow);
+			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
+			Assert.Equal (10, view.Bounds.Width);
+			Assert.Equal (1, view.Bounds.Height);
+			view.SetRelativeLayout (top.Bounds);
+			Assert.Equal (79, view.Bounds.Width);
+			Assert.Equal (24, view.Bounds.Height);
+			bool layoutStarted = false;
+			view.LayoutStarted += (_) => { layoutStarted = true; };
+			view.OnLayoutStarted (null);
+			Assert.True (layoutStarted);
+			view.LayoutComplete += (_) => { layoutStarted = false; };
+			view.OnLayoutComplete (null);
+			Assert.False (layoutStarted);
+		}
 	}
 }

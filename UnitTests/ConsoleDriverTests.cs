@@ -413,5 +413,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var cs = new ColorScheme ();
+			Assert.Equal ("", cs.caller);
+		}
 	}
 }

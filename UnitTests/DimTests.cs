@@ -8,7 +8,7 @@ using System.Threading;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
@@ -699,7 +699,30 @@ namespace Terminal.Gui.Core {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
+		}
 
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var dimFactor = new Dim.DimFactor (0.10F);
+			Assert.Equal (10, dimFactor.Anchor (100));
+
+			var dimAbsolute = new Dim.DimAbsolute (10);
+			Assert.Equal (10, dimAbsolute.Anchor (0));
+
+			var dimFill = new Dim.DimFill (1);
+			Assert.Equal (99, dimFill.Anchor (100));
+
+			var dimCombine = new Dim.DimCombine (true, dimFactor, dimAbsolute);
+			Assert.Equal (dimCombine.left, dimFactor);
+			Assert.Equal (dimCombine.right, dimAbsolute);
+			Assert.Equal (20, dimCombine.Anchor (100));
+
+			var view = new View (new Rect (20, 10, 20, 1));
+			var dimViewHeight = new Dim.DimView (view, 0);
+			Assert.Equal (1, dimViewHeight.Anchor (0));
+			var dimViewWidth = new Dim.DimView (view, 1);
+			Assert.Equal (20, dimViewWidth.Anchor (0));
 		}
 	}
 }

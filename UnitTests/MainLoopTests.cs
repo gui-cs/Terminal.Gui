@@ -10,7 +10,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Sdk;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
@@ -461,6 +461,43 @@ namespace Terminal.Gui.Core {
 			ml.Invoke (() => { actionCalled++; });
 			ml.MainIteration ();
 			Assert.Equal (1, actionCalled);
+		}
+
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var testMainloop = new TestMainloop ();
+			var mainloop = new MainLoop (testMainloop);
+			Assert.Empty (mainloop.timeouts);
+			Assert.Empty (mainloop.idleHandlers);
+			Assert.NotNull (new MainLoop.Timeout () {
+				Span = new TimeSpan (),
+				Callback = (_) => true
+			});
+		}
+
+		private class TestMainloop : IMainLoopDriver {
+			private MainLoop mainLoop;
+
+			public bool EventsPending (bool wait)
+			{
+				throw new NotImplementedException ();
+			}
+
+			public void MainIteration ()
+			{
+				throw new NotImplementedException ();
+			}
+
+			public void Setup (MainLoop mainLoop)
+			{
+				this.mainLoop = mainLoop;
+			}
+
+			public void Wakeup ()
+			{
+				throw new NotImplementedException ();
+			}
 		}
 
 		// TODO: EventsPending tests
