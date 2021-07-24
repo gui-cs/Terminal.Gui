@@ -116,7 +116,7 @@ namespace Terminal.Gui.Views {
 		[AutoInitShutdown]
 		public void Text_Setter_Not_Marquee ()
 		{
-			var pb = new ProgressBar () { Fraction = 0.25F};
+			var pb = new ProgressBar () { Fraction = 0.25F };
 
 			pb.ProgressBarFormat = ProgressBarFormat.Simple;
 			pb.Text = "blabla";
@@ -162,7 +162,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Pulse_Redraw ()
+		public void Pulse_Redraw_BidirectionalMarquee_True_Default ()
 		{
 			var driver = ((FakeDriver)Application.Driver);
 
@@ -782,6 +782,633 @@ namespace Terminal.Gui.Views {
 					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
 					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
 					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				}
+			}
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Pulse_Redraw_BidirectionalMarquee_False ()
+		{
+			var driver = ((FakeDriver)Application.Driver);
+
+			var pb = new ProgressBar () {
+				Width = 15,
+				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
+				BidirectionalMarquee = false
+			};
+
+			for (int i = 0; i < 38; i++) {
+				pb.Pulse ();
+				pb.Redraw (pb.Bounds);
+				if (i == 0) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 1) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 2) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 3) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 4) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 5) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 6) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 7) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 8) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 9) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 10) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 11) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 12) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 13) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 14) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 15) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 16) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 17) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 18) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 19) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 20) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 21) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 22) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 23) {
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 24) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 25) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 26) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 27) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 28) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 29) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 30) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 31) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 32) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 14, 0]);
+				} else if (i == 33) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 34) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 35) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 36) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
+				} else if (i == 37) {
+					Assert.Equal (' ', (double)driver.Contents [0, 0, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 2, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 3, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 4, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 5, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 6, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 7, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 8, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 9, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 10, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 11, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 12, 0]);
+					Assert.Equal (' ', (double)driver.Contents [0, 13, 0]);
+					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 14, 0]);
 				}
 			}
 		}
