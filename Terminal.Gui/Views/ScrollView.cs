@@ -207,7 +207,7 @@ namespace Terminal.Gui {
 			Type t = view.GetType ();
 			MethodInfo m = t.GetMethod ("MouseEvent");
 
-			return m.DeclaringType == t && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
+			return (m.DeclaringType == t || m.ReflectedType == t) && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 
 		/// <summary>
