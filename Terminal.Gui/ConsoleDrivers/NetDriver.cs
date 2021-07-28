@@ -302,7 +302,7 @@ namespace Terminal.Gui {
 				for (int i = 0; i < cki.Length; i++) {
 					var ck = cki [i];
 					if (NumberOfCSI > 0 && nCSI - curCSI > NumberOfCSI) {
-						if (cki [i + 1].KeyChar == '\x1b' && previousKChar != '\0') {
+						if (i + 1 < cki.Length && cki [i + 1].KeyChar == '\x1b' && previousKChar != '\0') {
 							curCSI++;
 							previousKChar = '\0';
 						} else {
@@ -506,7 +506,7 @@ namespace Terminal.Gui {
 		bool isButtonDoubleClicked;
 		bool isButtonTripleClicked;
 		bool isProcContBtnPressedRuning;
-		bool isButtonReleased;
+		//bool isButtonReleased;
 
 		void GetMouseEvent (ConsoleKeyInfo [] cki)
 		{
@@ -695,6 +695,7 @@ namespace Terminal.Gui {
 			mouseEvent.Position.X = point.X;
 			mouseEvent.Position.Y = point.Y;
 			mouseEvent.ButtonState = buttonState;
+			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState} X: {mouseEvent.Position.X} Y: {mouseEvent.Position.Y}");
 
 			if ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
@@ -715,7 +716,10 @@ namespace Terminal.Gui {
 			if (isButtonClicked && !isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
-				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 				isButtonDoubleClicked = true;
 				ProcessButtonDoubleClicked (mouseEvent);
 				Application.MainLoop.AddIdle (() => {
@@ -731,22 +735,25 @@ namespace Terminal.Gui {
 			if (isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
-				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 				isButtonTripleClicked = true;
 				ProcessButtonTripleClicked (mouseEvent);
 				inputReady.Set ();
 				return;
 			}
 
-			if (!isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
-				&& !isButtonReleased
-				&& ((buttonState & MouseButtonState.Button1Released) == 0
-				&& (buttonState & MouseButtonState.Button2Released) == 0
-				&& (buttonState & MouseButtonState.Button3Released) == 0)) {
-				ProcessButtonReleased (lastMouseEvent);
-				inputReady.Set ();
-				return;
-			}
+			//if (!isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
+			//	&& !isButtonReleased && lastMouseEvent.ButtonState != 0
+			//	&& ((buttonState & MouseButtonState.Button1Released) == 0
+			//	&& (buttonState & MouseButtonState.Button2Released) == 0
+			//	&& (buttonState & MouseButtonState.Button3Released) == 0)) {
+			//	ProcessButtonReleased (lastMouseEvent);
+			//	inputReady.Set ();
+			//	return;
+			//}
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -773,9 +780,9 @@ namespace Terminal.Gui {
 
 			lastMouseEvent = mouseEvent;
 			if (isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked && !isProcContBtnPressedRuning) {
-				isButtonReleased = false;
+				//isButtonReleased = false;
 				Application.MainLoop.AddIdle (() => {
-					ProcessContinuousButtonPressedAsync ().ConfigureAwait (false);
+					Task.Run (async () => await ProcessContinuousButtonPressedAsync ());
 					return false;
 				});
 			}
@@ -799,7 +806,7 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Released;
 				me.ButtonState |= MouseButtonState.Button3Clicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -823,7 +830,7 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Pressed;
 				me.ButtonState |= MouseButtonState.Button3DoubleClicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -847,7 +854,7 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Pressed;
 				me.ButtonState |= MouseButtonState.Button3TripleClicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -860,7 +867,7 @@ namespace Terminal.Gui {
 			isProcContBtnPressedRuning = true;
 			Point point = new Point ();
 			while (isButtonPressed) {
-				await Task.Delay (200);
+				await Task.Delay (300);
 				var view = Application.wantContinuousButtonPressedView;
 				if (isButtonPressed && !Console.KeyAvailable
 					&& !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
@@ -879,30 +886,30 @@ namespace Terminal.Gui {
 			//isButtonPressed = false;
 		}
 
-		void ProcessButtonReleased (MouseEvent mouseEvent)
-		{
-			var me = new MouseEvent () {
-				Position = mouseEvent.Position,
-				ButtonState = mouseEvent.ButtonState
-			};
-			if ((mouseEvent.ButtonState & MouseButtonState.Button1Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button1Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button1Released;
-			} else if ((mouseEvent.ButtonState & MouseButtonState.Button2Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button2Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button2Released;
-			} else if ((mouseEvent.ButtonState & MouseButtonState.Button3Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button3Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button3Released;
-			}
-			isButtonReleased = true;
-			lastMouseEvent = me;
+		//void ProcessButtonReleased (MouseEvent mouseEvent)
+		//{
+		//	var me = new MouseEvent () {
+		//		Position = mouseEvent.Position,
+		//		ButtonState = mouseEvent.ButtonState
+		//	};
+		//	if ((mouseEvent.ButtonState & MouseButtonState.Button1Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button1Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button1Released;
+		//	} else if ((mouseEvent.ButtonState & MouseButtonState.Button2Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button2Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button2Released;
+		//	} else if ((mouseEvent.ButtonState & MouseButtonState.Button3Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button3Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button3Released;
+		//	}
+		//	isButtonReleased = true;
+		//	lastMouseEvent = me;
 
-			inputResultQueue.Enqueue (new InputResult () {
-				EventType = EventType.Mouse,
-				MouseEvent = me
-			});
-		}
+		//	inputResultQueue.Enqueue (new InputResult () {
+		//		EventType = EventType.Mouse,
+		//		MouseEvent = me
+		//	});
+		//}
 
 		ConsoleModifiers GetConsoleModifiers (uint keyChar)
 		{
@@ -1104,7 +1111,7 @@ namespace Terminal.Gui {
 			} else {
 				if (CursesDriver.Is_WSL_Platform ()) {
 					Clipboard = new WSLClipboard ();
-				}else{
+				} else {
 					Clipboard = new CursesClipboard ();
 				}
 			}
