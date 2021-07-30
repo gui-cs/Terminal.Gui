@@ -382,6 +382,7 @@ namespace Terminal.Gui {
 
 		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
 		{
+			await Task.Delay (200);
 			while (isButtonPressed && lastMouseButtonPressed != null) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
@@ -394,7 +395,7 @@ namespace Terminal.Gui {
 				if (view == null)
 					break;
 				if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					mouseHandler (me);
+					Application.MainLoop.Invoke (() => mouseHandler (me));
 				}
 			}
 		}

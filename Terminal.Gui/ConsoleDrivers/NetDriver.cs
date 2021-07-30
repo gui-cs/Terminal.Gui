@@ -506,6 +506,7 @@ namespace Terminal.Gui {
 		bool isButtonDoubleClicked;
 		bool isButtonTripleClicked;
 		bool isProcContBtnPressedRuning;
+		Point point = new Point ();
 		//bool isButtonReleased;
 
 		void GetMouseEvent (ConsoleKeyInfo [] cki)
@@ -781,10 +782,20 @@ namespace Terminal.Gui {
 			lastMouseEvent = mouseEvent;
 			if (isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked && !isProcContBtnPressedRuning) {
 				//isButtonReleased = false;
-				Application.MainLoop.AddIdle (() => {
-					Task.Run (async () => await ProcessContinuousButtonPressedAsync ());
-					return false;
-				});
+				if ((buttonState & MouseButtonState.ReportMousePosition) != 0) {
+					point = new Point ();
+				} else {
+					point = new Point () {
+						X = mouseEvent.Position.X,
+						Y = mouseEvent.Position.Y
+					};
+				}
+				if ((buttonState & MouseButtonState.ReportMousePosition) == 0) {
+					Application.MainLoop.AddIdle (() => {
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseEvent));
+						return false;
+					});
+				}
 			}
 
 			inputReady.Set ();
@@ -862,24 +873,26 @@ namespace Terminal.Gui {
 			});
 		}
 
-		async Task ProcessContinuousButtonPressedAsync ()
+		async Task ProcessContinuousButtonPressedAsync (MouseEvent mouseEvent)
 		{
 			isProcContBtnPressedRuning = true;
-			Point point = new Point ();
+			await Task.Delay (200);
 			while (isButtonPressed) {
-				await Task.Delay (300);
+				await Task.Delay (100);
+				var me = new MouseEvent () {
+					Position = new Point (mouseEvent.Position.X, mouseEvent.Position.Y),
+					ButtonState=mouseEvent.ButtonState
+				};
 				var view = Application.wantContinuousButtonPressedView;
-				if (isButtonPressed && !Console.KeyAvailable
-					&& !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
-					&& (view != null || view == null && lastMouseEvent.Position != point)) {
-					point = lastMouseEvent.Position;
+				if (view == null) {
+					break;
+				}
+				if (isButtonPressed && (mouseEvent.ButtonState & MouseButtonState.ReportMousePosition) == 0) {
 					inputResultQueue.Enqueue (new InputResult () {
 						EventType = EventType.Mouse,
-						MouseEvent = lastMouseEvent
+						MouseEvent = me
 					});
 					inputReady.Set ();
-				} else {
-					break;
 				}
 			}
 			isProcContBtnPressedRuning = false;
