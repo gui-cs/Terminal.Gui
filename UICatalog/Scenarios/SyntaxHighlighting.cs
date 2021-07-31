@@ -1,13 +1,9 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Terminal.Gui;
-using static UICatalog.Scenario;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
@@ -15,47 +11,47 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Controls")]
 	class SyntaxHighlighting : Scenario {
 
-			public override void Setup ()
-			{
-				Win.Title = this.GetName ();
-				Win.Y = 1; // menu
-				Win.Height = Dim.Fill (1); // status bar
-				Top.LayoutSubviews ();
+		SqlTextView textView;
 
-				var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Quit()),
-				})
-				});
-				Top.Add (menu);
+		public override void Setup ()
+		{
+			Win.Title = this.GetName ();
+			Win.Y = 1; // menu
+			Win.Height = Dim.Fill (1); // status bar
+			Top.LayoutSubviews ();
 
-				var textView = new SqlTextView () {
-					X = 0,
-					Y = 0,
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-				};
+			var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Quit", "", () => Quit()),
+			})
+			});
+			Top.Add (menu);
 
-				textView.Init();
+			textView = new SqlTextView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (1),
+			};
 
-				textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
-				
-				Win.Add (textView);
+			textView.Init();
 
-				var statusBar = new StatusBar (new StatusItem [] {
+			textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
+
+			Win.Add (textView);
+
+			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-
 			});
 
 
-				Top.Add (statusBar);
-			}
+			Top.Add (statusBar);
+		}
 
-
-			private void Quit ()
-			{
-				Application.RequestStop ();
-			}
+		private void Quit ()
+		{
+			Application.RequestStop ();
+		}
 
 		private class SqlTextView : TextView{
 
@@ -63,10 +59,14 @@ namespace UICatalog.Scenarios {
 			private Attribute blue;
 			private Attribute white;
 			private Attribute magenta;
+			Autocomplete autocomplete;
 
 
-			public void Init()
+		public void Init()
 			{
+				autocomplete = new Autocomplete ();
+				autocomplete.Suggestions = new string [] { "test1", "test2" };
+
 				keywords.Add("select");
 				keywords.Add("distinct");
 				keywords.Add("top");
@@ -128,6 +128,24 @@ namespace UICatalog.Scenarios {
 				else{
 					Driver.SetAttribute (white);
 				}
+			}
+
+			public override bool ProcessKey (KeyEvent kb)
+			{
+				if(autocomplete.ProcessKey (this,kb)) {
+					return true;
+				}
+
+				return base.ProcessKey (kb);
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				autocomplete.GenerateSuggestions (this);
+
+				autocomplete.RenderOverlay (this, new Point(CursorPosition.X,CursorPosition.Y+1));
 			}
 
 			private bool IsInStringLiteral (List<System.Rune> line, int idx)

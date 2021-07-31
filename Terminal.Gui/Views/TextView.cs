@@ -1769,6 +1769,30 @@ namespace Terminal.Gui {
 			Clipboard.Contents += text;
 		}
 
+
+		/// <summary>
+		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
+		/// exactly as if the user had just typed it
+		/// </summary>
+		/// <param name="toAdd">Text to add</param>
+		public void InsertText (string toAdd)
+		{
+			foreach(var ch in toAdd) {
+
+				Key key;
+
+				try {
+					key = (Key)ch;
+				} catch (Exception) {
+
+					throw new ArgumentException($"Cannot insert character '{ch}' because it does not map to a Key");
+				}
+				
+
+				InsertText (new KeyEvent () { Key = key });
+			}
+		}
+
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
