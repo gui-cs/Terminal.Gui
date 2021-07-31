@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -102,21 +102,93 @@ namespace Terminal.Gui {
 			if(kb.Key == SelectionKey && SelectedIdx >=0 && SelectedIdx < Suggestions.Length) {
 
 				var accepted = Suggestions [SelectedIdx];
+								
+				var typedSoFar = GetCurrentWord (hostControl) ?? "";
+				
+				if(typedSoFar.Length < accepted.Length) {
+					accepted = accepted.Substring (typedSoFar.Length);
+					hostControl.InsertText (accepted);
+					return true;
+				}
 
-				// TODO: read current line/word and produce the substring they have not typed yet only
-
-				hostControl.InsertText(accepted);
-				return true;
+				return false;
 			}
 
 			return false;
 		}
 
-		public void GenerateSuggestions (TextView hostControl)
-		{
-			// TODO: how to get the current line and the cursor position within that line?
 
-			// generate suggestions based on current line and current word
+		/// <summary>
+		/// Populates <see cref="Suggestions"/> with all strings in <paramref name="options"/> that
+		/// match with the current cursor position/text in the <paramref name="hostControl"/>
+		/// </summary>
+		/// <param name="hostControl">The text view that you want suggestions for</param>
+		/// <param name="options">All options that could ever be offered to the user</param>
+		public void GenerateSuggestions (TextView hostControl, IEnumerable<string> options)
+		{
+			var currentWord = GetCurrentWord (hostControl); 
+
+			if(string.IsNullOrWhiteSpace(currentWord)) {
+				Suggestions = new string [0];
+			}
+			else {
+				Suggestions = options.Where (o => 
+				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
+				!o.Equals(currentWord,StringComparison.CurrentCultureIgnoreCase)
+				).ToArray ();
+			}
+		}
+
+		private string GetCurrentWord (TextView hostControl)
+		{
+			var currentLine = hostControl.GetCurrentLine ();
+			var cursorPosition = Math.Min (hostControl.CurrentColumn, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition);
+		}
+
+		private string IdxToWord (List<Rune> line, int idx)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			// do not generate suggestions if the cursor is positioned in the middle of a word
+			bool areMidWord;
+
+			if(idx == line.Count) {
+				// the cursor positioned at the very end of the line
+				areMidWord = false;
+			}
+			else {
+				// we are in the middle of a word if the cursor is over a letter/number
+				areMidWord = IsWordChar (line [idx]);
+			}
+
+			// if we are in the middle of a word then there is no way to autocomplete that word
+			if(areMidWord) {
+				return null;
+			}
+
+			// we are at the end of a word.  Work out what has been typed so far
+			while(idx-- > 0) {
+
+				if(IsWordChar(line [idx])) {
+					sb.Insert(0,(char)line [idx]);
+				}
+				else {
+					break;
+				}
+			}
+			return sb.ToString ();
+		}
+
+		/// <summary>
+		/// Return true if the given symbol should be considered part of a word
+		/// and can be contained in matches.  Base behaviour is to use <see cref="char.IsLetterOrDigit(char)"/>
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <returns></returns>
+		protected virtual bool IsWordChar (Rune rune)
+		{
+			return Char.IsLetterOrDigit ((char)rune);
 		}
 	}
 }

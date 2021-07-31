@@ -1792,7 +1792,7 @@ namespace Terminal.Gui {
 				InsertText (new KeyEvent () { Key = key });
 			}
 		}
-
+		
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
@@ -1837,7 +1837,13 @@ namespace Terminal.Gui {
 			return ustring.Make (encoded);
 		}
 
-		List<Rune> GetCurrentLine () => model.GetLine (currentRow);
+		/// <summary>
+		/// Returns the characters on the current line (where the cursor is positioned).
+		/// Use <see cref="CurrentColumn"/> to determine the position of the cursor within
+		/// that line
+		/// </summary>
+		/// <returns></returns>
+		public List<Rune> GetCurrentLine () => model.GetLine (currentRow);
 
 		void InsertText (ustring text)
 		{

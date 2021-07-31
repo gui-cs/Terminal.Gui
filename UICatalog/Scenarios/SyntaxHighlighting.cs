@@ -65,7 +65,6 @@ namespace UICatalog.Scenarios {
 		public void Init()
 			{
 				autocomplete = new Autocomplete ();
-				autocomplete.Suggestions = new string [] { "test1", "test2" };
 
 				keywords.Add("select");
 				keywords.Add("distinct");
@@ -143,7 +142,7 @@ namespace UICatalog.Scenarios {
 			{
 				base.Redraw (bounds);
 
-				autocomplete.GenerateSuggestions (this);
+				autocomplete.GenerateSuggestions (this,keywords);
 
 				autocomplete.RenderOverlay (this, new Point(CursorPosition.X,CursorPosition.Y+1));
 			}
