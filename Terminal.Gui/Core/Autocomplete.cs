@@ -58,6 +58,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key CloseKey {get;set;} = Key.Esc;
 
+		/// <summary>
+		/// Creates a new instance of the autocomplete overlay
+		/// </summary>
 		public Autocomplete ()
 		{
 			ColorScheme = new ColorScheme () {
@@ -74,12 +77,16 @@ namespace Terminal.Gui {
 		/// <param name="renderAt"></param>
 		public void RenderOverlay (View view, Point renderAt)
 		{
-			if (!Visible || !view.HasFocus) {
+			if (!Visible || !view.HasFocus || Suggestions.Count == 0) {
 				return;
 			}
 
 			view.Move (renderAt.X, renderAt.Y);
-			for(int i=0;i<Math.Min(Suggestions.Count,MaxHeight); i++) {
+
+			var toRender = Suggestions.Take(MaxHeight).ToArray();
+			var width = Math.Min(MaxWidth,toRender.Max(s=>s.Length));
+
+			for(int i=0;i<toRender.Length; i++) {
 
 				if(i== SelectedIdx) {
 					Application.Driver.SetAttribute (ColorScheme.HotNormal);
@@ -89,7 +96,10 @@ namespace Terminal.Gui {
 				}
 
 				view.Move (renderAt.X, renderAt.Y+i);
-				Application.Driver.AddStr (Suggestions[i]);
+
+				var text = TextFormatter.ClipOrPad(Suggestions[i],width);
+
+				Application.Driver.AddStr (text );
 			}
 		}
 
@@ -101,6 +111,14 @@ namespace Terminal.Gui {
 			SelectedIdx = Math.Max (0,Math.Min (Suggestions.Count - 1, SelectedIdx));
 		}
 
+		/// <summary>
+		/// Handle key events before <paramref name="hostControl"/> e.g. to make key events like
+		/// up/down apply to the autocomplete control instead of changing the cursor position in 
+		/// the underlying text view.
+		/// </summary>
+		/// <param name="hostControl"></param>
+		/// <param name="kb"></param>
+		/// <returns></returns>
 		public bool ProcessKey (TextView hostControl, KeyEvent kb)
 		{
 			if(IsWordChar((char)kb.Key))
@@ -144,8 +162,8 @@ namespace Terminal.Gui {
 			if(kb.Key == CloseKey)
 			{
 				Suggestions.Clear();
-				hostControl.SetNeedsDisplay();
 				Visible = false;
+				hostControl.SetNeedsDisplay();
 				return true;
 			}
 

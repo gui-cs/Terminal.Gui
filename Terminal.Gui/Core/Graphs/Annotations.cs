@@ -187,7 +187,7 @@ namespace Terminal.Gui.Graphs {
 				// add the text
 				graph.Move (x + 1, y + linesDrawn);
 
-				string str = TruncateOrPad (entry.Item2, availableWidth - 1);
+				string str = TextFormatter.ClipOrPad (entry.Item2, availableWidth - 1);
 				Application.Driver.AddStr (str);
 
 				linesDrawn++;
@@ -199,23 +199,6 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
-		private string TruncateOrPad (string text, int width)
-		{
-			if (string.IsNullOrEmpty (text))
-				return text;
-
-			// if value is not wide enough
-			if (text.Sum (c => Rune.ColumnWidth (c)) < width) {
-
-				// pad it out with spaces to the given alignment
-				int toPad = width - (text.Sum (c => Rune.ColumnWidth (c)));
-
-				return text + new string (' ', toPad);
-			}
-
-			// value is too wide
-			return new string (text.TakeWhile (c => (width -= Rune.ColumnWidth (c)) >= 0).ToArray ());
-		}
 
 		/// <summary>
 		/// Adds an entry into the legend.  Duplicate entries are permissable

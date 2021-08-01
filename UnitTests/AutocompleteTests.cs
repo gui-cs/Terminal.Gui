@@ -20,7 +20,7 @@ namespace UnitTests {
 
 			ac.GenerateSuggestions (tv);
 
-			Assert.Equal (2, ac.Suggestions.Length);
+			Assert.Equal (2, ac.Suggestions.Count);
 			Assert.Equal ("const", ac.Suggestions[0]);
 			Assert.Equal ("Cobble", ac.Suggestions[1]);
 
