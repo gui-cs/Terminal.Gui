@@ -28,8 +28,15 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The strings that form the current list of suggestions to render
+		/// based on what the user has typed so far.
 		/// </summary>
-		public string [] Suggestions { get; set; } = new string [0];
+		public List<string> Suggestions { get; set; } = new List<string>();
+
+		/// <summary>
+		/// The full set of all strings that can be suggested.
+		/// </summary>
+		/// <returns></returns>
+		public List<string> AllSuggestions { get; set; } = new List<string>();
 
 		/// <summary>
 		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
@@ -45,6 +52,11 @@ namespace Terminal.Gui {
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
 		public Key SelectionKey { get; set; } = Key.Enter;
+
+		/// <summary>
+		/// The key that the user can press to close the currently popped autocomplete menu
+		/// </summary>
+		public Key CloseKey {get;set;} = Key.Esc;
 
 		public Autocomplete ()
 		{
@@ -67,7 +79,7 @@ namespace Terminal.Gui {
 			}
 
 			view.Move (renderAt.X, renderAt.Y);
-			for(int i=0;i<Math.Min(Suggestions.Length,MaxHeight); i++) {
+			for(int i=0;i<Math.Min(Suggestions.Count,MaxHeight); i++) {
 
 				if(i== SelectedIdx) {
 					Application.Driver.SetAttribute (ColorScheme.HotNormal);
@@ -81,25 +93,40 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
+		/// </summary>
+		public void EnsureSelectedIdxIsValid()
+		{				
+			SelectedIdx = Math.Max (0,Math.Min (Suggestions.Count - 1, SelectedIdx));
+		}
+
 		public bool ProcessKey (TextView hostControl, KeyEvent kb)
 		{
-			if(!Visible || Suggestions.Length == 0) {
+			if(IsWordChar((char)kb.Key))
+			{
+				Visible = true;
+			}
+
+			if(!Visible || Suggestions.Count == 0) {
 				return false;
 			}
 
 			if (kb.Key == Key.CursorDown) {
-				SelectedIdx = Math.Min (Suggestions.Length - 1, SelectedIdx + 1);
+				SelectedIdx++;
+				EnsureSelectedIdxIsValid();
 				hostControl.SetNeedsDisplay ();
 				return true;
 			}
 
 			if (kb.Key == Key.CursorUp) {
-				SelectedIdx = Math.Max (0, Math.Min(SelectedIdx,Suggestions.Length-1) - 1);
+				SelectedIdx--;
+				EnsureSelectedIdxIsValid();
 				hostControl.SetNeedsDisplay ();
 				return true;
 			}
 
-			if(kb.Key == SelectionKey && SelectedIdx >=0 && SelectedIdx < Suggestions.Length) {
+			if(kb.Key == SelectionKey && SelectedIdx >=0 && SelectedIdx < Suggestions.Count) {
 
 				var accepted = Suggestions [SelectedIdx];
 								
@@ -114,28 +141,37 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if(kb.Key == CloseKey)
+			{
+				Suggestions.Clear();
+				hostControl.SetNeedsDisplay();
+				Visible = false;
+				return true;
+			}
+
 			return false;
 		}
 
 
 		/// <summary>
-		/// Populates <see cref="Suggestions"/> with all strings in <paramref name="options"/> that
+		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
 		/// match with the current cursor position/text in the <paramref name="hostControl"/>
 		/// </summary>
 		/// <param name="hostControl">The text view that you want suggestions for</param>
-		/// <param name="options">All options that could ever be offered to the user</param>
-		public void GenerateSuggestions (TextView hostControl, IEnumerable<string> options)
+		public void GenerateSuggestions (TextView hostControl)
 		{
 			var currentWord = GetCurrentWord (hostControl); 
 
 			if(string.IsNullOrWhiteSpace(currentWord)) {
-				Suggestions = new string [0];
+				Suggestions.Clear();
 			}
 			else {
-				Suggestions = options.Where (o => 
+				Suggestions = AllSuggestions.Where (o => 
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
 				!o.Equals(currentWord,StringComparison.CurrentCultureIgnoreCase)
-				).ToArray ();
+				).ToList ();
+
+				EnsureSelectedIdxIsValid();
 			}
 		}
 
@@ -186,7 +222,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="rune"></param>
 		/// <returns></returns>
-		protected virtual bool IsWordChar (Rune rune)
+		public virtual bool IsWordChar (Rune rune)
 		{
 			return Char.IsLetterOrDigit ((char)rune);
 		}

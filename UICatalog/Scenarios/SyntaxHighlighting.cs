@@ -64,8 +64,6 @@ namespace UICatalog.Scenarios {
 
 		public void Init()
 			{
-				autocomplete = new Autocomplete ();
-
 				keywords.Add("select");
 				keywords.Add("distinct");
 				keywords.Add("top");
@@ -103,6 +101,10 @@ namespace UICatalog.Scenarios {
 				keywords.Add ("on");
 				keywords.Add ("union");
 				keywords.Add ("exists");
+
+
+				autocomplete = new Autocomplete ();
+				autocomplete.AllSuggestions = keywords.ToList();
 
 				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);
@@ -142,7 +144,7 @@ namespace UICatalog.Scenarios {
 			{
 				base.Redraw (bounds);
 
-				autocomplete.GenerateSuggestions (this,keywords);
+				autocomplete.GenerateSuggestions (this);
 
 				autocomplete.RenderOverlay (this, new Point(CursorPosition.X,CursorPosition.Y+1));
 			}

@@ -13,13 +13,12 @@ namespace UnitTests {
 		public void Test_GenerateSuggestions_Simple()
 		{
 			var ac = new Autocomplete ();
+			ac.AllSuggestions = new List<string> { "fish","const","Cobble"};
 
 			var tv = new TextView ();
 			tv.InsertText ("co");
 
-			ac.GenerateSuggestions (
-				tv,
-				new [] { "fish","const","Cobble"});
+			ac.GenerateSuggestions (tv);
 
 			Assert.Equal (2, ac.Suggestions.Length);
 			Assert.Equal ("const", ac.Suggestions[0]);
