@@ -169,7 +169,13 @@ namespace Terminal.Gui {
 				var typedSoFar = GetCurrentWord (hostControl) ?? "";
 				
 				if(typedSoFar.Length < accepted.Length) {
-					accepted = accepted.Substring (typedSoFar.Length);
+
+					// delete the text
+					for(int i=0;i<typedSoFar.Length;i++)
+					{
+						hostControl.DeleteTextBackwards();
+					}
+
 					hostControl.InsertText (accepted);
 					return true;
 				}

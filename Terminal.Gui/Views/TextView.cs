@@ -2594,7 +2594,11 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool DeleteTextBackwards ()
+		/// <summary>
+		/// Deletes a single character from the position of the cursor
+		/// </summary>
+		/// <returns></returns>
+		public bool DeleteTextBackwards ()
 		{
 			if (currentColumn > 0) {
 				// Delete backwards 
