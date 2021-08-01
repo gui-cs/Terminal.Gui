@@ -90,8 +90,20 @@ namespace Terminal.Gui {
 
 			view.Move (renderAt.X, renderAt.Y);
 
-			var toRender = Suggestions.Skip(ScrollOffset).Take(MaxHeight).ToArray();
+			// don't overspill vertically
+			var height = Math.Min(view.Bounds.Height - renderAt.Y,MaxHeight);
+
+			var toRender = Suggestions.Skip(ScrollOffset).Take(height).ToArray();
+
+			if(toRender.Length == 0)
+			{
+				return;
+			}
+
 			var width = Math.Min(MaxWidth,toRender.Max(s=>s.Length));
+
+			// don't overspill horizontally
+			width = Math.Min(view.Bounds.Width - renderAt.X ,width);
 
 			for(int i=0;i<toRender.Length; i++) {
 
