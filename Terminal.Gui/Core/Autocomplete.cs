@@ -44,6 +44,13 @@ namespace Terminal.Gui {
 		public int SelectedIdx { get; set; }
 
 		/// <summary>
+		/// When more suggestions are available than can be rendered the user
+		/// can scroll down the dropdown list.  This indicates how far down they
+		/// have gone
+		/// </summary>
+		public int ScrollOffset {get;set;}
+
+		/// <summary>
 		/// The colors to use to render the overlay
 		/// </summary>
 		public ColorScheme ColorScheme { get; set; }
@@ -83,12 +90,12 @@ namespace Terminal.Gui {
 
 			view.Move (renderAt.X, renderAt.Y);
 
-			var toRender = Suggestions.Take(MaxHeight).ToArray();
+			var toRender = Suggestions.Skip(ScrollOffset).Take(MaxHeight).ToArray();
 			var width = Math.Min(MaxWidth,toRender.Max(s=>s.Length));
 
 			for(int i=0;i<toRender.Length; i++) {
 
-				if(i== SelectedIdx) {
+				if(i==  SelectedIdx - ScrollOffset) {
 					Application.Driver.SetAttribute (ColorScheme.HotNormal);
 				}
 				else {
@@ -97,7 +104,7 @@ namespace Terminal.Gui {
 
 				view.Move (renderAt.X, renderAt.Y+i);
 
-				var text = TextFormatter.ClipOrPad(Suggestions[i],width);
+				var text = TextFormatter.ClipOrPad(toRender[i],width);
 
 				Application.Driver.AddStr (text );
 			}
@@ -109,6 +116,17 @@ namespace Terminal.Gui {
 		public void EnsureSelectedIdxIsValid()
 		{				
 			SelectedIdx = Math.Max (0,Math.Min (Suggestions.Count - 1, SelectedIdx));
+			
+			// if user moved selection up off top of current scroll window
+			if(SelectedIdx < ScrollOffset)
+			{
+				ScrollOffset = SelectedIdx;
+			}
+
+			// if user moved selection down past bottom of current scroll window
+			while(SelectedIdx >= ScrollOffset + MaxHeight ){
+				ScrollOffset++;
+			}
 		}
 
 		/// <summary>
