@@ -71,8 +71,8 @@ namespace Terminal.Gui {
 		public Autocomplete ()
 		{
 			ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute(Color.White,Color.Blue),
-				HotNormal = Application.Driver.MakeAttribute (Color.Black, Color.BrightBlue),
+				Normal = Application.Driver.MakeAttribute(Color.White,Color.Cyan),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.BrightCyan),
 			};
 		}
 
@@ -95,8 +95,8 @@ namespace Terminal.Gui {
 
 			for(int i=0;i<toRender.Length; i++) {
 
-				if(i==  SelectedIdx - ScrollOffset) {
-					Application.Driver.SetAttribute (ColorScheme.HotNormal);
+				if(i ==  SelectedIdx - ScrollOffset) {
+					Application.Driver.SetAttribute (ColorScheme.Focus);
 				}
 				else {
 					Application.Driver.SetAttribute (ColorScheme.Normal);
