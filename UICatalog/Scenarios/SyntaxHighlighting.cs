@@ -12,6 +12,7 @@ namespace UICatalog.Scenarios {
 	class SyntaxHighlighting : Scenario {
 
 		SqlTextView textView;
+		MenuItem miWrap;
 
 		public override void Setup ()
 		{
@@ -22,6 +23,7 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
+				miWrap =  new MenuItem ("_Word Wrap", "", () => WordWrap()){CheckType = MenuItemCheckStyle.Checked},
 				new MenuItem ("_Quit", "", () => Quit()),
 			})
 			});
@@ -46,6 +48,12 @@ namespace UICatalog.Scenarios {
 
 
 			Top.Add (statusBar);
+		}
+
+		private void WordWrap ()
+		{
+			miWrap.Checked = !miWrap.Checked;
+			textView.WordWrap = miWrap.Checked;
 		}
 
 		private void Quit ()
