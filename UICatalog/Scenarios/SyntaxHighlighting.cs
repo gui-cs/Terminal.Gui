@@ -173,7 +173,11 @@ namespace UICatalog.Scenarios {
 
 				autocomplete.GenerateSuggestions (this);
 
-				autocomplete.RenderOverlay (this, new Point(CursorPosition.X,CursorPosition.Y+1));
+				var renderAt = new Point(
+					CursorPosition.X - LeftColumn,
+				(CursorPosition.Y+1) - TopRow);
+
+				autocomplete.RenderOverlay (this, renderAt);
 			}
 
 			private bool IsInStringLiteral (List<System.Rune> line, int idx)
