@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Rune = System.Rune;
@@ -31,7 +32,7 @@ namespace Terminal.Gui {
 		/// The strings that form the current list of suggestions to render
 		/// based on what the user has typed so far.
 		/// </summary>
-		public List<string> Suggestions { get; protected set; } = new List<string>();
+		public ReadOnlyCollection<string> Suggestions { get; protected set; } = new ReadOnlyCollection<string>(new string[0]);
 
 		/// <summary>
 		/// The full set of all strings that can be suggested.
@@ -198,13 +199,21 @@ namespace Terminal.Gui {
 
 			if(kb.Key == CloseKey)
 			{
-				Suggestions.Clear();
+				ClearSuggestions ();
 				Visible = false;
 				hostControl.SetNeedsDisplay();
 				return true;
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Clears <see cref="Suggestions"/>
+		/// </summary>
+		public void ClearSuggestions ()
+		{
+			Suggestions = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 		}
 
 
@@ -217,20 +226,20 @@ namespace Terminal.Gui {
 		{
 			// if there is nothing to pick from
 			if(AllSuggestions.Count == 0) {
-				Suggestions.Clear ();
+				ClearSuggestions ();
 				return;
 			}
 
 			var currentWord = GetCurrentWord (hostControl); 
 
 			if(string.IsNullOrWhiteSpace(currentWord)) {
-				Suggestions.Clear();
+				ClearSuggestions ();
 			}
 			else {
 				Suggestions = AllSuggestions.Where (o => 
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
 				!o.Equals(currentWord,StringComparison.CurrentCultureIgnoreCase)
-				).ToList ();
+				).ToList ().AsReadOnly();
 
 				EnsureSelectedIdxIsValid();
 			}
