@@ -72,7 +72,8 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
-					CreateAllowsTabChecked ()
+					CreateAllowsTabChecked (),
+					CreateAutocomplete()
 				})
 			});
 			Top.Add (menu);
@@ -448,6 +449,11 @@ namespace UICatalog {
 				}
 			};
 
+			return item;
+		}
+
+		private MenuItem CreateAutocomplete()
+		{
 			var auto = new MenuItem ();
 			auto.Title = "Autocomplete";
 			auto.CheckType |= MenuItemCheckStyle.Checked;
@@ -467,7 +473,7 @@ namespace UICatalog {
 				}
 			};
 
-			return new MenuItem [] { item, auto };
+			return auto;
 		}
 
 		private MenuItem CreateAllowsTabChecked ()
