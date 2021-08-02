@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// True if the autocomplete should be considered open and visible
 		/// </summary>
-		public bool Visible { get; set; } = true;
+		protected bool Visible { get; set; } = true;
 
 		/// <summary>
 		/// The strings that form the current list of suggestions to render
@@ -61,10 +61,7 @@ namespace Terminal.Gui {
 			{
 				if(colorScheme == null)
 				{
-					colorScheme = new ColorScheme{
-						Normal = Application.Driver.MakeAttribute(Color.White,Color.Cyan),
-						Focus = Application.Driver.MakeAttribute (Color.Black, Color.BrightCyan),
-					};
+					colorScheme = Colors.Menu;
 				}
 				return colorScheme;
 			}
