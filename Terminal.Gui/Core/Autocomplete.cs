@@ -53,9 +53,28 @@ namespace Terminal.Gui {
 		public int ScrollOffset {get;set;}
 
 		/// <summary>
-		/// The colors to use to render the overlay
+		/// The colors to use to render the overlay.  Accessing this property before
+		/// the Application has been initialised will cause an error
 		/// </summary>
-		public ColorScheme ColorScheme { get; set; }
+		public ColorScheme ColorScheme { 
+			get
+			{
+				if(colorScheme == null)
+				{
+					colorScheme = new ColorScheme{
+						Normal = Application.Driver.MakeAttribute(Color.White,Color.Cyan),
+						Focus = Application.Driver.MakeAttribute (Color.Black, Color.BrightCyan),
+					};
+				}
+				return colorScheme;
+			}
+		 	set
+			{
+				ColorScheme = value;
+			}
+		}
+
+		private ColorScheme colorScheme;
 
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
@@ -66,17 +85,6 @@ namespace Terminal.Gui {
 		/// The key that the user can press to close the currently popped autocomplete menu
 		/// </summary>
 		public Key CloseKey {get;set;} = Key.Esc;
-
-		/// <summary>
-		/// Creates a new instance of the autocomplete overlay
-		/// </summary>
-		public Autocomplete ()
-		{
-			ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute(Color.White,Color.Cyan),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.BrightCyan),
-			};
-		}
 
 		/// <summary>
 		/// Renders the autocomplete dialog inside the given <paramref name="view"/> at the
