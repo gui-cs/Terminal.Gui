@@ -85,13 +85,20 @@ namespace Terminal.Gui {
 			X = isVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 			Y = isVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
 			Host = host;
+			CanFocus = host.CanFocus;
+			Enabled = host.Enabled;
+			Host.CanFocusChanged += Host_CanFocusChanged;
+			Host.EnabledChanged += Host_EnabledChanged;
+			Host.VisibleChanged += Host_VisibleChanged;
 			Host.SuperView.Add (this);
 			AutoHideScrollBars = true;
 			if (showBothScrollIndicator) {
 				OtherScrollBarView = new ScrollBarView (0, 0, !isVertical) {
 					ColorScheme = host.ColorScheme,
 					Host = host,
-					OtherScrollBarView = this,
+					CanFocus = host.CanFocus,
+					Enabled = host.Enabled,
+					OtherScrollBarView = this
 				};
 				OtherScrollBarView.hosted = true;
 				OtherScrollBarView.X = OtherScrollBarView.IsVertical ? Pos.Right (host) - 1 : Pos.Left (host);
@@ -107,6 +114,34 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.Width = 1;
 			contentBottomRightCorner.Height = 1;
 			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+		}
+
+		private void Host_VisibleChanged ()
+		{
+			if (!Host.Visible) {
+				Visible = Host.Visible;
+				if (otherScrollBarView != null) {
+					otherScrollBarView.Visible = Visible;
+				}
+			} else {
+				ShowHideScrollBars ();
+			}
+		}
+
+		private void Host_EnabledChanged ()
+		{
+			Enabled = Host.Enabled;
+			if (otherScrollBarView != null) {
+				otherScrollBarView.Enabled = Enabled;
+			}
+		}
+
+		private void Host_CanFocusChanged ()
+		{
+			CanFocus = Host.CanFocus;
+			if (otherScrollBarView != null) {
+				otherScrollBarView.CanFocus = CanFocus;
+			}
 		}
 
 		void ContentBottomRightCorner_MouseClick (MouseEventArgs me)
@@ -322,6 +357,13 @@ namespace Terminal.Gui {
 			} else {
 				contentBottomRightCorner.Visible = false;
 			}
+			if (Host?.Visible == true && showScrollIndicator && !Visible) {
+				Visible = true;
+			}
+			if (Host?.Visible == true && otherScrollBarView != null && otherScrollBarView.showScrollIndicator
+				&& !otherScrollBarView.Visible) {
+				otherScrollBarView.Visible = true;
+			}
 			if (showScrollIndicator) {
 				Redraw (Bounds);
 			}
@@ -390,7 +432,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 			if ((vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
 				return;
@@ -549,7 +591,10 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (Host != null && !Host.HasFocus) {
+			if (!Host.CanFocus) {
+				return true;
+			}
+			if (Host?.HasFocus == false) {
 				Host.SetFocus ();
 			}
 

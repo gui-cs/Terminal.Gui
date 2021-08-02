@@ -17,7 +17,7 @@ namespace Terminal.Gui {
 		void Init (Rect rect, ustring [] radioLabels, int selected)
 		{
 			if (radioLabels == null) {
-				this.radioLabels = new List<ustring>();
+				this.radioLabels = new List<ustring> ();
 			} else {
 				this.radioLabels = radioLabels.ToList ();
 			}
@@ -63,7 +63,8 @@ namespace Terminal.Gui {
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		
 		public RadioGroup (int x, int y, ustring [] radioLabels, int selected = 0) :
-			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList() : null), radioLabels, selected) { }
+			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
+		{ }
 
 		/// <summary>
 		/// Gets or sets the <see cref="DisplayModeLayout"/> for this <see cref="RadioGroup"/>.
@@ -141,7 +142,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The radio labels.</value>
 		public ustring [] RadioLabels {
-			get => radioLabels.ToArray();
+			get => radioLabels.ToArray ();
 			set {
 				var prevCount = radioLabels.Count;
 				radioLabels = value.ToList ();
@@ -184,7 +185,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			Clear ();
 			for (int i = 0; i < radioLabels.Count; i++) {
 				switch (DisplayMode) {
@@ -195,8 +196,8 @@ namespace Terminal.Gui {
 					Move (horizontal [i].pos, 0);
 					break;
 				}
-				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.AddStr (ustring.Make(new Rune[] { (i == selected ? Driver.Selected : Driver.UnSelected), ' '}));
+				Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+				Driver.AddStr (ustring.Make (new Rune [] { (i == selected ? Driver.Selected : Driver.UnSelected), ' ' }));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
 		}
@@ -222,7 +223,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Gets the index of the item that was previously selected. -1 if there was no previous selection.
 			/// </summary>
-			public int PreviousSelectedItem { get;  }
+			public int PreviousSelectedItem { get; }
 
 			/// <summary>
 			/// Gets the index of the item that is now selected. -1 if there is no selection.
@@ -234,7 +235,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="selectedItem"></param>
 			/// <param name="previousSelectedItem"></param>
-			public SelectedItemChangedArgs(int selectedItem, int previousSelectedItem)
+			public SelectedItemChangedArgs (int selectedItem, int previousSelectedItem)
 			{
 				PreviousSelectedItem = previousSelectedItem;
 				SelectedItem = selectedItem;

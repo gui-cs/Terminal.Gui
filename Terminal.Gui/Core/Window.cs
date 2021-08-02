@@ -181,7 +181,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (!NeedDisplay.IsEmpty) {
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}
 
@@ -194,13 +194,13 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);
 			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 			// Checks if there are any SuperView view which intersect with this window.
 			if (SuperView != null) {

@@ -1233,22 +1233,27 @@ namespace Terminal.Gui {
 			return SelectedText.Length;
 		}
 
-		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
+		CursorVisibility savedCursorVisibility;
 
 		void SaveCursorVisibility ()
 		{
 			if (desiredCursorVisibility != CursorVisibility.Invisible) {
-				savedCursorVisibility = desiredCursorVisibility;
+				if (savedCursorVisibility == 0) {
+					savedCursorVisibility = desiredCursorVisibility;
+				}
 				DesiredCursorVisibility = CursorVisibility.Invisible;
 			}
 		}
 
 		void ResetCursorVisibility ()
 		{
-			if (savedCursorVisibility != desiredCursorVisibility) {
+			if (savedCursorVisibility == 0) {
+				savedCursorVisibility = desiredCursorVisibility;
+			}
+			if (savedCursorVisibility != desiredCursorVisibility && !HasFocus) {
 				DesiredCursorVisibility = savedCursorVisibility;
 				savedCursorVisibility = CursorVisibility.Default;
-			} else {
+			} else if (desiredCursorVisibility != CursorVisibility.Underline) {
 				DesiredCursorVisibility = CursorVisibility.Underline;
 			}
 		}
@@ -1306,6 +1311,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			if (!CanFocus || !Enabled) {
+				return;
+			}
+
 			if (selecting) {
 				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
 				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
@@ -1322,10 +1331,13 @@ namespace Terminal.Gui {
 					if (line [idx] == '\t') {
 						cols += TabWidth + 1;
 					}
-					TextModel.SetCol (ref col, Frame.Width, cols);
+					if (!TextModel.SetCol (ref col, Frame.Width, cols)) {
+						col = currentColumn;
+						break;
+					}
 				}
 			}
-			if ((col >= leftColumn || col < Frame.Width)
+			if (col >= leftColumn && currentColumn - leftColumn + RightOffset < Frame.Width
 				&& topRow <= currentRow && currentRow - topRow + BottomOffset < Frame.Height) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
@@ -1348,7 +1360,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void ColorNormal ()
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 		}
 
 		/// <summary>
@@ -1360,7 +1372,7 @@ namespace Terminal.Gui {
 		/// <param name="idx"></param>
 		protected virtual void ColorNormal (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 		}
 
 		/// <summary>
@@ -1397,6 +1409,7 @@ namespace Terminal.Gui {
 			get => isReadOnly;
 			set {
 				isReadOnly = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1413,6 +1426,7 @@ namespace Terminal.Gui {
 				}
 
 				desiredCursorVisibility = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1967,6 +1981,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (!CanFocus) {
+				return true;
+			}
+
 			int restCount;
 			List<Rune> rest;
 

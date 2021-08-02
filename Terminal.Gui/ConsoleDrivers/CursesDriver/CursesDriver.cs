@@ -143,6 +143,11 @@ namespace Terminal.Gui {
 				background: MapCursesColor (background));
 		}
 
+		static Attribute MakeColor (Color fore, Color back)
+		{
+			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
+		}
+
 		int [,] colorPairs = new int [16, 16];
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
@@ -795,57 +800,66 @@ namespace Terminal.Gui {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				Colors.TopLevel.Normal = MakeColor (Curses.COLOR_GREEN, Curses.COLOR_BLACK);
-				Colors.TopLevel.Focus = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
-				Colors.TopLevel.HotNormal = MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLACK);
-				Colors.TopLevel.HotFocus = MakeColor (Curses.COLOR_BLUE, Curses.COLOR_CYAN);
+				Colors.TopLevel.Normal = MakeColor (Color.Green, Color.Black);
+				Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
+				Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
+				Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
+				Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
 
-				Colors.Base.Normal = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLUE);
-				Colors.Base.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
-				Colors.Base.HotNormal = MakeColor (Curses.COLOR_CYAN, Curses.COLOR_BLUE);
-				Colors.Base.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_BLUE, Curses.COLOR_GRAY);
+				Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
+				Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
+				Colors.Base.HotNormal = MakeColor (Color.Cyan, Color.Blue);
+				Colors.Base.HotFocus = MakeColor (Color.Blue, Color.Gray);
+				Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
 
 				// Focused,
 				//    Selected, Hot: Yellow on Black
 				//    Selected, text: white on black
 				//    Unselected, hot: yellow on cyan
 				//    unselected, text: same as unfocused
-				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_GRAY);
-				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
-				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_GRAY);
-				Colors.Menu.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLACK);
-				Colors.Menu.Disabled = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_GRAY);
+				Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
+				Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
+				Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
+				Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
+				Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
 
-				Colors.Dialog.Normal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
-				Colors.Dialog.Focus = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_GRAY);
-				Colors.Dialog.HotNormal = MakeColor (Curses.COLOR_BLUE, Curses.COLOR_WHITE);
-				Colors.Dialog.HotFocus = MakeColor (Curses.COLOR_BLUE, Curses.COLOR_GRAY);
+				Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
+				Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
+				Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
+				Colors.Dialog.HotFocus = MakeColor (Color.Blue, Color.DarkGray);
+				Colors.Dialog.Disabled = MakeColor (Color.DarkGray, Color.Gray);
 
-				Colors.Error.Normal = MakeColor (Curses.COLOR_RED, Curses.COLOR_WHITE);
-				Colors.Error.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_RED);
-				Colors.Error.HotNormal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
-				Colors.Error.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_BLACK, Curses.COLOR_RED);
+				Colors.Error.Normal = MakeColor (Color.Red, Color.White);
+				Colors.Error.Focus = MakeColor (Color.White, Color.Red);
+				Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
+				Colors.Error.HotFocus = MakeColor (Color.Black, Color.Red);
+				Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
 			} else {
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
 				Colors.TopLevel.HotFocus = Curses.COLOR_YELLOW;
+				Colors.TopLevel.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 				Colors.Base.Normal = Curses.A_NORMAL;
 				Colors.Base.Focus = Curses.A_REVERSE;
 				Colors.Base.HotNormal = Curses.A_BOLD;
 				Colors.Base.HotFocus = Curses.A_BOLD | Curses.A_REVERSE;
+				Colors.Base.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 				Colors.Menu.Normal = Curses.A_REVERSE;
 				Colors.Menu.Focus = Curses.A_NORMAL;
 				Colors.Menu.HotNormal = Curses.A_BOLD;
 				Colors.Menu.HotFocus = Curses.A_NORMAL;
+				Colors.Menu.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 				Colors.Dialog.Normal = Curses.A_REVERSE;
 				Colors.Dialog.Focus = Curses.A_NORMAL;
 				Colors.Dialog.HotNormal = Curses.A_BOLD;
 				Colors.Dialog.HotFocus = Curses.A_NORMAL;
+				Colors.Dialog.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 				Colors.Error.Normal = Curses.A_BOLD;
 				Colors.Error.Focus = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotFocus = Curses.A_REVERSE;
+				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
 		}
 

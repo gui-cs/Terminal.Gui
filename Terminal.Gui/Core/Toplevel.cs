@@ -590,13 +590,13 @@ namespace Terminal.Gui {
 			}
 
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 				// This is the Application.Top. Clear just the region we're being asked to redraw 
 				// (the bounds passed to us).
 				// Must be the screen-relative region to clear, not the bounds.
 				Clear (Frame);
-				Driver.SetAttribute (Colors.Base.Normal);
+				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
 
 				if (LayoutStyle == LayoutStyle.Computed)
 					SetRelativeLayout (Bounds);

@@ -1203,11 +1203,13 @@ namespace Terminal.Gui {
 			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
 			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
 			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
@@ -1219,11 +1221,13 @@ namespace Terminal.Gui {
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
 			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
 
 			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
 			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
+			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 		}
 
 		void ResizeScreen ()
@@ -1472,8 +1476,7 @@ namespace Terminal.Gui {
 
 			try {
 				ProcessInput (input);
-			} catch (OverflowException) { }
-			finally {
+			} catch (OverflowException) { } finally {
 				keyEvent.bKeyDown = false;
 				input.KeyEvent = keyEvent;
 				ProcessInput (input);

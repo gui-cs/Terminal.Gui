@@ -515,10 +515,10 @@ namespace UICatalog {
 
 				_currentEditMenuBarItem = menuItem;
 				_frmMenuDetails.EditMenuBarItem (menuItem);
-				var f = _btnOk.CanFocus == _frmMenuDetails.CanFocus;
+				var f = _btnOk.Enabled == _frmMenuDetails.Enabled;
 				if (!f) {
-					_btnOk.CanFocus = _frmMenuDetails.CanFocus;
-					_btnCancel.CanFocus = _frmMenuDetails.CanFocus;
+					_btnOk.Enabled = _frmMenuDetails.Enabled;
+					_btnCancel.Enabled = _frmMenuDetails.Enabled;
 				}
 			}
 
@@ -624,7 +624,7 @@ namespace UICatalog {
 			}
 
 
-			_frmMenuDetails.Initialized += (s, e) => _frmMenuDetails.CanFocus = false;
+			//_frmMenuDetails.Initialized += (s, e) => _frmMenuDetails.Enabled = false;
 		}
 	}
 
@@ -790,19 +790,19 @@ namespace UICatalog {
 				if (_ckbIsTopLevel.Checked) {
 					_ckbSubMenu.Checked = false;
 					_ckbSubMenu.SetNeedsDisplay ();
-					_txtHelp.CanFocus = true;
-					_txtAction.CanFocus = true;
-					_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+					_txtHelp.Enabled = true;
+					_txtAction.Enabled = true;
+					_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 				} else {
 					if (_menuItem == null && !hasParent || _menuItem.Parent == null) {
 						_ckbSubMenu.Checked = true;
 						_ckbSubMenu.SetNeedsDisplay ();
-						_txtShortcut.CanFocus = false;
+						_txtShortcut.Enabled = false;
 					}
 					_txtHelp.Text = "";
-					_txtHelp.CanFocus = false;
+					_txtHelp.Enabled = false;
 					_txtAction.Text = "";
-					_txtAction.CanFocus = false;
+					_txtAction.Enabled = false;
 				}
 			};
 			_ckbSubMenu.Toggled += (e) => {
@@ -810,20 +810,20 @@ namespace UICatalog {
 					_ckbIsTopLevel.Checked = false;
 					_ckbIsTopLevel.SetNeedsDisplay ();
 					_txtHelp.Text = "";
-					_txtHelp.CanFocus = false;
+					_txtHelp.Enabled = false;
 					_txtAction.Text = "";
-					_txtAction.CanFocus = false;
+					_txtAction.Enabled = false;
 					_txtShortcut.Text = "";
-					_txtShortcut.CanFocus = false;
+					_txtShortcut.Enabled = false;
 				} else {
 					if (!hasParent) {
 						_ckbIsTopLevel.Checked = true;
 						_ckbIsTopLevel.SetNeedsDisplay ();
-						_txtShortcut.CanFocus = false;
+						_txtShortcut.Enabled = false;
 					}
-					_txtHelp.CanFocus = true;
-					_txtAction.CanFocus = true;
-					_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+					_txtHelp.Enabled = true;
+					_txtAction.Enabled = true;
+					_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 				}
 			};
 
@@ -843,9 +843,9 @@ namespace UICatalog {
 				_txtAction.Text = m.action;
 				_ckbIsTopLevel.Checked = false;
 				_ckbSubMenu.Checked = !hasParent;
-				_txtHelp.CanFocus = hasParent;
-				_txtAction.CanFocus = hasParent;
-				_txtShortcut.CanFocus = hasParent;
+				_txtHelp.Enabled = hasParent;
+				_txtAction.Enabled = hasParent;
+				_txtShortcut.Enabled = hasParent;
 			} else {
 				EditMenuBarItem (_menuItem);
 			}
@@ -891,12 +891,12 @@ namespace UICatalog {
 		{
 			if (menuItem == null) {
 				hasParent = false;
-				CanFocus = false;
+				Enabled = false;
 				CleanEditMenuBarItem ();
 				return;
 			} else {
 				hasParent = menuItem.Parent != null;
-				CanFocus = true;
+				Enabled = true;
 			}
 			_menuItem = menuItem;
 			_txtTitle.Text = menuItem?.Title ?? "";
@@ -904,11 +904,11 @@ namespace UICatalog {
 			_txtAction.Text = menuItem != null && menuItem.Action != null ? GetTargetAction (menuItem.Action) : ustring.Empty;
 			_ckbIsTopLevel.Checked = IsTopLevel (menuItem);
 			_ckbSubMenu.Checked = HasSubMenus (menuItem);
-			_txtHelp.CanFocus = !_ckbSubMenu.Checked;
-			_txtAction.CanFocus = !_ckbSubMenu.Checked;
+			_txtHelp.Enabled = !_ckbSubMenu.Checked;
+			_txtAction.Enabled = !_ckbSubMenu.Checked;
 			_rbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
 			_txtShortcut.Text = menuItem?.ShortcutTag ?? "";
-			_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+			_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 		}
 
 		void CleanEditMenuBarItem ()

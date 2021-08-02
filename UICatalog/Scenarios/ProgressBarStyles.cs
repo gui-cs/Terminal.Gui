@@ -58,7 +58,7 @@ namespace UICatalog {
 			};
 			button.Clicked += () => {
 				if (_fractionTimer == null) {
-					button.CanFocus = false;
+					button.Enabled = false;
 					blocksPB.Fraction = 0;
 					continuousPB.Fraction = 0;
 					float fractionSum = 0;
@@ -69,7 +69,7 @@ namespace UICatalog {
 						if (fractionSum > 1) {
 							_fractionTimer.Dispose ();
 							_fractionTimer = null;
-							button.CanFocus = true;
+							button.Enabled = true;
 						}
 						Application.MainLoop.Driver.Wakeup ();
 					}, null, 0, _timerTick);

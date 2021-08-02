@@ -184,6 +184,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			if (kb.IsAlt)
 				return CheckKey (kb);
 
@@ -193,6 +197,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			if (IsDefault && kb.KeyValue == '\n') {
 				Clicked?.Invoke ();
 				return true;
@@ -203,6 +211,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			var c = kb.KeyValue;
 			if (c == '\n' || c == ' ' || kb.Key == HotKey) {
 				Clicked?.Invoke ();
@@ -228,7 +240,7 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
 				me.Flags == MouseFlags.Button1TripleClicked) {
-				if (CanFocus) {
+				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();

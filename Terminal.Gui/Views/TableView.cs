@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 			// What columns to render at what X offset in viewport
 			var columnsToRender = CalculateViewport (bounds).ToArray ();
 
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
 			Driver.AddStr (new string (' ', bounds.Width));
@@ -253,7 +253,7 @@ namespace Terminal.Gui {
 		private void ClearLine (int row, int width)
 		{
 			Move (0, row);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			Driver.AddStr (new string (' ', width));
 		}
 
@@ -391,7 +391,8 @@ namespace Terminal.Gui {
 
 			//start by clearing the entire line
 			Move (0, row);
-			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus : rowScheme.Normal);
+			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus
+				: Enabled ? rowScheme.Normal : rowScheme.Disabled);
 			Driver.AddStr (new string (' ', Bounds.Width));
 
 			// Render cells for each visible header for the current row
@@ -431,7 +432,7 @@ namespace Terminal.Gui {
 					scheme = rowScheme;
 				}
 
-				var cellColor = isSelectedCell ? scheme.HotFocus : scheme.Normal;
+				var cellColor = isSelectedCell ? scheme.HotFocus : Enabled ? scheme.Normal : scheme.Disabled;
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
@@ -442,12 +443,13 @@ namespace Terminal.Gui {
 								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
-					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus : rowScheme.Normal);
+					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
+						: Enabled ? rowScheme.Normal : rowScheme.Disabled);
 				}
 
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
 				if (!FullRowSelect)
-					Driver.SetAttribute (rowScheme.Normal);
+					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
 
 				RenderSeparator (current.X - 1, row, false);
 

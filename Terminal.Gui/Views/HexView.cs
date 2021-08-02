@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 				Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * 4));
 
 				currentAttribute = ColorScheme.HotNormal;
-				SetAttribute (ColorScheme.Normal);
+				SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 				for (int block = 0; block < nblocks; block++) {
 					for (int b = 0; b < 4; b++) {
@@ -172,10 +172,10 @@ namespace Terminal.Gui {
 						if (offset + displayStart == position || edited)
 							SetAttribute (leftSide ? activeColor : trackingColor);
 						else
-							SetAttribute (ColorScheme.Normal);
+							SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 						Driver.AddStr (offset >= n ? "  " : string.Format ("{0:x2}", value));
-						SetAttribute (ColorScheme.Normal);
+						SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 						Driver.AddRune (' ');
 					}
 					Driver.AddStr (block + 1 == nblocks ? " " : "| ");
@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 					if (offset + displayStart == position || edited)
 						SetAttribute (leftSide ? trackingColor : activeColor);
 					else
-						SetAttribute (ColorScheme.Normal);
+						SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 					Driver.AddRune (c);
 				}
@@ -401,12 +401,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility DesiredCursorVisibility 
-		{ 
-			get => desiredCursorVisibility; 
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
 			set {
 				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);		
+					Application.Driver.SetCursorVisibility (value);
 				}
 
 				desiredCursorVisibility = value;

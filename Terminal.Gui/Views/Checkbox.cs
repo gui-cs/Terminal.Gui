@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			Move (0, 0);
 			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
 			Driver.AddRune (' ');
@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 			Driver.AddStr (Text);
 			if (hot_pos != -1) {
 				Move (2 + hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
 				Driver.AddRune (hot_key);
 			}
 		}

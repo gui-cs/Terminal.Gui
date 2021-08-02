@@ -426,17 +426,18 @@ namespace Terminal.Gui {
 				if (index == current) return ColorScheme.Focus;
 				if (!item.IsEnabled ()) return ColorScheme.Disabled;
 			}
-			return ColorScheme.Normal;
+			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
 
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			DrawFrame (bounds, padding: 0, fill: true);
 
 			for (int i = 0; i < barItems.Children.Length; i++) {
 				var item = barItems.Children [i];
-				Driver.SetAttribute (item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				Driver.SetAttribute (item == null ? Enabled ? ColorScheme.Normal : ColorScheme.Disabled
+					: i == current ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 				if (item == null) {
 					Move (0, i + 1);
 					Driver.AddRune (Driver.LeftTee);
@@ -482,7 +483,7 @@ namespace Terminal.Gui {
 				else
 					DrawHotString (textToDraw,
 					       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
+					       i == current ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 
 				// The help string
 				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
@@ -905,7 +906,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
@@ -918,13 +919,14 @@ namespace Terminal.Gui {
 				Attribute hotColor, normalColor;
 				if (i == selected && IsMenuOpen) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
-					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
+					normalColor = i == selected ? ColorScheme.Focus :
+						Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 				} else if (openedByAltKey) {
 					hotColor = ColorScheme.HotNormal;
-					normalColor = ColorScheme.Normal;
+					normalColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 				} else {
-					hotColor = ColorScheme.Normal;
-					normalColor = ColorScheme.Normal;
+					hotColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+					normalColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 				}
 				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
 				pos += 1 + menu.TitleLength + (menu.Help.Length > 0 ? menu.Help.Length + 2 : 0) + 2;
@@ -989,7 +991,7 @@ namespace Terminal.Gui {
 		/// Virtual method that will invoke the <see cref="MenuOpening"/> event if it's defined.
 		/// </summary>
 		/// <param name="currentMenu">The current menu to be replaced.</param>
-		/// /// <returns>Returns the <see cref="MenuOpeningEventArgs"/></returns>
+		/// <returns>Returns the <see cref="MenuOpeningEventArgs"/></returns>
 		public virtual MenuOpeningEventArgs OnMenuOpening (MenuBarItem currentMenu)
 		{
 			var ev = new MenuOpeningEventArgs (currentMenu);
@@ -1175,7 +1177,7 @@ namespace Terminal.Gui {
 				}
 				LastFocused = lastFocused;
 				lastFocused = null;
-				if (LastFocused != null) {
+				if (LastFocused != null && LastFocused.CanFocus) {
 					if (!reopen) {
 						selected = -1;
 					}

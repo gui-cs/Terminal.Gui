@@ -164,9 +164,20 @@ namespace Terminal.Gui {
 		public event Action<MouseEventArgs> MouseClick;
 
 		/// <summary>
-		/// Event fired when the visible value is being changed.
+		/// Event fired when the <see cref="CanFocus"/> value is being changed.
+		/// </summary>
+		public event Action CanFocusChanged;
+
+		/// <summary>
+		/// Event fired when the <see cref="Enabled"/> value is being changed.
+		/// </summary>
+		public event Action EnabledChanged;
+
+		/// <summary>
+		/// Event fired when the <see cref="Visible"/> value is being changed.
 		/// </summary>
 		public event Action VisibleChanged;
+
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
@@ -333,6 +344,11 @@ namespace Terminal.Gui {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
+					if (!value && HasFocus) {
+						SetHasFocus (false, this);
+					}
+					OnCanFocusChanged ();
+					SetNeedsDisplay ();
 				}
 				if (subviews != null && IsInitialized) {
 					foreach (var view in subviews) {
@@ -1118,7 +1134,7 @@ namespace Terminal.Gui {
 			if (focused)
 				DrawHotString (text, scheme.HotFocus, scheme.Focus);
 			else
-				DrawHotString (text, scheme.HotNormal, scheme.Normal);
+				DrawHotString (text, Enabled ? scheme.HotNormal : scheme.Disabled, Enabled ? scheme.Normal : scheme.Disabled);
 		}
 
 		/// <summary>
@@ -1147,11 +1163,11 @@ namespace Terminal.Gui {
 		///    in a visually sensible place.
 		public virtual void PositionCursor ()
 		{
-			if (!CanBeVisible (this)) {
+			if (!CanBeVisible (this) || !Enabled) {
 				return;
 			}
 
-			if (focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
+			if (focused?.Visible == true && focused?.Enabled == true && focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
 				focused.PositionCursor ();
 			} else {
 				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
@@ -1355,7 +1371,8 @@ namespace Terminal.Gui {
 				if (textFormatter != null) {
 					textFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled,
+					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
 			}
 
 			// Invoke DrawContentEvent
@@ -1418,7 +1435,7 @@ namespace Terminal.Gui {
 			if (view == null)
 				return;
 			//Console.WriteLine ($"Request to focus {view}");
-			if (!view.CanFocus || !view.Visible)
+			if (!view.CanFocus || !view.Visible || !view.Enabled)
 				return;
 			if (focused?.hasFocus == true && focused == view)
 				return;
@@ -1448,7 +1465,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetFocus ()
 		{
-			if (!CanBeVisible (this)) {
+			if (!CanBeVisible (this) || !Enabled) {
+				if (HasFocus) {
+					SetHasFocus (false, this);
+				}
 				return;
 			}
 
@@ -1483,14 +1503,20 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			Focused?.KeyPress?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (Focused?.ProcessKey (keyEvent) == true)
+			if (Focused?.Enabled == true) {
+				Focused?.KeyPress?.Invoke (args);
+				if (args.Handled)
+					return true;
+			}
+			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
 			return false;
@@ -1499,19 +1525,25 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			Focused?.KeyPress?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (Focused?.ProcessKey (keyEvent) == true)
+			if (Focused?.Enabled == true) {
+				Focused?.KeyPress?.Invoke (args);
+				if (args.Handled)
+					return true;
+			}
+			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessHotKey (keyEvent))
+				if (view.Enabled && view.ProcessHotKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -1519,19 +1551,25 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			Focused?.KeyPress?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (Focused?.ProcessKey (keyEvent) == true)
+			if (Focused?.Enabled == true) {
+				Focused?.KeyPress?.Invoke (args);
+				if (args.Handled)
+					return true;
+			}
+			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessColdKey (keyEvent))
+				if (view.Enabled && view.ProcessColdKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -1544,12 +1582,16 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyDown?.Invoke (args);
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.OnKeyDown (keyEvent) == true) {
+			if (Focused?.Enabled == true && Focused?.OnKeyDown (keyEvent) == true) {
 				return true;
 			}
 
@@ -1564,12 +1606,16 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyUp?.Invoke (args);
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.OnKeyUp (keyEvent) == true) {
+			if (Focused?.Enabled == true && Focused?.OnKeyUp (keyEvent) == true) {
 				return true;
 			}
 
@@ -1605,7 +1651,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var view in tabIndexes) {
-				if (view.CanFocus && view.tabStop && view.Visible) {
+				if (view.CanFocus && view.tabStop && view.Visible && view.Enabled) {
 					SetFocus (view);
 					return;
 				}
@@ -1630,7 +1676,7 @@ namespace Terminal.Gui {
 				i--;
 
 				View v = tabIndexes [i];
-				if (v.CanFocus && v.tabStop && v.Visible) {
+				if (v.CanFocus && v.tabStop && v.Visible && v.Enabled) {
 					SetFocus (v);
 					return;
 				}
@@ -1666,10 +1712,10 @@ namespace Terminal.Gui {
 					focused_idx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible) {
+				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible && w.Enabled) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop && w.Visible)
+					if (w != null && w.CanFocus && w.tabStop && w.Visible && w.Enabled)
 						w.FocusLast ();
 
 					SetFocus (w);
@@ -1712,10 +1758,10 @@ namespace Terminal.Gui {
 					focused_idx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible) {
+				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible && w.Enabled) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop && w.Visible)
+					if (w != null && w.CanFocus && w.tabStop && w.Visible && w.Enabled)
 						w.FocusFirst ();
 
 					SetFocus (w);
@@ -2076,7 +2122,50 @@ namespace Terminal.Gui {
 		/// Get or sets if  the <see cref="View"/> was already initialized.
 		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
 		/// </summary>
-		public bool IsInitialized { get; set; }
+		public virtual bool IsInitialized { get; set; }
+
+		bool oldEnabled;
+
+		/// <inheritdoc/>
+		public override bool Enabled {
+			get => base.Enabled;
+			set {
+				if (base.Enabled != value) {
+					base.Enabled = value;
+					if (!value && HasFocus) {
+						SetHasFocus (false, this);
+					}
+					OnEnabledChanged ();
+					SetNeedsDisplay ();
+				}
+				if (subviews != null) {
+					foreach (var view in subviews) {
+						if (!value) {
+							view.oldEnabled = view.Enabled;
+							view.Enabled = value;
+						} else {
+							view.Enabled = view.oldEnabled;
+							view.addingView = false;
+						}
+					}
+				}
+			}
+		}
+
+		/// <inheritdoc/>>
+		public override bool Visible {
+			get => base.Visible;
+			set {
+				if (base.Visible != value) {
+					base.Visible = value;
+					if (!value && HasFocus) {
+						SetHasFocus (false, this);
+					}
+					OnVisibleChanged ();
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Pretty prints the View
@@ -2152,6 +2241,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
+			if (!Enabled) {
+				return true;
+			}
+
 			if (!CanBeVisible (this)) {
 				return false;
 			}
@@ -2169,6 +2262,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
+			if (!Enabled) {
+				return true;
+			}
+
 			if (!CanBeVisible (this)) {
 				return false;
 			}
@@ -2190,13 +2287,16 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
+			if (!Enabled) {
+				return true;
+			}
+
 			if (!CanBeVisible (this)) {
 				return false;
 			}
 
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			OnMouseClick (args);
-			if (args.Handled)
+			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
 				return true;
@@ -2215,12 +2315,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invokes the MouseClick event.
 		/// </summary>
-		protected void OnMouseClick (MouseEventArgs args) => MouseClick?.Invoke (args);
+		protected bool OnMouseClick (MouseEventArgs args)
+		{
+			if (!Enabled) {
+				return true;
+			}
 
-		/// <summary>
-		/// Invokes the <see cref="VisibleChanged"/> event.
-		/// </summary>
-		protected void OnVisibleChanged () => VisibleChanged?.Invoke ();
+			MouseClick?.Invoke (args);
+			return args.Handled;
+		}
+
+		/// <inheritdoc/>
+		public override void OnCanFocusChanged () => CanFocusChanged?.Invoke ();
+
+		/// <inheritdoc/>
+		public override void OnEnabledChanged () => EnabledChanged?.Invoke ();
+
+		/// <inheritdoc/>
+		public override void OnVisibleChanged () => VisibleChanged?.Invoke ();
 
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
@@ -2265,19 +2377,6 @@ namespace Terminal.Gui {
 				}
 			}
 			Initialized?.Invoke (this, EventArgs.Empty);
-		}
-
-		bool visible = true;
-
-		/// <summary>
-		/// Gets or sets the view visibility.
-		/// </summary>
-		public bool Visible {
-			get => visible;
-			set {
-				visible = value;
-				OnVisibleChanged ();
-			}
 		}
 
 		bool CanBeVisible (View view)
