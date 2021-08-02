@@ -2539,6 +2539,19 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void TestClipOrPad_ShortWord()
+		{
+			// word is short but we want it to fill 6 so it should be padded
+			Assert.Equal ("fff   ", TextFormatter.ClipOrPad ("fff", 6));
+		}
+
+		[Fact]
+		public void TestClipOrPad_LongWord ()
+		{
+			// word is long but we want it to fill 3 space only
+			Assert.Equal ("123", TextFormatter.ClipOrPad ("123456789", 3));
+		}
+		[Fact]
 		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 		{
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
