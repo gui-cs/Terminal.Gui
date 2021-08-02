@@ -1155,14 +1155,14 @@ namespace Terminal.Gui {
 		public Rune RightBracket = ']';
 
 		/// <summary>
-		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// Blocks Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OnMeterSegment = '\u258c';
+		public Rune BlocksMeterSegment = '\u258c';
 
 		/// <summary>
-		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OffMeterSegement = ' ';
+		public Rune ContinuousMeterSegment = '\u2588';
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
