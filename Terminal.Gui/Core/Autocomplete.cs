@@ -5,6 +5,7 @@ using System.Text;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
+
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting
 	/// from a range of 'autocomplete' options.
@@ -30,7 +31,7 @@ namespace Terminal.Gui {
 		/// The strings that form the current list of suggestions to render
 		/// based on what the user has typed so far.
 		/// </summary>
-		public List<string> Suggestions { get; set; } = new List<string>();
+		public List<string> Suggestions { get; protected set; } = new List<string>();
 
 		/// <summary>
 		/// The full set of all strings that can be suggested.
@@ -214,6 +215,12 @@ namespace Terminal.Gui {
 		/// <param name="hostControl">The text view that you want suggestions for</param>
 		public void GenerateSuggestions (TextView hostControl)
 		{
+			// if there is nothing to pick from
+			if(AllSuggestions.Count == 0) {
+				Suggestions.Clear ();
+				return;
+			}
+
 			var currentWord = GetCurrentWord (hostControl); 
 
 			if(string.IsNullOrWhiteSpace(currentWord)) {

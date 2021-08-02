@@ -883,6 +883,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action TextChanged;
 
+		/// <summary>
+		/// Provides autocomplete context menu based on suggestions at the current cursor
+		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// </summary>
+		public Autocomplete Autocomplete { get; protected set; } = new Autocomplete ();
+
 #if false
 		/// <summary>
 		///   Changed event, raised when the text has clicked.
@@ -1738,6 +1744,15 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
+
+			// draw autocomplete
+			Autocomplete.GenerateSuggestions (this);
+
+			var renderAt = new Point (
+				CursorPosition.X - LeftColumn,
+			(CursorPosition.Y + 1) - TopRow);
+
+			Autocomplete.RenderOverlay (this, renderAt);
 		}
 
 		bool SpecialRune (Rune rune)
@@ -2020,6 +2035,11 @@ namespace Terminal.Gui {
 				if (currentColumn == lastCol && currentRow == lastRow) {
 					return false;
 				}
+			}
+
+			// Give autocomplete first opportunity to respond to key presses
+			if (Autocomplete.ProcessKey (this, kb)) {
+				return true;
 			}
 
 			// Handle some state here - whether the last command was a kill

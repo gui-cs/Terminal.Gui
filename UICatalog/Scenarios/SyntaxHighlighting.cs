@@ -67,7 +67,6 @@ namespace UICatalog.Scenarios {
 			private Attribute blue;
 			private Attribute white;
 			private Attribute magenta;
-			Autocomplete autocomplete;
 
 
 		public void Init()
@@ -137,9 +136,7 @@ namespace UICatalog.Scenarios {
 				keywords.Add ("union");
 				keywords.Add ("exists");
 
-
-				autocomplete = new Autocomplete ();
-				autocomplete.AllSuggestions = keywords.ToList();
+				Autocomplete.AllSuggestions = keywords.ToList();
 
 				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);
@@ -164,28 +161,6 @@ namespace UICatalog.Scenarios {
 				else{
 					Driver.SetAttribute (white);
 				}
-			}
-
-			public override bool ProcessKey (KeyEvent kb)
-			{
-				if(autocomplete.ProcessKey (this,kb)) {
-					return true;
-				}
-
-				return base.ProcessKey (kb);
-			}
-
-			public override void Redraw (Rect bounds)
-			{
-				base.Redraw (bounds);
-
-				autocomplete.GenerateSuggestions (this);
-
-				var renderAt = new Point(
-					CursorPosition.X - LeftColumn,
-				(CursorPosition.Y+1) - TopRow);
-
-				autocomplete.RenderOverlay (this, renderAt);
 			}
 
 			private bool IsInStringLiteral (List<System.Rune> line, int idx)
