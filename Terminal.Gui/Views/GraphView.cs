@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetDriverColorToGraphColor ()
 		{
-			Driver.SetAttribute (GraphColor ?? (Enabled ? ColorScheme.Normal : ColorScheme.Disabled));
+			Driver.SetAttribute (GraphColor ?? (GetNormalColor ()));
 		}
 
 		/// <summary>

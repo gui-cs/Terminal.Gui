@@ -432,7 +432,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 
 			if ((vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
 				return;

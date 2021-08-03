@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			SetViewsNeedsDisplay ();
 			Clear ();
 
@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		void ShowHideScrollBars ()

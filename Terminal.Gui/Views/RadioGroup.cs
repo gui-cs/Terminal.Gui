@@ -185,7 +185,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 			for (int i = 0; i < radioLabels.Count; i++) {
 				switch (DisplayMode) {
@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 					Move (horizontal [i].pos, 0);
 					break;
 				}
-				Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+				Driver.SetAttribute (GetNormalColor ());
 				Driver.AddStr (ustring.Make (new Rune [] { (i == selected ? Driver.Selected : Driver.UnSelected), ' ' }));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}

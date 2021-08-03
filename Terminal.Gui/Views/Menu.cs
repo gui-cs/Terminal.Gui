@@ -426,18 +426,18 @@ namespace Terminal.Gui {
 				if (index == current) return ColorScheme.Focus;
 				if (!item.IsEnabled ()) return ColorScheme.Disabled;
 			}
-			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+			return GetNormalColor ();
 		}
 
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			DrawFrame (bounds, padding: 0, fill: true);
 
 			for (int i = 0; i < barItems.Children.Length; i++) {
 				var item = barItems.Children [i];
-				Driver.SetAttribute (item == null ? Enabled ? ColorScheme.Normal : ColorScheme.Disabled
-					: i == current ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+				Driver.SetAttribute (item == null ? GetNormalColor ()
+					: i == current ? ColorScheme.Focus : GetNormalColor ());
 				if (item == null) {
 					Move (0, i + 1);
 					Driver.AddRune (Driver.LeftTee);
@@ -483,7 +483,7 @@ namespace Terminal.Gui {
 				else
 					DrawHotString (textToDraw,
 					       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-					       i == current ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+					       i == current ? ColorScheme.Focus : GetNormalColor ());
 
 				// The help string
 				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
@@ -906,7 +906,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
@@ -920,13 +920,13 @@ namespace Terminal.Gui {
 				if (i == selected && IsMenuOpen) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus :
-						Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+						GetNormalColor ();
 				} else if (openedByAltKey) {
 					hotColor = ColorScheme.HotNormal;
-					normalColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+					normalColor = GetNormalColor ();
 				} else {
-					hotColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
-					normalColor = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+					hotColor = GetNormalColor ();
+					normalColor = GetNormalColor ();
 				}
 				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
 				pos += 1 + menu.TitleLength + (menu.Help.Length > 0 ? menu.Help.Length + 2 : 0) + 2;

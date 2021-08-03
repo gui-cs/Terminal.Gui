@@ -1371,7 +1371,7 @@ namespace Terminal.Gui {
 				if (textFormatter != null) {
 					textFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled,
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
 			}
 
@@ -2487,6 +2487,16 @@ namespace Terminal.Gui {
 			currentHeight = Frame.Height;
 
 			return CanSetHeight (0, out _);
+		}
+
+		/// <summary>
+		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
+		/// </summary>
+		/// <returns><see cref="ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/></returns>
+		protected Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
 	}
 }

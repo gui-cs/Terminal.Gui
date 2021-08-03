@@ -130,12 +130,12 @@ namespace Terminal.Gui {
 			//}
 
 			Move (0, 0);
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
 			Move (1, 0);
-			var scheme = Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+			var scheme = GetNormalColor ();
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
 				var title = Items [i].Title.ToString ();

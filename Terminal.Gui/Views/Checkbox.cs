@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
 			Move (0, 0);
 			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
 			Driver.AddRune (' ');

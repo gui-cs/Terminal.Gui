@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 			// What columns to render at what X offset in viewport
 			var columnsToRender = CalculateViewport (bounds).ToArray ();
 
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
 			Driver.AddStr (new string (' ', bounds.Width));
@@ -253,7 +253,7 @@ namespace Terminal.Gui {
 		private void ClearLine (int row, int width)
 		{
 			Move (0, row);
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 			Driver.AddStr (new string (' ', width));
 		}
 

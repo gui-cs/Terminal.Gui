@@ -1360,7 +1360,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void ColorNormal ()
 		{
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
@@ -1372,7 +1372,7 @@ namespace Terminal.Gui {
 		/// <param name="idx"></param>
 		protected virtual void ColorNormal (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>

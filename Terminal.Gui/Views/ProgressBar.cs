@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 		{
 			DrawFrame ();
 
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 
 			int fWidth = GetFrameWidth ();
 			if (isActivity) {

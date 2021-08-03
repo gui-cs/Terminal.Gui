@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 				Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * 4));
 
 				currentAttribute = ColorScheme.HotNormal;
-				SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+				SetAttribute (GetNormalColor ());
 
 				for (int block = 0; block < nblocks; block++) {
 					for (int b = 0; b < 4; b++) {
@@ -172,10 +172,10 @@ namespace Terminal.Gui {
 						if (offset + displayStart == position || edited)
 							SetAttribute (leftSide ? activeColor : trackingColor);
 						else
-							SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+							SetAttribute (GetNormalColor ());
 
 						Driver.AddStr (offset >= n ? "  " : string.Format ("{0:x2}", value));
-						SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+						SetAttribute (GetNormalColor ());
 						Driver.AddRune (' ');
 					}
 					Driver.AddStr (block + 1 == nblocks ? " " : "| ");
@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 					if (offset + displayStart == position || edited)
 						SetAttribute (leftSide ? trackingColor : activeColor);
 					else
-						SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+						SetAttribute (GetNormalColor ());
 
 					Driver.AddRune (c);
 				}

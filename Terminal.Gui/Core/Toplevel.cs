@@ -590,7 +590,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+				Driver.SetAttribute (GetNormalColor ());
 
 				// This is the Application.Top. Clear just the region we're being asked to redraw 
 				// (the bounds passed to us).

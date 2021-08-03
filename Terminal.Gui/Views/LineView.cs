@@ -73,7 +73,7 @@ namespace Terminal.Gui.Views {
 			base.Redraw (bounds);
 
 			Move (0, 0);
-			Driver.SetAttribute (Enabled ? ColorScheme.Normal : ColorScheme.Disabled);
+			Driver.SetAttribute (GetNormalColor ());
 
 			var hLineWidth = Math.Max (1, Rune.ColumnWidth (Driver.HLine));
 
