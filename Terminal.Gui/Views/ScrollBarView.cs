@@ -87,6 +87,7 @@ namespace Terminal.Gui {
 			Host = host;
 			CanFocus = host.CanFocus;
 			Enabled = host.Enabled;
+			Visible = host.Visible;
 			Host.CanFocusChanged += Host_CanFocusChanged;
 			Host.EnabledChanged += Host_EnabledChanged;
 			Host.VisibleChanged += Host_VisibleChanged;
@@ -98,6 +99,7 @@ namespace Terminal.Gui {
 					Host = host,
 					CanFocus = host.CanFocus,
 					Enabled = host.Enabled,
+					Visible = host.Visible,
 					OtherScrollBarView = this
 				};
 				OtherScrollBarView.hosted = true;
@@ -107,7 +109,7 @@ namespace Terminal.Gui {
 				OtherScrollBarView.showScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
-			contentBottomRightCorner = new View (" ");
+			contentBottomRightCorner = new View (" ") { Visible = host.Visible };
 			Host.SuperView.Add (contentBottomRightCorner);
 			contentBottomRightCorner.X = Pos.Right (host) - 1;
 			contentBottomRightCorner.Y = Pos.Bottom (host) - 1;
@@ -123,6 +125,7 @@ namespace Terminal.Gui {
 				if (otherScrollBarView != null) {
 					otherScrollBarView.Visible = Visible;
 				}
+				contentBottomRightCorner.Visible = Visible;
 			} else {
 				ShowHideScrollBars ();
 			}
@@ -134,6 +137,7 @@ namespace Terminal.Gui {
 			if (otherScrollBarView != null) {
 				otherScrollBarView.Enabled = Enabled;
 			}
+			contentBottomRightCorner.Enabled = Enabled;
 		}
 
 		private void Host_CanFocusChanged ()

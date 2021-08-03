@@ -30,6 +30,28 @@ namespace UICatalog {
 				Top = Application.Top;
 			}
 
+			Win = new Window (_fileName ?? "Untitled") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				ColorScheme = colorScheme,
+			};
+			Top.Add (Win);
+
+			_textView = new TextView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				BottomOffset = 1,
+				RightOffset = 1
+			};
+
+			LoadFile ();
+
+			Win.Add (_textView);
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_New", "", () => New()),
@@ -91,28 +113,6 @@ namespace UICatalog {
 			Top.Add (statusBar);
 
 			CreateDemoFile (_fileName);
-
-			Win = new Window (_fileName ?? "Untitled") {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
-			};
-			Top.Add (Win);
-
-			_textView = new TextView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				BottomOffset = 1,
-				RightOffset = 1
-			};
-
-			LoadFile ();
-
-			Win.Add (_textView);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
@@ -456,7 +456,7 @@ namespace UICatalog {
 				Title = "Word Wrap"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = false;
+			item.Checked = _textView.WordWrap;
 			item.Action += () => {
 				_textView.WordWrap = item.Checked = !item.Checked;
 				if (_textView.WordWrap) {
@@ -478,7 +478,7 @@ namespace UICatalog {
 				Title = "Allows Tab"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = true;
+			item.Checked = _textView.AllowsTab;
 			item.Action += () => {
 				_textView.AllowsTab = item.Checked = !item.Checked;
 			};
@@ -492,7 +492,7 @@ namespace UICatalog {
 				Title = "CanFocus"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = true;
+			item.Checked = _textView.CanFocus;
 			item.Action += () => {
 				_textView.CanFocus = item.Checked = !item.Checked;
 				if (_textView.CanFocus) {
@@ -509,7 +509,7 @@ namespace UICatalog {
 				Title = "Enabled"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = true;
+			item.Checked = _textView.Enabled;
 			item.Action += () => {
 				_textView.Enabled = item.Checked = !item.Checked;
 				if (_textView.Enabled) {
@@ -526,7 +526,7 @@ namespace UICatalog {
 				Title = "Visible"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = true;
+			item.Checked = _textView.Visible;
 			item.Action += () => {
 				_textView.Visible = item.Checked = !item.Checked;
 				if (_textView.Visible) {
