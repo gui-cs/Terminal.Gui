@@ -482,10 +482,10 @@ namespace Terminal.Gui {
 		{
 			nx = Math.Max (x, 0);
 			int l;
-			if (SuperView == null || SuperView is Toplevel) {
+			if (top?.SuperView == null || top == Application.Top) {
 				l = Driver.Cols;
 			} else {
-				l = SuperView.Frame.Width;
+				l = top.SuperView.Frame.Width;
 			}
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
 			SetWidth (top.Frame.Width, out int rWidth);
@@ -494,26 +494,34 @@ namespace Terminal.Gui {
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
+			if (top?.SuperView == null || top == Application.Top) {
 				m = Application.Top.MenuBar != null;
 			} else {
-				m = ((Toplevel)SuperView).MenuBar != null;
+				var t = top.SuperView;
+				while (!(t is Toplevel)) {
+					t = t.SuperView;
+				}
+				m = ((Toplevel)t).MenuBar != null;
 			}
-			if (SuperView == null || SuperView is Toplevel) {
+			if (top?.SuperView == null || top == Application.Top) {
 				l = m ? 1 : 0;
 			} else {
 				l = 0;
 			}
 			ny = Math.Max (y, l);
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				s = Application.Top.StatusBar != null && Application.Top.StatusBar.Visible;
+			if (top?.SuperView == null || top == Application.Top) {
+				s = Application.Top.StatusBar?.Visible == true;
 			} else {
-				s = ((Toplevel)SuperView).StatusBar != null && ((Toplevel)SuperView).StatusBar.Visible;
+				var t = top.SuperView;
+				while (!(t is Toplevel)) {
+					t = t.SuperView;
+				}
+				s = ((Toplevel)t).StatusBar?.Visible == true;
 			}
-			if (SuperView == null || SuperView is Toplevel) {
+			if (top?.SuperView == null || top == Application.Top) {
 				l = s ? Driver.Rows - 1 : Driver.Rows;
 			} else {
-				l = s ? SuperView.Frame.Height - 1 : SuperView.Frame.Height;
+				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
@@ -573,13 +581,13 @@ namespace Terminal.Gui {
 					superView.LayoutSubviews ();
 				}
 			}
-			if (top.StatusBar != null) {
-				if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
-					top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
-					top.LayoutSubviews ();
-				}
-				top.BringSubviewToFront (top.StatusBar);
-			}
+			//if (top.StatusBar != null) {
+			//	if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
+			//		top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
+			//		top.LayoutSubviews ();
+			//	}
+			//	top.BringSubviewToFront (top.StatusBar);
+			//}
 		}
 
 		///<inheritdoc/>

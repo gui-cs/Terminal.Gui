@@ -145,7 +145,9 @@ namespace Terminal.Gui {
 
 			cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
-			UpdateOffscreen ();
+			FakeConsole.Clear ();
+			ResizeScreen ();
+			UpdateOffScreen ();
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -446,7 +448,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Default;
+			if (FakeConsole.CursorVisible) {
+				visibility = CursorVisibility.Default;
+			} else {
+				visibility = CursorVisibility.Invisible;
+			}
 
 			return false;
 		}
@@ -454,6 +460,12 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
+			if (visibility == CursorVisibility.Invisible) {
+				FakeConsole.CursorVisible = false;
+			} else {
+				FakeConsole.CursorVisible = true;
+			}
+
 			return false;
 		}
 
