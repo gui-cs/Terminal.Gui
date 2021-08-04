@@ -75,7 +75,7 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Width = 2,
 			};
-			_txtDelimiter.TextChanged += (_) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text;
+			_txtDelimiter.TextChanged += (_) => StatusBar.ShortcutDelimiter = _txtDelimiter.Text;
 			_frmDelimiter.Add (_txtDelimiter);
 
 			Add (_frmDelimiter);
@@ -132,7 +132,7 @@ namespace UICatalog {
 			Add (_frmStatusBar);
 
 
-			var _frmStatusBarDetails = new DynamicStatusBarDetails ("StatusBar Details:") {
+			var _frmStatusBarDetails = new DynamicStatusBarDetails ("StatusBar Item Details:") {
 				X = Pos.Right (_frmStatusBar),
 				Y = Pos.Top (_frmStatusBar),
 				Width = Dim.Fill (),
@@ -354,7 +354,7 @@ namespace UICatalog {
 		public TextView _txtAction;
 		public TextField _txtShortcut;
 
-		public DynamicStatusBarDetails (StatusItem statusItem = null) : this (statusItem == null ? "Adding New StatusBar." : "Editing StatusBar.")
+		public DynamicStatusBarDetails (StatusItem statusItem = null) : this (statusItem == null ? "Adding New StatusBar Item." : "Editing StatusBar Item.")
 		{
 			_statusItem = statusItem;
 		}
@@ -495,7 +495,7 @@ namespace UICatalog {
 				_txtTitle.Text = ustring.Empty;
 				Application.RequestStop ();
 			};
-			var _dialog = new Dialog ("Please enter the menu details.", _btnOk, _btnCancel);
+			var _dialog = new Dialog ("Please enter the item details.", _btnOk, _btnCancel);
 
 			Width = Dim.Fill ();
 			Height = Dim.Fill () - 1;
