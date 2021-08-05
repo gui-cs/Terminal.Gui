@@ -744,8 +744,9 @@ namespace Terminal.Gui {
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 
 				//isButtonClicked = false;
-				isButtonDoubleClicked = false;
+				//isButtonDoubleClicked = false;
 				isButtonTripleClicked = false;
+				buttonPressedCount = 0;
 				return;
 			}
 
@@ -760,13 +761,13 @@ namespace Terminal.Gui {
 				isButtonClicked = false;
 				isButtonDoubleClicked = true;
 				ProcessButtonDoubleClicked (mouseEvent);
-				//Application.MainLoop.AddIdle (() => {
-				//	Task.Run (async () => {
-				//		await Task.Delay (300);
-				//		isButtonDoubleClicked = false;
-				//	});
-				//	return false;
-				//});
+				Application.MainLoop.AddIdle (() => {
+					Task.Run (async () => {
+						await Task.Delay (600);
+						isButtonDoubleClicked = false;
+					});
+					return false;
+				});
 				inputReady.Set ();
 				return;
 			}
