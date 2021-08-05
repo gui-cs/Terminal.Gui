@@ -2568,5 +2568,15 @@ namespace Terminal.Gui.Core {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var tf = new TextFormatter ();
+			Assert.Equal (Key.Null, tf.HotKey);
+			tf.HotKey = Key.CtrlMask | Key.Q;
+			Assert.Equal (Key.CtrlMask | Key.Q, tf.HotKey);
+
+		}
 	}
 }

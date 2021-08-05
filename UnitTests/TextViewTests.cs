@@ -1942,5 +1942,83 @@ line.
 
 			GraphViewTests.AssertDriverContentsAre (expected, output);
 		}
+
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var txt = "This is a text.";
+			var txtRunes = TextModel.ToRunes (txt);
+			Assert.Equal (txt.Length, txtRunes.Count);
+			Assert.Equal ('T', txtRunes [0]);
+			Assert.Equal ('h', txtRunes [1]);
+			Assert.Equal ('i', txtRunes [2]);
+			Assert.Equal ('s', txtRunes [3]);
+			Assert.Equal (' ', txtRunes [4]);
+			Assert.Equal ('i', txtRunes [5]);
+			Assert.Equal ('s', txtRunes [6]);
+			Assert.Equal (' ', txtRunes [7]);
+			Assert.Equal ('a', txtRunes [8]);
+			Assert.Equal (' ', txtRunes [9]);
+			Assert.Equal ('t', txtRunes [10]);
+			Assert.Equal ('e', txtRunes [11]);
+			Assert.Equal ('x', txtRunes [12]);
+			Assert.Equal ('t', txtRunes [13]);
+			Assert.Equal ('.', txtRunes [^1]);
+
+			int col = 0;
+			Assert.True (TextModel.SetCol (ref col, 80, 79));
+			Assert.False (TextModel.SetCol (ref col, 80, 80));
+
+			var start = 0;
+			var x = 8;
+			Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
+			Assert.Equal ('a', txtRunes [start + x]);
+			start = 1;
+			x = 7;
+			Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
+			Assert.Equal ('a', txtRunes [start + x]);
+
+			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
+			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
+
+			Assert.Equal (0, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
+			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
+			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
+
+			var tm = new TextModel ();
+			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
+			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out bool gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (5, 0), true), tm.FindNextText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (2, 1), true), tm.FindNextText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (5, 1), true), tm.FindNextText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out gaveFullTurn));
+			Assert.True (gaveFullTurn);
+			tm.ResetContinuousFind (new Point (0, 0));
+			Assert.Equal ((new Point (5, 1), true), tm.FindPreviousText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (2, 1), true), tm.FindPreviousText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (5, 0), true), tm.FindPreviousText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (2, 0), true), tm.FindPreviousText ("is", out gaveFullTurn));
+			Assert.False (gaveFullTurn);
+			Assert.Equal ((new Point (5, 1), true), tm.FindPreviousText ("is", out gaveFullTurn));
+			Assert.True (gaveFullTurn);
+
+			Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
+			Assert.Equal (TextModel.ToRunes ("Threally really first line."),  tm.GetLine (0));
+			Assert.Equal (TextModel.ToRunes ("Threally really last line."),  tm.GetLine (1));
+			tm = new TextModel ();
+			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
+			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			Assert.Equal ((new Point (5, 1), true), tm.ReplaceAllText ("is", false, true, "really"));
+			Assert.Equal (TextModel.ToRunes ("This really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.ToRunes ("This really last line."), tm.GetLine (1));
+		}
 	}
 }
