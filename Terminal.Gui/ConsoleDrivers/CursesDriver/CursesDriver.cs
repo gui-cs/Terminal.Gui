@@ -248,8 +248,8 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Curses.Event? LastMouseButtonPressed;
-		bool IsButtonPressed;
+		Curses.Event? lastMouseButtonPressed;
+		bool isButtonPressed;
 		bool cancelButtonClicked;
 		bool isReportMousePosition;
 		Point point;
@@ -258,31 +258,31 @@ namespace Terminal.Gui {
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			if (LastMouseButtonPressed != null && cev.ButtonState != Curses.Event.ReportMousePosition) {
-				LastMouseButtonPressed = null;
-				IsButtonPressed = false;
+			if (lastMouseButtonPressed != null && cev.ButtonState != Curses.Event.ReportMousePosition) {
+				lastMouseButtonPressed = null;
+				isButtonPressed = false;
 			}
 
 
 			if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
 				cev.ButtonState == Curses.Event.Button3Clicked) &&
-				LastMouseButtonPressed == null) {
+				lastMouseButtonPressed == null) {
 
-				IsButtonPressed = false;
+				isButtonPressed = false;
 				mouseFlag = ProcessButtonClickedEvent (cev);
 
 			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
-				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
-				IsButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
+				cev.ButtonState == Curses.Event.Button3Pressed) && lastMouseButtonPressed == null) ||
+				isButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
 
 				mouseFlag = MapCursesButton (cev.ButtonState);
 				if (cev.ButtonState != Curses.Event.ReportMousePosition)
-					LastMouseButtonPressed = cev.ButtonState;
-				IsButtonPressed = true;
+					lastMouseButtonPressed = cev.ButtonState;
+				isButtonPressed = true;
 				isReportMousePosition = false;
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-					mouseFlag = MapCursesButton ((Curses.Event)LastMouseButtonPressed) | MouseFlags.ReportMousePosition;
+					mouseFlag = MapCursesButton ((Curses.Event)lastMouseButtonPressed) | MouseFlags.ReportMousePosition;
 					point = new Point ();
 					cancelButtonClicked = true;
 				} else {
@@ -293,7 +293,10 @@ namespace Terminal.Gui {
 				}
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					ProcessContinuousButtonPressedAsync (cev, mouseFlag).ConfigureAwait (false);
+					Application.MainLoop.AddIdle (() => {
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (cev, mouseFlag));
+						return false;
+					});
 				}
 
 
@@ -301,7 +304,7 @@ namespace Terminal.Gui {
 				cev.ButtonState == Curses.Event.Button3Released)) {
 
 				mouseFlag = ProcessButtonReleasedEvent (cev);
-				IsButtonPressed = false;
+				isButtonPressed = false;
 
 			} else if (cev.ButtonState == Curses.Event.ButtonWheeledUp) {
 
@@ -320,9 +323,13 @@ namespace Terminal.Gui {
 				mouseFlag = MouseFlags.WheeledRight;
 
 			} else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-
-				mouseFlag = MouseFlags.ReportMousePosition;
-				isReportMousePosition = true;
+				if (cev.X != point.X || cev.Y != point.Y) {
+					mouseFlag = MouseFlags.ReportMousePosition;
+					isReportMousePosition = true;
+					point = new Point ();
+				} else {
+					mouseFlag = 0;
+				}
 
 			} else {
 				mouseFlag = 0;
@@ -336,11 +343,6 @@ namespace Terminal.Gui {
 
 			mouseFlag = SetControlKeyStates (cev, mouseFlag);
 
-			point = new Point () {
-				X = cev.X,
-				Y = cev.Y
-			};
-
 			return new MouseEvent () {
 				X = cev.X,
 				Y = cev.Y,
@@ -351,24 +353,24 @@ namespace Terminal.Gui {
 
 		MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
 		{
-			LastMouseButtonPressed = cev.ButtonState;
+			lastMouseButtonPressed = cev.ButtonState;
 			var mf = GetButtonState (cev, true);
 			mouseHandler (ProcessButtonState (cev, mf));
-			if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+			if (lastMouseButtonPressed != null && lastMouseButtonPressed == cev.ButtonState) {
 				mf = GetButtonState (cev, false);
 				mouseHandler (ProcessButtonState (cev, mf));
-				if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+				if (lastMouseButtonPressed != null && lastMouseButtonPressed == cev.ButtonState) {
 					mf = MapCursesButton (cev.ButtonState);
 				}
 			}
-			LastMouseButtonPressed = null;
+			lastMouseButtonPressed = null;
 			return mf;
 		}
 
 		MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
 		{
 			var mf = MapCursesButton (cev.ButtonState);
-			if (!cancelButtonClicked && LastMouseButtonPressed == null && !isReportMousePosition) {
+			if (!cancelButtonClicked && lastMouseButtonPressed == null && !isReportMousePosition) {
 				mouseHandler (ProcessButtonState (cev, mf));
 				mf = GetButtonState (cev);
 			} else if (isReportMousePosition) {
@@ -380,7 +382,8 @@ namespace Terminal.Gui {
 
 		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
 		{
-			while (IsButtonPressed && LastMouseButtonPressed != null) {
+			await Task.Delay (200);
+			while (isButtonPressed && lastMouseButtonPressed != null) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
 					X = cev.X,
@@ -391,9 +394,8 @@ namespace Terminal.Gui {
 				var view = Application.wantContinuousButtonPressedView;
 				if (view == null)
 					break;
-				if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					mouseHandler (me);
-					//mainLoop.Driver.Wakeup ();
+				if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Application.MainLoop.Invoke (() => mouseHandler (me));
 				}
 			}
 		}
@@ -434,7 +436,6 @@ namespace Terminal.Gui {
 			case Curses.Event.Button3Released:
 				mf = MouseFlags.Button3Clicked;
 				break;
-
 
 			}
 			return mf;
@@ -518,6 +519,7 @@ namespace Terminal.Gui {
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
+			//System.Diagnostics.Debug.WriteLine ($"code: {code}; wch: {wch}");
 			if (code == Curses.ERR)
 				return;
 
