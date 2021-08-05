@@ -48,6 +48,8 @@ namespace UICatalog {
 				RightOffset = 1
 			};
 
+			CreateDemoFile (_fileName);
+
 			LoadFile ();
 
 			Win.Add (_textView);
@@ -111,8 +113,6 @@ namespace UICatalog {
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 			Top.Add (statusBar);
-
-			CreateDemoFile (_fileName);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
