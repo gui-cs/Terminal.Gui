@@ -1965,6 +1965,7 @@ line.
 			int col = 0;
 			Assert.True (TextModel.SetCol (ref col, 80, 79));
 			Assert.False (TextModel.SetCol (ref col, 80, 80));
+			Assert.Equal (79, col);
 
 			var start = 0;
 			var x = 8;
@@ -1978,9 +1979,9 @@ line.
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
 
-			Assert.Equal (0, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
-			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
-			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
+			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
+			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
+			Assert.Equal (3, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
 			var tm = new TextModel ();
 			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
