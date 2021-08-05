@@ -506,7 +506,6 @@ namespace Terminal.Gui {
 		bool isButtonDoubleClicked;
 		bool isButtonTripleClicked;
 		bool isProcContBtnPressedRuning;
-		Point point = new Point ();
 		//bool isButtonReleased;
 
 		void GetMouseEvent (ConsoleKeyInfo [] cki)
