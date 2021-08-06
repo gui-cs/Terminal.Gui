@@ -258,6 +258,7 @@ namespace Terminal.Gui {
 		bool cancelButtonClicked;
 		bool isReportMousePosition;
 		Point point;
+		int buttonPressedCount;
 
 		MouseEvent ToDriverMouse (Curses.MouseEvent cev)
 		{
@@ -268,10 +269,59 @@ namespace Terminal.Gui {
 				isButtonPressed = false;
 			}
 
+			if (cev.ButtonState == Curses.Event.Button1Pressed
+				|| cev.ButtonState == Curses.Event.Button2Pressed
+				|| cev.ButtonState == Curses.Event.Button3Pressed) {
 
-			if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
-				cev.ButtonState == Curses.Event.Button3Clicked) &&
-				lastMouseButtonPressed == null) {
+				isButtonPressed = true;
+				buttonPressedCount++;
+			} else {
+				buttonPressedCount = 0;
+			}
+			//System.Diagnostics.Debug.WriteLine ($"buttonPressedCount: {buttonPressedCount}");
+
+			if (buttonPressedCount == 2
+				&& (cev.ButtonState == Curses.Event.Button1Pressed
+				|| cev.ButtonState == Curses.Event.Button2Pressed
+				|| cev.ButtonState == Curses.Event.Button3Pressed)) {
+
+				switch (cev.ButtonState) {
+				case Curses.Event.Button1Pressed:
+					mouseFlag = MouseFlags.Button1DoubleClicked;
+					break;
+
+				case Curses.Event.Button2Pressed:
+					mouseFlag = MouseFlags.Button2DoubleClicked;
+					break;
+
+				case Curses.Event.Button3Pressed:
+					mouseFlag = MouseFlags.Button3DoubleClicked;
+					break;
+				}
+
+			} else if (buttonPressedCount == 3
+			       && (cev.ButtonState == Curses.Event.Button1Pressed
+			       || cev.ButtonState == Curses.Event.Button2Pressed
+			       || cev.ButtonState == Curses.Event.Button3Pressed)) {
+
+				switch (cev.ButtonState) {
+				case Curses.Event.Button1Pressed:
+					mouseFlag = MouseFlags.Button1TripleClicked;
+					break;
+
+				case Curses.Event.Button2Pressed:
+					mouseFlag = MouseFlags.Button2TripleClicked;
+					break;
+
+				case Curses.Event.Button3Pressed:
+					mouseFlag = MouseFlags.Button3TripleClicked;
+					break;
+				}
+				buttonPressedCount = 0;
+
+			} else if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
+			       cev.ButtonState == Curses.Event.Button3Clicked) &&
+			       lastMouseButtonPressed == null) {
 
 				isButtonPressed = false;
 				mouseFlag = ProcessButtonClickedEvent (cev);
