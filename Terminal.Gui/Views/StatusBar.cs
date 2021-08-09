@@ -96,7 +96,17 @@ namespace Terminal.Gui {
 
 		private void StatusBar_Initialized (object sender, EventArgs e)
 		{
-			Y = SuperView.Frame.Height - 1;
+			if (SuperView.Frame == Rect.Empty) {
+				((Toplevel)SuperView).Loaded += StatusBar_Loaded;
+			} else {
+				Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
+			}
+		}
+
+		private void StatusBar_Loaded ()
+		{
+			Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
+			((Toplevel)SuperView).Loaded -= StatusBar_Loaded;
 		}
 
 		private Action<Application.ResizedEventArgs> Application_Resized ()
@@ -105,9 +115,9 @@ namespace Terminal.Gui {
 				X = 0;
 				Height = 1;
 				if (SuperView != null || SuperView is Toplevel) {
-					Y = SuperView.Frame.Height - (Visible ? 1 : 0);
-				} else {
-					//Y = Pos.Bottom (SuperView);
+					if (Frame.Y != SuperView.Frame.Height - (Visible ? 1 : 0)) {
+						Y = SuperView.Frame.Height - (Visible ? 1 : 0);
+					}
 				}
 			};
 		}

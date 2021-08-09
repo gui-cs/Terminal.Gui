@@ -60,11 +60,6 @@ namespace UICatalog {
 				Add (top);
 			}
 
-			public void Load ()
-			{
-				Application.Run (this);
-			}
-
 			private void RunWorker ()
 			{
 				worker = new BackgroundWorker () { WorkerSupportsCancellation = true };
@@ -87,6 +82,10 @@ namespace UICatalog {
 				listLog.SetNeedsDisplay ();
 
 				var md = new Dialog ($"Running Worker started at {startStaging}.{startStaging:fff}", cancel);
+				md.Add (new Label ("Wait for worker to finish...") {
+					X = Pos.Center (),
+					Y = Pos.Center ()
+				});
 
 				worker.DoWork += (s, e) => {
 					var stageResult = new List<string> ();
@@ -163,9 +162,6 @@ namespace UICatalog {
 				top.Add (statusBar);
 
 				Title = $"Worker started at {start}.{start:fff}";
-				Y = 1;
-				Height = Dim.Fill (1);
-
 				ColorScheme = Colors.Base;
 
 				Add (new ListView (list) {
