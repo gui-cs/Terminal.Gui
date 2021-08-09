@@ -478,15 +478,19 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
+		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
+			out int nx, out int ny, out View mb, out View sb)
 		{
-			nx = Math.Max (x, 0);
 			int l;
+			View superView;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = Driver.Cols;
+				superView = Application.Top;
 			} else {
 				l = top.SuperView.Frame.Width;
+				superView = top.SuperView;
 			}
+			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
 			SetWidth (top.Frame.Width, out int rWidth);
 			if (rWidth < 0 && nx >= top.Frame.X) {
@@ -496,12 +500,14 @@ namespace Terminal.Gui {
 			bool m, s;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				m = Application.Top.MenuBar?.Visible == true;
+				mb = Application.Top.MenuBar;
 			} else {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
 				}
 				m = ((Toplevel)t).MenuBar?.Visible == true;
+				mb = ((Toplevel)t).MenuBar;
 			}
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = m ? 1 : 0;
@@ -511,12 +517,14 @@ namespace Terminal.Gui {
 			ny = Math.Max (y, l);
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				s = Application.Top.StatusBar?.Visible == true;
+				sb = Application.Top.StatusBar;
 			} else {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
 				}
 				s = ((Toplevel)t).StatusBar?.Visible == true;
+				sb = ((Toplevel)t).StatusBar;
 			}
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = s ? Driver.Rows - 1 : Driver.Rows;
@@ -524,12 +532,14 @@ namespace Terminal.Gui {
 				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
 			SetHeight (top.Frame.Height, out int rHeight);
 			if (rHeight < 0 && ny >= top.Frame.Y) {
 				ny = Math.Max (top.Frame.Bottom - 2, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+
+			return superView;
 		}
 
 		internal void PositionToplevels ()
@@ -548,48 +558,33 @@ namespace Terminal.Gui {
 		/// <param name="top">The toplevel.</param>
 		public virtual void PositionToplevel (Toplevel top)
 		{
-			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
+			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
+				out int nx, out int ny, out _, out View sb);
+			bool layoutSubviews = false;
 			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
 				|| (top?.SuperView == null && top.IsMdiChild))
 				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+
 				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
+					layoutSubviews = true;
 				}
 				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
 					top.Y = ny;
+					layoutSubviews = true;
 				}
 			}
 
-			View superView = null;
-			StatusBar statusBar = null;
-
-			if (((top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsMdiChild))
-				&& Application.Top.StatusBar != null) {
-				superView = Application.Top;
-				statusBar = Application.Top.StatusBar;
-			} else if (top?.SuperView != null && top.SuperView is Toplevel toplevel) {
-				superView = top.SuperView;
-				statusBar = toplevel.StatusBar;
-			}
-			if (statusBar != null) {
-				if (ny + top.Frame.Height != superView.Frame.Height - (statusBar.Visible ? 1 : 0)
+			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
 					&& top.Height is Dim.DimFill) {
 
-					top.Height = Dim.Fill (statusBar.Visible ? 1 : 0);
-				}
-				if (superView == Application.Top) {
-					top.SetRelativeLayout (superView.Frame);
-				} else {
-					superView.LayoutSubviews ();
-				}
+				top.Height = Dim.Fill (sb.Visible ? 1 : 0);
+				layoutSubviews = true;
 			}
-			//if (top.StatusBar != null) {
-			//	if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
-			//		top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
-			//		top.LayoutSubviews ();
-			//	}
-			//	top.BringSubviewToFront (top.StatusBar);
-			//}
+
+			if (layoutSubviews) {
+				superView.LayoutSubviews ();
+			}
 		}
 
 		///<inheritdoc/>
@@ -607,8 +602,6 @@ namespace Terminal.Gui {
 				Clear ();
 				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
 
-				if (LayoutStyle == LayoutStyle.Computed)
-					SetRelativeLayout (Bounds);
 				LayoutSubviews ();
 				PositionToplevels ();
 
@@ -689,7 +682,8 @@ namespace Terminal.Gui {
 						SuperView.SetNeedsDisplay ();
 					}
 					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y), out nx, out ny);
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y),
+						out nx, out ny, out _, out _);
 
 					dragPosition = new Point (nx, ny);
 					LayoutSubviews ();
