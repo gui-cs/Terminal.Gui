@@ -668,13 +668,21 @@ namespace Terminal.Gui {
 				Enabled = nameEntry.Text.IsEmpty ? false : true
 			};
 			this.prompt.Clicked += () => {
-				if (!dirListView.GetValidFilesName (nameEntry.Text.ToString (), out string res)) {
-					nameEntry.Text = res;
-					dirListView.SetNeedsDisplay ();
-					return;
-				}
-				if (!dirListView.canChooseDirectories && !dirListView.ExecuteSelection (false)) {
-					return;
+				if (this is OpenDialog) {
+					if (!dirListView.GetValidFilesName (nameEntry.Text.ToString (), out string res)) {
+						nameEntry.Text = res;
+						dirListView.SetNeedsDisplay ();
+						return;
+					}
+					if (!dirListView.canChooseDirectories && !dirListView.ExecuteSelection (false)) {
+						return;
+					}
+				} else if (this is SaveDialog) {
+					if (FilePath.IsEmpty || nameEntry.Text.Split (",").Length > 1) {
+						return;
+					}
+					FilePath = Path.Combine (FilePath.ToString (),
+						nameEntry.Text.ToString () + cmbAllowedTypes.Text.ToString ());
 				}
 				canceled = false;
 				Application.RequestStop ();

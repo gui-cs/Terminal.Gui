@@ -20,7 +20,7 @@ namespace UICatalog {
 		private string _textToReplace;
 		private bool _matchCase;
 		private bool _matchWholeWord;
-		Window winDialog;
+		private Window winDialog;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -361,7 +361,8 @@ namespace UICatalog {
 
 		private bool SaveAs ()
 		{
-			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.");
+		var aTypes = new List<string> () { ".txt", ".bin", ".xml", ".*" };
+			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.", aTypes);
 			sd.FilePath = System.IO.Path.Combine (sd.FilePath.ToString (), Win.Title.ToString ());
 			Application.Run (sd);
 
