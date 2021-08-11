@@ -25,9 +25,15 @@ namespace UICatalog {
 			};
 			Win.Add (rbPBFormat);
 
-			var label = new Label ("Blocks") {
+			var ckbBidirectional = new CheckBox ("BidirectionalMarquee", true) {
 				X = Pos.Center (),
 				Y = Pos.Bottom (rbPBFormat) + 1
+			};
+			Win.Add (ckbBidirectional);
+
+			var label = new Label ("Blocks") {
+				X = Pos.Center (),
+				Y = Pos.Bottom (ckbBidirectional) + 1
 			};
 			Win.Add (label);
 
@@ -58,7 +64,7 @@ namespace UICatalog {
 			};
 			button.Clicked += () => {
 				if (_fractionTimer == null) {
-					button.CanFocus = false;
+					button.Enabled = false;
 					blocksPB.Fraction = 0;
 					continuousPB.Fraction = 0;
 					float fractionSum = 0;
@@ -69,7 +75,7 @@ namespace UICatalog {
 						if (fractionSum > 1) {
 							_fractionTimer.Dispose ();
 							_fractionTimer = null;
-							button.CanFocus = true;
+							button.Enabled = true;
 						}
 						Application.MainLoop.Driver.Wakeup ();
 					}, null, 0, _timerTick);
@@ -110,6 +116,10 @@ namespace UICatalog {
 				continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
+			};
+
+			ckbBidirectional.Toggled += (e) => {
+				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = !e;
 			};
 
 			_pulseTimer = new Timer ((_) => {

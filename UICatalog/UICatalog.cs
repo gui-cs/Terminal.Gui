@@ -273,20 +273,31 @@ namespace UICatalog {
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
 
-			_top.Loaded += () => {
+			void TopHandler () {
 				if (_runningScenario != null) {
 					_runningScenario = null;
 					_isFirstRunning = false;
 				}
-			};
-			void ReadyHandler ()
-			{
 				if (!_isFirstRunning) {
 					_rightPane.SetFocus ();
 				}
-				_top.Ready -= ReadyHandler;
+				_top.Loaded -= TopHandler;
 			}
-			_top.Ready += ReadyHandler;
+			_top.Loaded += TopHandler;
+			// The following code was moved to the TopHandler event
+			//  because in the MainLoop.EventsPending (wait)
+			//  from the Application.RunLoop with the WindowsDriver
+			//  the OnReady event is triggered due the Focus event.
+			//  On CursesDriver and NetDriver the focus event won't be triggered
+			//  and if it's possible I don't know how to do it.
+			//void ReadyHandler ()
+			//{
+			//	if (!_isFirstRunning) {
+			//		_rightPane.SetFocus ();
+			//	}
+			//	_top.Ready -= ReadyHandler;
+			//}
+			//_top.Ready += ReadyHandler;
 
 			Application.Run (_top);
 			return _runningScenario;

@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring text, int w)
 		{
-			Initialize ();
+			Height = 1;
 
 			if (text == null)
 				text = "";
@@ -94,11 +94,6 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
-		}
-
-		void Initialize ()
-		{
-			Height = 1;
 		}
 
 		///<inheritdoc/>
@@ -141,7 +136,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value.Split ("\n") [0]);
+				var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 				if (newText.Cancel) {
 					if (point > text.Count) {
 						point = text.Count;
@@ -221,7 +216,7 @@ namespace Terminal.Gui {
 			int col = 0;
 			int width = Frame.Width + OffSetBackground ();
 			var tcount = text.Count;
-			var roc = Colors.Menu.Disabled;
+			var roc = GetReadOnlyColor ();
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
 				var cols = Rune.ColumnWidth (rune);
@@ -229,8 +224,10 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
-				} else if (!HasFocus) {
+				} else if (!HasFocus && Enabled) {
 					Driver.SetAttribute (ColorScheme.Focus);
+				} else if (!Enabled) {
+					Driver.SetAttribute (roc);
 				} else {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
@@ -251,6 +248,14 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
+		}
+
+		Attribute GetReadOnlyColor ()
+		{
+			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
+				return new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+			}
+			return new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
 		}
 
 		void Adjust ()

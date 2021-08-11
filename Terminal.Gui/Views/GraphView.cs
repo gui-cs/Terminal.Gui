@@ -99,7 +99,7 @@ namespace Terminal.Gui {
 				throw new Exception ($"{nameof(CellSize)} cannot be 0");
 			}
 
-			SetDriverColorToGraphColor (); 
+			SetDriverColorToGraphColor ();
 
 			Move (0, 0);
 
@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetDriverColorToGraphColor ()
 		{
-			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			Driver.SetAttribute (GraphColor ?? (GetNormalColor ()));
 		}
 
 		/// <summary>

@@ -303,10 +303,7 @@ namespace Terminal.Gui {
 				if (rune == '\t') {
 					size += tabWidth + 1;
 				}
-				if (size > width) {
-					if (end == t.Count) {
-						col++;
-					}
+				if (size >= width) {
 					break;
 				} else if (end < t.Count && col > 0 && start < end && col == start) {
 					break;
@@ -348,7 +345,8 @@ namespace Terminal.Gui {
 			if (toFind.found) {
 				toFind.currentPointToFind.X++;
 			}
-			var foundPos = GetFoundPreviousTextPoint (text, toFind.currentPointToFind.Y, matchCase, matchWholeWord, toFind.currentPointToFind);
+			var linesCount = toFind.currentPointToFind.IsEmpty ? lines.Count - 1 : toFind.currentPointToFind.Y;
+			var foundPos = GetFoundPreviousTextPoint (text, linesCount, matchCase, matchWholeWord, toFind.currentPointToFind);
 			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
 				foundPos = GetFoundPreviousTextPoint (text, lines.Count - 1, matchCase, matchWholeWord,
 					new Point (lines [lines.Count - 1].Count, lines.Count));
@@ -365,23 +363,41 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < lines.Count; i++) {
 				var x = lines [i];
+				var txt = GetText (x);
+				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var col = txt.IndexOf (matchText);
+				while (col > -1) {
+					if (matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
+						if (col + 1 > txt.Length) {
+							break;
+						}
+						col = txt.IndexOf (matchText, col + 1);
+						continue;
+					}
+					if (col > -1) {
+						if (!found) {
+							found = true;
+						}
+						lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
+						x = lines [i];
+						txt = GetText (x);
+						pos = new Point (col, i);
+						col += (textToReplace.Length - matchText.Length);
+					}
+					if (col + 1 > txt.Length) {
+						break;
+					}
+					col = txt.IndexOf (matchText, col + 1);
+				}
+			}
+
+			string GetText (List<Rune> x)
+			{
 				var txt = ustring.Make (x).ToString ();
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
-				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
-				var col = txt.IndexOf (matchText);
-				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
-					continue;
-				}
-				if (col > -1) {
-					if (!found) {
-						found = true;
-					}
-					pos = new Point (col, i);
-					lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
-					i--;
-				}
+				return txt;
 			}
 
 			return (pos, found);
@@ -453,11 +469,11 @@ namespace Terminal.Gui {
 					start.X = Math.Max (x.Count - 1, 0);
 				}
 				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
-				var col = txt.LastIndexOf (matchText, start.X);
+				var col = txt.LastIndexOf (matchText, toFind.found ? start.X - 1 : start.X);
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;
 				}
-				if (col > -1 && ((i == linesCount && col <= start.X)
+				if (col > -1 && ((i <= linesCount && col <= start.X)
 					|| i < start.Y)
 					&& txt.Contains (matchText)) {
 					return (new Point (col, i), true);
@@ -879,6 +895,7 @@ namespace Terminal.Gui {
 		bool wordWrap;
 		WordWrapManager wrapManager;
 		bool continuousFind;
+		int bottomOffset, rightOffset;
 		int tabWidth = 4;
 		bool allowsTab = true;
 		bool allowsReturn = true;
@@ -1115,13 +1132,31 @@ namespace Terminal.Gui {
 		/// The bottom offset needed to use a horizontal scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int BottomOffset { get; set; }
+		public int BottomOffset {
+			get => bottomOffset;
+			set {
+				if (currentRow == Lines - 1 && bottomOffset > 0 && value == 0) {
+					topRow = Math.Max (topRow - bottomOffset, 0);
+				}
+				bottomOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// The right offset needed to use a vertical scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int RightOffset { get; set; }
+		public int RightOffset {
+			get => rightOffset;
+			set {
+				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+					leftColumn = Math.Max (leftColumn - rightOffset, 0);
+				}
+				rightOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
@@ -1223,22 +1258,27 @@ namespace Terminal.Gui {
 			return SelectedText.Length;
 		}
 
-		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
+		CursorVisibility savedCursorVisibility;
 
 		void SaveCursorVisibility ()
 		{
 			if (desiredCursorVisibility != CursorVisibility.Invisible) {
-				savedCursorVisibility = desiredCursorVisibility;
+				if (savedCursorVisibility == 0) {
+					savedCursorVisibility = desiredCursorVisibility;
+				}
 				DesiredCursorVisibility = CursorVisibility.Invisible;
 			}
 		}
 
 		void ResetCursorVisibility ()
 		{
-			if (savedCursorVisibility != desiredCursorVisibility) {
+			if (savedCursorVisibility == 0) {
+				savedCursorVisibility = desiredCursorVisibility;
+			}
+			if (savedCursorVisibility != desiredCursorVisibility && !HasFocus) {
 				DesiredCursorVisibility = savedCursorVisibility;
 				savedCursorVisibility = CursorVisibility.Default;
-			} else {
+			} else if (desiredCursorVisibility != CursorVisibility.Underline) {
 				DesiredCursorVisibility = CursorVisibility.Underline;
 			}
 		}
@@ -1296,6 +1336,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			if (!CanFocus || !Enabled) {
+				return;
+			}
+
 			if (selecting) {
 				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
 				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
@@ -1312,10 +1356,13 @@ namespace Terminal.Gui {
 					if (line [idx] == '\t') {
 						cols += TabWidth + 1;
 					}
-					TextModel.SetCol (ref col, Frame.Width, cols);
+					if (!TextModel.SetCol (ref col, Frame.Width, cols)) {
+						col = currentColumn;
+						break;
+					}
 				}
 			}
-			if ((col >= leftColumn || col < Frame.Width)
+			if (col >= leftColumn && currentColumn - leftColumn + RightOffset < Frame.Width
 				&& topRow <= currentRow && currentRow - topRow + BottomOffset < Frame.Height) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
@@ -1338,7 +1385,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void ColorNormal ()
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
@@ -1350,7 +1397,7 @@ namespace Terminal.Gui {
 		/// <param name="idx"></param>
 		protected virtual void ColorNormal (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
@@ -1387,6 +1434,7 @@ namespace Terminal.Gui {
 			get => isReadOnly;
 			set {
 				isReadOnly = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1403,6 +1451,7 @@ namespace Terminal.Gui {
 				}
 
 				desiredCursorVisibility = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1996,6 +2045,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (!CanFocus) {
+				return true;
+			}
+
 			int restCount;
 			List<Rune> rest;
 

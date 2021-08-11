@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 				source = value;
 
 				// Only need to refresh list if its been added to a container view
-				if(SuperView != null && SuperView.Subviews.Contains(this)) { 
+				if (SuperView != null && SuperView.Subviews.Contains (this)) {
 					Search_Changed ("");
 					SetNeedsDisplay ();
 				}
@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		{
 			search = new TextField ("");
 			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
-						
+
 			Initialize ();
 			Text = text;
 		}
@@ -124,8 +124,8 @@ namespace Terminal.Gui {
 
 			// On resize
 			LayoutComplete += (LayoutEventArgs a) => {
-				if (!autoHide && search.Frame.Width != Bounds.Width ||
-					autoHide && search.Frame.Width != Bounds.Width - 1) {
+				if ((!autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width) ||
+					(autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width - 1)) {
 					search.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
 					listview.Height = CalculatetHeight ();
 					search.SetRelativeLayout (Bounds);
@@ -144,7 +144,7 @@ namespace Terminal.Gui {
 
 				// Determine if this view is hosted inside a dialog and is the only control
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
-					if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews[0] == this) {
+					if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this) {
 						autoHide = false;
 						break;
 					}
@@ -173,6 +173,21 @@ namespace Terminal.Gui {
 				listview.ColorScheme = value;
 				base.ColorScheme = value;
 				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		///If set to true its not allow any changes in the text.
+		/// </summary>
+		public bool ReadOnly {
+			get => search.ReadOnly;
+			set {
+				search.ReadOnly = value;
+				if (search.ReadOnly) {
+					if (search.ColorScheme != null) {
+						search.ColorScheme.Normal = search.ColorScheme.Focus;
+					}
+				}
 			}
 		}
 
@@ -247,7 +262,7 @@ namespace Terminal.Gui {
 		{
 			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
 			// So we cannot optimize. Ie: Don't call if not changed
-			SelectedItemChanged?.Invoke (new ListViewItemEventArgs(SelectedItem, search.Text));
+			SelectedItemChanged?.Invoke (new ListViewItemEventArgs (SelectedItem, search.Text));
 
 			return true;
 		}
@@ -321,7 +336,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if(e.Key == Key.PageDown) {
+			if (e.Key == Key.PageDown) {
 				if (listview.SelectedItem != -1) {
 					listview.MovePageDown ();
 				}
@@ -342,8 +357,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if(e.Key == Key.End) {
-				if(listview.SelectedItem != -1) {
+			if (e.Key == Key.End) {
+				if (listview.SelectedItem != -1) {
 					listview.MoveEnd ();
 				}
 				return true;
@@ -380,7 +395,7 @@ namespace Terminal.Gui {
 		private void SetValue (object text)
 		{
 			search.TextChanged -= Search_Changed;
-			this.text = search.Text = text.ToString();
+			this.text = search.Text = text.ToString ();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
 			SelectedItem = GetSelectedItemFromSource (this.text);
@@ -472,7 +487,7 @@ namespace Terminal.Gui {
 				ResetSearchSet (noCopy: true);
 
 				foreach (var item in source.ToList ()) { // Iterate to preserver object type and force deep copy
-					if (item.ToString().StartsWith (search.Text.ToString(), StringComparison.CurrentCultureIgnoreCase)) { 
+					if (item.ToString ().StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)) {
 						searchset.Add (item);
 					}
 				}
@@ -501,9 +516,11 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void HideList ()
 		{
+			var rect = listview.ViewToScreen (listview.Bounds);
 			Reset (SelectedItem > -1);
-			listview.Clear ();
+			listview.Clear (rect);
 			listview.TabStop = false;
+			SuperView?.SetNeedsDisplay (rect);
 		}
 
 		/// <summary>
@@ -515,7 +532,7 @@ namespace Terminal.Gui {
 			if (Bounds.Height == 0)
 				return 0;
 
-			return Math.Min (Math.Max(Bounds.Height - 1, minimumHeight - 1), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, minimumHeight - 1) : 0);
+			return Math.Min (Math.Max (Bounds.Height - 1, minimumHeight - 1), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, minimumHeight - 1) : 0);
 		}
 	}
 }

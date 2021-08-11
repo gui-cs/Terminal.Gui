@@ -191,6 +191,21 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private bool bidirectionalMarquee = true;
+
+		/// <summary>
+		/// Specifies if the <see cref="ProgressBarStyle.MarqueeBlocks"/> or the
+		///  <see cref="ProgressBarStyle.MarqueeContinuous"/> styles is unidirectional
+		///  or bidirectional.
+		/// </summary>
+		public bool BidirectionalMarquee {
+			get => bidirectionalMarquee;
+			set {
+				bidirectionalMarquee = value;
+				SetNeedsDisplay ();
+			}
+		}
+
 		ustring GetPercentageText ()
 		{
 			switch (progressBarStyle) {
@@ -245,10 +260,14 @@ namespace Terminal.Gui {
 					}
 					delta = 1;
 				} else if (activityPos [0] >= fWidth) {
-					for (int i = 0; i < activityPos.Length; i++) {
-						activityPos [i] = fWidth + i - 2;
+					if (bidirectionalMarquee) {
+						for (int i = 0; i < activityPos.Length; i++) {
+							activityPos [i] = fWidth + i - 2;
+						}
+						delta = -1;
+					} else {
+						PopulateActivityPos ();
 					}
-					delta = -1;
 				}
 			}
 
@@ -260,7 +279,7 @@ namespace Terminal.Gui {
 		{
 			DrawFrame ();
 
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 
 			int fWidth = GetFrameWidth ();
 			if (isActivity) {

@@ -377,7 +377,7 @@ namespace Terminal.Gui {
 
 					// Else clear the line to prevent stale symbols due to scrolling etc
 					Move (0, line);
-					Driver.SetAttribute (ColorScheme.Normal);
+					Driver.SetAttribute (GetNormalColor ());
 					Driver.AddStr (new string (' ', bounds.Width));
 				}
 

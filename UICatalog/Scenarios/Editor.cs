@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace UICatalog {
 		private string _textToReplace;
 		private bool _matchCase;
 		private bool _matchWholeWord;
-		Window winDialog;
+		private Window winDialog;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -30,6 +31,30 @@ namespace UICatalog {
 			if (Top == null) {
 				Top = Application.Top;
 			}
+
+			Win = new Window (_fileName ?? "Untitled") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				ColorScheme = colorScheme,
+			};
+			Top.Add (Win);
+
+			_textView = new TextView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				BottomOffset = 1,
+				RightOffset = 1
+			};
+
+			CreateDemoFile (_fileName);
+
+			LoadFile ();
+
+			Win.Add (_textView);
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -72,43 +97,25 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
-					CreateAllowsTabChecked (),
-					CreateAutocomplete()
-				})
+          CreateAutocomplete(),
+					CreateAllowsTabChecked ()
+				}),
+				new MenuBarItem ("_Responder", new MenuItem [] {
+					CreateCanFocusChecked (),
+					CreateEnabledChecked (),
+					CreateVisibleChecked ()
+				}),
 			});
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
+				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 			Top.Add (statusBar);
-
-			CreateDemoFile (_fileName);
-
-			Win = new Window (_fileName ?? "Untitled") {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
-			};
-			Top.Add (Win);
-
-			_textView = new TextView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				BottomOffset = 1,
-				RightOffset = 1
-			};
-
-			LoadFile ();
-
-			Win.Add (_textView);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
@@ -126,6 +133,22 @@ namespace UICatalog {
 					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
 				}
 				_textView.SetNeedsDisplay ();
+			};
+
+			_scrollBar.VisibleChanged += () => {
+				if (_scrollBar.Visible && _textView.RightOffset == 0) {
+					_textView.RightOffset = 1;
+				} else if (!_scrollBar.Visible && _textView.RightOffset == 1) {
+					_textView.RightOffset = 0;
+				}
+			};
+
+			_scrollBar.OtherScrollBarView.VisibleChanged += () => {
+				if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0) {
+					_textView.BottomOffset = 1;
+				} else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1) {
+					_textView.BottomOffset = 0;
+				}
 			};
 
 			_textView.DrawContent += (e) => {
@@ -318,8 +341,8 @@ namespace UICatalog {
 			if (!CanCloseFile ()) {
 				return;
 			}
-
-			var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = false };
+			var aTypes = new List<string> () { ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".*" };
+			var d = new OpenDialog ("Open", "Choose the path where to open the file.", aTypes) { AllowsMultipleSelection = false };
 			Application.Run (d);
 
 			if (!d.Canceled && d.FilePaths.Count > 0) {
@@ -341,7 +364,8 @@ namespace UICatalog {
 
 		private bool SaveAs ()
 		{
-			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.");
+		var aTypes = new List<string> () { ".txt", ".bin", ".xml", ".*" };
+			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.", aTypes);
 			sd.FilePath = System.IO.Path.Combine (sd.FilePath.ToString (), Win.Title.ToString ());
 			Application.Run (sd);
 
@@ -436,7 +460,7 @@ namespace UICatalog {
 				Title = "Word Wrap"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = false;
+			item.Checked = _textView.WordWrap;
 			item.Action += () => {
 				_textView.WordWrap = item.Checked = !item.Checked;
 				if (_textView.WordWrap) {
@@ -482,9 +506,60 @@ namespace UICatalog {
 				Title = "Allows Tab"
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = true;
+			item.Checked = _textView.AllowsTab;
 			item.Action += () => {
 				_textView.AllowsTab = item.Checked = !item.Checked;
+			};
+
+			return item;
+		}
+
+		private MenuItem CreateCanFocusChecked ()
+		{
+			var item = new MenuItem {
+				Title = "CanFocus"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = _textView.CanFocus;
+			item.Action += () => {
+				_textView.CanFocus = item.Checked = !item.Checked;
+				if (_textView.CanFocus) {
+					_textView.SetFocus ();
+				}
+			};
+
+			return item;
+		}
+
+		private MenuItem CreateEnabledChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Enabled"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = _textView.Enabled;
+			item.Action += () => {
+				_textView.Enabled = item.Checked = !item.Checked;
+				if (_textView.Enabled) {
+					_textView.SetFocus ();
+				}
+			};
+
+			return item;
+		}
+
+		private MenuItem CreateVisibleChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Visible"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = _textView.Visible;
+			item.Action += () => {
+				_textView.Visible = item.Checked = !item.Checked;
+				if (_textView.Visible) {
+					_textView.SetFocus ();
+				}
 			};
 
 			return item;
@@ -565,7 +640,7 @@ namespace UICatalog {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				CanFocus = !txtToFind.Text.IsEmpty,
+				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true
 			};
@@ -576,7 +651,7 @@ namespace UICatalog {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				CanFocus = !txtToFind.Text.IsEmpty,
+				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered
 			};
 			btnFindPrevious.Clicked += () => FindPrevious ();
@@ -585,8 +660,8 @@ namespace UICatalog {
 			txtToFind.TextChanged += (e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
-				btnFindNext.CanFocus = !txtToFind.Text.IsEmpty;
-				btnFindPrevious.CanFocus = !txtToFind.Text.IsEmpty;
+				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;
+				btnFindPrevious.Enabled = !txtToFind.Text.IsEmpty;
 			};
 
 			var btnCancel = new Button ("Cancel") {
@@ -658,7 +733,7 @@ namespace UICatalog {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				CanFocus = !txtToFind.Text.IsEmpty,
+				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true
 			};
@@ -686,7 +761,7 @@ namespace UICatalog {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				CanFocus = !txtToFind.Text.IsEmpty,
+				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered
 			};
 			btnFindPrevious.Clicked += () => ReplacePrevious ();
@@ -696,7 +771,7 @@ namespace UICatalog {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
-				CanFocus = !txtToFind.Text.IsEmpty,
+				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered
 			};
 			btnReplaceAll.Clicked += () => ReplaceAll ();
@@ -705,9 +780,9 @@ namespace UICatalog {
 			txtToFind.TextChanged += (e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
-				btnFindNext.CanFocus = !txtToFind.Text.IsEmpty;
-				btnFindPrevious.CanFocus = !txtToFind.Text.IsEmpty;
-				btnReplaceAll.CanFocus = !txtToFind.Text.IsEmpty;
+				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;
+				btnFindPrevious.Enabled = !txtToFind.Text.IsEmpty;
+				btnReplaceAll.Enabled = !txtToFind.Text.IsEmpty;
 			};
 
 			var btnCancel = new Button ("Cancel") {

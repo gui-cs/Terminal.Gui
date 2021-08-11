@@ -240,9 +240,7 @@ namespace Terminal.Gui {
 			Button2Pressed = 4,
 			Button3Pressed = 8,
 			Button4Pressed = 16,
-			RightmostButtonPressed = 2,
-			WheeledUp = unchecked((int)0x780000),
-			WheeledDown = unchecked((int)0xFF880000),
+			RightmostButtonPressed = 2
 		}
 
 		[Flags]
@@ -771,7 +769,7 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
-				if (IsButtonReleased)
+				if (isButtonReleased)
 					mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
 				break;
 
@@ -788,19 +786,23 @@ namespace Terminal.Gui {
 			}
 		}
 
-		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
-		bool IsButtonPressed = false;
-		bool IsButtonReleased = false;
-		bool IsButtonDoubleClicked = false;
+		WindowsConsole.ButtonState? lastMouseButtonPressed = null;
+		bool isButtonPressed = false;
+		bool isButtonReleased = false;
+		bool isButtonDoubleClicked = false;
 		Point point;
+		int buttonPressedCount;
+		bool isOneFingerDoubleClicked = false;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			if (IsButtonDoubleClicked) {
+			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState};EventFlags: {mouseEvent.EventFlags}");
+
+			if (isButtonDoubleClicked) {
 				Application.MainLoop.AddIdle (() => {
-					ProcessButtonDoubleClickedAsync ().ConfigureAwait (false);
+					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
 					return false;
 				});
 			}
@@ -810,10 +812,10 @@ namespace Terminal.Gui {
 			// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
 			// To map to the correct driver events we save the last pressed mouse button so we can
 			// map to the correct clicked event.
-			if ((LastMouseButtonPressed != null || IsButtonReleased) && mouseEvent.ButtonState != 0) {
-				LastMouseButtonPressed = null;
-				IsButtonPressed = false;
-				IsButtonReleased = false;
+			if ((lastMouseButtonPressed != null || isButtonReleased) && mouseEvent.ButtonState != 0) {
+				lastMouseButtonPressed = null;
+				//isButtonPressed = false;
+				isButtonReleased = false;
 			}
 
 			var p = new Point () {
@@ -821,9 +823,70 @@ namespace Terminal.Gui {
 				Y = mouseEvent.MousePosition.Y
 			};
 
-			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
-				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
-				mouseEvent.ButtonState != 0 && !IsButtonReleased && !IsButtonDoubleClicked)) {
+			if (!isButtonPressed && buttonPressedCount < 2
+				&& mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
+				&& (mouseEvent.ButtonState == WindowsConsole.ButtonState.Button1Pressed
+				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button2Pressed
+				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button3Pressed)) {
+
+				lastMouseButtonPressed = mouseEvent.ButtonState;
+				buttonPressedCount++;
+			} else if (!isButtonPressed && buttonPressedCount > 0 && mouseEvent.ButtonState == 0
+				&& mouseEvent.EventFlags == 0) {
+
+				buttonPressedCount++;
+			} else {
+				buttonPressedCount = 0;
+				isOneFingerDoubleClicked = false;
+			}
+			//System.Diagnostics.Debug.WriteLine ($"isButtonPressed: {isButtonPressed};buttonPressedCount: {buttonPressedCount};lastMouseButtonPressed: {lastMouseButtonPressed}");
+
+			if (buttonPressedCount == 3 && lastMouseButtonPressed != null
+				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+
+				switch (lastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3DoubleClicked;
+					break;
+				}
+				isOneFingerDoubleClicked = true;
+
+			} else if (buttonPressedCount == 5 && lastMouseButtonPressed != null && isOneFingerDoubleClicked
+				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+
+				switch (lastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3TripleClicked;
+					break;
+				}
+				buttonPressedCount = 0;
+				lastMouseButtonPressed = null;
+				isOneFingerDoubleClicked = false;
+				isButtonReleased = false;
+
+			} else if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
+				 (lastMouseButtonPressed == null && mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
+				 mouseEvent.ButtonState != 0 && !isButtonReleased && !isButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -841,26 +904,26 @@ namespace Terminal.Gui {
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					point = new Point ();
-					IsButtonReleased = false;
+					isButtonReleased = false;
 				} else {
 					point = new Point () {
 						X = mouseEvent.MousePosition.X,
 						Y = mouseEvent.MousePosition.Y
 					};
 				}
-				LastMouseButtonPressed = mouseEvent.ButtonState;
-				IsButtonPressed = true;
+				lastMouseButtonPressed = mouseEvent.ButtonState;
+				isButtonPressed = true;
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Application.MainLoop.AddIdle (() => {
-						ProcessContinuousButtonPressedAsync (mouseEvent, mouseFlag).ConfigureAwait (false);
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseEvent, mouseFlag));
 						return false;
 					});
 				}
 
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				LastMouseButtonPressed != null && !IsButtonReleased && !IsButtonDoubleClicked) {
-				switch (LastMouseButtonPressed) {
+				lastMouseButtonPressed != null && !isButtonReleased && !isButtonDoubleClicked) {
+				switch (lastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Released;
 					break;
@@ -873,11 +936,11 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3Released;
 					break;
 				}
-				IsButtonPressed = false;
-				IsButtonReleased = true;
-			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				  IsButtonReleased && p == point) {
-				switch (LastMouseButtonPressed) {
+				isButtonPressed = false;
+				isButtonReleased = true;
+			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
+				switch (lastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
 					break;
@@ -894,8 +957,8 @@ namespace Terminal.Gui {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y
 				};
-				LastMouseButtonPressed = null;
-				IsButtonReleased = false;
+				lastMouseButtonPressed = null;
+				isButtonReleased = false;
 			} else if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.DoubleClick)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
@@ -910,8 +973,8 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3DoubleClicked;
 					break;
 				}
-				IsButtonDoubleClicked = true;
-			} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && IsButtonDoubleClicked) {
+				isButtonDoubleClicked = true;
+			} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && isButtonDoubleClicked) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1TripleClicked;
@@ -925,26 +988,37 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3TripleClicked;
 					break;
 				}
-				IsButtonDoubleClicked = false;
+				isButtonDoubleClicked = false;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
-				switch (mouseEvent.ButtonState) {
-				case WindowsConsole.ButtonState.WheeledUp:
+				switch ((int)mouseEvent.ButtonState) {
+				case int v when v > 0:
 					mouseFlag = MouseFlags.WheeledUp;
 					break;
 
-				case WindowsConsole.ButtonState.WheeledDown:
+				case int v when v < 0:
 					mouseFlag = MouseFlags.WheeledDown;
 					break;
 				}
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled &&
 				mouseEvent.ControlKeyState == WindowsConsole.ControlKeyState.ShiftPressed) {
-				switch (mouseEvent.ButtonState) {
-				case WindowsConsole.ButtonState.WheeledUp:
+				switch ((int)mouseEvent.ButtonState) {
+				case int v when v > 0:
 					mouseFlag = MouseFlags.WheeledLeft;
 					break;
 
-				case WindowsConsole.ButtonState.WheeledDown:
+				case int v when v < 0:
+					mouseFlag = MouseFlags.WheeledRight;
+					break;
+				}
+
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseHorizontalWheeled) {
+				switch ((int)mouseEvent.ButtonState) {
+				case int v when v < 0:
+					mouseFlag = MouseFlags.WheeledLeft;
+					break;
+
+				case int v when v > 0:
 					mouseFlag = MouseFlags.WheeledRight;
 					break;
 				}
@@ -972,12 +1046,13 @@ namespace Terminal.Gui {
 		async Task ProcessButtonDoubleClickedAsync ()
 		{
 			await Task.Delay (200);
-			IsButtonDoubleClicked = false;
+			isButtonDoubleClicked = false;
 		}
 
 		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
 		{
-			while (IsButtonPressed) {
+			await Task.Delay (200);
+			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
 					X = mouseEvent.MousePosition.X,
@@ -989,8 +1064,8 @@ namespace Terminal.Gui {
 				if (view == null) {
 					break;
 				}
-				if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					mouseHandler (me);
+				if (isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Application.MainLoop.Invoke (() => mouseHandler (me));
 				}
 			}
 		}
@@ -1203,11 +1278,13 @@ namespace Terminal.Gui {
 			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
 			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
 			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
@@ -1219,11 +1296,13 @@ namespace Terminal.Gui {
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
 			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
 
 			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
 			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
+			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 		}
 
 		void ResizeScreen ()
@@ -1472,8 +1551,7 @@ namespace Terminal.Gui {
 
 			try {
 				ProcessInput (input);
-			} catch (OverflowException) { }
-			finally {
+			} catch (OverflowException) { } finally {
 				keyEvent.bKeyDown = false;
 				input.KeyEvent = keyEvent;
 				ProcessInput (input);
@@ -1526,7 +1604,7 @@ namespace Terminal.Gui {
 		{
 			this.mainLoop = mainLoop;
 			Task.Run (WindowsInputHandler);
-			// Nor working yet.
+			// Not working yet.
 			//Task.Run (CheckWinChange);
 		}
 

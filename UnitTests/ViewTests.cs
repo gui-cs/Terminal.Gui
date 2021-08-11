@@ -1370,5 +1370,203 @@ namespace Terminal.Gui.Views {
 				Application.Shutdown ();
 			}
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Internal_Tests ()
+		{
+			Assert.Equal (new [] { View.Direction.Forward, View.Direction.Backward },
+				Enum.GetValues (typeof (View.Direction)));
+
+			var rect = new Rect (1, 1, 10, 1);
+			var view = new View (rect);
+			var top = Application.Top;
+			top.Add (view);
+			Assert.Equal (View.Direction.Forward, view.FocusDirection);
+			view.FocusDirection = View.Direction.Backward;
+			Assert.Equal (View.Direction.Backward, view.FocusDirection);
+			Assert.Empty (view.InternalSubviews);
+			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view.NeedDisplay);
+			Assert.True (view.LayoutNeeded);
+			Assert.False (view.ChildNeedsDisplay);
+			Assert.False (view.addingView);
+			view.addingView = true;
+			Assert.True (view.addingView);
+			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			Assert.Equal (1, rcol);
+			Assert.Equal (1, rrow);
+			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
+			Assert.Equal (10, view.Bounds.Width);
+			Assert.Equal (1, view.Bounds.Height);
+			view.SetRelativeLayout (top.Bounds);
+			Assert.Equal (79, view.Bounds.Width);
+			Assert.Equal (24, view.Bounds.Height);
+			bool layoutStarted = false;
+			view.LayoutStarted += (_) => { layoutStarted = true; };
+			view.OnLayoutStarted (null);
+			Assert.True (layoutStarted);
+			view.LayoutComplete += (_) => { layoutStarted = false; };
+			view.OnLayoutComplete (null);
+			Assert.False (layoutStarted);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Enabled_False_Sets_HasFocus_To_False ()
+		{
+			var wasClicked = false;
+			var view = new Button ("Click Me");
+			view.Clicked += () => wasClicked = !wasClicked;
+			Application.Top.Add (view);
+
+			view.ProcessKey (new KeyEvent (Key.Enter, null));
+			Assert.True (wasClicked);
+			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+			Assert.False (wasClicked);
+			Assert.True (view.Enabled);
+			Assert.True (view.CanFocus);
+			Assert.True (view.HasFocus);
+
+			view.Enabled = false;
+			view.ProcessKey (new KeyEvent (Key.Enter, null));
+			Assert.False (wasClicked);
+			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+			Assert.False (wasClicked);
+			Assert.False (view.Enabled);
+			Assert.True (view.CanFocus);
+			Assert.False (view.HasFocus);
+			view.SetFocus ();
+			Assert.False (view.HasFocus);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Enabled_Sets_Also_Sets_Subviews ()
+		{
+			var wasClicked = false;
+			var button = new Button ("Click Me");
+			button.Clicked += () => wasClicked = !wasClicked;
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (button);
+			Application.Top.Add (win);
+
+			var iterations = 0;
+
+			Application.Iteration += () => {
+				iterations++;
+
+				button.ProcessKey (new KeyEvent (Key.Enter, null));
+				Assert.True (wasClicked);
+				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+				Assert.False (wasClicked);
+				Assert.True (button.Enabled);
+				Assert.True (button.CanFocus);
+				Assert.True (button.HasFocus);
+				Assert.True (win.Enabled);
+				Assert.True (win.CanFocus);
+				Assert.True (win.HasFocus);
+
+				win.Enabled = false;
+				button.ProcessKey (new KeyEvent (Key.Enter, null));
+				Assert.False (wasClicked);
+				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+				Assert.False (wasClicked);
+				Assert.False (button.Enabled);
+				Assert.True (button.CanFocus);
+				Assert.False (button.HasFocus);
+				Assert.False (win.Enabled);
+				Assert.True (win.CanFocus);
+				Assert.False (win.HasFocus);
+				button.SetFocus ();
+				Assert.False (button.HasFocus);
+				Assert.False (win.HasFocus);
+				win.SetFocus ();
+				Assert.False (button.HasFocus);
+				Assert.False (win.HasFocus);
+
+				win.Enabled = true;
+				win.FocusFirst ();
+				Assert.True (button.HasFocus);
+				Assert.True (win.HasFocus);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run ();
+
+			Assert.Equal (1, iterations);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Visible_Sets_Also_Sets_Subviews ()
+		{
+			var button = new Button ("Click Me");
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (button);
+			var top = Application.Top;
+			top.Add (win);
+
+			var iterations = 0;
+
+			Application.Iteration += () => {
+				iterations++;
+
+				Assert.True (button.Visible);
+				Assert.True (button.CanFocus);
+				Assert.True (button.HasFocus);
+				Assert.True (win.Visible);
+				Assert.True (win.CanFocus);
+				Assert.True (win.HasFocus);
+				Assert.True (RunesCount () > 0);
+
+				win.Visible = false;
+				Assert.True (button.Visible);
+				Assert.True (button.CanFocus);
+				Assert.False (button.HasFocus);
+				Assert.False (win.Visible);
+				Assert.True (win.CanFocus);
+				Assert.False (win.HasFocus);
+				button.SetFocus ();
+				Assert.False (button.HasFocus);
+				Assert.False (win.HasFocus);
+				win.SetFocus ();
+				Assert.False (button.HasFocus);
+				Assert.False (win.HasFocus);
+				top.Redraw (top.Bounds);
+				Assert.True (RunesCount () == 0);
+
+				win.Visible = true;
+				win.FocusFirst ();
+				Assert.True (button.HasFocus);
+				Assert.True (win.HasFocus);
+				top.Redraw (top.Bounds);
+				Assert.True (RunesCount () > 0);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run ();
+
+			Assert.Equal (1, iterations);
+
+			int RunesCount ()
+			{
+				var contents = ((FakeDriver)Application.Driver).Contents;
+				var runesCount = 0;
+
+				for (int i = 0; i < Application.Driver.Rows; i++) {
+					for (int j = 0; j < Application.Driver.Cols; j++) {
+						if (contents [i, j, 0] != ' ') {
+							runesCount++;
+						}
+					}
+				}
+				return runesCount;
+			}
+		}
 	}
 }

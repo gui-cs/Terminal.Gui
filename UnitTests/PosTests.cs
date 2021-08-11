@@ -7,7 +7,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
@@ -651,6 +651,37 @@ namespace Terminal.Gui.Core {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Internal_Tests ()
+		{
+			var posFactor = new Pos.PosFactor (0.10F);
+			Assert.Equal (10, posFactor.Anchor (100));
+
+			var posAnchorEnd = new Pos.PosAnchorEnd (1);
+			Assert.Equal (99, posAnchorEnd.Anchor (100));
+
+			var posCenter = new Pos.PosCenter ();
+			Assert.Equal (50, posCenter.Anchor (100));
+
+			var posAbsolute = new Pos.PosAbsolute (10);
+			Assert.Equal (10, posAbsolute.Anchor (0));
+
+			var posCombine = new Pos.PosCombine (true, posFactor, posAbsolute);
+			Assert.Equal (posCombine.left, posFactor);
+			Assert.Equal (posCombine.right, posAbsolute);
+			Assert.Equal (20, posCombine.Anchor (100));
+
+			var view = new View (new Rect (20, 10, 20, 1));
+			var posViewX = new Pos.PosView (view, 0);
+			Assert.Equal (20, posViewX.Anchor (0));
+			var posViewY = new Pos.PosView (view, 1);
+			Assert.Equal (10, posViewY.Anchor (0));
+			var posRight = new Pos.PosView (view, 2);
+			Assert.Equal (40, posRight.Anchor (0));
+			var posViewBottom = new Pos.PosView (view, 3);
+			Assert.Equal (11, posViewBottom.Anchor (0));
 		}
 	}
 }
