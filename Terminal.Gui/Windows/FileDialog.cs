@@ -678,11 +678,13 @@ namespace Terminal.Gui {
 						return;
 					}
 				} else if (this is SaveDialog) {
-					if (FilePath.IsEmpty || nameEntry.Text.Split (",").Length > 1) {
+					var name = nameEntry.Text.ToString ();
+					if (FilePath.IsEmpty || name.Split (',').Length > 1) {
 						return;
 					}
-					FilePath = Path.Combine (FilePath.ToString (),
-						nameEntry.Text.ToString () + cmbAllowedTypes.Text.ToString ());
+					var ext = name.EndsWith (cmbAllowedTypes.Text.ToString ())
+						? "" : cmbAllowedTypes.Text.ToString ();
+					FilePath = Path.Combine (FilePath.ToString (), $"{name}{ext}");
 				}
 				canceled = false;
 				Application.RequestStop ();
