@@ -94,8 +94,7 @@ namespace Terminal.Gui {
 		public override bool OnMouseEvent (MouseEvent mouseEvent)
 		{
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			OnMouseClick (args);
-			if (args.Handled)
+			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
 				return true;

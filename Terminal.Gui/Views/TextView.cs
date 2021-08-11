@@ -303,10 +303,7 @@ namespace Terminal.Gui {
 				if (rune == '\t') {
 					size += tabWidth + 1;
 				}
-				if (size > width) {
-					if (end == t.Count) {
-						col++;
-					}
+				if (size >= width) {
 					break;
 				} else if (end < t.Count && col > 0 && start < end && col == start) {
 					break;
@@ -898,6 +895,7 @@ namespace Terminal.Gui {
 		bool wordWrap;
 		WordWrapManager wrapManager;
 		bool continuousFind;
+		int bottomOffset, rightOffset;
 		int tabWidth = 4;
 		bool allowsTab = true;
 		bool allowsReturn = true;
@@ -1128,13 +1126,31 @@ namespace Terminal.Gui {
 		/// The bottom offset needed to use a horizontal scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int BottomOffset { get; set; }
+		public int BottomOffset {
+			get => bottomOffset;
+			set {
+				if (currentRow == Lines - 1 && bottomOffset > 0 && value == 0) {
+					topRow = Math.Max (topRow - bottomOffset, 0);
+				}
+				bottomOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// The right offset needed to use a vertical scrollbar or for another reason.
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
-		public int RightOffset { get; set; }
+		public int RightOffset {
+			get => rightOffset;
+			set {
+				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+					leftColumn = Math.Max (leftColumn - rightOffset, 0);
+				}
+				rightOffset = value;
+				Adjust ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
@@ -1236,22 +1252,27 @@ namespace Terminal.Gui {
 			return SelectedText.Length;
 		}
 
-		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
+		CursorVisibility savedCursorVisibility;
 
 		void SaveCursorVisibility ()
 		{
 			if (desiredCursorVisibility != CursorVisibility.Invisible) {
-				savedCursorVisibility = desiredCursorVisibility;
+				if (savedCursorVisibility == 0) {
+					savedCursorVisibility = desiredCursorVisibility;
+				}
 				DesiredCursorVisibility = CursorVisibility.Invisible;
 			}
 		}
 
 		void ResetCursorVisibility ()
 		{
-			if (savedCursorVisibility != desiredCursorVisibility) {
+			if (savedCursorVisibility == 0) {
+				savedCursorVisibility = desiredCursorVisibility;
+			}
+			if (savedCursorVisibility != desiredCursorVisibility && !HasFocus) {
 				DesiredCursorVisibility = savedCursorVisibility;
 				savedCursorVisibility = CursorVisibility.Default;
-			} else {
+			} else if (desiredCursorVisibility != CursorVisibility.Underline) {
 				DesiredCursorVisibility = CursorVisibility.Underline;
 			}
 		}
@@ -1309,6 +1330,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			if (!CanFocus || !Enabled) {
+				return;
+			}
+
 			if (selecting) {
 				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
 				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
@@ -1325,10 +1350,13 @@ namespace Terminal.Gui {
 					if (line [idx] == '\t') {
 						cols += TabWidth + 1;
 					}
-					TextModel.SetCol (ref col, Frame.Width, cols);
+					if (!TextModel.SetCol (ref col, Frame.Width, cols)) {
+						col = currentColumn;
+						break;
+					}
 				}
 			}
-			if ((col >= leftColumn || col < Frame.Width)
+			if (col >= leftColumn && currentColumn - leftColumn + RightOffset < Frame.Width
 				&& topRow <= currentRow && currentRow - topRow + BottomOffset < Frame.Height) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
@@ -1351,7 +1379,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void ColorNormal ()
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
@@ -1363,7 +1391,7 @@ namespace Terminal.Gui {
 		/// <param name="idx"></param>
 		protected virtual void ColorNormal (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
@@ -1400,6 +1428,7 @@ namespace Terminal.Gui {
 			get => isReadOnly;
 			set {
 				isReadOnly = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1416,6 +1445,7 @@ namespace Terminal.Gui {
 				}
 
 				desiredCursorVisibility = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1970,6 +2000,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (!CanFocus) {
+				return true;
+			}
+
 			int restCount;
 			List<Rune> rest;
 

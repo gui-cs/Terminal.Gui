@@ -728,8 +728,8 @@ namespace Terminal.Gui {
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-			toplevel.PositionToplevels ();
 			toplevel.LayoutSubviews ();
+			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
 			if (refreshDriver) {
 				if (MdiTop != null) {
@@ -794,6 +794,7 @@ namespace Terminal.Gui {
 			RootMouseEvent = null;
 			Resized = null;
 			_initialized = false;
+			mouseGrabView = null;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
@@ -1141,8 +1142,8 @@ namespace Terminal.Gui {
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
 				t.SetRelativeLayout (full);
-				t.PositionToplevels ();
 				t.LayoutSubviews ();
+				t.PositionToplevels ();
 			}
 			Refresh ();
 		}
@@ -1167,6 +1168,9 @@ namespace Terminal.Gui {
 		static bool SetCurrentAsTop ()
 		{
 			if (MdiTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false) {
+				if (Current.Frame != new Rect (0, 0, Driver.Cols, Driver.Rows)) {
+					Current.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
+				}
 				Top = Current;
 				return true;
 			}

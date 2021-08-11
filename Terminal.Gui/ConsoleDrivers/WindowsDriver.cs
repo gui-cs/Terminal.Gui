@@ -791,10 +791,14 @@ namespace Terminal.Gui {
 		bool isButtonReleased = false;
 		bool isButtonDoubleClicked = false;
 		Point point;
+		int buttonPressedCount;
+		bool isOneFingerDoubleClicked = false;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
+
+			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState};EventFlags: {mouseEvent.EventFlags}");
 
 			if (isButtonDoubleClicked) {
 				Application.MainLoop.AddIdle (() => {
@@ -810,7 +814,7 @@ namespace Terminal.Gui {
 			// map to the correct clicked event.
 			if ((lastMouseButtonPressed != null || isButtonReleased) && mouseEvent.ButtonState != 0) {
 				lastMouseButtonPressed = null;
-				isButtonPressed = false;
+				//isButtonPressed = false;
 				isButtonReleased = false;
 			}
 
@@ -819,9 +823,70 @@ namespace Terminal.Gui {
 				Y = mouseEvent.MousePosition.Y
 			};
 
-			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
-				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
-				mouseEvent.ButtonState != 0 && !isButtonReleased && !isButtonDoubleClicked)) {
+			if (!isButtonPressed && buttonPressedCount < 2
+				&& mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
+				&& (mouseEvent.ButtonState == WindowsConsole.ButtonState.Button1Pressed
+				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button2Pressed
+				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button3Pressed)) {
+
+				lastMouseButtonPressed = mouseEvent.ButtonState;
+				buttonPressedCount++;
+			} else if (!isButtonPressed && buttonPressedCount > 0 && mouseEvent.ButtonState == 0
+				&& mouseEvent.EventFlags == 0) {
+
+				buttonPressedCount++;
+			} else {
+				buttonPressedCount = 0;
+				isOneFingerDoubleClicked = false;
+			}
+			//System.Diagnostics.Debug.WriteLine ($"isButtonPressed: {isButtonPressed};buttonPressedCount: {buttonPressedCount};lastMouseButtonPressed: {lastMouseButtonPressed}");
+
+			if (buttonPressedCount == 3 && lastMouseButtonPressed != null
+				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+
+				switch (lastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3DoubleClicked;
+					break;
+				}
+				isOneFingerDoubleClicked = true;
+
+			} else if (buttonPressedCount == 5 && lastMouseButtonPressed != null && isOneFingerDoubleClicked
+				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+
+				switch (lastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3TripleClicked;
+					break;
+				}
+				buttonPressedCount = 0;
+				lastMouseButtonPressed = null;
+				isOneFingerDoubleClicked = false;
+				isButtonReleased = false;
+
+			} else if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
+				 (lastMouseButtonPressed == null && mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
+				 mouseEvent.ButtonState != 0 && !isButtonReleased && !isButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -856,7 +921,6 @@ namespace Terminal.Gui {
 					});
 				}
 
-
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
 				lastMouseButtonPressed != null && !isButtonReleased && !isButtonDoubleClicked) {
 				switch (lastMouseButtonPressed) {
@@ -874,8 +938,8 @@ namespace Terminal.Gui {
 				}
 				isButtonPressed = false;
 				isButtonReleased = true;
-			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				  isButtonReleased && p == point) {
+			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 				switch (lastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
@@ -1214,11 +1278,13 @@ namespace Terminal.Gui {
 			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
 			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
 			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
@@ -1230,11 +1296,13 @@ namespace Terminal.Gui {
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
 			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
 
 			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
 			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
+			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 		}
 
 		void ResizeScreen ()

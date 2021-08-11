@@ -4,7 +4,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
@@ -17,6 +17,8 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("Terminal.Gui.Responder", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
+			Assert.True (r.Enabled);
+			Assert.True (r.Visible);
 		}
 
 		[Fact]

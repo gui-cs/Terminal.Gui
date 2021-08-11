@@ -145,7 +145,9 @@ namespace Terminal.Gui {
 
 			cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
-			UpdateOffscreen ();
+			FakeConsole.Clear ();
+			ResizeScreen ();
+			UpdateOffScreen ();
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -158,11 +160,13 @@ namespace Terminal.Gui {
 			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
 			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
 			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
+			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
 			// Focused,
 			//    Selected, Hot: Yellow on Black
@@ -179,11 +183,13 @@ namespace Terminal.Gui {
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
 			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
 			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
+			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
 
 			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
+			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 
 			//MockConsole.Clear ();
 		}
@@ -442,7 +448,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Default;
+			if (FakeConsole.CursorVisible) {
+				visibility = CursorVisibility.Default;
+			} else {
+				visibility = CursorVisibility.Invisible;
+			}
 
 			return false;
 		}
@@ -450,6 +460,12 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
+			if (visibility == CursorVisibility.Invisible) {
+				FakeConsole.CursorVisible = false;
+			} else {
+				FakeConsole.CursorVisible = true;
+			}
+
 			return false;
 		}
 

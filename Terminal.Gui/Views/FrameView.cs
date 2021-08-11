@@ -60,7 +60,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
-		/// /// <param name="views">Views.</param>
+		/// <param name="views">Views.</param>
 		public FrameView (Rect frame, ustring title, View [] views) : this (frame, title)
 		{
 			Initialize (title, frame, views);
@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			if (!NeedDisplay.IsEmpty) {
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.SetAttribute (GetNormalColor ());
 				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}
 
@@ -166,13 +166,13 @@ namespace Terminal.Gui {
 			Driver.Clip = savedClip;
 
 			ClearNeedsDisplay ();
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);
 			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>

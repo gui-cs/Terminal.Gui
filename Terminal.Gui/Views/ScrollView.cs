@@ -250,7 +250,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// /// Gets or sets the visibility for the vertical scroll indicator.
+		/// Gets or sets the visibility for the vertical scroll indicator.
 		/// </summary>
 		/// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
 		public bool ShowVerticalScrollIndicator {
@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 			SetViewsNeedsDisplay ();
 			Clear ();
 
@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		void ShowHideScrollBars ()
