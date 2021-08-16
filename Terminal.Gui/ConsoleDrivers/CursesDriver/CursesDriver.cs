@@ -298,6 +298,7 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3DoubleClicked;
 					break;
 				}
+				cancelButtonClicked = true;
 
 			} else if (buttonPressedCount == 3
 			       && (cev.ButtonState == Curses.Event.Button1Pressed
@@ -328,7 +329,7 @@ namespace Terminal.Gui {
 
 			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
 				cev.ButtonState == Curses.Event.Button3Pressed) && lastMouseButtonPressed == null) ||
-				isButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
+				isButtonPressed && lastMouseButtonPressed != null && cev.ButtonState == Curses.Event.ReportMousePosition) {
 
 				mouseFlag = MapCursesButton (cev.ButtonState);
 				if (cev.ButtonState != Curses.Event.ReportMousePosition)
@@ -419,6 +420,7 @@ namespace Terminal.Gui {
 				}
 			}
 			lastMouseButtonPressed = null;
+			isButtonPressed = false;
 			return mf;
 		}
 
@@ -782,6 +784,9 @@ namespace Terminal.Gui {
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
 			}
+
+			// Ensures that all procedures are performed at some previous closing.
+			Curses.doupdate ();
 
 			// 
 			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
