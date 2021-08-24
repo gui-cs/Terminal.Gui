@@ -698,6 +698,13 @@ namespace Terminal.Gui {
 			mouseEvent.ButtonState = buttonState;
 			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState} X: {mouseEvent.Position.X} Y: {mouseEvent.Position.Y}");
 
+			if (isButtonDoubleClicked) {
+				Application.MainLoop.AddIdle (() => {
+					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
+					return false;
+				});
+			}
+
 			if ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
 				|| (buttonState & MouseButtonState.Button3Pressed) != 0) {
@@ -863,6 +870,13 @@ namespace Terminal.Gui {
 				EventType = EventType.Mouse,
 				MouseEvent = me
 			});
+		}
+
+		async Task ProcessButtonDoubleClickedAsync ()
+		{
+			await Task.Delay (300);
+			isButtonDoubleClicked = false;
+			buttonPressedCount = 0;
 		}
 
 		void ProcessButtonDoubleClicked (MouseEvent mouseEvent)
