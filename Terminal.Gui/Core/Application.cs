@@ -528,7 +528,9 @@ namespace Terminal.Gui {
 				wantContinuousButtonPressedView = view;
 			else
 				wantContinuousButtonPressedView = null;
-
+			if (view != null) {
+				me.View = view;
+			}
 			RootMouseEvent?.Invoke (me);
 			if (mouseGrabView != null) {
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
