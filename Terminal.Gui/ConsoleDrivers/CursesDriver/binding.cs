@@ -103,6 +103,9 @@ namespace Unix.Terminal {
 			setlocale (LC_ALL, "");
 			FindNCurses ();
 
+			// Prevents the terminal from being locked after exiting.
+			reset_shell_mode ();
+
 			main_window = new Window (methods.initscr ());
 			try {
 				console_sharp_get_dims (out lines, out cols);
@@ -310,6 +313,14 @@ namespace Unix.Terminal {
 		static public bool is_term_resized (int lines, int columns) => methods.is_term_resized (lines, columns);
 		static public int resize_term (int lines, int columns) => methods.resize_term (lines, columns);
 		static public int resizeterm (int lines, int columns) => methods.resizeterm (lines, columns);
+		static public void use_env (bool f) => methods.use_env (f);
+		static public int flushinp () => methods.flushinp ();
+		static public int def_prog_mode () => methods.def_prog_mode ();
+		static public int def_shell_mode () => methods.def_shell_mode ();
+		static public int reset_prog_mode () => methods.reset_prog_mode ();
+		static public int reset_shell_mode () => methods.reset_shell_mode ();
+		static public int savetty () => methods.savetty ();
+		static public int resetty () => methods.resetty ();
 	}
 
 #pragma warning disable RCS1102 // Make class static.
@@ -375,6 +386,14 @@ namespace Unix.Terminal {
 		public delegate bool is_term_resized (int lines, int columns);
 		public delegate int resize_term (int lines, int columns);
 		public delegate int resizeterm (int lines, int columns);
+		public delegate void use_env (bool f);
+		public delegate int flushinp ();
+		public delegate int def_prog_mode ();
+		public delegate int def_shell_mode ();
+		public delegate int reset_prog_mode ();
+		public delegate int reset_shell_mode ();
+		public delegate int savetty ();
+		public delegate int resetty ();
 	}
 
 	internal class NativeMethods {
@@ -438,6 +457,14 @@ namespace Unix.Terminal {
 		public readonly Delegates.is_term_resized is_term_resized;
 		public readonly Delegates.resize_term resize_term;
 		public readonly Delegates.resizeterm resizeterm;
+		public readonly Delegates.use_env use_env;
+		public readonly Delegates.flushinp flushinp;
+		public readonly Delegates.def_prog_mode def_prog_mode;
+		public readonly Delegates.def_shell_mode def_shell_mode;
+		public readonly Delegates.reset_prog_mode reset_prog_mode;
+		public readonly Delegates.reset_shell_mode reset_shell_mode;
+		public readonly Delegates.savetty savetty;
+		public readonly Delegates.resetty resetty;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -503,6 +530,14 @@ namespace Unix.Terminal {
 			is_term_resized = lib.GetNativeMethodDelegate<Delegates.is_term_resized> ("is_term_resized");
 			resize_term = lib.GetNativeMethodDelegate<Delegates.resize_term> ("resize_term");
 			resizeterm = lib.GetNativeMethodDelegate<Delegates.resizeterm> ("resizeterm");
+			use_env = lib.GetNativeMethodDelegate<Delegates.use_env> ("use_env");
+			flushinp = lib.GetNativeMethodDelegate<Delegates.flushinp> ("flushinp");
+			def_prog_mode = lib.GetNativeMethodDelegate<Delegates.def_prog_mode> ("def_prog_mode");
+			def_shell_mode = lib.GetNativeMethodDelegate<Delegates.def_shell_mode> ("def_shell_mode");
+			reset_prog_mode = lib.GetNativeMethodDelegate<Delegates.reset_prog_mode> ("reset_prog_mode");
+			reset_shell_mode = lib.GetNativeMethodDelegate<Delegates.reset_shell_mode> ("reset_shell_mode");
+			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
+			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
