@@ -71,6 +71,7 @@ git tag v2.3.4 -a -m "v2.3.4 Release"
 2) Update `./Terminal.Gui/Terminal.Gui.csproj` with latest release notes and submit a PR with a commit of `v2.3.4 Release`
 
 * Use `gh` to get list with just titles to make it easy to paste into release notes: `gh pr list --limit 500 --search "is:pr is:closed is:merged closed:>=2021-05-18"` 
+* PR title should be "v2.3.4 Release"
 
 ```powershell
 git add .
