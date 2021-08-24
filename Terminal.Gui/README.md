@@ -39,7 +39,7 @@ If the current commit does not have a version tag, another number is added to th
 
 You can see the version in the `UICatalog` about box or by viewing the "Details" page of the file properties of `/Terminal.Gui/bin/Release/net5.0/Terminal.Gui.dll.
 
-![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/about.png)
+![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/aboutbox.png)
 
 ## Publishing a Release of Terminal.Gui
 
@@ -60,12 +60,43 @@ git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
 git push upstream v1.3.4-beta.5
 ```
 
-To launch version 2.3.4 as a Release nuget package do this:
-       
+## To launch version 2.3.4 as a Release nuget package do this:
+
+1) Create a new tag
+
+```powershell
+git tag v2.3.4 -a -m "v2.3.4 Release"
+```       
+
+2) Update `./Terminal.Gui/Terminal.Gui.csproj` with latest release notes and submit a PR with a commit of `v2.3.4 Release`
+
+* Use `gh` to get list with just titles to make it easy to paste into release notes: `gh pr list --limit 500 --search "is:pr is:closed is:merged closed:>=2021-05-18"` 
+
+```powershell
+git add .
+git commit -m "v2.3.4 Release"
+git push
+```
+
+3) Pull upstream after PR has been merged
+
+```powershell
+git pull upstream main
+```
+
+4) Push new tag to `main`
+
 ```powershell
 git tag v2.3.4 -a -m "v2.3.4 Release"
 git push upstream v2.3.4
 ```       
+
+5) Monitor Github actions to ensure it worked.
+
+6) Check nuget to see new package (wait a few minutes)
+
+https://www.nuget.org/packages/Terminal.Gui
+
 
 ## Nuget
 
