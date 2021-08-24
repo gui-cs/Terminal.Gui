@@ -98,6 +98,7 @@ git push upstream v2.3.4
 
 https://www.nuget.org/packages/Terminal.Gui
 
+7) Add a new Release in Github: https://github.com/migueldeicaza/gui.cs/releases
 
 ## Nuget
 
