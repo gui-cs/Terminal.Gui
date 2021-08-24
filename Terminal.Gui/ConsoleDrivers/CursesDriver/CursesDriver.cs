@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using NStack;
@@ -111,11 +112,11 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		int currentAttribute;
+		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.Value;
+			currentAttribute = c;
 			Curses.attrset (currentAttribute);
 		}
 
@@ -1117,6 +1118,28 @@ namespace Terminal.Gui {
 				k |= Key.CtrlMask;
 			}
 			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+		}
+
+		public override bool GetColors (int value, out Color foreground, out Color background)
+		{
+			bool hasColor = false;
+			foreground = default;
+			background = default;
+			int back = -1;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains ((value >> 12) & 0xffff)) {
+				hasColor = true;
+				back = (value >> 12) & 0xffff;
+				background = MapCursesColor (back);
+			}
+			if (values.Contains ((value - (back << 12)) >> 8)) {
+				hasColor = true;
+				foreground = MapCursesColor ((value - (back << 12)) >> 8);
+			}
+			return hasColor;
+
 		}
 	}
 

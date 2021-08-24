@@ -43,6 +43,56 @@ namespace UICatalog {
 				x = 30;
 				y++;
 			}
+
+			Win.Add (new Label ("Mouse over to get the view color:") {
+				X = Pos.AnchorEnd (35)
+			});
+			Win.Add (new Label ("Foreground:") {
+				X = Pos.AnchorEnd (34),
+				Y = 2
+			});
+
+			var lblForeground = new Label () {
+				X = Pos.AnchorEnd (20),
+				Y = 2
+			};
+			Win.Add (lblForeground);
+
+			var viewForeground = new View ("  ") {
+				X = Pos.AnchorEnd (2),
+				Y = 2,
+				ColorScheme = new ColorScheme ()
+			};
+			Win.Add (viewForeground);
+
+			Win.Add (new Label ("Background:") {
+				X = Pos.AnchorEnd (34),
+				Y = 4
+			});
+
+			var lblBackground = new Label () {
+				X = Pos.AnchorEnd (20),
+				Y = 4
+			};
+			Win.Add (lblBackground);
+
+			var viewBackground = new View ("  ") {
+				X = Pos.AnchorEnd (2),
+				Y = 4,
+				ColorScheme = new ColorScheme ()
+			};
+			Win.Add (viewBackground);
+
+			Application.RootMouseEvent = (e) => {
+				if (e.View != null) {
+					var colorValue = e.View.GetNormalColor ().Value;
+					Application.Driver.GetColors (colorValue, out Color fore, out Color back);
+					lblForeground.Text = fore.ToString ();
+					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
+					lblBackground.Text = back.ToString ();
+					viewBackground.ColorScheme.Normal = new Attribute (back, back);
+				}
+			};
 		}
 	}
 }

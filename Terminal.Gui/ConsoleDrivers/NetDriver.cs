@@ -1497,10 +1497,10 @@ namespace Terminal.Gui {
 		{
 		}
 
-		int currentAttribute;
+		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.Value;
+			currentAttribute = c;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -1798,23 +1798,6 @@ namespace Terminal.Gui {
 			return currentAttribute;
 		}
 
-		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-		}
-
-		public override void CookMouse ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
@@ -1850,6 +1833,42 @@ namespace Terminal.Gui {
 			try {
 				ProcessInput (input);
 			} catch (OverflowException) { }
+		}
+
+		public override bool GetColors (int value, out Color foreground, out Color background)
+		{
+			bool hasColor = false;
+			foreground = default;
+			background = default;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains (value & 0xffff)) {
+				hasColor = true;
+				background = (Color)(ConsoleColor)(value & 0xffff);
+			}
+			if (values.Contains ((value >> 16) & 0xffff)) {
+				hasColor = true;
+				foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
+			}
+			return hasColor;
+		}
+
+		#region Unused
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		{
+		}
+
+		public override void SetColors (short foregroundColorId, short backgroundColorId)
+		{
+		}
+
+		public override void CookMouse ()
+		{
+		}
+
+		public override void UncookMouse ()
+		{
 		}
 		#endregion
 

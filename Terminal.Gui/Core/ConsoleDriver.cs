@@ -105,12 +105,30 @@ namespace Terminal.Gui {
 		public Color Background { get; }
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
+		///   and trying to get the colors if defined.
+		/// </summary>
+		/// <param name="value">Value.</param>
+		public Attribute (int value)
+		{
+			Color foreground = default;
+			Color background = default;
+
+			if (Application.Driver != null) {
+				Application.Driver.GetColors (value, out foreground, out background);
+			}
+			Value = value;
+			Foreground = foreground;
+			Background = background;
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int value, Color foreground = new Color (), Color background = new Color ())
+		public Attribute (int value, Color foreground, Color background)
 		{
 			Value = value;
 			Foreground = foreground;
@@ -128,6 +146,13 @@ namespace Terminal.Gui {
 			Foreground = foreground;
 			Background = background;
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct
+		///  with the same colors for the foreground and background.
+		/// </summary>
+		/// <param name="color">The color.</param>
+		public Attribute (Color color) : this (color, color) { }
 
 		/// <summary>
 		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
@@ -752,6 +777,15 @@ namespace Terminal.Gui {
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
 		/// <summary>
+		/// Gets the foreground and background colors based on the value.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="foreground">The foreground.</param>
+		/// <param name="background">The background.</param>
+		/// <returns></returns>
+		public abstract bool GetColors (int value, out Color foreground, out Color background);
+
+		/// <summary>
 		/// Allows sending keys without typing on a keyboard.
 		/// </summary>
 		/// <param name="keyChar">The character key.</param>
@@ -803,12 +837,12 @@ namespace Terminal.Gui {
 			/// </summary>
 			Off = 0b_0000_0000,
 			/// <summary>
-			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will draw a 
+			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
 			FrameRuler = 0b_0000_0001,
 			/// <summary>
-			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will use
+			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will use
 			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
 			/// </summary>
 			FramePadding = 0b_0000_0010,
@@ -829,7 +863,9 @@ namespace Terminal.Gui {
 		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
 		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
-		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)
+		/// <param name="borderContent">The <see cref="Border"/> to be used if defined.</param>
+		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
+			int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)
 		{
 			char clearChar = ' ';
 			char leftChar = clearChar;
@@ -866,15 +902,17 @@ namespace Terminal.Gui {
 			// ftop is location of top frame line
 			int ftop = region.Y + paddingTop - 1;
 
-			// fbottom is locaiton of bottom frame line
+			// fbottom is location of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			Rune hLine = border ? HLine : clearChar;
-			Rune vLine = border ? VLine : clearChar;
-			Rune uRCorner = border ? URCorner : clearChar;
-			Rune uLCorner = border ? ULCorner : clearChar;
-			Rune lLCorner = border ? LLCorner : clearChar;
-			Rune lRCorner = border ? LRCorner : clearChar;
+			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+
+			Rune hLine = border ? (borderStyle == BorderStyle.Single ? HLine : HDLine) : clearChar;
+			Rune vLine = border ? (borderStyle == BorderStyle.Single ? VLine : VDLine) : clearChar;
+			Rune uRCorner = border ? (borderStyle == BorderStyle.Single ? URCorner : URDCorner) : clearChar;
+			Rune uLCorner = border ? (borderStyle == BorderStyle.Single ? ULCorner : ULDCorner) : clearChar;
+			Rune lLCorner = border ? (borderStyle == BorderStyle.Single ? LLCorner : LLDCorner) : clearChar;
+			Rune lRCorner = border ? (borderStyle == BorderStyle.Single ? LRCorner : LRDCorner) : clearChar;
 
 			// Outside top
 			if (paddingTop > 1) {
@@ -985,7 +1023,7 @@ namespace Terminal.Gui {
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/>.</remarks>
 		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
 		/// A padding value of 0 means there is actually a one cell border.
 		/// </remarks>
@@ -1163,6 +1201,36 @@ namespace Terminal.Gui {
 		/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
 		public Rune ContinuousMeterSegment = '\u2588';
+
+		/// <summary>
+		/// Horizontal double line character.
+		/// </summary>
+		public Rune HDLine = '\u2550';
+
+		/// <summary>
+		/// Vertical double line character.
+		/// </summary>
+		public Rune VDLine = '\u2551';
+
+		/// <summary>
+		/// Upper left double corner
+		/// </summary>
+		public Rune ULDCorner = '\u2554';
+
+		/// <summary>
+		/// Lower left double corner
+		/// </summary>
+		public Rune LLDCorner = '\u255a';
+
+		/// <summary>
+		/// Upper right double corner
+		/// </summary>
+		public Rune URDCorner = '\u2557';
+
+		/// <summary>
+		/// Lower right double corner
+		/// </summary>
+		public Rune LRDCorner = '\u255d';
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
