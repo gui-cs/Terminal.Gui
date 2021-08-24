@@ -33,7 +33,7 @@ To define a new version (e.g. with a higher `major`, `minor`, `patch`, or `build
 ```powershell
 git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
 dotnet build -c Release
-``
+```
 
 If the current commit does not have a version tag, another number is added to the pre-release identifiers. This is the number of commits since the latest commit with a version tag or, if no commits have a version tag, since the root commit. This is known as "height". For example, if the latest version tag found is 1.0.0-beta.1, at a height of 42 commits, the calculated version is 1.0.0-beta.1.42.
 
