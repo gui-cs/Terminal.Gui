@@ -906,6 +906,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action TextChanged;
 
+		/// <summary>
+		/// Provides autocomplete context menu based on suggestions at the current cursor
+		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// </summary>
+		public Autocomplete Autocomplete { get; protected set; } = new Autocomplete ();
+
 #if false
 		/// <summary>
 		///   Changed event, raised when the text has clicked.
@@ -1779,6 +1785,15 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
+
+			// draw autocomplete
+			Autocomplete.GenerateSuggestions (this);
+
+			var renderAt = new Point (
+				CursorPosition.X - LeftColumn,
+			(CursorPosition.Y + 1) - TopRow);
+
+			Autocomplete.RenderOverlay (this, renderAt);
 		}
 
 		///<inheritdoc/>
@@ -1799,6 +1814,30 @@ namespace Terminal.Gui {
 			Clipboard.Contents += text;
 		}
 
+
+		/// <summary>
+		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
+		/// exactly as if the user had just typed it
+		/// </summary>
+		/// <param name="toAdd">Text to add</param>
+		public void InsertText (string toAdd)
+		{
+			foreach(var ch in toAdd) {
+
+				Key key;
+
+				try {
+					key = (Key)ch;
+				} catch (Exception) {
+
+					throw new ArgumentException($"Cannot insert character '{ch}' because it does not map to a Key");
+				}
+				
+
+				InsertText (new KeyEvent () { Key = key });
+			}
+		}
+		
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
@@ -1843,7 +1882,13 @@ namespace Terminal.Gui {
 			return ustring.Make (encoded);
 		}
 
-		List<Rune> GetCurrentLine () => model.GetLine (currentRow);
+		/// <summary>
+		/// Returns the characters on the current line (where the cursor is positioned).
+		/// Use <see cref="CurrentColumn"/> to determine the position of the cursor within
+		/// that line
+		/// </summary>
+		/// <returns></returns>
+		public List<Rune> GetCurrentLine () => model.GetLine (currentRow);
 
 		void InsertText (ustring text)
 		{
@@ -2024,6 +2069,11 @@ namespace Terminal.Gui {
 				if (currentColumn == lastCol && currentRow == lastRow) {
 					return false;
 				}
+			}
+
+			// Give autocomplete first opportunity to respond to key presses
+			if (Autocomplete.ProcessKey (this, kb)) {
+				return true;
 			}
 
 			// Handle some state here - whether the last command was a kill
@@ -2598,7 +2648,11 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool DeleteTextBackwards ()
+		/// <summary>
+		/// Deletes a single character from the position of the cursor
+		/// </summary>
+		/// <returns></returns>
+		public bool DeleteTextBackwards ()
 		{
 			if (currentColumn > 0) {
 				// Delete backwards 

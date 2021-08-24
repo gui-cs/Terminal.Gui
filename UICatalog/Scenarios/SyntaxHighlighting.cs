@@ -1,13 +1,9 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Terminal.Gui;
-using static UICatalog.Scenario;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
@@ -15,47 +11,55 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Controls")]
 	class SyntaxHighlighting : Scenario {
 
-			public override void Setup ()
-			{
-				Win.Title = this.GetName ();
-				Win.Y = 1; // menu
-				Win.Height = Dim.Fill (1); // status bar
-				Top.LayoutSubviews ();
+		SqlTextView textView;
+		MenuItem miWrap;
 
-				var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Quit()),
-				})
-				});
-				Top.Add (menu);
+		public override void Setup ()
+		{
+			Win.Title = this.GetName ();
+			Win.Y = 1; // menu
+			Win.Height = Dim.Fill (1); // status bar
+			Top.LayoutSubviews ();
 
-				var textView = new SqlTextView () {
-					X = 0,
-					Y = 0,
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-				};
+			var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				miWrap =  new MenuItem ("_Word Wrap", "", () => WordWrap()){CheckType = MenuItemCheckStyle.Checked},
+				new MenuItem ("_Quit", "", () => Quit()),
+			})
+			});
+			Top.Add (menu);
 
-				textView.Init();
+			textView = new SqlTextView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (1),
+			};
 
-				textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
-				
-				Win.Add (textView);
+			textView.Init();
 
-				var statusBar = new StatusBar (new StatusItem [] {
+			textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
+
+			Win.Add (textView);
+
+			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-
 			});
 
 
-				Top.Add (statusBar);
-			}
+			Top.Add (statusBar);
+		}
 
+		private void WordWrap ()
+		{
+			miWrap.Checked = !miWrap.Checked;
+			textView.WordWrap = miWrap.Checked;
+		}
 
-			private void Quit ()
-			{
-				Application.RequestStop ();
-			}
+		private void Quit ()
+		{
+			Application.RequestStop ();
+		}
 
 		private class SqlTextView : TextView{
 
@@ -65,13 +69,41 @@ namespace UICatalog.Scenarios {
 			private Attribute magenta;
 
 
-			public void Init()
+		public void Init()
 			{
 				keywords.Add("select");
 				keywords.Add("distinct");
 				keywords.Add("top");
 				keywords.Add("from");
-				keywords.Add ("create");
+				keywords.Add("create");
+				keywords.Add("CIPHER");
+				keywords.Add("CLASS_ORIGIN");
+				keywords.Add("CLIENT");
+				keywords.Add("CLOSE");
+				keywords.Add("COALESCE");
+				keywords.Add("CODE");
+				keywords.Add("COLUMNS");
+				keywords.Add("COLUMN_FORMAT");
+				keywords.Add("COLUMN_NAME");
+				keywords.Add("COMMENT");
+				keywords.Add("COMMIT");
+				keywords.Add("COMPACT");
+				keywords.Add("COMPLETION");
+				keywords.Add("COMPRESSED");
+				keywords.Add("COMPRESSION");
+				keywords.Add("CONCURRENT");
+				keywords.Add("CONNECT");
+				keywords.Add("CONNECTION");
+				keywords.Add("CONSISTENT");
+				keywords.Add("CONSTRAINT_CATALOG");
+				keywords.Add("CONSTRAINT_SCHEMA");
+				keywords.Add("CONSTRAINT_NAME");
+				keywords.Add("CONTAINS");
+				keywords.Add("CONTEXT");
+				keywords.Add("CONTRIBUTORS");
+				keywords.Add("COPY");
+				keywords.Add("CPU");
+				keywords.Add("CURSOR_NAME");
 				keywords.Add ("primary");
 				keywords.Add ("key");
 				keywords.Add ("insert");
@@ -96,7 +128,6 @@ namespace UICatalog.Scenarios {
 				keywords.Add ("is");
 				keywords.Add ("drop");
 				keywords.Add ("database");
-				keywords.Add ("column");
 				keywords.Add ("table");
 				keywords.Add ("having");
 				keywords.Add ("in");
@@ -104,6 +135,8 @@ namespace UICatalog.Scenarios {
 				keywords.Add ("on");
 				keywords.Add ("union");
 				keywords.Add ("exists");
+
+				Autocomplete.AllSuggestions = keywords.ToList();
 
 				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);

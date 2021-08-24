@@ -386,6 +386,33 @@ namespace Terminal.Gui {
 			return ustring.Make (runes);
 		}
 
+
+		/// <summary>
+		/// Adds trailing whitespace or truncates <paramref name="text"/>
+		/// so that it fits exactly <paramref name="width"/> console units.
+		/// Note that some unicode characters take 2+ columns
+		/// </summary>
+		/// <param name="text"></param>
+		/// <param name="width"></param>
+		/// <returns></returns>
+		public static string ClipOrPad (string text, int width)
+		{
+			if (string.IsNullOrEmpty (text))
+				return text;
+
+			// if value is not wide enough
+			if (text.Sum (c => Rune.ColumnWidth (c)) < width) {
+
+				// pad it out with spaces to the given alignment
+				int toPad = width - (text.Sum (c => Rune.ColumnWidth (c)));
+
+				return text + new string (' ', toPad);
+			}
+
+			// value is too wide
+			return new string (text.TakeWhile (c => (width -= Rune.ColumnWidth (c)) >= 0).ToArray ());
+		}
+
 		/// <summary>
 		/// Formats the provided text to fit within the width provided using word wrapping.
 		/// </summary>

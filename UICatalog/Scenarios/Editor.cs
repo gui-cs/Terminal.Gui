@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
@@ -95,6 +97,7 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
+          CreateAutocomplete(),
 					CreateAllowsTabChecked ()
 				}),
 				new MenuBarItem ("_Responder", new MenuItem [] {
@@ -471,6 +474,30 @@ namespace UICatalog {
 			};
 
 			return item;
+		}
+
+		private MenuItem CreateAutocomplete()
+		{
+			var auto = new MenuItem ();
+			auto.Title = "Autocomplete";
+			auto.CheckType |= MenuItemCheckStyle.Checked;
+			auto.Checked = false;
+			auto.Action += () => {
+				if(auto.Checked = !auto.Checked) {
+					// setup autocomplete with all words currently in the editor
+					_textView.Autocomplete.AllSuggestions = 
+					
+					Regex.Matches(_textView.Text.ToString(),"\\w+")
+					.Select(s=>s.Value)
+					.Distinct ().ToList ();
+				}
+				else {
+					_textView.Autocomplete.AllSuggestions.Clear ();
+
+				}
+			};
+
+			return auto;
 		}
 
 		private MenuItem CreateAllowsTabChecked ()
