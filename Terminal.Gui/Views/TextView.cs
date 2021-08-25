@@ -1822,7 +1822,7 @@ namespace Terminal.Gui {
 		/// <param name="toAdd">Text to add</param>
 		public void InsertText (string toAdd)
 		{
-			foreach(var ch in toAdd) {
+			foreach (var ch in toAdd) {
 
 				Key key;
 
@@ -1830,14 +1830,14 @@ namespace Terminal.Gui {
 					key = (Key)ch;
 				} catch (Exception) {
 
-					throw new ArgumentException($"Cannot insert character '{ch}' because it does not map to a Key");
+					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
-				
+
 
 				InsertText (new KeyEvent () { Key = key });
 			}
 		}
-		
+
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
@@ -1984,6 +1984,7 @@ namespace Terminal.Gui {
 			} else if (dSize.size + RightOffset < Frame.Width + offB.width
 				&& tSize.size + RightOffset < Frame.Width + offB.width) {
 				leftColumn = 0;
+				need = true;
 			}
 
 			if (currentRow < topRow) {
@@ -2686,7 +2687,7 @@ namespace Terminal.Gui {
 				} else {
 					currentColumn = prevCount;
 				}
-				Adjust ();
+				SetNeedsDisplay ();
 			}
 
 			return false;
