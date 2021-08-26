@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 			}
 		 	set
 			{
-				ColorScheme = value;
+				colorScheme = value;
 			}
 		}
 
