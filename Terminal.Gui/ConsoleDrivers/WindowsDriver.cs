@@ -27,7 +27,9 @@
 //
 using NStack;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1387,11 +1389,11 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		int currentAttribute;
+		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.Value;
+			currentAttribute = c;
 		}
 
 		Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -1492,35 +1494,6 @@ namespace Terminal.Gui {
 			return winConsole.EnsureCursorVisibility ();
 		}
 
-		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-		}
-
-		public override void Suspend ()
-		{
-		}
-
-		public override void StartReportingMouseMoves ()
-		{
-		}
-
-		public override void StopReportingMouseMoves ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
-		}
-
-		public override void CookMouse ()
-		{
-		}
-
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{
 			WindowsConsole.InputRecord input = new WindowsConsole.InputRecord ();
@@ -1572,6 +1545,54 @@ namespace Terminal.Gui {
 				input.KeyEvent = keyEvent;
 				ProcessInput (input);
 			}
+		}
+
+		public override bool GetColors (int value, out Color foreground, out Color background)
+		{
+			bool hasColor = false;
+			foreground = default;
+			background = default;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains ((value >> 4) & 0xffff)) {
+				hasColor = true;
+				background = (Color)(ConsoleColor)((value >> 4) & 0xffff);
+			}
+			if (values.Contains (value - ((int)background << 4))) {
+				hasColor = true;
+				foreground = (Color)(ConsoleColor)(value - ((int)background << 4));
+			}
+			return hasColor;
+		}
+
+		#region Unused
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		{
+		}
+
+		public override void SetColors (short foregroundColorId, short backgroundColorId)
+		{
+		}
+
+		public override void Suspend ()
+		{
+		}
+
+		public override void StartReportingMouseMoves ()
+		{
+		}
+
+		public override void StopReportingMouseMoves ()
+		{
+		}
+
+		public override void UncookMouse ()
+		{
+		}
+
+		public override void CookMouse ()
+		{
 		}
 		#endregion
 	}

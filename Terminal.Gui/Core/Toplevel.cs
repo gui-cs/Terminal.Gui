@@ -663,6 +663,7 @@ namespace Terminal.Gui {
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
 					dragPosition = new Point (nx, ny);
+					SuperView?.BringSubviewToFront (this);
 					Application.GrabMouse (this);
 				}
 

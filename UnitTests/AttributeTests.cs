@@ -43,6 +43,14 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (fg, attr.Foreground);
 			Assert.Equal (bg, attr.Background);
 
+			attr = new Attribute (fg);
+			Assert.Equal (fg, attr.Foreground);
+			Assert.Equal (fg, attr.Background);
+
+			attr = new Attribute (bg);
+			Assert.Equal (bg, attr.Foreground);
+			Assert.Equal (bg, attr.Background);
+
 			driver.End ();
 			Application.Shutdown ();
 		}
@@ -63,12 +71,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var bg = new Color ();
 			bg = Color.Blue;
 
-			// Test converstion to int
+			// Test conversion to int
 			attr = new Attribute (value, fg, bg);
 			int value_implicit = (int)attr.Value;
 			Assert.Equal (value, value_implicit);
 
-			// Test converstion from int
+			// Test conversion from int
 			attr = value;
 			Assert.Equal (value, attr.Value);
 
@@ -142,6 +150,18 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			driver.End ();
 			Application.Shutdown ();
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void GetColors_Based_On_Value ()
+		{
+			var driver = Application.Driver;
+			var attrValue = new Attribute (Color.Red, Color.Green).Value;
+			driver.GetColors (attrValue, out Color fg, out Color bg);
+
+			Assert.Equal (Color.Red, fg);
+			Assert.Equal (Color.Green, bg);
 		}
 	}
 }

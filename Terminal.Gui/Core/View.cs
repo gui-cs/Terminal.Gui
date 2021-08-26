@@ -664,9 +664,10 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="rect">Location.</param>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-		public View (Rect rect, ustring text)
+		/// <param name="border">The <see cref="Border"/>.</param>
+		public View (Rect rect, ustring text, Border border = null)
 		{
-			Initialize (text, rect, LayoutStyle.Absolute);
+			Initialize (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom, border);
 		}
 
 		/// <summary>
@@ -684,19 +685,22 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		/// <param name="direction">The text direction.</param>
-		public View (ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom)
+		/// <param name="border">The <see cref="Border"/>.</param>
+		public View (ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-			Initialize (text, Rect.Empty, LayoutStyle.Computed, direction);
+			Initialize (text, Rect.Empty, LayoutStyle.Computed, direction, border);
 		}
 
 		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
-			TextDirection direction = TextDirection.LeftRight_TopBottom)
+			TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
 			textFormatter = new TextFormatter ();
 			TextDirection = direction;
-
+			Border = border;
+			if (Border != null) {
+				Border.Child = this;
+			}
 			shortcutHelper = new ShortcutHelper ();
-
 			CanFocus = false;
 			TabIndex = -1;
 			TabStop = false;
@@ -1361,8 +1365,13 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
+			//if (ColorScheme != null && !(this is Toplevel)) {
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
+
+			if (Border != null) {
+				Border.DrawContent ();
 			}
 
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
@@ -2167,6 +2176,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		Border border;
+
+		/// <inheritdoc/>
+		public virtual Border Border {
+			get => border;
+			set {
+				if (border != value) {
+					border = value;
+					SetNeedsDisplay ();
+				}
+			}
+		}
+
 		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
@@ -2494,7 +2516,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns><see cref="ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
 		/// or <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/></returns>
-		protected Attribute GetNormalColor ()
+		public Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
