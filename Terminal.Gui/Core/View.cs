@@ -344,11 +344,6 @@ namespace Terminal.Gui {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
-					}
-					OnCanFocusChanged ();
-					SetNeedsDisplay ();
 				}
 				if (subviews != null && IsInitialized) {
 					foreach (var view in subviews) {
@@ -369,6 +364,16 @@ namespace Terminal.Gui {
 						}
 					}
 				}
+				if (!value && HasFocus) {
+					SetHasFocus (false, this);
+					EnsureFocus ();
+					if (Focused == null) {
+						Application.Top.FocusNext ();
+						Application.EnsuresTopOnFront ();
+					}
+				}
+				OnCanFocusChanged ();
+				SetNeedsDisplay ();
 			}
 		}
 

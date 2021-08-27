@@ -478,12 +478,11 @@ namespace Terminal.Gui {
 
 		static View FindTopFromView (View view)
 		{
-			View top = view?.SuperView != null ? view.SuperView : view;
+			View top = view?.SuperView != null && view?.SuperView != Top
+				? view.SuperView : view;
 
-			while (top?.SuperView != null) {
-				if (top?.SuperView != null) {
-					top = top.SuperView;
-				}
+			while (top?.SuperView != null && top?.SuperView != Top) {
+				top = top.SuperView;
 			}
 			return top;
 		}
@@ -591,6 +590,8 @@ namespace Terminal.Gui {
 
 				// Should we bubbled up the event, if it is not handled?
 				view.OnMouseEvent (nme);
+
+				EnsuresTopOnFront ();
 			}
 		}
 
@@ -1231,6 +1232,20 @@ namespace Terminal.Gui {
 		public static void DoEvents ()
 		{
 			MainLoop.Driver.Wakeup ();
+		}
+
+		/// <summary>
+		/// Ensures that the superview of the most focused view is on front.
+		/// </summary>
+		public static void EnsuresTopOnFront ()
+		{
+			if (MdiTop != null) {
+				return;
+			}
+			var top = FindTopFromView (Top?.MostFocused);
+			if (top != null && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top) {
+				Top.BringSubviewToFront (top);
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@ using Rune = System.Rune;
 namespace Terminal.Gui.Core {
 	public class BorderTests {
 		[Fact]
+		[AutoInitShutdown]
 		public void Constructor_Defaults ()
 		{
 			var b = new Border ();
@@ -24,7 +25,7 @@ namespace Terminal.Gui.Core {
 			Assert.Null (b.ChildContainer);
 			Assert.False (b.Effect3D);
 			Assert.Equal (new Point (1, 1), b.Effect3DOffset);
-			Assert.Equal (Color.DarkGray, b.Effect3DBrush);
+			Assert.Null (b.Effect3DBrush);
 		}
 
 		[Fact]
@@ -44,6 +45,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void ActualWidth_ActualHeight ()
 		{
 			var v = new View (new Rect (5, 10, 60, 20), "", new Border ());

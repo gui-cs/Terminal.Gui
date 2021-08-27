@@ -567,11 +567,17 @@ namespace UICatalog {
 
 		private void CreateFindReplace (bool isFind = true)
 		{
+			if (winDialog != null) {
+				winDialog.SetFocus ();
+				return;
+			}
+
 			winDialog = new Window (isFind ? "Find" : "Replace") {
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
-				ColorScheme = Colors.Menu
+				ColorScheme = Colors.TopLevel
 			};
+			winDialog.Border.Effect3D = true;
 
 			var tabView = new TabView () {
 				X = 0,

@@ -1142,5 +1142,96 @@ namespace Terminal.Gui.Core {
 			Assert.False (Application.ShowChild (Application.Top));
 			Application.End (Application.Top);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse ()
+		{
+			var top = Application.Top;
+			var win = new Window ("win") { X = 0, Y = 0, Width = 20, Height = 10 };
+			var tf = new TextField () { Width = 10 };
+			win.Add (tf);
+			var win2 = new Window ("win2") { X = 22, Y = 0, Width = 20, Height = 10 };
+			var tf2 = new TextField () { Width = 10 };
+			win2.Add (tf2);
+			top.Add (win, win2);
+
+			Application.Begin (top);
+
+			Assert.True (win.CanFocus);
+			Assert.True (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.False (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+			Assert.True (win.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+			Assert.True (win.CanFocus);
+			Assert.True (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.False (win2.HasFocus);
+			Assert.Equal ("win", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
+			Assert.True (win.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
+			Assert.Null (Toplevel.dragPosition);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void EnsuresTopOnFront_CanFocus_False_By_Keyboard_And_Mouse ()
+		{
+			var top = Application.Top;
+			var win = new Window ("win") { X = 0, Y = 0, Width = 20, Height = 10 };
+			var tf = new TextField () { Width = 10 };
+			win.Add (tf);
+			var win2 = new Window ("win2") { X = 22, Y = 0, Width = 20, Height = 10 };
+			var tf2 = new TextField () { Width = 10 };
+			win2.Add (tf2);
+			top.Add (win, win2);
+
+			Application.Begin (top);
+
+			win.CanFocus = false;
+			Assert.False (win.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+			Assert.True (win2.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+			Assert.False (win.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
+			win.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
+			Assert.False (win.CanFocus);
+			Assert.False (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.True (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
+			Assert.Null (Toplevel.dragPosition);
+		}
 	}
 }

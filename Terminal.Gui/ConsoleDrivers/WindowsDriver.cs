@@ -619,22 +619,19 @@ namespace Terminal.Gui {
 		static bool sync = false;
 		WindowsConsole.CharInfo [] OutputBuffer;
 		int cols, rows, top;
-		WindowsConsole winConsole;
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
+		int [,,] contents;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Left => 0;
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
-
 		public override IClipboard Clipboard => clipboard;
+		internal override int [,,] Contents => contents;
 
-		public WindowsConsole WinConsole {
-			get => winConsole;
-			private set => winConsole = value;
-		}
+		public WindowsConsole WinConsole { get; }
 
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyDownHandler;
@@ -643,7 +640,7 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
-			winConsole = new WindowsConsole ();
+			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
 		}
 
@@ -678,7 +675,7 @@ namespace Terminal.Gui {
 					X = (short)Clip.Width,
 					Y = (short)Clip.Height
 				};
-				winConsole.ReadFromConsoleOutput (e, bufferCoords, ref damageRegion);
+				WinConsole.ReadFromConsoleOutput (e, bufferCoords, ref damageRegion);
 				if (!winChanging) {
 					TerminalResized.Invoke ();
 				}
@@ -802,6 +799,7 @@ namespace Terminal.Gui {
 		Point point;
 		int buttonPressedCount;
 		bool isOneFingerDoubleClicked = false;
+		bool cancelButtonReleased;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -912,6 +910,7 @@ namespace Terminal.Gui {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					point = new Point ();
 					isButtonReleased = false;
+					cancelButtonReleased = true;
 				} else {
 					point = new Point () {
 						X = mouseEvent.MousePosition.X,
@@ -944,7 +943,11 @@ namespace Terminal.Gui {
 					break;
 				}
 				isButtonPressed = false;
-				isButtonReleased = true;
+				if (cancelButtonReleased) {
+					cancelButtonReleased = false;
+				} else {
+					isButtonReleased = true;
+				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 
@@ -1333,16 +1336,21 @@ namespace Terminal.Gui {
 				Bottom = (short)Rows,
 				Right = (short)Cols
 			};
-			winConsole.ForceRefreshCursorVisibility ();
+			WinConsole.ForceRefreshCursorVisibility ();
+			contents = new int [Rows, Cols, 3];
 		}
 
 		void UpdateOffScreen ()
 		{
+			contents = new int [rows, cols, 3];
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
 					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					OutputBuffer [position].Char.UnicodeChar = ' ';
+					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
+					contents [row, col, 1] = OutputBuffer [position].Attributes;
+					contents [row, col, 2] = 0;
 				}
 			}
 
@@ -1364,6 +1372,9 @@ namespace Terminal.Gui {
 			if (Clip.Contains (ccol, crow)) {
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
+				contents [crow, ccol, 0] = (int)(uint)rune;
+				contents [crow, ccol, 1] = currentAttribute;
+				contents [crow, ccol, 2] = 1;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
@@ -1415,7 +1426,7 @@ namespace Terminal.Gui {
 		{
 			UpdateScreen ();
 
-			winConsole.SetInitialCursorVisibility ();
+			WinConsole.SetInitialCursorVisibility ();
 #if false
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
@@ -1452,7 +1463,7 @@ namespace Terminal.Gui {
 			//};
 
 			UpdateCursor ();
-			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
+			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
 			//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
@@ -1463,12 +1474,12 @@ namespace Terminal.Gui {
 				X = (short)ccol,
 				Y = (short)crow
 			};
-			winConsole.SetCursorPosition (position);
+			WinConsole.SetCursorPosition (position);
 		}
 
 		public override void End ()
 		{
-			winConsole.Cleanup ();
+			WinConsole.Cleanup ();
 		}
 
 		public override Attribute GetAttribute ()
@@ -1479,19 +1490,19 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			return winConsole.GetCursorVisibility (out visibility);
+			return WinConsole.GetCursorVisibility (out visibility);
 		}
 
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return winConsole.SetCursorVisibility (visibility);
+			return WinConsole.SetCursorVisibility (visibility);
 		}
 
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			return winConsole.EnsureCursorVisibility ();
+			return WinConsole.EnsureCursorVisibility ();
 		}
 
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)

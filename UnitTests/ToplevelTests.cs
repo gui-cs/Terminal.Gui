@@ -310,6 +310,11 @@ namespace Terminal.Gui.Core {
 			Assert.Null (Toplevel.dragPosition);
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
 			Assert.Equal (new Point (6, 0), Toplevel.dragPosition);
+			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Released });
+			Assert.Null (Toplevel.dragPosition);
+			win.CanFocus = false;
+			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
+			Assert.Null (Toplevel.dragPosition);
 		}
 	}
 }

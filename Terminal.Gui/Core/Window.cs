@@ -159,6 +159,7 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
+			CanFocus = true;
 			ColorScheme = Colors.Base;
 			Title = title;
 			if (border == null) {
