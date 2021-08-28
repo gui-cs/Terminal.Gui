@@ -785,9 +785,9 @@ namespace Terminal.Gui {
 				driver.SetAttribute (GetEffect3DBrush ());
 
 				// Draw the upper Effect3D
-				for (int r = frame.Y + effect3DOffset.Y;
+				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
 					r < frame.Y; r++) {
-					for (int c = frame.X + effect3DOffset.X;
+					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
 						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
@@ -795,9 +795,9 @@ namespace Terminal.Gui {
 				}
 
 				// Draw the left Effect3D
-				for (int r = frame.Y + effect3DOffset.Y;
+				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
 					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.X + effect3DOffset.X;
+					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
 						c < frame.X; c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
@@ -805,7 +805,7 @@ namespace Terminal.Gui {
 				}
 
 				// Draw the right Effect3D
-				for (int r = frame.Y + effect3DOffset.Y;
+				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
 					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
 					for (int c = frame.Right;
 						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
@@ -817,7 +817,7 @@ namespace Terminal.Gui {
 				// Draw the lower Effect3D
 				for (int r = frame.Bottom;
 					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.X + effect3DOffset.X;
+					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
 						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
