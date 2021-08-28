@@ -2738,15 +2738,16 @@ namespace Terminal.Gui {
 			}
 
 			SetWrapModel ();
+			var contents = Clipboard.Contents;
 			if (copyWithoutSelection) {
-				var runeList = Clipboard.Contents == null ? new List<Rune> () : Clipboard.Contents.ToRuneList ();
+				var runeList = contents == null ? new List<Rune> () : contents.ToRuneList ();
 				model.AddLine (currentRow, runeList);
 				currentRow++;
 			} else {
 				if (selecting) {
 					ClearRegion ();
 				}
-				InsertText (Clipboard.Contents);
+				InsertText (contents);
 				copyWithoutSelection = false;
 			}
 			UpdateWrapModel ();

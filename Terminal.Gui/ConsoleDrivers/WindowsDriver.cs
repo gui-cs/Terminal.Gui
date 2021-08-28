@@ -1756,7 +1756,12 @@ namespace Terminal.Gui {
 	}
 
 	class WindowsClipboard : ClipboardBase {
-		public override bool IsSupported => IsClipboardFormatAvailable (cfUnicodeText) ? true : false;
+		public WindowsClipboard ()
+		{
+			IsSupported = IsClipboardFormatAvailable (cfUnicodeText);
+		}
+
+		public override bool IsSupported { get; }
 
 		protected override string GetClipboardDataImpl ()
 		{
