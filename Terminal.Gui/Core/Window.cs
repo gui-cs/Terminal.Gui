@@ -242,7 +242,7 @@ namespace Terminal.Gui {
 				CanFocus = false;
 			}
 			RemoveMenuStatusBar (view);
-			if (Focused == null) {
+			if (view != contentView && Focused == null) {
 				FocusFirst ();
 			}
 		}
