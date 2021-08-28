@@ -236,13 +236,15 @@ namespace Terminal.Gui {
 			}
 
 			SetNeedsDisplay ();
-			var touched = view.Frame;
 			contentView.Remove (view);
 
 			if (contentView.InternalSubviews.Count < 1) {
 				CanFocus = false;
 			}
 			RemoveMenuStatusBar (view);
+			if (Focused == null) {
+				FocusFirst ();
+			}
 		}
 
 		/// <inheritdoc/>
