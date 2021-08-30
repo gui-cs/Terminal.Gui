@@ -1437,7 +1437,7 @@ namespace Terminal.Gui {
 					RedirectStandardOutput = true,
 					FileName = "powershell.exe",
 					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = true,
+					UseShellExecute = Application.Driver is CursesDriver,
 					CreateNoWindow = true
 				}
 			}) {
@@ -1451,8 +1451,10 @@ namespace Terminal.Gui {
 							Error: {powershell.StandardError.ReadToEnd ()}";
 					throw new Exception (timeoutError);
 				}
-				Curses.raw ();
-				Curses.noecho ();
+				if (Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
 				return result.TrimEnd ();
 			}
 		}
@@ -1473,8 +1475,10 @@ namespace Terminal.Gui {
 							Error: {powershell.StandardError.ReadToEnd ()}";
 					throw new Exception (timeoutError);
 				}
-				Curses.raw ();
-				Curses.noecho ();
+				if (Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
 			}
 
 			//using (var clipExe = new System.Diagnostics.Process {

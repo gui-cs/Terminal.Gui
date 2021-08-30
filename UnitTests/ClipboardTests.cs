@@ -77,6 +77,7 @@ namespace Terminal.Gui.Core {
 		{
 			var clipText = "This is a clipboard unit test to get clipboard from OS.";
 			var exit = false;
+			var getClipText = "";
 
 			Application.Iteration += () => {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
@@ -147,6 +148,9 @@ namespace Terminal.Gui.Core {
 						} catch {
 							exit = true;
 						}
+						if (!exit) {
+							getClipText = Clipboard.Contents.ToString ();
+						}
 						Application.RequestStop ();
 						return;
 					}
@@ -168,6 +172,9 @@ namespace Terminal.Gui.Core {
 						bash.StandardInput.Close ();
 						bash.WaitForExit ();
 					}
+					if (!exit) {
+						getClipText = Clipboard.Contents.ToString ();
+					}
 				}
 
 				Application.RequestStop ();
@@ -176,7 +183,7 @@ namespace Terminal.Gui.Core {
 			Application.Run ();
 
 			if (!exit) {
-				Assert.Equal (clipText, Clipboard.Contents);
+				Assert.Equal (clipText, getClipText);
 			}
 		}
 
