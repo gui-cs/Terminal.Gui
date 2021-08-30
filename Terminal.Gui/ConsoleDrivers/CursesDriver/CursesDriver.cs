@@ -923,7 +923,7 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
-			var result = BashRunner.Run ("uname -a");
+			var result = BashRunner.Run ("uname -a", runCurses: false);
 			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
@@ -1215,7 +1215,7 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			try {
-				var result = BashRunner.Run ("which xclip");
+				var result = BashRunner.Run ("which xclip", runCurses: false);
 				return result.FileExists ();
 			} catch (Exception) {
 				// Permissions issue.
@@ -1251,7 +1251,7 @@ namespace Terminal.Gui {
 	}
 
 	static class BashRunner {
-		public static string Run (string commandLine, bool output = true, string inputText = "")
+		public static string Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
 		{
 			var arguments = $"-c \"{commandLine}\"";
 
@@ -1281,8 +1281,10 @@ namespace Terminal.Gui {
 						throw new Exception (timeoutError);
 					}
 					if (process.ExitCode == 0) {
-						Curses.raw ();
-						Curses.noecho ();
+						if (runCurses && Application.Driver is CursesDriver) {
+							Curses.raw ();
+							Curses.noecho ();
+						}
 						return outputBuilder.ToString ();
 					}
 
@@ -1305,8 +1307,10 @@ namespace Terminal.Gui {
 					process.StandardInput.Write (inputText);
 					process.StandardInput.Close ();
 					process.WaitForExit ();
-					Curses.raw ();
-					Curses.noecho ();
+					if (runCurses && Application.Driver is CursesDriver) {
+						Curses.raw ();
+						Curses.noecho ();
+					}
 					return inputText;
 				}
 			}
@@ -1411,8 +1415,12 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which powershell.exe");
-			return result.FileExists ();
+			try {
+				var result = BashRunner.Run ("which powershell.exe");
+				return result.FileExists ();
+			} catch (System.Exception) {
+				return false;
+			}
 
 			//var result = BashRunner.Run ("which powershell.exe");
 			//if (!result.FileExists ()) {
