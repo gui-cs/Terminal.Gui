@@ -1142,5 +1142,33 @@ namespace Terminal.Gui.Core {
 			Assert.False (Application.ShowChild (Application.Top));
 			Application.End (Application.Top);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void QuitKey_Getter_Setter ()
+		{
+			var top = Application.Top;
+			var isQuiting = false;
+
+			top.Closing += (e) => {
+				isQuiting = true;
+				e.Cancel = true;
+			};
+
+			Application.Begin (top);
+			top.Running = true;
+
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.True (isQuiting);
+
+			isQuiting = false;
+			Application.QuitKey = Key.C | Key.CtrlMask;
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (isQuiting);
+			Application.Driver.SendKeys ('c', ConsoleKey.C, false, false, true);
+			Assert.True (isQuiting);
+		}
 	}
 }
