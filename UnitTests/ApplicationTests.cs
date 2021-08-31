@@ -1169,6 +1169,9 @@ namespace Terminal.Gui.Core {
 			Assert.False (isQuiting);
 			Application.Driver.SendKeys ('c', ConsoleKey.C, false, false, true);
 			Assert.True (isQuiting);
+
+			// Reset the QuitKey to avoid throws errors on another tests
+			Application.QuitKey = Key.Q | Key.CtrlMask;
 		}
 	}
 }
