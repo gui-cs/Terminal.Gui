@@ -105,6 +105,8 @@ namespace Terminal.Gui.Core {
 						pwsh.Start ();
 						pwsh.WaitForExit ();
 					}
+					getClipText = Clipboard.Contents.ToString ();
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					using (Process copy = new Process {
 						StartInfo = new ProcessStartInfo {
@@ -117,6 +119,8 @@ namespace Terminal.Gui.Core {
 						copy.StandardInput.Close ();
 						copy.WaitForExit ();
 					}
+					getClipText = Clipboard.Contents.ToString ();
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {

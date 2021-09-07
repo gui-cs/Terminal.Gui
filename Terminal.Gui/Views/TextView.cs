@@ -2741,8 +2741,15 @@ namespace Terminal.Gui {
 			var contents = Clipboard.Contents;
 			if (copyWithoutSelection) {
 				var runeList = contents == null ? new List<Rune> () : contents.ToRuneList ();
-				model.AddLine (currentRow, runeList);
-				currentRow++;
+				if ((runeList?.Count > 0 && runeList [0] == '\n')
+					|| (runeList?.Count > 1 && runeList [0] == '\r'
+					&& runeList [1] == '\n')) {
+
+					InsertText (contents);
+				} else {
+					model.AddLine (currentRow, runeList);
+					currentRow++;
+				}
 			} else {
 				if (selecting) {
 					ClearRegion ();
