@@ -1018,8 +1018,8 @@ namespace Terminal.Gui {
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = Math.Max (row + frame.Y, 0);
-			rcol = Math.Max (col + frame.X, 0);
+			rrow = row + frame.Y;
+			rcol = col + frame.X;
 			var ccontainer = container;
 			while (ccontainer != null) {
 				rrow += ccontainer.frame.Y;

@@ -430,9 +430,9 @@ namespace Terminal.Gui {
 		public void DrawContent ()
 		{
 			if (Parent?.Border != null) {
-				DrawParentBorder (Parent.ViewToScreen (new Rect (0, 0, Parent.Frame.Width, Parent.Frame.Height)));
+				DrawParentBorder (Parent.ViewToScreen (Parent.Bounds));
 			} else {
-				DrawChildBorder (Child.ViewToScreen (new Rect (0, 0, Child.Frame.Width, Child.Frame.Height)));
+				DrawChildBorder (Child.ViewToScreen (Child.Bounds));
 			}
 		}
 
@@ -447,9 +447,9 @@ namespace Terminal.Gui {
 			var driver = Application.Driver;
 			Rect scrRect;
 			if (Parent?.Border != null) {
-				scrRect = Parent.ViewToScreen (new Rect (0, 0, Parent.Frame.Width, Parent.Frame.Height));
+				scrRect = Parent.ViewToScreen (Parent.Bounds);
 			} else {
-				scrRect = Child.ViewToScreen (new Rect (0, 0, Child.Frame.Width, Child.Frame.Height));
+				scrRect = Child.ViewToScreen (Child.Bounds);
 			}
 			Rect borderRect;
 			if (Parent?.Border != null) {
@@ -639,7 +639,7 @@ namespace Terminal.Gui {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
 						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
-						AddRuneAt (driver, c, r, ' ');
+						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
 
@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
 						c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
 
-						AddRuneAt (driver, c, r, ' ');
+						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
 
@@ -659,7 +659,7 @@ namespace Terminal.Gui {
 					for (int c = frame.Right + drawMarginFrame + sumThickness.Right;
 						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
-						AddRuneAt (driver, c, r, ' ');
+						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
 
@@ -669,7 +669,7 @@ namespace Terminal.Gui {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
 						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
-						AddRuneAt (driver, c, r, ' ');
+						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
 			}
