@@ -1411,6 +1411,12 @@ namespace Terminal.Gui.Views {
 			view.LayoutComplete += (_) => { layoutStarted = false; };
 			view.OnLayoutComplete (null);
 			Assert.False (layoutStarted);
+			view.X = Pos.Center () - 41;
+			view.Y = Pos.Center () - 13;
+			view.SetRelativeLayout (top.Bounds);
+			view.ViewToScreen (0, 0, out rcol, out rrow);
+			Assert.Equal (-1, rcol);
+			Assert.Equal (-1, rrow);
 		}
 
 		[Fact]
