@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 			}
 
 			if (e.Key == Key.CursorDown && search.HasFocus) { // jump to list
-				if (searchset.Count > 0) {
+				if (searchset?.Count > 0) {
 					listview.TabStop = true;
 					listview.SetFocus ();
 					SetValue (searchset [listview.SelectedItem]);
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
+			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
 			{
 				search.CursorPosition = search.Text.RuneCount;
 				search.SetFocus ();
