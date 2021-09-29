@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
-		IList searchset;
+        readonly IList searchset = new List<object> ();
 		ustring text = "";
 		readonly TextField search;
 		readonly ListView listview;
@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 			}
 
 			if (e.Key == Key.CursorDown && search.HasFocus) { // jump to list
-				if (searchset.Count > 0) {
+				if (searchset?.Count > 0) {
 					listview.TabStop = true;
 					listview.SetFocus ();
 					SetValue (searchset [listview.SelectedItem]);
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
+			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
 			{
 				search.CursorPosition = search.Text.RuneCount;
 				search.SetFocus ();
@@ -406,7 +406,7 @@ namespace Terminal.Gui {
 		{
 			isShow = false;
 			listview.TabStop = false;
-			if (listview.Source.Count == 0 || searchset.Count == 0) {
+			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
 				return;
 			}
@@ -452,11 +452,7 @@ namespace Terminal.Gui {
 
 		private void ResetSearchSet (bool noCopy = false)
 		{
-			if (searchset == null) {
-				searchset = new List<object> ();
-			} else {
-				searchset.Clear ();
-			}
+            searchset.Clear ();
 
 			if (autoHide || noCopy)
 				return;
@@ -465,9 +461,6 @@ namespace Terminal.Gui {
 
 		private void SetSearchSet ()
 		{
-			if (searchset == null) {
-				searchset = new List<object> ();
-			}
 			// force deep copy
 			foreach (var item in Source.ToList ()) {
 				searchset.Add (item);
@@ -503,7 +496,7 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void ShowList ()
 		{
-			listview.SetSource (searchset);
+            listview.SetSource (searchset);
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
 			this.SuperView?.BringSubviewToFront (this);
