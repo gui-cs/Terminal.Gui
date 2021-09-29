@@ -864,13 +864,14 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Mouse:
 				var me = ToDriverMouse (inputEvent.MouseEvent);
 				mouseHandler (me);
-				if (isButtonReleased) {
+				if (processButtonClick) {
 					mouseHandler (
 						new MouseEvent () {
 							X = me.X,
 							Y = me.Y,
 							Flags = ProcessButtonClick (inputEvent.MouseEvent)
 						});
+					processButtonClick = false;
 				}
 				break;
 
@@ -900,7 +901,7 @@ namespace Terminal.Gui {
 		Point point;
 		int buttonPressedCount;
 		bool isOneFingerDoubleClicked = false;
-		bool cancelButtonReleased;
+		bool processButtonClick;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -1011,7 +1012,7 @@ namespace Terminal.Gui {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					point = new Point ();
 					isButtonReleased = false;
-					cancelButtonReleased = true;
+					processButtonClick = false;
 				} else {
 					point = new Point () {
 						X = mouseEvent.MousePosition.X,
@@ -1865,7 +1866,12 @@ namespace Terminal.Gui {
 	}
 
 	class WindowsClipboard : ClipboardBase {
-		public override bool IsSupported => IsClipboardFormatAvailable (cfUnicodeText) ? true : false;
+		public WindowsClipboard ()
+		{
+			IsSupported = IsClipboardFormatAvailable (cfUnicodeText);
+		}
+
+		public override bool IsSupported { get; }
 
 		protected override string GetClipboardDataImpl ()
 		{
