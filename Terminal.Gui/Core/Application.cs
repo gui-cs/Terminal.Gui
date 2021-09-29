@@ -148,6 +148,10 @@ namespace Terminal.Gui {
 		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
 		/// </summary>
 		public static Key AlternateBackwardKey { get; set; } = Key.PageUp | Key.CtrlMask;
+		/// <summary>
+		/// Gets or sets the key to quit the application.
+		/// </summary>
+		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
