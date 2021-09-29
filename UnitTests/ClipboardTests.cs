@@ -5,10 +5,9 @@ using Xunit;
 namespace Terminal.Gui.Core {
 	public class ClipboardTests {
 		[Fact]
+		[AutoInitShutdown]
 		public void Contents_Gets_Sets ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			var clipText = "This is a clipboard unit test.";
 			Clipboard.Contents = clipText;
 
@@ -17,29 +16,23 @@ namespace Terminal.Gui.Core {
 			Application.Run ();
 
 			Assert.Equal (clipText, Clipboard.Contents);
-
-			Application.Shutdown ();
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void IsSupported_Get ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			if (Clipboard.IsSupported) {
 				Assert.True (Clipboard.IsSupported);
 			} else {
 				Assert.False (Clipboard.IsSupported);
 			}
-
-			Application.Shutdown ();
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void TryGetClipboardData_Gets_From_OS_Clipboard ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			var clipText = "Trying to get from the OS clipboard.";
 			Clipboard.Contents = clipText;
 
@@ -54,15 +47,12 @@ namespace Terminal.Gui.Core {
 				Assert.False (Clipboard.TryGetClipboardData (out string result));
 				Assert.NotEqual (clipText, result);
 			}
-
-			Application.Shutdown ();
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			var clipText = "Trying to set the OS clipboard.";
 			if (Clipboard.IsSupported) {
 				Assert.True (Clipboard.TrySetClipboardData (clipText));
@@ -79,17 +69,15 @@ namespace Terminal.Gui.Core {
 			} else {
 				Assert.NotEqual (clipText, Clipboard.Contents);
 			}
-
-			Application.Shutdown ();
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void Contents_Gets_From_OS_Clipboard ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			var clipText = "This is a clipboard unit test to get clipboard from OS.";
 			var exit = false;
+			var getClipText = "";
 
 			Application.Iteration += () => {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
@@ -117,6 +105,8 @@ namespace Terminal.Gui.Core {
 						pwsh.Start ();
 						pwsh.WaitForExit ();
 					}
+					getClipText = Clipboard.Contents.ToString ();
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					using (Process copy = new Process {
 						StartInfo = new ProcessStartInfo {
@@ -129,6 +119,8 @@ namespace Terminal.Gui.Core {
 						copy.StandardInput.Close ();
 						copy.WaitForExit ();
 					}
+					getClipText = Clipboard.Contents.ToString ();
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {
@@ -160,6 +152,9 @@ namespace Terminal.Gui.Core {
 						} catch {
 							exit = true;
 						}
+						if (!exit) {
+							getClipText = Clipboard.Contents.ToString ();
+						}
 						Application.RequestStop ();
 						return;
 					}
@@ -181,6 +176,9 @@ namespace Terminal.Gui.Core {
 						bash.StandardInput.Close ();
 						bash.WaitForExit ();
 					}
+					if (!exit) {
+						getClipText = Clipboard.Contents.ToString ();
+					}
 				}
 
 				Application.RequestStop ();
@@ -189,17 +187,14 @@ namespace Terminal.Gui.Core {
 			Application.Run ();
 
 			if (!exit) {
-				Assert.Equal (clipText, Clipboard.Contents);
+				Assert.Equal (clipText, getClipText);
 			}
-
-			Application.Shutdown ();
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void Contents_Sets_The_OS_Clipboard ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
 			var clipText = "This is a clipboard unit test to set the OS clipboard.";
 			var clipReadText = "";
 			var exit = false;
@@ -279,8 +274,6 @@ namespace Terminal.Gui.Core {
 			if (!exit) {
 				Assert.Equal (clipText, clipReadText);
 			}
-
-			Application.Shutdown ();
 		}
 
 		bool Is_WSL_Platform ()

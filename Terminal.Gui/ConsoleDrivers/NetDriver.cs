@@ -253,7 +253,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			case 27:
-			case 91:
+			//case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
 				int delay = 0;

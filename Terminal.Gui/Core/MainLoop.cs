@@ -122,8 +122,8 @@ namespace Terminal.Gui {
 				while (timeouts.ContainsKey (k)) {
 					k = (DateTime.UtcNow + time).Ticks;
 				}
+				timeouts.Add (k, timeout);
 			}
-			timeouts.Add (k, timeout);
 		}
 
 		/// <summary>

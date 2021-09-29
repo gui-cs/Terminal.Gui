@@ -923,7 +923,7 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
-			var result = BashRunner.Run ("uname -a");
+			var result = BashRunner.Run ("uname -a", runCurses: false);
 			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
@@ -1205,13 +1205,18 @@ namespace Terminal.Gui {
 	}
 
 	class CursesClipboard : ClipboardBase {
-		public override bool IsSupported => CheckSupport ();
+		public CursesClipboard ()
+		{
+			IsSupported = CheckSupport ();
+		}
+
+		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
 		{
 			try {
-				var result = BashRunner.Run ("which xclip");
-				return BashRunner.FileExists (result);
+				var result = BashRunner.Run ("which xclip", runCurses: false);
+				return result.FileExists ();
 			} catch (Exception) {
 				// Permissions issue.
 				return false;
@@ -1246,7 +1251,7 @@ namespace Terminal.Gui {
 	}
 
 	static class BashRunner {
-		public static string Run (string commandLine, bool output = true, string inputText = "")
+		public static string Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
 		{
 			var arguments = $"-c \"{commandLine}\"";
 
@@ -1276,6 +1281,10 @@ namespace Terminal.Gui {
 						throw new Exception (timeoutError);
 					}
 					if (process.ExitCode == 0) {
+						if (runCurses && Application.Driver is CursesDriver) {
+							Curses.raw ();
+							Curses.noecho ();
+						}
 						return outputBuilder.ToString ();
 					}
 
@@ -1298,12 +1307,16 @@ namespace Terminal.Gui {
 					process.StandardInput.Write (inputText);
 					process.StandardInput.Close ();
 					process.WaitForExit ();
+					if (runCurses && Application.Driver is CursesDriver) {
+						Curses.raw ();
+						Curses.noecho ();
+					}
 					return inputText;
 				}
 			}
 		}
 
-		static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+		public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
 		{
 			var result = process.WaitForExit (500);
 			if (result) {
@@ -1312,7 +1325,7 @@ namespace Terminal.Gui {
 			return result;
 		}
 
-		public static bool FileExists (string value)
+		public static bool FileExists (this string value)
 		{
 			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
 		}
@@ -1332,23 +1345,24 @@ namespace Terminal.Gui {
 		IntPtr generalPasteboardRegister = sel_registerName ("generalPasteboard");
 		IntPtr clearContentsRegister = sel_registerName ("clearContents");
 
-		public override bool IsSupported => CheckSupport ();
-
-		bool CheckSupport ()
-		{
-			var result = BashRunner.Run ("which pbcopy");
-			if (!BashRunner.FileExists (result)) {
-				return false;
-			}
-			result = BashRunner.Run ("which pbpaste");
-			return BashRunner.FileExists (result);
-		}
-
 		public MacOSXClipboard ()
 		{
 			utfTextType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "public.utf8-plain-text");
 			nsStringPboardType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "NSStringPboardType");
 			generalPasteboard = objc_msgSend (nsPasteboard, generalPasteboardRegister);
+			IsSupported = CheckSupport ();
+		}
+
+		public override bool IsSupported { get; }
+
+		bool CheckSupport ()
+		{
+			var result = BashRunner.Run ("which pbcopy");
+			if (!result.FileExists ()) {
+				return false;
+			}
+			result = BashRunner.Run ("which pbpaste");
+			return result.FileExists ();
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1392,19 +1406,28 @@ namespace Terminal.Gui {
 	}
 
 	class WSLClipboard : ClipboardBase {
-		public override bool IsSupported => CheckSupport ();
+		public WSLClipboard ()
+		{
+			IsSupported = CheckSupport ();
+		}
+
+		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which powershell.exe");
-			return BashRunner.FileExists (result);
+			try {
+				var result = BashRunner.Run ("which powershell.exe");
+				return result.FileExists ();
+			} catch (System.Exception) {
+				return false;
+			}
 
 			//var result = BashRunner.Run ("which powershell.exe");
-			//if (!BashRunner.FileExists (result)) {
+			//if (!result.FileExists ()) {
 			//	return false;
 			//}
 			//result = BashRunner.Run ("which clip.exe");
-			//return BashRunner.FileExists (result);
+			//return result.FileExists ();
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1413,13 +1436,25 @@ namespace Terminal.Gui {
 				StartInfo = new System.Diagnostics.ProcessStartInfo {
 					RedirectStandardOutput = true,
 					FileName = "powershell.exe",
-					Arguments = "-noprofile -command \"Get-Clipboard\""
+					Arguments = "-noprofile -command \"Get-Clipboard\"",
+					UseShellExecute = Application.Driver is CursesDriver,
+					CreateNoWindow = true
 				}
 			}) {
 				powershell.Start ();
 				var result = powershell.StandardOutput.ReadToEnd ();
 				powershell.StandardOutput.Close ();
 				powershell.WaitForExit ();
+				if (!powershell.DoubleWaitForExit ()) {
+					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
+							Output: {powershell.StandardOutput.ReadToEnd ()}
+							Error: {powershell.StandardError.ReadToEnd ()}";
+					throw new Exception (timeoutError);
+				}
+				if (Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
 				return result.TrimEnd ();
 			}
 		}
@@ -1434,6 +1469,16 @@ namespace Terminal.Gui {
 			}) {
 				powershell.Start ();
 				powershell.WaitForExit ();
+				if (!powershell.DoubleWaitForExit ()) {
+					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
+							Output: {powershell.StandardOutput.ReadToEnd ()}
+							Error: {powershell.StandardError.ReadToEnd ()}";
+					throw new Exception (timeoutError);
+				}
+				if (Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
 			}
 
 			//using (var clipExe = new System.Diagnostics.Process {
