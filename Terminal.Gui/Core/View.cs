@@ -1875,16 +1875,19 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (edges.Any () && edges.First ().From != Application.Top) {
-				if (!ReferenceEquals (edges.First ().From, edges.First ().To)) {
-					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
-				} else {
-					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
-				}
-			} else {
-				// return L (a topologically sorted order)
-				return result;
-			}
+            if (edges.Any ()) {
+                var (from, to) = edges.First ();
+                if (from != Application.Top) {
+                    if (!ReferenceEquals (from, to)) {
+                        throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
+                    } else {
+                        throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
+                    }
+                }
+            }
+
+            // return L (a topologically sorted order)
+            return result;
 		}
 
 		/// <summary>
