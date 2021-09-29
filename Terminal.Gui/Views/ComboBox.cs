@@ -406,7 +406,7 @@ namespace Terminal.Gui {
 		{
 			isShow = false;
 			listview.TabStop = false;
-			if (listview.Source.Count == 0 || searchset.Count == 0) {
+			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
 				return;
 			}
