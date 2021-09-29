@@ -294,7 +294,7 @@ namespace Terminal.Gui {
 				return true;
 
 			switch (ShortcutHelper.GetModifiersKey (keyEvent)) {
-			case Key.Q | Key.CtrlMask:
+			case Key k when k == Application.QuitKey:
 				// FIXED: stop current execution of this container
 				if (Application.MdiTop != null) {
 					Application.MdiTop.RequestStop ();

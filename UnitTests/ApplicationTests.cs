@@ -1145,6 +1145,37 @@ namespace Terminal.Gui.Core {
 
 		[Fact]
 		[AutoInitShutdown]
+		public void QuitKey_Getter_Setter ()
+		{
+			var top = Application.Top;
+			var isQuiting = false;
+
+			top.Closing += (e) => {
+				isQuiting = true;
+				e.Cancel = true;
+			};
+
+			Application.Begin (top);
+			top.Running = true;
+
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.True (isQuiting);
+
+			isQuiting = false;
+			Application.QuitKey = Key.C | Key.CtrlMask;
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (isQuiting);
+			Application.Driver.SendKeys ('c', ConsoleKey.C, false, false, true);
+			Assert.True (isQuiting);
+
+			// Reset the QuitKey to avoid throws errors on another tests
+			Application.QuitKey = Key.Q | Key.CtrlMask;
+		}
+
+		[Fact]
+		[AutoInitShutdown]
 		public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse ()
 		{
 			var top = Application.Top;
