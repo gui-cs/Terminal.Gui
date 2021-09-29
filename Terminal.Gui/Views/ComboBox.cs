@@ -503,7 +503,8 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void ShowList ()
 		{
-			listview.SetSource (searchset);
+            if (!(searchset is null))
+			    listview.SetSource (searchset); // Will an empty collection be better here?
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
 			this.SuperView?.BringSubviewToFront (this);
