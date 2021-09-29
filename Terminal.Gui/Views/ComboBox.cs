@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
-		IList searchset;
+        readonly IList searchset = new List<object> ();
 		ustring text = "";
 		readonly TextField search;
 		readonly ListView listview;
@@ -452,11 +452,7 @@ namespace Terminal.Gui {
 
 		private void ResetSearchSet (bool noCopy = false)
 		{
-			if (searchset == null) {
-				searchset = new List<object> ();
-			} else {
-				searchset.Clear ();
-			}
+            searchset.Clear ();
 
 			if (autoHide || noCopy)
 				return;
@@ -465,9 +461,6 @@ namespace Terminal.Gui {
 
 		private void SetSearchSet ()
 		{
-			if (searchset == null) {
-				searchset = new List<object> ();
-			}
 			// force deep copy
 			foreach (var item in Source.ToList ()) {
 				searchset.Add (item);
@@ -503,8 +496,7 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void ShowList ()
 		{
-            if (!(searchset is null))
-			    listview.SetSource (searchset); // Will an empty collection be better here?
+            listview.SetSource (searchset);
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
 			this.SuperView?.BringSubviewToFront (this);
