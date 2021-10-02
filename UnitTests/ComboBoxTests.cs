@@ -3,7 +3,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-namespace UnitTests {
+namespace Terminal.Gui.Views {
     public class ComboBoxTests {
         [Fact]
         [AutoInitShutdown]
