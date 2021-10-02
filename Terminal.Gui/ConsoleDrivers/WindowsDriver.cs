@@ -1045,11 +1045,7 @@ namespace Terminal.Gui {
 					break;
 				}
 				isButtonPressed = false;
-				if (cancelButtonReleased) {
-					cancelButtonReleased = false;
-				} else {
-					isButtonReleased = true;
-				}
+				isButtonReleased = true;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 

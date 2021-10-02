@@ -98,7 +98,7 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
-	  CreateAutocomplete(),
+					CreateAutocomplete(),
 					CreateAllowsTabChecked ()
 				}),
 				new MenuBarItem ("_Responder", new MenuItem [] {

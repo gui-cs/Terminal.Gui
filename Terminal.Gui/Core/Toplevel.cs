@@ -348,6 +348,7 @@ namespace Terminal.Gui {
 						top.FocusNext ();
 					}
 					top.SetNeedsDisplay ();
+					Application.EnsuresTopOnFront ();
 				} else {
 					MoveNext ();
 				}
@@ -361,6 +362,7 @@ namespace Terminal.Gui {
 						top.FocusPrev ();
 					}
 					top.SetNeedsDisplay ();
+					Application.EnsuresTopOnFront ();
 				} else {
 					MovePrevious ();
 				}
