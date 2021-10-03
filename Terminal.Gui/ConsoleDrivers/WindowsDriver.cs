@@ -1046,6 +1046,9 @@ namespace Terminal.Gui {
 				}
 				isButtonPressed = false;
 				isButtonReleased = true;
+				if (point.X == mouseEvent.MousePosition.X && point.Y == mouseEvent.MousePosition.Y) {
+					processButtonClick = true;
+				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 
