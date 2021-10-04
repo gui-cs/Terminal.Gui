@@ -246,9 +246,9 @@ namespace Terminal.Gui {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(cols - 1), (short)Math.Max (rows - 1, 0));
-			if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-			}
+			//if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
+			//	throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+			//}
 			SetConsoleOutputWindow (csbi);
 			return new Size (winRect.Right + 1, rows - 1 < 0 ? 0 : winRect.Bottom + 1);
 		}
@@ -276,10 +276,10 @@ namespace Terminal.Gui {
 				Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
 			position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 			SetConsoleOutputWindow (csbi);
-			var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
-			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-			}
+			//var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
+			//if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
+			//	throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+			//}
 
 			return sz;
 		}
@@ -701,11 +701,11 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern bool SetConsoleScreenBufferInfoEx (IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
 
-		[DllImport ("kernel32.dll", SetLastError = true)]
-		static extern bool SetConsoleWindowInfo (
-			IntPtr hConsoleOutput,
-			bool bAbsolute,
-			[In] ref SmallRect lpConsoleWindow);
+		//[DllImport ("kernel32.dll", SetLastError = true)]
+		//static extern bool SetConsoleWindowInfo (
+		//	IntPtr hConsoleOutput,
+		//	bool bAbsolute,
+		//	[In] ref SmallRect lpConsoleWindow);
 	}
 
 	internal class WindowsDriver : ConsoleDriver {
