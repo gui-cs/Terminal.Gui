@@ -28,6 +28,9 @@ namespace Terminal.Gui {
 		CursorVisibility? initialCursorVisibility = null;
 		CursorVisibility? currentCursorVisibility = null;
 		IClipboard clipboard;
+		int [,,] contents;
+
+		internal override int [,,] Contents => contents;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -54,7 +57,11 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch ((int)(uint)MakePrintable (rune));
+				rune = MakePrintable (rune);
+				Curses.addch ((int)(uint)rune);
+				contents [crow, ccol, 0] = (int)(uint)rune;
+				contents [crow, ccol, 1] = currentAttribute;
+				contents [crow, ccol, 2] = 1;
 			} else
 				needMove = true;
 			if (sync)
@@ -80,6 +87,7 @@ namespace Terminal.Gui {
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
 				Clip = new Rect (0, 0, Cols, Rows);
+				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
 			}
 		}
@@ -765,6 +773,7 @@ namespace Terminal.Gui {
 			mLoop.WinChanged += () => {
 				if (Curses.CheckWinChange ()) {
 					Clip = new Rect (0, 0, Cols, Rows);
+					UpdateOffScreen ();
 					TerminalResized?.Invoke ();
 				}
 			};
@@ -854,6 +863,7 @@ namespace Terminal.Gui {
 			Colors.Menu = new ColorScheme ();
 			Colors.Error = new ColorScheme ();
 			Clip = new Rect (0, 0, Cols, Rows);
+			UpdateOffScreen ();
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
@@ -867,7 +877,7 @@ namespace Terminal.Gui {
 				Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
 				Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
 				Colors.Base.HotNormal = MakeColor (Color.Cyan, Color.Blue);
-				Colors.Base.HotFocus = MakeColor (Color.Blue, Color.Gray);
+				Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
 				Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
 
 				// Focused,
@@ -918,6 +928,21 @@ namespace Terminal.Gui {
 				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+			}
+		}
+
+		void UpdateOffScreen ()
+		{
+			contents = new int [Rows, Cols, 3];
+			for (int row = 0; row < Rows; row++) {
+				for (int col = 0; col < Cols; col++) {
+					//Curses.move (row, col);
+					//Curses.attrset (Colors.TopLevel.Normal);
+					//Curses.addch ((int)(uint)' ');
+					contents [row, col, 0] = ' ';
+					contents [row, col, 1] = Colors.TopLevel.Normal;
+					contents [row, col, 2] = 0;
+				}
 			}
 		}
 
@@ -1139,7 +1164,6 @@ namespace Terminal.Gui {
 				foreground = MapCursesColor ((value - (back << 12)) >> 8);
 			}
 			return hasColor;
-
 		}
 	}
 

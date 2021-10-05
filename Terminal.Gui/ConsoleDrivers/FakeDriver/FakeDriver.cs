@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		/// </summary>
-		public int [,,] Contents => contents;
+		internal override int [,,] Contents => contents;
 
 		void UpdateOffscreen ()
 		{

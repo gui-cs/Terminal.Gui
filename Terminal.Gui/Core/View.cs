@@ -344,11 +344,6 @@ namespace Terminal.Gui {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
-					}
-					OnCanFocusChanged ();
-					SetNeedsDisplay ();
 				}
 				if (subviews != null && IsInitialized) {
 					foreach (var view in subviews) {
@@ -369,6 +364,16 @@ namespace Terminal.Gui {
 						}
 					}
 				}
+				if (!value && HasFocus) {
+					SetHasFocus (false, this);
+					EnsureFocus ();
+					if (Focused == null) {
+						Application.Top.FocusNext ();
+						Application.EnsuresTopOnFront ();
+					}
+				}
+				OnCanFocusChanged ();
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -1013,8 +1018,8 @@ namespace Terminal.Gui {
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = Math.Max (row + frame.Y, 0);
-			rcol = Math.Max (col + frame.X, 0);
+			rrow = row + frame.Y;
+			rcol = col + frame.X;
 			var ccontainer = container;
 			while (ccontainer != null) {
 				rrow += ccontainer.frame.Y;

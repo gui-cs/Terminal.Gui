@@ -209,7 +209,9 @@ namespace Terminal.Gui {
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				position = Point.Empty;
+				return Size.Empty;
 			}
 			var sz = new Size (csbi.srWindow.Right - csbi.srWindow.Left + 1,
 				csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
@@ -239,18 +241,22 @@ namespace Terminal.Gui {
 			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
-			csbi.dwSize = new Coord (cols, Math.Max (rows, (short)1));
-			csbi.srWindow = new SmallRect (0, 0, cols, rows);
-			csbi.dwMaximumWindowSize = new Coord (cols, rows);
+			var maxWinSize = GetLargestConsoleWindowSize (ScreenBuffer);
+			var newCols = Math.Min (cols, maxWinSize.X);
+			var newRows = Math.Min (rows, maxWinSize.Y);
+			csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
+			csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
+			csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
 			if (!SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
-			var winRect = new SmallRect (0, 0, (short)(cols - 1), (short)Math.Max (rows - 1, 0));
+			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
 			if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				return new Size (cols, rows);
 			}
 			SetConsoleOutputWindow (csbi);
-			return new Size (winRect.Right + 1, rows - 1 < 0 ? 0 : winRect.Bottom + 1);
+			return new Size (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
 		}
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
@@ -706,6 +712,10 @@ namespace Terminal.Gui {
 			IntPtr hConsoleOutput,
 			bool bAbsolute,
 			[In] ref SmallRect lpConsoleWindow);
+
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern Coord GetLargestConsoleWindowSize (
+			IntPtr hConsoleOutput);
 	}
 
 	internal class WindowsDriver : ConsoleDriver {
@@ -714,6 +724,7 @@ namespace Terminal.Gui {
 		int cols, rows, left, top;
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
+		int [,,] contents;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
@@ -721,6 +732,7 @@ namespace Terminal.Gui {
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 		public override IClipboard Clipboard => clipboard;
+		internal override int [,,] Contents => contents;
 
 		public WindowsConsole WinConsole { get; private set; }
 
@@ -734,8 +746,6 @@ namespace Terminal.Gui {
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
 		}
-
-		bool winChanging;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
@@ -755,7 +765,6 @@ namespace Terminal.Gui {
 
 		private void ChangeWin (Size e)
 		{
-			winChanging = true;
 			if (!HeightAsBuffer) {
 				var w = e.Width;
 				if (w == cols - 3 && e.Height < rows) {
@@ -769,9 +778,7 @@ namespace Terminal.Gui {
 				rows = newSize.Height;
 				ResizeScreen ();
 				UpdateOffScreen ();
-				if (!winChanging) {
-					TerminalResized.Invoke ();
-				}
+				TerminalResized.Invoke ();
 			}
 		}
 
@@ -1044,6 +1051,9 @@ namespace Terminal.Gui {
 				}
 				isButtonPressed = false;
 				isButtonReleased = true;
+				if (point.X == mouseEvent.MousePosition.X && point.Y == mouseEvent.MousePosition.Y) {
+					processButtonClick = true;
+				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 
@@ -1436,15 +1446,17 @@ namespace Terminal.Gui {
 
 		void UpdateOffScreen ()
 		{
+			contents = new int [rows, cols, 3];
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
 					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					OutputBuffer [position].Char.UnicodeChar = ' ';
+					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
+					contents [row, col, 1] = OutputBuffer [position].Attributes;
+					contents [row, col, 2] = 0;
 				}
 			}
-
-			winChanging = false;
 		}
 
 		int ccol, crow;
@@ -1462,6 +1474,9 @@ namespace Terminal.Gui {
 			if (Clip.Contains (ccol, crow)) {
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
+				contents [crow, ccol, 0] = (int)(uint)rune;
+				contents [crow, ccol, 1] = currentAttribute;
+				contents [crow, ccol, 2] = 1;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 

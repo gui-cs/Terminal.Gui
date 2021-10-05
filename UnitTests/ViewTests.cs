@@ -878,7 +878,7 @@ namespace Terminal.Gui.Views {
 				Assert.True (v2.CanFocus);
 
 				w.CanFocus = false;
-				Assert.True (w.CanFocus);
+				Assert.False (w.CanFocus);
 				Assert.False (f.CanFocus);
 				Assert.False (v1.CanFocus);
 				Assert.False (v2.CanFocus);
@@ -913,7 +913,7 @@ namespace Terminal.Gui.Views {
 				Assert.True (v2.CanFocus);
 
 				w.CanFocus = false;
-				Assert.True (w.CanFocus);
+				Assert.False (w.CanFocus);
 				Assert.False (f.CanFocus);
 				Assert.False (v1.CanFocus);
 				Assert.False (v2.CanFocus);
@@ -1411,6 +1411,12 @@ namespace Terminal.Gui.Views {
 			view.LayoutComplete += (_) => { layoutStarted = false; };
 			view.OnLayoutComplete (null);
 			Assert.False (layoutStarted);
+			view.X = Pos.Center () - 41;
+			view.Y = Pos.Center () - 13;
+			view.SetRelativeLayout (top.Bounds);
+			view.ViewToScreen (0, 0, out rcol, out rrow);
+			Assert.Equal (-1, rcol);
+			Assert.Equal (-1, rrow);
 		}
 
 		[Fact]

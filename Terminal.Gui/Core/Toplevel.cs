@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
-			get => true;
+			get => SuperView == null ? true : base.CanFocus;
 		}
 
 		/// <summary>
@@ -348,6 +348,7 @@ namespace Terminal.Gui {
 						top.FocusNext ();
 					}
 					top.SetNeedsDisplay ();
+					Application.EnsuresTopOnFront ();
 				} else {
 					MoveNext ();
 				}
@@ -361,6 +362,7 @@ namespace Terminal.Gui {
 						top.FocusPrev ();
 					}
 					top.SetNeedsDisplay ();
+					Application.EnsuresTopOnFront ();
 				} else {
 					MovePrevious ();
 				}
@@ -656,16 +658,25 @@ namespace Terminal.Gui {
 			// Driver.UncookMouse does not seem to have an effect if there is
 			// a pending mouse event activated.
 
+			if (!CanFocus) {
+				return true;
+			}
+
 			int nx, ny;
-			if (!dragPosition.HasValue && mouseEvent.Flags == (MouseFlags.Button1Pressed)) {
+			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
+				|| mouseEvent.Flags == MouseFlags.Button2Pressed
+				|| mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+
+				SetFocus ();
+				Application.EnsuresTopOnFront ();
+
 				// Only start grabbing if the user clicks on the title bar.
-				if (mouseEvent.Y == 0) {
+				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					start = new Point (mouseEvent.X, mouseEvent.Y);
 					dragPosition = new Point ();
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
 					dragPosition = new Point (nx, ny);
-					SuperView?.BringSubviewToFront (this);
 					Application.GrabMouse (this);
 				}
 

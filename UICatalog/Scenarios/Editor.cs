@@ -23,6 +23,7 @@ namespace UICatalog {
 		private bool _matchCase;
 		private bool _matchWholeWord;
 		private Window winDialog;
+		private TabView _tabView;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -97,7 +98,7 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
-          CreateAutocomplete(),
+					CreateAutocomplete(),
 					CreateAllowsTabChecked ()
 				}),
 				new MenuBarItem ("_Responder", new MenuItem [] {
@@ -163,11 +164,26 @@ namespace UICatalog {
 			};
 
 			Win.KeyPress += (e) => {
+				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
 					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
 				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
+					e.Handled = true;
+				} else if (keys == (Key.Tab | Key.CtrlMask)) {
+					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
+						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
+					} else {
+						_tabView.SwitchTabBy (1);
+					}
+					e.Handled = true;
+				} else if (keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
+						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
+					} else {
+						_tabView.SwitchTabBy (-1);
+					}
 					e.Handled = true;
 				}
 			};
@@ -364,7 +380,7 @@ namespace UICatalog {
 
 		private bool SaveAs ()
 		{
-		var aTypes = new List<string> () { ".txt", ".bin", ".xml", ".*" };
+			var aTypes = new List<string> () { ".txt", ".bin", ".xml", ".*" };
 			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.", aTypes);
 			sd.FilePath = System.IO.Path.Combine (sd.FilePath.ToString (), Win.Title.ToString ());
 			Application.Run (sd);
@@ -476,22 +492,21 @@ namespace UICatalog {
 			return item;
 		}
 
-		private MenuItem CreateAutocomplete()
+		private MenuItem CreateAutocomplete ()
 		{
 			var auto = new MenuItem ();
 			auto.Title = "Autocomplete";
 			auto.CheckType |= MenuItemCheckStyle.Checked;
 			auto.Checked = false;
 			auto.Action += () => {
-				if(auto.Checked = !auto.Checked) {
+				if (auto.Checked = !auto.Checked) {
 					// setup autocomplete with all words currently in the editor
-					_textView.Autocomplete.AllSuggestions = 
-					
-					Regex.Matches(_textView.Text.ToString(),"\\w+")
-					.Select(s=>s.Value)
+					_textView.Autocomplete.AllSuggestions =
+
+					Regex.Matches (_textView.Text.ToString (), "\\w+")
+					.Select (s => s.Value)
 					.Distinct ().ToList ();
-				}
-				else {
+				} else {
 					_textView.Autocomplete.AllSuggestions.Clear ();
 
 				}
@@ -567,24 +582,30 @@ namespace UICatalog {
 
 		private void CreateFindReplace (bool isFind = true)
 		{
+			if (winDialog != null) {
+				winDialog.SetFocus ();
+				return;
+			}
+
 			winDialog = new Window (isFind ? "Find" : "Replace") {
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
-				ColorScheme = Colors.Menu
+				ColorScheme = Colors.TopLevel
 			};
+			winDialog.Border.Effect3D = true;
 
-			var tabView = new TabView () {
+			_tabView = new TabView () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
 
-			tabView.AddTab (new TabView.Tab ("Find", FindTab ()), isFind);
+			_tabView.AddTab (new TabView.Tab ("Find", FindTab ()), isFind);
 			var replace = ReplaceTab ();
-			tabView.AddTab (new TabView.Tab ("Replace", replace), !isFind);
-			tabView.SelectedTabChanged += (s, e) => tabView.SelectedTab.View.FocusFirst ();
-			winDialog.Add (tabView);
+			_tabView.AddTab (new TabView.Tab ("Replace", replace), !isFind);
+			_tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
+			winDialog.Add (_tabView);
 
 			Win.Add (winDialog);
 

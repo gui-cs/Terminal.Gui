@@ -159,6 +159,7 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
+			CanFocus = true;
 			ColorScheme = Colors.Base;
 			Title = title;
 			if (border == null) {
@@ -235,13 +236,15 @@ namespace Terminal.Gui {
 			}
 
 			SetNeedsDisplay ();
-			var touched = view.Frame;
 			contentView.Remove (view);
 
 			if (contentView.InternalSubviews.Count < 1) {
 				CanFocus = false;
 			}
 			RemoveMenuStatusBar (view);
+			if (view != contentView && Focused == null) {
+				FocusFirst ();
+			}
 		}
 
 		/// <inheritdoc/>
