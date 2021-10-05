@@ -85,7 +85,9 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 * **[Standalone Example](https://github.com/migueldeicaza/gui.cs/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
 * **[F# Example](https://github.com/migueldeicaza/gui.cs/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
 * **[Powershell Sample]()** - (Coming soon! See PR #952. Shows how to build Terminal.Gui apps using Powershell.
-* **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui. 
+* **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui.
+* **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
+
 
 ## Documentation
 
