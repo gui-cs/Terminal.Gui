@@ -1096,6 +1096,11 @@ namespace Terminal.Gui {
 		public Rune Diamond = '\u25ca';
 
 		/// <summary>
+		/// Lozenge character
+		/// </summary>
+		public Rune Lozenge = '\u25c6';
+		
+		/// <summary>
 		/// Upper left corner
 		/// </summary>
 		public Rune ULCorner = '\u250C';
