@@ -573,6 +573,14 @@ namespace Terminal.Gui.Views {
 					Assert.Equal ("", _textView.SelectedText);
 					break;
 				case 9:
+					Assert.Equal (54, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal (0, _textView.SelectionStartColumn);
+					Assert.Equal (0, _textView.SelectionStartRow);
+					Assert.Equal (0, _textView.SelectedLength);
+					Assert.Equal ("", _textView.SelectedText);
+					break;
+				case 10:
 					Assert.Equal (55, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal (0, _textView.SelectionStartColumn);
@@ -2009,8 +2017,8 @@ line.
 			Assert.True (gaveFullTurn);
 
 			Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
-			Assert.Equal (TextModel.ToRunes ("Threally really first line."),  tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("Threally really last line."),  tm.GetLine (1));
+			Assert.Equal (TextModel.ToRunes ("Threally really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.ToRunes ("Threally really last line."), tm.GetLine (1));
 			tm = new TextModel ();
 			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
 			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
@@ -2078,5 +2086,34 @@ line.
 			Assert.Equal (3, tv.LeftColumn);
 			Assert.Equal (0, tv.RightOffset);
 		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_SpaceHandling ()
+		{
+			var tv = new TextView () {
+				Width = 10,
+				Text = " "
+			};
+
+			MouseEvent ev = new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tv.MouseEvent (ev);
+			Assert.Equal (1, tv.SelectedLength);
+
+			ev = new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tv.MouseEvent (ev);
+			Assert.Equal (1, tv.SelectedLength);
+		}
+
 	}
 }

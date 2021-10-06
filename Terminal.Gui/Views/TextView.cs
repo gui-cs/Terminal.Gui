@@ -2885,10 +2885,13 @@ namespace Terminal.Gui {
 			if (col + 1 < line.Count) {
 				col++;
 				rune = line [col];
-				if (col + 1 == line.Count) {
+				if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune)
+					&& !Rune.IsWhiteSpace (line [col - 1])) {
 					col++;
 				}
 				return true;
+			} else if (col + 1 == line.Count) {
+				col++;
 			}
 			while (row + 1 < model.Count) {
 				col = 0;
@@ -3060,7 +3063,8 @@ namespace Terminal.Gui {
 				&& !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
 				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)) {
+				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
 				return false;
 			}
 
@@ -3160,28 +3164,37 @@ namespace Terminal.Gui {
 					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out List<Rune> line);
-				(int col, int row)? newPos = null;
-				if (currentColumn > 0 && line [currentColumn - 1] != ' ') {
+				(int col, int row)? newPos;
+				int sbw = currentColumn;
+				if (currentColumn == line.Count || (currentColumn > 0 && (line [currentColumn - 1] != ' '
+					|| line [currentColumn] == ' '))) {
+
 					newPos = WordBackward (currentColumn, currentRow);
 					if (newPos.HasValue) {
-						currentColumn = newPos.Value.col;
-						currentRow = newPos.Value.row;
+						currentColumn = currentRow == newPos.Value.row ? newPos.Value.col : 0;
+						sbw = currentColumn;
 					}
 				}
 				if (!selecting) {
 					StartSelecting ();
 				}
-				if (currentRow < selectionStartRow || currentRow == selectionStartRow && currentColumn < selectionStartColumn) {
-					if (currentColumn > 0 && line [currentColumn - 1] != ' ') {
-						newPos = WordBackward (currentColumn, currentRow);
-					}
-				} else {
-					newPos = WordForward (currentColumn, currentRow);
+				newPos = WordForward (currentColumn, currentRow);
+				if (newPos != null && newPos.HasValue && sbw != -1) {
+					currentColumn = currentRow == newPos.Value.row ? newPos.Value.col : line.Count;
 				}
-				if (newPos != null && newPos.HasValue) {
-					currentColumn = newPos.Value.col;
-					currentRow = newPos.Value.row;
+				PositionCursor ();
+				lastWasKill = false;
+				columnTrack = currentColumn;
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
+				if (selecting) {
+					StopSelecting ();
 				}
+				ProcessMouseClick (ev, out List<Rune> line);
+				currentColumn = 0;
+				if (!selecting) {
+					StartSelecting ();
+				}
+				currentColumn = line.Count;
 				PositionCursor ();
 				lastWasKill = false;
 				columnTrack = currentColumn;

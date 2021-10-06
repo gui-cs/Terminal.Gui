@@ -457,6 +457,12 @@ namespace Terminal.Gui.Views {
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 9:
+					Assert.Equal (54, _textField.CursorPosition);
+					Assert.Equal (-1, _textField.SelectedStart);
+					Assert.Equal (0, _textField.SelectedLength);
+					Assert.Null (_textField.SelectedText);
+					break;
+				case 10:
 					Assert.Equal (55, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
@@ -784,6 +790,34 @@ namespace Terminal.Gui.Views {
 			Clipboard.Contents = "\t\tTAB to jump between text fields.";
 			_textField.Paste ();
 			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextField_SpaceHandling ()
+		{
+			var tf = new TextField () {
+				Width = 10,
+				Text = " "
+			};
+
+			MouseEvent ev = new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tf.MouseEvent (ev);
+			Assert.Equal (1, tf.SelectedLength);
+
+			ev = new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tf.MouseEvent (ev);
+			Assert.Equal (1, tf.SelectedLength);
 		}
 	}
 }
