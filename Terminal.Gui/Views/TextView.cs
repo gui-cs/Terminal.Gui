@@ -3165,21 +3165,19 @@ namespace Terminal.Gui {
 				}
 				ProcessMouseClick (ev, out List<Rune> line);
 				(int col, int row)? newPos;
-				int sbw = currentColumn;
 				if (currentColumn == line.Count || (currentColumn > 0 && (line [currentColumn - 1] != ' '
 					|| line [currentColumn] == ' '))) {
 
 					newPos = WordBackward (currentColumn, currentRow);
 					if (newPos.HasValue) {
 						currentColumn = currentRow == newPos.Value.row ? newPos.Value.col : 0;
-						sbw = currentColumn;
 					}
 				}
 				if (!selecting) {
 					StartSelecting ();
 				}
 				newPos = WordForward (currentColumn, currentRow);
-				if (newPos != null && newPos.HasValue && sbw != -1) {
+				if (newPos != null && newPos.HasValue) {
 					currentColumn = currentRow == newPos.Value.row ? newPos.Value.col : line.Count;
 				}
 				PositionCursor ();
