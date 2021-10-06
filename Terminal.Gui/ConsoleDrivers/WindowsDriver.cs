@@ -953,7 +953,7 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"isButtonPressed: {isButtonPressed};buttonPressedCount: {buttonPressedCount};lastMouseButtonPressed: {lastMouseButtonPressed}");
 			//System.Diagnostics.Debug.WriteLine ($"isOneFingerDoubleClicked: {isOneFingerDoubleClicked}");
 
-			if (buttonPressedCount == 1 && lastMouseButtonPressed != null
+			if (buttonPressedCount == 1 && lastMouseButtonPressed != null && p == point
 				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
 				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
 				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
@@ -973,7 +973,7 @@ namespace Terminal.Gui {
 				}
 				isOneFingerDoubleClicked = true;
 
-			} else if (buttonPressedCount == 3 && lastMouseButtonPressed != null && isOneFingerDoubleClicked
+			} else if (buttonPressedCount == 3 && lastMouseButtonPressed != null && isOneFingerDoubleClicked && p == point
 				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
 				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
 				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
