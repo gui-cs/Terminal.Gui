@@ -235,11 +235,11 @@ let ShowHex (top: Toplevel) =
 
 type MenuItemDetails () =
     inherit MenuItem ()
-    new (title: ustring, help: string, action: Action) as this =
+    new (title: ustring, help: ustring, action: Action) as this =
         MenuItemDetails ()
         then
             this.Title <- title
-            this.Help <- ustr help
+            this.Help <- help
             this.Action <- action
 
     static member Instance (mi: MenuItem) =
@@ -362,10 +362,10 @@ let Main () =
             Width = Dim.Fill () - Dim.op_Implicit margin,
             Height = Dim.Fill () - Dim.op_Implicit margin)
     let menuItems =
-        [|MenuItemDetails (ustr "F_ind", "", Unchecked.defaultof<_>);
-            MenuItemDetails (ustr "_Replace", "", Unchecked.defaultof<_>);
-            MenuItemDetails (ustr "_Item1", "", Unchecked.defaultof<_>);
-            MenuItemDetails (ustr "_Also From Sub Menu", "", Unchecked.defaultof<_>)|]
+        [|MenuItemDetails (ustr "F_ind",ustr "", Unchecked.defaultof<_>);
+            MenuItemDetails (ustr "_Replace", ustr "", Unchecked.defaultof<_>);
+            MenuItemDetails (ustr "_Item1", ustr "", Unchecked.defaultof<_>);
+            MenuItemDetails (ustr "_Also From Sub Menu", ustr "", Unchecked.defaultof<_>)|]
     menuItems.[0].Action <- fun _ -> ShowMenuItem (menuItems.[0])
     menuItems.[1].Action <- fun _ -> ShowMenuItem (menuItems.[1])
     menuItems.[2].Action <- fun _ -> ShowMenuItem (menuItems.[2])
@@ -392,10 +392,10 @@ let Main () =
                MenuBarItem (ustr "_List Demos", 
                     [| MenuItem (ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo true))
                        MenuItem (ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo false)) |])   
-               MenuBarItem(ustr "A_ssorted",
+               MenuBarItem (ustr "A_ssorted",
                     [| MenuItem (ustr "_Show text alignments", ustring.Empty, (fun () -> ShowTextAlignments())) 
                        MenuItem (ustr "_OnKeyDown/Press/Up", ustring.Empty, (fun () -> OnKeyDownPressUpDemo())) |])
-               MenuBarItem(ustr "_Test Menu and SubMenus",
+               MenuBarItem (ustr "_Test Menu and SubMenus",
                     [| MenuBarItem (ustr "SubMenu1Item_1",
                             [| MenuBarItem (ustr "SubMenu2Item_1",
                                     [| MenuBarItem (ustr "SubMenu3Item_1",
@@ -431,7 +431,7 @@ let Main () =
     win.Add bottom
     let bottom2 = new Label (ustr "This should go on the bottom of another top-level!")
     top.Add bottom2
-    Application.Loaded <- Action<Application.ResizedEventArgs> (
+    Application.Resized <- Action<Application.ResizedEventArgs> (
         fun _ ->
             bottom.X <- win.X
             bottom.Y <- Pos.Bottom win - Pos.Top win - Pos.At margin
