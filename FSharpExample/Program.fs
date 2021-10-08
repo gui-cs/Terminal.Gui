@@ -400,7 +400,10 @@ let Main () =
                     [| MenuBarItem (ustr "SubMenu1Item_1",
                             [| MenuBarItem (ustr "SubMenu2Item_1",
                                     [| MenuBarItem (ustr "SubMenu3Item_1",
-                                            [| menuItems.[2] :> MenuItem |]) :> MenuItem |]) :> MenuItem |]) :> MenuItem |])
+                                            [| menuItems.[2] :> MenuItem |])
+                                    :> MenuItem |])
+                            :> MenuItem |])
+                    :> MenuItem |])
                MenuBarItem (ustr "_About...", ustr "Demonstrates top-level menu item", (fun () -> MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore)) |])
     menuKeysStyle <- new CheckBox (3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
     menuKeysStyle.add_Toggled (Action<bool> (MenuKeysStyleToggled))
