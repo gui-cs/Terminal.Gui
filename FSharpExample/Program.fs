@@ -445,6 +445,7 @@ let Main () =
     top.Add win
     top.Add (menu, statusBar)
     Application.Run ()
+    Application.Shutdown ();
 
 module Demo =
     [<EntryPoint>]
