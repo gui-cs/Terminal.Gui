@@ -381,14 +381,15 @@ let Main () =
                        MenuItem (ustr "_Disabled", ustring.Empty, (fun () -> ()), (fun () -> false))
                        Unchecked.defaultof<_>
                        MenuItem (ustr "_Quit", ustring.Empty, (fun () -> if Quit() then top.Running <- false)) |])
-               MenuBarItem (ustr "_Edit", 
+               MenuBarItem (ustr "_Edit",
                     [| MenuItem (ustr "_Copy", ustring.Empty, fun () -> Copy())
                        MenuItem (ustr "C_ut", ustring.Empty, fun () -> Cut())
                        MenuItem (ustr "_Paste", ustring.Empty, fun () -> Paste())
                        MenuBarItem (ustr "_Find and Replace",
-                           [| menuItems.[0]
-                              menuItems.[1] |])
-                       menuItems.[3] |])
+                           [| menuItems.[0] :> MenuItem
+                              menuItems.[1] :> MenuItem |]) :> MenuItem
+                       menuItems.[3] :> MenuItem
+                    |])
                MenuBarItem (ustr "_List Demos", 
                     [| MenuItem (ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo true))
                        MenuItem (ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo false)) |])   
@@ -399,7 +400,7 @@ let Main () =
                     [| MenuBarItem (ustr "SubMenu1Item_1",
                             [| MenuBarItem (ustr "SubMenu2Item_1",
                                     [| MenuBarItem (ustr "SubMenu3Item_1",
-                                            [| menuItems.[2] |]) |]) |]) |])
+                                            [| menuItems.[2] :> MenuItem |]) :> MenuItem |]) :> MenuItem |]) :> MenuItem |])
                MenuBarItem (ustr "_About...", ustr "Demonstrates top-level menu item", (fun () -> MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore)) |])
     menuKeysStyle <- new CheckBox (3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
     menuKeysStyle.add_Toggled (Action<bool> (MenuKeysStyleToggled))
