@@ -435,12 +435,13 @@ let Main () =
     win.Add bottom
     let bottom2 = new Label (ustr "This should go on the bottom of another top-level!")
     top.Add bottom2
-    Application.Resized <- Action<Application.ResizedEventArgs> (
-        fun _ ->
+    top.add_LayoutComplete (Action<View.LayoutEventArgs>
+        (fun e ->
             bottom.X <- win.X
             bottom.Y <- Pos.Bottom win - Pos.Top win - Pos.At margin
             bottom2.X <- Pos.Left win
             bottom2.Y <- Pos.Bottom win)
+        )
     top.Add win
     top.Add (menu, statusBar)
     Application.Run ()
