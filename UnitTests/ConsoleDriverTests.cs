@@ -420,5 +420,86 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var cs = new ColorScheme ();
 			Assert.Equal ("", cs.caller);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyModifiers_Resetting_At_New_Keystrokes ()
+		{
+			bool? okInitialFocused = null;
+			bool? cancelInitialFocused = null;
+			var okClicked = false;
+			var closing = false;
+			var cursorRight = false;
+			var cancelHasFocus = false;
+			var closed = false;
+
+			var top = Application.Top;
+
+			var ok = new Button ("Ok");
+			ok.Clicked += () => {
+				if (!okClicked) {
+					okClicked = true;
+					Application.RequestStop ();
+				}
+			};
+
+			var cancel = new Button ("Cancel");
+
+			var d = new Dialog ("Quit", cancel, ok);
+			d.KeyPress += (e) => {
+				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					if (!okClicked && !closing) {
+						okInitialFocused = ok.HasFocus;
+						cancelInitialFocused = cancel.HasFocus;
+						closing = true;
+						var mKeys = new Stack<ConsoleKeyInfo> ();
+						var cki = new ConsoleKeyInfo ('\0', ConsoleKey.Enter, false, false, false);
+						mKeys.Push (cki);
+						cki = new ConsoleKeyInfo ('\0', ConsoleKey.RightArrow, false, false, false);
+						mKeys.Push (cki);
+						FakeConsole.MockKeyPresses = mKeys;
+					}
+					e.Handled = true;
+				} else if (e.KeyEvent.Key == Key.CursorRight) {
+					if (!cursorRight) {
+						cursorRight = true;
+					} else if (ok.HasFocus) {
+						e.Handled = true;
+					} else {
+						cancelHasFocus = true;
+					}
+				}
+			};
+			d.Loaded += () => {
+				var mKeys = new Stack<ConsoleKeyInfo> ();
+				var cki = new ConsoleKeyInfo ('q', ConsoleKey.Q, false, false, true);
+				mKeys.Push (cki);
+				FakeConsole.MockKeyPresses = mKeys;
+			};
+			d.Closed += (_) => {
+				if (okClicked && closing) {
+					closed = true;
+				}
+			};
+
+			top.Ready += () => Application.Run (d);
+
+			Application.Iteration += () => {
+				if (closed) {
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+
+			Assert.False (okInitialFocused);
+			Assert.True (cancelInitialFocused);
+			Assert.True (okClicked);
+			Assert.True (closing);
+			Assert.True (cursorRight);
+			Assert.True (cancelHasFocus);
+			Assert.True (closed);
+			Assert.Empty (FakeConsole.MockKeyPresses);
+		}
 	}
 }

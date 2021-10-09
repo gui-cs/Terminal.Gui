@@ -400,13 +400,10 @@ namespace Terminal.Gui {
 
 		void ProcessInput (ConsoleKeyInfo consoleKey)
 		{
+			keyModifiers = new KeyModifiers ();
 			var map = MapKey (consoleKey);
 			if (map == (Key)0xffffffff)
 				return;
-
-			if (keyModifiers == null) {
-				keyModifiers = new KeyModifiers ();
-			}
 
 			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
 				keyModifiers.Alt = true;
@@ -420,7 +417,6 @@ namespace Terminal.Gui {
 
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
-			keyModifiers = new KeyModifiers ();
 		}
 
 		public override Attribute GetAttribute ()
