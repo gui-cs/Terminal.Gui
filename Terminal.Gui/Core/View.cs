@@ -1593,7 +1593,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyDown;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (!Enabled) {
@@ -1617,7 +1617,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyUp;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (!Enabled) {
