@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		public override Border Border {
 			get => base.Border;
 			set {
-				if (base.Border != null && base.Border.Child != null && value.Child == null) { // <- nrt found a null ref here which is quite logical
+				if (base.Border?.Child != null && value?.Child == null) {
 					value.Child = base.Border.Child;
 				}
 				base.Border = value;
