@@ -171,14 +171,14 @@ namespace UICatalog {
 				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
 					e.Handled = true;
-				} else if (keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
@@ -438,6 +438,7 @@ namespace UICatalog {
 		private void Quit ()
 		{
 			if (!CanCloseFile ()) {
+				_textView.SetFocus ();
 				return;
 			}
 
