@@ -1399,6 +1399,86 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		public void YAxisLabels_With_MarginBottom ()
+		{
+			GraphViewTests.InitFakeDriver ();
+			var gv = new GraphView {
+				ColorScheme = new ColorScheme (),
+				Bounds = new Rect (0, 0, 10, 7)
+			};
+
+			gv.CellSize = new PointF (1, 0.5f);
+			gv.AxisY.Increment = 1;
+			gv.AxisY.ShowLabelsEvery = 1;
+
+			gv.Series.Add (new ScatterSeries {
+				Points = { new PointF (1, 1), new PointF (5, 0) }
+			});
+
+			// reserve 3 cells of the console for the margin
+			gv.MarginBottom = 3;
+			gv.MarginLeft = 1;
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"
+ │
+1┤x
+ │ 
+0┼┬┬┬┬x┬┬┬
+ 0    5   
+          
+          ";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+			
+		[Fact]
+		public void XAxisLabels_With_MarginLeft()
+		{
+			GraphViewTests.InitFakeDriver ();
+			var gv = new GraphView {
+				ColorScheme = new ColorScheme (),
+				Bounds = new Rect (0, 0, 10, 7)
+			};
+
+			gv.CellSize = new PointF (1, 0.5f);
+			gv.AxisY.Increment = 1;
+			gv.AxisY.ShowLabelsEvery = 1;
+
+			gv.Series.Add (new ScatterSeries {
+				Points = { new PointF (1, 1), new PointF (5, 0) }
+			});
+
+			// reserve 3 cells of the left for the margin
+			gv.MarginLeft = 3; 
+			gv.MarginBottom = 1;
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+	@"
+   │
+  2┤
+   │
+  1┤x
+   │ 
+  0┼┬┬┬┬x┬
+   0    5
+         
+          ";
+				GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
 		public void PathAnnotation_Diamond ()
 		{
 			var gv = GraphViewTests.GetGraph ();

@@ -256,7 +256,7 @@ namespace Terminal.Gui.Graphs {
 			int labels = 0;
 			int y = GetAxisYPosition (graph);
 
-			var start = graph.ScreenToGraphSpace (0, y);
+			var start = graph.ScreenToGraphSpace ((int)graph.MarginLeft, y);
 			var end = graph.ScreenToGraphSpace (bounds.Width, y);
 
 			// don't draw labels below the minimum
@@ -426,7 +426,7 @@ namespace Terminal.Gui.Graphs {
 
 			// remember screen space is top down so the lowest graph
 			// space value is at the bottom of the screen
-			var start = graph.ScreenToGraphSpace (x, bounds.Height - 1);
+			var start = graph.ScreenToGraphSpace (x, bounds.Height - (1 + (int)graph.MarginBottom));
 			var end = graph.ScreenToGraphSpace (x, 0);
 
 			// don't draw labels below the minimum
