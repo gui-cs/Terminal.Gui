@@ -1272,14 +1272,9 @@ namespace Terminal.Gui {
 
 		void ResetCursorVisibility ()
 		{
-			if (savedCursorVisibility == 0) {
-				savedCursorVisibility = desiredCursorVisibility;
-			}
-			if (savedCursorVisibility != desiredCursorVisibility && !HasFocus) {
+			if (savedCursorVisibility != 0) {
 				DesiredCursorVisibility = savedCursorVisibility;
-				savedCursorVisibility = CursorVisibility.Default;
-			} else if (desiredCursorVisibility != CursorVisibility.Underline) {
-				DesiredCursorVisibility = CursorVisibility.Underline;
+				savedCursorVisibility = 0;
 			}
 		}
 
@@ -1446,7 +1441,7 @@ namespace Terminal.Gui {
 		public CursorVisibility DesiredCursorVisibility {
 			get => desiredCursorVisibility;
 			set {
-				if (desiredCursorVisibility != value && HasFocus) {
+				if (HasFocus) {
 					Application.Driver.SetCursorVisibility (value);
 				}
 
