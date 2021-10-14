@@ -2154,15 +2154,16 @@ namespace Terminal.Gui {
 					}
 					OnEnabledChanged ();
 					SetNeedsDisplay ();
-				}
-				if (subviews != null) {
-					foreach (var view in subviews) {
-						if (!value) {
-							view.oldEnabled = view.Enabled;
-							view.Enabled = value;
-						} else {
-							view.Enabled = view.oldEnabled;
-							view.addingView = false;
+
+					if (subviews != null) {
+						foreach (var view in subviews) {
+							if (!value) {
+								view.oldEnabled = view.Enabled;
+								view.Enabled = value;
+							} else {
+								view.Enabled = view.oldEnabled;
+								view.addingView = false;
+							}
 						}
 					}
 				}
