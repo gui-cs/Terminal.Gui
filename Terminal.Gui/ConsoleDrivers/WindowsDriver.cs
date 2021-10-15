@@ -937,66 +937,67 @@ namespace Terminal.Gui {
 				Y = mouseEvent.MousePosition.Y
 			};
 
-			if (!isButtonPressed && buttonPressedCount < 2
-				&& mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
-				&& (mouseEvent.ButtonState == WindowsConsole.ButtonState.Button1Pressed
-				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button2Pressed
-				|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button3Pressed)) {
+			//if (!isButtonPressed && buttonPressedCount < 2
+			//	&& mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
+			//	&& (mouseEvent.ButtonState == WindowsConsole.ButtonState.Button1Pressed
+			//	|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button2Pressed
+			//	|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button3Pressed)) {
 
-				lastMouseButtonPressed = mouseEvent.ButtonState;
-				buttonPressedCount++;
-			} else if (!isButtonPressed && buttonPressedCount > 0 && mouseEvent.ButtonState == 0
-				&& mouseEvent.EventFlags == 0) {
+			//	lastMouseButtonPressed = mouseEvent.ButtonState;
+			//	buttonPressedCount++;
+			//} else if (!isButtonPressed && buttonPressedCount > 0 && mouseEvent.ButtonState == 0
+			//	&& mouseEvent.EventFlags == 0) {
 
-				buttonPressedCount++;
-			}
+			//	buttonPressedCount++;
+			//}
 			//System.Diagnostics.Debug.WriteLine ($"isButtonPressed: {isButtonPressed};buttonPressedCount: {buttonPressedCount};lastMouseButtonPressed: {lastMouseButtonPressed}");
 			//System.Diagnostics.Debug.WriteLine ($"isOneFingerDoubleClicked: {isOneFingerDoubleClicked}");
 
-			if (buttonPressedCount == 1 && lastMouseButtonPressed != null && p == point
-				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
-				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
-				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+			//if (buttonPressedCount == 1 && lastMouseButtonPressed != null && p == point
+			//	&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
 
-				switch (lastMouseButtonPressed) {
-				case WindowsConsole.ButtonState.Button1Pressed:
-					mouseFlag = MouseFlags.Button1DoubleClicked;
-					break;
+			//	switch (lastMouseButtonPressed) {
+			//	case WindowsConsole.ButtonState.Button1Pressed:
+			//		mouseFlag = MouseFlags.Button1DoubleClicked;
+			//		break;
 
-				case WindowsConsole.ButtonState.Button2Pressed:
-					mouseFlag = MouseFlags.Button2DoubleClicked;
-					break;
+			//	case WindowsConsole.ButtonState.Button2Pressed:
+			//		mouseFlag = MouseFlags.Button2DoubleClicked;
+			//		break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3DoubleClicked;
-					break;
-				}
-				isOneFingerDoubleClicked = true;
+			//	case WindowsConsole.ButtonState.Button3Pressed:
+			//		mouseFlag = MouseFlags.Button3DoubleClicked;
+			//		break;
+			//	}
+			//	isOneFingerDoubleClicked = true;
 
-			} else if (buttonPressedCount == 3 && lastMouseButtonPressed != null && isOneFingerDoubleClicked && p == point
-				&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
-				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
-				|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
+			//} else if (buttonPressedCount == 3 && lastMouseButtonPressed != null && isOneFingerDoubleClicked && p == point
+			//	&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
+			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
+			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
 
-				switch (lastMouseButtonPressed) {
-				case WindowsConsole.ButtonState.Button1Pressed:
-					mouseFlag = MouseFlags.Button1TripleClicked;
-					break;
+			//	switch (lastMouseButtonPressed) {
+			//	case WindowsConsole.ButtonState.Button1Pressed:
+			//		mouseFlag = MouseFlags.Button1TripleClicked;
+			//		break;
 
-				case WindowsConsole.ButtonState.Button2Pressed:
-					mouseFlag = MouseFlags.Button2TripleClicked;
-					break;
+			//	case WindowsConsole.ButtonState.Button2Pressed:
+			//		mouseFlag = MouseFlags.Button2TripleClicked;
+			//		break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3TripleClicked;
-					break;
-				}
-				buttonPressedCount = 0;
-				lastMouseButtonPressed = null;
-				isOneFingerDoubleClicked = false;
-				isButtonReleased = false;
+			//	case WindowsConsole.ButtonState.Button3Pressed:
+			//		mouseFlag = MouseFlags.Button3TripleClicked;
+			//		break;
+			//	}
+			//	buttonPressedCount = 0;
+			//	lastMouseButtonPressed = null;
+			//	isOneFingerDoubleClicked = false;
+			//	isButtonReleased = false;
 
-			} else if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
+			//}
+			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
 				 (lastMouseButtonPressed == null && mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
 				 mouseEvent.ButtonState != 0 && !isButtonReleased && !isButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
@@ -1807,7 +1808,6 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			result = null;
 			waitForProbe.Set ();
 			winChange.Set ();
 
