@@ -2115,5 +2115,71 @@ line.
 			Assert.Equal (1, tv.SelectedLength);
 		}
 
+		[Fact]
+		[InitShutdown]
+		public void CanFocus_False_Wont_Focus_With_Mouse ()
+		{
+			var top = Application.Top;
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				CanFocus = false,
+				ReadOnly = true,
+				Text = "some text"
+			};
+			var fv = new FrameView ("I shouldn't get focus") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				CanFocus = false,
+			};
+			fv.Add (tv);
+			top.Add (fv);
+
+			Application.Begin (top);
+
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Empty (tv.SelectedText);
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
+			fv.CanFocus = true;
+			tv.CanFocus = true;
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tv.SelectedText);
+			Assert.True (tv.CanFocus);
+			Assert.True (tv.HasFocus);
+			Assert.True (fv.CanFocus);
+			Assert.True (fv.HasFocus);
+
+			fv.CanFocus = false;
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+		}
 	}
 }

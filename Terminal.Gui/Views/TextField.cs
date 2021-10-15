@@ -733,9 +733,7 @@ namespace Terminal.Gui {
 			}
 
 			if (ev.Flags == MouseFlags.Button1Pressed) {
-				if (!HasFocus) {
-					SetFocus ();
-				}
+				EnsureHasFocus ();
 				PositionCursor (ev);
 				if (isButtonReleased) {
 					ClearAllSelection ();
@@ -754,6 +752,7 @@ namespace Terminal.Gui {
 				isButtonPressed = false;
 				Application.UngrabMouse ();
 			} else if (ev.Flags == MouseFlags.Button1DoubleClicked) {
+				EnsureHasFocus ();
 				int x = PositionCursor (ev);
 				int sbw = x;
 				if (x == text.Count || (x > 0 && (char)Text [x - 1] != ' '
@@ -772,6 +771,7 @@ namespace Terminal.Gui {
 				}
 				PrepareSelection (sbw, sfw - sbw);
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
+				EnsureHasFocus ();
 				PositionCursor (0);
 				ClearAllSelection ();
 				PrepareSelection (0, text.Count);
@@ -779,6 +779,13 @@ namespace Terminal.Gui {
 
 			SetNeedsDisplay ();
 			return true;
+
+			void EnsureHasFocus ()
+			{
+				if (!HasFocus) {
+					SetFocus ();
+				}
+			}
 		}
 
 		int PositionCursor (MouseEvent ev)
