@@ -270,23 +270,21 @@ namespace Terminal.Gui.Graphs {
 
 				int screenX = graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).X;
 
-				// Ensure the axis point does not draw into the margin
-				if (screenX >= graph.MarginLeft) {
-					// The increment we will render (normally a top T unicode symbol)
-					var toRender = new AxisIncrementToRender (Orientation, screenX, current.X);
+				// The increment we will render (normally a top T unicode symbol)
+				var toRender = new AxisIncrementToRender (Orientation, screenX, current.X);
 
-					// Not every increment has to have a label
-					if (ShowLabelsEvery != 0) {
+				// Not every increment has to have a label
+				if (ShowLabelsEvery != 0) {
 
-						// if this increment does also needs a label
-						if (labels++ % ShowLabelsEvery == 0) {
-							toRender.Text = LabelGetter (toRender);
-						};
-					}
-
-					// Label or no label definetly render it
-					yield return toRender;
+					// if this increment does also needs a label
+					if (labels++ % ShowLabelsEvery == 0) {
+						toRender.Text = LabelGetter (toRender);
+					};
 				}
+
+				// Label or no label definetly render it
+				yield return toRender;
+				
 
 				current.X += Increment;
 			}
@@ -435,29 +433,26 @@ namespace Terminal.Gui.Graphs {
 			}
 
 			var current = start;
-			var dontDrawBelowScreenY = bounds.Height - graph.MarginBottom;
 
 			while (current.Y < end.Y) {
 
 				int screenY = graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).Y;
 
-				// if the axis label is above the bottom margin (screen y starts at 0 at the top)
-				if (screenY < dontDrawBelowScreenY) {
-					// Create the axis symbol
-					var toRender = new AxisIncrementToRender (Orientation, screenY, current.Y);
+				// Create the axis symbol
+				var toRender = new AxisIncrementToRender (Orientation, screenY, current.Y);
 
-					// and the label (if we are due one)
-					if (ShowLabelsEvery != 0) {
+				// and the label (if we are due one)
+				if (ShowLabelsEvery != 0) {
 
-						// if this increment also needs a label
-						if (labels++ % ShowLabelsEvery == 0) {
-							toRender.Text = LabelGetter (toRender);
-						};
-					}
-
-					// draw the axis symbol (and label if it has one)
-					yield return toRender;
+					// if this increment also needs a label
+					if (labels++ % ShowLabelsEvery == 0) {
+						toRender.Text = LabelGetter (toRender);
+					};
 				}
+
+				// draw the axis symbol (and label if it has one)
+				yield return toRender;
+				
 
 				current.Y += Increment;
 			}
