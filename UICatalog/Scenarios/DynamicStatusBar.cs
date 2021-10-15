@@ -9,10 +9,11 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
 	[ScenarioCategory ("Dynamic")]
 	class DynamicStatusBar : Scenario {
-		public override void Run ()
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
-			Top.Add (new DynamicStatusBarSample (Win.Title));
-			base.Run ();
+			Application.Init ();
+			Top = Application.Top;	
+			Top.Add (new DynamicStatusBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
 		}
 	}
 
@@ -222,6 +223,7 @@ namespace UICatalog {
 				_statusBar.AddItemAt (_currentSelectedStatusBar, newStatusItem);
 				DataContext.Items.Add (new DynamicStatusItemList (newStatusItem.Title, newStatusItem));
 				_lstItems.MoveDown ();
+				SetFrameDetails ();
 			};
 
 			_btnRemove.Clicked += () => {
@@ -310,8 +312,7 @@ namespace UICatalog {
 
 			StatusItem CreateNewStatusBar (DynamicStatusItem item)
 			{
-				StatusItem newStatusItem;
-				newStatusItem = new StatusItem (ShortcutHelper.GetShortcutFromTag (
+				var newStatusItem = new StatusItem (ShortcutHelper.GetShortcutFromTag (
 					item.shortcut, StatusBar.ShortcutDelimiter),
 					item.title, _frmStatusBarDetails.CreateAction (item));
 
