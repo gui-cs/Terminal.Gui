@@ -1478,6 +1478,58 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+
+		[Fact]
+		public void MarginBottom_BiggerThanHeight_ExpectBlankGraph ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+			gv.Height = 10;
+			gv.MarginBottom = 20;
+
+			gv.Series.Add (new ScatterSeries {
+				Points = { new PointF (1, 1), new PointF (5, 0) }
+			});
+
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+	@"
+         
+         
+          ";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+		[Fact]
+		public void MarginLeft_BiggerThanWidth_ExpectBlankGraph ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+			gv.Width = 10;
+			gv.MarginLeft = 20;
+
+			gv.Series.Add (new ScatterSeries {
+				Points = { new PointF (1, 1), new PointF (5, 0) }
+			});
+
+
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+	@"
+         
+         
+          ";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
 		[Fact]
 		public void PathAnnotation_Diamond ()
 		{
