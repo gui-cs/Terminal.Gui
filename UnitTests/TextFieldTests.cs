@@ -819,5 +819,43 @@ namespace Terminal.Gui.Views {
 			tf.MouseEvent (ev);
 			Assert.Equal (1, tf.SelectedLength);
 		}
+
+		[Fact]
+		[InitShutdown]
+		public void CanFocus_False_Wont_Focus_With_Mouse ()
+		{
+			var tf = new TextField () {
+				Width = Dim.Fill (),
+				CanFocus = false,
+				ReadOnly = true,
+				Text = "some text"
+			};
+			var fv = new FrameView ("I shouldn't get focus") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				CanFocus = false,
+			};
+			fv.Add (tf);
+			Application.Top.Add (fv);
+
+			Assert.False (tf.CanFocus);
+
+			tf.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Null (tf.SelectedText);
+
+			tf.CanFocus = true;
+			tf.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tf.SelectedText);
+		}
 	}
 }

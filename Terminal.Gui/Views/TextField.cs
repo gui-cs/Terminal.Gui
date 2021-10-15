@@ -728,10 +728,11 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if (!CanFocus) {
+				return true;
+			}
+
 			if (ev.Flags == MouseFlags.Button1Pressed) {
-				if (!CanFocus) {
-					return true;
-				}
 				if (!HasFocus) {
 					SetFocus ();
 				}
