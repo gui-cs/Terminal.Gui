@@ -1733,7 +1733,7 @@ namespace Terminal.Gui {
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		// The records that we keep fetching
-		WindowsConsole.InputRecord [] result = new WindowsConsole.InputRecord [1];
+		Queue<WindowsConsole.InputRecord []> resultQueue = new Queue<WindowsConsole.InputRecord []> ();
 
 		/// <summary>
 		/// Invoked when a Key is pressed or released.
@@ -1764,7 +1764,9 @@ namespace Terminal.Gui {
 				waitForProbe.Wait ();
 				waitForProbe.Reset ();
 
-				result = winConsole.ReadConsoleInput ();
+				if (resultQueue?.Count == 0) {
+					resultQueue.Enqueue (winConsole.ReadConsoleInput ());
+				}
 
 				eventReady.Set ();
 			}
@@ -1822,7 +1824,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!tokenSource.IsCancellationRequested) {
-				return result != null || CheckTimers (wait, out _) || winChanged;
+				return resultQueue.Count > 0 || CheckTimers (wait, out _) || winChanged;
 			}
 
 			tokenSource.Dispose ();
@@ -1855,9 +1857,8 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (result != null) {
-				var inputEvent = result [0];
-				result = null;
+			while (resultQueue.Count > 0) {
+				var inputEvent = resultQueue.Dequeue()[0];
 				ProcessInput?.Invoke (inputEvent);
 			}
 			if (winChanged) {
