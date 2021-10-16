@@ -904,7 +904,7 @@ namespace Terminal.Gui {
 		bool isButtonReleased = false;
 		bool isButtonDoubleClicked = false;
 		Point point;
-		int buttonPressedCount;
+		//int buttonPressedCount;
 		bool isOneFingerDoubleClicked = false;
 		bool processButtonClick;
 
@@ -1174,7 +1174,7 @@ namespace Terminal.Gui {
 			await Task.Delay (300);
 			isButtonDoubleClicked = false;
 			isOneFingerDoubleClicked = false;
-			buttonPressedCount = 0;
+			//buttonPressedCount = 0;
 		}
 
 		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
