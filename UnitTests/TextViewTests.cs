@@ -2181,5 +2181,83 @@ line.
 			Assert.False (fv.CanFocus);
 			Assert.False (fv.HasFocus);
 		}
+
+		[Fact]
+		[InitShutdown]
+		public void DesiredCursorVisibility_Vertical_Navigation ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"This is the line {i}\n";
+			}
+			var tv = new TextView () { Width = 10, Height = 10 };
+			tv.Text = text;
+
+			Assert.Equal (0, tv.TopRow);
+			tv.PositionCursor ();
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+
+			for (int i = 0; i < 12; i++) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledDown
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i + 1, tv.TopRow);
+				Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+			}
+
+			for (int i = 12; i > 0; i--) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledUp
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i - 1, tv.TopRow);
+				if (i - 1 == 0) {
+					Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+				} else {
+					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+				}
+			}
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void DesiredCursorVisibility_Horizontal_Navigation ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"{i.ToString () [^1]}";
+			}
+			var tv = new TextView () { Width = 10, Height = 10 };
+			tv.Text = text;
+
+			Assert.Equal (0, tv.LeftColumn);
+			tv.PositionCursor ();
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+
+			for (int i = 0; i < 12; i++) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledRight
+				});
+				tv.PositionCursor ();
+				Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
+				Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+			}
+
+			for (int i = 11; i > 0; i--) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledLeft
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i - 1, tv.LeftColumn);
+				if (i - 1 == 0) {
+					Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+				} else {
+					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+				}
+			}
+		}
 	}
 }

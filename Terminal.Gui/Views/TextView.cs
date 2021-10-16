@@ -1357,8 +1357,10 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (col >= leftColumn && currentColumn - leftColumn + RightOffset < Frame.Width
-				&& topRow <= currentRow && currentRow - topRow + BottomOffset < Frame.Height) {
+			var posX = currentColumn - leftColumn;
+			var posY = currentRow - topRow;
+			if ( posX > -1 && col >= posX && posX < Frame.Width - RightOffset
+				&& topRow <= currentRow && posY < Frame.Height - BottomOffset) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
 			} else {
