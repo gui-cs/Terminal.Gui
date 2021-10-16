@@ -1442,6 +1442,7 @@ namespace Terminal.Gui {
 					continue;
 				}
 				dirtyLine [row] = false;
+				System.Text.StringBuilder output = new System.Text.StringBuilder ();
 				for (int col = 0; col < cols; col++) {
 					if (contents [row, col, 2] != 1) {
 						continue;
@@ -1452,13 +1453,24 @@ namespace Terminal.Gui {
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
 						if (color != redrawColor) {
+							if (!AlwaysSetPosition) {
+								Console.Write (output);
+								output = new System.Text.StringBuilder ();
+							}
 							SetColor (color);
 						}
 						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
 							return;
 						}
-						Console.Write ((char)contents [row, col, 0]);
+						if (AlwaysSetPosition) {
+							Console.Write ((char)contents [row, col, 0]);
+						} else {
+							output.Append ((char)contents [row, col, 0]);
+						}
 						contents [row, col, 2] = 0;
+						if (!AlwaysSetPosition && col == cols - 1) {
+							Console.Write (output);
+						}
 					}
 				}
 			}
