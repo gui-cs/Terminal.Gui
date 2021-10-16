@@ -2005,7 +2005,7 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (inputResult.Count > 0) {
+			while (inputResult.Count > 0) {
 				ProcessInput?.Invoke (inputResult.Dequeue ().Value);
 			}
 		}
