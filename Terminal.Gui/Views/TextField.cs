@@ -613,6 +613,9 @@ namespace Terminal.Gui {
 				return text.Count;
 
 			var ti = text [i];
+			if (Rune.IsLetterOrDigit (ti) && Rune.IsWhiteSpace (text [p]))
+				return i;
+
 			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i < text.Count; i++) {
 					if (Rune.IsLetterOrDigit (text [i]))
@@ -624,7 +627,8 @@ namespace Terminal.Gui {
 						break;
 				}
 				for (; i < text.Count; i++) {
-					if (Rune.IsLetterOrDigit (text [i]))
+					if (Rune.IsLetterOrDigit (text [i]) || 
+						(Rune.IsPunctuation (text [i]) && Rune.IsWhiteSpace (text [i - 1])))
 						break;
 				}
 			}
@@ -724,13 +728,12 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if (!CanFocus) {
+				return true;
+			}
+
 			if (ev.Flags == MouseFlags.Button1Pressed) {
-				if (!CanFocus) {
-					return true;
-				}
-				if (!HasFocus) {
-					SetFocus ();
-				}
+				EnsureHasFocus ();
 				PositionCursor (ev);
 				if (isButtonReleased) {
 					ClearAllSelection ();
@@ -749,9 +752,12 @@ namespace Terminal.Gui {
 				isButtonPressed = false;
 				Application.UngrabMouse ();
 			} else if (ev.Flags == MouseFlags.Button1DoubleClicked) {
+				EnsureHasFocus ();
 				int x = PositionCursor (ev);
 				int sbw = x;
-				if (x > 0 && (char)Text [x - 1] != ' ') {
+				if (x == text.Count || (x > 0 && (char)Text [x - 1] != ' '
+					|| (x > 0 && (char)Text [x] == ' '))) {
+
 					sbw = WordBackward (x);
 				}
 				if (sbw != -1) {
@@ -765,6 +771,7 @@ namespace Terminal.Gui {
 				}
 				PrepareSelection (sbw, sfw - sbw);
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
+				EnsureHasFocus ();
 				PositionCursor (0);
 				ClearAllSelection ();
 				PrepareSelection (0, text.Count);
@@ -772,6 +779,13 @@ namespace Terminal.Gui {
 
 			SetNeedsDisplay ();
 			return true;
+
+			void EnsureHasFocus ()
+			{
+				if (!HasFocus) {
+					SetFocus ();
+				}
+			}
 		}
 
 		int PositionCursor (MouseEvent ev)
