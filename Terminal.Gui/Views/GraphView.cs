@@ -114,6 +114,15 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			// The drawable area of the graph (anything that isn't in the margins)
+			var graphScreenWidth = Bounds.Width - ((int)MarginLeft);
+			var graphScreenHeight = Bounds.Height - (int)MarginBottom;
+
+			// if the margins take up the full draw bounds don't render
+			if (graphScreenWidth < 0 || graphScreenHeight < 0) {
+				return;
+			}
+
 			// Draw 'before' annotations
 			foreach (var a in Annotations.ToArray().Where (a => a.BeforeSeries)) {
 				a.Render (this);
@@ -137,8 +146,9 @@ namespace Terminal.Gui {
 
 			SetDriverColorToGraphColor ();
 
-			// The drawable area of the graph (anything that isn't in the margins)
-			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
+
+			Rect drawBounds = new Rect((int)MarginLeft,0, graphScreenWidth, graphScreenHeight);
+			
 			RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
 			foreach (var s in Series.ToArray ()) {
