@@ -243,7 +243,14 @@ namespace Terminal.Gui {
 				}
 				break;
 			case uint n when (n >= '\u0001' && n <= '\u001a'):
-				if (consoleKeyInfo.Key == 0) {
+				if (consoleKeyInfo.Key == 0 && consoleKeyInfo.KeyChar == '\r') {
+					key = ConsoleKey.Enter;
+					newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+						key,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+				} else if (consoleKeyInfo.Key == 0) {
 					key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
 					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
 						key,
@@ -253,7 +260,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			case 27:
-			//case 91:
+				//case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
 				int delay = 0;
@@ -1435,6 +1442,7 @@ namespace Terminal.Gui {
 					continue;
 				}
 				dirtyLine [row] = false;
+				System.Text.StringBuilder output = new System.Text.StringBuilder ();
 				for (int col = 0; col < cols; col++) {
 					if (contents [row, col, 2] != 1) {
 						continue;
@@ -1445,13 +1453,24 @@ namespace Terminal.Gui {
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
 						if (color != redrawColor) {
+							if (!AlwaysSetPosition) {
+								Console.Write (output);
+								output = new System.Text.StringBuilder ();
+							}
 							SetColor (color);
 						}
 						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
 							return;
 						}
-						Console.Write ((char)contents [row, col, 0]);
+						if (AlwaysSetPosition) {
+							Console.Write ((char)contents [row, col, 0]);
+						} else {
+							output.Append ((char)contents [row, col, 0]);
+						}
 						contents [row, col, 2] = 0;
+						if (!AlwaysSetPosition && col == cols - 1) {
+							Console.Write (output);
+						}
 					}
 				}
 			}
@@ -1648,6 +1667,7 @@ namespace Terminal.Gui {
 		{
 			switch (inputEvent.EventType) {
 			case NetEvents.EventType.Key:
+				keyModifiers = new KeyModifiers ();
 				var map = MapKey (inputEvent.ConsoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
@@ -1655,7 +1675,6 @@ namespace Terminal.Gui {
 				keyDownHandler (new KeyEvent (map, keyModifiers));
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
-				keyModifiers = new KeyModifiers ();
 				break;
 			case NetEvents.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
@@ -1998,7 +2017,7 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (inputResult.Count > 0) {
+			while (inputResult.Count > 0) {
 				ProcessInput?.Invoke (inputResult.Dequeue ().Value);
 			}
 		}
