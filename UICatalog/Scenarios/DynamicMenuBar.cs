@@ -12,10 +12,11 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "Dynamic MenuBar", Description: "Demonstrates how to add and remove a MenuBar, Menus and change titles dynamically.")]
 	[ScenarioCategory ("Dynamic")]
 	class DynamicMenuBar : Scenario {
-		public override void Run ()
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
-			Top.Add (new DynamicMenuBarSample (Win.Title));
-			base.Run ();
+			Application.Init ();
+			Top = Application.Top;
+			Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
 		}
 	}
 
