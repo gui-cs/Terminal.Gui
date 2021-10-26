@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ShortcutHelper
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -406,14 +406,14 @@ Gets the key with all the keys modifiers, especially the shift key that sometime
   
   
   <a id="Terminal_Gui_ShortcutHelper_GetShortcutFromTag_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutFromTag*"></a>
-  <h4 id="Terminal_Gui_ShortcutHelper_GetShortcutFromTag_NStack_ustring_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutFromTag(NStack.ustring)">GetShortcutFromTag(ustring)</h4>
+  <h4 id="Terminal_Gui_ShortcutHelper_GetShortcutFromTag_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutFromTag(NStack.ustring,NStack.ustring)">GetShortcutFromTag(ustring, ustring)</h4>
   <div class="markdown level1 summary">
 Allows to retrieve a <a class="xref" href="Terminal.Gui.Key.html">Key</a> from a <a class="xref" href="Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutTag">ShortcutTag</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Key GetShortcutFromTag(ustring tag)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Key GetShortcutFromTag(ustring tag, ustring delimiter = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -429,6 +429,11 @@ Allows to retrieve a <a class="xref" href="Terminal.Gui.Key.html">Key</a> from a
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">tag</span></td>
         <td>The key as string.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">delimiter</span></td>
+        <td>The delimiter string.</td>
       </tr>
     </tbody>
   </table>
@@ -450,14 +455,14 @@ Allows to retrieve a <a class="xref" href="Terminal.Gui.Key.html">Key</a> from a
   
   
   <a id="Terminal_Gui_ShortcutHelper_GetShortcutTag_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutTag*"></a>
-  <h4 id="Terminal_Gui_ShortcutHelper_GetShortcutTag_Terminal_Gui_Key_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutTag(Terminal.Gui.Key)">GetShortcutTag(Key)</h4>
+  <h4 id="Terminal_Gui_ShortcutHelper_GetShortcutTag_Terminal_Gui_Key_NStack_ustring_" data-uid="Terminal.Gui.ShortcutHelper.GetShortcutTag(Terminal.Gui.Key,NStack.ustring)">GetShortcutTag(Key, ustring)</h4>
   <div class="markdown level1 summary">
 Get the <a class="xref" href="Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_Shortcut">Shortcut</a> key as string.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ustring GetShortcutTag(Key shortcut)</code></pre>
+    <pre><code class="lang-csharp hljs">public static ustring GetShortcutTag(Key shortcut, ustring delimiter = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -473,6 +478,11 @@ Get the <a class="xref" href="Terminal.Gui.ShortcutHelper.html#Terminal_Gui_Shor
         <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
         <td><span class="parametername">shortcut</span></td>
         <td>The shortcut key.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">delimiter</span></td>
+        <td>The delimiter string.</td>
       </tr>
     </tbody>
   </table>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Clipboard
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -84,8 +84,7 @@
   <h1 id="Terminal_Gui_Clipboard" data-uid="Terminal.Gui.Clipboard" class="text-break">Class Clipboard
   </h1>
   <div class="markdown level0 summary">
-Provides cut, copy, and paste support for the clipboard. 
-NOTE: Currently not implemented.
+Provides cut, copy, and paste support for the clipboard with OS interaction.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -130,7 +129,7 @@ NOTE: Currently not implemented.
   <a id="Terminal_Gui_Clipboard_Contents_" data-uid="Terminal.Gui.Clipboard.Contents*"></a>
   <h4 id="Terminal_Gui_Clipboard_Contents" data-uid="Terminal.Gui.Clipboard.Contents">Contents</h4>
   <div class="markdown level1 summary">
-
+Get or sets the operation system clipboard, otherwise the contents field.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -149,6 +148,123 @@ NOTE: Currently not implemented.
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Clipboard_IsSupported_" data-uid="Terminal.Gui.Clipboard.IsSupported*"></a>
+  <h4 id="Terminal_Gui_Clipboard_IsSupported" data-uid="Terminal.Gui.Clipboard.IsSupported">IsSupported</h4>
+  <div class="markdown level1 summary">
+Returns true if the environmental dependencies are in place to interact with the OS clipboard.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsSupported { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_Clipboard_TryGetClipboardData_" data-uid="Terminal.Gui.Clipboard.TryGetClipboardData*"></a>
+  <h4 id="Terminal_Gui_Clipboard_TryGetClipboardData_System_String__" data-uid="Terminal.Gui.Clipboard.TryGetClipboardData(System.String@)">TryGetClipboardData(out String)</h4>
+  <div class="markdown level1 summary">
+Gets the operation system clipboard if possible.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetClipboardData(out string result)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">result</span></td>
+        <td>Clipboard contents read</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true if it was possible to read the OS clipboard.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Clipboard_TrySetClipboardData_" data-uid="Terminal.Gui.Clipboard.TrySetClipboardData*"></a>
+  <h4 id="Terminal_Gui_Clipboard_TrySetClipboardData_System_String_" data-uid="Terminal.Gui.Clipboard.TrySetClipboardData(System.String)">TrySetClipboardData(String)</h4>
+  <div class="markdown level1 summary">
+Sets the operation system clipboard if possible.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TrySetClipboardData(string text)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>True if the clipboard content was set successfully.</td>
       </tr>
     </tbody>
   </table>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MainLoop
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -294,7 +294,7 @@ Adds a timeout to the mainloop.
   </table>
   <h5 id="Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean___remarks">Remarks</h5>
   <div class="markdown level1 remarks">
-When time time specified passes, the callback will be invoked.
+When time specified passes, the callback will be invoked.
 If the callback returns true, the timeout will be reset, repeating
 the invocation. If it returns false, the timeout will stop and be removed.
 
@@ -409,7 +409,7 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveIdle(Func&lt;bool&gt; token)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool RemoveIdle(Func&lt;bool&gt; token)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -428,6 +428,21 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_MainLoop_RemoveTimeout_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout*"></a>
@@ -438,7 +453,7 @@ Removes a previously scheduled timeout
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveTimeout(object token)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool RemoveTimeout(object token)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -453,6 +468,21 @@ Removes a previously scheduled timeout
       <tr>
         <td><span class="xref">System.Object</span></td>
         <td><span class="parametername">token</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FrameView
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -123,6 +123,15 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -353,6 +362,12 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -368,6 +383,12 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -375,9 +396,6 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -390,6 +408,9 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
@@ -439,14 +460,14 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
   
   
   <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
-  <h4 id="Terminal_Gui_FrameView__ctor_NStack_ustring_" data-uid="Terminal.Gui.FrameView.#ctor(NStack.ustring)">FrameView(ustring)</h4>
+  <h4 id="Terminal_Gui_FrameView__ctor_NStack_ustring_Terminal_Gui_Border_" data-uid="Terminal.Gui.FrameView.#ctor(NStack.ustring,Terminal.Gui.Border)">FrameView(ustring, Border)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FrameView(ustring title)</code></pre>
+    <pre><code class="lang-csharp hljs">public FrameView(ustring title, Border border = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -463,53 +484,24 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
         <td><span class="parametername">title</span></td>
         <td>Title.</td>
       </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Border">Border</a>.</td>
+      </tr>
     </tbody>
   </table>
   
   
   <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
-  <h4 id="Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)">FrameView(Rect, ustring)</h4>
+  <h4 id="Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_Terminal_Gui_View___Terminal_Gui_Border_" data-uid="Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring,Terminal.Gui.View[],Terminal.Gui.Border)">FrameView(Rect, ustring, View[], Border)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FrameView(Rect frame, ustring title = null)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">frame</span></td>
-        <td>Frame.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td>Title.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
-  <h4 id="Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_Terminal_Gui_View___" data-uid="Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring,Terminal.Gui.View[])">FrameView(Rect, ustring, View[])</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FrameView(Rect frame, ustring title, View[] views)</code></pre>
+    <pre><code class="lang-csharp hljs">public FrameView(Rect frame, ustring title = null, View[] views = null, Border border = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -536,10 +528,42 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
         <td><span class="parametername">views</span></td>
         <td>Views.</td>
       </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Border">Border</a>.</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="Terminal_Gui_FrameView_Border_" data-uid="Terminal.Gui.FrameView.Border*"></a>
+  <h4 id="Terminal_Gui_FrameView_Border" data-uid="Terminal.Gui.FrameView.Border">Border</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override Border Border { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a></div>
   
   
   <a id="Terminal_Gui_FrameView_Text_" data-uid="Terminal.Gui.FrameView.Text*"></a>
@@ -658,6 +682,18 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
+  
+  
+  <a id="Terminal_Gui_FrameView_OnCanFocusChanged_" data-uid="Terminal.Gui.FrameView.OnCanFocusChanged*"></a>
+  <h4 id="Terminal_Gui_FrameView_OnCanFocusChanged" data-uid="Terminal.Gui.FrameView.OnCanFocusChanged">OnCanFocusChanged()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void OnCanFocusChanged()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a></div>
   
   
   <a id="Terminal_Gui_FrameView_OnEnter_" data-uid="Terminal.Gui.FrameView.OnEnter*"></a>

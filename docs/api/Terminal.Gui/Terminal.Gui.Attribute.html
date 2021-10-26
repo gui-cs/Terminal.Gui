@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct Attribute
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -125,6 +125,36 @@ class to define color schemes that can be used in your application.
   
   
   <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
+  <h4 id="Terminal_Gui_Attribute__ctor_System_Int32_" data-uid="Terminal.Gui.Attribute.#ctor(System.Int32)">Attribute(Int32)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> struct with only the value passed to
+and trying to get the colors if defined.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute(int value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">value</span></td>
+        <td>Value.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
   <h4 id="Terminal_Gui_Attribute__ctor_System_Int32_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)">Attribute(Int32, Color, Color)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> struct.
@@ -132,7 +162,7 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.h
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute(int value, Color foreground = Color.Black, Color background = Color.Black)</code></pre>
+    <pre><code class="lang-csharp hljs">public Attribute(int value, Color foreground, Color background)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -158,6 +188,36 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.h
         <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
         <td><span class="parametername">background</span></td>
         <td>Background</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
+  <h4 id="Terminal_Gui_Attribute__ctor_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color)">Attribute(Color)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> struct
+with the same colors for the foreground and background.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute(Color color)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">color</span></td>
+        <td>The color.</td>
       </tr>
     </tbody>
   </table>
@@ -207,7 +267,7 @@ The background color.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Color Background { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Color Background { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -234,7 +294,7 @@ The foreground color.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Color Foreground { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Color Foreground { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -261,7 +321,7 @@ The color attribute value.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Value { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly int Value { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
