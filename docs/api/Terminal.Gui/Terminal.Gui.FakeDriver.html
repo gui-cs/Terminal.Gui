@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FakeDriver
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -111,7 +111,7 @@ Implements a mock ConsoleDriver for unit testing
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics">ConsoleDriver.Diagnostics</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_">ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)</a>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_Terminal_Gui_Border_">ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean, Border)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">ConsoleDriver.DrawFrame(Rect, Int32, Boolean)</a>
@@ -192,10 +192,28 @@ Implements a mock ConsoleDriver for unit testing
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightBracket">ConsoleDriver.RightBracket</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnMeterSegment">ConsoleDriver.OnMeterSegment</a>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_BlocksMeterSegment">ConsoleDriver.BlocksMeterSegment</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OffMeterSegement">ConsoleDriver.OffMeterSegement</a>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ContinuousMeterSegment">ConsoleDriver.ContinuousMeterSegment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HDLine">ConsoleDriver.HDLine</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_VDLine">ConsoleDriver.VDLine</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ULDCorner">ConsoleDriver.ULDCorner</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LLDCorner">ConsoleDriver.LLDCorner</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_URDCorner">ConsoleDriver.URDCorner</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LRDCorner">ConsoleDriver.LRDCorner</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
@@ -241,6 +259,33 @@ Implements a mock ConsoleDriver for unit testing
   </h3>
   
   
+  <a id="Terminal_Gui_FakeDriver_Clipboard_" data-uid="Terminal.Gui.FakeDriver.Clipboard*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Clipboard" data-uid="Terminal.Gui.FakeDriver.Clipboard">Clipboard</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override IClipboard Clipboard { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.IClipboard.html">IClipboard</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clipboard">ConsoleDriver.Clipboard</a></div>
+  
+  
   <a id="Terminal_Gui_FakeDriver_Cols_" data-uid="Terminal.Gui.FakeDriver.Cols*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Cols" data-uid="Terminal.Gui.FakeDriver.Cols">Cols</h4>
   <div class="markdown level1 summary"></div>
@@ -268,33 +313,6 @@ Implements a mock ConsoleDriver for unit testing
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols">ConsoleDriver.Cols</a></div>
   
   
-  <a id="Terminal_Gui_FakeDriver_Contents_" data-uid="Terminal.Gui.FakeDriver.Contents*"></a>
-  <h4 id="Terminal_Gui_FakeDriver_Contents" data-uid="Terminal.Gui.FakeDriver.Contents">Contents</h4>
-  <div class="markdown level1 summary">
-Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int[,, ] Contents { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span>[,,]</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="Terminal_Gui_FakeDriver_HeightAsBuffer_" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer*"></a>
   <h4 id="Terminal_Gui_FakeDriver_HeightAsBuffer" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer">HeightAsBuffer</h4>
   <div class="markdown level1 summary"></div>
@@ -320,6 +338,33 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HeightAsBuffer">ConsoleDriver.HeightAsBuffer</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_Left_" data-uid="Terminal.Gui.FakeDriver.Left*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Left" data-uid="Terminal.Gui.FakeDriver.Left">Left</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int Left { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Left">ConsoleDriver.Left</a></div>
   
   
   <a id="Terminal_Gui_FakeDriver_Rows_" data-uid="Terminal.Gui.FakeDriver.Rows*"></a>
@@ -512,6 +557,60 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetAttribute">ConsoleDriver.GetAttribute()</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_GetColors_" data-uid="Terminal.Gui.FakeDriver.GetColors*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__" data-uid="Terminal.Gui.FakeDriver.GetColors(System.Int32,Terminal.Gui.Color@,Terminal.Gui.Color@)">GetColors(Int32, out Color, out Color)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool GetColors(int value, out Color foreground, out Color background)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">foreground</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">background</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__">ConsoleDriver.GetColors(Int32, out Color, out Color)</a></div>
   
   
   <a id="Terminal_Gui_FakeDriver_GetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility*"></a>
@@ -809,6 +908,38 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">ConsoleDriver.SetAttribute(Attribute)</a></div>
   
   
+  <a id="Terminal_Gui_FakeDriver_SetBufferSize_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetBufferSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)">SetBufferSize(Int32, Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetBufferSize(int width, int height)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">height</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_FakeDriver_SetColors_" data-uid="Terminal.Gui.FakeDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetColors_System_ConsoleColor_System_ConsoleColor_" data-uid="Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor,System.ConsoleColor)">SetColors(ConsoleColor, ConsoleColor)</h4>
   <div class="markdown level1 summary"></div>
@@ -919,6 +1050,70 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_">ConsoleDriver.SetCursorVisibility(CursorVisibility)</a></div>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_SetWindowPosition_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetWindowPosition_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)">SetWindowPosition(Int32, Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetWindowPosition(int left, int top)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">top</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_FakeDriver_SetWindowSize_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetWindowSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)">SetWindowSize(Int32, Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetWindowSize(int width, int height)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">height</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_FakeDriver_StartReportingMouseMoves_" data-uid="Terminal.Gui.FakeDriver.StartReportingMouseMoves*"></a>

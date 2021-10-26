@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TextView
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,15 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -346,6 +355,15 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -361,6 +379,15 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -368,9 +395,6 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -383,6 +407,9 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -558,6 +585,34 @@ types a TAB character in the view instead of moving the focus to the next view i
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextView_Autocomplete_" data-uid="Terminal.Gui.TextView.Autocomplete*"></a>
+  <h4 id="Terminal_Gui_TextView_Autocomplete" data-uid="Terminal.Gui.TextView.Autocomplete">Autocomplete</h4>
+  <div class="markdown level1 summary">
+Provides autocomplete context menu based on suggestions at the current cursor
+position.  Populate <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_AllSuggestions">AllSuggestions</a> to enable this feature
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Autocomplete Autocomplete { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Autocomplete.html">Autocomplete</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -1222,6 +1277,126 @@ Closes the contents of the stream into the  <a class="xref" href="Terminal.Gui.T
   </table>
   
   
+  <a id="Terminal_Gui_TextView_ColorNormal_" data-uid="Terminal.Gui.TextView.ColorNormal*"></a>
+  <h4 id="Terminal_Gui_TextView_ColorNormal" data-uid="Terminal.Gui.TextView.ColorNormal">ColorNormal()</h4>
+  <div class="markdown level1 summary">
+Sets the driver to the default color for the control where no text is being rendered.  Defaults to <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Normal">Normal</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ColorNormal()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_TextView_ColorNormal_" data-uid="Terminal.Gui.TextView.ColorNormal*"></a>
+  <h4 id="Terminal_Gui_TextView_ColorNormal_System_Collections_Generic_List_System_Rune__System_Int32_" data-uid="Terminal.Gui.TextView.ColorNormal(System.Collections.Generic.List{System.Rune},System.Int32)">ColorNormal(List&lt;Rune&gt;, Int32)</h4>
+  <div class="markdown level1 summary">
+Sets the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">Driver</a> to an appropriate color for rendering the given <code data-dev-comment-type="paramref" class="paramref">idx</code> of the
+current <code data-dev-comment-type="paramref" class="paramref">line</code>.  Override to provide custom coloring by calling <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">SetAttribute(Attribute)</a>
+Defaults to <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Normal">Normal</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ColorNormal(List&lt;Rune&gt; line, int idx)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><span class="parametername">line</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">idx</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextView_ColorSelection_" data-uid="Terminal.Gui.TextView.ColorSelection*"></a>
+  <h4 id="Terminal_Gui_TextView_ColorSelection_System_Collections_Generic_List_System_Rune__System_Int32_" data-uid="Terminal.Gui.TextView.ColorSelection(System.Collections.Generic.List{System.Rune},System.Int32)">ColorSelection(List&lt;Rune&gt;, Int32)</h4>
+  <div class="markdown level1 summary">
+Sets the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">Driver</a> to an appropriate color for rendering the given <code data-dev-comment-type="paramref" class="paramref">idx</code> of the
+current <code data-dev-comment-type="paramref" class="paramref">line</code>.  Override to provide custom coloring by calling <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">SetAttribute(Attribute)</a>
+Defaults to <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Focus">Focus</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ColorSelection(List&lt;Rune&gt; line, int idx)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><span class="parametername">line</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">idx</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextView_ColorUsed_" data-uid="Terminal.Gui.TextView.ColorUsed*"></a>
+  <h4 id="Terminal_Gui_TextView_ColorUsed_System_Collections_Generic_List_System_Rune__System_Int32_" data-uid="Terminal.Gui.TextView.ColorUsed(System.Collections.Generic.List{System.Rune},System.Int32)">ColorUsed(List&lt;Rune&gt;, Int32)</h4>
+  <div class="markdown level1 summary">
+Sets the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">Driver</a> to an appropriate color for rendering the given <code data-dev-comment-type="paramref" class="paramref">idx</code> of the
+current <code data-dev-comment-type="paramref" class="paramref">line</code>.  Override to provide custom coloring by calling <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">SetAttribute(Attribute)</a>
+Defaults to <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotFocus">HotFocus</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ColorUsed(List&lt;Rune&gt; line, int idx)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><span class="parametername">line</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">idx</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_TextView_Copy_" data-uid="Terminal.Gui.TextView.Copy*"></a>
   <h4 id="Terminal_Gui_TextView_Copy" data-uid="Terminal.Gui.TextView.Copy">Copy()</h4>
   <div class="markdown level1 summary">
@@ -1244,6 +1419,33 @@ Cut the selected text to the clipboard contents.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Cut()</code></pre>
   </div>
+  
+  
+  <a id="Terminal_Gui_TextView_DeleteTextBackwards_" data-uid="Terminal.Gui.TextView.DeleteTextBackwards*"></a>
+  <h4 id="Terminal_Gui_TextView_DeleteTextBackwards" data-uid="Terminal.Gui.TextView.DeleteTextBackwards">DeleteTextBackwards()</h4>
+  <div class="markdown level1 summary">
+Deletes a single character from the position of the cursor
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool DeleteTextBackwards()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_TextView_FindNextText_" data-uid="Terminal.Gui.TextView.FindNextText*"></a>
@@ -1394,6 +1596,65 @@ Reset the flag to stop continuous find.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void FindTextChanged()</code></pre>
   </div>
+  
+  
+  <a id="Terminal_Gui_TextView_GetCurrentLine_" data-uid="Terminal.Gui.TextView.GetCurrentLine*"></a>
+  <h4 id="Terminal_Gui_TextView_GetCurrentLine" data-uid="Terminal.Gui.TextView.GetCurrentLine">GetCurrentLine()</h4>
+  <div class="markdown level1 summary">
+Returns the characters on the current line (where the cursor is positioned).
+Use <a class="xref" href="Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentColumn">CurrentColumn</a> to determine the position of the cursor within
+that line
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Rune&gt; GetCurrentLine()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextView_InsertText_" data-uid="Terminal.Gui.TextView.InsertText*"></a>
+  <h4 id="Terminal_Gui_TextView_InsertText_System_String_" data-uid="Terminal.Gui.TextView.InsertText(System.String)">InsertText(String)</h4>
+  <div class="markdown level1 summary">
+Inserts the given <code data-dev-comment-type="paramref" class="paramref">toAdd</code> text at the current cursor position
+exactly as if the user had just typed it
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void InsertText(string toAdd)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">toAdd</span></td>
+        <td>Text to add</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_TextView_LoadFile_" data-uid="Terminal.Gui.TextView.LoadFile*"></a>

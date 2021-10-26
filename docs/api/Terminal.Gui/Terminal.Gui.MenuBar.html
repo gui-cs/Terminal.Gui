@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuBar
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,15 @@ The MenuBar provides a menu for Terminal.Gui applications.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -346,6 +355,15 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -361,6 +379,15 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -368,9 +395,6 @@ The MenuBar provides a menu for Terminal.Gui applications.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -383,6 +407,9 @@ The MenuBar provides a menu for Terminal.Gui applications.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -850,15 +877,47 @@ Virtual method that will invoke the <a class="xref" href="Terminal.Gui.MenuBar.h
   
   
   <a id="Terminal_Gui_MenuBar_OnMenuOpening_" data-uid="Terminal.Gui.MenuBar.OnMenuOpening*"></a>
-  <h4 id="Terminal_Gui_MenuBar_OnMenuOpening" data-uid="Terminal.Gui.MenuBar.OnMenuOpening">OnMenuOpening()</h4>
+  <h4 id="Terminal_Gui_MenuBar_OnMenuOpening_Terminal_Gui_MenuBarItem_" data-uid="Terminal.Gui.MenuBar.OnMenuOpening(Terminal.Gui.MenuBarItem)">OnMenuOpening(MenuBarItem)</h4>
   <div class="markdown level1 summary">
-Virtual method that will invoke the <a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpening">MenuOpening</a>
+Virtual method that will invoke the <a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpening">MenuOpening</a> event if it&apos;s defined.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void OnMenuOpening()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual MenuOpeningEventArgs OnMenuOpening(MenuBarItem currentMenu)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
+        <td><span class="parametername">currentMenu</span></td>
+        <td>The current menu to be replaced.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuOpeningEventArgs.html">MenuOpeningEventArgs</a></td>
+        <td>Returns the <a class="xref" href="Terminal.Gui.MenuOpeningEventArgs.html">MenuOpeningEventArgs</a></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_MenuBar_OpenMenu_" data-uid="Terminal.Gui.MenuBar.OpenMenu*"></a>
@@ -1081,7 +1140,7 @@ Raised as a menu is opening.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event Action MenuOpening</code></pre>
+    <pre><code class="lang-csharp hljs">public event Action&lt;MenuOpeningEventArgs&gt; MenuOpening</code></pre>
   </div>
   <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1093,7 +1152,7 @@ Raised as a menu is opening.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Action</span></td>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.MenuOpeningEventArgs.html">MenuOpeningEventArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

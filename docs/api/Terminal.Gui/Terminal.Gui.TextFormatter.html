@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TextFormatter
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.5.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -148,6 +148,36 @@ Controls the horizontal text-alignment property.
       <tr>
         <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
         <td>The text alignment.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_AutoSize_" data-uid="Terminal.Gui.TextFormatter.AutoSize*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_AutoSize" data-uid="Terminal.Gui.TextFormatter.AutoSize">AutoSize</h4>
+  <div class="markdown level1 summary">
+Used by <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text">Text</a> to resize the view&apos;s <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> with the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size">Size</a>.
+Setting <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_AutoSize">AutoSize</a> to true only work if the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a> and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> are null or
+<a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> values and doesn&apos;t work with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout,
+to avoid breaking the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> and <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> settings.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool AutoSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -468,14 +498,14 @@ Controls the vertical text-alignment property.
   
   
   <a id="Terminal_Gui_TextFormatter_CalcRect_" data-uid="Terminal.Gui.TextFormatter.CalcRect*"></a>
-  <h4 id="Terminal_Gui_TextFormatter_CalcRect_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,NStack.ustring)">CalcRect(Int32, Int32, ustring)</h4>
+  <h4 id="Terminal_Gui_TextFormatter_CalcRect_System_Int32_System_Int32_NStack_ustring_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,NStack.ustring,Terminal.Gui.TextDirection)">CalcRect(Int32, Int32, ustring, TextDirection)</h4>
   <div class="markdown level1 summary">
 Calculates the rectangle required to hold text, assuming no word wrapping.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Rect CalcRect(int x, int y, ustring text)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Rect CalcRect(int x, int y, ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -501,6 +531,11 @@ Calculates the rectangle required to hold text, assuming no word wrapping.
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
         <td>The text to measure</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">direction</span></td>
+        <td>The text direction.</td>
       </tr>
     </tbody>
   </table>
@@ -624,6 +659,57 @@ Justifies text within a specified width.
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td>Justified and clipped text.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextFormatter_ClipOrPad_" data-uid="Terminal.Gui.TextFormatter.ClipOrPad*"></a>
+  <h4 id="Terminal_Gui_TextFormatter_ClipOrPad_System_String_System_Int32_" data-uid="Terminal.Gui.TextFormatter.ClipOrPad(System.String,System.Int32)">ClipOrPad(String, Int32)</h4>
+  <div class="markdown level1 summary">
+Adds trailing whitespace or truncates <code data-dev-comment-type="paramref" class="paramref">text</code>
+so that it fits exactly <code data-dev-comment-type="paramref" class="paramref">width</code> console units.
+Note that some unicode characters take 2+ columns
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string ClipOrPad(string text, int width)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
