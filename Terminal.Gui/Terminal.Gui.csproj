@@ -43,7 +43,7 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
-      v1.3.0
+      v1.3.1
       * #1491  Fix link to MainLoop docs in README.md
       * #1489  Dynamic menu/statusbar and Enable property fix.
       * #1488  Fixed label positions to begin at Margins not just bottom left of screen
