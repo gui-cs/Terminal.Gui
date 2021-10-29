@@ -643,8 +643,14 @@ namespace Terminal.Gui {
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
 		/// </para>
 		/// </remarks>
-		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom) { }
-
+		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom)
+		{
+			X = 0;
+			Y = 0;
+			Width = Dim.Fill();
+			Height = Dim.Fill();
+		}
+		
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
