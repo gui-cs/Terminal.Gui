@@ -821,7 +821,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The absolute file path for the file path entered.</value>
 		public ustring FilePath {
-			get => dirListView.MakePath (nameEntry.Text.ToString ());
+			get {
+				if (nameEntry.Text == "")
+					return null;
+				return dirListView.MakePath (nameEntry.Text.ToString ());
+			}
 			set {
 				nameEntry.Text = Path.GetFileName (value.ToString ());
 			}
@@ -868,6 +872,8 @@ namespace Terminal.Gui {
 		public ustring FileName {
 			get {
 				if (canceled)
+					return null;
+				if (FilePath == null)
 					return null;
 				return Path.GetFileName (FilePath.ToString ());
 			}
