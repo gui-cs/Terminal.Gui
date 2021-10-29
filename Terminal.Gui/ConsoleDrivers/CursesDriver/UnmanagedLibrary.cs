@@ -168,7 +168,10 @@ namespace Unix.Terminal {
 		{
 			var ptr = LoadSymbol (methodName);
 			if (ptr == IntPtr.Zero) {
-				throw new MissingMethodException (string.Format ("The native method \"{0}\" does not exist", methodName));
+				if (methodName == "get_escdelay" || methodName  == "set_escdelay") // This is not supported on mac
+					return null;
+				else
+					throw new MissingMethodException (string.Format ("The native method \"{0}\" does not exist", methodName));
 			}
 			return Marshal.GetDelegateForFunctionPointer<T>(ptr);  // non-generic version is obsolete
 		}

@@ -103,8 +103,14 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			// Reset default esc delay before quitting
-			if (CursesDefaultEscDelay != -1)
-				Curses.set_escdelay (CursesDefaultEscDelay);
+			if (CursesDefaultEscDelay != -1) 
+			{
+				try{
+					Curses.set_escdelay (CursesDefaultEscDelay);
+				} catch (Exception e) {
+					Console.WriteLine ("Curses failed to set esc delay, the exception is: " + e);
+				}
+			}
 			
 			Curses.endwin ();
 
@@ -840,7 +846,12 @@ namespace Terminal.Gui {
 			Curses.noecho ();
 			
 			// Get the expected delay for esc button and store it for resetting.
-			CursesDefaultEscDelay = Curses.get_escdelay ();
+			try{
+				CursesDefaultEscDelay = Curses.get_escdelay ();
+				Curses.set_escdelay (10);
+			} catch (Exception e) {
+				Console.WriteLine ("Curses failed to get esc delay, the exception is: " + e);
+			}
 			Curses.set_escdelay (10);
 
 			Curses.Window.Standard.keypad (true);
