@@ -267,6 +267,8 @@ namespace Unix.Terminal {
 		static public void noqiflush () => methods.noqiflush ();
 		static public void qiflush () => methods.qiflush ();
 		static public int typeahead (IntPtr fd) => methods.typeahead (fd);
+		static public int get_escdelay () => methods.get_escdelay ();
+		static public int set_escdelay (int delay) => methods.set_escdelay (delay);
 		static public int timeout (int delay) => methods.timeout (delay);
 		static public int wtimeout (IntPtr win, int delay) => methods.wtimeout (win, delay);
 		static public int notimeout (IntPtr win, bool bf) => methods.notimeout (win, bf);
@@ -339,6 +341,8 @@ namespace Unix.Terminal {
 		public delegate void noqiflush ();
 		public delegate void qiflush ();
 		public delegate int typeahead (IntPtr fd);
+		public delegate int get_escdelay ();
+		public delegate int set_escdelay (int delay);
 		public delegate int timeout (int delay);
 		public delegate int wtimeout (IntPtr win, int delay);
 		public delegate int notimeout (IntPtr win, bool bf);
@@ -410,6 +414,8 @@ namespace Unix.Terminal {
 		public readonly Delegates.noqiflush noqiflush;
 		public readonly Delegates.qiflush qiflush;
 		public readonly Delegates.typeahead typeahead;
+		public readonly Delegates.get_escdelay get_escdelay;
+		public readonly Delegates.set_escdelay set_escdelay;
 		public readonly Delegates.timeout timeout;
 		public readonly Delegates.wtimeout wtimeout;
 		public readonly Delegates.notimeout notimeout;
@@ -483,6 +489,8 @@ namespace Unix.Terminal {
 			noqiflush = lib.GetNativeMethodDelegate<Delegates.noqiflush> ("noqiflush");
 			qiflush = lib.GetNativeMethodDelegate<Delegates.qiflush> ("qiflush");
 			typeahead = lib.GetNativeMethodDelegate<Delegates.typeahead> ("typeahead");
+			get_escdelay = lib.GetNativeMethodDelegate<Delegates.get_escdelay> ("get_escdelay");
+			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
 			timeout = lib.GetNativeMethodDelegate<Delegates.timeout> ("timeout");
 			wtimeout = lib.GetNativeMethodDelegate<Delegates.wtimeout> ("wtimeout");
 			notimeout = lib.GetNativeMethodDelegate<Delegates.notimeout> ("notimeout");

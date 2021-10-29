@@ -102,6 +102,10 @@ namespace Terminal.Gui {
 
 			SetCursorVisibility (CursorVisibility.Default);
 
+			// Reset default esc delay before quitting
+			if (CursesDefaultEscDelay != -1)
+				Curses.set_escdelay (CursesDefaultEscDelay);
+			
 			Curses.endwin ();
 
 			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
@@ -630,7 +634,7 @@ namespace Terminal.Gui {
 
 			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
-				Curses.timeout (200);
+				Curses.timeout (10); // We should really not have a delay here, the experience is annoying.
 
 				code = Curses.get_wch (out int wch2);
 
@@ -755,6 +759,7 @@ namespace Terminal.Gui {
 
 		Action<KeyEvent> keyHandler;
 		Action<MouseEvent> mouseHandler;
+		int CursesDefaultEscDelay = -1;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
@@ -833,6 +838,10 @@ namespace Terminal.Gui {
 
 			Curses.raw ();
 			Curses.noecho ();
+			
+			// Get the expected delay for esc button and store it for resetting.
+			CursesDefaultEscDelay = Curses.get_escdelay ();
+			Curses.set_escdelay (10);
 
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
