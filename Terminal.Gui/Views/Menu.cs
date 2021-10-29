@@ -567,7 +567,7 @@ namespace Terminal.Gui {
 				host.PreviousMenu (true);
 				return true;
 			case Key.CursorRight:
-				host.NextMenu (barItems.IsTopLevel || (barItems.Children != null && current > -1 && current < barItems.Children.Length && barItems.Children [current].IsFromSubMenu) ? true : false);
+				host.NextMenu (barItems.IsTopLevel || (barItems.Children != null && current > -1 && current < barItems.Children.Length && barItems.Children [current].IsFromSubMenu) ? false : true);
 				return true;
 			case Key.Esc:
 				Application.UngrabMouse ();
