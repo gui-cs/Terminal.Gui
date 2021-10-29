@@ -749,6 +749,10 @@ namespace Terminal.Gui {
 				} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 					keyModifiers.Shift = true;
 				}
+				else if (k == (Key.H|Key.CtrlMask)) { // In linux terminals, ControlH and ctrl+backspace send the same keycode
+					keyModifiers.Ctrl = true;
+					k = Key.Backspace;
+				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
