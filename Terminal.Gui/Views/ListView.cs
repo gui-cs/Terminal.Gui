@@ -109,8 +109,15 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class ListView : View {
-		protected int top, left;
+		/// <summary>
+		/// The index of the top item in the current view box
+		/// </summary>
+		protected int top;
+		/// <summary>
+		/// The currently selected item index
+		/// </summary>
 		protected int selected;
+		int left;
 
 		IListDataSource source;
 		/// <summary>
