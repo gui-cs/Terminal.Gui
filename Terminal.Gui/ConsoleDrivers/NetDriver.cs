@@ -175,6 +175,7 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
+				Thread.Sleep (10);
 				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
 						var w = Math.Max (Console.WindowWidth, 0);
