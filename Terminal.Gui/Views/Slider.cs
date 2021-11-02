@@ -258,7 +258,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
-		public Slider ()
+		public Slider () : base ()
 		{
 		}
 
