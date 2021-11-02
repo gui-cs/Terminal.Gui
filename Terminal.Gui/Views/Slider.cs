@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// Slider Style and Config.
 	/// </summary>
 	public class SliderStyle {
-		
+
 		/// <summary>
 		/// Allow range start and end be in the same option, as a single option.
 		/// </summary>
@@ -36,11 +36,6 @@ namespace Terminal.Gui {
 		/// Show/Hide the options legends.
 		/// </summary>
 		internal bool ShowLegends { get; set; }
-
-		/// <summary>
-		/// Allow range start and end be in the same option, as a single option.
-		/// </summary>
-		public int MouseClickXOptionThreshold { get; set; } = 1;
 
 		/// <summary>
 		/// Left margin.
@@ -315,6 +310,8 @@ namespace Terminal.Gui {
 		int currentOption = 0;
 		ustring header;
 
+		bool settingRange = false;
+
 		#region Events
 
 		/// <summary>
@@ -383,6 +380,12 @@ namespace Terminal.Gui {
 			this.Options = options;
 
 			this.Height = CalcHeight ();
+
+			Leave += (FocusEventArgs e) => {
+				if (settingRange == true) {
+					settingRange = false;
+				}
+			};
 		}
 
 		#endregion
@@ -611,34 +614,23 @@ namespace Terminal.Gui {
 			return (x, style.ShowHeader ? 1 : 0);
 		}
 
-		/// <summary>
-		/// Get the Option index
-		/// </summary>
-		/// <param name="x">x position relative to this view.</param>
-		/// <param name="y">y position relative to this view.</param>
-		/// <param name="x_threshold"></param>
-		int GetOptionByPosition (int x, int y, int x_threshold = 0)
+		int GetOptionByPosition (int x, int y)
 		{
 			if (y != (style.ShowHeader ? 1 : 0))
 				return -1;
 
-			for(int xx = (x - x_threshold); xx < (x + x_threshold + 1); xx++) {
-				var cx = xx;
-				cx -= style.ShowBorders ? 1 : 0;
-				cx -= style.LeftMargin;
-				cx -= style.LeftSpacing;
+			x -= style.ShowBorders ? 1 : 0;
+			x -= style.LeftMargin;
+			x -= style.LeftSpacing;
 
-				var option = cx / (style.InnerSpacing + 1);
-				var valid = cx % (style.InnerSpacing + 1) == 0;
+			var option = x / (style.InnerSpacing + 1);
+			var valid = x % (style.InnerSpacing + 1) == 0;
 
-				if (!valid || option < 0 || option > options.Count - 1) {
-					continue;
-				}
-
-				return option;
+			if (!valid || option < 0 || option > options.Count - 1) {
+				return -1;
 			}
 
-			return -1;
+			return option;
 		}
 
 		void SetCurrentOption ()
@@ -673,28 +665,37 @@ namespace Terminal.Gui {
 				OptionsChanged?.Invoke (currentOptions.ToDictionary (e => e, e => options [e]));
 				break;
 			case SliderType.Range:
-				if (currentOptions.Count == 0) {
-					// Always 2 options sets
-					if (style.RangeAllowSingle) {
-						currentOptions.Add (currentOption);
-						currentOptions.Add (currentOption);
-					} else {
-						currentOptions.Add (currentOption);
-						if (currentOption == options.Count - 1) {
-							currentOptions.Add (currentOption - 1);
-						} else {
-							currentOptions.Add (currentOption + 1);
-						}
-					}
-
-					// Raise per Option Set event.
-					options [currentOptions [0]].OnSet ();
-					options [currentOptions [1]].OnSet ();
-
-					OptionsChanged?.Invoke (currentOptions.ToDictionary (e => e, e => options [e]));
-				} else if (currentOptions.Count == 2) {
-
+				// Start range setting
+				if(settingRange == false) {
+					currentOptions.Clear();
+					currentOptions.Add (currentOption);
+					currentOptions.Add (currentOption);
+					settingRange = true;
+				} else { // End
+					currentOptions[1] = currentOption;
 				}
+				// if (currentOptions.Count == 0) {
+				// 	// Always 2 options sets
+				// 	if (style.RangeAllowSingle) {
+				// 		currentOptions.Add (currentOption);
+				// 		currentOptions.Add (currentOption);
+				// 	} else {
+				// 		currentOptions.Add (currentOption);
+				// 		if (currentOption == options.Count - 1) {
+				// 			currentOptions.Add (currentOption - 1);
+				// 		} else {
+				// 			currentOptions.Add (currentOption + 1);
+				// 		}
+				// 	}
+
+				// 	// Raise per Option Set event.
+				// 	options [currentOptions [0]].OnSet ();
+				// 	options [currentOptions [1]].OnSet ();
+
+				// 	OptionsChanged?.Invoke (currentOptions.ToDictionary (e => e, e => options [e]));
+				// } else if (currentOptions.Count == 2) {
+
+				// }
 				break;
 			default:
 				throw new ArgumentOutOfRangeException (type.ToString ());
@@ -704,6 +705,8 @@ namespace Terminal.Gui {
 		#endregion
 
 		#region Cursor and Drawing
+
+		
 
 		/// <inheritdoc/>
 		public override void PositionCursor ()
@@ -911,7 +914,7 @@ namespace Terminal.Gui {
 			// TODO(jmperricone): Make Range type work with mouse.
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-				var option = GetOptionByPosition (mouseEvent.X, mouseEvent.Y, style.MouseClickXOptionThreshold);
+				var option = GetOptionByPosition (mouseEvent.X, mouseEvent.Y);
 				if (option != -1) {
 					currentOption = option;
 					OptionFocused?.Invoke (currentOption, options [currentOption]);
@@ -958,13 +961,28 @@ namespace Terminal.Gui {
 			case Key.CursorLeft:
 				currentOption = currentOption > 0 ? currentOption - 1 : currentOption;
 				OptionFocused?.Invoke (currentOption, options [currentOption]);
+
+				if(settingRange == true) {
+					SetCurrentOption();
+				}
+
 				break;
 			case Key.CursorRight:
 				currentOption = currentOption < this.options.Count - 1 ? currentOption + 1 : currentOption;
 				OptionFocused?.Invoke (currentOption, options [currentOption]);
+
+				if(settingRange == true) {
+					SetCurrentOption();
+				}
+
+
 				break;
 			case Key.Enter:
-				SetCurrentOption ();
+				if(settingRange == true) {
+					settingRange = false;
+				} else {
+					SetCurrentOption ();
+				}
 				break;
 			default:
 				return false;
