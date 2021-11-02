@@ -38,6 +38,11 @@ namespace Terminal.Gui {
 		internal bool ShowLegends { get; set; }
 
 		/// <summary>
+		/// Allow range start and end be in the same option, as a single option.
+		/// </summary>
+		public int MouseClickXOptionThreshold { get; set; } = 1;
+
+		/// <summary>
 		/// Left margin.
 		/// </summary>
 		public int LeftMargin { get; set; }
@@ -623,23 +628,34 @@ namespace Terminal.Gui {
 			return (x, style.ShowHeader ? 1 : 0);
 		}
 
-		int GetOptionByPosition (int x, int y)
+		/// <summary>
+		/// Get the Option index
+		/// </summary>
+		/// <param name="x">x position relative to this view.</param>
+		/// <param name="y">y position relative to this view.</param>
+		/// <param name="x_threshold"></param>
+		int GetOptionByPosition (int x, int y, int x_threshold = 0)
 		{
 			if (y != (style.ShowHeader ? 1 : 0))
 				return -1;
 
-			x -= style.ShowBorders ? 1 : 0;
-			x -= style.LeftMargin;
-			x -= style.LeftSpacing;
+			for(int xx = (x - x_threshold); xx < (x + x_threshold + 1); xx++) {
+				var cx = xx;
+				cx -= style.ShowBorders ? 1 : 0;
+				cx -= style.LeftMargin;
+				cx -= style.LeftSpacing;
 
-			var option = x / (style.InnerSpacing + 1);
-			var valid = x % (style.InnerSpacing + 1) == 0;
+				var option = cx / (style.InnerSpacing + 1);
+				var valid = cx % (style.InnerSpacing + 1) == 0;
 
-			if (!valid || option < 0 || option > options.Count - 1) {
-				return -1;
+				if (!valid || option < 0 || option > options.Count - 1) {
+					continue;
+				}
+
+				return option;
 			}
-
-			return option;
+			
+			return -1;
 		}
 
 		void SetCurrentOption ()
@@ -923,7 +939,7 @@ namespace Terminal.Gui {
 			// TODO(jmperricone): Make Range type work with mouse.
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-				var option = GetOptionByPosition (mouseEvent.X, mouseEvent.Y);
+				var option = GetOptionByPosition (mouseEvent.X, mouseEvent.Y,style.MouseClickXOptionThreshold);
 				if (option != -1) {
 					currentOption = option;
 					OptionFocused?.Invoke (currentOption, options [currentOption]);
