@@ -340,7 +340,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
 		/// <param name="options">Initial slider options.</param>
-		public Slider (List<T> options) : this (ustring.Empty, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList ())
+		public Slider (List<T> options) : this (ustring.Empty, options)
 		{
 		}
 
@@ -349,8 +349,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="header">Header text of the slider.</param>
 		/// <param name="options">Initial slider options.</param>
-		public Slider (ustring header, List<T> options) : this (header, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList ())
+		public Slider (ustring header, List<T> options)
 		{
+			if(options == null) {
+				Init(header, null);
+			} else {
+				Init(header, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList ());
+			}
 		}
 
 		/// <summary>
@@ -368,6 +373,10 @@ namespace Terminal.Gui {
 		/// <param name="options">Initial slider options.</param>
 		public Slider (ustring header, List<SliderOption<T>> options)
 		{
+			Init(header, options);
+		}
+
+		void Init(ustring header, List<SliderOption<T>> options) {
 			SetDefaultHorizontalStyle ();
 
 			CanFocus = true;
@@ -377,7 +386,7 @@ namespace Terminal.Gui {
 				this.header = header;
 			}
 
-			this.Options = options;
+			this.Options = options ?? new List<SliderOption<T>>();
 
 			this.Height = CalcHeight ();
 
