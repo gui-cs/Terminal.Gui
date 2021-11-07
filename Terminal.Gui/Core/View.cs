@@ -1335,6 +1335,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public void RefreshColorScheme ()
+		{
+			if (ColorScheme?.caller != null) {
+				ColorScheme = Colors.ColorSchemes [ColorScheme.caller];
+			}
+
+			if (subviews == null)
+				return;
+			foreach (var subview in subviews) {
+				subview.RefreshColorScheme ();
+			}
+		}
+
 		/// <summary>
 		/// Displays the specified character in the specified column and row of the View.
 		/// </summary>
