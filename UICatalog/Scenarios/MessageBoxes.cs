@@ -12,9 +12,9 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			var frame = new FrameView ("MessageBox Options") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = 1,
-				Width = Dim.Percent(75),
+				Width = Dim.Percent (75),
 				Height = 10
 			};
 			Win.Add (frame);
@@ -71,7 +71,7 @@ namespace UICatalog {
 			var titleEdit = new TextField ("Title") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
-				Width = Dim.Fill(),
+				Width = Dim.Fill (),
 				Height = 1
 			};
 			frame.Add (titleEdit);
@@ -134,16 +134,29 @@ namespace UICatalog {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var styleRadioGroup = new RadioGroup (new ustring [] { "_Query", "_Error" } ) {
+			var styleRadioGroup = new RadioGroup (new ustring [] { "_Query", "_Error" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
 			frame.Add (styleRadioGroup);
 
+			var border = new Border () {
+				Effect3D = true,
+				BorderStyle = BorderStyle.Single
+			};
+			var ckbEffect3D = new CheckBox ("Effect3D", true) {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label) + 2
+			};
+			ckbEffect3D.Toggled += (e) => {
+				border.Effect3D = !e;
+			};
+			frame.Add (ckbEffect3D);
+
 			void Top_Loaded ()
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
-				+ Dim.Height (numButtonsEdit) + Dim.Height(defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2;
+				+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2 + Dim.Height (ckbEffect3D);
 				Top.Loaded -= Top_Loaded;
 			}
 			Top.Loaded += Top_Loaded;
@@ -167,7 +180,7 @@ namespace UICatalog {
 			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
 			var showMessageBoxButton = new Button ("Show MessageBox") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
@@ -184,9 +197,9 @@ namespace UICatalog {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";
