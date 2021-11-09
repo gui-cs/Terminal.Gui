@@ -391,7 +391,7 @@ namespace Terminal.Gui {
 
 			//start by clearing the entire line
 			Move (0, row);
-			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus
+			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.Focus
 				: Enabled ? rowScheme.Normal : rowScheme.Disabled);
 			Driver.AddStr (new string (' ', Bounds.Width));
 
@@ -432,7 +432,7 @@ namespace Terminal.Gui {
 					scheme = rowScheme;
 				}
 
-				var cellColor = isSelectedCell ? scheme.HotFocus : Enabled ? scheme.Normal : scheme.Disabled;
+				var cellColor = isSelectedCell ? scheme.Focus : Enabled ? scheme.Normal : scheme.Disabled;
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
-					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
+					Driver.SetAttribute (isSelectedCell ? rowScheme.Focus
 						: Enabled ? rowScheme.Normal : rowScheme.Disabled);
 				}
 
