@@ -642,7 +642,8 @@ namespace Terminal.Gui {
 			};
 			cmbAllowedTypes.SetSource (allowedTypes ?? new List<string> ());
 			cmbAllowedTypes.OpenSelectedItem += (e) => AllowedFileTypes = cmbAllowedTypes.Text.ToString ().Split (';');
-			Add (cmbAllowedTypes);
+			if (allowedTypes != null)
+				Add (cmbAllowedTypes);
 
 			dirListView = new DirListView (this) {
 				X = 1,
@@ -705,12 +706,12 @@ namespace Terminal.Gui {
 			// On success, we will set this to false.
 			canceled = true;
 
-			KeyPress += (e) => {
-				if (e.KeyEvent.Key == Key.Esc) {
-					Cancel ();
-					e.Handled = true;
-				}
-			};
+			// KeyPress += (e) => {
+			// 	if (e.KeyEvent.Key == Key.Esc) {
+			// 		Cancel ();
+			// 		e.Handled = true;
+			// 	}
+			// };
 			void Cancel ()
 			{
 				canceled = true;
@@ -862,7 +863,7 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
-			: base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message, allowedTypes) { }
+			: base (title, prompt: "Save", nameFieldLabel: "Save as", message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null

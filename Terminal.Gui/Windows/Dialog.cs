@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 
 			ColorScheme = Colors.Dialog;
 			Modal = true;
-			Border.Effect3D = true;
+			// Border.Effect3D = true;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {
