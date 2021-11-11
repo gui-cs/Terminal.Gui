@@ -174,7 +174,7 @@ namespace Terminal.Gui {
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, bounds.Width,
-			       bounds.Height - spaceAtBottom - startAtY), 0, true);
+			       Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
 			}
 
 			if (Tabs.Any ()) {

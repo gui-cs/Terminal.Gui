@@ -454,7 +454,7 @@ namespace Terminal.Gui {
 			// Fixed = true, is for inputs thar have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
-			if (provider.Fixed == false && TextAlignment == TextAlignment.Right) {
+			if (provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
 				Move (cursorPosition + left - 1, 0);
 			} else {
 				Move (cursorPosition + left, 0);
@@ -591,7 +591,7 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (provider == null) {
-				return true;
+				return false;
 			}
 
 			switch (kb.Key) {
