@@ -2554,6 +2554,11 @@ namespace Terminal.Gui {
 				if (!AllowsTab) {
 					return false;
 				}
+
+				if (ReadOnly) {
+					return false;
+				}
+				
 				InsertText (new KeyEvent ((Key)'\t', null));
 				break;
 
@@ -2568,6 +2573,11 @@ namespace Terminal.Gui {
 						currentColumn--;
 					}
 				}
+				
+				if (ReadOnly) {
+					return false;
+				}
+
 				break;
 
 			default:
