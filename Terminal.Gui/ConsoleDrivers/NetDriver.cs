@@ -175,6 +175,7 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
+				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
 				Thread.Sleep (10);
 				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
