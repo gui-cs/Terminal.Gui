@@ -22,51 +22,65 @@ namespace Terminal.Gui.Views {
 		public bool Constructors_FullTest (Type type)
 		{
 			foreach (var ctor in type.GetConstructors ()) {
-				if (type.IsGenericType && type.IsTypeDefinition) {
-					List<Type> gTypes = new List<Type> ();
-
-					foreach (var args in type.GetGenericArguments ()) {
-						gTypes.Add (typeof (object));
-					}
-					type = type.MakeGenericType (gTypes.ToArray ());
-
-					Assert.IsType (type, (View)Activator.CreateInstance (type));
-
-				} else {
-					ParameterInfo [] paramsInfo = ctor.GetParameters ();
-					Type paramType;
-					List<object> pTypes = new List<object> ();
-
-					if (type.IsGenericType) {
-						foreach (var args in type.GetGenericArguments ()) {
-							paramType = args.GetType ();
-							if (args.Name == "T") {
-								pTypes.Add (typeof (object));
-							} else {
-								AddArguments (paramType, pTypes);
-							}
-						}
-					}
-
-					foreach (var p in paramsInfo) {
-						paramType = p.ParameterType;
-						if (p.HasDefaultValue) {
-							pTypes.Add (p.DefaultValue);
-						} else {
-							AddArguments (paramType, pTypes);
-						}
-
-					}
-
-					if (type.IsGenericType && !type.IsTypeDefinition) {
-						Assert.IsType (type, (View)Activator.CreateInstance (type));
-					} else {
-						Assert.IsType (type, ctor.Invoke (pTypes.ToArray ()));
-					}
+				var view = GetTypeInitializer (type, ctor);
+				if (view != null) {
+					Assert.True (type.FullName == view.GetType ().FullName);
 				}
 			}
 
 			return true;
+		}
+
+		private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+		{
+			View viewType = null;
+
+			if (type.IsGenericType && type.IsTypeDefinition) {
+				List<Type> gTypes = new List<Type> ();
+
+				foreach (var args in type.GetGenericArguments ()) {
+					gTypes.Add (typeof (object));
+				}
+				type = type.MakeGenericType (gTypes.ToArray ());
+
+				Assert.IsType (type, (View)Activator.CreateInstance (type));
+
+			} else {
+				ParameterInfo [] paramsInfo = ctor.GetParameters ();
+				Type paramType;
+				List<object> pTypes = new List<object> ();
+
+				if (type.IsGenericType) {
+					foreach (var args in type.GetGenericArguments ()) {
+						paramType = args.GetType ();
+						if (args.Name == "T") {
+							pTypes.Add (typeof (object));
+						} else {
+							AddArguments (paramType, pTypes);
+						}
+					}
+				}
+
+				foreach (var p in paramsInfo) {
+					paramType = p.ParameterType;
+					if (p.HasDefaultValue) {
+						pTypes.Add (p.DefaultValue);
+					} else {
+						AddArguments (paramType, pTypes);
+					}
+
+				}
+
+				if (type.IsGenericType && !type.IsTypeDefinition) {
+					viewType = (View)Activator.CreateInstance (type);
+					Assert.IsType (type, viewType);
+				} else {
+					viewType = (View)ctor.Invoke (pTypes.ToArray ());
+					Assert.IsType (type, viewType);
+				}
+			}
+
+			return viewType;
 		}
 
 		private static void AddArguments (Type paramType, List<object> pTypes)
@@ -107,6 +121,64 @@ namespace Terminal.Gui.Views {
 				types.Add (type);
 			}
 			return types;
+		}
+
+		[Fact]
+		public void AllViews_Enter_Leave_Events ()
+		{
+			foreach (var type in GetAllViewClassesCollection ()) {
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+				var top = Application.Top;
+				var vType = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+				if (vType == null) {
+					Application.Shutdown ();
+					continue;
+				}
+				vType.X = 0;
+				vType.Y = 0;
+				vType.Width = 10;
+				vType.Height = 1;
+
+				var view = new View () {
+					X = 0,
+					Y = 1,
+					Width = 10,
+					Height = 1,
+					CanFocus = true
+				};
+				var vTypeEnter = 0;
+				var vTypeLeave = 0;
+				var viewEnter = 0;
+				var viewLeave = 0;
+
+				vType.Enter += _ => vTypeEnter++;
+				vType.Leave += _ => vTypeLeave++;
+				view.Enter += _ => viewEnter++;
+				view.Leave += _ => viewLeave++;
+
+				top.Add (vType, view);
+				Application.Begin (top);
+
+				if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal)) {
+					Application.Shutdown ();
+					continue;
+				}
+
+				if (vType is TextView) {
+					top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ()));
+				} else {
+					top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+				}
+				top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+
+				Assert.Equal (2, vTypeEnter);
+				Assert.Equal (1, vTypeLeave);
+				Assert.Equal (1, viewEnter);
+				Assert.Equal (1, viewLeave);
+
+				Application.Shutdown ();
+			}
 		}
 	}
 }

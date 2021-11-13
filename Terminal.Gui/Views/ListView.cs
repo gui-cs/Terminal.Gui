@@ -673,7 +673,6 @@ namespace Terminal.Gui {
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
 				OnSelectedChanged ();
-				return true;
 			}
 
 			return base.OnEnter (view);
@@ -684,10 +683,9 @@ namespace Terminal.Gui {
 		{
 			if (lastSelectedItem > -1) {
 				lastSelectedItem = -1;
-				return true;
 			}
 
-			return false;
+			return base.OnLeave (view);
 		}
 
 		void EnsuresVisibilitySelectedItem ()
