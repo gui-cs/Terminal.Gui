@@ -25,7 +25,7 @@
     <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
 
-    <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
