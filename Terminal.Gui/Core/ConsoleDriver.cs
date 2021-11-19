@@ -1098,7 +1098,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Lozenge character
 		/// </summary>
-		public Rune Lozenge = '\u25c6';
+		public Rune Lozenge => Application.Driver is WindowsDriver ? '\u2666' : '\u25c6';
 		
 		/// <summary>
 		/// Upper left corner
