@@ -368,6 +368,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> SelectedItemChanged;
 
+		protected void InvokeSelectedItemChanged (ListViewItemEventArgs e)
+		{
+			SelectedItemChanged?.Invoke (e);
+		}
+
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
