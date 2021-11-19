@@ -4,11 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
+
+
+using S = Terminal.Gui.Sliders;
+
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Slider", Description: "Demonstrates all sorts of Sliders")]
-	[ScenarioCategory ("Controls")]
+	//[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("")]
 
-	class Sliders : Scenario {
+	class SlidersScenario : Scenario {
 		public override void Setup ()
 		{
 			var leftView = new FrameView {
@@ -41,96 +46,187 @@ namespace UICatalog {
 				var label = new Label ("Sliders Options") { X = 0, Y = 0, Width = Dim.Fill (), TextAlignment = TextAlignment.Centered };
 				rightView.Add (label);
 
+				#region Config Slider
+
 				var slider = new Slider<string> () {
 					X = Pos.Center (),
 					Y = Pos.Bottom (label) + 1,
-					Type = SliderType.Multiple,
+					Type = S.SliderType.Multiple,
 				};
 
-				slider.Style.SetAllAttributes (new Terminal.Gui.Attribute (Color.White, Color.Blue));
-				slider.Style.SetAttr = new Terminal.Gui.Attribute (Color.BrightGreen);
-				slider.Style.LegendSetAttr = new Terminal.Gui.Attribute (Color.Green);
+				slider.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
+				slider.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (Color.Green, Color.Black);
 
 				slider.ShowHeader = true;
 				slider.Header = "Slider Config";
-				slider.Options = new List<SliderOption<string>> {
-					new SliderOption<string>{
-						Legend="Borders"
-					},
-					new SliderOption<string>{
+				slider.Options = new List<S.SliderOption<string>> {
+					new S.SliderOption<string>{
 						Legend="Legends"
 					},
-					new SliderOption<string>{
+					new S.SliderOption<string>{
 						Legend="Header"
 					},
-					new SliderOption<string>{
+					new S.SliderOption<string>{
 						Legend="RangeSingle"
+					},
+					new S.SliderOption<string>{
+						Legend="Spacing"
 					}
 				};
 
+				slider.SetOption (0);
 				slider.SetOption (1);
-				slider.SetOption (2);
 
 				rightView.Add (slider);
 
 				slider.OptionsChanged += (options) => {
 					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
-
 						if (options.ContainsKey (0))
-							s.ShowBorders = true;
-						else
-							s.ShowBorders = false;
-
-						if (options.ContainsKey (1))
 							s.ShowLegends = true;
 						else
 							s.ShowLegends = false;
 
-						if (options.ContainsKey (2))
+						if (options.ContainsKey (1))
 							s.ShowHeader = true;
 						else
 							s.ShowHeader = false;
 
-						if (options.ContainsKey (3))
+						if (options.ContainsKey (2))
 							s.RangeAllowSingle = true;
 						else
 							s.RangeAllowSingle = false;
 
+						if (options.ContainsKey (3))
+							s.ShowSpacing = true;
+						else
+							s.ShowSpacing = false;
 					}
 				};
 
-				// COLOR
+				#endregion
+
+				#region InnerSpacing Input
+
+				var innerspacing_slider = new Slider<string> ("Innerspacing", new List<string> { "Auto", "0", "1", "2", "3", "4", "5" }) {
+					X = Pos.Center (),
+					Y = Pos.Bottom (slider) + 1
+				};
+
+				innerspacing_slider.SetOption (0);
+
+				rightView.Add (innerspacing_slider);
+
+				innerspacing_slider.OptionsChanged += (options) => {
+					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+						if (options.ContainsKey (0))
+						{}
+							//s.la = S.SliderLayout.Auto;
+						else{
+							s.InnerSpacing = options.Keys.First() - 1;
+						}
+					}
+				};
+				#endregion
+
+				#region Slider Orientation Slider
+
+				var slider_orientation_slider = new Slider<string> ("Slider Orientation", new List<string> { "Horizontal", "Vertical" }) {
+					X = Pos.Center (),
+					Y = Pos.Bottom (innerspacing_slider) + 1
+				};
+
+				slider_orientation_slider.SetOption (0);
+
+				rightView.Add (slider_orientation_slider);
+
+				slider_orientation_slider.OptionsChanged += (options) => {
+
+					View prev = null;
+					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+
+
+						if (options.ContainsKey (0)) {
+							s.SliderOrientation = S.Orientation.Horizontal;
+							s.Style.SpaceChar.Rune = '─';
+
+							if (prev == null) {
+								s.Y = Pos.Bottom (label) + 1;
+							} else {
+								s.Y = Pos.Bottom (prev) + 1;
+							}
+							s.X = Pos.Center ();
+							prev = s;
+
+						} else if (options.ContainsKey (1)) {
+							s.SliderOrientation = S.Orientation.Vertical;
+							s.Style.SpaceChar.Rune = '│';
+
+							if (prev == null) {
+								s.X = Pos.Left (label);
+							} else {
+								s.X = Pos.Right (prev) + 2;
+							}
+							s.Y = Pos.Center ();
+							prev = s;
+						}
+					}
+				};
+
+				#endregion
+
+				#region Legends Orientation Slider
+
+				var legends_orientation_slider = new Slider<string> ("Legends Orientation", new List<string> { "Horizontal", "Vertical" }) {
+					X = Pos.Center (),
+					Y = Pos.Bottom (slider_orientation_slider) + 1
+				};
+
+				legends_orientation_slider.SetOption (0);
+
+				rightView.Add (legends_orientation_slider);
+
+				legends_orientation_slider.OptionsChanged += (options) => {
+					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+						if (options.ContainsKey (0))
+							s.LegendsOrientation = S.Orientation.Horizontal;
+						else if (options.ContainsKey (1))
+							s.LegendsOrientation = S.Orientation.Vertical;
+					}
+				};
+
+				#endregion
+
+				#region Color Slider
 
 				var sliderColor = new Slider<(Color, Color)> () {
 					X = Pos.Center (),
-					Y = Pos.Bottom (slider) + 1,
-					Type = SliderType.Single,
+					Y = Pos.Bottom (legends_orientation_slider) + 1,
+					Type = S.SliderType.Single,
 				};
 
-				sliderColor.Style.SetAllAttributes (new Terminal.Gui.Attribute (Color.White, Color.Blue));
-				sliderColor.Style.SetAttr = new Terminal.Gui.Attribute (Color.BrightGreen, Color.BrightGreen);
-				sliderColor.Style.LegendSetAttr = new Terminal.Gui.Attribute (Color.Green, Color.Blue);
+				sliderColor.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
+				sliderColor.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (Color.Green, Color.Blue);
 
 				sliderColor.ShowHeader = true;
 				sliderColor.Header = "Slider Color";
-				sliderColor.Options = new List<SliderOption<(Color, Color)>> {
-					new SliderOption<(Color, Color)> {
+				sliderColor.Options = new List<S.SliderOption<(Color, Color)>> {
+					new S.SliderOption<(Color, Color)> {
 						Data = (Color.Red,Color.BrightRed),
 						Legend = "Red"
 					},
-					new SliderOption<(Color, Color)> {
+					new S.SliderOption<(Color, Color)> {
 						Data = (Color.Blue,Color.BrightBlue),
 						Legend = "Blue"
 					},
-					new SliderOption<(Color, Color)> {
+					new S.SliderOption<(Color, Color)> {
 						Data = (Color.Green,Color.BrightGreen),
 						Legend = "Green"
 					},
-					new SliderOption<(Color, Color)> {
+					new S.SliderOption<(Color, Color)> {
 						Data = (Color.Cyan,Color.BrightCyan),
 						Legend = "Cyan"
 					},
-					new SliderOption<(Color, Color)> {
+					new S.SliderOption<(Color, Color)> {
 						Data = (Color.Brown,Color.BrightYellow),
 						Legend = "Yellow"
 					}
@@ -142,70 +238,41 @@ namespace UICatalog {
 					var data = options.First ().Value.Data;
 
 					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
-						s.Style.SetAttr = new Terminal.Gui.Attribute (data.Item1, data.Item1);
-						s.Style.LegendSetAttr = new Terminal.Gui.Attribute (data.Item1, Color.Black);
-						s.Style.RangeAttr = new Terminal.Gui.Attribute (data.Item2, data.Item2);
+						s.Style.SetChar.Attribute = new Terminal.Gui.Attribute (data.Item1, data.Item2);
+						s.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (data.Item1, Color.Black);
+						s.Style.RangeChar.Attribute = new Terminal.Gui.Attribute (data.Item2, Color.Black);
+
+						// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing, that internaly calls SetNeedDisplay.
 					}
 				};
 
 				// Set option after Eventhandler def, so it updates the sliders color.
 				sliderColor.SetOption (2);
 
-				// Slider Options Editor
-
-				var labeleditor = new Label ("Slider Options Editor") { X = Pos.Center (), Y = Pos.Bottom (sliderColor) + 1 };
-
-				var view = new View () { X = Pos.Center (), Y = Pos.Bottom (labeleditor) + 1, Width = 20, Height = 0 };
-				var field = new TextField () { X = Pos.Center () + 1, Y = Pos.Bottom (view), Width = 20 };
-
-				field.KeyDown += (k) => {
-					if (k.KeyEvent.Key == Key.Enter && field.Text != ustring.Empty) {
-						var vfield = new TextField (field.Text) { X = 1, Y = view.Bounds.Height, Width = 20 };
-
-						field.Text = "";
-
-						view.Add (vfield);
-
-						view.Height = view.Bounds.Height + 1;
-
-						var options = view.Subviews.OfType<TextField> ().Select (e => e.Text.ToString ()).ToList<object> ();
-
-						foreach (var s in leftView.Subviews [0].Subviews) {
-							s.Dispose ();
-						}
-						leftView.Subviews [0].RemoveAll ();
-
-						k.Handled = true;
-
-						MakeSliders (leftView, options);
-					}
-				};
-
-				rightView.Add (labeleditor);
-				rightView.Add (view);
-				rightView.Add (field);
-				//Win.Add (button);
+				#endregion
 			}
 			#endregion
 		}
 
 		public void MakeSliders (View v, List<object> options)
 		{
-			var types = Enum.GetValues (typeof (SliderType)).Cast<SliderType> ().ToList ();
+			var types = Enum.GetValues (typeof (Terminal.Gui.Sliders.SliderType)).Cast<Terminal.Gui.Sliders.SliderType> ().ToList ();
 
 			View view = new Label ("Slider Types") { X = 0, Y = 0, Width = Dim.Fill (), TextAlignment = TextAlignment.Centered };
+
 			v.Add (view);
 
 			foreach (var type in types) {
-				view = new Slider (type.ToString (), options) {
+				view = new Slider (type.ToString (), options, S.Orientation.Horizontal) {
 					X = Pos.Center (),
+					//X = Pos.Right (view) + 1,
 					Y = Pos.Bottom (view) + 1,
-					Type = type
+					//Y = Pos.Center (),
+					Type = type,
+					LegendsOrientation = S.Orientation.Horizontal,
 				};
 				v.Add (view);
 			};
-
-			//v.FocusFirst ();
 		}
 	}
 }
