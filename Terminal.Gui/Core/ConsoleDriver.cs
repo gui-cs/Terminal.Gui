@@ -1148,7 +1148,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Un-checked checkmark.
 		/// </summary>
-		public Rune UnChecked = '\u2574';
+		public Rune UnChecked = ' ';// '\u2574';
 
 		/// <summary>
 		/// Selected mark.

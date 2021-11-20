@@ -335,7 +335,7 @@ namespace Terminal.Gui {
 			var f = Frame;
 			var item = top;
 			bool focused = HasFocus;
-			int col = allowsMarking ? 2 : 0;
+			int col = allowsMarking ? 4 : 0;
 			int start = left;
 
 			for (int row = 0; row < f.Height; row++, item++) {
@@ -355,7 +355,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 				} else {
 					if (allowsMarking) {
-						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
+						Driver.AddStr ($"[{(source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected))}]");
 						Driver.AddRune (' ');
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);

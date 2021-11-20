@@ -118,9 +118,9 @@ namespace Terminal.Gui {
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
 			Move (0, 0);
-			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
+			Driver.AddStr ($"[{(Checked ? Driver.Checked : Driver.UnChecked)}]");
 			Driver.AddRune (' ');
-			Move (2, 0);
+			Move (4, 0);
 			Driver.AddStr (Text);
 			if (hot_pos != -1) {
 				Move (2 + hot_pos, 0);
