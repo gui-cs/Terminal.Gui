@@ -1498,8 +1498,9 @@ namespace Terminal.Gui {
 			if (values.Contains ((attr >> 16) & 0xffff)) {
 				fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
 			}
+			sb.Append ($"{CSI}{bg};{fg}m");
 
-			return new System.Text.StringBuilder ($"{CSI}{bg};{fg}m");
+			return sb;
 		}
 
 		int MapColors (ConsoleColor color, bool isForeground = true)
