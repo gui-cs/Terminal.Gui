@@ -9037,6 +9037,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
   nameWithType: MessageBox.ErrorQuery(ustring, ustring, Int32, ustring[])
   nameWithType.vb: MessageBox.ErrorQuery(ustring, ustring, Int32, ustring())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name: ErrorQuery(ustring, ustring, Int32, Border, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name.vb: ErrorQuery(ustring, ustring, Int32, Border, ustring())
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring())
+  nameWithType: MessageBox.ErrorQuery(ustring, ustring, Int32, Border, ustring[])
+  nameWithType.vb: MessageBox.ErrorQuery(ustring, ustring, Int32, Border, ustring())
 - uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])
   name: ErrorQuery(Int32, Int32, ustring, ustring, ustring[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___
@@ -9055,6 +9064,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
   nameWithType: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring[])
   nameWithType.vb: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name: ErrorQuery(Int32, Int32, ustring, ustring, Int32, Border, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name.vb: ErrorQuery(Int32, Int32, ustring, ustring, Int32, Border, ustring())
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring())
+  nameWithType: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, Border, ustring[])
+  nameWithType.vb: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, Border, ustring())
 - uid: Terminal.Gui.MessageBox.ErrorQuery*
   name: ErrorQuery
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_
@@ -9080,6 +9098,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
   nameWithType: MessageBox.Query(ustring, ustring, Int32, ustring[])
   nameWithType.vb: MessageBox.Query(ustring, ustring, Int32, ustring())
+- uid: Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name: Query(ustring, ustring, Int32, Border, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name.vb: Query(ustring, ustring, Int32, Border, ustring())
+  fullName: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring())
+  nameWithType: MessageBox.Query(ustring, ustring, Int32, Border, ustring[])
+  nameWithType.vb: MessageBox.Query(ustring, ustring, Int32, Border, ustring())
 - uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])
   name: Query(Int32, Int32, ustring, ustring, ustring[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___
@@ -9098,6 +9125,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
   nameWithType: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, ustring[])
   nameWithType.vb: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, ustring())
+- uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name: Query(Int32, Int32, ustring, ustring, Int32, Border, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])
+  name.vb: Query(Int32, Int32, ustring, ustring, Int32, Border, ustring())
+  fullName: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, Terminal.Gui.Border, NStack.ustring())
+  nameWithType: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, Border, ustring[])
+  nameWithType.vb: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, Border, ustring())
 - uid: Terminal.Gui.MessageBox.Query*
   name: Query
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_
