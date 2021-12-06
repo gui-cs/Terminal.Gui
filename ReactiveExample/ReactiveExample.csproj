@@ -5,7 +5,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="ReactiveUI.Fody" Version="14.2.1" />
-        <PackageReference Include="ReactiveUI" Version="14.2.1" />
+        <PackageReference Include="ReactiveUI" Version="17.1.4" />
         <PackageReference
             Include="ReactiveMarbles.ObservableEvents.SourceGenerator"
             Version="1.1.4"
