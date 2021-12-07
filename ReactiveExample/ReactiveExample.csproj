@@ -4,7 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="ReactiveUI.Fody" Version="14.2.1" />
+        <PackageReference Include="ReactiveUI.Fody" Version="17.1.6" />
         <PackageReference Include="ReactiveUI" Version="14.2.1" />
         <PackageReference
             Include="ReactiveMarbles.ObservableEvents.SourceGenerator"
