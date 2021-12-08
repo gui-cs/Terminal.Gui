@@ -8,10 +8,10 @@ using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View")]
 	[ScenarioCategory ("Layout")]
-	class AllViewsTester : Scenario {
+	public class AllViewsTester : Scenario {
 		Window _leftPane;
 		ListView _classListView;
 		FrameView _hostPane;

@@ -5,11 +5,11 @@ using Terminal.Gui.TextValidateProviders;
 
 
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Bug Repro")]
-	class Text : Scenario {
+	public class Text : Scenario {
 		public override void Setup ()
 		{
 			var s = "TAB to jump between text fields.";

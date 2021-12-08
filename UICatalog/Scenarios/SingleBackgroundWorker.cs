@@ -4,13 +4,13 @@ using System.ComponentModel;
 using System.Threading;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Single BackgroundWorker", Description: "A single BackgroundWorker threading opening another Toplevel")]
 	[ScenarioCategory ("Threading")]
 	[ScenarioCategory ("TopLevel")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
-	class SingleBackgroundWorker : Scenario {
+	public class SingleBackgroundWorker : Scenario {
 		public override void Run ()
 		{
 			Top.Dispose ();

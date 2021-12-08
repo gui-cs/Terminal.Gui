@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Unicode", Description: "Tries to test Unicode in all controls (#204)")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Controls")]
-	class UnicodeInMenu : Scenario {
+	public class UnicodeInMenu : Scenario {
 		public override void Setup ()
 		{
 			const string IdenticalSign = "\u2261";

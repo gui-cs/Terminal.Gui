@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Threading", Description: "Demonstration of how to use threading in different ways")]
 	[ScenarioCategory ("Threading")]
-	class Threading : Scenario {
+	public class Threading : Scenario {
 		private Action _action;
 		private Action _lambda;
 		private EventHandler _handler;

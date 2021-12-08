@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders with/without PanelView", Description: "Demonstrate with/without PanelView borders manipulation.")]
 	[ScenarioCategory ("Border")]
-	class Borders : Scenario {
+	public class Borders : Scenario {
 		public override void Setup ()
 		{
 			var borderStyle = BorderStyle.Single;

@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Notepad", Description: "Multi tab text editor")]
 	[ScenarioCategory ("Controls")]
-	class Notepad : Scenario {
+	public class Notepad : Scenario {
 
 		TabView tabView;
 		Label lblStatus;

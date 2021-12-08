@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class DynamicStatusItemList
+    <title>Class WindowsAndFrameViews
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class DynamicStatusItemList
+    <meta name="title" content="Class WindowsAndFrameViews
    ">
     <meta name="generator" content="docfx 2.58.9.0">
     
@@ -78,20 +78,52 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="UICatalog.DynamicStatusItemList">
+            <article class="content wrap" id="_content" data-uid="UICatalog.Scenarios.WindowsAndFrameViews">
   
   
-  <h1 id="UICatalog_DynamicStatusItemList" data-uid="UICatalog.DynamicStatusItemList" class="text-break">Class DynamicStatusItemList
+  <h1 id="UICatalog_Scenarios_WindowsAndFrameViews" data-uid="UICatalog.Scenarios.WindowsAndFrameViews" class="text-break">Class WindowsAndFrameViews
   </h1>
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">DynamicStatusItemList</span></div>
+    <div class="level1"><a class="xref" href="UICatalog.Scenario.html">Scenario</a></div>
+    <div class="level2"><span class="xref">WindowsAndFrameViews</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Scenario.Top</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Win">Scenario.Win</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_GetName">Scenario.GetName()</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_GetDescription">Scenario.GetDescription()</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_GetCategories">Scenario.GetCategories()</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_ToString">Scenario.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_GetDerivedClasses__1">Scenario.GetDerivedClasses&lt;T&gt;()</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Dispose_System_Boolean_">Scenario.Dispose(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Dispose">Scenario.Dispose()</a>
+    </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
     </div>
@@ -111,29 +143,25 @@
       <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="UICatalog.html">UICatalog</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="UICatalog.Scenarios.html">UICatalog.Scenarios</a></h6>
   <h6><strong>Assembly</strong>: UICatalog.dll</h6>
-  <h5 id="UICatalog_DynamicStatusItemList_syntax">Syntax</h5>
+  <h5 id="UICatalog_Scenarios_WindowsAndFrameViews_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DynamicStatusItemList</code></pre>
+    <pre><code class="lang-csharp hljs">[Scenario.ScenarioMetadata(&quot;Windows &amp; FrameViews&quot;, &quot;Shows Windows, sub-Windows, FrameViews, and how TAB doesn't work right (#434, #522)&quot;)]
+[Scenario.ScenarioCategory(&quot;Views&quot;)]
+[Scenario.ScenarioCategory(&quot;Layout&quot;)]
+[Scenario.ScenarioCategory(&quot;Bug Repro&quot;)]
+public class WindowsAndFrameViews : Scenario, IDisposable</code></pre>
   </div>
-  <h3 id="constructors">Constructors
+  <h3 id="methods">Methods
   </h3>
-  <a id="UICatalog_DynamicStatusItemList__ctor_" data-uid="UICatalog.DynamicStatusItemList.#ctor*"></a>
-  <h4 id="UICatalog_DynamicStatusItemList__ctor" data-uid="UICatalog.DynamicStatusItemList.#ctor">DynamicStatusItemList()</h4>
+  <a id="UICatalog_Scenarios_WindowsAndFrameViews_Init_" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Init*"></a>
+  <h4 id="UICatalog_Scenarios_WindowsAndFrameViews_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)">Init(Toplevel, ColorScheme)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DynamicStatusItemList()</code></pre>
-  </div>
-  <a id="UICatalog_DynamicStatusItemList__ctor_" data-uid="UICatalog.DynamicStatusItemList.#ctor*"></a>
-  <h4 id="UICatalog_DynamicStatusItemList__ctor_ustring_Terminal_Gui_StatusItem_" data-uid="UICatalog.DynamicStatusItemList.#ctor(ustring,Terminal.Gui.StatusItem)">DynamicStatusItemList(ustring, StatusItem)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DynamicStatusItemList(ustring title, StatusItem statusItem)</code></pre>
+    <pre><code class="lang-csharp hljs">public override void Init(Toplevel top, ColorScheme colorScheme)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -146,92 +174,53 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">ustring</span></td>
-        <td><span class="parametername">title</span></td>
+        <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a></td>
+        <td><span class="parametername">top</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.StatusItem.html">StatusItem</a></td>
-        <td><span class="parametername">statusItem</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  <a id="UICatalog_DynamicStatusItemList_StatusItem_" data-uid="UICatalog.DynamicStatusItemList.StatusItem*"></a>
-  <h4 id="UICatalog_DynamicStatusItemList_StatusItem" data-uid="UICatalog.DynamicStatusItemList.StatusItem">StatusItem</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatusItem StatusItem { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.StatusItem.html">StatusItem</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="UICatalog_DynamicStatusItemList_Title_" data-uid="UICatalog.DynamicStatusItemList.Title*"></a>
-  <h4 id="UICatalog_DynamicStatusItemList_Title" data-uid="UICatalog.DynamicStatusItemList.Title">Title</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring Title { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">ustring</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  <a id="UICatalog_DynamicStatusItemList_ToString_" data-uid="UICatalog.DynamicStatusItemList.ToString*"></a>
-  <h4 id="UICatalog_DynamicStatusItemList_ToString" data-uid="UICatalog.DynamicStatusItemList.ToString">ToString()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">colorScheme</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
+  <div><a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_">Scenario.Init(Toplevel, ColorScheme)</a></div>
+  <a id="UICatalog_Scenarios_WindowsAndFrameViews_RequestStop_" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.RequestStop*"></a>
+  <h4 id="UICatalog_Scenarios_WindowsAndFrameViews_RequestStop" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.RequestStop">RequestStop()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void RequestStop()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_RequestStop">Scenario.RequestStop()</a></div>
+  <a id="UICatalog_Scenarios_WindowsAndFrameViews_Run_" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Run*"></a>
+  <h4 id="UICatalog_Scenarios_WindowsAndFrameViews_Run" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Run">Run()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Run()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Scenario.Run()</a></div>
+  <a id="UICatalog_Scenarios_WindowsAndFrameViews_Setup_" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Setup*"></a>
+  <h4 id="UICatalog_Scenarios_WindowsAndFrameViews_Setup" data-uid="UICatalog.Scenarios.WindowsAndFrameViews.Setup">Setup()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Setup()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Scenario.Setup()</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
 </article>
           </div>
           

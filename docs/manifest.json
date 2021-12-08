@@ -1862,162 +1862,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.Binding.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.Binding.html",
-          "hash": "y8q0m1heGEU7GlR2QFg+svFiCdKJYYhK7a+LtJRBy68="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicMenuBarDetails.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicMenuBarDetails.html",
-          "hash": "Wz42inX2fgQiBNKp3G0CiMQbqlgT/ZVnrM6VYyv698s="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicMenuBarSample.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicMenuBarSample.html",
-          "hash": "vtva4Z+f1ULxeVEgEaleVDzi8LTgI05/5pj7hgbUBT8="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicMenuItem.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicMenuItem.html",
-          "hash": "FNlZ11rNUAT3AW5KAhl0Uk8WndnxOdF9VP+s9pVEw0Q="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicMenuItemList.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicMenuItemList.html",
-          "hash": "DDI++PjDqi8n4pK71Sz36NCHtoHgQsLJFszEWq/FJuU="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicMenuItemModel.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicMenuItemModel.html",
-          "hash": "/pWPp/ZBUj4qIX7Zyi/gjaQcS3Jtv7rgmMd8pngqTgA="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicStatusBarDetails.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicStatusBarDetails.html",
-          "hash": "fdjzbcY75I/ComD8kd3YFZINBH5s4wnaDTq0MIBML24="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicStatusBarSample.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicStatusBarSample.html",
-          "hash": "P4nZC/RSwR/mWlcZ4jbkvo+UnOqNL3yqUbw75uh+9Es="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicStatusItem.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicStatusItem.html",
-          "hash": "a2cXpSQZ6V7/v8ZMkkk/UbdRbvjCdn1Bo32u1AjgbQA="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicStatusItemList.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicStatusItemList.html",
-          "hash": "vAS1F6C5hyY5qu4hhy2yi8lxqptbW1S5oPTrdMqJk54="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.DynamicStatusItemModel.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.DynamicStatusItemModel.html",
-          "hash": "7RGBTuAGAO63JU72YLSvn9V7Y2gB2LT9B2kW5+cE0SA="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.IValueConverter.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.IValueConverter.html",
-          "hash": "3Ac6Aky+l5cFu6ktDVI+ry4JaufhXATe8OYLmAbWJFY="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.ListWrapperConverter.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.ListWrapperConverter.html",
-          "hash": "c/qdV7/LGAsPeUQu+quh1vDnxVxFl9eeQz5v/hMUQFk="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/UICatalog/UICatalog.NumberToWords.yml",
       "output": {
         ".html": {
@@ -2058,7 +1902,175 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.Scenario.html",
-          "hash": "VUBCIkfPUUNLS/m0zgSmF/hotUZ/k0ieYZP7oH54HQg="
+          "hash": "mh0i5KytE1UTDXKDtzjUOikd1y/L3izTm/2qmBzyo2I="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.AllViewsTester.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.AllViewsTester.html",
+          "hash": "fQTsq/RgXDyEWrxDN7nTv4OMMD5FQyLQo7BqfrS0Fzg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.AutoSizeAndDirectionText.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.AutoSizeAndDirectionText.html",
+          "hash": "uPG5s0VKULWUM+yv+8ntKCgOOXFesC/TP1Vc58q4Ryg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BackgroundWorkerCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BackgroundWorkerCollection.html",
+          "hash": "luXJKEjHqULdlNfTp4ol6knG7bkj4DwKAunYIh9DpOg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BasicColors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BasicColors.html",
+          "hash": "rR3WU/dK0sUQzihQh9wT0SAzT2bDJAzsalMImGfMxKQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Borders.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Borders.html",
+          "hash": "GYiZJrCxwxta4Nlomq0ak2iFnT5lx+7PelqWxofekvA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BordersComparisons.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BordersComparisons.html",
+          "hash": "pSXMFFBao5CM67aJuQocbZrM6pEJkmkJAXD8/dd04TI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnFrameView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnFrameView.html",
+          "hash": "VZgQYv1bafudaOqkpRDdMI7WXH4RZkpNe+J3+GGsFaQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnToplevel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnToplevel.html",
+          "hash": "ktyueiO+t9ddtmK55alEHdgkzUz4qtsMCNIpNGYJf68="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnWindow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.BordersOnWindow.html",
+          "hash": "7xQTok5d51eZmvs5VHZPiMY1FF5/kHwzky6PKb5bMzo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Buttons.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Buttons.html",
+          "hash": "HVvNVQTG/uvGuvPRs6XkE7kz0s/8aAKypJbsvkwjK9Y="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.CharacterMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.CharacterMap.html",
+          "hash": "aPaSdYcZSY+J6Dofkf0ycsLngRhGRm/j2AdpMA2NbpA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.ClassExplorer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.ClassExplorer.html",
+          "hash": "D74zrLmVp5Uc5yiYq+bpNZimSwsMz9fx34xJQx+Pfbs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Clipping.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Clipping.html",
+          "hash": "gg1aiRPAIOxdVTZOHz16wiUEp4SR6Ab/Omc7AghEWH8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.ComputedLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.ComputedLayout.html",
+          "hash": "frN9pYgBS+Spu5bdAHtGn89bsr4fa2XDOQ/YwqDBfbw="
         }
       },
       "is_incremental": false,
@@ -2078,11 +2090,539 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Dialogs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Dialogs.html",
+          "hash": "1un+tYp3ghUfFMDmkMVBHPlkHwHjvokOxqwx2NpiL0A="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.Binding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.Binding.html",
+          "hash": "HOvt35JP+stor23W0Vj3We5YSKEmUMeUkXNtV3SZQwc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuBarDetails.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuBarDetails.html",
+          "hash": "3M0A99ozP5nyuWVHayeYPPoMZzZ5EIuwjiExgEf/Ezk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuBarSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuBarSample.html",
+          "hash": "W+qbm5evLt3Sk8yWUKGYtpmzCPMXNe8jE19pSh6xAk0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItem.html",
+          "hash": "Pa1u/uv3Qb6pnJBTqBZ1QOpT3EZUGL9jH34teRPXNDk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItemList.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItemList.html",
+          "hash": "pMTRdekx58MGoLZwMhQWzKvfTo1BZhBnCMyfpUM2q2s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItemModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.DynamicMenuItemModel.html",
+          "hash": "J8rRO9lQ/H2HrYDN+BdNJmLbJhs8s+tQgXg3G8RoJHE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.IValueConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.IValueConverter.html",
+          "hash": "7hSS0ETYkm9XvVnEKhdjRRWdoHRmZvrveoNddl/AMSQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.ListWrapperConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.ListWrapperConverter.html",
+          "hash": "pCkrMEzAw+pCCXAileQFhTHfk3xaZoQcQRAX8DdKJEc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.UStringValueConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.UStringValueConverter.html",
+          "hash": "WP2lv2mpiZDrs8hYNQ9b0joIO9cwvTYALkuk3QkITsw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicMenuBar.html",
+          "hash": "afyY8rn2izHWDskL0LTSaYVLQrcMoZDgwLetvpKtKXc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.Binding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.Binding.html",
+          "hash": "Hywuqox6e9PeGX3RQoB5Xl5i8+Ut8gQ4YaRzyaHErlA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusBarDetails.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusBarDetails.html",
+          "hash": "cRGIFOXPGwGE1YPlDQrXmYBPv9K2PWO0nE16raHGiyI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusBarSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusBarSample.html",
+          "hash": "HKFJvJ8exA1M6qkh99evE5MRViFhhT3kuIJzRaqanDs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItem.html",
+          "hash": "IFJ49cE+f9dUFngqHGc+6EgiG3ZsIwjbJyaDu1dzL+Y="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItemList.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItemList.html",
+          "hash": "F8tw4lqi2ENkhdmnoll0EOoe4Jjjlv6GFtyhxRyn+QQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItemModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.DynamicStatusItemModel.html",
+          "hash": "2pTEvnxXbG8lmkl+IgotYB8D7ETtbeRkgYu4ywMwiL0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.IValueConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.IValueConverter.html",
+          "hash": "5dknGT3a1oFoDxPMFVrOrerBLuHSgV0VbCzR7RU5TwI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.ListWrapperConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.ListWrapperConverter.html",
+          "hash": "JRTIovrfGTKCNYQBV6XGhD8lO5AqGKDPrH70kfvQI38="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.UStringValueConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.UStringValueConverter.html",
+          "hash": "uCOsBCsw0c8YbMB32JZqVDxiMwDb16WCtWEB6xdI51Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.DynamicStatusBar.html",
+          "hash": "ko5dDa/xOfYQ7BBYx2hj0q5Ea8CO2hAWD6pfdfYuxHA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Editor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Editor.html",
+          "hash": "HrixONA7G9DHxlrZ3T0VfupqxtxaW8I2jH2sOA5A6TM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.GraphViewExample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.GraphViewExample.html",
+          "hash": "zfR/arOu6AIyVj7m2evjuTDqLyIiUR/T93zlhnRy7NA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.HexEditor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.HexEditor.html",
+          "hash": "Z2msyTN9sUpo4Te+/1nQV41cm5klQ+9BtD/wv4Z/Wa0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.InteractiveTree.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.InteractiveTree.html",
+          "hash": "mkgzuhMq2H3d3w6bzl+QbHt6aG5UJvCqxZgpNayCr18="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.InvertColors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.InvertColors.html",
+          "hash": "9kdh/cT6KNr8rwqw3j1mJKflrpSxDXzcpTskTi5Sp5k="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Keys.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Keys.html",
+          "hash": "AniLa5iFphCkW34SFRjyGKDL3seHP+04WBGoum/0ejA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.LabelsAsLabels.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.LabelsAsLabels.html",
+          "hash": "DLHH9w277dNp/ZLWWW1rCPXpzxXJcBobou2kl97f+ZM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.LineViewExample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.LineViewExample.html",
+          "hash": "L1Kb7hLbSK9tOWvWhSyK8vWTqsVz1AivMLJuk2GVtKA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.ListViewWithSelection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.ListViewWithSelection.html",
+          "hash": "vnJhjb1lOU97qW9SWEobTXmKK76gNtsAjtljPS72mWQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.ListsAndCombos.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.ListsAndCombos.html",
+          "hash": "ZttpDnrJQGK+yhUsU4pJp0P35XAf4NFC7+0SdSX6nLE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.MessageBoxes.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.MessageBoxes.html",
+          "hash": "hzrumhPdECbl7/lI7+0ZK5VKD6YgTHLOh2DU5IW/fyw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Mouse.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Mouse.html",
+          "hash": "am0SN4Fhw/EFJe6+5Hq0yBGEEZRUaDSK3Zgn+x0cw/U="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/UICatalog/UICatalog.Scenarios.MultiColouredTable.yml",
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.Scenarios.MultiColouredTable.html",
           "hash": "NTb+HKB8Uumwrbh7mjmWvaYRCV4MQj96iWEfRjlQJ9w="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.MyScenario.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.MyScenario.html",
+          "hash": "jq7axrSh7+PUrKRozY9uboo1P42Kz3EF/oXLeXLjg4U="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Notepad.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Notepad.html",
+          "hash": "H3J0/3tLVeNgh00aKweMSkhgx0rIo4iytjS8w8a6xGc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Progress.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Progress.html",
+          "hash": "7mINu/hchzk5J7OklhSMXzjEPUbVbN2mB3oQ0IFn8Qo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.ProgressBarStyles.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.ProgressBarStyles.html",
+          "hash": "Y4BWsD9wqXMeRqUmjyAKBRwDK4iekHcIat2JMIzU7AM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Scrolling.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Scrolling.html",
+          "hash": "sDahrbHmtfStkoZ40c7ugww6h99urdNupPM01MC34II="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.SendKeys.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.SendKeys.html",
+          "hash": "+7kF+KN2CPWb3Nrdt68TpxmTbHVRNs5ofY/ZNXsB46Y="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.MainApp.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.MainApp.html",
+          "hash": "KgaU5KU4JDV1fkf0rhX2UYX+7r+NvTVafNKj7EC3rwM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.StagingUIController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.StagingUIController.html",
+          "hash": "498rq69HIggkZX9krhjKpbM+iXE8NdRBPkozl8fBacM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.SingleBackgroundWorker.html",
+          "hash": "0YowKRM+JqTpAVR7h/3nvc7z6PiD6IoKAdejmH6zcv4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.SyntaxHighlighting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.SyntaxHighlighting.html",
+          "hash": "ZIhZQLE9YkZaPna4KIssvx+aVkEsUroc9orfv+SoTsQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TabViewExample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TabViewExample.html",
+          "hash": "gywCini/YU/3nsjpL1liuZ3wjUbYVMo8QgHsUhfY7v0="
         }
       },
       "is_incremental": false,
@@ -2102,11 +2642,155 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Text.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Text.html",
+          "hash": "zLaatsQ/xPYu6C7BQ9Ekr/PD00NEPFzVsrr9WgufySQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TextAlignments.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TextAlignments.html",
+          "hash": "hDiFpuxt6nmlptg/YvOg/LYfRFcBBwvTOQhVvz3PQ1Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TextAlignmentsAndDirections.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TextAlignmentsAndDirections.html",
+          "hash": "OGi4F/fqCup7X1uYq37tZG0Vk6KOEB1UT57QBl9EJqc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TextFormatterDemo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TextFormatterDemo.html",
+          "hash": "Yl8FFPCEgr/JEVkh3tkuDvqoOx2ouQMsOLcKF+yof/E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.Threading.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.Threading.html",
+          "hash": "oTHaeU2cQPmR29RBZ9YilVQ9CP/sidGplGZ01Hden3s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TimeAndDate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TimeAndDate.html",
+          "hash": "cXv0tDjzm4ACE2Mcvk3h6wfgl/4JPTpxv3qRccnLGis="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TopLevelNoWindowBug.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TopLevelNoWindowBug.html",
+          "hash": "3cnYX7liIGVs7F6HGReI6s6BIaV3lrlxHZC4X+BnvlM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TreeUseCases.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TreeUseCases.html",
+          "hash": "s0bTha8fjlyVO7laBqFX7eUWW9V+fKTOZwTBAPpH1A8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.TreeViewFileSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.TreeViewFileSystem.html",
+          "hash": "N+DZ1OtmRRUfr/O2qcnuol01VDZ3RYHs8wjREZfKsFA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.UnicodeInMenu.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.UnicodeInMenu.html",
+          "hash": "kzWzjIFhP7Kfb/FweKbeAq4Zlw6RdDhAOsr4PvANLo4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.UseSystemConsole.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.UseSystemConsole.html",
+          "hash": "F93XEDa6WiqSRXSQzWNn/zAkX7t/q5+WKsDBm7FiulE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/UICatalog/UICatalog.Scenarios.WindowsAndFrameViews.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/UICatalog/UICatalog.Scenarios.WindowsAndFrameViews.html",
+          "hash": "OAUrj7phzaNpjwcERn8w54QwfZh2WnSoehxhjkpCgfQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/UICatalog/UICatalog.Scenarios.yml",
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.Scenarios.html",
-          "hash": "QjznQpVQSF2t4Mm3S+G0UFcTmo5zSSjqWp6CUWtcCG4="
+          "hash": "uG20z+6T1tNaWEsWs9f4EcIAkWOi3i5sTEZoTLHQ7Js="
         }
       },
       "is_incremental": false,
@@ -2126,23 +2810,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/UICatalog/UICatalog.UStringValueConverter.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/UICatalog/UICatalog.UStringValueConverter.html",
-          "hash": "k03QZynhStOrCKTpqdsGYGefWLY8dYD39AISznbpv20="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/UICatalog/UICatalog.yml",
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.html",
-          "hash": "RCg56zDdwKqeT+WXUNck69vertscg/8pcNTt2fMpVTw="
+          "hash": "j6dc9jc9kzp2UYt1/D0O0Jnzcb/y+hpLEolFUH1GKd4="
         }
       },
       "is_incremental": false,
@@ -2154,97 +2826,79 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/toc.html",
-          "hash": "W3ne7e/eZcy/GpKhWIvcbUgOwSaryXUoPeuD8hM+brw="
+          "hash": "e0riON2CVVDGmBNJ9/0VkNaBFcERNJUyR18camCS58Q="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/index.md",
       "output": {
         ".html": {
           "relative_path": "articles/index.html",
-          "hash": "vhoqPObWPeA/8qgQAdQTmgsEQyNhXKMW7itbY6kulG4="
+          "hash": "rt0hGQnsUMJfENN9ZeLyZyBj/AdZSlYV/6UQzaTSdYA="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/keyboard.md",
       "output": {
         ".html": {
           "relative_path": "articles/keyboard.html",
-          "hash": "EMwXAki3h1pWcJ5BUu3nRAsspXHVegJB2Xn1rFnHQdk="
+          "hash": "XX1IeXv/TstzuI/X7mcYII9dOGl1Yr993ArLCuuAYR0="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/mainloop.md",
       "output": {
         ".html": {
           "relative_path": "articles/mainloop.html",
-          "hash": "VFA4zuA0NUcpUjE/xoCeBEvEtp2Gr1iQcmm0/5J4wVk="
+          "hash": "OYqEUTpqmJoaF3qtzRG54Zoongf3sYArR7isvkZJdSM="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/overview.md",
       "output": {
         ".html": {
           "relative_path": "articles/overview.html",
-          "hash": "kHOTJmfjLLusTORzeTPOy19G2wrMamm5BK+PLlYQTmM="
+          "hash": "6YFkIPP4k67d+M9Sf192qMuxydP/zW5bTcMX4HmHoJg="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/tableview.md",
       "output": {
         ".html": {
           "relative_path": "articles/tableview.html",
-          "hash": "Rkdt3dpba1f/VveFNYG0uYMOrzL4igb6qvxzHlqHrJ4="
+          "hash": "HIgJ1pN6gWmjMH43a+hUvsqoskEGI0gj8E41Osaq3RU="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/treeview.md",
       "output": {
         ".html": {
           "relative_path": "articles/treeview.html",
-          "hash": "AP/ppw8eMfDbfniYzFSR/TgMwFbE5fR84hvz1lSFcu0="
+          "hash": "aLXKISwk5GzuXEAWYMjp0uoAiPyKIXTmW5dlbhHZ8+E="
         }
       },
       "is_incremental": false,
@@ -2285,15 +2939,12 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "index.md",
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "bkNxlgj4cs80yuJCHFPzkJhyaNCocKuLDZHKkWjH9ec="
+          "hash": "rbF71dvo6YXtidEfJuf4RZCfrBgJCyH/Cy1kOrHIR98="
         }
       },
       "is_incremental": false,
@@ -2330,8 +2981,8 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 176,
-          "skipped_file_count": 98
+          "total_file_count": 232,
+          "skipped_file_count": 154
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,

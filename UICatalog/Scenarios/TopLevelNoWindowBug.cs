@@ -1,10 +1,10 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes MenuBar to misbehave. #437")]
 	[ScenarioCategory ("Bug Repro")]
 
-	class TopLevelNoWindowBug : Scenario {
+	public class TopLevelNoWindowBug : Scenario {
 
 		public override void Run ()
 		{
