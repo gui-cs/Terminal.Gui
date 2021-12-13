@@ -90,6 +90,12 @@ namespace Terminal.Gui {
 	///   [x] or [ ] and bind the space character to toggle the selection.  If you desire a different
 	///   marking style do not set the property and provide your own custom rendering.   
 	/// </para>
+	/// <para>
+	///   By default ListViews render items that are one line tall.   To change, this set the
+	///   ItemHeigh property to a larger value.   This will allow cells to be rendered with additional
+	///   lines.    This is typically used when you have a custom renderer that can render cells
+	///   larger that one line.
+	/// </para>
 	/// </remarks>
 	public class ListView : View {
 		int top;
@@ -133,6 +139,7 @@ namespace Terminal.Gui {
 
 			public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
 			{
+				var height = container.itemHeight;
 				container.Move (col, line);
 				var t = src [item];
 				if (t is ustring) {
@@ -141,6 +148,11 @@ namespace Terminal.Gui {
 					RenderUstr (driver, (string)t, col, line, width);
 				} else
 					RenderUstr (driver, t.ToString (), col, line, width);
+
+				for (int l = 1; l < height; l++) {
+					RenderUstr (driver, "", col, line, width);
+				}
+
 			}
 
 			public bool IsMarked (int item)
@@ -305,7 +317,7 @@ namespace Terminal.Gui {
 			bool focused = HasFocus;
 			int col = allowsMarking ? 4 : 0;
 
-			for (int row = 0; row < f.Height; row++, item++) {
+			for (int row = 0; row < f.Height; row += ItemHeight, item++) {
 				bool isSelected = item == selected;
 
 				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : ColorScheme.Normal;
@@ -324,6 +336,24 @@ namespace Terminal.Gui {
 					}
 					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
 				}
+			}
+		}
+
+		int itemHeight = 1;
+		/// <summary>
+		/// The number of lines occupied by a an item in the ListView, this defaults to one,
+		/// but can be change to a larger value for items that need to use more than one cell,
+		/// typically used with a custom IListDataSource that implements a renderer for multiple
+		/// lines of content.
+		/// </summary>
+		public int ItemHeight {
+			get {
+				return itemHeight;
+			}
+			set {
+				if (itemHeight < 1)
+					throw new ArgumentOutOfRangeException ("Must be larger than one");
+				itemHeight = value;
 			}
 		}
 
@@ -359,7 +389,7 @@ namespace Terminal.Gui {
 			case Key.ControlN:
 				if (selected + 1 < source.Count) {
 					selected++;
-					if (selected >= top + Frame.Height)
+					if (selected >= (top + Frame.Height)/itemHeight)
 						top++;
 					if (SelectedChanged != null)
 						SelectedChanged ();
@@ -369,12 +399,12 @@ namespace Terminal.Gui {
 
 			case Key.ControlV:
 			case Key.PageDown:
-				var n = (selected + Frame.Height);
+				var n = selected + (Frame.Height/itemHeight);
 				if (n > source.Count)
 					n = source.Count - 1;
 				if (n != selected) {
 					selected = n;
-					if (source.Count >= Frame.Height)
+					if (source.Count >= Frame.Height/itemHeight)
 						top = selected;
 					else
 						top = 0;
@@ -385,7 +415,7 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.PageUp:
-				n = (selected - Frame.Height);
+				n = (selected - Frame.Height/itemHeight);
 				if (n < 0)
 					n = 0;
 				if (n != selected) {
@@ -413,7 +443,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor()
 		{
-			Move (0, selected-top);
+			Move (0, (selected-top)*itemHeight);
 		}
 
 		public override bool MouseEvent(MouseEvent me)
@@ -430,7 +460,7 @@ namespace Terminal.Gui {
 			if (me.Y + top >= source.Count)
 				return true;
 
-			selected = top + me.Y;
+			selected = top + me.Y/itemHeight;
 			if (SelectedChanged != null)
 				SelectedChanged();
 			SetNeedsDisplay ();
