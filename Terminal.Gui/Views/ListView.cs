@@ -107,6 +107,12 @@ namespace Terminal.Gui {
 	///   [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different
 	///   marking style set <see cref="AllowsMarking"/> to false and implement custom rendering.
 	/// </para>
+	/// <para>
+	///   By default ListViews render items that are one line tall.   To change, this set the
+	///   ItemHeigh property to a larger value.   This will allow cells to be rendered with additional
+	///   lines.    This is typically used when you have a custom renderer that can render cells
+	///   larger that one line.
+	/// </para>
 	/// </remarks>
 	public class ListView : View {
 		int top, left;
@@ -331,7 +337,7 @@ namespace Terminal.Gui {
 			int col = allowsMarking ? 2 : 0;
 			int start = left;
 
-			for (int row = 0; row < f.Height; row++, item++) {
+			for (int row = 0; row < f.Height; row += itemHeight, item++) {
 				bool isSelected = item == selected;
 
 				var newcolor = focused ? (isSelected ? ColorScheme.Focus : GetNormalColor ())
@@ -353,6 +359,30 @@ namespace Terminal.Gui {
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
 				}
+			}
+		}
+
+		internal int itemHeight = 1;
+		/// <summary>
+		/// The number of lines occupied by a an item in the ListView, this defaults to one,
+		/// but can be change to a larger value for items that need to use more than one cell,
+		/// typically used with a custom IListDataSource that implements a renderer for multiple
+		/// lines of content.
+		/// </summary>
+		public int ItemHeight {
+			get {
+				return itemHeight;
+			}
+			set {
+				if (itemHeight < 1)
+					throw new ArgumentOutOfRangeException ("Must be larger than one");
+				itemHeight = value;
+			}
+		}
+
+		int VisibleItems {
+			get {
+				return itemHeight / Frame.Height;
 			}
 		}
 
@@ -544,8 +574,8 @@ namespace Terminal.Gui {
 				}
 				if (selected < top) {
 					top = selected;
-				} else if (selected > top + Frame.Height) {
-					top = Math.Max (selected - Frame.Height + 1, 0);
+				} else if (selected > top + VisibleItems) {
+					top = Math.Max (selected - VisibleItems + 1, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -561,7 +591,7 @@ namespace Terminal.Gui {
 		{
 			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
-				if (top + selected > Frame.Height - 1) {
+				if (top + selected > VisibleItems - 1) {
 					top = selected;
 				}
 				OnSelectedChanged ();
@@ -590,20 +620,20 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view down.
 		/// </summary>
-		/// <param name="lines">Number of lines to scroll down.</param>
-		public virtual void ScrollDown (int lines)
+		/// <param name="lines">Number of items to scroll down.</param>
+		public virtual void ScrollDown (int items)
 		{
-			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
+			top = Math.Max (Math.Min (top + items*itemHeight, source.Count - 1), 0);
 			SetNeedsDisplay ();
 		}
 
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
-		/// <param name="lines">Number of lines to scroll up.</param>
-		public virtual void ScrollUp (int lines)
+		/// <param name="lines">Number of items to scroll up.</param>
+		public virtual void ScrollUp (int items)
 		{
-			top = Math.Max (top - lines, 0);
+			top = Math.Max (top - items*itemHeight, 0);
 			SetNeedsDisplay ();
 		}
 
@@ -702,9 +732,9 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (allowsMarking)
-				Move (0, selected - top);
+				Move (0, selected*itemHeight - top);
 			else
-				Move (Bounds.Width - 1, selected - top);
+				Move (Bounds.Width - 1, selected*itemHeight - top);
 		}
 
 		///<inheritdoc/>
@@ -741,7 +771,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			selected = top + me.Y;
+			selected = top + me.Y/itemHeight;
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();
@@ -849,6 +879,7 @@ namespace Terminal.Gui {
 		/// <param name="start">The index of the string to be displayed.</param>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
+			var height = container.itemHeight;
 			container.Move (col, line);
 			var t = src [item];
 			if (t == null) {
@@ -862,6 +893,9 @@ namespace Terminal.Gui {
 					RenderUstr (driver, t.ToString (), col, line, width, start);
 				}
 			}
+                        for (int l = 1; l < height; l++) {
+                                RenderUstr (driver, "", col, line, width);
+                        }
 		}
 
 		/// <summary>
