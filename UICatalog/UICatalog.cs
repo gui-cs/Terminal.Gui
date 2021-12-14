@@ -310,7 +310,24 @@ namespace UICatalog {
 			menuItems.Add (new MenuItem [] { null });
 			menuItems.Add (CreateSizeStyle ());
 			menuItems.Add (CreateAlwaysSetPosition ());
+			menuItems.Add (CreateDisabledEnabledMouse ());
 			return menuItems;
+		}
+
+		private static MenuItem [] CreateDisabledEnabledMouse ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Disable/Enable Mouse";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.IsMouseDisabled;
+			item.Action += () => {
+				item.Checked = Application.IsMouseDisabled = !item.Checked;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
 		}
 
 		static MenuItem [] CreateAlwaysSetPosition ()
