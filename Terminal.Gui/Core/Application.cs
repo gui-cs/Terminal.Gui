@@ -153,6 +153,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
 
+		public static KeyBindings KeyBindings {get; set;}
+
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
 		/// </summary>

@@ -1557,12 +1557,34 @@ namespace Terminal.Gui {
 			if (args.Handled)
 				return true;
 			if (Focused?.Enabled == true) {
+				var savedKeyEvent = keyEvent;
+				var kbs = Application.KeyBindings;
+				if (kbs != null && kbs.Count > 0 && kbs.Enabled) {
+					var viewName = Focused.GetType ().Name;
+					var (v, e) = kbs.Views.FirstOrDefault (x => x.View == viewName);
+					if (v != null) {
+						var k = args.KeyEvent.Key;
+						KeyBinding kb;
+						if (k == Key.Enter && !e) {
+							e = true;
+							return true;
+						} else if (k == Key.Esc && e) {
+							e = false;
+							return true;
+						} else if ((kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
+							keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
+							args = new KeyEventEventArgs (keyEvent);
+						}
+					}
+				}
 				Focused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
+				if (Focused?.ProcessKey (keyEvent) == true)
+					return true;
+				keyEvent = savedKeyEvent;
+				args = new KeyEventEventArgs (keyEvent);
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
-				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
