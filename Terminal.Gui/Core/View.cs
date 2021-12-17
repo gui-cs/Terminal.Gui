@@ -1562,6 +1562,10 @@ namespace Terminal.Gui {
 				if (kbs != null && kbs.Count > 0 && kbs.Enabled) {
 					var viewName = Focused.GetType ().Name;
 					var (v, e) = kbs.Views.FirstOrDefault (x => x.View == viewName);
+					if (v == null) {
+						viewName = nameof (View);
+						(v, e) = kbs.Views.FirstOrDefault (x => x.View == viewName);
+					}
 					if (v != null) {
 						var k = args.KeyEvent.Key;
 						KeyBinding kb;
