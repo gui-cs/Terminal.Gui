@@ -154,6 +154,16 @@ namespace UICatalog {
 			Application.HeightAsBuffer = _heightAsBuffer;
 			Application.AlwaysSetPosition = _alwaysSetPosition;
 
+			KeyBindings keyBindings = new KeyBindings ();
+			keyBindings.AddKey (typeof (View), (Key)'h', Key.CursorLeft);
+			keyBindings.AddKey (typeof (View), (Key)'j', Key.CursorDown);
+			keyBindings.AddKey (typeof (View), (Key)'k', Key.CursorUp);
+			keyBindings.AddKey (typeof (View), (Key)'l', Key.CursorRight);
+			keyBindings.AddKey (typeof (View), (Key)'H', Key.Home);
+			keyBindings.AddKey (typeof (View), (Key)'E', Key.End);
+			Application.KeyBindings = keyBindings;
+
+
 			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
 
@@ -313,7 +323,25 @@ namespace UICatalog {
 			menuItems.Add (CreateSizeStyle ());
 			menuItems.Add (CreateAlwaysSetPosition ());
 			menuItems.Add (CreateDisabledEnabledMouse ());
+			menuItems.Add (CreateKeyBindings ());
 			return menuItems;
+		}
+
+		private static MenuItem [] CreateKeyBindings ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Enable Key Bindings";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.KeyBindings.Enabled;
+			item.Action += () => {
+				Application.KeyBindings.Enabled = !item.Checked;
+				item.Checked = Application.KeyBindings.Enabled;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
 		}
 
 		private static MenuItem [] CreateDisabledEnabledMouse ()

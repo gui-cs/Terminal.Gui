@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Terminal.Gui {
 	public sealed class KeyBinding {
-		public KeyBinding (View view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public KeyBinding (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
 		{
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null", nameof (view));
 			}
-			View = view.GetType ().Name;
+			View = view.Name;
 			InKey = inKey;
 			OutKey = outKey;
 			Description = description;
@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		{
 		}
 
-		public KeyBindings (View view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public KeyBindings (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
 		{
 			AddKey (view, inKey, outKey, description, enabled);
 		}
@@ -84,13 +84,13 @@ namespace Terminal.Gui {
 
 		public int Count => Views.Count;
 
-		public bool AddKey (View view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public bool AddKey (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
 		{
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null", nameof (view));
 			}
 			var kb = new KeyBinding (view, inKey, outKey, description, enabled);
-			var viewName = view.GetType ().Name;
+			var viewName = view.Name;
 			if (!Views.Any (x => x.View == viewName)) {
 				Views.Add ((viewName, true));
 			}
@@ -103,14 +103,14 @@ namespace Terminal.Gui {
 
 		public bool AddKey (KeyBinding keyBinding)
 		{
-			View view = GetInstance (keyBinding.View);
+			Type view = GetInstance (keyBinding.View).GetType ();
 			return AddKey (view, keyBinding.InKey, keyBinding.OutKey, keyBinding.Description, keyBinding.Enabled);
 		}
 
-		public bool RemoveKey (View view, Key inKey, Key outKey)
+		public bool RemoveKey (Type view, Key inKey, Key outKey)
 		{
 			var kb = new KeyBinding (view, inKey, outKey);
-			var viewName = view.GetType ().Name;
+			var viewName = view.Name;
 			var idx = Keys.FindIndex (x => x.View == viewName && x.InKey == inKey && x.OutKey == outKey);
 			if (idx == -1) {
 				return false;
@@ -128,22 +128,25 @@ namespace Terminal.Gui {
 
 		public bool RemoveKey (string view, Key inKey, Key outKey)
 		{
-			View v = GetInstance (view);
+			if (view == null) {
+				throw new ArgumentNullException ("View cannot be null", nameof (view));
+			}
+			Type v = GetInstance (view).GetType ();
 			return RemoveKey (v, inKey, outKey);
 		}
 
 		public bool RemoveKey (KeyBinding keyBinding)
 		{
-			View view = GetInstance (keyBinding.View);
+			Type view = GetInstance (keyBinding.View).GetType ();
 			return RemoveKey (view, keyBinding.InKey, keyBinding.OutKey);
 		}
 
-		public bool RemoveAll (View view)
+		public bool RemoveAll (Type view)
 		{
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null", nameof (view));
 			}
-			var viewName = view.GetType ().Name;
+			var viewName = view.Name;
 			var result = Keys.RemoveAll (x => x.View == viewName) > 0;
 			if (result) {
 				Views.Remove (Views.FirstOrDefault (x => x.View == viewName));
@@ -161,12 +164,12 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public bool EnableDisableKeyBinding (View view, Key inKey, Key outKey, bool toReplace)
+		public bool EnableDisableKeyBinding (Type view, Key inKey, Key outKey, bool toReplace)
 		{
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null", nameof (view));
 			}
-			var viewName = view.GetType ().Name;
+			var viewName = view.Name;
 			var kb = Keys.FirstOrDefault (x => x.View == viewName && x.InKey == inKey && x.OutKey == outKey);
 			if (kb.Enabled != toReplace) {
 				kb.Enabled = toReplace;
@@ -177,16 +180,19 @@ namespace Terminal.Gui {
 
 		public bool EnableDisableKeyBinding (string view, Key inKey, Key outKey, bool toReplace)
 		{
-			View v = GetInstance (view);
+			if (view == null) {
+				throw new ArgumentNullException ("View cannot be null", nameof (view));
+			}
+			Type v = GetInstance (view).GetType ();
 			return EnableDisableKeyBinding (v, inKey, outKey, toReplace);
 		}
 
-		public bool EnableDisableKeyBinding(KeyBinding keyBinding, bool toReplace)
+		public bool EnableDisableKeyBinding (KeyBinding keyBinding, bool toReplace)
 		{
 			if (keyBinding == null) {
 				throw new ArgumentNullException ("KeyBinding cannot be null", nameof (keyBinding));
 			}
-			View view = GetInstance (keyBinding.View);
+			Type view = GetInstance (keyBinding.View).GetType ();
 			return EnableDisableKeyBinding (view, keyBinding.InKey, keyBinding.OutKey, toReplace);
 		}
 
