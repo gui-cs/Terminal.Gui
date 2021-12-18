@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Interactive Tree", Description: "Create nodes and child nodes in TreeView")]
 	[ScenarioCategory ("Controls")]
-	class InteractiveTree : Scenario {
+	public class InteractiveTree : Scenario {
 
 		TreeView treeView;
 

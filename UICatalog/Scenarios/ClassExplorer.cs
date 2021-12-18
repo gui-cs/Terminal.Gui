@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView")]
 	[ScenarioCategory ("Controls")]
-	class ClassExplorer : Scenario {
+	public class ClassExplorer : Scenario {
 		private TreeView<object> treeView;
 		private TextView textView;
 		private MenuItem miShowPrivate;

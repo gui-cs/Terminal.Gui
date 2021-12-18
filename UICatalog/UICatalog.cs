@@ -11,6 +11,9 @@ using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
+/// <summary>
+/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+/// </summary>
 /// <remarks>
 /// <para>
 ///	UI Catalog attempts to satisfy the following goals:
@@ -38,7 +41,6 @@ using Rune = System.Rune;
 ///	See the project README for more details (https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog/README.md).
 /// </para>	
 /// </remarks>
-
 namespace UICatalog {
 	/// <summary>
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>

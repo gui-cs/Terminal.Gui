@@ -5,13 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "BackgroundWorker Collection", Description: "A persisting multi Toplevel BackgroundWorker threading")]
 	[ScenarioCategory ("Threading")]
 	[ScenarioCategory ("TopLevel")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
-	class BackgroundWorkerCollection : Scenario {
+	public class BackgroundWorkerCollection : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Top.Dispose ();

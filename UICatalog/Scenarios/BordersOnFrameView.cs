@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders on FrameView", Description: "Demonstrate FrameView borders manipulation.")]
 	[ScenarioCategory ("Border")]
-	class BordersOnFrameView : Scenario {
+	public class BordersOnFrameView : Scenario {
 		public override void Setup ()
 		{
 			var borderStyle = BorderStyle.Double;
