@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
 	[ScenarioCategory ("Input")]
-	class Keys : Scenario {
+	public class Keys : Scenario {
 
 		class TestWindow : Window {
 			public List<string> _processKeyList = new List<string> ();

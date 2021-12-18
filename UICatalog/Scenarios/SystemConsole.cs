@@ -1,10 +1,10 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "System Console", Description: "Not working - #518 - Enables System Console and exercises things")]
 	[ScenarioCategory ("Bug Repro")]
 	[ScenarioCategory ("Console")]
-	class UseSystemConsole : Scenario {
+	public class UseSystemConsole : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.UseSystemConsole = true;

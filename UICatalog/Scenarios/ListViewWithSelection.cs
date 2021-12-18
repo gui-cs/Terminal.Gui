@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
 	[ScenarioCategory ("Controls")]
-	class ListViewWithSelection : Scenario {
+	public class ListViewWithSelection : Scenario {
 
 		public CheckBox _customRenderCB;
 		public CheckBox _allowMarkingCB;

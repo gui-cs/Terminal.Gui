@@ -8,7 +8,7 @@ using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	/// <summary>
 	/// This Scenario demonstrates building a custom control (a class deriving from View) that:
 	///   - Provides a simple "Character Map" application (like Windows' charmap.exe).
@@ -18,7 +18,7 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "Character Map", Description: "Illustrates a custom control and Unicode")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Controls")]
-	class CharacterMap : Scenario {
+	public class CharacterMap : Scenario {
 		CharMap _charMap;
 		public override void Setup ()
 		{

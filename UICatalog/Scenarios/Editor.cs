@@ -5,14 +5,14 @@ using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("TopLevel")]
-	class Editor : Scenario {
+	public class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;

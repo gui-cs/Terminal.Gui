@@ -8,7 +8,7 @@ using Terminal.Gui.Trees;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Tree View", Description: "Simple tree view examples")]
 	[ScenarioCategory ("Controls")]
-	class TreeUseCases : Scenario {
+	public class TreeUseCases : Scenario {
 
 		View currentTree;
 
