@@ -161,6 +161,12 @@ namespace UICatalog {
 			keyBindings.AddKey (typeof (View), (Key)'l', Key.CursorRight);
 			keyBindings.AddKey (typeof (View), (Key)'H', Key.Home);
 			keyBindings.AddKey (typeof (View), (Key)'E', Key.End);
+			keyBindings.AddKey (typeof (TextView), (Key)'h', Key.CursorLeft);
+			keyBindings.AddKey (typeof (TextView), (Key)'j', Key.CursorDown);
+			keyBindings.AddKey (typeof (TextView), (Key)'k', Key.CursorUp);
+			keyBindings.AddKey (typeof (TextView), (Key)'l', Key.CursorRight);
+			keyBindings.AddKey (typeof (TextView), (Key)'H', Key.Home);
+			keyBindings.AddKey (typeof (TextView), (Key)'E', Key.End);
 			Application.KeyBindings = keyBindings;
 
 

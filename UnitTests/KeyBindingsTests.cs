@@ -26,27 +26,27 @@ namespace Terminal.Gui.Core {
 			KeyBindings bindings = new KeyBindings ();
 			Assert.Empty (bindings.Views);
 			Assert.Empty (bindings.Keys);
-			Assert.False (bindings.Enabled);
-			Assert.Equal (Key.Enter, bindings.EnableKey);
-			Assert.Equal (Key.Esc, bindings.DisableKey);
+			Assert.True (bindings.Enabled);
+			Assert.Equal (Key.Esc, bindings.EnableKey);
+			Assert.Equal (Key.Enter, bindings.DisableKey);
 			Assert.Equal (0, bindings.Count);
 
 			bindings = new KeyBindings (typeof (Window), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (Window).Name, bindings.Views [0].View);
-			Assert.True (bindings.Views [0].Enabled);
+			Assert.Equal (typeof (Window).Name, bindings.Views.Keys.ToList () [0]);
+			Assert.True (bindings.Views.Values.ToList () [0]);
 			Assert.Equal (typeof (Window).Name, bindings.Keys [0].View);
-			Assert.False (bindings.Enabled);
-			Assert.Equal (Key.Enter, bindings.EnableKey);
-			Assert.Equal (Key.Esc, bindings.DisableKey);
+			Assert.True (bindings.Enabled);
+			Assert.Equal (Key.Esc, bindings.EnableKey);
+			Assert.Equal (Key.Enter, bindings.DisableKey);
 			Assert.Equal (1, bindings.Count);
 
 			bindings = new KeyBindings (new KeyBinding (typeof (Window), (Key)'j', Key.CursorDown));
-			Assert.Equal (typeof (Window).Name, bindings.Views [0].View);
-			Assert.True (bindings.Views [0].Enabled);
+			Assert.Equal (typeof (Window).Name, bindings.Views.Keys.ToList () [0]);
+			Assert.True (bindings.Views.Values.ToList () [0]);
 			Assert.Equal (typeof (Window).Name, bindings.Keys [0].View);
-			Assert.False (bindings.Enabled);
-			Assert.Equal (Key.Enter, bindings.EnableKey);
-			Assert.Equal (Key.Esc, bindings.DisableKey);
+			Assert.True (bindings.Enabled);
+			Assert.Equal (Key.Esc, bindings.EnableKey);
+			Assert.Equal (Key.Enter, bindings.DisableKey);
 			Assert.Equal (1, bindings.Count);
 		}
 
@@ -55,12 +55,12 @@ namespace Terminal.Gui.Core {
 		{
 			var view = new TextView ();
 			KeyBindings bindings = new KeyBindings (view.GetType (), (Key)'j', Key.CursorDown);
-			Assert.Equal (view.GetType ().Name, bindings.Views [0].View);
-			Assert.True (bindings.Views [0].Enabled);
+			Assert.Equal (view.GetType ().Name, bindings.Views.Keys.ToList () [0]);
+			Assert.True (bindings.Views.Values.ToList () [0]);
 			Assert.Equal (view.GetType ().Name, bindings.Keys [0].View);
-			Assert.False (bindings.Enabled);
-			Assert.Equal (Key.Enter, bindings.EnableKey);
-			Assert.Equal (Key.Esc, bindings.DisableKey);
+			Assert.True (bindings.Enabled);
+			Assert.Equal (Key.Esc, bindings.EnableKey);
+			Assert.Equal (Key.Enter, bindings.DisableKey);
 			Assert.Equal (1, bindings.Count);
 		}
 
@@ -68,29 +68,29 @@ namespace Terminal.Gui.Core {
 		public void Enabled_Property ()
 		{
 			KeyBindings bindings = new KeyBindings (typeof (Window), (Key)'j', Key.CursorDown);
-			Assert.False (bindings.Enabled);
-
-			bindings.Enabled = true;
 			Assert.True (bindings.Enabled);
+
+			bindings.Enabled = false;
+			Assert.False (bindings.Enabled);
 		}
 
 		[Fact]
 		public void AddKey_Methods ()
 		{
 			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (TextView).Name, bindings.Views [0].View);
+			Assert.Equal (typeof (TextView).Name, bindings.Views.Keys.ToList () [0]);
 			Assert.Equal (typeof (TextView).Name, bindings.Keys [0].View);
 
 			bindings.AddKey (typeof (TextField), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (TextField).Name, bindings.Views [1].View);
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [1].View);
 
 			bindings.AddKey (new KeyBinding (typeof (TextField), (Key)'k', Key.CursorUp));
-			Assert.Equal (typeof (TextField).Name, bindings.Views [1].View);
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [2].View);
 
 			bindings.AddKey (new KeyBinding (typeof (TextField), Key.CursorUp, (Key)'k'));
-			Assert.Equal (typeof (TextField).Name, bindings.Views [1].View);
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [3].View);
 		}
 
@@ -114,19 +114,19 @@ namespace Terminal.Gui.Core {
 		public void RemoveKey_Methods ()
 		{
 			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (TextView).Name, bindings.Views [0].View);
+			Assert.Equal (typeof (TextView).Name, bindings.Views.Keys.ToList () [0]);
 			Assert.Equal (typeof (TextView).Name, bindings.Keys [0].View);
 
 			bindings.AddKey (typeof (TextField), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (TextField).Name, bindings.Views [1].View);
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [1].View);
 
 			bindings.AddKey (new KeyBinding (typeof (TextField), (Key)'k', Key.CursorUp));
-			Assert.Equal (typeof (TextField).Name, bindings.Views [1].View);
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [2].View);
 
 			bindings.AddKey (new KeyBinding (typeof (ListView), (Key)'l', Key.CursorRight));
-			Assert.Equal (typeof (ListView).Name, bindings.Views [2].View);
+			Assert.Equal (typeof (ListView).Name, bindings.Views.Keys.ToList () [2]);
 			Assert.Equal (typeof (ListView).Name, bindings.Keys [3].View);
 			Assert.Equal (3, bindings.Views.Count);
 			Assert.Equal (4, bindings.Keys.Count);

@@ -1556,38 +1556,53 @@ namespace Terminal.Gui {
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			if (Focused?.Enabled == true) {
+			if (MostFocused?.Enabled == true) {
 				var savedKeyEvent = keyEvent;
 				var kbs = Application.KeyBindings;
-				if (kbs != null && kbs.Count > 0 && kbs.Enabled) {
-					var viewName = Focused.GetType ().Name;
-					var (v, e) = kbs.Views.FirstOrDefault (x => x.View == viewName);
-					if (v == null) {
+				var isGlobal = false;
+				if (kbs != null && kbs.Enabled && kbs.Count > 0) {
+					var viewName = MostFocused.GetType ().Name;
+					var v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
+					if (v.Key == null) {
 						viewName = nameof (View);
-						(v, e) = kbs.Views.FirstOrDefault (x => x.View == viewName);
+						v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
+						isGlobal = true;
 					}
-					if (v != null) {
+					if (v.Key != null) {
 						var k = args.KeyEvent.Key;
 						KeyBinding kb;
-						if (k == Key.Enter && e) {
-							kbs.Views [kbs.Views.IndexOf ((v, e))] = (v, false);
+						if (k == kbs.DisableKey && v.Value) {
+							kbs.Views [v.Key] = false;
 							return true;
-						} else if (k == Key.Esc && !e) {
-							kbs.Views [kbs.Views.IndexOf ((v, e))] = (v, true);
+						} else if (k == kbs.EnableKey && !v.Value) {
+							kbs.Views [v.Key] = true;
 							return true;
-						} else if (e && (kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
+						} else if (v.Value && (kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
 							keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
 							args = new KeyEventEventArgs (keyEvent);
 						}
+					} else {
+						isGlobal = false;
 					}
 				}
-				Focused?.KeyPress?.Invoke (args);
+				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
-				if (Focused?.ProcessKey (keyEvent) == true)
+				if (MostFocused?.ProcessKey (keyEvent) == true)
 					return true;
-				keyEvent = savedKeyEvent;
-				args = new KeyEventEventArgs (keyEvent);
+				if (isGlobal) {
+					// Is global so propagate upwards
+					for (View c = this; c != null; c = c.SuperView) {
+						c?.KeyPress?.Invoke (args);
+						if (args.Handled)
+							return true;
+						if (c?.ProcessKey (keyEvent) == true)
+							return true;
+					}
+				} else {
+					keyEvent = savedKeyEvent;
+					args = new KeyEventEventArgs (keyEvent);
+				}
 			}
 			if (subviews == null || subviews.Count == 0)
 				return false;

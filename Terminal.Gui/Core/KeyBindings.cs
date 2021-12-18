@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The views name with the enabled status.
 		/// </summary>
-		public List<(string View, bool Enabled)> Views { get; private set; } = new List<(string View, bool Enabled)> ();
+		public Dictionary<string, bool> Views { get; private set; } = new Dictionary<string, bool> ();
 
 		/// <summary>
 		/// The <see cref="KeyBinding"/> collection.
@@ -124,17 +124,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get or sets the enabled status.
 		/// </summary>
-		public bool Enabled { get; set; } = false;
+		public bool Enabled { get; set; } = true;
 
 		/// <summary>
-		/// Get or sets the enable key to enter insert mode leaving the keys bindings.
+		/// Gets or sets the enable key to leave insert mode returning to the keys bindings.
 		/// </summary>
-		public Key EnableKey { get; set; } = Key.Enter;
+		public Key EnableKey { get; set; } = Key.Esc;
 
 		/// <summary>
-		/// Gets or sets the disable key to leave insert mode returning to the keys bindings.
+		/// Get or sets the disable key to enter insert mode leaving the keys bindings.
 		/// </summary>
-		public Key DisableKey { get; set; } = Key.Esc;
+		public Key DisableKey { get; set; } = Key.Enter;
 
 		/// <summary>
 		/// Gets the total of views with key bindings.
@@ -157,8 +157,8 @@ namespace Terminal.Gui {
 			}
 			var kb = new KeyBinding (view, inKey, outKey, description, enabled);
 			var viewName = view.Name;
-			if (!Views.Any (x => x.View == viewName)) {
-				Views.Add ((viewName, true));
+			if (!Views.Keys.Contains (viewName)) {
+				Views.Add (viewName, true);
 			}
 			if (Keys.Contains (kb, new KeyBindingEqualityComparer ())) {
 				throw new ArgumentException ("One of the keys already exists.", nameof (view));
@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 			var count = Keys.Count;
 			Keys.RemoveAt (idx);
 			if (Keys.FirstOrDefault (x => x.View == viewName) == null) {
-				Views.Remove (Views.FirstOrDefault (x => x.View == viewName));
+				Views.Remove (viewName);
 			}
 			if (count == Keys.Count) {
 				return false;
@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 			var viewName = view.Name;
 			var result = Keys.RemoveAll (x => x.View == viewName) > 0;
 			if (result) {
-				Views.Remove (Views.FirstOrDefault (x => x.View == viewName));
+				Views.Remove (viewName);
 			}
 			return result;
 		}
@@ -256,7 +256,7 @@ namespace Terminal.Gui {
 		public bool RemoveAll ()
 		{
 			if (Views.Count > 0) {
-				Views = new List<(string View, bool Enabled)> ();
+				Views = new Dictionary<string, bool> ();
 				Keys = new List<KeyBinding> ();
 				return true;
 			}
@@ -351,7 +351,7 @@ namespace Terminal.Gui {
 			kb.OutKey = to.OutKey;
 			kb.Description = to.Description;
 			kb.Enabled = to.Enabled;
-			if (new KeyBindingEqualityComparer().ReferenceEquals (kb, to)) {
+			if (new KeyBindingEqualityComparer ().ReferenceEquals (kb, to)) {
 				return true;
 			}
 			return false;
