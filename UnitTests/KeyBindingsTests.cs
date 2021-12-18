@@ -18,6 +18,13 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (Key.CursorDown, binding.OutKey);
 			Assert.Equal ("", binding.Description);
 			Assert.True (binding.Enabled);
+
+			binding = new KeyBinding (nameof (Dialog), (Key)'j', Key.CursorDown);
+			Assert.Equal (typeof (Dialog).Name, binding.View);
+			Assert.Equal ((Key)'j', binding.InKey);
+			Assert.Equal (Key.CursorDown, binding.OutKey);
+			Assert.Equal ("", binding.Description);
+			Assert.True (binding.Enabled);
 		}
 
 		[Fact]
@@ -25,6 +32,13 @@ namespace Terminal.Gui.Core {
 		{
 			Assert.Throws<ArgumentNullException> (() => new KeyBinding ((Type)null, (Key)'j', Key.CursorDown));
 			Assert.Throws<ArgumentException> (() => new KeyBinding (typeof (Responder), (Key)'j', Key.CursorDown));
+		}
+
+		[Fact]
+		public void KeyBinding_ToString ()
+		{
+			KeyBinding binding = new KeyBinding (typeof (Dialog), (Key)'j', Key.CursorDown);
+			Assert.Equal ("View:Dialog; Inkey:Space, J; Outkey:CursorDown", binding.ToString ());
 		}
 
 		[Fact]
@@ -48,6 +62,15 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (1, bindings.Count);
 
 			bindings = new KeyBindings (new KeyBinding (typeof (Window), (Key)'j', Key.CursorDown));
+			Assert.Equal (typeof (Window).Name, bindings.Views.Keys.ToList () [0]);
+			Assert.True (bindings.Views.Values.ToList () [0]);
+			Assert.Equal (typeof (Window).Name, bindings.Keys [0].View);
+			Assert.True (bindings.Enabled);
+			Assert.Equal (Key.Esc, bindings.EnableKey);
+			Assert.Equal (Key.Enter, bindings.DisableKey);
+			Assert.Equal (1, bindings.Count);
+
+			bindings = new KeyBindings (nameof (Window), (Key)'j', Key.CursorDown);
 			Assert.Equal (typeof (Window).Name, bindings.Views.Keys.ToList () [0]);
 			Assert.True (bindings.Views.Values.ToList () [0]);
 			Assert.Equal (typeof (Window).Name, bindings.Keys [0].View);
@@ -99,6 +122,10 @@ namespace Terminal.Gui.Core {
 			bindings.AddKey (new KeyBinding (typeof (TextField), Key.CursorUp, (Key)'k'));
 			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
 			Assert.Equal (typeof (TextField).Name, bindings.Keys [3].View);
+
+			bindings.AddKey (nameof (TextField), Key.CursorRight, (Key)'l');
+			Assert.Equal (typeof (TextField).Name, bindings.Views.Keys.ToList () [1]);
+			Assert.Equal (typeof (TextField).Name, bindings.Keys [4].View);
 		}
 
 		[Fact]
@@ -193,6 +220,7 @@ namespace Terminal.Gui.Core {
 			Assert.Empty (bindings.Keys);
 
 			Assert.False (bindings.RemoveAll ());
+			Assert.False (bindings.RemoveAll (nameof (TextView)));
 		}
 
 		[Fact]

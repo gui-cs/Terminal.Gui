@@ -73,6 +73,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Enabled { get; set; } = true;
 
+		/// <summary>Returns a string that represents the current object.</summary>
+		/// <returns>A string that represents the current object.</returns>
+		public override string ToString ()
+		{
+			return $"View:{View}; Inkey:{InKey}; Outkey:{OutKey}";
+		}
 	}
 
 	/// <summary>
@@ -214,9 +220,8 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException ("View cannot be null.", nameof (view));
 			}
 			var kb = new KeyBinding (view, inKey, outKey, description, enabled);
-			var viewName = view;
-			if (!Views.ContainsKey (viewName)) {
-				Views.Add (viewName, true);
+			if (!Views.ContainsKey (view)) {
+				Views.Add (view, true);
 			}
 			if (Keys.Contains (kb, new KeyBindingEqualityComparer ())) {
 				throw new ArgumentException ("One of the keys already exists.", nameof (view));
