@@ -1569,13 +1569,13 @@ namespace Terminal.Gui {
 					if (v != null) {
 						var k = args.KeyEvent.Key;
 						KeyBinding kb;
-						if (k == Key.Enter && !e) {
-							e = true;
+						if (k == Key.Enter && e) {
+							kbs.Views [kbs.Views.IndexOf ((v, e))] = (v, false);
 							return true;
-						} else if (k == Key.Esc && e) {
-							e = false;
+						} else if (k == Key.Esc && !e) {
+							kbs.Views [kbs.Views.IndexOf ((v, e))] = (v, true);
 							return true;
-						} else if ((kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
+						} else if (e && (kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
 							keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
 							args = new KeyEventEventArgs (keyEvent);
 						}
