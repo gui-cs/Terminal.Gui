@@ -175,6 +175,8 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
+				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
+				Thread.Sleep (10);
 				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
 						var w = Math.Max (Console.WindowWidth, 0);
@@ -1151,7 +1153,25 @@ namespace Terminal.Gui {
 	}
 
 	internal class NetDriver : ConsoleDriver {
+		const int COLOR_BLACK = 30;
+		const int COLOR_RED = 31;
+		const int COLOR_GREEN = 32;
+		const int COLOR_YELLOW = 33;
+		const int COLOR_BLUE = 34;
+		const int COLOR_MAGENTA = 35;
+		const int COLOR_CYAN = 36;
+		const int COLOR_WHITE = 37;
+		const int COLOR_BRIGHT_BLACK = 90;
+		const int COLOR_BRIGHT_RED = 91;
+		const int COLOR_BRIGHT_GREEN = 92;
+		const int COLOR_BRIGHT_YELLOW = 93;
+		const int COLOR_BRIGHT_BLUE = 94;
+		const int COLOR_BRIGHT_MAGENTA = 95;
+		const int COLOR_BRIGHT_CYAN = 96;
+		const int COLOR_BRIGHT_WHITE = 97;
+
 		int cols, rows, top;
+
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Left => 0;
@@ -1404,25 +1424,12 @@ namespace Terminal.Gui {
 			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
 		}
 
-		int redrawColor = -1;
-		void SetColor (int color)
-		{
-			redrawColor = color;
-			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
-			if (values.Contains (color & 0xffff)) {
-				Console.BackgroundColor = (ConsoleColor)(color & 0xffff);
-			}
-			if (values.Contains ((color >> 16) & 0xffff)) {
-				Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-			}
-		}
-
 		public override void Refresh ()
 		{
 			UpdateScreen ();
 		}
+
+		int redrawAttr = -1;
 
 		public override void UpdateScreen ()
 		{
@@ -1450,20 +1457,16 @@ namespace Terminal.Gui {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
-					for (; col < cols && contents [row, col, 2] == 1; col++) {
-						var color = contents [row, col, 1];
-						if (color != redrawColor) {
-							if (!AlwaysSetPosition) {
-								Console.Write (output);
-								output = new System.Text.StringBuilder ();
-							}
-							SetColor (color);
+					for (; col < cols; col++) {
+						var attr = contents [row, col, 1];
+						if (attr != redrawAttr) {
+							output.Append (WriteAttributes (attr));
 						}
 						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
 							return;
 						}
 						if (AlwaysSetPosition) {
-							Console.Write ((char)contents [row, col, 0]);
+							Console.Write ($"{output}{(char)contents [row, col, 0]}");
 						} else {
 							output.Append ((char)contents [row, col, 0]);
 						}
@@ -1476,6 +1479,67 @@ namespace Terminal.Gui {
 			}
 			Console.CursorVisible = true;
 			UpdateCursor ();
+		}
+
+		System.Text.StringBuilder WriteAttributes (int attr)
+		{
+			const string CSI = "\x1b[";
+			int bg = 0;
+			int fg = 0;
+			System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+
+			redrawAttr = attr;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains (attr & 0xffff)) {
+				bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
+			}
+			if (values.Contains ((attr >> 16) & 0xffff)) {
+				fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
+			}
+			sb.Append ($"{CSI}{bg};{fg}m");
+
+			return sb;
+		}
+
+		int MapColors (ConsoleColor color, bool isForeground = true)
+		{
+			switch (color) {
+			case ConsoleColor.Black:
+				return isForeground ? COLOR_BLACK : COLOR_BLACK + 10;
+			case ConsoleColor.DarkBlue:
+				return isForeground ? COLOR_BLUE : COLOR_BLUE + 10;
+			case ConsoleColor.DarkGreen:
+				return isForeground ? COLOR_GREEN : COLOR_GREEN + 10;
+			case ConsoleColor.DarkCyan:
+				return isForeground ? COLOR_CYAN : COLOR_CYAN + 10;
+			case ConsoleColor.DarkRed:
+				return isForeground ? COLOR_RED : COLOR_RED + 10;
+			case ConsoleColor.DarkMagenta:
+				return isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10;
+			case ConsoleColor.DarkYellow:
+				return isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10;
+			case ConsoleColor.Gray:
+				return isForeground ? COLOR_WHITE : COLOR_WHITE + 10;
+			case ConsoleColor.DarkGray:
+				return isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10;
+			case ConsoleColor.Blue:
+				return isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10;
+			case ConsoleColor.Green:
+				return isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10;
+			case ConsoleColor.Cyan:
+				return isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10;
+			case ConsoleColor.Red:
+				return isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10;
+			case ConsoleColor.Magenta:
+				return isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10;
+			case ConsoleColor.Yellow:
+				return isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10;
+			case ConsoleColor.White:
+				return isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10;
+			}
+			return 0;
 		}
 
 		bool SetCursorPosition (int col, int row)
