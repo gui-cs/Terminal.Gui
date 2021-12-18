@@ -280,5 +280,67 @@ namespace Terminal.Gui.Core {
 			}
 		}
 
+		[Fact]
+		public void ReplaceViewKey_Method ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextField), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextView), (Key)'l', Key.CursorRight);
+
+			KeyBinding kbFrom = bindings.Keys [2];
+			KeyBinding kbTo = new KeyBinding (typeof (TextView), kbFrom.InKey, Key.PageDown, "New key 1", false);
+			bindings.ReplaceViewKey (kbFrom, kbTo);
+			KeyBinding kb = bindings.Keys [2];
+			Assert.Equal (typeof (TextView).Name, kb.View);
+			Assert.Equal ((Key)'l', kb.InKey);
+			Assert.Equal (Key.PageDown, kb.OutKey);
+			Assert.Equal ("New key 1", kb.Description);
+			Assert.False (kb.Enabled);
+
+			kbFrom = bindings.Keys [0];
+			kbTo = new KeyBinding (typeof (TextView), (Key)'i', kbFrom.OutKey, "New key 2", false);
+			bindings.ReplaceViewKey (kbFrom, kbTo);
+			kb = bindings.Keys [0];
+			Assert.Equal (typeof (TextView).Name, kb.View);
+			Assert.Equal ((Key)'i', kb.InKey);
+			Assert.Equal (Key.CursorDown, kb.OutKey);
+			Assert.Equal ("New key 2", kb.Description);
+			Assert.False (kb.Enabled);
+
+			kbFrom = bindings.Keys [1];
+			kbTo = new KeyBinding (typeof (TextField), (Key)'i', kbFrom.OutKey, "New key 3", false);
+			bindings.ReplaceViewKey (kbFrom, kbTo);
+			kb = bindings.Keys [1];
+			Assert.Equal (typeof (TextField).Name, kb.View);
+			Assert.Equal ((Key)'i', kb.InKey);
+			Assert.Equal (Key.CursorDown, kb.OutKey);
+			Assert.Equal ("New key 3", kb.Description);
+			Assert.False (kb.Enabled);
+		}
+
+		[Fact]
+		public void ReplaceViewKey_Exceptions ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+
+			KeyBinding kb = new KeyBinding (typeof (TextView), Key.J, Key.CursorLeft, "New Description", false);
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceViewKey (null, kb));
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceViewKey (kb, null));
+
+			KeyBinding kbFrom = new KeyBinding (typeof (TextView), Key.J, Key.CursorLeft, "From Description", false);
+			KeyBinding kbTo = new KeyBinding (typeof (TextField), Key.J, Key.CursorLeft, "From Description", false);
+			Assert.Throws<InvalidOperationException> (() => bindings.ReplaceViewKey (kbFrom, kbTo));
+
+			kbTo = new KeyBinding (typeof (TextView), Key.J, Key.CursorLeft, "From Description", false);
+			Assert.Throws<ArgumentException> (() => bindings.ReplaceViewKey (kbFrom, kbTo));
+
+			kbTo = new KeyBinding (typeof (TextView), Key.J, Key.CursorLeft, "To Description", false);
+			Assert.Throws<ArgumentException> (() => bindings.ReplaceViewKey (kbFrom, kbTo));
+
+			bindings.AddKey (typeof (TextView), (Key)'k', Key.CursorUp);
+			kbFrom = new KeyBinding (typeof (TextView), (Key)'j', Key.CursorDown, "From Description", false);
+			kbTo = new KeyBinding (typeof (TextView), Key.J, Key.CursorUp, "To Description", false);
+			Assert.Throws<ArgumentException> (() => bindings.ReplaceViewKey (kbFrom, kbTo));
+		}
 	}
 }

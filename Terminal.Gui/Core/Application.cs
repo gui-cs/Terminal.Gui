@@ -153,6 +153,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
 
+		/// <summary>
+		/// Gets or sets the key bindings for the application.
+		/// </summary>
 		public static KeyBindings KeyBindings {get; set;}
 
 		/// <summary>
