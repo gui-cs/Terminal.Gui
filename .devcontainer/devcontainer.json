@@ -1,6 +1,6 @@
 {
 	"name": "Terminal.Gui Codespace",
-	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:5.0",
+	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:6.0",
 	"settings": {
 		"terminal.integrated.defaultProfile.linux": "pwsh"
 	},
