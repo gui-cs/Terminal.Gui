@@ -12,12 +12,19 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void KeyBinding_Constructors ()
 		{
-			KeyBinding binding = new KeyBinding (typeof (Window), (Key)'j', Key.CursorDown);
-			Assert.Equal (typeof (Window).Name, binding.View);
+			KeyBinding binding = new KeyBinding (typeof (Dialog), (Key)'j', Key.CursorDown);
+			Assert.Equal (typeof (Dialog).Name, binding.View);
 			Assert.Equal ((Key)'j', binding.InKey);
 			Assert.Equal (Key.CursorDown, binding.OutKey);
 			Assert.Equal ("", binding.Description);
 			Assert.True (binding.Enabled);
+		}
+
+		[Fact]
+		public void KeyBinding_Constructors_Exceptions ()
+		{
+			Assert.Throws<ArgumentNullException> (() => new KeyBinding ((Type)null, (Key)'j', Key.CursorDown));
+			Assert.Throws<ArgumentException> (() => new KeyBinding (typeof (Responder), (Key)'j', Key.CursorDown));
 		}
 
 		[Fact]
@@ -98,7 +105,14 @@ namespace Terminal.Gui.Core {
 		public void AddKey_Throws_If_View_Is_Null ()
 		{
 			var bindings = new KeyBindings ();
-			Assert.Throws<ArgumentNullException> (() => bindings.AddKey (null, (Key)'j', Key.CursorDown));
+			Assert.Throws<ArgumentNullException> (() => bindings.AddKey ((Type)null, (Key)'j', Key.CursorDown));
+		}
+
+		[Fact]
+		public void AddKey_Throws_If_View_Is_Not_Assignable_To_Given_Type ()
+		{
+			var bindings = new KeyBindings ();
+			Assert.Throws<ArgumentException> (() => bindings.AddKey (typeof (Responder), (Key)'j', Key.CursorDown));
 		}
 
 		[Fact]
@@ -185,7 +199,7 @@ namespace Terminal.Gui.Core {
 		public void RemoveAll_Throws_If_View_Is_Null ()
 		{
 			var bindings = new KeyBindings ();
-			Assert.Throws<ArgumentNullException> (() => bindings.RemoveAll (null));
+			Assert.Throws<ArgumentNullException> (() => bindings.RemoveAll ((Type)null));
 		}
 
 		[Fact]
@@ -341,6 +355,46 @@ namespace Terminal.Gui.Core {
 			kbFrom = new KeyBinding (typeof (TextView), (Key)'j', Key.CursorDown, "From Description", false);
 			kbTo = new KeyBinding (typeof (TextView), Key.J, Key.CursorUp, "To Description", false);
 			Assert.Throws<ArgumentException> (() => bindings.ReplaceViewKey (kbFrom, kbTo));
+		}
+
+		[Fact]
+		public void ReplaceAllKeysFromView_Methods ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextField), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextField), (Key)'l', Key.CursorRight);
+			bindings.AddKey (typeof (ListView), (Key)'k', Key.CursorRight);
+
+			Assert.True (bindings.ReplaceAllKeysFromView (typeof (TextField), typeof (ListView), true));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextView)));
+			Assert.False (bindings.Views.ContainsKey (nameof (TextField)));
+			Assert.True (bindings.Views.ContainsKey (nameof (ListView)));
+			Assert.Equal (1, bindings.Keys.Count (x => x.View == nameof (TextView)));
+			Assert.Equal (0, bindings.Keys.Count (x => x.View == nameof (TextField)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (ListView)));
+
+			Assert.True (bindings.ReplaceAllKeysFromView (nameof (ListView), nameof (TableView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextView)));
+			Assert.False (bindings.Views.ContainsKey (nameof (TextField)));
+			Assert.False (bindings.Views.ContainsKey (nameof (ListView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TableView)));
+			Assert.Equal (1, bindings.Keys.Count (x => x.View == nameof (TextView)));
+			Assert.Equal (0, bindings.Keys.Count (x => x.View == nameof (TextField)));
+			Assert.Equal (0, bindings.Keys.Count (x => x.View == nameof (ListView)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (TableView)));
+		}
+
+		[Fact]
+		public void ReplaceAllKeysFromView_Exceptions ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (ListView), (Key)'j', Key.CursorDown);
+
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (null, nameof (TextView)));
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (nameof (TextView), null));
+			Assert.Throws<ArgumentException> (() => bindings.ReplaceAllKeysFromView (nameof (TextField), nameof (TextField)));
+			Assert.Throws<ArgumentException> (() => bindings.ReplaceAllKeysFromView (nameof (TextField), nameof (TextView)));
+			Assert.Throws<InvalidOperationException> (() => bindings.ReplaceAllKeysFromView (nameof (ListView), nameof (TextView)));
 		}
 	}
 }
