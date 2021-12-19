@@ -43,6 +43,14 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.4.0
+      * #1546  Fixes #1535. Added IsMouseDisabled prop to Application   
+      * #1515  Upgrading to Net6.0                                      
+      * #1508  Allows ListView trigger the Enter and Leave events.      
+      * #1506  Prevents a Process breaks rendering on Linux.            
+      * #1505  Fixes #1499. Allowing border settings for the MessageBox.
+      * #1504  Fixes #1502. Prevents high CPU usage.                    
+
       v1.3.0
       * #1491  Fix link to MainLoop docs in README.md
       * #1489  Dynamic menu/statusbar and Enable property fix.
