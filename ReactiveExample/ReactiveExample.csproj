@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="ReactiveUI.Fody" Version="16.3.10" />
+        <PackageReference Include="ReactiveUI.Fody" Version="17.1.9" />
         <PackageReference Include="ReactiveUI" Version="17.1.9" />
         <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.1.4" PrivateAssets="all" />
     </ItemGroup>
