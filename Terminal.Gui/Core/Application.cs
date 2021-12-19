@@ -1203,8 +1203,8 @@ namespace Terminal.Gui {
 			if (MdiTop != null && !Current.Modal) {
 				lock (toplevels) {
 					toplevels.MoveNext ();
-					var isMdi = false;
-					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
+					bool isMdi;
+					while (isMdi = toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
 						if (!isMdi && toplevels.Peek () == MdiTop) {
 							isMdi = true;
 						} else if (isMdi && toplevels.Peek () == MdiTop) {
