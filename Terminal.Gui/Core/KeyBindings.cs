@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
 	/// Class that implement the keys used by the <see cref="KeyBindings"/> for any <see cref="View"/>.
 	/// </summary>
-	public sealed class KeyBinding {
+	public sealed class KeyBinding : ICloneable {
 		/// <summary>
 		/// Initializes a new key binding for a view. If <see cref="View"/> is used will applied to all views.
 		/// </summary>
@@ -16,7 +17,6 @@ namespace Terminal.Gui {
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
 		public KeyBinding (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
-			: this (inKey, outKey, description, enabled)
 		{
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null.", nameof (view));
@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 			if (!typeof (View).IsAssignableFrom (view)) {
 				throw new ArgumentException ("Type is not assignable from View.", nameof (view));
 			}
-			View = view.Name;
+			Initialize (view.Name, inKey, outKey, description, enabled);
 		}
 
 		/// <summary>
@@ -36,16 +36,16 @@ namespace Terminal.Gui {
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
 		public KeyBinding (string view, Key inKey, Key outKey, string description = "", bool enabled = true)
-			: this (inKey, outKey, description, enabled)
+		{
+			Initialize (view, inKey, outKey, description, enabled);
+		}
+
+		private void Initialize (string view, Key inKey, Key outKey, string description, bool enabled)
 		{
 			if (string.IsNullOrEmpty (view)) {
 				throw new ArgumentNullException ("View cannot be null or empty.", nameof (view));
 			}
 			View = view;
-		}
-
-		private KeyBinding (Key inKey, Key outKey, string description, bool enabled)
-		{
 			InKey = inKey;
 			OutKey = outKey;
 			Description = description;
@@ -73,11 +73,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Enabled { get; set; } = true;
 
+		/// <summary>Creates a new object that is a copy of the current instance.</summary>
+		/// <returns>A new object that is a copy of this instance.</returns>
+		public object Clone ()
+		{
+			return this.MemberwiseClone ();
+		}
+
 		/// <summary>Returns a string that represents the current object.</summary>
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString ()
 		{
-			return $"View:{View}; Inkey:{InKey}; Outkey:{OutKey}";
+			return $"{View}({InKey})({OutKey})";
 		}
 	}
 
@@ -95,9 +102,23 @@ namespace Terminal.Gui {
 
 			public bool ReferenceEquals (KeyBinding x, KeyBinding y)
 			{
-				if (x.View == y.View && x.InKey == y.InKey && x.OutKey == y.OutKey && x.Description == y.Description && x.Enabled == y.Enabled)
-					return true;
-				return false;
+				PropertyInfo [] xProps = x.GetType ()
+					.GetProperties (BindingFlags.Public | BindingFlags.Instance);
+				PropertyInfo [] yProps = y.GetType ()
+					.GetProperties (BindingFlags.Public | BindingFlags.Instance);
+
+				for (int i = 0; i < xProps.Length; i++) {
+					PropertyInfo piX = xProps [i];
+					PropertyInfo piY = yProps [i];
+					if (piX.Name != piY.Name) {
+						throw new InvalidOperationException (
+							$"The type {nameof (piX)} doesn't have the same hierarchy of type {nameof (piY)}");
+					}
+					if (!piX.GetValue (x, null).Equals (piY.GetValue (y, null))) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			public int GetHashCode (KeyBinding obj)
@@ -484,6 +505,116 @@ namespace Terminal.Gui {
 				return false;
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// Copy the match <paramref name="from"/> <see cref="KeyBinding"/> to the new <paramref name="toView"/>.
+		/// </summary>
+		/// <param name="from">The key binding to be copied.</param>
+		/// <param name="toView">The view type being copied.</param>
+		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
+		public bool CopyViewKey (KeyBinding from, Type toView)
+		{
+			if (from == null) {
+				throw new ArgumentNullException ("KeyBinding cannot be null.", nameof (from));
+			}
+			if (toView == null) {
+				throw new ArgumentNullException ("KeyBinding cannot be null.", nameof (toView));
+			}
+			return CopyViewKey (from, toView.Name);
+		}
+
+		/// <summary>
+		/// Copy the match <paramref name="from"/> <see cref="KeyBinding"/> to the new <paramref name="toView"/>.
+		/// </summary>
+		/// <param name="from">The key binding to be copied.</param>
+		/// <param name="toView">The view being copied.</param>
+		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
+		public bool CopyViewKey (KeyBinding from, string toView)
+		{
+			if (from == null) {
+				throw new ArgumentNullException ("KeyBinding cannot be null.", nameof (from));
+			}
+			if (toView == null) {
+				throw new ArgumentNullException ("KeyBinding cannot be null.", nameof (toView));
+			}
+			if (from.View == toView) {
+				throw new InvalidOperationException ("Both views cannot be the same.");
+			}
+			if (Keys.Find (x => x.View == from.View && x.InKey == from.InKey && x.OutKey == from.OutKey) == default) {
+				throw new ArgumentException ("KeyBinding not found.", nameof (from));
+			}
+			var to = (KeyBinding)from.Clone ();
+			to.View = toView;
+			return AddKey (to);
+		}
+
+		/// <summary>
+		/// Copy all keys from the matched view to the destiny view.
+		/// </summary>
+		/// <param name="fromView">The view type to be copied.</param>
+		/// <param name="toView">The view type being copied.</param>
+		/// <param name="force">Used to delete the destiny if already exists.</param>
+		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
+		public bool CopyAllKeysFromView (Type fromView, Type toView, bool force = false)
+		{
+			if (fromView == null) {
+				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+			}
+			if (toView == null) {
+				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+			}
+			return CopyAllKeysFromView (fromView.Name, toView.Name, force);
+		}
+
+		/// <summary>
+		/// Copy all keys from the matched view to the destiny view.
+		/// </summary>
+		/// <param name="fromView">The view to be copied.</param>
+		/// <param name="toView">The view being copied.</param>
+		/// <param name="force">Used to delete the destiny if already exists.</param>
+		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
+		public bool CopyAllKeysFromView (string fromView, string toView, bool force = false)
+		{
+			if (string.IsNullOrEmpty (fromView)) {
+				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+			}
+			if (string.IsNullOrEmpty (toView)) {
+				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+			}
+			if (fromView == toView) {
+				throw new ArgumentException ("The source and destiny are the same.", nameof (fromView));
+			}
+			if (!Views.ContainsKey (fromView)) {
+				throw new ArgumentException ("View not found.", nameof (fromView));
+			}
+			if (Views.ContainsKey (toView) && !force) {
+				throw new InvalidOperationException ("Destiny View already exists. Set force = true to delete it before.");
+			} else if (Views.ContainsKey (toView) && force) {
+				RemoveAll (toView);
+				Views.Add (toView, Views [fromView]);
+			} else {
+				Views.Add (toView, Views [fromView]);
+			}
+			try {
+				var keys = new List<KeyBinding> ();
+				foreach (var kb in Keys.Where (x => x.View == fromView)) {
+					KeyBinding newKb = (KeyBinding)kb.Clone ();
+					newKb.View = toView;
+					keys.Add (newKb);
+				}
+				Keys.AddRange (keys);
+			} catch (Exception) {
+				return false;
+			}
+			return true;
+		}
+
+		/// <summary>Returns a string that represents the current object.</summary>
+		/// <returns>A string that represents the current object.</returns>
+		public override string ToString ()
+		{
+			return $"Views({Count})Keys({Keys.Count})";
 		}
 	}
 }

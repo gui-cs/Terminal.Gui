@@ -8,7 +8,6 @@ using Xunit;
 
 namespace Terminal.Gui.Core {
 	public class KeyBindingsTests {
-
 		[Fact]
 		public void KeyBinding_Constructors ()
 		{
@@ -38,7 +37,7 @@ namespace Terminal.Gui.Core {
 		public void KeyBinding_ToString ()
 		{
 			KeyBinding binding = new KeyBinding (typeof (Dialog), (Key)'j', Key.CursorDown);
-			Assert.Equal ("View:Dialog; Inkey:Space, J; Outkey:CursorDown", binding.ToString ());
+			Assert.Equal ("Dialog(Space, J)(CursorDown)", binding.ToString ());
 		}
 
 		[Fact]
@@ -149,6 +148,9 @@ namespace Terminal.Gui.Core {
 			Assert.Throws<ArgumentException> (() => bindings.AddKey (typeof (TextView), (Key)'j', Key.CursorDown));
 			Assert.Throws<ArgumentException> (() => bindings.AddKey (typeof (TextView), (Key)'k', Key.CursorDown));
 			Assert.Throws<ArgumentException> (() => bindings.AddKey (typeof (TextView), (Key)'j', Key.CursorUp));
+			Assert.Throws<ArgumentException> (() => bindings.AddKey (typeof (TextView), Key.J | Key.Space, Key.CursorLeft));
+			Assert.Throws<ArgumentException> (() => bindings.AddKey (
+				new KeyBinding (nameof (TextView), Key.J | Key.Space, Key.CursorLeft)));
 		}
 
 		[Fact]
@@ -286,9 +288,7 @@ namespace Terminal.Gui.Core {
 			rs.Toplevel.Running = true;
 
 			Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
-
 		}
-
 
 		[Fact]
 		[AutoInitShutdown]
@@ -310,11 +310,9 @@ namespace Terminal.Gui.Core {
 			rs.Toplevel.Running = true;
 
 			Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
-
 		}
 
 		private class TextViewBinding : TextView {
-
 			public override bool ProcessKey (KeyEvent kb)
 			{
 				Assert.Equal (Key.CursorDown, kb.Key);
@@ -418,11 +416,104 @@ namespace Terminal.Gui.Core {
 			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
 			bindings.AddKey (typeof (ListView), (Key)'j', Key.CursorDown);
 
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (null, typeof (TextView)));
+			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (typeof (TextView), null));
 			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (null, nameof (TextView)));
 			Assert.Throws<ArgumentNullException> (() => bindings.ReplaceAllKeysFromView (nameof (TextView), null));
 			Assert.Throws<ArgumentException> (() => bindings.ReplaceAllKeysFromView (nameof (TextField), nameof (TextField)));
 			Assert.Throws<ArgumentException> (() => bindings.ReplaceAllKeysFromView (nameof (TextField), nameof (TextView)));
 			Assert.Throws<InvalidOperationException> (() => bindings.ReplaceAllKeysFromView (nameof (ListView), nameof (TextView)));
+		}
+
+		[Fact]
+		public void CopyViewKey_Method ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown, "Move Down");
+			bindings.AddKey (typeof (TextField), (Key)'k', Key.CursorUp, "Move Up", false);
+
+			KeyBinding kbFrom = bindings.Keys [1];
+			bindings.CopyViewKey (kbFrom, typeof (TextView));
+			KeyBinding kb = bindings.Keys [2];
+			Assert.Equal (typeof (TextView).Name, kb.View);
+			Assert.Equal ((Key)'k', kb.InKey);
+			Assert.Equal (Key.CursorUp, kb.OutKey);
+			Assert.Equal ("Move Up", kb.Description);
+			Assert.False (kb.Enabled);
+
+			kbFrom = bindings.Keys [0];
+			bindings.CopyViewKey (kbFrom, nameof (ListView));
+			kb = bindings.Keys [3];
+			Assert.Equal (nameof (ListView), kb.View);
+			Assert.Equal ((Key)'j', kb.InKey);
+			Assert.Equal (Key.CursorDown, kb.OutKey);
+			Assert.Equal ("Move Down", kb.Description);
+			Assert.True (kb.Enabled);
+		}
+
+		[Fact]
+		public void CopyViewKey_Exceptions ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyViewKey (null, typeof (TextView)));
+			KeyBinding kb = bindings.Keys [0];
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyViewKey (kb, (Type)null));
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyViewKey (null, nameof (TextView)));
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyViewKey (kb, (string)null));
+			Assert.Throws<InvalidOperationException> (() => bindings.CopyViewKey (kb, nameof (TextView)));
+			kb = (KeyBinding)bindings.Keys [0].Clone ();
+			kb.View = nameof (TextField);
+			Assert.Throws<ArgumentException> (() => bindings.CopyViewKey (kb, nameof (ListView)));
+		}
+
+		[Fact]
+		public void CopyAllKeysFromView_Methods ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextField), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (TextField), (Key)'l', Key.CursorRight);
+			bindings.AddKey (typeof (ListView), (Key)'k', Key.CursorRight);
+
+			Assert.True (bindings.CopyAllKeysFromView (typeof (TextField), typeof (ListView), true));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextField)));
+			Assert.True (bindings.Views.ContainsKey (nameof (ListView)));
+			Assert.Equal (1, bindings.Keys.Count (x => x.View == nameof (TextView)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (TextField)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (ListView)));
+
+			Assert.True (bindings.CopyAllKeysFromView (nameof (ListView), nameof (TableView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TextField)));
+			Assert.True (bindings.Views.ContainsKey (nameof (ListView)));
+			Assert.True (bindings.Views.ContainsKey (nameof (TableView)));
+			Assert.Equal (1, bindings.Keys.Count (x => x.View == nameof (TextView)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (TextField)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (ListView)));
+			Assert.Equal (2, bindings.Keys.Count (x => x.View == nameof (TableView)));
+		}
+
+		[Fact]
+		public void CopyAllKeysFromView_Exceptions ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (TextView), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (ListView), (Key)'j', Key.CursorDown);
+
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyAllKeysFromView (null, typeof (TextView)));
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyAllKeysFromView (typeof (TextView), null));
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyAllKeysFromView (null, nameof (TextView)));
+			Assert.Throws<ArgumentNullException> (() => bindings.CopyAllKeysFromView (nameof (TextView), null));
+			Assert.Throws<ArgumentException> (() => bindings.CopyAllKeysFromView (nameof (TextField), nameof (TextField)));
+			Assert.Throws<ArgumentException> (() => bindings.CopyAllKeysFromView (nameof (TextField), nameof (TextView)));
+			Assert.Throws<InvalidOperationException> (() => bindings.CopyAllKeysFromView (nameof (ListView), nameof (TextView)));
+		}
+
+		[Fact]
+		public void KeyBindings_ToString ()
+		{
+			KeyBindings bindings = new KeyBindings (typeof (Dialog), (Key)'j', Key.CursorDown);
+			bindings.AddKey (typeof (Dialog), (Key)'k', Key.CursorUp);
+			Assert.Equal ("Views(1)Keys(2)", bindings.ToString ());
 		}
 	}
 }
