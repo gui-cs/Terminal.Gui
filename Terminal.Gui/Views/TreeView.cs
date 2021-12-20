@@ -481,30 +481,18 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == ObjectActivationKey) {
-				var o = SelectedObject;
 
-				if (o != null) {
-					OnObjectActivated (new ObjectActivatedEventArgs<T> (this, o));
-
-					PositionCursor ();
-					return true;
-				}
+				ActivateSelectedObjectIfAny();
+				return true;
 			}
 
+			// if it is a single character pressed without any control keys
 			if (keyEvent.KeyValue > 0 && keyEvent.KeyValue < 0xFFFF) {
 
-				var character = (char)keyEvent.KeyValue;
-
-				// if it is a single character pressed without any control keys
-				if (char.IsLetterOrDigit (character) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl) {
-					// search for next branch that begins with that letter
-					var characterAsStr = character.ToString ();
-					AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, StringComparison.CurrentCultureIgnoreCase));
-
-					PositionCursor ();
+				if (char.IsLetterOrDigit ((char)keyEvent.KeyValue) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl) {
+					AdjustSelectionToNextItemBeginningWith ((char)keyEvent.KeyValue);
 					return true;
-				}
-
+				}	
 			}
 
 
@@ -537,12 +525,12 @@ namespace Terminal.Gui {
 				break;
 			case Key.PageUp:
 			case Key.PageUp | Key.ShiftMask:
-				AdjustSelection (-Bounds.Height, keyEvent.Key.HasFlag (Key.ShiftMask));
+				MovePageUp (keyEvent.Key.HasFlag (Key.ShiftMask));
 				break;
 
 			case Key.PageDown:
 			case Key.PageDown | Key.ShiftMask:
-				AdjustSelection (Bounds.Height, keyEvent.Key.HasFlag (Key.ShiftMask));
+				MovePageDown (keyEvent.Key.HasFlag (Key.ShiftMask));
 				break;
 			case Key.A | Key.CtrlMask:
 				SelectAll ();
@@ -561,6 +549,57 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 			return true;
+		}
+
+
+		/// <summary>
+		/// <para>Triggers the <see cref="ObjectActivated"/> event with the <see cref="SelectedObject"/>.</para>
+		/// 
+		/// <para>This method also ensures that the selected object is visible</para>
+		/// </summary>
+		public void ActivateSelectedObjectIfAny ()
+		{
+			var o = SelectedObject;
+
+			if (o != null) {
+				OnObjectActivated (new ObjectActivatedEventArgs<T> (this, o));
+				PositionCursor ();
+			}
+		}
+
+		/// <summary>
+		/// <para>Moves the <see cref="SelectedObject"/> to the next item that begins with <paramref name="character"/></para>
+		/// <para>This method will loop back to the start of the tree if reaching the end without finding a match</para>
+		/// </summary>
+		/// <param name="character">The first character of the next item you want selected</param>
+		/// <param name="caseSensitivity">Case sensitivity of the search</param>
+		public void AdjustSelectionToNextItemBeginningWith (char character, StringComparison caseSensitivity = StringComparison.CurrentCultureIgnoreCase)
+		{
+			// search for next branch that begins with that letter
+			var characterAsStr = character.ToString ();
+			AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, caseSensitivity));
+
+			PositionCursor ();
+		}
+
+		/// <summary>
+		/// Moves the selection up by the height of the control (1 page).
+		/// </summary>
+		/// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection</param>
+		/// <exception cref="NotImplementedException"></exception>
+		public void MovePageUp (bool expandSelection = false)
+		{
+			AdjustSelection (-Bounds.Height, expandSelection);
+		}
+
+		/// <summary>
+		/// Moves the selection down by the height of the control (1 page).
+		/// </summary>
+		/// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection</param>
+		/// <exception cref="NotImplementedException"></exception>
+		public void MovePageDown (bool expandSelection = false)
+		{
+			AdjustSelection (Bounds.Height, expandSelection);
 		}
 
 		/// <summary>
