@@ -107,8 +107,8 @@ namespace Terminal.Gui {
 			{
 				try{
 					Curses.set_escdelay (CursesDefaultEscDelay);
-				} catch (Exception e) {
-					Console.WriteLine ("Curses failed to set esc delay, the exception is: " + e);
+				} catch {
+					// ignored
 				}
 			}
 			
@@ -853,8 +853,8 @@ namespace Terminal.Gui {
 			try{
 				CursesDefaultEscDelay = Curses.get_escdelay ();
 				Curses.set_escdelay (10);
-			} catch (Exception e) {
-				Console.WriteLine ("Curses failed to get esc delay, the exception is: " + e);
+			} catch {
+				// ignored
 			}
 			Curses.set_escdelay (10);
 
