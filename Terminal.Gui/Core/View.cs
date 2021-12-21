@@ -1523,6 +1523,31 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyPress;
 
+		protected bool InvokeKeybindings (KeyEvent keyEvent, out KeyEvent newKeyEvent)
+		{
+			newKeyEvent = keyEvent;
+			var kbs = KeyBindings;
+			//var isGlobal = false;
+			if (kbs != null && kbs.Enabled && kbs.Count > 0) {
+				foreach (var b in kbs.Keys.Where (x => x.InKey == keyEvent.Key && x.Action != null && x.Enabled)) {
+					b.Action ();
+					return true;
+				}
+				var k = keyEvent.Key;
+				KeyBinding kb;
+				if (k == kbs.DisableKey && kbs.EnabledDisabledKeyStatus) {
+					kbs.EnabledDisabledKeyStatus = false;
+					return true;
+				} else if (k == kbs.EnableKey && !kbs.EnabledDisabledKeyStatus) {
+					kbs.EnabledDisabledKeyStatus = true;
+					return true;
+				} else if (kbs.EnabledDisabledKeyStatus && (kb = kbs.Keys.FirstOrDefault (x => x.InKey == k && x.Enabled)) != null) {
+					newKeyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
+				}
+			}
+			return false;
+		}
+
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
@@ -1557,34 +1582,6 @@ namespace Terminal.Gui {
 			if (args.Handled)
 				return true;
 			if (MostFocused?.Enabled == true) {
-				var savedKeyEvent = keyEvent;
-				var kbs = MostFocused.KeyBindings;
-				//var isGlobal = false;
-				if (kbs != null && kbs.Enabled && kbs.Count > 0) {
-					foreach (var b in kbs.Keys.Where (x => x.InKey == keyEvent.Key && x.Action != null && x.Enabled)) {
-						b.Action ();
-						return true;
-					}
-					//var viewName = MostFocused.GetType ().Name;
-					//var v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
-					//if (v.Key == null) {
-					//	viewName = nameof (View);
-					//	v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
-					//	isGlobal = true;
-					//}
-					var k = keyEvent.Key;
-					KeyBinding kb;
-					if (k == kbs.DisableKey && kbs.EnabledDisabledKeyStatus) {
-						kbs.EnabledDisabledKeyStatus = false;
-						return true;
-					} else if (k == kbs.EnableKey && !kbs.EnabledDisabledKeyStatus) {
-						kbs.EnabledDisabledKeyStatus = true;
-						return true;
-					} else if (kbs.EnabledDisabledKeyStatus && (kb = kbs.Keys.FirstOrDefault (x => x.InKey == k && x.Enabled)) != null) {
-						keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
-						args = new KeyEventEventArgs (keyEvent);
-					}
-				}
 				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;

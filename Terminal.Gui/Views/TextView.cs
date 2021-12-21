@@ -2056,6 +2056,11 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			if (InvokeKeybindings (kb, out KeyEvent newKeyEvent))
+				return true;
+
+			kb = newKeyEvent;
+
 			int restCount;
 			List<Rune> rest;
 
