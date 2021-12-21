@@ -1,9 +1,9 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Basic Colors", Description: "Show all basic colors.")]
 	[ScenarioCategory ("Colors")]
-	class BasicColors : Scenario {
+	public class BasicColors : Scenario {
 		public override void Setup ()
 		{
 			var vx = 30;

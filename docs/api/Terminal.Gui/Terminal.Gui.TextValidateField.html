@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TextValidateField
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,15 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -361,6 +370,15 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -376,6 +394,15 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -383,9 +410,6 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -398,6 +422,9 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -429,8 +456,6 @@ Text field that validates input through a  <a class="xref" href="Terminal.Gui.Te
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_TextValidateField__ctor_" data-uid="Terminal.Gui.TextValidateField.#ctor*"></a>
   <h4 id="Terminal_Gui_TextValidateField__ctor" data-uid="Terminal.Gui.TextValidateField.#ctor">TextValidateField()</h4>
   <div class="markdown level1 summary">
@@ -441,8 +466,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextValidat
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public TextValidateField()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_TextValidateField__ctor_" data-uid="Terminal.Gui.TextValidateField.#ctor*"></a>
   <h4 id="Terminal_Gui_TextValidateField__ctor_Terminal_Gui_TextValidateProviders_ITextValidateProvider_" data-uid="Terminal.Gui.TextValidateField.#ctor(Terminal.Gui.TextValidateProviders.ITextValidateProvider)">TextValidateField(ITextValidateProvider)</h4>
   <div class="markdown level1 summary">
@@ -472,8 +495,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextValidat
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_TextValidateField_IsValid_" data-uid="Terminal.Gui.TextValidateField.IsValid*"></a>
   <h4 id="Terminal_Gui_TextValidateField_IsValid" data-uid="Terminal.Gui.TextValidateField.IsValid">IsValid</h4>
   <div class="markdown level1 summary">
@@ -499,8 +520,6 @@ This property returns true if the input is valid.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TextValidateField_Provider_" data-uid="Terminal.Gui.TextValidateField.Provider*"></a>
   <h4 id="Terminal_Gui_TextValidateField_Provider" data-uid="Terminal.Gui.TextValidateField.Provider">Provider</h4>
   <div class="markdown level1 summary">
@@ -526,8 +545,6 @@ Provider
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TextValidateField_Text_" data-uid="Terminal.Gui.TextValidateField.Text*"></a>
   <h4 id="Terminal_Gui_TextValidateField_Text" data-uid="Terminal.Gui.TextValidateField.Text">Text</h4>
   <div class="markdown level1 summary">
@@ -555,8 +572,6 @@ Text
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_TextValidateField_MouseEvent_" data-uid="Terminal.Gui.TextValidateField.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TextValidateField_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TextValidateField.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -599,8 +614,6 @@ Text
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_TextValidateField_PositionCursor_" data-uid="Terminal.Gui.TextValidateField.PositionCursor*"></a>
   <h4 id="Terminal_Gui_TextValidateField_PositionCursor" data-uid="Terminal.Gui.TextValidateField.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -611,8 +624,6 @@ Text
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
   <a id="Terminal_Gui_TextValidateField_ProcessKey_" data-uid="Terminal.Gui.TextValidateField.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TextValidateField_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TextValidateField.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -655,8 +666,6 @@ Text
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_TextValidateField_Redraw_" data-uid="Terminal.Gui.TextValidateField.Redraw*"></a>
   <h4 id="Terminal_Gui_TextValidateField_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TextValidateField.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -699,10 +708,6 @@ Text
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

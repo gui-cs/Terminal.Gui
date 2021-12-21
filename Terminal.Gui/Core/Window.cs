@@ -293,6 +293,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override void OnCanFocusChanged ()
+		{
+			if (contentView != null) {
+				contentView.CanFocus = CanFocus;
+			}
+			base.OnCanFocusChanged ();
+		}
+
 		/// <summary>
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>

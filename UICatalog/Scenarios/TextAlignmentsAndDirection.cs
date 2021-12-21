@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demonstrates text alignment")]
 	[ScenarioCategory ("Text")]
-	class TextAlignmentsAndDirections : Scenario {
+	public class TextAlignmentsAndDirections : Scenario {
 
 		public override void Setup ()
 		{

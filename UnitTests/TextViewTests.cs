@@ -573,6 +573,14 @@ namespace Terminal.Gui.Views {
 					Assert.Equal ("", _textView.SelectedText);
 					break;
 				case 9:
+					Assert.Equal (54, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal (0, _textView.SelectionStartColumn);
+					Assert.Equal (0, _textView.SelectionStartRow);
+					Assert.Equal (0, _textView.SelectedLength);
+					Assert.Equal ("", _textView.SelectedText);
+					break;
+				case 10:
 					Assert.Equal (55, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal (0, _textView.SelectionStartColumn);
@@ -2009,8 +2017,8 @@ line.
 			Assert.True (gaveFullTurn);
 
 			Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
-			Assert.Equal (TextModel.ToRunes ("Threally really first line."),  tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("Threally really last line."),  tm.GetLine (1));
+			Assert.Equal (TextModel.ToRunes ("Threally really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.ToRunes ("Threally really last line."), tm.GetLine (1));
 			tm = new TextModel ();
 			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
 			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
@@ -2077,6 +2085,179 @@ line.
 			tv.RightOffset = 0;
 			Assert.Equal (3, tv.LeftColumn);
 			Assert.Equal (0, tv.RightOffset);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_SpaceHandling ()
+		{
+			var tv = new TextView () {
+				Width = 10,
+				Text = " "
+			};
+
+			MouseEvent ev = new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tv.MouseEvent (ev);
+			Assert.Equal (1, tv.SelectedLength);
+
+			ev = new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tv.MouseEvent (ev);
+			Assert.Equal (1, tv.SelectedLength);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void CanFocus_False_Wont_Focus_With_Mouse ()
+		{
+			var top = Application.Top;
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				CanFocus = false,
+				ReadOnly = true,
+				Text = "some text"
+			};
+			var fv = new FrameView ("I shouldn't get focus") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				CanFocus = false,
+			};
+			fv.Add (tv);
+			top.Add (fv);
+
+			Application.Begin (top);
+
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Empty (tv.SelectedText);
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
+			fv.CanFocus = true;
+			tv.CanFocus = true;
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tv.SelectedText);
+			Assert.True (tv.CanFocus);
+			Assert.True (tv.HasFocus);
+			Assert.True (fv.CanFocus);
+			Assert.True (fv.HasFocus);
+
+			fv.CanFocus = false;
+			tv.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
+			Assert.False (tv.CanFocus);
+			Assert.False (tv.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void DesiredCursorVisibility_Vertical_Navigation ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"This is the line {i}\n";
+			}
+			var tv = new TextView () { Width = 10, Height = 10 };
+			tv.Text = text;
+
+			Assert.Equal (0, tv.TopRow);
+			tv.PositionCursor ();
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+
+			for (int i = 0; i < 12; i++) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledDown
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i + 1, tv.TopRow);
+				Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+			}
+
+			for (int i = 12; i > 0; i--) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledUp
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i - 1, tv.TopRow);
+				if (i - 1 == 0) {
+					Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+				} else {
+					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+				}
+			}
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void DesiredCursorVisibility_Horizontal_Navigation ()
+		{
+			string text = "";
+
+			for (int i = 0; i < 12; i++) {
+				text += $"{i.ToString () [^1]}";
+			}
+			var tv = new TextView () { Width = 10, Height = 10 };
+			tv.Text = text;
+
+			Assert.Equal (0, tv.LeftColumn);
+			tv.PositionCursor ();
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+
+			for (int i = 0; i < 12; i++) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledRight
+				});
+				tv.PositionCursor ();
+				Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
+				Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+			}
+
+			for (int i = 11; i > 0; i--) {
+				tv.MouseEvent (new MouseEvent () {
+					Flags = MouseFlags.WheeledLeft
+				});
+				tv.PositionCursor ();
+				Assert.Equal (i - 1, tv.LeftColumn);
+				if (i - 1 == 0) {
+					Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+				} else {
+					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+				}
+			}
 		}
 	}
 }

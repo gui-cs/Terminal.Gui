@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class GraphView
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,15 @@ Control for rendering graphs (bar, scatter etc)
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -367,6 +376,15 @@ Control for rendering graphs (bar, scatter etc)
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -382,6 +400,15 @@ Control for rendering graphs (bar, scatter etc)
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -389,9 +416,6 @@ Control for rendering graphs (bar, scatter etc)
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -404,6 +428,9 @@ Control for rendering graphs (bar, scatter etc)
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
@@ -438,8 +465,6 @@ Control for rendering graphs (bar, scatter etc)
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_GraphView__ctor_" data-uid="Terminal.Gui.GraphView.#ctor*"></a>
   <h4 id="Terminal_Gui_GraphView__ctor" data-uid="Terminal.Gui.GraphView.#ctor">GraphView()</h4>
   <div class="markdown level1 summary">
@@ -452,8 +477,6 @@ Creates a new graph with a 1 to 1 graph space with absolute layout
   </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_GraphView_Annotations_" data-uid="Terminal.Gui.GraphView.Annotations*"></a>
   <h4 id="Terminal_Gui_GraphView_Annotations" data-uid="Terminal.Gui.GraphView.Annotations">Annotations</h4>
   <div class="markdown level1 summary">
@@ -479,8 +502,6 @@ Elements drawn into graph after series have been drawn e.g. Legends etc
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_AxisX_" data-uid="Terminal.Gui.GraphView.AxisX*"></a>
   <h4 id="Terminal_Gui_GraphView_AxisX" data-uid="Terminal.Gui.GraphView.AxisX">AxisX</h4>
   <div class="markdown level1 summary">
@@ -506,8 +527,6 @@ Horizontal axis
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_AxisY_" data-uid="Terminal.Gui.GraphView.AxisY*"></a>
   <h4 id="Terminal_Gui_GraphView_AxisY" data-uid="Terminal.Gui.GraphView.AxisY">AxisY</h4>
   <div class="markdown level1 summary">
@@ -533,8 +552,6 @@ Vertical axis
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_CellSize_" data-uid="Terminal.Gui.GraphView.CellSize*"></a>
   <h4 id="Terminal_Gui_GraphView_CellSize" data-uid="Terminal.Gui.GraphView.CellSize">CellSize</h4>
   <div class="markdown level1 summary">
@@ -561,8 +578,6 @@ to 1 row/col of console space being 1 unit of graph space.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_GraphColor_" data-uid="Terminal.Gui.GraphView.GraphColor*"></a>
   <h4 id="Terminal_Gui_GraphView_GraphColor" data-uid="Terminal.Gui.GraphView.GraphColor">GraphColor</h4>
   <div class="markdown level1 summary">
@@ -588,8 +603,6 @@ The color of the background of the graph and axis/labels
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_MarginBottom_" data-uid="Terminal.Gui.GraphView.MarginBottom*"></a>
   <h4 id="Terminal_Gui_GraphView_MarginBottom" data-uid="Terminal.Gui.GraphView.MarginBottom">MarginBottom</h4>
   <div class="markdown level1 summary">
@@ -616,8 +629,6 @@ will not be rendered in margins but axis labels may be
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_MarginLeft_" data-uid="Terminal.Gui.GraphView.MarginLeft*"></a>
   <h4 id="Terminal_Gui_GraphView_MarginLeft" data-uid="Terminal.Gui.GraphView.MarginLeft">MarginLeft</h4>
   <div class="markdown level1 summary">
@@ -644,8 +655,6 @@ will not be rendered in margins but axis labels may be
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_ScrollOffset_" data-uid="Terminal.Gui.GraphView.ScrollOffset*"></a>
   <h4 id="Terminal_Gui_GraphView_ScrollOffset" data-uid="Terminal.Gui.GraphView.ScrollOffset">ScrollOffset</h4>
   <div class="markdown level1 summary">
@@ -672,8 +681,6 @@ Changing this scrolls the viewport around in the graph
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_Series_" data-uid="Terminal.Gui.GraphView.Series*"></a>
   <h4 id="Terminal_Gui_GraphView_Series" data-uid="Terminal.Gui.GraphView.Series">Series</h4>
   <div class="markdown level1 summary">
@@ -701,8 +708,6 @@ Collection of data series that are rendered in the graph
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_GraphView_DrawLine_" data-uid="Terminal.Gui.GraphView.DrawLine*"></a>
   <h4 id="Terminal_Gui_GraphView_DrawLine_Terminal_Gui_Point_Terminal_Gui_Point_System_Rune_" data-uid="Terminal.Gui.GraphView.DrawLine(Terminal.Gui.Point,Terminal.Gui.Point,System.Rune)">DrawLine(Point, Point, Rune)</h4>
   <div class="markdown level1 summary">
@@ -740,8 +745,6 @@ Draws a line between two points in screen space.  Can be diagonals.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_GraphSpaceToScreen_" data-uid="Terminal.Gui.GraphView.GraphSpaceToScreen*"></a>
   <h4 id="Terminal_Gui_GraphView_GraphSpaceToScreen_Terminal_Gui_PointF_" data-uid="Terminal.Gui.GraphView.GraphSpaceToScreen(Terminal.Gui.PointF)">GraphSpaceToScreen(PointF)</h4>
   <div class="markdown level1 summary">
@@ -787,8 +790,6 @@ Note that this can be outside the current client area of the control</td>
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_ProcessKey_" data-uid="Terminal.Gui.GraphView.ProcessKey*"></a>
   <h4 id="Terminal_Gui_GraphView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.GraphView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -831,8 +832,6 @@ Note that this can be outside the current client area of the control</td>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_GraphView_Redraw_" data-uid="Terminal.Gui.GraphView.Redraw*"></a>
   <h4 id="Terminal_Gui_GraphView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.GraphView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -860,8 +859,6 @@ Note that this can be outside the current client area of the control</td>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  
-  
   <a id="Terminal_Gui_GraphView_Reset_" data-uid="Terminal.Gui.GraphView.Reset*"></a>
   <h4 id="Terminal_Gui_GraphView_Reset" data-uid="Terminal.Gui.GraphView.Reset">Reset()</h4>
   <div class="markdown level1 summary">
@@ -873,8 +870,6 @@ to default values (<a class="xref" href="Terminal.Gui.GraphView.html#Terminal_Gu
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Reset()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_GraphView_ScreenToGraphSpace_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace*"></a>
   <h4 id="Terminal_Gui_GraphView_ScreenToGraphSpace_System_Int32_System_Int32_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace(System.Int32,System.Int32)">ScreenToGraphSpace(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -923,8 +918,6 @@ screen position
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_ScreenToGraphSpace_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace*"></a>
   <h4 id="Terminal_Gui_GraphView_ScreenToGraphSpace_Terminal_Gui_Rect_" data-uid="Terminal.Gui.GraphView.ScreenToGraphSpace(Terminal.Gui.Rect)">ScreenToGraphSpace(Rect)</h4>
   <div class="markdown level1 summary">
@@ -967,8 +960,6 @@ Returns the section of the graph that is represented by the screen area
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_GraphView_SetDriverColorToGraphColor_" data-uid="Terminal.Gui.GraphView.SetDriverColorToGraphColor*"></a>
   <h4 id="Terminal_Gui_GraphView_SetDriverColorToGraphColor" data-uid="Terminal.Gui.GraphView.SetDriverColorToGraphColor">SetDriverColorToGraphColor()</h4>
   <div class="markdown level1 summary">
@@ -995,10 +986,6 @@ Sets the color attribute of <a class="xref" href="Terminal.Gui.Application.html#
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

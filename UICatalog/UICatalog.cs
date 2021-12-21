@@ -11,6 +11,9 @@ using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
+/// <summary>
+/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+/// </summary>
 /// <remarks>
 /// <para>
 ///	UI Catalog attempts to satisfy the following goals:
@@ -38,7 +41,6 @@ using Rune = System.Rune;
 ///	See the project README for more details (https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog/README.md).
 /// </para>	
 /// </remarks>
-
 namespace UICatalog {
 	/// <summary>
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
@@ -310,7 +312,24 @@ namespace UICatalog {
 			menuItems.Add (new MenuItem [] { null });
 			menuItems.Add (CreateSizeStyle ());
 			menuItems.Add (CreateAlwaysSetPosition ());
+			menuItems.Add (CreateDisabledEnabledMouse ());
 			return menuItems;
+		}
+
+		private static MenuItem [] CreateDisabledEnabledMouse ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Disable/Enable Mouse";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.IsMouseDisabled;
+			item.Action += () => {
+				item.Checked = Application.IsMouseDisabled = !item.Checked;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
 		}
 
 		static MenuItem [] CreateAlwaysSetPosition ()

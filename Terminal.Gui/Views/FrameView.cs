@@ -268,5 +268,14 @@ namespace Terminal.Gui {
 
 			return base.OnEnter (view);
 		}
+
+		/// <inheritdoc/>
+		public override void OnCanFocusChanged ()
+		{
+			if (contentView != null) {
+				contentView.CanFocus = CanFocus;
+			}
+			base.OnCanFocusChanged ();
+		}
 	}
 }

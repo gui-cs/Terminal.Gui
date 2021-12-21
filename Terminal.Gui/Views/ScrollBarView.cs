@@ -85,10 +85,10 @@ namespace Terminal.Gui {
 			X = isVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 			Y = isVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
 			Host = host;
-			CanFocus = host.CanFocus;
+			CanFocus = false;
 			Enabled = host.Enabled;
 			Visible = host.Visible;
-			Host.CanFocusChanged += Host_CanFocusChanged;
+			//Host.CanFocusChanged += Host_CanFocusChanged;
 			Host.EnabledChanged += Host_EnabledChanged;
 			Host.VisibleChanged += Host_VisibleChanged;
 			Host.SuperView.Add (this);
@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 				OtherScrollBarView = new ScrollBarView (0, 0, !isVertical) {
 					ColorScheme = host.ColorScheme,
 					Host = host,
-					CanFocus = host.CanFocus,
+					CanFocus = false,
 					Enabled = host.Enabled,
 					Visible = host.Visible,
 					OtherScrollBarView = this
@@ -140,13 +140,13 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.Enabled = Enabled;
 		}
 
-		private void Host_CanFocusChanged ()
-		{
-			CanFocus = Host.CanFocus;
-			if (otherScrollBarView != null) {
-				otherScrollBarView.CanFocus = CanFocus;
-			}
-		}
+		//private void Host_CanFocusChanged ()
+		//{
+		//	CanFocus = Host.CanFocus;
+		//	if (otherScrollBarView != null) {
+		//		otherScrollBarView.CanFocus = CanFocus;
+		//	}
+		//}
 
 		void ContentBottomRightCorner_MouseClick (MouseEventArgs me)
 		{

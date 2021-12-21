@@ -257,6 +257,15 @@ namespace Terminal.Gui {
 					SuperView.SetNeedsDisplay ();
 				}
 			}
+
+			/// <inheritdoc/>
+			public override void OnCanFocusChanged ()
+			{
+				if (Border.Child != null) {
+					Border.Child.CanFocus = CanFocus;
+				}
+				base.OnCanFocusChanged ();
+			}
 		}
 
 		private class ChildContentView : View {

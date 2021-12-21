@@ -3,11 +3,11 @@ using System.Linq;
 using System.Threading;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ProgressBar Styles", Description: "Shows the ProgressBar Styles")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("MainLoop")]
-	class ProgressBarStyles : Scenario {
+	public class ProgressBarStyles : Scenario {
 		private Timer _fractionTimer;
 		private Timer _pulseTimer;
 		private const uint _timerTick = 100;

@@ -1234,6 +1234,12 @@ namespace Terminal.Gui.Core {
 
 			Application.Begin (top);
 
+			Assert.True (win.CanFocus);
+			Assert.True (win.HasFocus);
+			Assert.True (win2.CanFocus);
+			Assert.False (win2.HasFocus);
+			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+
 			win.CanFocus = false;
 			Assert.False (win.CanFocus);
 			Assert.False (win.HasFocus);

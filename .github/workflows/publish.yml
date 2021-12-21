@@ -18,7 +18,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.100
+          dotnet-version: 6.0.100
 
       - name: minver-cli
         run: |
@@ -36,7 +36,7 @@ jobs:
       
       - name: Publish Terminal.Gui
         id: publish_nuget
-        uses: brandedoutcast/publish-nuget@v2.5.5
+        uses: rohith/publish-nuget@v2
         with:
           VERSION_STATIC: ${{ env.MINVERVERSIONOVERRIDE }}
           NUGET_SOURCE: https://api.nuget.org
