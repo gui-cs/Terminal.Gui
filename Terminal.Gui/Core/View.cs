@@ -253,7 +253,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Configurable keybindings supported by the control
 		/// </summary>
-		public List<KeyBinding> KeyBindings { get; set; } = new List<KeyBinding> ();
+		private Dictionary<Key,Command> KeyBindings { get; set; } = new Dictionary<Key, Command>();
+		private Dictionary<Command,Action> CommandImplementations { get; set; } = new Dictionary<Command, Action> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
@@ -1542,19 +1543,85 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invokes any <see cref="KeyBinding"/> that is registered on this <see cref="View"/>
+		/// Invokes any binding that is registered on this <see cref="View"/>
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent"></param>
 		protected bool InvokeKeybindings(KeyEvent keyEvent)
 		{
-			bool handled = false;
-			foreach(var binding in KeyBindings.Where (b => b.Key == keyEvent.Key && b.Enabled)) {
-				binding.Action ();
-				handled = true;
+			if(KeyBindings.ContainsKey(keyEvent.Key)) 
+			{
+				var command = KeyBindings[keyEvent.Key];
+
+				if(!CommandImplementations.ContainsKey(command)) {
+					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType().Name})");
+				}
+
+				CommandImplementations [command] ();
+				return true;
 			}
 			
-			return handled;
+			return false;
+		}
+
+
+		/// <summary>
+		/// <para>Adds a new key combination that will trigger the given <paramref name="command"/>
+		/// (if supported by the View - see <see cref="GetSupportedCommands"/>)
+		/// </para>
+		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
+		/// rebound to this one</para>
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="command"></param>
+		public void AddKeyBinding (Key key, Command command)
+		{
+			if (KeyBindings.ContainsKey (key)) {
+				KeyBindings[key] = command;
+			}
+			else {
+				KeyBindings.Add (key, command);
+			}
+		}
+
+		/// <summary>
+		/// Removes all bound keys from the View making including the default
+		/// key combinations such as cursor navigation, scrolling etc
+		/// </summary>
+		public void ClearKeybindings()
+		{
+			KeyBindings.Clear ();
+		}
+
+		/// <summary>
+		/// <para>States that the given <see cref="View"/> supports a given <paramref name="command"/>
+		/// and what <paramref name="action"/> to perform to make that command happen
+		/// </para>
+		/// <para>If the <paramref name="command"/> already has an implementation the <paramref name="action"/>
+		/// will replace the old one</para>
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="action"></param>
+		protected void AddCommand (Command command, Action action)
+		{
+			// if there is already an implementation of this command
+			if(CommandImplementations.ContainsKey(command)) {
+				// replace that implementation
+				CommandImplementations [command] = action;
+			}
+			else {
+				// else record how to perform the action (this should be the normal case)
+				CommandImplementations.Add (command, action);
+			}
+		}
+
+		/// <summary>
+		/// Returns all commands that are supported by this <see cref="View"/>
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<Command> GetSupportedCommands ()
+		{
+			return CommandImplementations.Keys;
 		}
 
 		/// <inheritdoc/>

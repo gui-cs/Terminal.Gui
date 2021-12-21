@@ -318,16 +318,18 @@ namespace Terminal.Gui {
 			Source = source;
 			CanFocus = true;
 
-		    // Default keybindings for all ListViews
-			KeyBindings.Add (new KeyBinding (Key.CursorUp,Command.LineUp,()=>MoveUp()));
-			KeyBindings.Add (new KeyBinding (Key.P | Key.CtrlMask, Command.LineUp, () => MoveUp ()));
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.LineScrollUp, () => ScrollUp (1));
+			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
 
-			KeyBindings.Add (new KeyBinding (Key.CursorDown, Command.LineDown, () => MoveDown ()));
-			KeyBindings.Add (new KeyBinding (Key.N | Key.CtrlMask, Command.LineDown, () => MoveDown ()));
+			// Default keybindings for all ListViews
+			AddKeyBinding (Key.CursorUp,Command.LineUp);
+			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
 
-			// things the users could bind in this control but dont
-			KeyBindings.Add (new KeyBinding (Key.Null, Command.LineScrollDown, ()=>ScrollDown(1)));
-			KeyBindings.Add (new KeyBinding (Key.Null, Command.LineScrollUp, () => ScrollUp (1)));
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
 		}
 
 		///<inheritdoc/>

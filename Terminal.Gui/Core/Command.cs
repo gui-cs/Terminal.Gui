@@ -5,57 +5,6 @@ using System;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Records for a given <see cref="View"/> instance how to carry out a given <see cref="Command"/>
-	/// </summary>
-	public class KeyBinding {
-
-		/// <summary>
-		///  The key which can be pressed to trigger the given <see cref="Command"/>
-		/// </summary>
-		public Key Key { get; set; }
-
-
-		/// <summary>
-		///  The type of operation that will be performed
-		/// </summary>
-		public Command Command { get; }
-
-		/// <summary>
-		/// The view specific implementation logic of the given <see cref="Command"/>
-		/// </summary>
-		public Action Action { get; }
-
-		/// <summary>
-		/// Set to false to disable this keybinding.  Defaults to true
-		/// </summary>
-		public bool Enabled { get; set; } = true;
-
-		/// <summary>
-		///  Creates a new instance in which the given key combination triggers the associated action
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="command"></param>
-		/// <param name="action"></param>
-		public KeyBinding (Key key, Command command, Action action)
-		{
-			Key = key;
-			Command = command;
-			Action = action;
-		}
-
-		/// <summary>
-		/// Creates a new instance targetting the same <see cref="Action"/> with the same
-		/// bindings.  Use this method if you want to configure additional keys which will
-		/// also trigger the same <see cref="Command"/> in a view
-		/// </summary>
-		/// <returns></returns>
-		public KeyBinding Clone ()
-		{
-			return new KeyBinding (Key, Command, Action);
-		}
-	}
-
-	/// <summary>
 	/// Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.
 	/// </summary>
 	public enum Command {
