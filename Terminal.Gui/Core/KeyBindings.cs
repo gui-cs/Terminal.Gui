@@ -5,6 +5,39 @@ using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
+	/// All keybindable operations supported by Terminal.Gui views.  Concepts should be kept
+	/// broad enough to apply to all views e.g. LineScrollDown.  Not all <see cref="View"/> implement
+	/// all <see cref="Command"/>
+	/// </summary>
+	public enum Command {
+
+		/// <summary>
+		/// When bound to keys performs the standard platform behavior.
+		/// </summary>
+		Default = 0,
+
+		/// <summary>
+		/// Moves the caret down one line.
+		/// </summary>
+		LineDown,
+
+		/// <summary>
+		/// Scrolls down one line.
+		/// </summary>
+		LineScrollDown,
+
+		/// <summary>
+		/// Moves the caret down one page.
+		/// </summary>
+		PageDown,
+
+		/// <summary>
+		/// Extends the selection down one page.
+		/// </summary>
+		PageDownExtend,
+	}
+
+	/// <summary>
 	/// Class that implement the keys used by the <see cref="KeyBindings"/> for any <see cref="View"/>.
 	/// </summary>
 	public sealed class KeyBinding : ICloneable {
@@ -16,15 +49,15 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The desired output key.</param>
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
-		public KeyBinding (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public KeyBinding (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
 		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			if (!typeof (View).IsAssignableFrom (view)) {
-				throw new ArgumentException ("Type is not assignable from View.", nameof (view));
-			}
-			Initialize (view.Name, inKey, outKey, description, enabled);
+			//if (view == null) {
+			//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+			//}
+			//if (!typeof (View).IsAssignableFrom (view)) {
+			//	throw new ArgumentException ("Type is not assignable from View.", nameof (view));
+			//}
+			Initialize (inKey, outKey, command, action, description, enabled);
 		}
 
 		/// <summary>
@@ -35,21 +68,23 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The desired output key.</param>
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
-		public KeyBinding (string view, Key inKey, Key outKey, string description = "", bool enabled = true)
-		{
-			Initialize (view, inKey, outKey, description, enabled);
-		}
+		//public KeyBinding (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
+		//{
+		//	Initialize (inKey, outKey, command, action, description, enabled);
+		//}
 
-		private void Initialize (string view, Key inKey, Key outKey, string description, bool enabled)
+		private void Initialize (Key inKey, Key outKey, Command command, Action action, string description, bool enabled)
 		{
-			if (string.IsNullOrEmpty (view)) {
-				throw new ArgumentNullException ("View cannot be null or empty.", nameof (view));
-			}
-			View = view;
+			//if (string.IsNullOrEmpty (view)) {
+			//	throw new ArgumentNullException ("View cannot be null or empty.", nameof (view));
+			//}
+			//View = view;
 			InKey = inKey;
 			OutKey = outKey;
 			Description = description;
 			Enabled = enabled;
+			Command = command;
+			Action = action;
 		}
 
 		/// <summary>
@@ -73,6 +108,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Enabled { get; set; } = true;
 
+		public Command Command;
+
+		public Action Action { get; set; }
+
 		/// <summary>Creates a new object that is a copy of the current instance.</summary>
 		/// <returns>A new object that is a copy of this instance.</returns>
 		public object Clone ()
@@ -95,7 +134,8 @@ namespace Terminal.Gui {
 		private class KeyBindingEqualityComparer : IEqualityComparer<KeyBinding> {
 			public bool Equals (KeyBinding x, KeyBinding y)
 			{
-				if (x.View == y.View && (x.InKey == y.InKey || x.OutKey == y.OutKey))
+				if (x.InKey == y.InKey || x.OutKey == y.OutKey && x.Action == null && y.Action == null
+					|| (x.OutKey == default && y.OutKey == default && x.Action == y.Action))
 					return true;
 				return false;
 			}
@@ -149,9 +189,9 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The desired output key.</param>
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
-		public KeyBindings (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public KeyBindings (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
 		{
-			AddKey (view, inKey, outKey, description, enabled);
+			AddKey (inKey, outKey, command, action, description, enabled);
 		}
 
 		/// <summary>
@@ -162,10 +202,10 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The desired output key.</param>
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
-		public KeyBindings (string view, Key inKey, Key outKey, string description = "", bool enabled = true)
-		{
-			AddKey (view, inKey, outKey, description, enabled);
-		}
+		//public KeyBindings (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
+		//{
+		//	AddKey (inKey, outKey, action, description, enabled);
+		//}
 
 		/// <summary>
 		/// Initializes a instance of a <see cref="KeyBinding"/> instance.
@@ -179,7 +219,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The views name with the enabled status.
 		/// </summary>
-		public Dictionary<string, bool> Views { get; private set; } = new Dictionary<string, bool> ();
+		//public Dictionary<string, bool> Views { get; private set; } = new Dictionary<string, bool> ();
 
 		/// <summary>
 		/// The <see cref="KeyBinding"/> collection.
@@ -202,9 +242,9 @@ namespace Terminal.Gui {
 		public Key DisableKey { get; set; } = Key.Enter;
 
 		/// <summary>
-		/// Gets the total of views with key bindings.
+		/// Gets the total of key bindings.
 		/// </summary>
-		public int Count => Views.Count;
+		public int Count => Keys.Count;
 
 		/// <summary>
 		/// Add a new <see cref="KeyBinding"/> to the <see cref="Keys"/> collection.
@@ -215,16 +255,16 @@ namespace Terminal.Gui {
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
 		/// <returns><c>true</c> if the key binding was successfully added, <c>false</c>otherwise.</returns>
-		public bool AddKey (Type view, Key inKey, Key outKey, string description = "", bool enabled = true)
-		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			if (!typeof (View).IsAssignableFrom (view)) {
-				throw new ArgumentException ("Type is not assignable from View.", nameof (view));
-			}
-			return AddKey (view.Name, inKey, outKey, description, enabled);
-		}
+		//public bool AddKey (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
+		//{
+		//	//if (view == null) {
+		//	//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+		//	//}
+		//	//if (!typeof (View).IsAssignableFrom (view)) {
+		//	//	throw new ArgumentException ("Type is not assignable from View.", nameof (view));
+		//	//}
+		//	return AddKey (inKey, outKey, command, action, description, enabled);
+		//}
 
 		/// <summary>
 		/// Add a new <see cref="KeyBinding"/> to the <see cref="Keys"/> collection.
@@ -235,18 +275,18 @@ namespace Terminal.Gui {
 		/// <param name="description">The description.</param>
 		/// <param name="enabled"><c>true</c> if enabled, <c>false</c>otherwise.</param>
 		/// <returns><c>true</c> if the key binding was successfully added, <c>false</c>otherwise.</returns>
-		public bool AddKey (string view, Key inKey, Key outKey, string description = "", bool enabled = true)
+		public bool AddKey (Key inKey, Key outKey, Command command = default, Action action = null, string description = "", bool enabled = true)
 		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			var kb = new KeyBinding (view, inKey, outKey, description, enabled);
-			if (!Views.ContainsKey (view)) {
-				Views.Add (view, true);
-			}
-			if (Keys.Contains (kb, new KeyBindingEqualityComparer ())) {
-				throw new ArgumentException ("One of the keys already exists.", nameof (view));
-			}
+			//if (view == null) {
+			//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+			//}
+			var kb = new KeyBinding (inKey, outKey, command, action, description, enabled);
+			//if (!Views.ContainsKey (view)) {
+			//	Views.Add (view, true);
+			//}
+			//if (Keys.Contains (kb, new KeyBindingEqualityComparer ())) {
+			//	throw new ArgumentException ("One of the keys already exists.", nameof (view));
+			//}
 			Keys.Add (kb);
 			return true;
 		}
@@ -258,7 +298,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if the key binding was successfully added, <c>false</c>otherwise.</returns>
 		public bool AddKey (KeyBinding keyBinding)
 		{
-			return AddKey (keyBinding.View, keyBinding.InKey, keyBinding.OutKey, keyBinding.Description, keyBinding.Enabled);
+			return AddKey (keyBinding.InKey, keyBinding.OutKey, keyBinding.Command, keyBinding.Action, keyBinding.Description, keyBinding.Enabled);
 		}
 
 		/// <summary>
@@ -268,12 +308,12 @@ namespace Terminal.Gui {
 		/// <param name="inKey">The input key pressed.</param>
 		/// <param name="outKey">The desired output key.</param>
 		/// <returns><c>true</c> if the key binding was successfully removed, <c>false</c>otherwise.</returns>
-		public bool RemoveKey (Type view, Key inKey, Key outKey)
+		public bool RemoveKey (Key inKey, Key outKey)
 		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			return RemoveKey (view.Name, inKey, outKey);
+			//if (view == null) {
+			//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+			//}
+			return RemoveKey (inKey, outKey);
 		}
 
 		/// <summary>
@@ -288,16 +328,16 @@ namespace Terminal.Gui {
 			if (view == null) {
 				throw new ArgumentNullException ("View cannot be null.", nameof (view));
 			}
-			var kb = new KeyBinding (view, inKey, outKey);
+			var kb = new KeyBinding (inKey, outKey);
 			var idx = Keys.FindIndex (x => x.View == view && x.InKey == inKey && x.OutKey == outKey);
 			if (idx == -1) {
 				return false;
 			}
 			var count = Keys.Count;
 			Keys.RemoveAt (idx);
-			if (Keys.FirstOrDefault (x => x.View == view) == null) {
-				Views.Remove (view);
-			}
+			//if (Keys.FirstOrDefault (x => x.View == view) == null) {
+			//	Views.Remove (view);
+			//}
 			if (count == Keys.Count) {
 				return false;
 			}
@@ -338,9 +378,9 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException ("View cannot be null.", nameof (view));
 			}
 			var result = Keys.RemoveAll (x => x.View == view) > 0;
-			if (result) {
-				Views.Remove (view);
-			}
+			//if (result) {
+			//	Views.Remove (view);
+			//}
 			return result;
 		}
 
@@ -350,8 +390,8 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c> if all key binding was successfully removed, <c>false</c>otherwise.</returns>
 		public bool RemoveAll ()
 		{
-			if (Views.Count > 0) {
-				Views = new Dictionary<string, bool> ();
+			if (Keys.Count > 0) {
+				//Views = new Dictionary<string, bool> ();
 				Keys = new List<KeyBinding> ();
 				return true;
 			}
@@ -366,13 +406,13 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The current output key.</param>
 		/// <param name="toReplace">The enabled state to replace.</param>
 		/// <returns><c>true</c> if enabled status was successfully sets, <c>false</c>otherwise.</returns>
-		public bool EnableDisableKeyBinding (Type view, Key inKey, Key outKey, bool toReplace)
-		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			return EnableDisableKeyBinding (view.Name, inKey, outKey, toReplace);
-		}
+		//public bool EnableDisableKeyBinding (Key inKey, Key outKey, bool toReplace)
+		//{
+		//	//if (view == null) {
+		//	//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+		//	//}
+		//	return EnableDisableKeyBinding (inKey, outKey, toReplace);
+		//}
 
 		/// <summary>
 		/// Enables or disables the <see cref="KeyBinding.Enabled"/> of the match key binding.
@@ -382,12 +422,12 @@ namespace Terminal.Gui {
 		/// <param name="outKey">The current output key.</param>
 		/// <param name="toReplace">The enabled state to replace.</param>
 		/// <returns><c>true</c> if enabled status was successfully sets, <c>false</c>otherwise.</returns>
-		public bool EnableDisableKeyBinding (string view, Key inKey, Key outKey, bool toReplace)
+		public bool EnableDisableKeyBinding (Key inKey, Key outKey, bool toReplace)
 		{
-			if (view == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (view));
-			}
-			var kb = Keys.FirstOrDefault (x => x.View == view && x.InKey == inKey && x.OutKey == outKey);
+			//if (view == null) {
+			//	throw new ArgumentNullException ("View cannot be null.", nameof (view));
+			//}
+			var kb = Keys.FirstOrDefault (x => x.InKey == inKey && x.OutKey == outKey);
 			if (kb.Enabled != toReplace) {
 				kb.Enabled = toReplace;
 				return true;
@@ -406,7 +446,7 @@ namespace Terminal.Gui {
 			if (keyBinding == null) {
 				throw new ArgumentNullException ("KeyBinding cannot be null.", nameof (keyBinding));
 			}
-			return EnableDisableKeyBinding (keyBinding.View, keyBinding.InKey, keyBinding.OutKey, toReplace);
+			return EnableDisableKeyBinding (keyBinding.InKey, keyBinding.OutKey, toReplace);
 		}
 
 		/// <summary>
@@ -455,16 +495,16 @@ namespace Terminal.Gui {
 		/// <param name="toView">The view type being replaced.</param>
 		/// <param name="force">Used to delete the destiny if already exists.</param>
 		/// <returns><c>true</c> if the view keys was successfully replaced, <c>false</c>otherwise.</returns>
-		public bool ReplaceAllKeysFromView (Type fromView, Type toView, bool force = false)
-		{
-			if (fromView == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
-			}
-			if (toView == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
-			}
-			return ReplaceAllKeysFromView (fromView.Name, toView.Name, force);
-		}
+		//public bool ReplaceAllKeysFromView (Type fromView, Type toView, bool force = false)
+		//{
+		//	if (fromView == null) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+		//	}
+		//	if (toView == null) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+		//	}
+		//	return ReplaceAllKeysFromView (fromView.Name, toView.Name, force);
+		//}
 
 		/// <summary>
 		/// Replaces all keys from the matched view to the destiny view.
@@ -473,39 +513,39 @@ namespace Terminal.Gui {
 		/// <param name="toView">The view being replaced.</param>
 		/// <param name="force">Used to delete the destiny if already exists.</param>
 		/// <returns><c>true</c> if the view keys was successfully replaced, <c>false</c>otherwise.</returns>
-		public bool ReplaceAllKeysFromView (string fromView, string toView, bool force = false)
-		{
-			if (string.IsNullOrEmpty (fromView)) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
-			}
-			if (string.IsNullOrEmpty (toView)) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
-			}
-			if (fromView == toView) {
-				throw new ArgumentException ("The source and destiny are the same.", nameof (fromView));
-			}
-			if (!Views.ContainsKey (fromView)) {
-				throw new ArgumentException ("View not found.", nameof (fromView));
-			}
-			if (Views.ContainsKey (toView) && !force) {
-				throw new InvalidOperationException ("Destiny View already exists. Set force = true to delete it before.");
-			} else if (Views.ContainsKey (toView) && force) {
-				var enable = Views [toView];
-				RemoveAll (toView);
-				Views.Add (toView, enable);
-			} else {
-				Views.Add (toView, Views [fromView]);
-			}
-			try {
-				Views.Remove (fromView);
-				foreach (var kb in Keys.Where (x => x.View == fromView)) {
-					kb.View = toView;
-				}
-			} catch (Exception) {
-				return false;
-			}
-			return true;
-		}
+		//public bool ReplaceAllKeysFromView (string fromView, string toView, bool force = false)
+		//{
+		//	if (string.IsNullOrEmpty (fromView)) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+		//	}
+		//	if (string.IsNullOrEmpty (toView)) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+		//	}
+		//	if (fromView == toView) {
+		//		throw new ArgumentException ("The source and destiny are the same.", nameof (fromView));
+		//	}
+		//	if (!Views.ContainsKey (fromView)) {
+		//		throw new ArgumentException ("View not found.", nameof (fromView));
+		//	}
+		//	if (Views.ContainsKey (toView) && !force) {
+		//		throw new InvalidOperationException ("Destiny View already exists. Set force = true to delete it before.");
+		//	} else if (Views.ContainsKey (toView) && force) {
+		//		var enable = Views [toView];
+		//		RemoveAll (toView);
+		//		Views.Add (toView, enable);
+		//	} else {
+		//		Views.Add (toView, Views [fromView]);
+		//	}
+		//	try {
+		//		Views.Remove (fromView);
+		//		foreach (var kb in Keys.Where (x => x.View == fromView)) {
+		//			kb.View = toView;
+		//		}
+		//	} catch (Exception) {
+		//		return false;
+		//	}
+		//	return true;
+		//}
 
 		/// <summary>
 		/// Copy the match <paramref name="from"/> <see cref="KeyBinding"/> to the new <paramref name="toView"/>.
@@ -556,16 +596,16 @@ namespace Terminal.Gui {
 		/// <param name="toView">The view type being copied.</param>
 		/// <param name="force">Used to delete the destiny if already exists.</param>
 		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
-		public bool CopyAllKeysFromView (Type fromView, Type toView, bool force = false)
-		{
-			if (fromView == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
-			}
-			if (toView == null) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
-			}
-			return CopyAllKeysFromView (fromView.Name, toView.Name, force);
-		}
+		//public bool CopyAllKeysFromView (Type fromView, Type toView, bool force = false)
+		//{
+		//	if (fromView == null) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+		//	}
+		//	if (toView == null) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+		//	}
+		//	return CopyAllKeysFromView (fromView.Name, toView.Name, force);
+		//}
 
 		/// <summary>
 		/// Copy all keys from the matched view to the destiny view.
@@ -574,41 +614,41 @@ namespace Terminal.Gui {
 		/// <param name="toView">The view being copied.</param>
 		/// <param name="force">Used to delete the destiny if already exists.</param>
 		/// <returns><c>true</c> if the view keys was successfully copied, <c>false</c>otherwise.</returns>
-		public bool CopyAllKeysFromView (string fromView, string toView, bool force = false)
-		{
-			if (string.IsNullOrEmpty (fromView)) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
-			}
-			if (string.IsNullOrEmpty (toView)) {
-				throw new ArgumentNullException ("View cannot be null.", nameof (toView));
-			}
-			if (fromView == toView) {
-				throw new ArgumentException ("The source and destiny are the same.", nameof (fromView));
-			}
-			if (!Views.ContainsKey (fromView)) {
-				throw new ArgumentException ("View not found.", nameof (fromView));
-			}
-			if (Views.ContainsKey (toView) && !force) {
-				throw new InvalidOperationException ("Destiny View already exists. Set force = true to delete it before.");
-			} else if (Views.ContainsKey (toView) && force) {
-				RemoveAll (toView);
-				Views.Add (toView, Views [fromView]);
-			} else {
-				Views.Add (toView, Views [fromView]);
-			}
-			try {
-				var keys = new List<KeyBinding> ();
-				foreach (var kb in Keys.Where (x => x.View == fromView)) {
-					KeyBinding newKb = (KeyBinding)kb.Clone ();
-					newKb.View = toView;
-					keys.Add (newKb);
-				}
-				Keys.AddRange (keys);
-			} catch (Exception) {
-				return false;
-			}
-			return true;
-		}
+		//public bool CopyAllKeysFromView (string fromView, string toView, bool force = false)
+		//{
+		//	if (string.IsNullOrEmpty (fromView)) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (fromView));
+		//	}
+		//	if (string.IsNullOrEmpty (toView)) {
+		//		throw new ArgumentNullException ("View cannot be null.", nameof (toView));
+		//	}
+		//	if (fromView == toView) {
+		//		throw new ArgumentException ("The source and destiny are the same.", nameof (fromView));
+		//	}
+		//	if (!Views.ContainsKey (fromView)) {
+		//		throw new ArgumentException ("View not found.", nameof (fromView));
+		//	}
+		//	if (Views.ContainsKey (toView) && !force) {
+		//		throw new InvalidOperationException ("Destiny View already exists. Set force = true to delete it before.");
+		//	} else if (Views.ContainsKey (toView) && force) {
+		//		RemoveAll (toView);
+		//		Views.Add (toView, Views [fromView]);
+		//	} else {
+		//		Views.Add (toView, Views [fromView]);
+		//	}
+		//	try {
+		//		var keys = new List<KeyBinding> ();
+		//		foreach (var kb in Keys.Where (x => x.View == fromView)) {
+		//			KeyBinding newKb = (KeyBinding)kb.Clone ();
+		//			newKb.View = toView;
+		//			keys.Add (newKb);
+		//		}
+		//		Keys.AddRange (keys);
+		//	} catch (Exception) {
+		//		return false;
+		//	}
+		//	return true;
+		//}
 
 		/// <summary>Returns a string that represents the current object.</summary>
 		/// <returns>A string that represents the current object.</returns>
