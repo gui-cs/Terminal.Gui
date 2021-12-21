@@ -945,6 +945,15 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			Used = true;
+
+			KeyBindings.AddKey ((Key)'h', Key.CursorLeft);
+			KeyBindings.AddKey ((Key)'j', Key.CursorDown);
+			KeyBindings.AddKey ((Key)'k', Key.CursorUp);
+			KeyBindings.AddKey ((Key)'l', Key.CursorRight);
+			KeyBindings.AddKey ((Key)'H', Key.Home);
+			KeyBindings.AddKey ((Key)'L', Key.End);
+			KeyBindings.AddKey (Key.C | Key.CtrlMask, default, Command.Default, new Action (Copy), null, true);
+			KeyBindings.AddKey (Key.Y | Key.CtrlMask, default, Command.Default, new Action (Paste), null, true);
 		}
 
 		/// <summary>

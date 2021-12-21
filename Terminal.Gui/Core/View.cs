@@ -1558,31 +1558,31 @@ namespace Terminal.Gui {
 				return true;
 			if (MostFocused?.Enabled == true) {
 				var savedKeyEvent = keyEvent;
-				var kbs = Application.KeyBindings;
-				var isGlobal = false;
+				var kbs = MostFocused.KeyBindings;
+				//var isGlobal = false;
 				if (kbs != null && kbs.Enabled && kbs.Count > 0) {
-					var viewName = MostFocused.GetType ().Name;
-					var v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
-					if (v.Key == null) {
-						viewName = nameof (View);
-						v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
-						isGlobal = true;
+					foreach (var b in kbs.Keys.Where (x => x.InKey == keyEvent.Key && x.Action != null && x.Enabled)) {
+						b.Action ();
+						return true;
 					}
-					if (v.Key != null) {
-						var k = args.KeyEvent.Key;
-						KeyBinding kb;
-						if (k == kbs.DisableKey && v.Value) {
-							kbs.Views [v.Key] = false;
-							return true;
-						} else if (k == kbs.EnableKey && !v.Value) {
-							kbs.Views [v.Key] = true;
-							return true;
-						} else if (v.Value && (kb = kbs.Keys.FirstOrDefault (x => x.View == viewName && x.InKey == k && x.Enabled)) != null) {
-							keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
-							args = new KeyEventEventArgs (keyEvent);
-						}
-					} else {
-						isGlobal = false;
+					//var viewName = MostFocused.GetType ().Name;
+					//var v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
+					//if (v.Key == null) {
+					//	viewName = nameof (View);
+					//	v = kbs.Views.FirstOrDefault (x => x.Key == viewName);
+					//	isGlobal = true;
+					//}
+					var k = keyEvent.Key;
+					KeyBinding kb;
+					if (k == kbs.DisableKey && kbs.EnabledDisabledKeyStatus) {
+						kbs.EnabledDisabledKeyStatus = false;
+						return true;
+					} else if (k == kbs.EnableKey && !kbs.EnabledDisabledKeyStatus) {
+						kbs.EnabledDisabledKeyStatus = true;
+						return true;
+					} else if (kbs.EnabledDisabledKeyStatus && (kb = kbs.Keys.FirstOrDefault (x => x.InKey == k && x.Enabled)) != null) {
+						keyEvent = new KeyEvent (kb.OutKey, new KeyModifiers ());
+						args = new KeyEventEventArgs (keyEvent);
 					}
 				}
 				MostFocused?.KeyPress?.Invoke (args);
@@ -1590,19 +1590,21 @@ namespace Terminal.Gui {
 					return true;
 				if (MostFocused?.ProcessKey (keyEvent) == true)
 					return true;
-				if (isGlobal) {
-					// Is global so propagate upwards
-					for (View c = this; c != null; c = c.SuperView) {
-						c?.KeyPress?.Invoke (args);
-						if (args.Handled)
-							return true;
-						if (c?.ProcessKey (keyEvent) == true)
-							return true;
-					}
-				} else {
-					keyEvent = savedKeyEvent;
-					args = new KeyEventEventArgs (keyEvent);
-				}
+				//if (isGlobal) {
+				//	// Is global so propagate upwards
+				//	for (View c = this; c != null; c = c.SuperView) {
+				//		c?.KeyPress?.Invoke (args);
+				//		if (args.Handled)
+				//			return true;
+				//		if (c?.ProcessKey (keyEvent) == true)
+				//			return true;
+				//	}
+				//} else {
+				//	keyEvent = savedKeyEvent;
+				//	args = new KeyEventEventArgs (keyEvent);
+				//}
+				//keyEvent = savedKeyEvent;
+				//args = new KeyEventEventArgs (keyEvent);
 			}
 			if (subviews == null || subviews.Count == 0)
 				return false;
@@ -2260,6 +2262,8 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		public KeyBindings KeyBindings { get; set; } = new KeyBindings ();
 
 		/// <summary>
 		/// Pretty prints the View

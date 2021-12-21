@@ -241,6 +241,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key DisableKey { get; set; } = Key.Enter;
 
+		public bool EnabledDisabledKeyStatus { get; set; } = true;
+
 		/// <summary>
 		/// Gets the total of key bindings.
 		/// </summary>

@@ -154,21 +154,14 @@ namespace UICatalog {
 			Application.HeightAsBuffer = _heightAsBuffer;
 			Application.AlwaysSetPosition = _alwaysSetPosition;
 
-			KeyBindings keyBindings = new KeyBindings ();
-			keyBindings.AddKey (typeof (View), (Key)'h', Key.CursorLeft);
-			keyBindings.AddKey (typeof (View), (Key)'j', Key.CursorDown);
-			keyBindings.AddKey (typeof (View), (Key)'k', Key.CursorUp);
-			keyBindings.AddKey (typeof (View), (Key)'l', Key.CursorRight);
-			keyBindings.AddKey (typeof (View), (Key)'H', Key.Home);
-			keyBindings.AddKey (typeof (View), (Key)'L', Key.End);
-			keyBindings.AddKey (typeof (TextView), (Key)'h', Key.CursorLeft);
-			keyBindings.AddKey (typeof (TextView), (Key)'j', Key.CursorDown);
-			keyBindings.AddKey (typeof (TextView), (Key)'k', Key.CursorUp);
-			keyBindings.AddKey (typeof (TextView), (Key)'l', Key.CursorRight);
-			keyBindings.AddKey (typeof (TextView), (Key)'H', Key.Home);
-			keyBindings.AddKey (typeof (TextView), (Key)'L', Key.End);
-			keyBindings.AddKey (typeof (TextView), Key.C, default, () => Copy());
-			Application.KeyBindings = keyBindings;
+			//KeyBindings keyBindings = new KeyBindings ();
+			//keyBindings.AddKey (typeof (View), (Key)'h', Key.CursorLeft);
+			//keyBindings.AddKey (typeof (View), (Key)'j', Key.CursorDown);
+			//keyBindings.AddKey (typeof (View), (Key)'k', Key.CursorUp);
+			//keyBindings.AddKey (typeof (View), (Key)'l', Key.CursorRight);
+			//keyBindings.AddKey (typeof (View), (Key)'H', Key.Home);
+			//keyBindings.AddKey (typeof (View), (Key)'L', Key.End);
+			//Application.KeyBindings = keyBindings;
 
 
 			// Set this here because not initialized until driver is loaded
@@ -341,11 +334,11 @@ namespace UICatalog {
 			item.Title = "_Enable Key Bindings";
 			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
 			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = Application.KeyBindings.Enabled;
-			item.Action += () => {
-				Application.KeyBindings.Enabled = !item.Checked;
-				item.Checked = Application.KeyBindings.Enabled;
-			};
+			//item.Checked = Application.KeyBindings.Enabled;
+			//item.Action += () => {
+			//	Application.KeyBindings.Enabled = !item.Checked;
+			//	item.Checked = Application.KeyBindings.Enabled;
+			//};
 			menuItems.Add (item);
 
 			return menuItems.ToArray ();

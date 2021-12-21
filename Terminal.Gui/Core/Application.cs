@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key bindings for the application.
 		/// </summary>
-		public static KeyBindings KeyBindings {get; set;}
+		//public static KeyBindings KeyBindings {get; set;}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
