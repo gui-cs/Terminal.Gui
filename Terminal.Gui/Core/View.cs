@@ -251,6 +251,11 @@ namespace Terminal.Gui {
 		List<View> tabIndexes;
 
 		/// <summary>
+		/// Configurable keybindings supported by the control
+		/// </summary>
+		public List<KeyBinding> KeyBindings { get; set; } = new List<KeyBinding> ();
+
+		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
 		/// </summary>
 		/// <value>The tabIndexes.</value>
@@ -1534,6 +1539,22 @@ namespace Terminal.Gui {
 				return true;
 
 			return false;
+		}
+
+		/// <summary>
+		/// Invokes any <see cref="KeyBinding"/> that is registered on this <see cref="View"/>
+		/// and matches the <paramref name="keyEvent"/>
+		/// </summary>
+		/// <param name="keyEvent"></param>
+		protected bool InvokeKeybindings(KeyEvent keyEvent)
+		{
+			bool handled = false;
+			foreach(var binding in KeyBindings.Where (b => b.Key == keyEvent.Key && b.Enabled)) {
+				binding.Action ();
+				handled = true;
+			}
+			
+			return handled;
 		}
 
 		/// <inheritdoc/>

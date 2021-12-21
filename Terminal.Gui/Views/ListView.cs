@@ -317,6 +317,17 @@ namespace Terminal.Gui {
 		{
 			Source = source;
 			CanFocus = true;
+
+		    // Default keybindings for all ListViews
+			KeyBindings.Add (new KeyBinding (Key.CursorUp,Command.LineUp,()=>MoveUp()));
+			KeyBindings.Add (new KeyBinding (Key.P | Key.CtrlMask, Command.LineUp, () => MoveUp ()));
+
+			KeyBindings.Add (new KeyBinding (Key.CursorDown, Command.LineDown, () => MoveDown ()));
+			KeyBindings.Add (new KeyBinding (Key.N | Key.CtrlMask, Command.LineDown, () => MoveDown ()));
+
+			// things the users could bind in this control but dont
+			KeyBindings.Add (new KeyBinding (Key.Null, Command.LineScrollDown, ()=>ScrollDown(1)));
+			KeyBindings.Add (new KeyBinding (Key.Null, Command.LineScrollUp, () => ScrollUp (1)));
 		}
 
 		///<inheritdoc/>
@@ -372,14 +383,10 @@ namespace Terminal.Gui {
 			if (source == null)
 				return base.ProcessKey (kb);
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-			case Key.P | Key.CtrlMask:
-				return MoveUp ();
+			if (InvokeKeybindings (kb))
+				return true;
 
-			case Key.CursorDown:
-			case Key.N | Key.CtrlMask:
-				return MoveDown ();
+			switch (kb.Key) {
 
 			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
