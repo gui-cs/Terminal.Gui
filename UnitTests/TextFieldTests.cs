@@ -457,6 +457,12 @@ namespace Terminal.Gui.Views {
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 9:
+					Assert.Equal (54, _textField.CursorPosition);
+					Assert.Equal (-1, _textField.SelectedStart);
+					Assert.Equal (0, _textField.SelectedLength);
+					Assert.Null (_textField.SelectedText);
+					break;
+				case 10:
 					Assert.Equal (55, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
@@ -784,6 +790,101 @@ namespace Terminal.Gui.Views {
 			Clipboard.Contents = "\t\tTAB to jump between text fields.";
 			_textField.Paste ();
 			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextField_SpaceHandling ()
+		{
+			var tf = new TextField () {
+				Width = 10,
+				Text = " "
+			};
+
+			MouseEvent ev = new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tf.MouseEvent (ev);
+			Assert.Equal (1, tf.SelectedLength);
+
+			ev = new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked,
+			};
+
+			tf.MouseEvent (ev);
+			Assert.Equal (1, tf.SelectedLength);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void CanFocus_False_Wont_Focus_With_Mouse ()
+		{
+			var top = Application.Top;
+			var tf = new TextField () {
+				Width = Dim.Fill (),
+				CanFocus = false,
+				ReadOnly = true,
+				Text = "some text"
+			};
+			var fv = new FrameView ("I shouldn't get focus") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				CanFocus = false,
+			};
+			fv.Add (tf);
+			top.Add (fv);
+
+			Application.Begin (top);
+
+			Assert.False (tf.CanFocus);
+			Assert.False (tf.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			tf.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Null (tf.SelectedText);
+			Assert.False (tf.CanFocus);
+			Assert.False (tf.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
+
+			Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
+			fv.CanFocus = true;
+			tf.CanFocus = true;
+			tf.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tf.SelectedText);
+			Assert.True (tf.CanFocus);
+			Assert.True (tf.HasFocus);
+			Assert.True (fv.CanFocus);
+			Assert.True (fv.HasFocus);
+
+			fv.CanFocus = false;
+			tf.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 0,
+				Flags = MouseFlags.Button1DoubleClicked
+			});
+
+			Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
+			Assert.False (tf.CanFocus);
+			Assert.False (tf.HasFocus);
+			Assert.False (fv.CanFocus);
+			Assert.False (fv.HasFocus);
 		}
 	}
 }

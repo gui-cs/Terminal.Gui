@@ -238,7 +238,7 @@ namespace Terminal.Gui {
 
 			search.CursorPosition = search.Text.RuneCount;
 
-			return true;
+			return base.OnEnter (view);
 		}
 
 		///<inheritdoc/>
@@ -251,7 +251,7 @@ namespace Terminal.Gui {
 				listview.TabStop = false;
 			}
 
-			return true;
+			return base.OnLeave (view);
 		}
 
 		/// <summary>

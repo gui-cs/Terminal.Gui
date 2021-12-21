@@ -4,7 +4,7 @@ using System.Threading;
 using Terminal.Gui;
 using System.Linq;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	// 
 	// This would be a great scenario to show of threading (Issue #471)
 	//
@@ -12,7 +12,7 @@ namespace UICatalog {
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("MainLoop")]
 	[ScenarioCategory ("Threading")]
-	class Progress : Scenario {
+	public class Progress : Scenario {
 
 		class ProgressDemo : FrameView {
 			const int _verticalSpace = 1;

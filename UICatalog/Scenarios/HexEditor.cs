@@ -3,14 +3,14 @@ using System.IO;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("TopLevel")]
-	class HexEditor : Scenario {
+	public class HexEditor : Scenario {
 		private string _fileName = "demo.bin";
 		private HexView _hexView;
 		private bool _saved = true;

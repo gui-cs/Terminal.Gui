@@ -350,36 +350,45 @@ namespace Terminal.Gui {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
-				}
-				if (subviews != null && IsInitialized) {
-					foreach (var view in subviews) {
-						if (view.CanFocus != value) {
-							if (!value) {
-								view.oldCanFocus = view.CanFocus;
-								view.oldTabIndex = view.tabIndex;
-								view.CanFocus = value;
-								view.tabIndex = -1;
+
+					if (!value && Application.Top?.Focused == this) {
+						Application.Top.focused = null;
+					}
+					if (!value && HasFocus) {
+						SetHasFocus (false, this);
+						EnsureFocus ();
+						if (Focused == null) {
+							if (Application.Top.Focused == null) {
+								Application.Top.FocusNext ();
 							} else {
-								if (addingView) {
-									view.addingView = true;
+								var v = Application.Top.GetMostFocused (Application.Top.Focused);
+								v.SetHasFocus (true, null, true);
+							}
+							Application.EnsuresTopOnFront ();
+						}
+					}
+					if (subviews != null && IsInitialized) {
+						foreach (var view in subviews) {
+							if (view.CanFocus != value) {
+								if (!value) {
+									view.oldCanFocus = view.CanFocus;
+									view.oldTabIndex = view.tabIndex;
+									view.CanFocus = value;
+									view.tabIndex = -1;
+								} else {
+									if (addingView) {
+										view.addingView = true;
+									}
+									view.CanFocus = view.oldCanFocus;
+									view.tabIndex = view.oldTabIndex;
+									view.addingView = false;
 								}
-								view.CanFocus = view.oldCanFocus;
-								view.tabIndex = view.oldTabIndex;
-								view.addingView = false;
 							}
 						}
 					}
+					OnCanFocusChanged ();
+					SetNeedsDisplay ();
 				}
-				if (!value && HasFocus) {
-					SetHasFocus (false, this);
-					EnsureFocus ();
-					if (Focused == null) {
-						Application.Top.FocusNext ();
-						Application.EnsuresTopOnFront ();
-					}
-				}
-				OnCanFocusChanged ();
-				SetNeedsDisplay ();
 			}
 		}
 
@@ -1201,9 +1210,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void SetHasFocus (bool value, View view)
+		void SetHasFocus (bool value, View view, bool force = false)
 		{
-			if (hasFocus != value) {
+			if (hasFocus != value || force) {
 				hasFocus = value;
 				if (value) {
 					OnEnter (view);
@@ -1681,7 +1690,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyDown;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (!Enabled) {
@@ -1705,7 +1714,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyUp;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (!Enabled) {
@@ -1877,6 +1886,19 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		View GetMostFocused (View view)
+		{
+			if (view == null) {
+				return view;
+			}
+
+			if (view.focused != null) {
+				return GetMostFocused (view.focused);
+			} else {
+				return view;
+			}
+		}
+
 		/// <summary>
 		/// Sets the View's <see cref="Frame"/> to the relative coordinates if its container, given the <see cref="Frame"/> for its container.
 		/// </summary>
@@ -1963,19 +1985,19 @@ namespace Terminal.Gui {
 				}
 			}
 
-            if (edges.Any ()) {
-                var (from, to) = edges.First ();
-                if (from != Application.Top) {
-                    if (!ReferenceEquals (from, to)) {
-                        throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
-                    } else {
-                        throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
-                    }
-                }
-            }
+			if (edges.Any ()) {
+				var (from, to) = edges.First ();
+				if (from != Application.Top) {
+					if (!ReferenceEquals (from, to)) {
+						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
+					} else {
+						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
+					}
+				}
+			}
 
-            // return L (a topologically sorted order)
-            return result;
+			// return L (a topologically sorted order)
+			return result;
 		}
 
 		/// <summary>
@@ -2242,15 +2264,16 @@ namespace Terminal.Gui {
 					}
 					OnEnabledChanged ();
 					SetNeedsDisplay ();
-				}
-				if (subviews != null) {
-					foreach (var view in subviews) {
-						if (!value) {
-							view.oldEnabled = view.Enabled;
-							view.Enabled = value;
-						} else {
-							view.Enabled = view.oldEnabled;
-							view.addingView = false;
+
+					if (subviews != null) {
+						foreach (var view in subviews) {
+							if (!value) {
+								view.oldEnabled = view.Enabled;
+								view.Enabled = value;
+							} else {
+								view.Enabled = view.oldEnabled;
+								view.addingView = false;
+							}
 						}
 					}
 				}

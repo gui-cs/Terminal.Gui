@@ -37,7 +37,7 @@
       "dest": "api/UICatalog",
       "shouldSkipMarkup": false,
       "properties": {
-          "TargetFramework": "netstandard2.1"
+          "TargetFramework": "net5.0"
       }
     }
   ],
@@ -65,7 +65,7 @@
     "resource": [
       {
         "files": [
-          "images/**",
+          "images/**"
         ],
         "exclude": [
           "obj/**",
@@ -87,7 +87,8 @@
     "dest": "../docs",
     "globalMetadata": {
       "_enableSearch": "true",
-      "_appLogoPath": "images/logo48.png"
+      "_appLogoPath": "images/logo48.png",
+      "_disableContribution": true
     },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],

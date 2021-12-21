@@ -1,11 +1,11 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Clipping", Description: "Used to test that things clip correctly")]
 	[ScenarioCategory ("Bug Repro")]
 
-	class Clipping : Scenario {
+	public class Clipping : Scenario {
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{

@@ -160,6 +160,11 @@ namespace Terminal.Gui {
 		public static MainLoop MainLoop { get; private set; }
 
 		/// <summary>
+		/// Disable or enable the mouse in this <see cref="Application"/>
+		/// </summary>
+		public static bool IsMouseDisabled { get; set; }
+
+		/// <summary>
 		///   This event is raised on each iteration of the <see cref="MainLoop"/> 
 		/// </summary>
 		/// <remarks>
@@ -523,6 +528,10 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			if (IsMouseDisabled) {
+				return;
+			}
+
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed)

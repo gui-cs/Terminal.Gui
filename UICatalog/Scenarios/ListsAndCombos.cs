@@ -8,7 +8,7 @@ using NStack;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
 	[ScenarioCategory ("Controls")]
-	class ListsAndCombos : Scenario {
+	public class ListsAndCombos : Scenario {
 
 		public override void Setup ()
 		{

@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Tab View", Description: "Demos TabView control with limited screen space in Absolute layout")]
 	[ScenarioCategory ("Controls")]
-	class TabViewExample : Scenario {
+	public class TabViewExample : Scenario {
 
 		TabView tabView;
 

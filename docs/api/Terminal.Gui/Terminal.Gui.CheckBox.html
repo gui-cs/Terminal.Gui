@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CheckBox
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,15 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -355,6 +364,15 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -370,6 +388,15 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -377,9 +404,6 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -392,6 +416,9 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -423,8 +450,6 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor" data-uid="Terminal.Gui.CheckBox.#ctor">CheckBox()</h4>
   <div class="markdown level1 summary">
@@ -435,8 +460,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public CheckBox()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(NStack.ustring,System.Boolean)">CheckBox(ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -469,8 +492,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring)">CheckBox(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
@@ -513,8 +534,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
 The size of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is computed based on the
 text length. This <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is not toggled.
 </div>
-  
-  
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">CheckBox(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -564,8 +583,6 @@ text length.
 </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_CheckBox_Checked_" data-uid="Terminal.Gui.CheckBox.Checked*"></a>
   <h4 id="Terminal_Gui_CheckBox_Checked" data-uid="Terminal.Gui.CheckBox.Checked">Checked</h4>
   <div class="markdown level1 summary">
@@ -591,8 +608,6 @@ The state of the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a>
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_CheckBox_Text_" data-uid="Terminal.Gui.CheckBox.Text*"></a>
   <h4 id="Terminal_Gui_CheckBox_Text" data-uid="Terminal.Gui.CheckBox.Text">Text</h4>
   <div class="markdown level1 summary">
@@ -620,8 +635,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.CheckBox.html">Che
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_CheckBox_MouseEvent_" data-uid="Terminal.Gui.CheckBox.MouseEvent*"></a>
   <h4 id="Terminal_Gui_CheckBox_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.CheckBox.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -664,8 +677,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.CheckBox.html">Che
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_CheckBox_OnEnter_" data-uid="Terminal.Gui.CheckBox.OnEnter*"></a>
   <h4 id="Terminal_Gui_CheckBox_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.CheckBox.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -708,8 +719,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.CheckBox.html">Che
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_CheckBox_OnToggled_" data-uid="Terminal.Gui.CheckBox.OnToggled*"></a>
   <h4 id="Terminal_Gui_CheckBox_OnToggled_System_Boolean_" data-uid="Terminal.Gui.CheckBox.OnToggled(System.Boolean)">OnToggled(Boolean)</h4>
   <div class="markdown level1 summary">
@@ -737,8 +746,6 @@ Called when the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_Ch
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_CheckBox_PositionCursor_" data-uid="Terminal.Gui.CheckBox.PositionCursor*"></a>
   <h4 id="Terminal_Gui_CheckBox_PositionCursor" data-uid="Terminal.Gui.CheckBox.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -749,8 +756,6 @@ Called when the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_Ch
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
   <a id="Terminal_Gui_CheckBox_ProcessHotKey_" data-uid="Terminal.Gui.CheckBox.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_CheckBox_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.CheckBox.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -793,8 +798,6 @@ Called when the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_Ch
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_CheckBox_ProcessKey_" data-uid="Terminal.Gui.CheckBox.ProcessKey*"></a>
   <h4 id="Terminal_Gui_CheckBox_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -837,8 +840,6 @@ Called when the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_Ch
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_CheckBox_Redraw_" data-uid="Terminal.Gui.CheckBox.Redraw*"></a>
   <h4 id="Terminal_Gui_CheckBox_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -868,8 +869,6 @@ Called when the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_Ch
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
   <h3 id="events">Events
   </h3>
-  
-  
   <h4 id="Terminal_Gui_CheckBox_Toggled" data-uid="Terminal.Gui.CheckBox.Toggled">Toggled</h4>
   <div class="markdown level1 summary">
 Toggled event, raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a>  is toggled.
@@ -915,10 +914,6 @@ the mouse or the keyboard. The passed <code>bool</code> contains the previous st
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

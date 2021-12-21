@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct Attribute
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,8 +122,34 @@ class to define color schemes that can be used in your application.
 </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
+  <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
+  <h4 id="Terminal_Gui_Attribute__ctor_System_Int32_" data-uid="Terminal.Gui.Attribute.#ctor(System.Int32)">Attribute(Int32)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> struct with only the value passed to
+and trying to get the colors if defined.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute(int value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">value</span></td>
+        <td>Value.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
   <h4 id="Terminal_Gui_Attribute__ctor_System_Int32_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)">Attribute(Int32, Color, Color)</h4>
   <div class="markdown level1 summary">
@@ -132,7 +158,7 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.h
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute(int value, Color foreground = Color.Black, Color background = Color.Black)</code></pre>
+    <pre><code class="lang-csharp hljs">public Attribute(int value, Color foreground, Color background)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -161,8 +187,34 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.h
       </tr>
     </tbody>
   </table>
-  
-  
+  <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
+  <h4 id="Terminal_Gui_Attribute__ctor_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color)">Attribute(Color)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> struct
+with the same colors for the foreground and background.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Attribute(Color color)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">color</span></td>
+        <td>The color.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Attribute__ctor_" data-uid="Terminal.Gui.Attribute.#ctor*"></a>
   <h4 id="Terminal_Gui_Attribute__ctor_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)">Attribute(Color, Color)</h4>
   <div class="markdown level1 summary">
@@ -197,8 +249,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Attribute.h
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_Attribute_Background_" data-uid="Terminal.Gui.Attribute.Background*"></a>
   <h4 id="Terminal_Gui_Attribute_Background" data-uid="Terminal.Gui.Attribute.Background">Background</h4>
   <div class="markdown level1 summary">
@@ -207,7 +257,7 @@ The background color.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Color Background { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Color Background { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -224,8 +274,6 @@ The background color.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Attribute_Foreground_" data-uid="Terminal.Gui.Attribute.Foreground*"></a>
   <h4 id="Terminal_Gui_Attribute_Foreground" data-uid="Terminal.Gui.Attribute.Foreground">Foreground</h4>
   <div class="markdown level1 summary">
@@ -234,7 +282,7 @@ The foreground color.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Color Foreground { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Color Foreground { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -251,8 +299,6 @@ The foreground color.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Attribute_Value_" data-uid="Terminal.Gui.Attribute.Value*"></a>
   <h4 id="Terminal_Gui_Attribute_Value" data-uid="Terminal.Gui.Attribute.Value">Value</h4>
   <div class="markdown level1 summary">
@@ -261,7 +307,7 @@ The color attribute value.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Value { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly int Value { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -280,8 +326,6 @@ The color attribute value.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_Attribute_Get_" data-uid="Terminal.Gui.Attribute.Get*"></a>
   <h4 id="Terminal_Gui_Attribute_Get" data-uid="Terminal.Gui.Attribute.Get">Get()</h4>
   <div class="markdown level1 summary">
@@ -307,8 +351,6 @@ Gets the current <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Attribute_Make_" data-uid="Terminal.Gui.Attribute.Make*"></a>
   <h4 id="Terminal_Gui_Attribute_Make_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)">Make(Color, Color)</h4>
   <div class="markdown level1 summary">
@@ -358,8 +400,6 @@ Creates an <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a> from
   </table>
   <h3 id="operators">Operators
   </h3>
-  
-  
   <a id="Terminal_Gui_Attribute_op_Implicit_" data-uid="Terminal.Gui.Attribute.op_Implicit*"></a>
   <h4 id="Terminal_Gui_Attribute_op_Implicit_System_Int32__Terminal_Gui_Attribute" data-uid="Terminal.Gui.Attribute.op_Implicit(System.Int32)~Terminal.Gui.Attribute">Implicit(Int32 to Attribute)</h4>
   <div class="markdown level1 summary">
@@ -402,8 +442,6 @@ Implicitly convert an integer value into an <a class="xref" href="Terminal.Gui.A
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Attribute_op_Implicit_" data-uid="Terminal.Gui.Attribute.op_Implicit*"></a>
   <h4 id="Terminal_Gui_Attribute_op_Implicit_Terminal_Gui_Attribute__System_Int32" data-uid="Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute)~System.Int32">Implicit(Attribute to Int32)</h4>
   <div class="markdown level1 summary">
@@ -451,10 +489,6 @@ Implicit conversion from an <a class="xref" href="Terminal.Gui.Attribute.html">A
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

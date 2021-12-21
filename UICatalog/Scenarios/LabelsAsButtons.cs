@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Labels As Buttons", Description: "Illustrates that Button is really just a Label++")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("POC")]
-	class LabelsAsLabels : Scenario {
+	public class LabelsAsLabels : Scenario {
 		public override void Setup ()
 		{
 			// Add a label & text field so we can demo IsDefault

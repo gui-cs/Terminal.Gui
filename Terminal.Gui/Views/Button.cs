@@ -256,7 +256,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			if (HotKey == Key.Unknown) {
+			if (HotKey == Key.Unknown && text != "") {
 				for (int i = 0; i < base.Text.RuneCount; i++) {
 					if (base.Text [i] == text [0]) {
 						Move (i, 0);

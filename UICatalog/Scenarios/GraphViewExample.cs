@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Graph View", Description: "Demos GraphView control")]
 	[ScenarioCategory ("Controls")]
-	class GraphViewExample : Scenario {
+	public class GraphViewExample : Scenario {
 
 		GraphView graphView;
 		private TextView about;
@@ -52,6 +52,10 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("_View", new MenuItem [] {
 					new MenuItem ("Zoom _In", "", () => Zoom(0.5f)),
 					 new MenuItem ("Zoom _Out", "", () =>  Zoom(2f)),
+					new MenuItem ("MarginLeft++", "", () => Margin(true,true)),
+					new MenuItem ("MarginLeft--", "", () => Margin(true,false)),
+					new MenuItem ("MarginBottom++", "", () => Margin(false,true)),
+					new MenuItem ("MarginBottom--", "", () => Margin(false,false)),
 				}),
 
 				});
@@ -673,6 +677,17 @@ namespace UICatalog.Scenarios {
 
 			graphView.AxisX.Increment *= factor;
 			graphView.AxisY.Increment *= factor;
+
+			graphView.SetNeedsDisplay ();
+		}
+		private void Margin (bool left, bool increase)
+		{
+			if (left) {
+				graphView.MarginLeft = (uint)Math.Max(0,graphView.MarginLeft + (increase ? 1 : -1));
+			}
+			else {
+				graphView.MarginBottom = (uint)Math.Max (0, graphView.MarginBottom + (increase ? 1 : -1));
+			}
 
 			graphView.SetNeedsDisplay ();
 		}

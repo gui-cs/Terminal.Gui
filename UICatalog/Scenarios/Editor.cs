@@ -5,14 +5,14 @@ using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("TopLevel")]
-	class Editor : Scenario {
+	public class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
@@ -83,19 +83,7 @@ namespace UICatalog {
 					new MenuItem ("_Select All", "", () => SelectAll(),null,null, Key.CtrlMask | Key.T)
 				}),
 				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
-				new MenuBarItem ("_Cursor", new MenuItem [] {
-					new MenuItem ("_Invisible", "", () => SetCursor(CursorVisibility.Invisible)),
-					new MenuItem ("_Box", "", () => SetCursor(CursorVisibility.Box)),
-					new MenuItem ("_Underline", "", () => SetCursor(CursorVisibility.Underline)),
-					new MenuItem ("", "", () => {}, () => { return false; }),
-					new MenuItem ("xTerm :", "", () => {}, () => { return false; }),
-					new MenuItem ("", "", () => {}, () => { return false; }),
-					new MenuItem ("  _Default", "", () => SetCursor(CursorVisibility.Default)),
-					new MenuItem ("  _Vertical", "", () => SetCursor(CursorVisibility.Vertical)),
-					new MenuItem ("  V_ertical Fix", "", () => SetCursor(CursorVisibility.VerticalFix)),
-					new MenuItem ("  B_ox Fix", "", () => SetCursor(CursorVisibility.BoxFix)),
-					new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
-				}),
+				new MenuBarItem ("_Cursor", CreateCursorRadio ()),
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
 					CreateAutocomplete(),
@@ -171,14 +159,14 @@ namespace UICatalog {
 				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
 					e.Handled = true;
-				} else if (keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
@@ -328,11 +316,6 @@ namespace UICatalog {
 			} else {
 				MessageBox.Query ("Replace All", $"None of the following specified text was found: '{_textToFind}'", "Ok");
 			}
-		}
-
-		private void SetCursor (CursorVisibility visibility)
-		{
-			_textView.DesiredCursorVisibility = visibility;
 		}
 
 		private bool CanCloseFile ()
@@ -578,6 +561,84 @@ namespace UICatalog {
 			};
 
 			return item;
+		}
+
+		MenuItem [] CreateCursorRadio ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			menuItems.Add (new MenuItem ("_Invisible", "", () => SetCursor (CursorVisibility.Invisible)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.Invisible
+			});
+			menuItems.Add (new MenuItem ("_Box", "", () => SetCursor (CursorVisibility.Box)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.Box
+			});
+			menuItems.Add (new MenuItem ("_Underline", "", () => SetCursor (CursorVisibility.Underline)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.Underline
+			});
+			menuItems.Add (new MenuItem ("", "", () => { }, () => false));
+			menuItems.Add (new MenuItem ("xTerm :", "", () => { }, () => false));
+			menuItems.Add (new MenuItem ("", "", () => { }, () => false));
+			menuItems.Add (new MenuItem ("  _Default", "", () => SetCursor (CursorVisibility.Default)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.Default
+			});
+			menuItems.Add (new MenuItem ("  _Vertical", "", () => SetCursor (CursorVisibility.Vertical)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.Vertical
+			});
+			menuItems.Add (new MenuItem ("  V_ertical Fix", "", () => SetCursor (CursorVisibility.VerticalFix)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.VerticalFix
+			});
+			menuItems.Add (new MenuItem ("  B_ox Fix", "", () => SetCursor (CursorVisibility.BoxFix)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.BoxFix
+			});
+			menuItems.Add (new MenuItem ("  U_nderline Fix", "", () => SetCursor (CursorVisibility.UnderlineFix)) {
+				CheckType = MenuItemCheckStyle.Radio,
+				Checked = _textView.DesiredCursorVisibility == CursorVisibility.UnderlineFix
+			});
+
+			void SetCursor (CursorVisibility visibility)
+			{
+				_textView.DesiredCursorVisibility = visibility;
+				var title = "";
+				switch (visibility) {
+				case CursorVisibility.Default:
+					title = "  _Default";
+					break;
+				case CursorVisibility.Invisible:
+					title = "_Invisible";
+					break;
+				case CursorVisibility.Underline:
+					title = "_Underline";
+					break;
+				case CursorVisibility.UnderlineFix:
+					title = "  U_nderline Fix";
+					break;
+				case CursorVisibility.Vertical:
+					title = "  _Vertical";
+					break;
+				case CursorVisibility.VerticalFix:
+					title = "  V_ertical Fix";
+					break;
+				case CursorVisibility.Box:
+					title = "_Box";
+					break;
+				case CursorVisibility.BoxFix:
+					title = "  B_ox Fix";
+					break;
+				}
+
+				foreach (var menuItem in menuItems) {
+					menuItem.Checked = menuItem.Title.Equals (title) && visibility == _textView.DesiredCursorVisibility;
+				}
+			}
+
+			return menuItems.ToArray ();
 		}
 
 		private void CreateFindReplace (bool isFind = true)

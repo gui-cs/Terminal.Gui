@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Label
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -84,7 +84,8 @@
   <h1 id="Terminal_Gui_Label" data-uid="Terminal.Gui.Label" class="text-break">Class Label
   </h1>
   <div class="markdown level0 summary">
-The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
+The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a string at a given position and supports multiple lines separated by newline characters.
+Multi-line Labels support word wrap.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -122,6 +123,15 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -370,6 +380,15 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -382,6 +401,15 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -389,9 +417,6 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -404,6 +429,9 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
@@ -442,8 +470,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
 </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor" data-uid="Terminal.Gui.Label.#ctor">Label()</h4>
   <div class="markdown level1 summary"></div>
@@ -452,8 +478,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Label()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring)">Label(ustring)</h4>
   <div class="markdown level1 summary"></div>
@@ -479,8 +503,36 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       </tr>
     </tbody>
   </table>
-  
-  
+  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
+  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring,Terminal.Gui.TextDirection)">Label(ustring, TextDirection)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Label(ustring text, TextDirection direction)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
+        <td><span class="parametername">direction</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)">Label(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary"></div>
@@ -516,8 +568,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect)">Label(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -543,8 +593,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)">Label(Rect, ustring)</h4>
   <div class="markdown level1 summary"></div>
@@ -577,8 +625,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_Label_OnEnter_" data-uid="Terminal.Gui.Label.OnEnter*"></a>
   <h4 id="Terminal_Gui_Label_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.Label.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -621,8 +667,6 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_Label_OnMouseEvent_" data-uid="Terminal.Gui.Label.OnMouseEvent*"></a>
   <h4 id="Terminal_Gui_Label_OnMouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Label.OnMouseEvent(Terminal.Gui.MouseEvent)">OnMouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary">
@@ -669,8 +713,6 @@ Method invoked when a mouse event is generated
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a></div>
   <h3 id="events">Events
   </h3>
-  
-  
   <h4 id="Terminal_Gui_Label_Clicked" data-uid="Terminal.Gui.Label.Clicked">Clicked</h4>
   <div class="markdown level1 summary">
 Clicked <span class="xref">System.Action</span>, raised when the user clicks the primary mouse button within the Bounds of this <a class="xref" href="Terminal.Gui.View.html">View</a>
@@ -717,10 +759,6 @@ the mouse or the keyboard.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

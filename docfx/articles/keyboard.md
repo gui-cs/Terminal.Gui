@@ -1,7 +1,7 @@
 Keyboard Event Processing
 =========================
 
-Keyboard events are sent by the [Main Loop](mainloop.html) to the
+Keyboard events are sent by the [Main Loop](mainloop.md) to the
 Application class for processing.  The keyboard events are sent
 exclusively to the current `Toplevel`, this being either the default
 that is created when you call `Application.Init`, or one that you

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class StatusBar
    ">
-    <meta name="generator" content="docfx 2.56.7.0">
+    <meta name="generator" content="docfx 2.58.9.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -125,6 +125,15 @@ So for each context must be a new instance of a statusbar.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -367,6 +376,15 @@ So for each context must be a new instance of a statusbar.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -382,13 +400,19 @@ So for each context must be a new instance of a statusbar.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
@@ -401,6 +425,9 @@ So for each context must be a new instance of a statusbar.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -432,8 +459,6 @@ So for each context must be a new instance of a statusbar.
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_StatusBar__ctor_" data-uid="Terminal.Gui.StatusBar.#ctor*"></a>
   <h4 id="Terminal_Gui_StatusBar__ctor" data-uid="Terminal.Gui.StatusBar.#ctor">StatusBar()</h4>
   <div class="markdown level1 summary">
@@ -444,8 +469,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.StatusBar.h
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public StatusBar()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_StatusBar__ctor_" data-uid="Terminal.Gui.StatusBar.#ctor*"></a>
   <h4 id="Terminal_Gui_StatusBar__ctor_Terminal_Gui_StatusItem___" data-uid="Terminal.Gui.StatusBar.#ctor(Terminal.Gui.StatusItem[])">StatusBar(StatusItem[])</h4>
   <div class="markdown level1 summary">
@@ -476,8 +499,6 @@ The <a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a> will be dra
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_StatusBar_Items_" data-uid="Terminal.Gui.StatusBar.Items*"></a>
   <h4 id="Terminal_Gui_StatusBar_Items" data-uid="Terminal.Gui.StatusBar.Items">Items</h4>
   <div class="markdown level1 summary">
@@ -503,10 +524,65 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_StatusBar_ShortcutDelimiter_" data-uid="Terminal.Gui.StatusBar.ShortcutDelimiter*"></a>
+  <h4 id="Terminal_Gui_StatusBar_ShortcutDelimiter" data-uid="Terminal.Gui.StatusBar.ShortcutDelimiter">ShortcutDelimiter</h4>
+  <div class="markdown level1 summary">
+Used for change the shortcut delimiter separator.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ustring ShortcutDelimiter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
+  <a id="Terminal_Gui_StatusBar_AddItemAt_" data-uid="Terminal.Gui.StatusBar.AddItemAt*"></a>
+  <h4 id="Terminal_Gui_StatusBar_AddItemAt_System_Int32_Terminal_Gui_StatusItem_" data-uid="Terminal.Gui.StatusBar.AddItemAt(System.Int32,Terminal.Gui.StatusItem)">AddItemAt(Int32, StatusItem)</h4>
+  <div class="markdown level1 summary">
+Inserts a <a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a> in the specified index of <a class="xref" href="Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Items">Items</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddItemAt(int index, StatusItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">index</span></td>
+        <td>The zero-based index at which item should be inserted.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a></td>
+        <td><span class="parametername">item</span></td>
+        <td>The item to insert.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_StatusBar_Dispose_" data-uid="Terminal.Gui.StatusBar.Dispose*"></a>
   <h4 id="Terminal_Gui_StatusBar_Dispose_System_Boolean_" data-uid="Terminal.Gui.StatusBar.Dispose(System.Boolean)">Dispose(Boolean)</h4>
   <div class="markdown level1 summary"></div>
@@ -534,8 +610,6 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a></div>
-  
-  
   <a id="Terminal_Gui_StatusBar_MouseEvent_" data-uid="Terminal.Gui.StatusBar.MouseEvent*"></a>
   <h4 id="Terminal_Gui_StatusBar_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.StatusBar.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -578,8 +652,6 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_StatusBar_OnEnter_" data-uid="Terminal.Gui.StatusBar.OnEnter*"></a>
   <h4 id="Terminal_Gui_StatusBar_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.StatusBar.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -622,8 +694,6 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_StatusBar_ProcessHotKey_" data-uid="Terminal.Gui.StatusBar.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_StatusBar_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.StatusBar.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -666,8 +736,6 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_StatusBar_Redraw_" data-uid="Terminal.Gui.StatusBar.Redraw*"></a>
   <h4 id="Terminal_Gui_StatusBar_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.StatusBar.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -695,6 +763,48 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <a id="Terminal_Gui_StatusBar_RemoveItem_" data-uid="Terminal.Gui.StatusBar.RemoveItem*"></a>
+  <h4 id="Terminal_Gui_StatusBar_RemoveItem_System_Int32_" data-uid="Terminal.Gui.StatusBar.RemoveItem(System.Int32)">RemoveItem(Int32)</h4>
+  <div class="markdown level1 summary">
+Removes a <a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a> at specified index of <a class="xref" href="Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Items">Items</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StatusItem RemoveItem(int index)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">index</span></td>
+        <td>The zero-based index of the item to remove.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a> removed.</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
@@ -710,10 +820,6 @@ The items that compose the <a class="xref" href="Terminal.Gui.StatusBar.html">St
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

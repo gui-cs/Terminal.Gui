@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Invert Colors", Description: "Invert the foreground and the background colors.")]
 	[ScenarioCategory ("Colors")]
-	class InvertColors : Scenario {
+	public class InvertColors : Scenario {
 		public override void Setup ()
 		{
 			Win.ColorScheme = Colors.TopLevel;

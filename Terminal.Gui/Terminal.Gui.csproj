@@ -25,7 +25,7 @@
     <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
 
-    <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
@@ -43,53 +43,84 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.4.0
+      * #1546  Fixes #1535. Added IsMouseDisabled prop to Application   
+      * #1515  Upgrading to Net6.0                                      
+      * #1508  Allows ListView trigger the Enter and Leave events.      
+      * #1506  Prevents a Process breaks rendering on Linux.            
+      * #1505  Fixes #1499. Allowing border settings for the MessageBox.
+      * #1504  Fixes #1502. Prevents high CPU usage.                    
+
+      v1.3.0
+      * #1491  Fix link to MainLoop docs in README.md
+      * #1489  Dynamic menu/statusbar and Enable property fix.
+      * #1488  Fixed label positions to begin at Margins not just bottom left of screen
+      * #1486  Scrollbarview ensures host always focused.
+      * #1484  NetDriver fixes keys modifiers not reseting and enter key on Windows Terminal.
+      * #1479  Trying updating FSharpExample to net5.0
+      * #1478  Fixes #1475. Selection ending with a white space error.
+      * #1476  Added PoshRedisViewer to the list of Showcases/Examples
+      * #1473  Bump ReportGenerator from 4.8.12 to 4.8.13
+      * #1472  ComboBox cursonDownKey nullref fix
+      * #1468  Fixes #1467. AlternateForward/BackwardKey bypasses dialog modality
+      * #1466  Fixes WindowsDriver HeightAsBuffer set to false.
+      * #1450  Added Application.QuitKey property to allow change the quitting application key.
+      * #1449  Bump ReactiveMarbles.ObservableEvents.SourceGenerator from 1.1.3 to 1.1.4
+      * #1448  Fixes #1445. Fixing more the Curses and WSL clipboard.
+      * #1447  Fixes #1446. Added more features to the Border and Toplevel focus.
+      * #1441  Fixes #1438. Backspace not redrawing screen under some situations.
+      * #1440  feature: Don't pull Terminal.Gui from NuGet, use ReactiveMarbles.ObservableEvents
+      * #1437  Fixed bug setting ColorScheme on Autocomplete
+      * #1436  Border feature
+      * #1432  tweaked readme
+
       v1.2.1
-      * Fixes code block fencing                                                                                               
-      * NetDriver triple click mouse bug fix.                                                                                
-      * WindowsDriver double click mouse bug fix.                                                                            
-      * Fixes CursesDriver mouse and reset issue.                                                                            
-      * Correctly mark the .NET Framework reference assemblies as private.                                                   
-      * Fix version conflicts caused by PR#1412                                                                              
-      * Autocomplete for TextView                                                                                            
-      * Fixes #1402. Only WindowsDriver supports horizontal scroll.                                                          
-      * Fixes #1396. Using the Loaded event instead the Ready event.                                                         
-      * Fixes #1394. Added ReflectedType to check for overridden.                                                            
-      * Fixes #1389. Added a unidirectional feature to the Marquee styles to the ProgressBar.                                
-      * Fixes #1387. Allowing the UnitTests project to test internal keywords.                                               
-      * Fixes #1384. Added a VisibleChanged event on the View class.                                                         
-      * Fixes #1381. Unit tests to demonstrate the Key enum ambiguity check.                                                 
-      * Fixes #546. Enhancement ProgressBar.                                                                                 
-      * Disables MinVer on Debug builds                                                                                      
-      * Adds Lineview                                                                                                        
-      * CheckBox AutoSize should initialize with the Label default.                                                          
-      * Fixes to avoid exception with the ComboBox in All Views Tester.                                                      
-      * Simplifying FrameView constructors avoiding redundant code.                                                          
-      * Button text should be centered by default.                                                                           
-      * Fixes #1078. ColorScheme setter now calls SetNeedsDisplay.                                                           
-      * Bump ReportGenerator from 4.8.11 to 4.8.12                                                                           
-      * Fixes #1314. TextView now exposes file exceptions from callers.                                                      
-      * Prevents application crash if OS clipboard is not supported.                                                         
-      * Fixes #1358. Attribute.Foreground / Attribute.Background now working with CursesDriver                               
-      * Added support for coloring cells in TableView                                                                        
-      * More unit test for issue #1344, testing IsVertical as False.                                                         
-      * Fix for #1353 (tab view not refreshing in some circumstances)                                                        
+      * Fixes code block fencing
+      * NetDriver triple click mouse bug fix.
+      * WindowsDriver double click mouse bug fix.
+      * Fixes CursesDriver mouse and reset issue.
+      * Correctly mark the .NET Framework reference assemblies as private.
+      * Fix version conflicts caused by PR#1412
+      * Autocomplete for TextView
+      * Fixes #1402. Only WindowsDriver supports horizontal scroll.
+      * Fixes #1396. Using the Loaded event instead the Ready event.
+      * Fixes #1394. Added ReflectedType to check for overridden.
+      * Fixes #1389. Added a unidirectional feature to the Marquee styles to the ProgressBar.
+      * Fixes #1387. Allowing the UnitTests project to test internal keywords.
+      * Fixes #1384. Added a VisibleChanged event on the View class.
+      * Fixes #1381. Unit tests to demonstrate the Key enum ambiguity check.
+      * Fixes #546. Enhancement ProgressBar.
+      * Disables MinVer on Debug builds
+      * Adds Lineview
+      * CheckBox AutoSize should initialize with the Label default.
+      * Fixes to avoid exception with the ComboBox in All Views Tester.
+      * Simplifying FrameView constructors avoiding redundant code.
+      * Button text should be centered by default.
+      * Fixes #1078. ColorScheme setter now calls SetNeedsDisplay.
+      * Bump ReportGenerator from 4.8.11 to 4.8.12
+      * Fixes #1314. TextView now exposes file exceptions from callers.
+      * Prevents application crash if OS clipboard is not supported.
+      * Fixes #1358. Attribute.Foreground / Attribute.Background now working with CursesDriver
+      * Added support for coloring cells in TableView
+      * More unit test for issue #1344, testing IsVertical as False.
+      * Fix for #1353 (tab view not refreshing in some circumstances)
       * Fixes #1344. Setting showBothScrollIndicator to false on the constructor don't throws NullReferenceException anymore.
-      * Fixes #1341. Now if AutoSize is true the Bounds size is always updated by using the Dim.Fill or the Dim.Absolute.    
-      * Resolves: Add GitHub Codespaces configuration                                                                        
-      * Expose TextView color methods as protected virtual (allows custom colors)                                            
-      * Fixes InvalidOperationException from throwing when removing the label on the LabelsAsLabels scenario.                
-      * Added a Initialize method to the Window to simplify the constructors.                                                
-      * Fixes GetCurrentWidth and GetCurrentHeight providing the correct current values.                                     
-      * Fixes CursesDriver resize issue.                                                                                     
-      * Toplevel improvement as a subviews container without frame borders.                                                  
-      * Prevents ListView top to be less than zero if source count is zero.                                                  
-      * Fixes #1326. Prevent selected item to be equal to the source count.                                                  
-      * Fixes #1327. Fixes TextField backspace and canceling TextChanging.                                                   
-      * Prevents WindowSize event from being always triggered in Netdriver unnecessarily.                                    
-      * Fix bug where series/annotations are added during render                                                             
-      * Fixes #1318. Ensures that the OS clipboard is always sets.                                                           
-      * Fixes #983. Improving clipboard with interaction with the OS.                                                        
-      * Added Attributes tests; balanced Application.Init/Shutdown                                                           
+      * Fixes #1341. Now if AutoSize is true the Bounds size is always updated by using the Dim.Fill or the Dim.Absolute.
+      * Resolves: Add GitHub Codespaces configuration
+      * Expose TextView color methods as protected virtual (allows custom colors)
+      * Fixes InvalidOperationException from throwing when removing the label on the LabelsAsLabels scenario.
+      * Added a Initialize method to the Window to simplify the constructors.
+      * Fixes GetCurrentWidth and GetCurrentHeight providing the correct current values.
+      * Fixes CursesDriver resize issue.
+      * Toplevel improvement as a subviews container without frame borders.
+      * Prevents ListView top to be less than zero if source count is zero.
+      * Fixes #1326. Prevent selected item to be equal to the source count.
+      * Fixes #1327. Fixes TextField backspace and canceling TextChanging.
+      * Prevents WindowSize event from being always triggered in Netdriver unnecessarily.
+      * Fix bug where series/annotations are added during render
+      * Fixes #1318. Ensures that the OS clipboard is always sets.
+      * Fixes #983. Improving clipboard with interaction with the OS.
+      * Added Attributes tests; balanced Application.Init/Shutdown
 
       v1.1.1
       * Fixes #1307 - MainLoop timeouts duplicate keys error.

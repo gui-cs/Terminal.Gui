@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders on Window", Description: "Demonstrate Window borders manipulation.")]
 	[ScenarioCategory ("Border")]
-	class BordersOnWindow : Scenario {
+	public class BordersOnWindow : Scenario {
 		public override void Setup ()
 		{
 			var borderStyle = BorderStyle.Double;
