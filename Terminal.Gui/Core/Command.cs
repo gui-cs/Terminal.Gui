@@ -81,6 +81,34 @@ namespace Terminal.Gui {
 		/// </summary>
 		WordRightExtend,
 
+		/// <summary>
+		/// Move the page down.
+		/// </summary>
+		PageDown,
 
+		/// <summary>
+		/// Move the page up.
+		/// </summary>
+		PageUp,
+
+		/// <summary>
+		/// Move to begin.
+		/// </summary>
+		Home,
+
+		/// <summary>
+		/// Move to end.
+		/// </summary>
+		End,
+
+		/// <summary>
+		/// Open selected item.
+		/// </summary>
+		OpenSelectedItem,
+
+		/// <summary>
+		/// Toggle the checked state.
+		/// </summary>
+		ToggleChecked,
 	}
 }
