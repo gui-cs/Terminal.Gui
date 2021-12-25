@@ -54,7 +54,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Application.html",
-          "hash": "0GLDdY6YdzsU/ixJAfhnsojVMdk58fygYEr6CxcgBb0="
+          "hash": "G4w+EaQ/bOboYyhc/goZ83rgoEdmkvtFcdpgvlYBEu4="
         }
       },
       "is_incremental": false,
@@ -2939,12 +2939,15 @@
       "version": ""
     },
     {
+      "log_codes": [
+        "InvalidFileLink"
+      ],
       "type": "Conceptual",
       "source_relative_path": "index.md",
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "rbF71dvo6YXtidEfJuf4RZCfrBgJCyH/Cy1kOrHIR98="
+          "hash": "A6GZ87PPt6KNAuoQ4xzQnOi4h5I9vh6aeT7u5mLzy/E="
         }
       },
       "is_incremental": false,
