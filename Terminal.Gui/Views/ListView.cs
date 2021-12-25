@@ -323,6 +323,12 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDown, () => MoveDown ());
 			AddCommand (Command.LineScrollUp, () => ScrollUp (1));
 			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
+			AddCommand (Command.PageUp, () => MovePageUp ());
+			AddCommand (Command.PageDown, () => MovePageDown ());
+			AddCommand (Command.Home, () => MoveHome ());
+			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
 			AddKeyBinding (Key.CursorUp,Command.LineUp);
@@ -330,6 +336,19 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
 			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+
+			AddKeyBinding(Key.PageUp,Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.Home, Command.Home);
+
+			AddKeyBinding (Key.End, Command.End);
+
+			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		///<inheritdoc/>
@@ -388,35 +407,7 @@ namespace Terminal.Gui {
 			if (InvokeKeybindings (kb))
 				return true;
 
-			switch (kb.Key) {
-
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return MovePageDown ();
-
-			case Key.PageUp:
-				return MovePageUp ();
-
-			case Key.Space:
-				if (MarkUnmarkRow ())
-					return true;
-				else
-					break;
-
-			case Key.Enter:
-				return OnOpenSelectedItem ();
-
-			case Key.End:
-				return MoveEnd ();
-
-			case Key.Home:
-				return MoveHome ();
-
-			default:
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
 		/// <summary>
