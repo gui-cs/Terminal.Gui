@@ -24,7 +24,7 @@ namespace Terminal.Gui.Views {
 			Assert.False (pv.UsePanelFrame);
 			Assert.NotNull (pv.Child);
 			Assert.NotNull (pv.Border);
-			Assert.Null (pv.Child.Border);
+			Assert.NotNull (pv.Child.Border);
 		}
 
 		[Fact]
@@ -120,6 +120,19 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
+			Assert.False (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+
+			pv.Child.Border.Effect3D = true;
+
+			Assert.True (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+
+			pv.Child.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Point (-1, -1), pv.Child.Border.Effect3DOffset);
 			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
 		}
@@ -171,11 +184,31 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
 			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
 			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
+
+			pv.Child.Border.Effect3D = pv1.Child.Border.Effect3D = pv2.Child.Border.Effect3D = true;
+
+			Assert.True (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 78, 23), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 68, 9), pv.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 77, 22), pv1.Frame);
+			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
+			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
+
+			pv.Child.Border.Effect3DOffset = pv1.Child.Border.Effect3DOffset = pv2.Child.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Point (-1, -1), pv.Child.Border.Effect3DOffset);
+			Assert.Equal (new Rect (0, 0, 78, 23), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 68, 9), pv.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 77, 22), pv1.Frame);
+			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
+			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void UsePanelFrame_False_PanelView_Always_Respect_The_Child_Upper_Left_Corner_Position_And_Size ()
+		public void UsePanelFrame_False_PanelView_Always_Respect_The_PanelView_Upper_Left_Corner_Position_And_The_Child_Size ()
 		{
 			var top = Application.Top;
 			var win = new Window ();
@@ -208,17 +241,44 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
-			Assert.Equal (new Rect (0, 0, 15, 1), pv.Frame);
+			Assert.False (pv.UsePanelFrame);
+			Assert.False (pv.Border.Effect3D);
+			Assert.Equal (pv.Child.Border, pv.Border);
+			Assert.False (pv1.UsePanelFrame);
+			Assert.False (pv1.Border.Effect3D);
+			Assert.Equal (pv1.Child.Border, pv1.Border);
+			Assert.False (pv2.UsePanelFrame);
+			Assert.False (pv2.Border.Effect3D);
+			Assert.Equal (pv2.Child.Border, pv2.Border);
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
-			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Frame);
-			Assert.Equal (new Rect (0, 0, 15, 1), pv1.Child.Frame);
-			Assert.Equal (new Rect (5, 6, 73, 17), pv2.Frame);
-			Assert.Equal (new Rect (0, 0, 73, 17), pv2.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
+
+			pv.Border.Effect3D = pv1.Border.Effect3D = pv2.Border.Effect3D = true;
+
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
+
+			pv.Border.Effect3DOffset = pv1.Border.Effect3DOffset = pv2.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void UsePanelFrame_True_PanelView_Position_And_Size_Are_Used ()
+		public void UsePanelFrame_True_PanelView_Position_And_Size_Are_Used_Depending_On_Effect3DOffset ()
 		{
 			var top = Application.Top;
 			var win = new Window ();
@@ -253,9 +313,23 @@ namespace Terminal.Gui.Views {
 			Application.Begin (top);
 
 			Assert.Equal (new Rect (5, 6, 73, 17), pv.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
 			Assert.Equal (new Rect (2, 4, 20, 10), pv1.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), pv1.Child.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
+
+			pv.Border.Effect3D = pv1.Border.Effect3D = true;
+
+			Assert.Equal (new Rect (5, 6, 73, 17), pv.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv1.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
+
+			pv.Border.Effect3DOffset = pv1.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Rect (6, 7, 73, 17), pv.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (3, 5, 20, 10), pv1.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
 		}
 	}
 }
