@@ -303,7 +303,10 @@ namespace Terminal.Gui {
 				if (rune == '\t') {
 					size += tabWidth + 1;
 				}
-				if (size >= width) {
+				if (size > width) {
+					if (col + width == end) {
+						col++;
+					}
 					break;
 				} else if (end < t.Count && col > 0 && start < end && col == start) {
 					break;
