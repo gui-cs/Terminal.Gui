@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 
 			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
-			first = point > w ? point - w : 0;
+			first = point > w + 1 ? point - w + 1 : 0;
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;

@@ -1809,7 +1809,10 @@ namespace Terminal.Gui.Views {
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
-				if (sumLength >= width) {
+				if (sumLength > width) {
+					if (col + width == cCol) {
+						col++;
+					}
 					break;
 				} else if (cCol < line.Length && col > 0 && start < cCol && col == start) {
 					break;
@@ -1987,9 +1990,9 @@ line.
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
 
-			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
-			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
-			Assert.Equal (3, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
+			Assert.Equal (0, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
+			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
+			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
 			var tm = new TextModel ();
 			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
