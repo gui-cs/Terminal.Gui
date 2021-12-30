@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 		/// </param>
 		public Button (ustring text, bool is_default = false) : base (text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1), text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
 		Rune _leftBracket;
@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 		Rune _leftDefault;
 		Rune _rightDefault;
 
-		void Init (ustring text, bool is_default)
+		void Initialize (ustring text, bool is_default)
 		{
 			TextAlignment = TextAlignment.Centered;
 
@@ -112,6 +112,33 @@ namespace Terminal.Gui {
 			this.is_default = is_default;
 			this.text = text ?? string.Empty;
 			Update ();
+
+			HotKeyChanged += Button_HotKeyChanged;
+
+			// Things this view knows how to do
+			AddCommand (Command.AcceptKey, () => AcceptKey ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.AltMask | HotKey, Command.AcceptKey);
+			AddKeyBinding ((Key)'\n', Command.AcceptKey);
+
+			AddKeyBinding (Key.Enter, Command.AcceptKey);
+			AddKeyBinding (Key.Space, Command.AcceptKey);
+			if (HotKey != Key.Null) {
+				AddKeyBinding (Key.Space | HotKey, Command.AcceptKey);
+			}
+		}
+
+		private void Button_HotKeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (Key.AltMask | obj, Key.AltMask | HotKey);
+			if (HotKey != Key.Null) {
+				if (ContainsKeyBinding (obj)) {
+					ReplaceKeyBinding (Key.Space | obj, Key.Space | HotKey);
+				} else {
+					AddKeyBinding (Key.Space | HotKey, Command.AcceptKey);
+				}
+			}
 		}
 
 		/// <summary>
@@ -171,16 +198,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		bool CheckKey (KeyEvent key)
-		{
-			if (key.Key == (Key.AltMask | HotKey)) {
-				SetFocus ();
-				Clicked?.Invoke ();
-				return true;
-			}
-			return false;
-		}
-
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
@@ -188,8 +205,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (kb.IsAlt)
-				return CheckKey (kb);
+			if (kb.IsAlt && InvokeKeybindings (kb))
+				return true;
 
 			return false;
 		}
@@ -201,11 +218,10 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (IsDefault && kb.KeyValue == '\n') {
-				Clicked?.Invoke ();
+			if (IsDefault && InvokeKeybindings (kb))
 				return true;
-			}
-			return CheckKey (kb);
+
+			return false;
 		}
 
 		///<inheritdoc/>
@@ -215,14 +231,19 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || kb.Key == HotKey) {
-				Clicked?.Invoke ();
+			if (InvokeKeybindings (kb))
 				return true;
-			}
+
 			return base.ProcessKey (kb);
 		}
 
+		void AcceptKey ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			Clicked?.Invoke ();
+		}
 
 		/// <summary>
 		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>

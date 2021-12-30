@@ -110,5 +110,10 @@ namespace Terminal.Gui {
 		/// Toggle the checked state.
 		/// </summary>
 		ToggleChecked,
+
+		/// <summary>
+		/// Executes an accept key event.
+		/// </summary>
+		AcceptKey,
 	}
 }

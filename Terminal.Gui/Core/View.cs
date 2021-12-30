@@ -179,6 +179,11 @@ namespace Terminal.Gui {
 		public event Action VisibleChanged;
 
 		/// <summary>
+		/// Event invoked when the <see cref="HotKey"/> is changed.
+		/// </summary>
+		public event Action<Key> HotKeyChanged;
+
+		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
 		public Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
@@ -253,8 +258,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Configurable keybindings supported by the control
 		/// </summary>
-		private Dictionary<Key,Command> KeyBindings { get; set; } = new Dictionary<Key, Command>();
-		private Dictionary<Command,Action> CommandImplementations { get; set; } = new Dictionary<Command, Action> ();
+		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
+		private Dictionary<Command, Action> CommandImplementations { get; set; } = new Dictionary<Command, Action> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
@@ -715,6 +720,7 @@ namespace Terminal.Gui {
 			TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
 			textFormatter = new TextFormatter ();
+			textFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
 			if (Border != null) {
@@ -740,6 +746,11 @@ namespace Terminal.Gui {
 			Frame = r;
 
 			Text = text;
+		}
+
+		private void TextFormatter_HotKeyChanged (Key obj)
+		{
+			HotKeyChanged?.Invoke (obj);
 		}
 
 		/// <summary>
@@ -1556,20 +1567,19 @@ namespace Terminal.Gui {
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent"></param>
-		protected bool InvokeKeybindings(KeyEvent keyEvent)
+		protected bool InvokeKeybindings (KeyEvent keyEvent)
 		{
-			if(KeyBindings.ContainsKey(keyEvent.Key)) 
-			{
-				var command = KeyBindings[keyEvent.Key];
+			if (KeyBindings.ContainsKey (keyEvent.Key)) {
+				var command = KeyBindings [keyEvent.Key];
 
-				if(!CommandImplementations.ContainsKey(command)) {
-					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType().Name})");
+				if (!CommandImplementations.ContainsKey (command)) {
+					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
 				}
 
 				CommandImplementations [command] ();
 				return true;
 			}
-			
+
 			return false;
 		}
 
@@ -1586,18 +1596,41 @@ namespace Terminal.Gui {
 		public void AddKeyBinding (Key key, Command command)
 		{
 			if (KeyBindings.ContainsKey (key)) {
-				KeyBindings[key] = command;
-			}
-			else {
+				KeyBindings [key] = command;
+			} else {
 				KeyBindings.Add (key, command);
 			}
+		}
+
+		/// <summary>
+		/// Replaces a key combination already bound to <see cref="Command"/>.
+		/// </summary>
+		/// <param name="fromKey">The key to be replaced.</param>
+		/// <param name="toKey">The new key to be used.</param>
+		public void ReplaceKeyBinding (Key fromKey, Key toKey)
+		{
+			if (KeyBindings.ContainsKey (fromKey)) {
+				Command value = KeyBindings [fromKey];
+				KeyBindings.Remove (fromKey);
+				KeyBindings [toKey] = value;
+			}
+		}
+
+		/// <summary>
+		/// Checks if key combination already exist.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <returns><c>true</c> If the key already exist, <c>false</c>otherwise.</returns>
+		public bool ContainsKeyBinding (Key key)
+		{
+			return KeyBindings.ContainsKey (key);
 		}
 
 		/// <summary>
 		/// Removes all bound keys from the View making including the default
 		/// key combinations such as cursor navigation, scrolling etc
 		/// </summary>
-		public void ClearKeybindings()
+		public void ClearKeybindings ()
 		{
 			KeyBindings.Clear ();
 		}
@@ -1614,11 +1647,10 @@ namespace Terminal.Gui {
 		protected void AddCommand (Command command, Action action)
 		{
 			// if there is already an implementation of this command
-			if(CommandImplementations.ContainsKey(command)) {
+			if (CommandImplementations.ContainsKey (command)) {
 				// replace that implementation
 				CommandImplementations [command] = action;
-			}
-			else {
+			} else {
 				// else record how to perform the action (this should be the normal case)
 				CommandImplementations.Add (command, action);
 			}
