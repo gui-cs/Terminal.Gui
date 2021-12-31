@@ -47,11 +47,7 @@ namespace Terminal.Gui {
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
 		public CheckBox (ustring s, bool is_checked = false) : base ()
 		{
-			Checked = is_checked;
-			Text = s;
-			CanFocus = true;
-			Height = 1;
-			Width = s.RuneCount + 4;
+			Initialize (s, is_checked);
 		}
 
 		/// <summary>
@@ -74,10 +70,33 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
 		{
+			Initialize (s, is_checked);
+		}
+
+		void Initialize (ustring s, bool is_checked)
+		{
 			Checked = is_checked;
 			Text = s;
-
 			CanFocus = true;
+			Height = 1;
+			Width = s.RuneCount + 4;
+
+			HotKeyChanged += CheckBox_HotKeyChanged;
+
+			// Things this view knows how to do
+			AddCommand (Command.ExecuteHotKey, (_) => ToggleChecked ());
+			AddCommand (Command.ToggleChecked, (_) => ToggleChecked ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.AltMask | HotKey, Command.ExecuteHotKey);
+
+			AddKeyBinding ((Key)' ', Command.ToggleChecked);
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
+		}
+
+		private void CheckBox_HotKeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (Key.AltMask | obj, Key.AltMask | HotKey);
 		}
 
 		/// <summary>
@@ -138,29 +157,31 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (kb.KeyValue == ' ') {
-				var previousChecked = Checked;
-				Checked = !Checked;
-				OnToggled (previousChecked);
-				SetNeedsDisplay ();
+			if (InvokeKeybindings (kb))
 				return true;
-			}
+
 			return base.ProcessKey (kb);
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent ke)
+		public override bool ProcessHotKey (KeyEvent kb)
 		{
-			if (ke.Key == (Key.AltMask | HotKey)) {
-				SetFocus ();
-				var previousChecked = Checked;
-				Checked = !Checked;
-				OnToggled (previousChecked);
-				SetNeedsDisplay ();
+			if (InvokeKeybindings (kb))
 				return true;
-			}
 
 			return false;
+		}
+
+		bool ToggleChecked ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			var previousChecked = Checked;
+			Checked = !Checked;
+			OnToggled (previousChecked);
+			SetNeedsDisplay ();
+			return true;
 		}
 
 		///<inheritdoc/>
