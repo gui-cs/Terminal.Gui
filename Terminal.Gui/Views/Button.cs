@@ -116,11 +116,13 @@ namespace Terminal.Gui {
 			HotKeyChanged += Button_HotKeyChanged;
 
 			// Things this view knows how to do
-			AddCommand (Command.AcceptKey, () => AcceptKey ());
+			AddCommand (Command.ExecuteHotKey, (e) => ExecuteHotKey (e));
+			AddCommand (Command.ExecuteColdKey, (_) => ExecuteColdKey ());
+			AddCommand (Command.AcceptKey, (_) => AcceptKey ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.AltMask | HotKey, Command.AcceptKey);
-			AddKeyBinding ((Key)'\n', Command.AcceptKey);
+			AddKeyBinding (Key.AltMask | HotKey, Command.ExecuteHotKey);
+			AddKeyBinding ((Key)'\n', Command.ExecuteColdKey);
 
 			AddKeyBinding (Key.Enter, Command.AcceptKey);
 			AddKeyBinding (Key.Space, Command.AcceptKey);
@@ -205,7 +207,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (kb.IsAlt && InvokeKeybindings (kb))
+			if (InvokeKeybindings (kb))
 				return true;
 
 			return false;
@@ -214,11 +216,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
-			if (!Enabled) {
+			if (!Enabled || !IsDefault) {
 				return false;
 			}
 
-			if (IsDefault && InvokeKeybindings (kb))
+			if (InvokeKeybindings (kb))
 				return true;
 
 			return false;
@@ -237,12 +239,29 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
-		void AcceptKey ()
+		bool ExecuteHotKey (KeyEvent ke)
+		{
+			if (ke.IsAlt) {
+				return AcceptKey ();
+			}
+			return false;
+		}
+
+		bool ExecuteColdKey ()
+		{
+			if (IsDefault) {
+				return AcceptKey ();
+			}
+			return false;
+		}
+
+		bool AcceptKey ()
 		{
 			if (!HasFocus) {
 				SetFocus ();
 			}
 			Clicked?.Invoke ();
+			return true;
 		}
 
 		/// <summary>
