@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 		/// Configurable keybindings supported by the control
 		/// </summary>
 		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
-		private Dictionary<Command, Func<KeyEvent, bool>> CommandImplementations { get; set; } = new Dictionary<Command, Func<KeyEvent, bool>> ();
+		private Dictionary<Command, Func<object [], bool>> CommandImplementations { get; set; } = new Dictionary<Command, Func<object [], bool>> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
@@ -1566,8 +1566,9 @@ namespace Terminal.Gui {
 		/// Invokes any binding that is registered on this <see cref="View"/>
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
-		/// <param name="keyEvent"></param>
-		protected bool InvokeKeybindings (KeyEvent keyEvent)
+		/// <param name="keyEvent">The key event passed.</param>
+		/// <param name="args">The arguments to send to the command.</param>
+		protected bool InvokeKeybindings (KeyEvent keyEvent, params object [] args)
 		{
 			if (KeyBindings.ContainsKey (keyEvent.Key)) {
 				var command = KeyBindings [keyEvent.Key];
@@ -1576,7 +1577,7 @@ namespace Terminal.Gui {
 					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
 				}
 
-				return CommandImplementations [command] (keyEvent);
+				return CommandImplementations [command] (args);
 			}
 
 			return false;
@@ -1643,7 +1644,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="command">The command.</param>
 		/// <param name="f">The function.</param>
-		protected void AddCommand (Command command, Func<KeyEvent, bool> f)
+		protected void AddCommand (Command command, Func<object [], bool> f)
 		{
 			// if there is already an implementation of this command
 			if (CommandImplementations.ContainsKey (command)) {
