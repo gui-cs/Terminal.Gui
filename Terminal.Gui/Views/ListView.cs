@@ -319,16 +319,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 
 			// Things this view knows how to do
-			AddCommand (Command.LineUp, () => MoveUp ());
-			AddCommand (Command.LineDown, () => MoveDown ());
-			AddCommand (Command.LineScrollUp, () => ScrollUp (1));
-			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
-			AddCommand (Command.PageUp, () => MovePageUp ());
-			AddCommand (Command.PageDown, () => MovePageDown ());
-			AddCommand (Command.Home, () => MoveHome ());
-			AddCommand (Command.End, () => MoveEnd ());
-			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
-			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
+			AddCommand (Command.LineUp, (_) => MoveUp ());
+			AddCommand (Command.LineDown, (_) => MoveDown ());
+			AddCommand (Command.LineScrollUp, (_) => ScrollUp (1));
+			AddCommand (Command.LineScrollDown, (_) => ScrollDown (1));
+			AddCommand (Command.PageUp, (_) => MovePageUp ());
+			AddCommand (Command.PageDown, (_) => MovePageDown ());
+			AddCommand (Command.Home, (_) => MoveHome ());
+			AddCommand (Command.End, (_) => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, (_) => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, (_) => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
 			AddKeyBinding (Key.CursorUp,Command.LineUp);
@@ -591,40 +591,44 @@ namespace Terminal.Gui {
 		/// Scrolls the view down.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll down.</param>
-		public virtual void ScrollDown (int lines)
+		public virtual bool ScrollDown (int lines)
 		{
 			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll up.</param>
-		public virtual void ScrollUp (int lines)
+		public virtual bool ScrollUp (int lines)
 		{
 			top = Math.Max (top - lines, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view right.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll right.</param>
-		public virtual void ScrollRight (int cols)
+		public virtual bool ScrollRight (int cols)
 		{
 			left = Math.Max (Math.Min (left + cols, Maxlength - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view left.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll left.</param>
-		public virtual void ScrollLeft (int cols)
+		public virtual bool ScrollLeft (int cols)
 		{
 			left = Math.Max (left - cols, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		int lastSelectedItem = -1;
