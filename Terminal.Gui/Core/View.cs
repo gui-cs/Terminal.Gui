@@ -1607,7 +1607,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="fromKey">The key to be replaced.</param>
 		/// <param name="toKey">The new key to be used.</param>
-		public void ReplaceKeyBinding (Key fromKey, Key toKey)
+		protected void ReplaceKeyBinding (Key fromKey, Key toKey)
 		{
 			if (KeyBindings.ContainsKey (fromKey)) {
 				Command value = KeyBindings [fromKey];

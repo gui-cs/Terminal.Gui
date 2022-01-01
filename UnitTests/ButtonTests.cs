@@ -73,5 +73,29 @@ namespace Terminal.Gui.Views {
 			Assert.True (btn.ProcessKey (new KeyEvent ((Key)'t', new KeyModifiers ())));
 			Assert.True (clicked);
 		}
+
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ChangeHotKey ()
+		{
+			var clicked = false;
+			Button btn = new Button ("Test");
+			btn.Clicked += () => clicked = true;
+			Application.Top.Add (btn);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (Key.T, btn.HotKey);
+			Assert.False (btn.ProcessHotKey (new KeyEvent (Key.T, new KeyModifiers ())));
+			Assert.False (clicked);
+			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (clicked);
+			clicked = false;
+
+			btn.HotKey = Key.E;
+			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (clicked);
+
+		}
 	}
 }
