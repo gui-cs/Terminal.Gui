@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			HotKeyChanged += Button_HotKeyChanged;
 
 			// Things this view knows how to do
-			AddCommand (Command.ExecuteHotKey, (e) => ExecuteHotKey (e [0] as KeyEvent));
+			AddCommand (Command.ExecuteHotKey, (e) => ExecuteHotKey (e));
 			AddCommand (Command.ExecuteColdKey, (_) => ExecuteColdKey ());
 			AddCommand (Command.AcceptKey, (_) => AcceptKey ());
 
@@ -207,7 +207,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (InvokeKeybindings (kb, kb))
+			if (InvokeKeybindings (kb))
 				return true;
 
 			return false;
