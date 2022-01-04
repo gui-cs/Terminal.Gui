@@ -174,7 +174,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///    Sets or gets the current cursor position.
 		/// </summary>
-		public int CursorPosition {
+		public virtual int CursorPosition {
 			get { return point; }
 			set {
 				if (value < 0) {

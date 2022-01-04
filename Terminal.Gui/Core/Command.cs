@@ -150,6 +150,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Unix emulation
 		/// </summary>
-		UnixEmulation
+		UnixEmulation,
+
+		/// <summary>
+		/// Deletes the character on the right.
+		/// </summary>
+		DeleteCharRight,
+
+		/// <summary>
+		/// Deletes the character on the left.
+		/// </summary>
+		DeleteCharLeft
 	}
 }

@@ -26,8 +26,8 @@ namespace Terminal.Gui {
 		string longFormat;
 		string shortFormat;
 
-		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
-		string Format { get { return isShort ? shortFormat : longFormat; } }
+		int fieldLen => isShort ? shortFieldLen : longFieldLen;
+		string format => isShort ? shortFormat : longFormat;
 
 		/// <summary>
 		///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -49,8 +49,7 @@ namespace Terminal.Gui {
 		/// <param name="isShort">If true, shows only two digits for the year.</param>
 		public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "")
 		{
-			this.isShort = isShort;
-			Initialize (date);
+			Initialize (date, isShort);
 		}
 
 		/// <summary>
@@ -64,20 +63,47 @@ namespace Terminal.Gui {
 		/// <param name="date"></param>
 		public DateField (DateTime date) : base ("")
 		{
-			this.isShort = true;
-			Width = FieldLen + 2;
+			Width = fieldLen + 2;
 			Initialize (date);
 		}
 
-		void Initialize (DateTime date)
+		void Initialize (DateTime date, bool isShort = false)
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
 			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
 			shortFormat = GetShortFormat (longFormat);
-			CursorPosition = 1;
+			this.isShort = isShort;
 			Date = date;
+			CursorPosition = 1;
 			TextChanged += DateField_Changed;
+
+			// Things this view knows how to do
+			AddCommand (Command.DeleteCharRight, (_) => DeleteCharRight ());
+			AddCommand (Command.DeleteCharLeft, (_) => DeleteCharLeft ());
+			AddCommand (Command.Home, (_) => MoveHome ());
+			AddCommand (Command.CharLeft, (_) => MoveLeft ());
+			AddCommand (Command.End, (_) => MoveEnd ());
+			AddCommand (Command.CharRight, (_) => MoveRight ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
+			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+
+			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
+			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+
+			AddKeyBinding (Key.Home, Command.Home);
+			AddKeyBinding (Key.A | Key.CtrlMask, Command.Home);
+
+			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.CharLeft);
+
+			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.E | Key.CtrlMask, Command.End);
+
+			AddKeyBinding (Key.CursorRight, Command.CharRight);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.CharRight);
 		}
 
 		void DateField_Changed (ustring e)
@@ -129,8 +155,8 @@ namespace Terminal.Gui {
 
 				var oldData = date;
 				date = value;
-				this.Text = value.ToString (Format);
-				var args = new DateTimeEventArgs<DateTime> (oldData, value, Format);
+				this.Text = value.ToString (format);
+				var args = new DateTimeEventArgs<DateTime> (oldData, value, format);
 				if (oldData != value) {
 					OnDateChanged (args);
 				}
@@ -157,12 +183,20 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override int CursorPosition {
+			get => base.CursorPosition;
+			set {
+				base.CursorPosition = Math.Max (Math.Min (value, fieldLen), 1);
+			}
+		}
+
 		bool SetText (Rune key)
 		{
 			var text = TextModel.ToRunes (Text);
 			var newText = text.GetRange (0, CursorPosition);
 			newText.Add (key);
-			if (CursorPosition < FieldLen)
+			if (CursorPosition < fieldLen)
 				newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
 			return SetText (ustring.Make (newText));
 		}
@@ -174,7 +208,7 @@ namespace Terminal.Gui {
 			}
 
 			ustring [] vals = text.Split (ustring.Make (sepChar));
-			ustring [] frm = ustring.Make (Format).Split (ustring.Make (sepChar));
+			ustring [] frm = ustring.Make (format).Split (ustring.Make (sepChar));
 			bool isValidDate = true;
 			int idx = GetFormatIndex (frm, "y");
 			int year = Int32.Parse (vals [idx].ToString ());
@@ -204,7 +238,7 @@ namespace Terminal.Gui {
 				day = Int32.Parse (vals [idx].ToString ());
 			string d = GetDate (month, day, year, frm);
 
-			if (!DateTime.TryParseExact (d, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+			if (!DateTime.TryParseExact (d, format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
 				!isValidDate)
 				return false;
 			Date = result;
@@ -238,7 +272,7 @@ namespace Terminal.Gui {
 		ustring GetDate (ustring text)
 		{
 			ustring [] vals = text.Split (ustring.Make (sepChar));
-			ustring [] frm = ustring.Make (Format).Split (ustring.Make (sepChar));
+			ustring [] frm = ustring.Make (format).Split (ustring.Make (sepChar));
 			ustring [] date = { null, null, null };
 
 			for (int i = 0; i < frm.Length; i++) {
@@ -274,7 +308,7 @@ namespace Terminal.Gui {
 
 		void IncCursorPosition ()
 		{
-			if (CursorPosition == FieldLen)
+			if (CursorPosition == fieldLen)
 				return;
 			if (Text [++CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
@@ -297,57 +331,63 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			switch (kb.Key) {
-			case Key.DeleteChar:
-			case Key.D | Key.CtrlMask:
-				if (ReadOnly)
-					return true;
-
-				SetText ('0');
-				break;
-
-			case Key.Delete:
-			case Key.Backspace:
-				if (ReadOnly)
-					return true;
-
-				SetText ('0');
-				DecCursorPosition ();
-				break;
-
-			// Home, C-A
-			case Key.Home:
-			case Key.A | Key.CtrlMask:
-				CursorPosition = 1;
-				break;
-
-			case Key.CursorLeft:
-			case Key.B | Key.CtrlMask:
-				DecCursorPosition ();
-				break;
-
-			case Key.End:
-			case Key.E | Key.CtrlMask: // End
-				CursorPosition = FieldLen;
-				break;
-
-			case Key.CursorRight:
-			case Key.F | Key.CtrlMask:
-				IncCursorPosition ();
-				break;
-
-			default:
-				// Ignore non-numeric characters.
-				if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9'))
-					return false;
-
-				if (ReadOnly)
-					return true;
-
-				if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
-					IncCursorPosition ();
+			if (InvokeKeybindings (kb))
 				return true;
-			}
+
+			// Ignore non-numeric characters.
+			if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9'))
+				return false;
+
+			if (ReadOnly)
+				return true;
+
+			if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
+				IncCursorPosition ();
+
+			return true;
+		}
+
+		bool MoveRight ()
+		{
+			IncCursorPosition ();
+			return true;
+		}
+
+		bool MoveEnd ()
+		{
+			CursorPosition = fieldLen;
+			return true;
+		}
+
+		bool MoveLeft ()
+		{
+			DecCursorPosition ();
+			return true;
+		}
+
+		bool MoveHome ()
+		{
+			// Home, C-A
+			CursorPosition = 1;
+			return true;
+		}
+
+		bool DeleteCharLeft ()
+		{
+			if (ReadOnly)
+				return true;
+
+			SetText ('0');
+			DecCursorPosition ();
+			return true;
+		}
+
+		bool DeleteCharRight ()
+		{
+			if (ReadOnly)
+				return true;
+
+			SetText ('0');
 			return true;
 		}
 
@@ -360,8 +400,8 @@ namespace Terminal.Gui {
 				SetFocus ();
 
 			var point = ev.X;
-			if (point > FieldLen)
-				point = FieldLen;
+			if (point > fieldLen)
+				point = fieldLen;
 			if (point < 1)
 				point = 1;
 			CursorPosition = point;
@@ -386,7 +426,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The old <see cref="DateField"/> or <see cref="TimeField"/> value.
 		/// </summary>
-		public T OldValue {get;}
+		public T OldValue { get; }
 
 		/// <summary>
 		/// The new <see cref="DateField"/> or <see cref="TimeField"/> value.
