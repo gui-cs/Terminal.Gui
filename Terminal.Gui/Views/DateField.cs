@@ -72,8 +72,8 @@ namespace Terminal.Gui {
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
 			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
-			this.isShort = isShort;
 			shortFormat = GetShortFormat (longFormat);
+			this.isShort = isShort;
 			Date = date;
 			CursorPosition = 1;
 			TextChanged += DateField_Changed;
@@ -341,12 +341,10 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
-			if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ())) {
+			if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
 				IncCursorPosition ();
-				return true;
-			}
 
-			return false;
+			return true;
 		}
 
 		bool MoveRight ()
