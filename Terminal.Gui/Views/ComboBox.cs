@@ -159,27 +159,29 @@ namespace Terminal.Gui {
 			};
 
 			// Things this view knows how to do
-			AddCommand (Command.AcceptKey, (_) => ActivateSelected ());
-			AddCommand (Command.ExpandCollapse, (_) => ExpandCollapse ());
+			AddCommand (Command.Accept, (_) => ActivateSelected ());
+			AddCommand (Command.ToggleExpandCollapse, (_) => ExpandCollapse ());
+			AddCommand (Command.Expand, (_) => Expand ());
+			AddCommand (Command.Collapse, (_) => Collapse ());
 			AddCommand (Command.LineDown, (_) => MoveDown ());
 			AddCommand (Command.LineUp, (_) => MoveUp ());
 			AddCommand (Command.PageDown, (_) => PageDown ());
 			AddCommand (Command.PageUp, (_) => PageUp ());
 			AddCommand (Command.Home, (_) => MoveHome ());
 			AddCommand (Command.End, (_) => MoveEnd ());
-			AddCommand (Command.CancelKey, (_) => CancelSelected ());
+			AddCommand (Command.Cancel, (_) => CancelSelected ());
 			AddCommand (Command.UnixEmulation, (_) => UnixEmulation ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.AcceptKey);
-			AddKeyBinding (Key.F4, Command.ExpandCollapse);
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.F4, Command.ToggleExpandCollapse);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.PageDown, Command.PageDown);
 			AddKeyBinding (Key.PageUp, Command.PageUp);
 			AddKeyBinding (Key.Home, Command.Home);
 			AddKeyBinding (Key.End, Command.End);
-			AddKeyBinding (Key.Esc, Command.CancelKey);
+			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
 
@@ -345,6 +347,7 @@ namespace Terminal.Gui {
 			search.SetFocus ();
 			search.Text = text = "";
 			OnSelectedChanged ();
+			Collapse ();
 			return true;
 		}
 
@@ -411,15 +414,18 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Toggles the expand/collapse state of the sublist in the combo box
+		/// </summary>
+		/// <returns></returns>
 		bool ExpandCollapse ()
 		{
 			if (search.HasFocus || listview.HasFocus) {
 				if (!isShow) {
-					Expand ();
+					return Expand ();
 				} else {
-					Collapse ();
+					return Collapse ();
 				}
-				return true;
 			}
 			return false;
 		}
@@ -439,31 +445,36 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Collapses the drop down list.
+		/// Collapses the drop down list.  Returns true if the state chagned or false
+		/// if it was already collapsed and no action was taken
 		/// </summary>
-		public virtual void Collapse ()
+		public virtual bool Collapse ()
 		{
 			if (!isShow) {
-				return;
+				return false;
 			}
 
 			isShow = false;
 			HideList ();
+			return true;
 		}
 
 		/// <summary>
-		/// Expands the drop down list.
+		/// Expands the drop down list.  Returns true if the state chagned or false
+		/// if it was already expanded and no action was taken
 		/// </summary>
-		public virtual void Expand ()
+		public virtual bool Expand ()
 		{
 			if (isShow) {
-				return;
+				return false;
 			}
 
 			SetSearchSet ();
 			isShow = true;
 			ShowList ();
 			FocusSelectedItem ();
+
+			return true;
 		}
 
 		/// <summary>

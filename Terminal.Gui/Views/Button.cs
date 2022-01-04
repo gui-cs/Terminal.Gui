@@ -118,16 +118,16 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.ExecuteHotKey, (e) => ExecuteHotKey (e));
 			AddCommand (Command.ExecuteColdKey, (_) => ExecuteColdKey ());
-			AddCommand (Command.AcceptKey, (_) => AcceptKey ());
+			AddCommand (Command.Accept, (_) => AcceptKey ());
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.AltMask | HotKey, Command.ExecuteHotKey);
 			AddKeyBinding ((Key)'\n', Command.ExecuteColdKey);
 
-			AddKeyBinding (Key.Enter, Command.AcceptKey);
-			AddKeyBinding (Key.Space, Command.AcceptKey);
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
-				AddKeyBinding (Key.Space | HotKey, Command.AcceptKey);
+				AddKeyBinding (Key.Space | HotKey, Command.Accept);
 			}
 		}
 
@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 				if (ContainsKeyBinding (obj)) {
 					ReplaceKeyBinding (Key.Space | obj, Key.Space | HotKey);
 				} else {
-					AddKeyBinding (Key.Space | HotKey, Command.AcceptKey);
+					AddKeyBinding (Key.Space | HotKey, Command.Accept);
 				}
 			}
 		}

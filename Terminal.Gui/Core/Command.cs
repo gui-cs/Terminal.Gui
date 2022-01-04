@@ -122,19 +122,30 @@ namespace Terminal.Gui {
 		ExecuteColdKey,
 
 		/// <summary>
-		/// Executes an accept key event.
+		/// Accepts the current state (e.g. selection, button press etc)
 		/// </summary>
-		AcceptKey,
+		Accept,
 
 		/// <summary>
-		/// Expands or collapses a list.
+		/// Toggles the Expanded or collapsed state of a a list or item (with subitems)
 		/// </summary>
-		ExpandCollapse,
+		ToggleExpandCollapse,
 
 		/// <summary>
-		/// Cancel a key event.
+		/// Expands a list or item (with subitems)
 		/// </summary>
-		CancelKey,
+		Expand,
+
+		/// <summary>
+		/// Collapses a list or item (with subitems)
+		/// </summary>
+		Collapse,
+
+		/// <summary>
+		/// Cancels any current temporary states on the control e.g. expanding
+		/// a combo list
+		/// </summary>
+		Cancel,
 
 		/// <summary>
 		/// Unix emulation
