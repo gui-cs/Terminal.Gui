@@ -125,5 +125,20 @@ namespace Terminal.Gui {
 		/// Executes an accept key event.
 		/// </summary>
 		AcceptKey,
+
+		/// <summary>
+		/// Expands or collapses a list.
+		/// </summary>
+		ExpandCollapse,
+
+		/// <summary>
+		/// Cancel a key event.
+		/// </summary>
+		CancelKey,
+
+		/// <summary>
+		/// Unix emulation
+		/// </summary>
+		UnixEmulation
 	}
 }
