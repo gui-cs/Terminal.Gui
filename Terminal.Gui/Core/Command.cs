@@ -20,7 +20,12 @@ namespace Terminal.Gui {
 		LineDownExtend,
 
 		/// <summary>
-		/// Scrolls down one line.
+		/// Moves the caret down to the last child node of the branch that holds the current selection
+		/// </summary>
+		LineDownToLastBranch,
+
+		/// <summary>
+		/// Scrolls down one line (without changing the selection).
 		/// </summary>
 		LineScrollDown,
 
@@ -37,7 +42,12 @@ namespace Terminal.Gui {
 		LineUpExtend,
 
 		/// <summary>
-		/// Scrolls up one line.
+		/// Moves the caret up to the first child node of the branch that holds the current selection
+		/// </summary>
+		LineUpToFirstBranch,
+
+		/// <summary>
+		/// Scrolls up one line (without changing the selection).
 		/// </summary>
 		LineScrollUp,
 
@@ -87,9 +97,19 @@ namespace Terminal.Gui {
 		PageDown,
 
 		/// <summary>
+		/// Move the page down increase selection area to cover revealed objects/characters.
+		/// </summary>
+		PageDownExtend,
+
+		/// <summary>
 		/// Move the page up.
 		/// </summary>
 		PageUp,
+
+		/// <summary>
+		/// Move the page up increase selection area to cover revealed objects/characters.
+		/// </summary>
+		PageUpExtend,
 
 		/// <summary>
 		/// Move to begin.
@@ -137,9 +157,19 @@ namespace Terminal.Gui {
 		Expand,
 
 		/// <summary>
+		/// Recursively Expands all child items and their child items (if any)
+		/// </summary>
+		ExpandAll,
+
+		/// <summary>
 		/// Collapses a list or item (with subitems)
 		/// </summary>
 		Collapse,
+
+		/// <summary>
+		/// Recursively collapses a list items of their children (if any)
+		/// </summary>
+		CollapseAll,
 
 		/// <summary>
 		/// Cancels any current temporary states on the control e.g. expanding
@@ -160,6 +190,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Deletes the character on the left.
 		/// </summary>
-		DeleteCharLeft
+		DeleteCharLeft,
+
+		/// <summary>
+		/// Selects all objects in the control
+		/// </summary>
+		SelectAll
 	}
 }

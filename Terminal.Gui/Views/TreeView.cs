@@ -2,11 +2,11 @@
 // by phillip.piper@gmail.com).  Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
+using NStack;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using NStack;
 using Terminal.Gui.Trees;
 
 namespace Terminal.Gui {
@@ -211,6 +211,52 @@ namespace Terminal.Gui {
 		public TreeView () : base ()
 		{
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.PageUp, (_) => { MovePageUp (false); return true; });
+			AddCommand (Command.PageDown, (_) => { MovePageDown (false); return true; });
+			AddCommand (Command.PageUpExtend, (_) => { MovePageUp (true); return true; });
+			AddCommand (Command.PageDownExtend, (_) => { MovePageDown (true); return true; });
+			AddCommand (Command.Expand, (_) => { Expand (); return true; });
+			AddCommand (Command.ExpandAll, (_) => { ExpandAll (SelectedObject); return true; });
+			AddCommand (Command.Collapse, (e) => { CursorLeft (false); return true; });
+			AddCommand (Command.CollapseAll, (e) => { CursorLeft (true); return true; });
+			AddCommand (Command.LineUp, (_) => { AdjustSelection (-1,false); return true; });
+			AddCommand (Command.LineUpExtend, (_) => { AdjustSelection (-1, true); return true; });
+			AddCommand (Command.LineUpToFirstBranch, (_) => { AdjustSelectionToBranchStart (); return true; });
+
+			AddCommand (Command.LineDown, (_) => { AdjustSelection (1, false); return true; });
+			AddCommand (Command.LineDownExtend, (_) => { AdjustSelection (1, true); return true; });
+			AddCommand (Command.LineDownToLastBranch, (_) => { AdjustSelectionToBranchEnd (); return true; });
+
+			AddCommand (Command.Home, (_) => { GoToFirst (); return true; });
+			AddCommand (Command.End, (_) => { GoToEnd (); return true; });
+			AddCommand (Command.SelectAll, (_) => { SelectAll (); return true; });
+
+			AddCommand (Command.LineScrollUp, (_) => { ScrollUp (); return true; });
+			AddCommand (Command.LineScrollDown, (_) => { ScrollDown (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.PageUp, Command.PageUp);
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
+			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
+			AddKeyBinding (Key.CursorRight, Command.Expand);
+			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.ExpandAll);
+			AddKeyBinding (Key.CursorLeft, Command.Collapse);
+			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.CollapseAll);
+			
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
+			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LineUpToFirstBranch);
+
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
+			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.LineDownToLastBranch);
+
+			AddKeyBinding (Key.Home, Command.Home);
+			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
 		}
 
 		/// <summary>
@@ -480,9 +526,13 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			if (!Enabled) {
+				return false;
+			}
+
 			if (keyEvent.Key == ObjectActivationKey) {
 
-				ActivateSelectedObjectIfAny();
+				ActivateSelectedObjectIfAny ();
 				return true;
 			}
 
@@ -492,63 +542,19 @@ namespace Terminal.Gui {
 				if (char.IsLetterOrDigit ((char)keyEvent.KeyValue) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl) {
 					AdjustSelectionToNextItemBeginningWith ((char)keyEvent.KeyValue);
 					return true;
-				}	
+				}
 			}
 
+			try {
+				if (InvokeKeybindings (keyEvent)) {
+					return true;
+				}
+			} finally {
 
-			switch (keyEvent.Key) {
-
-			case Key.CursorRight:
-				Expand (SelectedObject);
-				break;
-			case Key.CursorRight | Key.CtrlMask:
-				ExpandAll (SelectedObject);
-				break;
-			case Key.CursorLeft:
-			case Key.CursorLeft | Key.CtrlMask:
-				CursorLeft (keyEvent.Key.HasFlag (Key.CtrlMask));
-				break;
-
-			case Key.CursorUp:
-			case Key.CursorUp | Key.ShiftMask:
-				AdjustSelection (-1, keyEvent.Key.HasFlag (Key.ShiftMask));
-				break;
-			case Key.CursorDown:
-			case Key.CursorDown | Key.ShiftMask:
-				AdjustSelection (1, keyEvent.Key.HasFlag (Key.ShiftMask));
-				break;
-			case Key.CursorUp | Key.CtrlMask:
-				AdjustSelectionToBranchStart ();
-				break;
-			case Key.CursorDown | Key.CtrlMask:
-				AdjustSelectionToBranchEnd ();
-				break;
-			case Key.PageUp:
-			case Key.PageUp | Key.ShiftMask:
-				MovePageUp (keyEvent.Key.HasFlag (Key.ShiftMask));
-				break;
-
-			case Key.PageDown:
-			case Key.PageDown | Key.ShiftMask:
-				MovePageDown (keyEvent.Key.HasFlag (Key.ShiftMask));
-				break;
-			case Key.A | Key.CtrlMask:
-				SelectAll ();
-				break;
-			case Key.Home:
-				GoToFirst ();
-				break;
-			case Key.End:
-				GoToEnd ();
-				break;
-
-			default:
-				// we don't care about this keystroke
-				return false;
+				PositionCursor ();
 			}
 
-			PositionCursor ();
-			return true;
+			return base.ProcessKey (keyEvent);
 		}
 
 
@@ -603,6 +609,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Scrolls the view area down a single line without changing the current selection
+		/// </summary>
+		public void ScrollDown ()
+		{
+			ScrollOffsetVertical++;
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Scrolls the view area up a single line without changing the current selection
+		/// </summary>
+		public void ScrollUp ()
+		{
+			ScrollOffsetVertical--;
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
 		/// Raises the <see cref="ObjectActivated"/> event
 		/// </summary>
 		/// <param name="e"></param>
@@ -633,13 +657,11 @@ namespace Terminal.Gui {
 
 			if (me.Flags == MouseFlags.WheeledDown) {
 
-				ScrollOffsetVertical++;
-				SetNeedsDisplay ();
+				ScrollDown ();
 
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
-				ScrollOffsetVertical--;
-				SetNeedsDisplay ();
+				ScrollUp ();
 
 				return true;
 			}
@@ -751,7 +773,7 @@ namespace Terminal.Gui {
 			if (CanFocus && HasFocus && Visible && SelectedObject != null) {
 
 				var map = BuildLineMap ();
-				var idx = map.IndexOf(b => b.Model.Equals (SelectedObject));
+				var idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
 
 				// if currently selected line is visible
 				if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Bounds.Height) {
@@ -854,7 +876,7 @@ namespace Terminal.Gui {
 			} else {
 				var map = BuildLineMap ();
 
-				var idx = map.IndexOf(b => b.Model.Equals (SelectedObject));
+				var idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
 
 				if (idx == -1) {
 
@@ -863,7 +885,7 @@ namespace Terminal.Gui {
 				} else {
 					var newIdx = Math.Min (Math.Max (0, idx + offset), map.Count - 1);
 
-					var newBranch = map.ElementAt(newIdx);
+					var newBranch = map.ElementAt (newIdx);
 
 					// If it is a multi selection
 					if (expandSelection && MultiSelect) {
@@ -873,7 +895,7 @@ namespace Terminal.Gui {
 							multiSelectedRegions.Push (new TreeSelection<T> (head.Origin, newIdx, map));
 						} else {
 							// or start a new multi selection region
-							multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt(idx), newIdx, map));
+							multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt (idx), newIdx, map));
 						}
 					}
 
@@ -899,13 +921,13 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			int currentIdx = map.IndexOf(b => Equals (b.Model, o));
+			int currentIdx = map.IndexOf (b => Equals (b.Model, o));
 
 			if (currentIdx == -1) {
 				return;
 			}
 
-			var currentBranch = map.ElementAt(currentIdx);
+			var currentBranch = map.ElementAt (currentIdx);
 			var next = currentBranch;
 
 			for (; currentIdx >= 0; currentIdx--) {
@@ -920,7 +942,7 @@ namespace Terminal.Gui {
 
 				// look at next branch up for consideration
 				currentBranch = next;
-				next = map.ElementAt(currentIdx);
+				next = map.ElementAt (currentIdx);
 			}
 
 			// We ran all the way to top of tree
@@ -939,13 +961,13 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			int currentIdx = map.IndexOf(b => Equals (b.Model, o));
+			int currentIdx = map.IndexOf (b => Equals (b.Model, o));
 
 			if (currentIdx == -1) {
 				return;
 			}
 
-			var currentBranch = map.ElementAt(currentIdx);
+			var currentBranch = map.ElementAt (currentIdx);
 			var next = currentBranch;
 
 			for (; currentIdx < map.Count; currentIdx++) {
@@ -960,7 +982,7 @@ namespace Terminal.Gui {
 
 				// look at next branch for consideration
 				currentBranch = next;
-				next = map.ElementAt(currentIdx);
+				next = map.ElementAt (currentIdx);
 			}
 
 			GoToEnd ();
@@ -985,7 +1007,7 @@ namespace Terminal.Gui {
 
 			// or the current selected branch
 			if (SelectedObject != null) {
-				idxStart = map.IndexOf(b => Equals (b.Model, SelectedObject));
+				idxStart = map.IndexOf (b => Equals (b.Model, SelectedObject));
 			}
 
 			// if currently selected object mysteriously vanished, search from beginning
@@ -995,9 +1017,9 @@ namespace Terminal.Gui {
 
 			// loop around all indexes and back to first index
 			for (int idxCur = (idxStart + 1) % map.Count; idxCur != idxStart; idxCur = (idxCur + 1) % map.Count) {
-				if (predicate (map.ElementAt(idxCur))) {
-					SelectedObject = map.ElementAt(idxCur).Model;
-					EnsureVisible (map.ElementAt(idxCur).Model);
+				if (predicate (map.ElementAt (idxCur))) {
+					SelectedObject = map.ElementAt (idxCur).Model;
+					EnsureVisible (map.ElementAt (idxCur).Model);
 					SetNeedsDisplay ();
 					return;
 				}
@@ -1012,7 +1034,7 @@ namespace Terminal.Gui {
 		{
 			var map = BuildLineMap ();
 
-			var idx = map.IndexOf(b => Equals (b.Model, model));
+			var idx = map.IndexOf (b => Equals (b.Model, model));
 
 			if (idx == -1) {
 				return;
@@ -1030,6 +1052,14 @@ namespace Terminal.Gui {
 				//if user has scrolled off bottom of visible tree
 				ScrollOffsetVertical = Math.Max (0, (idx + 1) - (Bounds.Height - leaveSpace));
 			}
+		}
+
+		/// <summary>
+		/// Expands the currently <see cref="SelectedObject"/>
+		/// </summary>
+		public void Expand ()
+		{
+			Expand (SelectedObject);
 		}
 
 		/// <summary>
@@ -1095,6 +1125,14 @@ namespace Terminal.Gui {
 		public bool IsExpanded (T o)
 		{
 			return ObjectToBranch (o)?.IsExpanded ?? false;
+		}
+
+		/// <summary>
+		/// Collapses the <see cref="SelectedObject"/>
+		/// </summary>
+		public void Collapse ()
+		{
+			Collapse(selectedObject);
 		}
 
 		/// <summary>
@@ -1239,7 +1277,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt(0), map.Count, map));
+			multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt (0), map.Count, map));
 			SetNeedsDisplay ();
 
 			OnSelectionChanged (new SelectionChangedEventArgs<T> (this, SelectedObject, SelectedObject));
@@ -1273,7 +1311,7 @@ namespace Terminal.Gui {
 			Origin = from;
 			included.Add (Origin.Model);
 
-			var oldIdx = map.IndexOf(from);
+			var oldIdx = map.IndexOf (from);
 
 			var lowIndex = Math.Min (oldIdx, toIndex);
 			var highIndex = Math.Max (oldIdx, toIndex);
