@@ -41,22 +41,26 @@ namespace Terminal.Gui {
 		bool firstNibble, leftSide;
 
 		/// <summary>
-		/// Initialzies a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="source">The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking, or an exception will be thrown.</param>
 		public HexView (Stream source) : base ()
 		{
 			Source = source;
-			this.source = source;
 			CanFocus = true;
 			leftSide = true;
 			firstNibble = true;
 		}
 
 		/// <summary>
-		/// Initialzies a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		public HexView () : this (source: new MemoryStream ()) { }
+
+		/// <summary>
+		/// Event to be invoked when an edit is made on the <see cref="Stream"/>.
+		/// </summary>
+		public event Action<KeyValuePair<long, byte>> Edited;
 
 		/// <summary>
 		/// Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support seeking (<see cref="Stream.CanSeek"/> == true).
@@ -71,13 +75,17 @@ namespace Terminal.Gui {
 					throw new ArgumentException ("The source stream must be seekable (CanSeek property)", "source");
 				source = value;
 
+				if (displayStart > source.Length)
+					DisplayStart = 0;
+				if (position > source.Length)
+					position = 0;
 				SetNeedsDisplay ();
 			}
 		}
 
 		internal void SetDisplayStart (long value)
 		{
-			if (value >= source.Length)
+			if (value > 0 && value >= source.Length)
 				displayStart = source.Length - 1;
 			else if (value < 0)
 				displayStart = 0;
@@ -109,10 +117,10 @@ namespace Terminal.Gui {
 			set {
 				base.Frame = value;
 
-				// Small buffers will just show the position, with 4 bytes
-				bytesPerLine = 4;
+				// Small buffers will just show the position, with the bsize field value (4 bytes)
+				bytesPerLine = bsize;
 				if (value.Width - displayWidth > 17)
-					bytesPerLine = 4 * ((value.Width - displayWidth) / 18);
+					bytesPerLine = bsize * ((value.Width - displayWidth) / 18);
 			}
 		}
 
@@ -144,8 +152,8 @@ namespace Terminal.Gui {
 
 			var frame = Frame;
 
-			var nblocks = bytesPerLine / 4;
-			var data = new byte [nblocks * 4 * frame.Height];
+			var nblocks = bytesPerLine / bsize;
+			var data = new byte [nblocks * bsize * frame.Height];
 			Source.Position = displayStart;
 			var n = source.Read (data, 0, data.Length);
 
@@ -159,14 +167,14 @@ namespace Terminal.Gui {
 
 				Move (0, line);
 				Driver.SetAttribute (ColorScheme.HotNormal);
-				Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * 4));
+				Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * bsize));
 
 				currentAttribute = ColorScheme.HotNormal;
 				SetAttribute (GetNormalColor ());
 
 				for (int block = 0; block < nblocks; block++) {
-					for (int b = 0; b < 4; b++) {
-						var offset = (line * nblocks * 4) + block * 4 + b;
+					for (int b = 0; b < bsize; b++) {
+						var offset = (line * nblocks * bsize) + block * bsize + b;
 						bool edited;
 						var value = GetData (data, offset, out edited);
 						if (offset + displayStart == position || edited)
@@ -181,9 +189,8 @@ namespace Terminal.Gui {
 					Driver.AddStr (block + 1 == nblocks ? " " : "| ");
 				}
 
-
-				for (int bitem = 0; bitem < nblocks * 4; bitem++) {
-					var offset = line * nblocks * 4 + bitem;
+				for (int bitem = 0; bitem < nblocks * bsize; bitem++) {
+					var offset = line * nblocks * bsize + bitem;
 
 					bool edited = false;
 					Rune c = ' ';
@@ -214,7 +221,6 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (attribute);
 				}
 			}
-
 		}
 
 		///<inheritdoc/>
@@ -223,13 +229,13 @@ namespace Terminal.Gui {
 			var delta = (int)(position - displayStart);
 			var line = delta / bytesPerLine;
 			var item = delta % bytesPerLine;
-			var block = item / 4;
-			var column = (item % 4) * 3;
+			var block = item / bsize;
+			var column = (item % bsize) * 3;
 
 			if (leftSide)
 				Move (displayWidth + block * 14 + column + (firstNibble ? 0 : 1), line);
 			else
-				Move (displayWidth + (bytesPerLine / 4) * 14 + item - 1, line);
+				Move (displayWidth + (bytesPerLine / bsize) * 14 + item - 1, line);
 		}
 
 		void RedisplayLine (long pos)
@@ -240,13 +246,77 @@ namespace Terminal.Gui {
 			SetNeedsDisplay (new Rect (0, line, Frame.Width, 1));
 		}
 
-		void CursorRight ()
+		bool MoveEndOfLine ()
+		{
+			position = (position / bytesPerLine * bytesPerLine) + bytesPerLine - 1;
+			SetNeedsDisplay ();
+
+			return true;
+		}
+
+		bool MoveStartOfLine ()
+		{
+			position = position / bytesPerLine * bytesPerLine;
+			SetNeedsDisplay ();
+
+			return true;
+		}
+
+		bool MoveEnd ()
+		{
+			position = source.Length;
+			SetDisplayStart (position);
+			SetNeedsDisplay ();
+
+			return true;
+		}
+
+		bool MoveHome ()
+		{
+			DisplayStart = 0;
+			SetNeedsDisplay ();
+
+			return true;
+		}
+
+		bool ToggleSide ()
+		{
+			leftSide = !leftSide;
+			RedisplayLine (position);
+			firstNibble = true;
+
+			return true;
+		}
+
+		bool MoveLeft ()
+		{
+			RedisplayLine (position);
+			if (leftSide) {
+				if (!firstNibble) {
+					firstNibble = true;
+					return true;
+				}
+				firstNibble = false;
+			}
+			if (position == 0)
+				return true;
+			if (position - 1 < DisplayStart) {
+				SetDisplayStart (displayStart - bytesPerLine);
+				SetNeedsDisplay ();
+			} else
+				RedisplayLine (position);
+			position--;
+
+			return true;
+		}
+
+		bool MoveRight ()
 		{
 			RedisplayLine (position);
 			if (leftSide) {
 				if (firstNibble) {
 					firstNibble = false;
-					return;
+					return true;
 				} else
 					firstNibble = true;
 			}
@@ -257,23 +327,25 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			} else
 				RedisplayLine (position);
+
+			return true;
 		}
 
-		void MoveUp (int bytes)
+		bool MoveUp (int bytes)
 		{
 			RedisplayLine (position);
-			position -= bytes;
-			if (position < 0)
-				position = 0;
+			if (position - bytes > -1)
+				position -= bytes;
 			if (position < DisplayStart) {
 				SetDisplayStart (DisplayStart - bytes);
 				SetNeedsDisplay ();
 			} else
 				RedisplayLine (position);
 
+			return true;
 		}
 
-		void MoveDown (int bytes)
+		bool MoveDown (int bytes)
 		{
 			RedisplayLine (position);
 			if (position + bytes < source.Length)
@@ -283,6 +355,8 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			} else
 				RedisplayLine (position);
+
+			return true;
 		}
 
 		/// <inheritdoc/>
@@ -290,52 +364,39 @@ namespace Terminal.Gui {
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorLeft:
-				RedisplayLine (position);
-				if (leftSide) {
-					if (!firstNibble) {
-						firstNibble = true;
-						return true;
-					}
-					firstNibble = false;
-				}
-				if (position == 0)
-					return true;
-				if (position - 1 < DisplayStart) {
-					SetDisplayStart (displayStart - bytesPerLine);
-					SetNeedsDisplay ();
-				} else
-					RedisplayLine (position);
-				position--;
-				break;
+				return MoveLeft ();
 			case Key.CursorRight:
-				CursorRight ();
-				break;
+				return MoveRight ();
 			case Key.CursorDown:
-				MoveDown (bytesPerLine);
-				break;
+				return MoveDown (bytesPerLine);
 			case Key.CursorUp:
-				MoveUp (bytesPerLine);
-				break;
+				return MoveUp (bytesPerLine);
 			case Key.Enter:
-				leftSide = !leftSide;
-				RedisplayLine (position);
-				firstNibble = true;
-				break;
+				return ToggleSide ();
 			case ((int)'v' + Key.AltMask):
 			case Key.PageUp:
-				MoveUp (bytesPerLine * Frame.Height);
-				break;
+				return MoveUp (bytesPerLine * Frame.Height);
 			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
-				MoveDown (bytesPerLine * Frame.Height);
-				break;
+				return MoveDown (bytesPerLine * Frame.Height);
 			case Key.Home:
-				DisplayStart = 0;
-				SetNeedsDisplay ();
-				break;
+				return MoveHome ();
+			case Key.End:
+				return MoveEnd ();
+			case Key.CursorLeft | Key.CtrlMask:
+				return MoveStartOfLine ();
+			case Key.CursorRight | Key.CtrlMask:
+				return MoveEndOfLine ();
+			case Key.CursorUp | Key.CtrlMask:
+				return MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine));
+			case Key.CursorDown | Key.CtrlMask:
+				return MoveDown (((Frame.Height - 1) * bytesPerLine) - (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
 			default:
+				if (!AllowEdits)
+					return false;
+
 				if (leftSide) {
-					int value = -1;
+					int value;
 					var k = (char)keyEvent.Key;
 					if (k >= 'A' && k <= 'F')
 						value = k - 'A' + 10;
@@ -354,18 +415,81 @@ namespace Terminal.Gui {
 					RedisplayLine (position);
 					if (firstNibble) {
 						firstNibble = false;
-						b = (byte)(b & 0xf | (value << 4));
+						b = (byte)(b & 0xf | (value << bsize));
 						edits [position] = b;
+						OnEdited (new KeyValuePair<long, byte> (position, edits [position]));
 					} else {
 						b = (byte)(b & 0xf0 | value);
 						edits [position] = b;
-						CursorRight ();
+						OnEdited (new KeyValuePair<long, byte> (position, edits [position]));
+						MoveRight ();
 					}
 					return true;
 				} else
 					return false;
 			}
-			PositionCursor ();
+		}
+
+		/// <summary>
+		/// Method used to invoke the <see cref="Edited"/> event passing the <see cref="KeyValuePair{TKey, TValue}"/>.
+		/// </summary>
+		/// <param name="keyValuePair">The key value pair.</param>
+		public virtual void OnEdited (KeyValuePair<long, byte> keyValuePair)
+		{
+			Edited?.Invoke (keyValuePair);
+		}
+
+		/// <inheritdoc/>
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+				&& !me.Flags.HasFlag (MouseFlags.WheeledDown) && !me.Flags.HasFlag (MouseFlags.WheeledUp))
+				return false;
+
+			if (!HasFocus)
+				SetFocus ();
+
+			if (me.Flags == MouseFlags.WheeledDown) {
+				DisplayStart = Math.Min (DisplayStart + bytesPerLine, source.Length);
+				return true;
+			}
+
+			if (me.Flags == MouseFlags.WheeledUp) {
+				DisplayStart = Math.Max (DisplayStart - bytesPerLine, 0);
+				return true;
+			}
+
+			if (me.X < displayWidth)
+				return true;
+			var nblocks = bytesPerLine / bsize;
+			var blocksSize = nblocks * 14;
+			var blocksRightOffset = displayWidth + blocksSize - 1;
+			if (me.X > blocksRightOffset + bytesPerLine - 1)
+				return true;
+			leftSide = me.X >= blocksRightOffset;
+			var lineStart = (me.Y * bytesPerLine) + displayStart;
+			var x = me.X - displayWidth + 1;
+			var block = x / 14;
+			x -= block * 2;
+			var empty = x % 3;
+			var item = x / 3;
+			if (!leftSide && item > 0 && (empty == 0 || x == (block * 14) + 14 - 1 - (block * 2)))
+				return true;
+			firstNibble = true;
+			if (leftSide)
+				position = Math.Min (lineStart + me.X - blocksRightOffset, source.Length);
+			else
+				position = Math.Min (lineStart + item, source.Length);
+
+			if (me.Flags == MouseFlags.Button1DoubleClicked) {
+				leftSide = !leftSide;
+				if (leftSide)
+					firstNibble = empty == 1;
+				else
+					firstNibble = true;
+			}
+			SetNeedsDisplay ();
+
 			return true;
 		}
 
@@ -374,7 +498,7 @@ namespace Terminal.Gui {
 		/// of the underlying <see cref="Stream"/>.
 		/// </summary>
 		/// <value><c>true</c> if allow edits; otherwise, <c>false</c>.</value>
-		public bool AllowEdits { get; set; }
+		public bool AllowEdits { get; set; } = true;
 
 		/// <summary>
 		/// Gets a <see cref="SortedDictionary{TKey, TValue}"/> describing the edits done to the <see cref="HexView"/>. 
@@ -384,15 +508,26 @@ namespace Terminal.Gui {
 		public IReadOnlyDictionary<long, byte> Edits => edits;
 
 		/// <summary>
-		/// This method applies andy edits made to the <see cref="Stream"/> and resets the 
-		/// contents of the <see cref="Edits"/> property
+		/// This method applies and edits made to the <see cref="Stream"/> and resets the 
+		/// contents of the <see cref="Edits"/> property.
 		/// </summary>
 		public void ApplyEdits ()
 		{
 			foreach (var kv in edits) {
 				source.Position = kv.Key;
 				source.WriteByte (kv.Value);
+				source.Flush ();
 			}
+			edits = new SortedDictionary<long, byte> ();
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// This method discards the edits made to the <see cref="Stream"/> by resetting the 
+		/// contents of the <see cref="Edits"/> property.
+		/// </summary>
+		public void DiscardEdits ()
+		{
 			edits = new SortedDictionary<long, byte> ();
 		}
 
@@ -410,6 +545,14 @@ namespace Terminal.Gui {
 
 				desiredCursorVisibility = value;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+
+			return base.OnEnter (view);
 		}
 	}
 }
