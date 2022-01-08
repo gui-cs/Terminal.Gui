@@ -28,10 +28,7 @@ namespace Terminal.Gui.Views {
 		{
 			MemoryStream stream = new MemoryStream ();
 			UnicodeEncoding encoding = new UnicodeEncoding ();
-			byte [] bArray = encoding.GetBytes (
-				@"Hello world.\n
-This is a test of the Emergency Broadcast System.\n
-");
+			byte [] bArray = encoding.GetBytes ("Hello world.\nThis is a test of the Emergency Broadcast System.\n");
 
 			stream.Write (bArray);
 
@@ -51,7 +48,7 @@ This is a test of the Emergency Broadcast System.\n
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
 			Assert.False (hv.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ())));
 			Assert.Empty (hv.Edits);
-			Assert.Equal (138, hv.Source.Length);
+			Assert.Equal (126, hv.Source.Length);
 
 			hv.AllowEdits = true;
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
@@ -59,7 +56,7 @@ This is a test of the Emergency Broadcast System.\n
 			Assert.Single (hv.Edits);
 			Assert.Equal (65, hv.Edits.ToList () [0].Value);
 			Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
-			Assert.Equal (138, hv.Source.Length);
+			Assert.Equal (126, hv.Source.Length);
 
 			// Appends byte
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
@@ -68,11 +65,11 @@ This is a test of the Emergency Broadcast System.\n
 			Assert.Equal (2, hv.Edits.Count);
 			Assert.Equal (66, hv.Edits.ToList () [1].Value);
 			Assert.Equal ('B', (char)hv.Edits.ToList () [1].Value);
-			Assert.Equal (138, hv.Source.Length);
+			Assert.Equal (126, hv.Source.Length);
 
 			hv.ApplyEdits ();
 			Assert.Empty (hv.Edits);
-			Assert.Equal (139, hv.Source.Length);
+			Assert.Equal (127, hv.Source.Length);
 		}
 
 		[Fact]
@@ -118,7 +115,7 @@ This is a test of the Emergency Broadcast System.\n
 			Assert.Single (hv.Edits);
 			Assert.Equal (65, hv.Edits.ToList () [0].Value);
 			Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
-			Assert.Equal (138, hv.Source.Length);
+			Assert.Equal (126, hv.Source.Length);
 
 			hv.DiscardEdits ();
 			Assert.Empty (hv.Edits);
