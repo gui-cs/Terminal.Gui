@@ -81,22 +81,12 @@ namespace Terminal.Gui {
 			Height = 1;
 			Width = s.RuneCount + 4;
 
-			HotKeyChanged += CheckBox_HotKeyChanged;
-
 			// Things this view knows how to do
-			AddCommand (Command.ExecuteHotKey, (_) => ToggleChecked ());
-			AddCommand (Command.ToggleChecked, (_) => ToggleChecked ());
+			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.AltMask | HotKey, Command.ExecuteHotKey);
-
 			AddKeyBinding ((Key)' ', Command.ToggleChecked);
 			AddKeyBinding (Key.Space, Command.ToggleChecked);
-		}
-
-		private void CheckBox_HotKeyChanged (Key obj)
-		{
-			ReplaceKeyBinding (Key.AltMask | obj, Key.AltMask | HotKey);
 		}
 
 		/// <summary>
@@ -166,8 +156,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
-			if (InvokeKeybindings (kb))
-				return true;
+			if (kb.Key == (Key.AltMask | HotKey))
+				return ToggleChecked ();
 
 			return false;
 		}

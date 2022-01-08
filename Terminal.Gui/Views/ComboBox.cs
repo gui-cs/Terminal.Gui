@@ -159,18 +159,18 @@ namespace Terminal.Gui {
 			};
 
 			// Things this view knows how to do
-			AddCommand (Command.Accept, (_) => ActivateSelected ());
-			AddCommand (Command.ToggleExpandCollapse, (_) => ExpandCollapse ());
-			AddCommand (Command.Expand, (_) => Expand ());
-			AddCommand (Command.Collapse, (_) => Collapse ());
-			AddCommand (Command.LineDown, (_) => MoveDown ());
-			AddCommand (Command.LineUp, (_) => MoveUp ());
-			AddCommand (Command.PageDown, (_) => PageDown ());
-			AddCommand (Command.PageUp, (_) => PageUp ());
-			AddCommand (Command.Home, (_) => MoveHome ());
-			AddCommand (Command.End, (_) => MoveEnd ());
-			AddCommand (Command.Cancel, (_) => CancelSelected ());
-			AddCommand (Command.UnixEmulation, (_) => UnixEmulation ());
+			AddCommand (Command.Accept, () => ActivateSelected ());
+			AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
+			AddCommand (Command.Expand, () => Expand ());
+			AddCommand (Command.Collapse, () => Collapse ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.PageDown, () => PageDown ());
+			AddCommand (Command.PageUp, () => PageUp ());
+			AddCommand (Command.Home, () => MoveHome ());
+			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.Cancel, () => CancelSelected ());
+			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.Enter, Command.Accept);

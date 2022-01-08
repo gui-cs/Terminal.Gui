@@ -132,16 +132,6 @@ namespace Terminal.Gui {
 		ToggleChecked,
 
 		/// <summary>
-		/// Executes a hot key event.
-		/// </summary>
-		ExecuteHotKey,
-
-		/// <summary>
-		/// Executes a cold key event.
-		/// </summary>
-		ExecuteColdKey,
-
-		/// <summary>
 		/// Accepts the current state (e.g. selection, button press etc)
 		/// </summary>
 		Accept,
