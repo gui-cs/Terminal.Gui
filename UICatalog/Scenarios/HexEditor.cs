@@ -14,13 +14,22 @@ namespace UICatalog.Scenarios {
 		private string _fileName = "demo.bin";
 		private HexView _hexView;
 		private bool _saved = true;
+		private MenuItem miAllowEdits;
 
 		public override void Setup ()
 		{
-			Win.Title = this.GetName() + "-" + _fileName ?? "Untitled";
-			Win.Y = 1; // menu
-			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Win.Title = this.GetName () + "-" + _fileName ?? "Untitled";
+
+			CreateDemoFile (_fileName);
+
+			_hexView = new HexView (LoadFile ()) {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+			_hexView.Edited += _hexView_Edited;
+			Win.Add (_hexView);
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -35,48 +44,53 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("C_ut", "", () => Cut()),
 					new MenuItem ("_Paste", "", () => Paste())
 				}),
+				new MenuBarItem ("_Options", new MenuItem [] {
+					miAllowEdits = new MenuItem ("_AllowEdits", "", () => ToggleAllowEdits ()){Checked = _hexView.AllowEdits, CheckType = MenuItemCheckStyle.Checked}
+				})
 			});
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
+		}
 
-			CreateDemoFile (_fileName);
+		private void ToggleAllowEdits ()
+		{
+			_hexView.AllowEdits = miAllowEdits.Checked = !miAllowEdits.Checked;
+		}
 
-			_hexView = new HexView (LoadFile()) {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-			_hexView.CanFocus = true;
-			Win.Add (_hexView);
+		private void _hexView_Edited (System.Collections.Generic.KeyValuePair<long, byte> obj)
+		{
+			_saved = false;
 		}
 
 		private void New ()
 		{
 			_fileName = null;
-			Win.Title = this.GetName () + "-" + _fileName ?? "Untitled";
-			throw new NotImplementedException ();
+			_hexView.Source = LoadFile ();
 		}
 
 		private Stream LoadFile ()
 		{
-			MemoryStream stream = null;
-			if (!_saved) {
-				MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
+			MemoryStream stream = new MemoryStream ();
+			if (!_saved && _hexView != null && _hexView.Edits.Count > 0) {
+				if (MessageBox.ErrorQuery ("Save", "The changes were not saved. Want to open without saving?", "Yes", "No") == 1)
+					return _hexView.Source;
+				_hexView.DiscardEdits ();
+				_saved = true;
 			}
 
 			if (_fileName != null) {
 				var bin = System.IO.File.ReadAllBytes (_fileName);
-				stream = new MemoryStream (bin);
+				stream.Write (bin);
 				Win.Title = this.GetName () + "-" + _fileName;
 				_saved = true;
+			} else {
+				Win.Title = this.GetName () + "-" + (_fileName ?? "Untitled");
 			}
 			return stream;
 		}
@@ -94,9 +108,6 @@ namespace UICatalog.Scenarios {
 		private void Copy ()
 		{
 			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
-			//if (_textView != null && _textView.SelectedLength != 0) {
-			//	_textView.Copy ();
-			//}
 		}
 
 		private void Open ()
@@ -120,6 +131,8 @@ namespace UICatalog.Scenarios {
 					fs.Flush ();
 				}
 				_saved = true;
+			} else {
+				_hexView.ApplyEdits ();
 			}
 		}
 
@@ -128,10 +141,9 @@ namespace UICatalog.Scenarios {
 			Application.RequestStop ();
 		}
 
-		private void CreateDemoFile(string fileName)
+		private void CreateDemoFile (string fileName)
 		{
 			var sb = new StringBuilder ();
-			// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
