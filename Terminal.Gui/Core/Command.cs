@@ -185,6 +185,26 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selects all objects in the control
 		/// </summary>
-		SelectAll
+		SelectAll,
+
+		/// <summary>
+		/// Moves the cursor to the start of line.
+		/// </summary>
+		StartOfLine,
+
+		/// <summary>
+		/// Moves the cursor to the end of line.
+		/// </summary>
+		EndOfLine,
+
+		/// <summary>
+		/// Moves the cursor to the top of page.
+		/// </summary>
+		StartOfPage,
+
+		/// <summary>
+		/// Moves the cursor to the bottom of page.
+		/// </summary>
+		EndOfPage
 	}
 }
