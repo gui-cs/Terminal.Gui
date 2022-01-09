@@ -95,7 +95,6 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
 			Assert.Equal (hv.Source.Length, hv.Source.Position);
 
-
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
 			// already on last page and so the DisplayStart is the same as before
 			Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
@@ -114,6 +113,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (0, (int)keyValuePair.Key);
 			Assert.Equal (70, (int)keyValuePair.Value);
+			Assert.Equal ('F', (char)keyValuePair.Value);
 		}
 
 		[Fact]
@@ -195,9 +195,9 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void CursorPosition_Property ()
+		public void CursorPosition_Encoding_Unicode ()
 		{
-			var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var hv = new HexView (LoadStream (true)) { Width = Dim.Fill (), Height = Dim.Fill () };
 			Application.Top.Add (hv);
 			Application.Begin (Application.Top);
 
@@ -205,7 +205,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
-			var bytesPerLine = hv.CursorPosition.X;
+			Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
 
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
@@ -217,8 +217,183 @@ namespace Terminal.Gui.Views {
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
 			var col = hv.CursorPosition.X;
 			var line = hv.CursorPosition.Y;
-			var offset = (line - 1) * (bytesPerLine - col);
+			var offset = (line - 1) * (hv.BytesPerLine - col);
 			Assert.Equal (hv.Position, col * line + offset);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CursorPosition_Encoding_Default ()
+		{
+			var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
+			Application.Top.Add (hv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (new Point (1, 1), hv.CursorPosition);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.Equal (new Point (2, 1), hv.CursorPosition);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (new Point (2, 2), hv.CursorPosition);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			var col = hv.CursorPosition.X;
+			var line = hv.CursorPosition.Y;
+			var offset = (line - 1) * (hv.BytesPerLine - col);
+			Assert.Equal (hv.Position, col * line + offset);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void PositionChanged_Event ()
+		{
+			var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
+			HexView.HexViewEventArgs hexViewEventArgs = null;
+			hv.PositionChanged += (e) => hexViewEventArgs = e;
+			Application.Top.Add (hv);
+			Application.Begin (Application.Top);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()))); // left side must press twice
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+
+			Assert.Equal (12, hexViewEventArgs.BytesPerLine);
+			Assert.Equal (new Point (2, 2), hexViewEventArgs.CursorPosition);
+			Assert.Equal (14, hexViewEventArgs.Position);
+		}
+
+		private class NonSeekableStream : Stream {
+			Stream m_stream;
+			public NonSeekableStream (Stream baseStream)
+			{
+				m_stream = baseStream;
+			}
+			public override bool CanRead {
+				get { return m_stream.CanRead; }
+			}
+
+			public override bool CanSeek {
+				get { return false; }
+			}
+
+			public override bool CanWrite {
+				get { return m_stream.CanWrite; }
+			}
+
+			public override void Flush ()
+			{
+				m_stream.Flush ();
+			}
+
+			public override long Length {
+				get { throw new NotSupportedException (); }
+			}
+
+			public override long Position {
+				get {
+					return m_stream.Position;
+				}
+				set {
+					throw new NotSupportedException ();
+				}
+			}
+
+			public override int Read (byte [] buffer, int offset, int count)
+			{
+				return m_stream.Read (buffer, offset, count);
+			}
+
+			public override long Seek (long offset, SeekOrigin origin)
+			{
+				throw new NotImplementedException ();
+			}
+
+			public override void SetLength (long value)
+			{
+				throw new NotSupportedException ();
+			}
+
+			public override void Write (byte [] buffer, int offset, int count)
+			{
+				m_stream.Write (buffer, offset, count);
+			}
+		}
+
+		[Fact]
+		public void Exceptions_Tests ()
+		{
+			Assert.Throws<ArgumentNullException> (() => new HexView (null));
+			Assert.Throws<ArgumentException> (() => new HexView (new NonSeekableStream (new MemoryStream ())));
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Source_Sets_DisplayStart_And_Position_To_Zero_If_Greater_Than_Source_Length ()
+		{
+			var hv = new HexView (LoadStream ()) { Width = 10, Height = 5 };
+			Application.Top.Add (hv);
+			Application.Begin (Application.Top);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.Equal (62, hv.DisplayStart);
+			Assert.Equal (64, hv.Position);
+
+			hv.Source = new MemoryStream ();
+			Assert.Equal (0, hv.DisplayStart);
+			Assert.Equal (0, hv.Position - 1);
+
+			hv.Source = LoadStream ();
+			hv.Width = Dim.Fill ();
+			hv.Height = Dim.Fill ();
+			Application.Top.LayoutSubviews ();
+			Assert.Equal (0, hv.DisplayStart);
+			Assert.Equal (0, hv.Position - 1);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.Equal (0, hv.DisplayStart);
+			Assert.Equal (64, hv.Position);
+
+			hv.Source = new MemoryStream ();
+			Assert.Equal (0, hv.DisplayStart);
+			Assert.Equal (0, hv.Position - 1);
+		}
+
+		[Fact]
+		public void ApplyEdits_With_Argument ()
+		{
+			byte [] buffer = Encoding.Default.GetBytes ("Fest");
+			var original = new MemoryStream ();
+			original.Write (buffer, 0, buffer.Length);
+			original.Flush ();
+			var copy = new MemoryStream ();
+			original.Position = 0;
+			original.CopyTo (copy);
+			copy.Flush ();
+			var hv = new HexView (copy) { Width = Dim.Fill (), Height = Dim.Fill () };
+			byte [] readBuffer = new byte [hv.Source.Length];
+			hv.Source.Position = 0;
+			hv.Source.Read (readBuffer);
+			Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.D5, new KeyModifiers ())));
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
+			readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
+			Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
+
+			hv.ApplyEdits (original);
+			original.Position = 0;
+			original.Read (buffer);
+			copy.Position = 0;
+			copy.Read (readBuffer);
+			Assert.Equal ("Test", Encoding.Default.GetString (buffer));
+			Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
+			Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
 		}
 	}
 }

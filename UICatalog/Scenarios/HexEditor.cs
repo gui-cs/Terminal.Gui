@@ -58,14 +58,15 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-				siPositionChanged = new StatusItem(Key.Null, $"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X}", () => {})
+				siPositionChanged = new StatusItem(Key.Null,
+					$"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X} Line length: {_hexView.BytesPerLine}", () => {})
 			});
 			Top.Add (statusBar);
 		}
 
 		private void _hexView_PositionChanged (HexView.HexViewEventArgs obj)
 		{
-			siPositionChanged.Title = $"Position: {obj.Position} Line: {obj.CursorPosition.Y} Col: {obj.CursorPosition.X}";
+			siPositionChanged.Title = $"Position: {obj.Position} Line: {obj.CursorPosition.Y} Col: {obj.CursorPosition.X} Line length: {obj.BytesPerLine}";
 			statusBar.SetNeedsDisplay ();
 		}
 
@@ -137,9 +138,10 @@ namespace UICatalog.Scenarios {
 		{
 			if (_fileName != null) {
 				using (FileStream fs = new FileStream (_fileName, FileMode.OpenOrCreate)) {
-					_hexView.ApplyEdits ();
-					_hexView.Source.CopyTo (fs);
-					fs.Flush ();
+					_hexView.ApplyEdits (fs);
+					//_hexView.Source.Position = 0;
+					//_hexView.Source.CopyTo (fs);
+					//fs.Flush ();
 				}
 				_saved = true;
 			} else {

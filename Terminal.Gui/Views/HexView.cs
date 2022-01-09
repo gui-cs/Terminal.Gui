@@ -122,7 +122,14 @@ namespace Terminal.Gui {
 
 		const int displayWidth = 9;
 		const int bsize = 4;
-		int bytesPerLine;
+		int bpl;
+		private int bytesPerLine {
+			get => bpl;
+			set {
+				bpl = value;
+				OnPositionChanged ();
+			}
+		}
 
 		/// <inheritdoc/>
 		public override Rect Frame {
@@ -188,14 +195,13 @@ namespace Terminal.Gui {
 				for (int block = 0; block < nblocks; block++) {
 					for (int b = 0; b < bsize; b++) {
 						var offset = (line * nblocks * bsize) + block * bsize + b;
-						bool edited;
-						var value = GetData (data, offset, out edited);
+						var value = GetData (data, offset, out bool edited);
 						if (offset + displayStart == position || edited)
 							SetAttribute (leftSide ? activeColor : trackingColor);
 						else
 							SetAttribute (GetNormalColor ());
 
-						Driver.AddStr (offset >= n ? "  " : string.Format ("{0:x2}", value));
+						Driver.AddStr (offset >= n && !edited ? "  " : string.Format ("{0:x2}", value));
 						SetAttribute (GetNormalColor ());
 						Driver.AddRune (' ');
 					}
@@ -204,13 +210,11 @@ namespace Terminal.Gui {
 
 				for (int bitem = 0; bitem < nblocks * bsize; bitem++) {
 					var offset = line * nblocks * bsize + bitem;
-
-					bool edited = false;
-					Rune c = ' ';
-					if (offset >= n)
+					var b = GetData (data, offset, out bool edited);
+					Rune c;
+					if (offset >= n && !edited)
 						c = ' ';
 					else {
-						var b = GetData (data, offset, out edited);
 						if (b < 32)
 							c = '.';
 						else if (b > 127)
@@ -464,11 +468,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method used to invoke the <see cref="PositionChanged"/> event passing the position and the cursor position.
+		/// Method used to invoke the <see cref="PositionChanged"/> event passing the <see cref="HexViewEventArgs"/> arguments.
 		/// </summary>
 		public virtual void OnPositionChanged ()
 		{
-			PositionChanged?.Invoke (new HexViewEventArgs (Position, CursorPosition));
+			PositionChanged?.Invoke (new HexViewEventArgs (Position, CursorPosition, BytesPerLine));
 		}
 
 		/// <inheritdoc/>
@@ -558,15 +562,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// The bytes length per line.
+		/// </summary>
+		public int BytesPerLine => bytesPerLine;
+
+		/// <summary>
 		/// This method applies and edits made to the <see cref="Stream"/> and resets the 
 		/// contents of the <see cref="Edits"/> property.
 		/// </summary>
-		public void ApplyEdits ()
+		/// <param name="stream">If provided also applies the changes to the passed <see cref="Stream"/></param>.
+		public void ApplyEdits (Stream stream = null)
 		{
 			foreach (var kv in edits) {
 				source.Position = kv.Key;
 				source.WriteByte (kv.Value);
 				source.Flush ();
+				if (stream != null) {
+					stream.Position = kv.Key;
+					stream.WriteByte (kv.Value);
+					stream.Flush ();
+				}
 			}
 			edits = new SortedDictionary<long, byte> ();
 			SetNeedsDisplay ();
@@ -619,14 +634,21 @@ namespace Terminal.Gui {
 			public Point CursorPosition { get; private set; }
 
 			/// <summary>
+			/// The bytes length per line.
+			/// </summary>
+			public int BytesPerLine { get; private set; }
+
+			/// <summary>
 			/// Initializes a new instance of <see cref="HexViewEventArgs"/>
 			/// </summary>
 			/// <param name="pos">The character position.</param>
 			/// <param name="cursor">The cursor position.</param>
-			public HexViewEventArgs (long pos, Point cursor)
+			/// <param name="lineLength">Line bytes length.</param>
+			public HexViewEventArgs (long pos, Point cursor, int lineLength)
 			{
 				Position = pos;
 				CursorPosition = cursor;
+				BytesPerLine = lineLength;
 			}
 		}
 	}
