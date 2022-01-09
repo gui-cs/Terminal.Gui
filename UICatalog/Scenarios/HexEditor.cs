@@ -15,12 +15,15 @@ namespace UICatalog.Scenarios {
 		private HexView _hexView;
 		private bool _saved = true;
 		private MenuItem miAllowEdits;
+		private StatusItem siPositionChanged;
+		private StatusBar statusBar;
 
 		public override void Setup ()
 		{
 			Win.Title = this.GetName () + "-" + _fileName ?? "Untitled";
 
 			CreateDemoFile (_fileName);
+			//CreateUnicodeDemoFile (_fileName);
 
 			_hexView = new HexView (LoadFile ()) {
 				X = 0,
@@ -29,6 +32,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 			_hexView.Edited += _hexView_Edited;
+			_hexView.PositionChanged += _hexView_PositionChanged;
 			Win.Add (_hexView);
 
 			var menu = new MenuBar (new MenuBarItem [] {
@@ -50,12 +54,19 @@ namespace UICatalog.Scenarios {
 			});
 			Top.Add (menu);
 
-			var statusBar = new StatusBar (new StatusItem [] {
+			statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				siPositionChanged = new StatusItem(Key.Null, $"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X}", () => {})
 			});
 			Top.Add (statusBar);
+		}
+
+		private void _hexView_PositionChanged (HexView.HexViewEventArgs obj)
+		{
+			siPositionChanged.Title = $"Position: {obj.Position} Line: {obj.CursorPosition.Y} Col: {obj.CursorPosition.X}";
+			statusBar.SetNeedsDisplay ();
 		}
 
 		private void ToggleAllowEdits ()
@@ -150,6 +161,20 @@ namespace UICatalog.Scenarios {
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
+		}
+
+		private void CreateUnicodeDemoFile (string fileName)
+		{
+			var sb = new StringBuilder ();
+			sb.Append ("Hello world.\n");
+			sb.Append ("This is a test of the Emergency Broadcast System.\n");
+
+			byte [] buffer = Encoding.Unicode.GetBytes (sb.ToString());
+			MemoryStream ms = new MemoryStream (buffer);
+			FileStream file = new FileStream (fileName, FileMode.Create, FileAccess.Write);
+			ms.WriteTo (file);
+			file.Close ();
+			ms.Close ();
 		}
 	}
 }

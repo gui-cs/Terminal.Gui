@@ -37,8 +37,16 @@ namespace Terminal.Gui {
 	public class HexView : View {
 		SortedDictionary<long, byte> edits = new SortedDictionary<long, byte> ();
 		Stream source;
-		long displayStart, position;
+		long displayStart, pos;
 		bool firstNibble, leftSide;
+
+		private long position {
+			get => pos;
+			set {
+				pos = value;
+				OnPositionChanged ();
+			}
+		}
 
 		/// <summary>
 		/// Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
@@ -61,6 +69,11 @@ namespace Terminal.Gui {
 		/// Event to be invoked when an edit is made on the <see cref="Stream"/>.
 		/// </summary>
 		public event Action<KeyValuePair<long, byte>> Edited;
+
+		/// <summary>
+		/// Event to be invoked when the position and cursor position changes.
+		/// </summary>
+		public event Action<HexViewEventArgs> PositionChanged;
 
 		/// <summary>
 		/// Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support seeking (<see cref="Stream.CanSeek"/> == true).
@@ -248,7 +261,7 @@ namespace Terminal.Gui {
 
 		bool MoveEndOfLine ()
 		{
-			position = (position / bytesPerLine * bytesPerLine) + bytesPerLine - 1;
+			position = Math.Min ((position / bytesPerLine * bytesPerLine) + bytesPerLine - 1, source.Length);
 			SetNeedsDisplay ();
 
 			return true;
@@ -265,8 +278,11 @@ namespace Terminal.Gui {
 		bool MoveEnd ()
 		{
 			position = source.Length;
-			SetDisplayStart (position);
-			SetNeedsDisplay ();
+			if (position >= (DisplayStart + bytesPerLine * Frame.Height)) {
+				SetDisplayStart (position);
+				SetNeedsDisplay ();
+			} else
+				RedisplayLine (position);
 
 			return true;
 		}
@@ -350,6 +366,14 @@ namespace Terminal.Gui {
 			RedisplayLine (position);
 			if (position + bytes < source.Length)
 				position += bytes;
+			else if ((bytes == bytesPerLine * Frame.Height && source.Length >= (DisplayStart + bytesPerLine * Frame.Height))
+				|| (bytes <= (bytesPerLine * Frame.Height - bytesPerLine) && source.Length <= (DisplayStart + bytesPerLine * Frame.Height))) {
+				var p = position;
+				while (p + bytesPerLine < source.Length) {
+					p += bytesPerLine;
+				}
+				position = p;
+			}
 			if (position >= (DisplayStart + bytesPerLine * Frame.Height)) {
 				SetDisplayStart (DisplayStart + bytes);
 				SetNeedsDisplay ();
@@ -390,7 +414,7 @@ namespace Terminal.Gui {
 			case Key.CursorUp | Key.CtrlMask:
 				return MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine));
 			case Key.CursorDown | Key.CtrlMask:
-				return MoveDown (((Frame.Height - 1) * bytesPerLine) - (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
+				return MoveDown (bytesPerLine * (Frame.Height - 1 - ((int)(position - displayStart) / bytesPerLine)));
 			default:
 				if (!AllowEdits)
 					return false;
@@ -437,6 +461,14 @@ namespace Terminal.Gui {
 		public virtual void OnEdited (KeyValuePair<long, byte> keyValuePair)
 		{
 			Edited?.Invoke (keyValuePair);
+		}
+
+		/// <summary>
+		/// Method used to invoke the <see cref="PositionChanged"/> event passing the position and the cursor position.
+		/// </summary>
+		public virtual void OnPositionChanged ()
+		{
+			PositionChanged?.Invoke (new HexViewEventArgs (Position, CursorPosition));
 		}
 
 		/// <inheritdoc/>
@@ -508,6 +540,24 @@ namespace Terminal.Gui {
 		public IReadOnlyDictionary<long, byte> Edits => edits;
 
 		/// <summary>
+		/// Gets the current character position starting at one, related to the <see cref="Stream"/>.
+		/// </summary>
+		public long Position => position + 1;
+
+		/// <summary>
+		/// Gets the current cursor position starting at one for both, line and column.
+		/// </summary>
+		public Point CursorPosition {
+			get {
+				var delta = (int)position;
+				var line = delta / bytesPerLine + 1;
+				var item = delta % bytesPerLine + 1;
+
+				return new Point (item, line);
+			}
+		}
+
+		/// <summary>
 		/// This method applies and edits made to the <see cref="Stream"/> and resets the 
 		/// contents of the <see cref="Edits"/> property.
 		/// </summary>
@@ -553,6 +603,31 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
 			return base.OnEnter (view);
+		}
+
+		/// <summary>
+		/// Defines the event arguments for <see cref="PositionChanged"/> event.
+		/// </summary>
+		public class HexViewEventArgs : EventArgs {
+			/// <summary>
+			/// Gets the current character position starting at one, related to the <see cref="Stream"/>.
+			/// </summary>
+			public long Position { get; private set; }
+			/// <summary>
+			/// Gets the current cursor position starting at one for both, line and column.
+			/// </summary>
+			public Point CursorPosition { get; private set; }
+
+			/// <summary>
+			/// Initializes a new instance of <see cref="HexViewEventArgs"/>
+			/// </summary>
+			/// <param name="pos">The character position.</param>
+			/// <param name="cursor">The cursor position.</param>
+			public HexViewEventArgs (long pos, Point cursor)
+			{
+				Position = pos;
+				CursorPosition = cursor;
+			}
 		}
 	}
 }
