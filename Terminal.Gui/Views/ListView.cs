@@ -319,16 +319,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 
 			// Things this view knows how to do
-			AddCommand (Command.LineUp, (_) => MoveUp ());
-			AddCommand (Command.LineDown, (_) => MoveDown ());
-			AddCommand (Command.LineScrollUp, (_) => ScrollUp (1));
-			AddCommand (Command.LineScrollDown, (_) => ScrollDown (1));
-			AddCommand (Command.PageUp, (_) => MovePageUp ());
-			AddCommand (Command.PageDown, (_) => MovePageDown ());
-			AddCommand (Command.Home, (_) => MoveHome ());
-			AddCommand (Command.End, (_) => MoveEnd ());
-			AddCommand (Command.OpenSelectedItem, (_) => OnOpenSelectedItem ());
-			AddCommand (Command.ToggleChecked, (_) => MarkUnmarkRow ());
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.LineScrollUp, () => ScrollUp (1));
+			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
+			AddCommand (Command.PageUp, () => MovePageUp ());
+			AddCommand (Command.PageDown, () => MovePageDown ());
+			AddCommand (Command.Home, () => MoveHome ());
+			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
 			AddKeyBinding (Key.CursorUp,Command.LineUp);

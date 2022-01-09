@@ -64,6 +64,9 @@ namespace Terminal.Gui.Views {
 			Assert.True (btn.ProcessColdKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
+			Assert.True (btn.ProcessColdKey (new KeyEvent (Key.AltMask | Key.T, new KeyModifiers ())));
+			Assert.True (clicked);
+			clicked = false;
 			Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
@@ -95,7 +98,6 @@ namespace Terminal.Gui.Views {
 			btn.HotKey = Key.E;
 			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (clicked);
-
 		}
 	}
 }

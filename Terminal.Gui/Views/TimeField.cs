@@ -79,12 +79,12 @@ namespace Terminal.Gui {
 			TextChanged += TextField_TextChanged;
 
 			// Things this view knows how to do
-			AddCommand (Command.DeleteCharRight, (_) => DeleteCharRight ());
-			AddCommand (Command.DeleteCharLeft, (_) => DeleteCharLeft ());
-			AddCommand (Command.Home, (_) => MoveHome ());
-			AddCommand (Command.CharLeft, (_) => MoveLeft ());
-			AddCommand (Command.End, (_) => MoveEnd ());
-			AddCommand (Command.CharRight, (_) => MoveRight ());
+			AddCommand (Command.DeleteCharRight, () => DeleteCharRight ());
+			AddCommand (Command.DeleteCharLeft, () => DeleteCharLeft ());
+			AddCommand (Command.Home, () => MoveHome ());
+			AddCommand (Command.CharLeft, () => MoveLeft ());
+			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.CharRight, () => MoveRight ());
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);

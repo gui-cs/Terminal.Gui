@@ -116,14 +116,9 @@ namespace Terminal.Gui {
 			HotKeyChanged += Button_HotKeyChanged;
 
 			// Things this view knows how to do
-			AddCommand (Command.ExecuteHotKey, (e) => ExecuteHotKey (e));
-			AddCommand (Command.ExecuteColdKey, (_) => ExecuteColdKey ());
-			AddCommand (Command.Accept, (_) => AcceptKey ());
+			AddCommand (Command.Accept, () => AcceptKey ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.AltMask | HotKey, Command.ExecuteHotKey);
-			AddKeyBinding ((Key)'\n', Command.ExecuteColdKey);
-
 			AddKeyBinding (Key.Enter, Command.Accept);
 			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
@@ -133,7 +128,6 @@ namespace Terminal.Gui {
 
 		private void Button_HotKeyChanged (Key obj)
 		{
-			ReplaceKeyBinding (Key.AltMask | obj, Key.AltMask | HotKey);
 			if (HotKey != Key.Null) {
 				if (ContainsKeyBinding (obj)) {
 					ReplaceKeyBinding (Key.Space | obj, Key.Space | HotKey);
@@ -207,23 +201,17 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (InvokeKeybindings (kb))
-				return true;
-
-			return false;
+			return ExecuteHotKey (kb);
 		}
 
 		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
-			if (!Enabled || !IsDefault) {
+			if (!Enabled) {
 				return false;
 			}
 
-			if (InvokeKeybindings (kb))
-				return true;
-
-			return false;
+			return ExecuteColdKey (kb);
 		}
 
 		///<inheritdoc/>
@@ -241,18 +229,18 @@ namespace Terminal.Gui {
 
 		bool ExecuteHotKey (KeyEvent ke)
 		{
-			if (ke.IsAlt) {
+			if (ke.Key == (Key.AltMask | HotKey)) {
 				return AcceptKey ();
 			}
 			return false;
 		}
 
-		bool ExecuteColdKey ()
+		bool ExecuteColdKey (KeyEvent ke)
 		{
-			if (IsDefault) {
+			if (IsDefault && ke.KeyValue == '\n') {
 				return AcceptKey ();
 			}
-			return false;
+			return ExecuteHotKey (ke);
 		}
 
 		bool AcceptKey ()
@@ -260,8 +248,16 @@ namespace Terminal.Gui {
 			if (!HasFocus) {
 				SetFocus ();
 			}
-			Clicked?.Invoke ();
+			OnClicked ();
 			return true;
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
 		}
 
 		/// <summary>
@@ -285,7 +281,7 @@ namespace Terminal.Gui {
 						SetFocus ();
 						SetNeedsDisplay ();
 					}
-					Clicked?.Invoke ();
+					OnClicked ();
 				}
 
 				return true;

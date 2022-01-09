@@ -213,28 +213,28 @@ namespace Terminal.Gui {
 			CanFocus = true;
 
 			// Things this view knows how to do
-			AddCommand (Command.PageUp, (_) => { MovePageUp (false); return true; });
-			AddCommand (Command.PageDown, (_) => { MovePageDown (false); return true; });
-			AddCommand (Command.PageUpExtend, (_) => { MovePageUp (true); return true; });
-			AddCommand (Command.PageDownExtend, (_) => { MovePageDown (true); return true; });
-			AddCommand (Command.Expand, (_) => { Expand (); return true; });
-			AddCommand (Command.ExpandAll, (_) => { ExpandAll (SelectedObject); return true; });
-			AddCommand (Command.Collapse, (e) => { CursorLeft (false); return true; });
-			AddCommand (Command.CollapseAll, (e) => { CursorLeft (true); return true; });
-			AddCommand (Command.LineUp, (_) => { AdjustSelection (-1,false); return true; });
-			AddCommand (Command.LineUpExtend, (_) => { AdjustSelection (-1, true); return true; });
-			AddCommand (Command.LineUpToFirstBranch, (_) => { AdjustSelectionToBranchStart (); return true; });
+			AddCommand (Command.PageUp, () => { MovePageUp (false); return true; });
+			AddCommand (Command.PageDown, () => { MovePageDown (false); return true; });
+			AddCommand (Command.PageUpExtend, () => { MovePageUp (true); return true; });
+			AddCommand (Command.PageDownExtend, () => { MovePageDown (true); return true; });
+			AddCommand (Command.Expand, () => { Expand (); return true; });
+			AddCommand (Command.ExpandAll, () => { ExpandAll (SelectedObject); return true; });
+			AddCommand (Command.Collapse, () => { CursorLeft (false); return true; });
+			AddCommand (Command.CollapseAll, () => { CursorLeft (true); return true; });
+			AddCommand (Command.LineUp, () => { AdjustSelection (-1,false); return true; });
+			AddCommand (Command.LineUpExtend, () => { AdjustSelection (-1, true); return true; });
+			AddCommand (Command.LineUpToFirstBranch, () => { AdjustSelectionToBranchStart (); return true; });
 
-			AddCommand (Command.LineDown, (_) => { AdjustSelection (1, false); return true; });
-			AddCommand (Command.LineDownExtend, (_) => { AdjustSelection (1, true); return true; });
-			AddCommand (Command.LineDownToLastBranch, (_) => { AdjustSelectionToBranchEnd (); return true; });
+			AddCommand (Command.LineDown, () => { AdjustSelection (1, false); return true; });
+			AddCommand (Command.LineDownExtend, () => { AdjustSelection (1, true); return true; });
+			AddCommand (Command.LineDownToLastBranch, () => { AdjustSelectionToBranchEnd (); return true; });
 
-			AddCommand (Command.Home, (_) => { GoToFirst (); return true; });
-			AddCommand (Command.End, (_) => { GoToEnd (); return true; });
-			AddCommand (Command.SelectAll, (_) => { SelectAll (); return true; });
+			AddCommand (Command.Home, () => { GoToFirst (); return true; });
+			AddCommand (Command.End, () => { GoToEnd (); return true; });
+			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
 
-			AddCommand (Command.LineScrollUp, (_) => { ScrollUp (); return true; });
-			AddCommand (Command.LineScrollDown, (_) => { ScrollDown (); return true; });
+			AddCommand (Command.LineScrollUp, () => { ScrollUp (); return true; });
+			AddCommand (Command.LineScrollDown, () => { ScrollDown (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.PageUp, Command.PageUp);
