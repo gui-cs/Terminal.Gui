@@ -47,15 +47,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
-		public MenuItem (Key shortcut = Key.Null)
-		{
-			Title = "";
-			Help = "";
-			shortcutHelper = new ShortcutHelper ();
-			if (shortcut != Key.Null) {
-				shortcutHelper.Shortcut = shortcut;
-			}
-		}
+		public MenuItem (Key shortcut = Key.Null) : this ("", "", null, null, null, shortcut) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>.
@@ -216,8 +208,7 @@ namespace Terminal.Gui {
 		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 		public MenuBarItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null) : base (title, help, action, canExecute, parent)
 		{
-			SetTitle (title ?? "");
-			Children = null;
+			Initialize (title, null, null, true);
 		}
 
 		/// <summary>
@@ -228,15 +219,7 @@ namespace Terminal.Gui {
 		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 		public MenuBarItem (ustring title, MenuItem [] children, MenuItem parent = null)
 		{
-			if (children == null) {
-				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
-			}
-			SetTitle (title ?? "");
-			if (parent != null) {
-				Parent = parent;
-			}
-			SetChildrensParent (children);
-			Children = children;
+			Initialize (title, children, parent);
 		}
 
 		/// <summary>
@@ -247,22 +230,7 @@ namespace Terminal.Gui {
 		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 		public MenuBarItem (ustring title, List<MenuItem []> children, MenuItem parent = null)
 		{
-			if (children == null) {
-				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
-			}
-			SetTitle (title ?? "");
-			if (parent != null) {
-				Parent = parent;
-			}
-			MenuItem [] childrens = new MenuItem [] { };
-			foreach (var item in children) {
-				for (int i = 0; i < item.Length; i++) {
-					SetChildrensParent (item);
-					Array.Resize (ref childrens, childrens.Length + 1);
-					childrens [childrens.Length - 1] = item [i];
-				}
-			}
-			Children = childrens;
+			Initialize (title, children, parent);
 		}
 
 		/// <summary>
@@ -275,6 +243,33 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		public MenuBarItem () : this (children: new MenuItem [] { }) { }
+
+		void Initialize (ustring title, object children, MenuItem parent = null, bool isTopLevel = false)
+		{
+			if (!isTopLevel && children == null) {
+				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+			}
+			SetTitle (title ?? "");
+			if (parent != null) {
+				Parent = parent;
+			}
+			if (children is List<MenuItem []>) {
+				MenuItem [] childrens = new MenuItem [] { };
+				foreach (var item in (List<MenuItem []>)children) {
+					for (int i = 0; i < item.Length; i++) {
+						SetChildrensParent (item);
+						Array.Resize (ref childrens, childrens.Length + 1);
+						childrens [childrens.Length - 1] = item [i];
+					}
+				}
+				Children = childrens;
+			} else if (children is MenuItem []) {
+				SetChildrensParent ((MenuItem [])children);
+				Children = (MenuItem [])children;
+			} else {
+				Children = null;
+			}
+		}
 
 		//static int GetMaxTitleLength (MenuItem [] children)
 		//{

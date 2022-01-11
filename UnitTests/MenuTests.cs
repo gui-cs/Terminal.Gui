@@ -62,6 +62,24 @@ namespace Terminal.Gui.Views {
 			Assert.Null (menuBarItem.CanExecute);
 			Assert.Null (menuBarItem.Parent);
 			Assert.Equal (Key.Null, menuBarItem.Shortcut);
+
+			var menuItem = new MenuItem ();
+			Assert.Equal ("", menuItem.Title);
+			Assert.Equal ("", menuItem.Help);
+			Assert.Null (menuItem.Action);
+			Assert.Null (menuItem.CanExecute);
+			Assert.Null (menuItem.Parent);
+			Assert.Equal (Key.Null, menuItem.Shortcut);
+
+			menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), Key.F1);
+			Assert.Equal ("Test", menuItem.Title);
+			Assert.Equal ("Help", menuItem.Help);
+			Assert.Equal (Run, menuItem.Action);
+			Assert.NotNull (menuItem.CanExecute);
+			Assert.NotNull (menuItem.Parent);
+			Assert.Equal (Key.F1, menuItem.Shortcut);
+
+			void Run () { }
 		}
 
 		[Fact]
