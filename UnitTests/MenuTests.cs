@@ -119,6 +119,7 @@ namespace Terminal.Gui.Views {
 			void New () => miAction = "New";
 			void Copy () => miAction = "Copy";
 		}
+
 		[Fact]
 		[AutoInitShutdown]
 		public void MouseEvent_Test ()
