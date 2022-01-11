@@ -413,6 +413,27 @@ namespace Terminal.Gui {
 				WantMousePositionReports = host.WantMousePositionReports;
 			}
 
+			// Things this view knows how to do
+			AddCommand (Command.CleanUp, () => { this.host.CleanUp (); return true; });
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.LeftItem, () => { this.host.PreviousMenu (true); return true; });
+			AddCommand (Command.RightItem, () => {
+				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
+					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu)
+					? true : false); return true;
+			});
+			AddCommand (Command.Cancel, () => { CloseAllMenus (); return true; });
+			AddCommand (Command.Accept, () => { RunSelected (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.Tab, Command.CleanUp);
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
+			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.Esc, Command.Cancel);
+			AddKeyBinding (Key.Enter, Command.Accept);
 		}
 
 		internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
@@ -550,40 +571,20 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			switch (kb.Key) {
-			case Key.Tab:
-				host.CleanUp ();
+			if (InvokeKeybindings (kb))
 				return true;
-			case Key.CursorUp:
-				return MoveUp ();
-			case Key.CursorDown:
-				return MoveDown ();
-			case Key.CursorLeft:
-				host.PreviousMenu (true);
-				return true;
-			case Key.CursorRight:
-				host.NextMenu (barItems.IsTopLevel || (barItems.Children != null && current > -1 && current < barItems.Children.Length && barItems.Children [current].IsFromSubMenu) ? true : false);
-				return true;
-			case Key.Esc:
-				CloseAllMenus ();
-				return true;
-			case Key.Enter:
-				RunSelected ();
-				return true;
-			default:
-				// TODO: rune-ify
-				if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
-					var x = Char.ToUpper ((char)kb.KeyValue);
-					foreach (var item in barItems.Children) {
-						if (item == null) continue;
-						if (item.IsEnabled () && item.HotKey == x) {
-							host.CloseMenu ();
-							Run (item.Action);
-							return true;
-						}
+
+			// TODO: rune-ify
+			if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
+				var x = Char.ToUpper ((char)kb.KeyValue);
+				foreach (var item in barItems.Children) {
+					if (item == null) continue;
+					if (item.IsEnabled () && item.HotKey == x) {
+						host.CloseMenu ();
+						Run (item.Action);
+						return true;
 					}
 				}
-				break;
 			}
 			return false;
 		}
@@ -832,6 +833,20 @@ namespace Terminal.Gui {
 			ColorScheme = Colors.Menu;
 			WantMousePositionReports = true;
 			IsMenuOpen = false;
+
+			// Things this view knows how to do
+			AddCommand (Command.LeftItem, () => { MoveLeft (); return true; });
+			AddCommand (Command.RightItem, () => { MoveRight (); return true; });
+			AddCommand (Command.Cancel, () => { CloseMenuBar (); return true; });
+			AddCommand (Command.Accept, () => { ProcessMenu (selected, Menus [selected]); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
+			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.Esc, Command.Cancel);
+			AddKeyBinding (Key.C | Key.CtrlMask, Command.Cancel);
+			AddKeyBinding (Key.CursorDown, Command.Accept);
+			AddKeyBinding (Key.Enter, Command.Accept);
 		}
 
 		bool openedByAltKey;
@@ -1491,48 +1506,30 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			switch (kb.Key) {
-			case Key.CursorLeft:
-				MoveLeft ();
+			if (InvokeKeybindings (kb))
 				return true;
 
-			case Key.CursorRight:
-				MoveRight ();
-				return true;
+			var key = kb.KeyValue;
+			if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
+				char c = Char.ToUpper ((char)key);
 
-			case Key.Esc:
-			case Key.C | Key.CtrlMask:
-				CloseMenuBar ();
-				return true;
+				if (selected == -1 || Menus [selected].IsTopLevel)
+					return false;
 
-			case Key.CursorDown:
-			case Key.Enter:
-				ProcessMenu (selected, Menus [selected]);
-				return true;
-
-			default:
-				var key = kb.KeyValue;
-				if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
-					char c = Char.ToUpper ((char)key);
-
-					if (selected == -1 || Menus [selected].IsTopLevel)
-						return false;
-
-					foreach (var mi in Menus [selected].Children) {
-						if (mi == null)
-							continue;
-						int p = mi.Title.IndexOf ('_');
-						if (p != -1 && p + 1 < mi.Title.RuneCount) {
-							if (mi.Title [p + 1] == c) {
-								Selected (mi);
-								return true;
-							}
+				foreach (var mi in Menus [selected].Children) {
+					if (mi == null)
+						continue;
+					int p = mi.Title.IndexOf ('_');
+					if (p != -1 && p + 1 < mi.Title.RuneCount) {
+						if (mi.Title [p + 1] == c) {
+							Selected (mi);
+							return true;
 						}
 					}
 				}
-
-				return false;
 			}
+
+			return false;
 		}
 
 		void CloseMenuBar ()

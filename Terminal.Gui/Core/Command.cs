@@ -205,6 +205,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Moves the cursor to the bottom of page.
 		/// </summary>
-		EndOfPage
+		EndOfPage,
+
+		CleanUp,
+
+		LeftItem,
+
+		RightItem
 	}
 }
