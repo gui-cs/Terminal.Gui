@@ -229,8 +229,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDownExtend, () => { AdjustSelection (1, true); return true; });
 			AddCommand (Command.LineDownToLastBranch, () => { AdjustSelectionToBranchEnd (); return true; });
 
-			AddCommand (Command.Home, () => { GoToFirst (); return true; });
-			AddCommand (Command.End, () => { GoToEnd (); return true; });
+			AddCommand (Command.TopHome, () => { GoToFirst (); return true; });
+			AddCommand (Command.BottomEnd, () => { GoToEnd (); return true; });
 			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
 
 			AddCommand (Command.LineScrollUp, () => { ScrollUp (); return true; });
@@ -254,8 +254,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
 			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.LineDownToLastBranch);
 
-			AddKeyBinding (Key.Home, Command.Home);
-			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
 		}
 

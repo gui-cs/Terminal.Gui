@@ -67,8 +67,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => ToggleSide ());
 			AddCommand (Command.PageUp, () => MoveUp (bytesPerLine * Frame.Height));
 			AddCommand (Command.PageDown, () => MoveDown (bytesPerLine * Frame.Height));
-			AddCommand (Command.Home, () => MoveHome ());
-			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
 			AddCommand (Command.StartOfLine, () => MoveStartOfLine ());
 			AddCommand (Command.EndOfLine, () => MoveEndOfLine ());
 			AddCommand (Command.StartOfPage, () => MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
@@ -87,8 +87,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
 			AddKeyBinding (Key.PageDown, Command.PageDown);
 
-			AddKeyBinding (Key.Home, Command.Home);
-			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.StartOfLine);
 			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.EndOfLine);
 			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.StartOfPage);

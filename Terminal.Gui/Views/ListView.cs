@@ -325,8 +325,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
 			AddCommand (Command.PageUp, () => MovePageUp ());
 			AddCommand (Command.PageDown, () => MovePageDown ());
-			AddCommand (Command.Home, () => MoveHome ());
-			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
 			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
 			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
@@ -342,9 +342,9 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.PageDown, Command.PageDown);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
 
-			AddKeyBinding (Key.Home, Command.Home);
+			AddKeyBinding (Key.Home, Command.TopHome);
 
-			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.End, Command.BottomEnd);
 
 			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
 

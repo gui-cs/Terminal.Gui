@@ -39,7 +39,7 @@ namespace Terminal.Gui {
 		/// <param name="frame"></param>
 		public ScrollView (Rect frame) : base (frame)
 		{
-			Init (frame);
+			Initialize (frame);
 		}
 
 
@@ -48,10 +48,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ScrollView () : base ()
 		{
-			Init (new Rect (0, 0, 0, 0));
+			Initialize (Rect.Empty);
 		}
 
-		void Init (Rect frame)
+		void Initialize (Rect frame)
 		{
 			contentView = new View (frame);
 			vertical = new ScrollBarView (1, 0, isVertical: true) {
@@ -74,6 +74,8 @@ namespace Terminal.Gui {
 				ContentOffset = new Point (horizontal.Position, ContentOffset.Y);
 			};
 			horizontal.Host = this;
+			vertical.OtherScrollBarView = horizontal;
+			horizontal.OtherScrollBarView = vertical;
 			base.Add (contentView);
 			CanFocus = true;
 
@@ -81,6 +83,39 @@ namespace Terminal.Gui {
 			MouseLeave += View_MouseLeave;
 			contentView.MouseEnter += View_MouseEnter;
 			contentView.MouseLeave += View_MouseLeave;
+
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => ScrollUp (1));
+			AddCommand (Command.LineDown, () => ScrollDown (1));
+			AddCommand (Command.CharLeft, () => ScrollLeft (1));
+			AddCommand (Command.CharRight, () => ScrollRight (1));
+			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
+			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
+			AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
+			AddCommand (Command.PageRight, () => ScrollRight (Bounds.Width));
+			AddCommand (Command.TopHome, () => ScrollUp (contentSize.Height));
+			AddCommand (Command.BottomEnd, () => ScrollDown (contentSize.Height));
+			AddCommand (Command.LeftHome, () => ScrollLeft (contentSize.Width));
+			AddCommand (Command.RightEnd, () => ScrollRight (contentSize.Width));
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
+			AddKeyBinding (Key.CursorRight, Command.CharRight);
+
+			AddKeyBinding (Key.PageUp, Command.PageUp);
+			AddKeyBinding ((Key)'v' | Key.AltMask, Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.PageUp | Key.CtrlMask, Command.PageLeft);
+			AddKeyBinding (Key.PageDown | Key.CtrlMask, Command.PageRight);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
+			AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
+			AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
 		}
 
 		Size contentSize;
@@ -451,33 +486,9 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (kb))
 				return true;
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-				return ScrollUp (1);
-			case (Key)'v' | Key.AltMask:
-			case Key.PageUp:
-				return ScrollUp (Bounds.Height);
+			if (InvokeKeybindings (kb))
+				return true;
 
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return ScrollDown (Bounds.Height);
-
-			case Key.CursorDown:
-				return ScrollDown (1);
-
-			case Key.CursorLeft:
-				return ScrollLeft (1);
-
-			case Key.CursorRight:
-				return ScrollRight (1);
-
-			case Key.Home:
-				return ScrollUp (contentSize.Height);
-
-			case Key.End:
-				return ScrollDown (contentSize.Height);
-
-			}
 			return false;
 		}
 
