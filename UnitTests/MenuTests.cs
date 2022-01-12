@@ -300,7 +300,9 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.False (mCurrent.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());

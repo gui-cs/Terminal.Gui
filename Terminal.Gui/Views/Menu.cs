@@ -414,7 +414,6 @@ namespace Terminal.Gui {
 			}
 
 			// Things this view knows how to do
-			AddCommand (Command.CleanUp, () => { this.host.CleanUp (); return true; });
 			AddCommand (Command.LineUp, () => MoveUp ());
 			AddCommand (Command.LineDown, () => MoveDown ());
 			AddCommand (Command.LeftItem, () => { this.host.PreviousMenu (true); return true; });
@@ -427,7 +426,6 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => { RunSelected (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Tab, Command.CleanUp);
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
 			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
