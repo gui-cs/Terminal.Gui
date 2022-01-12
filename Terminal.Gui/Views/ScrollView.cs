@@ -110,8 +110,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.PageDown, Command.PageDown);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
 
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.PageLeft);
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.PageRight);
+			AddKeyBinding (Key.PageUp | Key.CtrlMask, Command.PageLeft);
+			AddKeyBinding (Key.PageDown | Key.CtrlMask, Command.PageRight);
 			AddKeyBinding (Key.Home, Command.TopHome);
 			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
