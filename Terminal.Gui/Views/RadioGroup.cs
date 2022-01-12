@@ -67,15 +67,15 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => { MoveUp (); return true; });
 			AddCommand (Command.LineDown, () => { MoveDown (); return true; });
-			AddCommand (Command.Home, () => { MoveHome (); return true; });
-			AddCommand (Command.End, () => { MoveEnd (); return true; });
+			AddCommand (Command.TopHome, () => { MoveHome (); return true; });
+			AddCommand (Command.BottomEnd, () => { MoveEnd (); return true; });
 			AddCommand (Command.Accept, () => { SelectItem (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.Home, Command.Home);
-			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.Space, Command.Accept);
 		}
 

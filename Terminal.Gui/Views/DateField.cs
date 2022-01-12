@@ -81,9 +81,9 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => DeleteCharRight ());
 			AddCommand (Command.DeleteCharLeft, () => DeleteCharLeft ());
-			AddCommand (Command.Home, () => MoveHome ());
+			AddCommand (Command.LeftHome, () => MoveHome ());
 			AddCommand (Command.CharLeft, () => MoveLeft ());
-			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.RightEnd, () => MoveEnd ());
 			AddCommand (Command.CharRight, () => MoveRight ());
 
 			// Default keybindings for this view
@@ -93,14 +93,14 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
 			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
 
-			AddKeyBinding (Key.Home, Command.Home);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.Home);
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
 
 			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
 			AddKeyBinding (Key.B | Key.CtrlMask, Command.CharLeft);
 
-			AddKeyBinding (Key.End, Command.End);
-			AddKeyBinding (Key.E | Key.CtrlMask, Command.End);
+			AddKeyBinding (Key.End, Command.RightEnd);
+			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
 
 			AddKeyBinding (Key.CursorRight, Command.CharRight);
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.CharRight);

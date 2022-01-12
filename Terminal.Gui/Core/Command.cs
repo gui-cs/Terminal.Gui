@@ -112,14 +112,14 @@ namespace Terminal.Gui {
 		PageUpExtend,
 
 		/// <summary>
-		/// Move to begin.
+		/// Moves to top begin.
 		/// </summary>
-		Home,
+		TopHome,
 
 		/// <summary>
-		/// Move to end.
+		/// Moves to bottom end.
 		/// </summary>
-		End,
+		BottomEnd,
 
 		/// <summary>
 		/// Open selected item.
@@ -220,6 +220,26 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Moves the cursor to the item on the right.
 		/// </summary>
-		RightItem
+		RightItem,
+
+		/// <summary>
+		/// Moves to the left page.
+		/// </summary>
+		PageLeft,
+
+		/// <summary>
+		/// Moves to the right page.
+		/// </summary>
+		PageRight,
+
+		/// <summary>
+		/// Moves to the left begin.
+		/// </summary>
+		LeftHome,
+
+		/// <summary>
+		/// Moves to the right end.
+		/// </summary>
+		RightEnd
 	}
 }

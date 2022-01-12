@@ -167,8 +167,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineUp, () => MoveUp ());
 			AddCommand (Command.PageDown, () => PageDown ());
 			AddCommand (Command.PageUp, () => PageUp ());
-			AddCommand (Command.Home, () => MoveHome ());
-			AddCommand (Command.End, () => MoveEnd ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
 			AddCommand (Command.Cancel, () => CancelSelected ());
 			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
@@ -179,8 +179,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.PageDown, Command.PageDown);
 			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.Home, Command.Home);
-			AddKeyBinding (Key.End, Command.End);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
