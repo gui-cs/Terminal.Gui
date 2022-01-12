@@ -207,10 +207,19 @@ namespace Terminal.Gui {
 		/// </summary>
 		EndOfPage,
 
+		/// <summary>
+		/// Used to do some cleanup-
+		/// </summary>
 		CleanUp,
 
+		/// <summary>
+		/// Moves the cursor to the item on the left.
+		/// </summary>
 		LeftItem,
 
+		/// <summary>
+		/// Moves the cursor to the item on the right.
+		/// </summary>
 		RightItem
 	}
 }
