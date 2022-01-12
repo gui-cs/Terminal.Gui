@@ -183,7 +183,6 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("_Paste", miCurrent.Title);
 
 			for (int i = 2; i >= -1; i--) {
-				View view;
 				if (i == -1) {
 					Assert.False (mCurrent.MouseEvent (new MouseEvent () {
 						X = 10,
