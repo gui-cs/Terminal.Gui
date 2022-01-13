@@ -117,9 +117,19 @@ namespace Terminal.Gui {
 		TopHome,
 
 		/// <summary>
+		/// Extends the selection to the top begin.
+		/// </summary>
+		TopHomeExtend,
+
+		/// <summary>
 		/// Moves to bottom end.
 		/// </summary>
 		BottomEnd,
+
+		/// <summary>
+		/// Extends the selection to the bottom end.
+		/// </summary>
+		BottomEndExtend,
 
 		/// <summary>
 		/// Open selected item.
@@ -233,8 +243,18 @@ namespace Terminal.Gui {
 		LeftHome,
 
 		/// <summary>
+		/// Extends the selection to the left begin.
+		/// </summary>
+		LeftHomeExtend,
+
+		/// <summary>
 		/// Moves to the right end.
 		/// </summary>
-		RightEnd
+		RightEnd,
+
+		/// <summary>
+		/// Extends the selection to the right end.
+		/// </summary>
+		RightEndExtend
 	}
 }

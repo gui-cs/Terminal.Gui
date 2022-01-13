@@ -188,32 +188,82 @@ namespace Terminal.Gui {
 		public TableView () : base ()
 		{
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.CharRight, () => { ChangeSelectionByOffset (1, 0, false); return true; });
+			AddCommand (Command.CharLeft, () => { ChangeSelectionByOffset (-1, 0, false); return true; });
+			AddCommand (Command.LineUp, () => { ChangeSelectionByOffset (0, -1, false); return true; });
+			AddCommand (Command.LineDown, () => { ChangeSelectionByOffset (0, 1, false); return true; });
+			AddCommand (Command.PageUp, () => { PageUp (false); return true; });
+			AddCommand (Command.PageDown, () => { PageDown (false); return true; });
+			AddCommand (Command.LeftHome, () => { ChangeSelectionToStartOfRow (false);  return true; });
+			AddCommand (Command.RightEnd, () => { ChangeSelectionToEndOfRow (false); return true; });
+			AddCommand (Command.TopHome, () => { ChangeSelectionToStartOfTable(false); return true; });
+			AddCommand (Command.BottomEnd, () => { ChangeSelectionToEndOfTable (false); return true; });
+
+			AddCommand (Command.CharRightExtend, () => { ChangeSelectionByOffset (1, 0, true); return true; });
+			AddCommand (Command.CharLeftExtend, () => { ChangeSelectionByOffset (-1, 0, true); return true; });
+			AddCommand (Command.LineUpExtend, () => { ChangeSelectionByOffset (0, -1, true); return true; });
+			AddCommand (Command.LineDownExtend, () => { ChangeSelectionByOffset (0, 1, true); return true; });
+			AddCommand (Command.PageUpExtend, () => { PageUp (true); return true; });
+			AddCommand (Command.PageDownExtend, () => { PageDown (true); return true; });
+			AddCommand (Command.LeftHomeExtend, () => { ChangeSelectionToStartOfRow (true); return true; });
+			AddCommand (Command.RightEndExtend, () => { ChangeSelectionToEndOfRow (true); return true; });
+			AddCommand (Command.TopHomeExtend, () => { ChangeSelectionToStartOfTable (true); return true; });
+			AddCommand (Command.BottomEndExtend, () => { ChangeSelectionToEndOfTable (true); return true; });
+
+			AddCommand (Command.SelectAll, () => { SelectAll(); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
+			AddKeyBinding (Key.CursorRight, Command.CharRight);
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.PageUp, Command.PageUp);
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.End, Command.RightEnd);
+			AddKeyBinding (Key.Home | Key.CtrlMask, Command.TopHome);
+			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
+
+			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.CharLeftExtend);
+			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.CharRightExtend);
+			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
+			AddKeyBinding (Key.CursorDown| Key.ShiftMask, Command.LineDownExtend);
+			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
+			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
+			AddKeyBinding (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
+			AddKeyBinding (Key.End | Key.ShiftMask, Command.RightEndExtend);
+			AddKeyBinding (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
+			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
+
+			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
-		{
-			Move (0, 0);
-			var frame = Frame;
+			{
+				Move (0, 0);
+				var frame = Frame;
 
-			// What columns to render at what X offset in viewport
-			var columnsToRender = CalculateViewport (bounds).ToArray ();
+				// What columns to render at what X offset in viewport
+				var columnsToRender = CalculateViewport (bounds).ToArray ();
 
-			Driver.SetAttribute (GetNormalColor ());
+				Driver.SetAttribute (GetNormalColor ());
 
-			//invalidate current row (prevents scrolling around leaving old characters in the frame
-			Driver.AddStr (new string (' ', bounds.Width));
+				//invalidate current row (prevents scrolling around leaving old characters in the frame
+				Driver.AddStr (new string (' ', bounds.Width));
 
-			int line = 0;
+				int line = 0;
 
-			if (ShouldRenderHeaders ()) {
-				// Render something like:
-				/*
-					┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-					│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
-				*/
-				if (Style.ShowHorizontalHeaderOverline) {
+				if (ShouldRenderHeaders ()) {
+					// Render something like:
+					/*
+						┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+						│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+						└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+					*/
+			if (Style.ShowHorizontalHeaderOverline) {
 					RenderHeaderOverline (line, bounds.Width, columnsToRender);
 					line++;
 				}
@@ -566,71 +616,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			switch (keyEvent.Key) {
-			case Key.CursorLeft:
-			case Key.CursorLeft | Key.ShiftMask:
-				ChangeSelectionByOffset (-1, 0, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.CursorRight:
-			case Key.CursorRight | Key.ShiftMask:
-				ChangeSelectionByOffset (1, 0, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.CursorDown:
-			case Key.CursorDown | Key.ShiftMask:
-				ChangeSelectionByOffset (0, 1, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.CursorUp:
-			case Key.CursorUp | Key.ShiftMask:
-				ChangeSelectionByOffset (0, -1, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.PageUp:
-			case Key.PageUp | Key.ShiftMask:
-				ChangeSelectionByOffset (0, -(Bounds.Height - GetHeaderHeightIfAny ()), keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.PageDown:
-			case Key.PageDown | Key.ShiftMask:
-				ChangeSelectionByOffset (0, Bounds.Height - GetHeaderHeightIfAny (), keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.Home | Key.CtrlMask:
-			case Key.Home | Key.CtrlMask | Key.ShiftMask:
-				// jump to table origin
-				SetSelection (0, 0, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.Home:
-			case Key.Home | Key.ShiftMask:
-				// jump to start of line
-				SetSelection (0, SelectedRow, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.End | Key.CtrlMask:
-			case Key.End | Key.CtrlMask | Key.ShiftMask:
-				// jump to end of table
-				SetSelection (Table.Columns.Count - 1, Table.Rows.Count - 1, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			case Key.A | Key.CtrlMask:
-				SelectAll ();
-				Update ();
-				break;
-			case Key.End:
-			case Key.End | Key.ShiftMask:
-				//jump to end of row
-				SetSelection (Table.Columns.Count - 1, SelectedRow, keyEvent.Key.HasFlag (Key.ShiftMask));
-				Update ();
-				break;
-			default:
-				// Not a keystroke we care about
-				return false;
+			if (HasFocus && CanFocus && InvokeKeybindings (keyEvent)) {
+
+				PositionCursor ();
+				return true;
 			}
-			PositionCursor ();
-			return true;
+
+			return false;
 		}
 
 		/// <summary>
@@ -671,6 +663,68 @@ namespace Terminal.Gui {
 		public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
 		{
 			SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
+			Update ();
+		}
+
+		/// <summary>
+		/// Moves the selection up by one page
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void PageUp(bool extend)
+		{
+			ChangeSelectionByOffset (0, -(Bounds.Height - GetHeaderHeightIfAny ()), extend);
+			Update ();
+		}
+
+		/// <summary>
+		/// Moves the selection down by one page
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void PageDown(bool extend)
+		{
+			ChangeSelectionByOffset (0, Bounds.Height - GetHeaderHeightIfAny (), extend);
+			Update ();
+		}
+
+		/// <summary>
+		/// Moves or extends the selection to the first cell in the table (0,0)
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void ChangeSelectionToStartOfTable (bool extend)
+		{
+			SetSelection (0, 0, extend);
+			Update ();
+		}
+
+		/// <summary>
+		/// Moves or extends the selection to the final cell in the table
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void ChangeSelectionToEndOfTable(bool extend)
+		{
+			SetSelection (Table.Columns.Count - 1, Table.Rows.Count - 1, extend);
+			Update ();
+		}
+
+
+		/// <summary>
+		/// Moves or extends the selection to the last cell in the current row
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void ChangeSelectionToEndOfRow (bool extend)
+		{
+			SetSelection (Table.Columns.Count - 1, SelectedRow, extend);
+			Update ();
+		}
+
+		/// <summary>
+		/// Moves or extends the selection to the first cell in the current row
+		/// </summary>
+		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+		public void ChangeSelectionToStartOfRow (bool extend)
+		{
+			SetSelection (0, SelectedRow, extend);
+			Update ();
 		}
 
 		/// <summary>
