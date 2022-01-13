@@ -110,6 +110,19 @@ namespace Terminal.Gui {
 
 			base.Add (tabsBar);
 			base.Add (contentView);
+
+			// Things this view knows how to do
+			AddCommand (Command.LeftItem, () => { SwitchTabBy(-1); return true; });
+			AddCommand (Command.RightItem, () => { SwitchTabBy (1); return true; });
+			AddCommand (Command.LeftHome, () => { SelectedTab = Tabs.FirstOrDefault (); return true; });
+			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
+
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
+			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.End, Command.RightEnd);
 		}
 
 		/// <summary>
@@ -215,23 +228,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (HasFocus && CanFocus && Focused == tabsBar) {
-				switch (keyEvent.Key) {
-
-				case Key.CursorLeft:
-					SwitchTabBy (-1);
-					return true;
-				case Key.CursorRight:
-					SwitchTabBy (1);
-					return true;
-				case Key.Home:
-					SelectedTab = Tabs.FirstOrDefault ();
-					return true;
-				case Key.End:
-					SelectedTab = Tabs.LastOrDefault ();
-					return true;
-				}
-			}
+			if (HasFocus && CanFocus && Focused == tabsBar && InvokeKeybindings (keyEvent))
+				return true;
 
 			return base.ProcessKey (keyEvent);
 		}
