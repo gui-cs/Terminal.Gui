@@ -2335,7 +2335,7 @@ namespace Terminal.Gui {
 				lastWasKill = setLastWasKill;
 				break;
 
-			case Key.Backspace | Key.CtrlMask | Key.ShiftMask: // kill-to-start
+			case Key.K | Key.AltMask: // kill-to-start
 				if (isReadOnly)
 					break;
 				currentLine = GetCurrentLine ();
