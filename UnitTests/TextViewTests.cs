@@ -974,7 +974,7 @@ namespace Terminal.Gui.Views {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
