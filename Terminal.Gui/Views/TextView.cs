@@ -1362,7 +1362,7 @@ namespace Terminal.Gui {
 			}
 			var posX = currentColumn - leftColumn;
 			var posY = currentRow - topRow;
-			if ( posX > -1 && col >= posX && posX < Frame.Width - RightOffset
+			if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset
 				&& topRow <= currentRow && posY < Frame.Height - BottomOffset) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
@@ -2567,6 +2567,22 @@ namespace Terminal.Gui {
 					}
 				}
 				break;
+
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == (Key.Tab | Key.CtrlMask):
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == Application.AlternateForwardKey:
+				if (Application.MdiTop != null) {
+					return SuperView?.FocusNext () == true;
+				}
+
+				return false;
+
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == (Key.Tab | Key.CtrlMask | Key.ShiftMask):
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == Application.AlternateBackwardKey:
+				if (Application.MdiTop != null) {
+					return SuperView?.FocusPrev () == true;
+				}
+
+				return false;
 
 			default:
 				// Ignore control characters and other special keys
