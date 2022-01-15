@@ -122,9 +122,22 @@ namespace Terminal.Gui {
 		KillWordBackwards,
 
 		/// <summary>
-		/// Inserts the characters in the current position.
+		/// Toggles overwrite mode such that newly typed text overwrites the text that is
+		/// already there (typically associated with the Insert key).
 		/// </summary>
-		InsertChar,
+		ToggleOverwriteMode,
+
+
+		/// <summary>
+		/// Enables overwrite mode such that newly typed text overwrites the text that is
+		/// already there (typically associated with the Insert key).
+		/// </summary>
+		EnableOverwrite,
+
+		/// <summary>
+		/// Disables overwrite mode (<see cref="EnableOverwrite"/>)
+		/// </summary>
+		DisableOverwrite,
 
 		/// <summary>
 		/// Move the page down.
