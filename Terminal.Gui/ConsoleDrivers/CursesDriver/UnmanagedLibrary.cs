@@ -258,7 +258,7 @@ namespace Unix.Terminal {
 		/// </summary>
 		static class CoreCLR
 		{
-#if NET6_0 || NET5_0
+#if NET6_0
 			// Custom resolver to support true single-file apps
 			// (those which run directly from bundle; in-memory).
 			//     -1 on Unix means self-referencing binary (libcoreclr.so)
