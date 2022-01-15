@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.WordRight, () => { MoveWordRight (); return true; });
 			AddCommand (Command.KillWordForwards, () => { KillWordForwards (); return true; });
 			AddCommand (Command.KillWordBackwards, () => { KillWordBackwards (); return true; });
-			AddCommand (Command.ToggleOverwriteMode, () => { SetOverwrite (!Used); return true; });
+			AddCommand (Command.ToggleOverwrite, () => { SetOverwrite (!Used); return true; });
 			AddCommand (Command.EnableOverwrite, () => { SetOverwrite (true); return true; });
 			AddCommand (Command.DisableOverwrite, () => { SetOverwrite (false); return true; });
 			AddCommand (Command.Copy, () => { Copy (); return true; });
@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.DeleteChar | Key.CtrlMask, Command.KillWordForwards);
 			AddKeyBinding (Key.Backspace | Key.CtrlMask, Command.KillWordBackwards);
-			AddKeyBinding (Key.InsertChar, Command.ToggleOverwriteMode);
+			AddKeyBinding (Key.InsertChar, Command.ToggleOverwrite);
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
