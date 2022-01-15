@@ -92,6 +92,31 @@ namespace Terminal.Gui {
 		WordRightExtend,
 
 		/// <summary>
+		/// Deletes and copies to the clipboard the characters from the current position to the end of the line.
+		/// </summary>
+		CharKillToEndLine,
+
+		/// <summary>
+		/// Deletes and copies to the clipboard the characters from the current position to the start of the line.
+		/// </summary>
+		CharKillToStartLine,
+
+		/// <summary>
+		/// Deletes the characters forwards.
+		/// </summary>
+		KillWordForwards,
+
+		/// <summary>
+		/// Deletes the characters backwards.
+		/// </summary>
+		KillWordBackwards,
+
+		/// <summary>
+		/// Inserts the characters in the current position.
+		/// </summary>
+		InsertChar,
+
+		/// <summary>
 		/// Move the page down.
 		/// </summary>
 		PageDown,
@@ -255,6 +280,31 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Extends the selection to the right end.
 		/// </summary>
-		RightEndExtend
+		RightEndExtend,
+
+		/// <summary>
+		/// Undo changes.
+		/// </summary>
+		Undo,
+
+		/// <summary>
+		/// Redo changes.
+		/// </summary>
+		Redo,
+
+		/// <summary>
+		/// Copies the current selection.
+		/// </summary>
+		Copy,
+
+		/// <summary>
+		/// Cuts the current selection.
+		/// </summary>
+		Cut,
+
+		/// <summary>
+		/// Pastes the current selection.
+		/// </summary>
+		Paste
 	}
 }
