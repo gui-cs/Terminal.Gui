@@ -190,8 +190,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 
 			// Things this view knows how to do
-			AddCommand (Command.CharRight, () => { ChangeSelectionByOffset (1, 0, false); return true; });
-			AddCommand (Command.CharLeft, () => { ChangeSelectionByOffset (-1, 0, false); return true; });
+			AddCommand (Command.Right, () => { ChangeSelectionByOffset (1, 0, false); return true; });
+			AddCommand (Command.Left, () => { ChangeSelectionByOffset (-1, 0, false); return true; });
 			AddCommand (Command.LineUp, () => { ChangeSelectionByOffset (0, -1, false); return true; });
 			AddCommand (Command.LineDown, () => { ChangeSelectionByOffset (0, 1, false); return true; });
 			AddCommand (Command.PageUp, () => { PageUp (false); return true; });
@@ -201,8 +201,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.TopHome, () => { ChangeSelectionToStartOfTable(false); return true; });
 			AddCommand (Command.BottomEnd, () => { ChangeSelectionToEndOfTable (false); return true; });
 
-			AddCommand (Command.CharRightExtend, () => { ChangeSelectionByOffset (1, 0, true); return true; });
-			AddCommand (Command.CharLeftExtend, () => { ChangeSelectionByOffset (-1, 0, true); return true; });
+			AddCommand (Command.RightExtend, () => { ChangeSelectionByOffset (1, 0, true); return true; });
+			AddCommand (Command.LeftExtend, () => { ChangeSelectionByOffset (-1, 0, true); return true; });
 			AddCommand (Command.LineUpExtend, () => { ChangeSelectionByOffset (0, -1, true); return true; });
 			AddCommand (Command.LineDownExtend, () => { ChangeSelectionByOffset (0, 1, true); return true; });
 			AddCommand (Command.PageUpExtend, () => { PageUp (true); return true; });
@@ -215,8 +215,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.SelectAll, () => { SelectAll(); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
 			AddKeyBinding (Key.PageUp, Command.PageUp);
@@ -226,8 +226,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Home | Key.CtrlMask, Command.TopHome);
 			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
 
-			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.CharLeftExtend);
-			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.CharRightExtend);
+			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
+			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
 			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
 			AddKeyBinding (Key.CursorDown| Key.ShiftMask, Command.LineDownExtend);
 			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);

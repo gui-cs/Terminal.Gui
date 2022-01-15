@@ -101,15 +101,15 @@ namespace Terminal.Gui {
 			AddCommand (Command.LeftHomeExtend, () => { MoveHomeExtend (); return true; });
 			AddCommand (Command.RightEndExtend, () => { MoveEndExtend (); return true; });
 			AddCommand (Command.LeftHome, () => { MoveHome (); return true; });
-			AddCommand (Command.CharLeftExtend, () => { MoveLeftExtend (); return true; });
-			AddCommand (Command.CharRightExtend, () => { MoveRightExtend (); return true; });
+			AddCommand (Command.LeftExtend, () => { MoveLeftExtend (); return true; });
+			AddCommand (Command.RightExtend, () => { MoveRightExtend (); return true; });
 			AddCommand (Command.WordLeftExtend, () => { MoveWordLeftExtend (); return true; });
 			AddCommand (Command.WordRightExtend, () => { MoveWordRightExtend (); return true; });
-			AddCommand (Command.CharLeft, () => { MoveLeft (); return true; });
+			AddCommand (Command.Left, () => { MoveLeft (); return true; });
 			AddCommand (Command.RightEnd, () => { MoveEnd (); return true; });
-			AddCommand (Command.CharRight, () => { MoveRight (); return true; });
-			AddCommand (Command.CharKillToEndLine, () => { KillToEnd (); return true; });
-			AddCommand (Command.CharKillToStartLine, () => { KillToStart (); return true; });
+			AddCommand (Command.Right, () => { MoveRight (); return true; });
+			AddCommand (Command.CutToEndLine, () => { KillToEnd (); return true; });
+			AddCommand (Command.CutToStartLine, () => { KillToStart (); return true; });
 			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
 			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
 			AddCommand (Command.WordLeft, () => { MoveWordLeft (); return true; });
@@ -140,11 +140,11 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
 
-			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.CharLeftExtend);
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.CharLeftExtend);
+			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
+			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LeftExtend);
 
-			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.CharRightExtend);
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.CharRightExtend);
+			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
+			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.RightExtend);
 
 			AddKeyBinding (Key.CursorLeft | Key.ShiftMask | Key.CtrlMask, Command.WordLeftExtend);
 			AddKeyBinding (Key.CursorUp | Key.ShiftMask | Key.CtrlMask, Command.WordLeftExtend);
@@ -154,18 +154,18 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorDown | Key.ShiftMask | Key.CtrlMask, Command.WordRightExtend);
 			AddKeyBinding ((Key)((int)'F' + Key.ShiftMask | Key.AltMask), Command.WordRightExtend);
 
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.CharLeft);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
 
 			AddKeyBinding (Key.End, Command.RightEnd);
 			AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
 			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
 
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.CharRight);
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
 
-			AddKeyBinding (Key.K | Key.CtrlMask, Command.CharKillToEndLine);
-			AddKeyBinding (Key.K | Key.AltMask, Command.CharKillToStartLine);
+			AddKeyBinding (Key.K | Key.CtrlMask, Command.CutToEndLine);
+			AddKeyBinding (Key.K | Key.AltMask, Command.CutToStartLine);
 
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
 			AddKeyBinding (Key.Backspace | Key.AltMask, Command.Undo);

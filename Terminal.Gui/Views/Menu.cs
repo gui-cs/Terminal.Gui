@@ -416,8 +416,8 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => MoveUp ());
 			AddCommand (Command.LineDown, () => MoveDown ());
-			AddCommand (Command.LeftItem, () => { this.host.PreviousMenu (true); return true; });
-			AddCommand (Command.RightItem, () => {
+			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
+			AddCommand (Command.Right, () => {
 				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
 					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu)
 					? true : false); return true;
@@ -428,8 +428,8 @@ namespace Terminal.Gui {
 			// Default keybindings for this view
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
-			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.Enter, Command.Accept);
 		}
@@ -833,14 +833,14 @@ namespace Terminal.Gui {
 			IsMenuOpen = false;
 
 			// Things this view knows how to do
-			AddCommand (Command.LeftItem, () => { MoveLeft (); return true; });
-			AddCommand (Command.RightItem, () => { MoveRight (); return true; });
+			AddCommand (Command.Left, () => { MoveLeft (); return true; });
+			AddCommand (Command.Right, () => { MoveRight (); return true; });
 			AddCommand (Command.Cancel, () => { CloseMenuBar (); return true; });
 			AddCommand (Command.Accept, () => { ProcessMenu (selected, Menus [selected]); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
-			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Cancel);
 			AddKeyBinding (Key.CursorDown, Command.Accept);

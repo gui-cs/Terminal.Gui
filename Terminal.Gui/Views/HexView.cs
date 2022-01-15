@@ -60,8 +60,8 @@ namespace Terminal.Gui {
 			firstNibble = true;
 
 			// Things this view knows how to do
-			AddCommand (Command.CharLeft, () => MoveLeft ());
-			AddCommand (Command.CharRight, () => MoveRight ());
+			AddCommand (Command.Left, () => MoveLeft ());
+			AddCommand (Command.Right, () => MoveRight ());
 			AddCommand (Command.LineDown, () => MoveDown (bytesPerLine));
 			AddCommand (Command.LineUp, () => MoveUp (bytesPerLine));
 			AddCommand (Command.ToggleChecked, () => ToggleSide ());
@@ -75,8 +75,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.EndOfPage, () => MoveDown (bytesPerLine * (Frame.Height - 1 - ((int)(position - displayStart) / bytesPerLine))));
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.Enter, Command.ToggleChecked);

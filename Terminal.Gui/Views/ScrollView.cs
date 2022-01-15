@@ -85,10 +85,10 @@ namespace Terminal.Gui {
 			contentView.MouseLeave += View_MouseLeave;
 
 			// Things this view knows how to do
-			AddCommand (Command.LineUp, () => ScrollUp (1));
-			AddCommand (Command.LineDown, () => ScrollDown (1));
-			AddCommand (Command.CharLeft, () => ScrollLeft (1));
-			AddCommand (Command.CharRight, () => ScrollRight (1));
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
+			AddCommand (Command.ScrollLeft, () => ScrollLeft (1));
+			AddCommand (Command.ScrollRight, () => ScrollRight (1));
 			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
 			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
 			AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
@@ -99,10 +99,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.RightEnd, () => ScrollRight (contentSize.Width));
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
+			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
+			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
+			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
+			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
 
 			AddKeyBinding (Key.PageUp, Command.PageUp);
 			AddKeyBinding ((Key)'v' | Key.AltMask, Command.PageUp);

@@ -112,15 +112,15 @@ namespace Terminal.Gui {
 			base.Add (contentView);
 
 			// Things this view knows how to do
-			AddCommand (Command.LeftItem, () => { SwitchTabBy(-1); return true; });
-			AddCommand (Command.RightItem, () => { SwitchTabBy (1); return true; });
+			AddCommand (Command.Left, () => { SwitchTabBy(-1); return true; });
+			AddCommand (Command.Right, () => { SwitchTabBy (1); return true; });
 			AddCommand (Command.LeftHome, () => { SelectedTab = Tabs.FirstOrDefault (); return true; });
 			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
 
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.LeftItem);
-			AddKeyBinding (Key.CursorRight, Command.RightItem);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.Home, Command.LeftHome);
 			AddKeyBinding (Key.End, Command.RightEnd);
 		}

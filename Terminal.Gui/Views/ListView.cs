@@ -321,8 +321,8 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => MoveUp ());
 			AddCommand (Command.LineDown, () => MoveDown ());
-			AddCommand (Command.LineScrollUp, () => ScrollUp (1));
-			AddCommand (Command.LineScrollDown, () => ScrollDown (1));
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
 			AddCommand (Command.PageUp, () => MovePageUp ());
 			AddCommand (Command.PageDown, () => MovePageDown ());
 			AddCommand (Command.TopHome, () => MoveHome ());

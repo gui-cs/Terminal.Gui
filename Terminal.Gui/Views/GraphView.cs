@@ -76,17 +76,17 @@ namespace Terminal.Gui {
 			AxisY = new VerticalAxis ();
 
 			// Things this view knows how to do
-			AddCommand (Command.LineScrollUp, () => { Scroll (0, CellSize.Y); return true; });
-			AddCommand (Command.LineScrollDown, () => { Scroll (0, -CellSize.Y); return true; });
-			AddCommand (Command.CharRight, () => { Scroll (CellSize.X, 0); return true; });
-			AddCommand (Command.CharLeft, () => { Scroll (-CellSize.X, 0); return true; });
+			AddCommand (Command.ScrollUp, () => { Scroll (0, CellSize.Y); return true; });
+			AddCommand (Command.ScrollDown, () => { Scroll (0, -CellSize.Y); return true; });
+			AddCommand (Command.ScrollRight, () => { Scroll (CellSize.X, 0); return true; });
+			AddCommand (Command.ScrollLeft, () => { Scroll (-CellSize.X, 0); return true; });
 			AddCommand (Command.PageUp, () => { PageUp (); return true; });
 			AddCommand (Command.PageDown, () => { PageDown(); return true; });
 
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.CursorUp, Command.LineScrollUp);
-			AddKeyBinding (Key.CursorDown, Command.LineScrollDown);
+			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
+			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
+			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
+			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
 			
 			// Not bound by default (preserves backwards compatibility)
 			//AddKeyBinding (Key.PageUp, Command.PageUp);

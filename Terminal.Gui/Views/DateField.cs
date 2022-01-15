@@ -82,9 +82,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.DeleteCharRight, () => DeleteCharRight ());
 			AddCommand (Command.DeleteCharLeft, () => DeleteCharLeft ());
 			AddCommand (Command.LeftHome, () => MoveHome ());
-			AddCommand (Command.CharLeft, () => MoveLeft ());
+			AddCommand (Command.Left, () => MoveLeft ());
 			AddCommand (Command.RightEnd, () => MoveEnd ());
-			AddCommand (Command.CharRight, () => MoveRight ());
+			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
@@ -96,14 +96,14 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Home, Command.LeftHome);
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
 
-			AddKeyBinding (Key.CursorLeft, Command.CharLeft);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.CharLeft);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
 
 			AddKeyBinding (Key.End, Command.RightEnd);
 			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
 
-			AddKeyBinding (Key.CursorRight, Command.CharRight);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.CharRight);
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
 		}
 
 		void DateField_Changed (ustring e)

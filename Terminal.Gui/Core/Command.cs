@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls down one line (without changing the selection).
 		/// </summary>
-		LineScrollDown,
+		ScrollDown,
 
 		// --------------------------------------------------------------------
 
@@ -49,27 +49,37 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls up one line (without changing the selection).
 		/// </summary>
-		LineScrollUp,
+		ScrollUp,
 
 		/// <summary>
-		/// Moves the caret left one character.
+		/// Moves the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
 		/// </summary>
-		CharLeft,
+		Left,
 
 		/// <summary>
-		/// Extends the selection left one character.
+		/// Scrolls one character to the left
 		/// </summary>
-		CharLeftExtend,
+		ScrollLeft,
 
 		/// <summary>
-		/// Moves the caret right one character.
+		/// Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
 		/// </summary>
-		CharRight,
+		LeftExtend,
 
 		/// <summary>
-		/// Extends the selection right one character.
+		/// Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
 		/// </summary>
-		CharRightExtend,
+		Right,
+
+		/// <summary>
+		/// Scrolls one character to the right.
+		/// </summary>
+		ScrollRight,
+
+		/// <summary>
+		/// Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+		/// </summary>
+		RightExtend,
 
 		/// <summary>
 		/// Moves the caret to the start of the previous word.
@@ -94,12 +104,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Deletes and copies to the clipboard the characters from the current position to the end of the line.
 		/// </summary>
-		CharKillToEndLine,
+		CutToEndLine,
 
 		/// <summary>
 		/// Deletes and copies to the clipboard the characters from the current position to the start of the line.
 		/// </summary>
-		CharKillToStartLine,
+		CutToStartLine,
 
 		/// <summary>
 		/// Deletes the characters forwards.
@@ -241,16 +251,6 @@ namespace Terminal.Gui {
 		/// Moves the cursor to the bottom of page.
 		/// </summary>
 		EndOfPage,
-
-		/// <summary>
-		/// Moves the cursor to the item on the left.
-		/// </summary>
-		LeftItem,
-
-		/// <summary>
-		/// Moves the cursor to the item on the right.
-		/// </summary>
-		RightItem,
 
 		/// <summary>
 		/// Moves to the left page.

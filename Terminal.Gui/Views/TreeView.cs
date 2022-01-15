@@ -233,8 +233,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.BottomEnd, () => { GoToEnd (); return true; });
 			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
 
-			AddCommand (Command.LineScrollUp, () => { ScrollUp (); return true; });
-			AddCommand (Command.LineScrollDown, () => { ScrollDown (); return true; });
+			AddCommand (Command.ScrollUp, () => { ScrollUp (); return true; });
+			AddCommand (Command.ScrollDown, () => { ScrollDown (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.PageUp, Command.PageUp);
