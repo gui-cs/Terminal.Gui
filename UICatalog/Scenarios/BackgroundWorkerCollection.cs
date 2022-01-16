@@ -367,7 +367,7 @@ namespace UICatalog.Scenarios {
 
 			private void OnReportClosed ()
 			{
-				if (Staging.StartStaging != null) {
+				if (Staging?.StartStaging != null) {
 					ReportClosed?.Invoke (this);
 				}
 				RequestStop ();
