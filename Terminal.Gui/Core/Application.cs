@@ -118,9 +118,9 @@ namespace Terminal.Gui {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-					Driver.HeightAsBuffer = value;
-				}
+				Driver.HeightAsBuffer = value;
 			}
+		}
 
 		/// <summary>
 		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
@@ -140,18 +140,83 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateForwardKey { get; set; } = Key.PageDown | Key.CtrlMask;
+		public static Key AlternateForwardKey {
+			get => alternateForwardKey;
+			set {
+				if (alternateForwardKey != value) {
+					var oldKey = alternateForwardKey;
+					alternateForwardKey = value;
+					OnAlternateForwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="AlternateForwardKey"/> is changed.
+		/// </summary>
+		public static Action<Key> AlternateForwardKeyChanged;
+
+		static void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			AlternateForwardKeyChanged?.Invoke (oldKey);
+		}
+
+		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateBackwardKey { get; set; } = Key.PageUp | Key.CtrlMask;
+		public static Key AlternateBackwardKey {
+			get => alternateBackwardKey;
+			set {
+				if (alternateBackwardKey != value) {
+					var oldKey = alternateBackwardKey;
+					alternateBackwardKey = value;
+					OnAlternateBackwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="AlternateBackwardKey"/> is changed.
+		/// </summary>
+		public static Action<Key> AlternateBackwardKeyChanged;
+
+		static void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			AlternateBackwardKeyChanged?.Invoke (oldKey);
+		}
+
+		static Key quitKey = Key.Q | Key.CtrlMask;
+
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
+		public static Key QuitKey {
+			get => quitKey;
+			set {
+				if (quitKey != value) {
+					var oldKey = quitKey;
+					quitKey = value;
+					OnQuitKeyChanged (oldKey);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="QuitKey"/> is changed.
+		/// </summary>
+		public static Action<Key> QuitKeyChanged;
+
+		static void OnQuitKeyChanged (Key oldKey)
+		{
+			QuitKeyChanged?.Invoke (oldKey);
+		}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application

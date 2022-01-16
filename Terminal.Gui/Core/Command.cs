@@ -318,6 +318,41 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Pastes the current selection.
 		/// </summary>
-		Paste
+		Paste,
+
+		/// <summary>
+		/// Quit a toplevel.
+		/// </summary>
+		QuitToplevel,
+
+		/// <summary>
+		/// Suspend a application (used on Linux).
+		/// </summary>
+		Suspend,
+
+		/// <summary>
+		/// Moves focus to the next view.
+		/// </summary>
+		NextView,
+
+		/// <summary>
+		/// Moves focuss to the previous view.
+		/// </summary>
+		PreviousView,
+
+		/// <summary>
+		/// Moves focus to the next view or toplevel (case of Mdi).
+		/// </summary>
+		NextViewOrTop,
+
+		/// <summary>
+		/// Moves focus to the next previous or toplevel (case of Mdi).
+		/// </summary>
+		PreviousViewOrTop,
+
+		/// <summary>
+		/// Refresh the application.
+		/// </summary>
+		Refresh
 	}
 }
