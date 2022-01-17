@@ -156,14 +156,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Invoked when the <see cref="AlternateForwardKey"/> is changed.
-		/// </summary>
-		public static Action<Key> AlternateForwardKeyChanged;
-
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			AlternateForwardKeyChanged?.Invoke (oldKey);
+			foreach (var top in toplevels) {
+				top.OnAlternateForwardKeyChanged (oldKey);
+			}
 		}
 
 		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
@@ -182,14 +179,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Invoked when the <see cref="AlternateBackwardKey"/> is changed.
-		/// </summary>
-		public static Action<Key> AlternateBackwardKeyChanged;
-
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			AlternateBackwardKeyChanged?.Invoke (oldKey);
+			foreach (var top in toplevels) {
+				top.OnAlternateBackwardKeyChanged (oldKey);
+			}
 		}
 
 		static Key quitKey = Key.Q | Key.CtrlMask;
@@ -208,14 +202,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Invoked when the <see cref="QuitKey"/> is changed.
-		/// </summary>
-		public static Action<Key> QuitKeyChanged;
-
 		static void OnQuitKeyChanged (Key oldKey)
 		{
-			QuitKeyChanged?.Invoke (oldKey);
+			foreach (var top in toplevels) {
+				top.OnQuitKeyChanged (oldKey);
+			}
 		}
 
 		/// <summary>

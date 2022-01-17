@@ -198,9 +198,9 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
-			Application.QuitKeyChanged += Application_QuitKeyChanged;
-			Application.AlternateForwardKeyChanged += Application_AlternateForwardKeyChanged;
-			Application.AlternateBackwardKeyChanged += Application_AlternateBackwardKeyChanged;
+			QuitKeyChanged += Toplevel_QuitKeyChanged;
+			AlternateForwardKeyChanged += Toplevel_AlternateForwardKeyChanged;
+			AlternateBackwardKeyChanged += Toplevel_AlternateBackwardKeyChanged;
 
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
@@ -233,19 +233,52 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
 		}
 
-		private void Application_QuitKeyChanged (Key obj)
+		private void Toplevel_QuitKeyChanged (Key obj)
 		{
 			ReplaceKeyBinding (obj, Application.QuitKey);
+			InovkeQuitKeyChanged (obj);
 		}
 
-		private void Application_AlternateBackwardKeyChanged (Key obj)
+		void InovkeQuitKeyChanged (Key oldKey)
+		{
+			foreach (var view in Subviews) {
+				view.OnQuitKeyChanged (oldKey);
+				if (view.Subviews.Count > 0) {
+					InovkeQuitKeyChanged (oldKey);
+				}
+			}
+		}
+
+		private void Toplevel_AlternateBackwardKeyChanged (Key obj)
 		{
 			ReplaceKeyBinding (obj, Application.AlternateBackwardKey);
+			InovkeAlternateBackwardKeyChanged (obj);
 		}
 
-		private void Application_AlternateForwardKeyChanged (Key obj)
+		void InovkeAlternateBackwardKeyChanged (Key oldKey)
+		{
+			foreach (var view in Subviews) {
+				view.OnAlternateBackwardKeyChanged (oldKey);
+				if (view.Subviews.Count > 0) {
+					InovkeAlternateBackwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		private void Toplevel_AlternateForwardKeyChanged (Key obj)
 		{
 			ReplaceKeyBinding (obj, Application.AlternateForwardKey);
+			InovkeAlternateForwardKeyChanged (obj);
+		}
+
+		void InovkeAlternateForwardKeyChanged (Key oldKey)
+		{
+			foreach (var view in Subviews) {
+				view.OnAlternateForwardKeyChanged (oldKey);
+				if (view.Subviews.Count > 0) {
+					InovkeAlternateForwardKeyChanged (oldKey);
+				}
+			}
 		}
 
 		/// <summary>

@@ -2670,5 +2670,47 @@ namespace Terminal.Gui {
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateForwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			AlternateForwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateBackwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			AlternateBackwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
+		/// </summary>
+		public static Action<Key> QuitKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnQuitKeyChanged (Key oldKey)
+		{
+			QuitKeyChanged?.Invoke (oldKey);
+		}
 	}
 }
