@@ -198,10 +198,6 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
-			QuitKeyChanged += Toplevel_QuitKeyChanged;
-			AlternateForwardKeyChanged += Toplevel_AlternateForwardKeyChanged;
-			AlternateBackwardKeyChanged += Toplevel_AlternateBackwardKeyChanged;
-
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
 			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
@@ -233,52 +229,49 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
 		}
 
-		private void Toplevel_QuitKeyChanged (Key obj)
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateForwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			ReplaceKeyBinding (obj, Application.QuitKey);
-			InovkeQuitKeyChanged (obj);
+			ReplaceKeyBinding (oldKey, Application.AlternateForwardKey);
+			AlternateForwardKeyChanged?.Invoke (oldKey);
 		}
 
-		void InovkeQuitKeyChanged (Key oldKey)
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateBackwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var view in Subviews) {
-				view.OnQuitKeyChanged (oldKey);
-				if (view.Subviews.Count > 0) {
-					InovkeQuitKeyChanged (oldKey);
-				}
-			}
+			ReplaceKeyBinding (oldKey, Application.AlternateBackwardKey);
+			AlternateBackwardKeyChanged?.Invoke (oldKey);
 		}
 
-		private void Toplevel_AlternateBackwardKeyChanged (Key obj)
-		{
-			ReplaceKeyBinding (obj, Application.AlternateBackwardKey);
-			InovkeAlternateBackwardKeyChanged (obj);
-		}
+		/// <summary>
+		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
+		/// </summary>
+		public static Action<Key> QuitKeyChanged;
 
-		void InovkeAlternateBackwardKeyChanged (Key oldKey)
+		/// <summary>
+		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnQuitKeyChanged (Key oldKey)
 		{
-			foreach (var view in Subviews) {
-				view.OnAlternateBackwardKeyChanged (oldKey);
-				if (view.Subviews.Count > 0) {
-					InovkeAlternateBackwardKeyChanged (oldKey);
-				}
-			}
-		}
-
-		private void Toplevel_AlternateForwardKeyChanged (Key obj)
-		{
-			ReplaceKeyBinding (obj, Application.AlternateForwardKey);
-			InovkeAlternateForwardKeyChanged (obj);
-		}
-
-		void InovkeAlternateForwardKeyChanged (Key oldKey)
-		{
-			foreach (var view in Subviews) {
-				view.OnAlternateForwardKeyChanged (oldKey);
-				if (view.Subviews.Count > 0) {
-					InovkeAlternateForwardKeyChanged (oldKey);
-				}
-			}
+			ReplaceKeyBinding (oldKey, Application.QuitKey);
+			QuitKeyChanged?.Invoke (oldKey);
 		}
 
 		/// <summary>
