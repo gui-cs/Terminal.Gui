@@ -527,5 +527,59 @@ namespace Terminal.Gui.Core {
 
 			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
+		{
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
+
+			var view = new View ();
+			view.Added += View_Added;
+			view.Removed += View_Removed;
+
+			void View_Added (View obj)
+			{
+				Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e;
+				Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e;
+				Application.Top.QuitKeyChanged += (e) => quitKey = e;
+				view.Added -= View_Added;
+			}
+
+			void View_Removed (View obj)
+			{
+				// Replacing the defaults keys to avoid errors on others unit tests that are using it.
+				Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
+				Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
+				Application.QuitKey = Key.Q | Key.CtrlMask;
+				view.Removed -= View_Removed;
+			}
+
+			var top = Application.Top;
+			top.Add (view);
+			Application.Begin (top);
+
+			Assert.Equal (Key.Null, alternateForwardKey);
+			Assert.Equal (Key.Null, alternateBackwardKey);
+			Assert.Equal (Key.Null, quitKey);
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+
+			Application.AlternateForwardKey = Key.A;
+			Application.AlternateBackwardKey = Key.B;
+			Application.QuitKey = Key.C;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, alternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, alternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, quitKey);
+
+			Assert.Equal (Key.A, Application.AlternateForwardKey);
+			Assert.Equal (Key.B, Application.AlternateBackwardKey);
+			Assert.Equal (Key.C, Application.QuitKey);
+		}
 	}
 }

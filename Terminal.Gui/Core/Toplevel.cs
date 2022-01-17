@@ -262,7 +262,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
 		/// </summary>
-		public static Action<Key> QuitKeyChanged;
+		public event Action<Key> QuitKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
