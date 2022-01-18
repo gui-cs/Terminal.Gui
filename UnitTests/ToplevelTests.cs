@@ -529,6 +529,38 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void Added_Event_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
+		{
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
+			var wasAdded = false;
+
+			var view = new View ();
+			view.Added += View_Added;
+
+			void View_Added (View obj)
+			{
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e);
+				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (e) => quitKey = e);
+				Assert.False (wasAdded);
+				wasAdded = true;
+				view.Added -= View_Added;
+			}
+
+			var win = new Window ();
+			win.Add (view);
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var top = Application.Top;
+			top.Add (win);
+
+			Assert.True (wasAdded);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
 		[AutoInitShutdown]
 		public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
 		{
@@ -537,28 +569,19 @@ namespace Terminal.Gui.Core {
 			Key quitKey = default;
 
 			var view = new View ();
-			view.Added += View_Added;
-			view.Removed += View_Removed;
+			view.Initialized += View_Initialized;
 
-			void View_Added (View obj)
+			void View_Initialized (object sender, EventArgs e)
 			{
 				Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e;
 				Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e;
 				Application.Top.QuitKeyChanged += (e) => quitKey = e;
-				view.Added -= View_Added;
 			}
 
-			void View_Removed (View obj)
-			{
-				// Replacing the defaults keys to avoid errors on others unit tests that are using it.
-				Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
-				Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
-				Application.QuitKey = Key.Q | Key.CtrlMask;
-				view.Removed -= View_Removed;
-			}
-
+			var win = new Window ();
+			win.Add (view);
 			var top = Application.Top;
-			top.Add (view);
+			top.Add (win);
 			Application.Begin (top);
 
 			Assert.Equal (Key.Null, alternateForwardKey);
@@ -580,6 +603,15 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (Key.A, Application.AlternateForwardKey);
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
 			Assert.Equal (Key.C, Application.QuitKey);
+
+			// Replacing the defaults keys to avoid errors on others unit tests that are using it.
+			Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
+			Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
+			Application.QuitKey = Key.Q | Key.CtrlMask;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 		}
 	}
 }

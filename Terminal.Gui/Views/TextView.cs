@@ -949,7 +949,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 
-			Added += TextView_Added;
+			Initialized += TextView_Initialized;
 
 			// Things this view knows how to do
 			AddCommand (Command.PageDown, () => { ProcessPageDown (); return true; });
@@ -1088,19 +1088,18 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousView);
 		}
 
-		private void TextView_Added (View obj)
+		void TextView_Initialized (object sender, EventArgs e)
 		{
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
-			Added -= TextView_Added;
 		}
 
-		private void Top_AlternateBackwardKeyChanged (Key obj)
+		void Top_AlternateBackwardKeyChanged (Key obj)
 		{
 			ReplaceKeyBinding (obj, Application.AlternateBackwardKey);
 		}
 
-		private void Top_AlternateForwardKeyChanged (Key obj)
+		void Top_AlternateForwardKeyChanged (Key obj)
 		{
 			ReplaceKeyBinding (obj, Application.AlternateForwardKey);
 		}
@@ -2244,7 +2243,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private bool ProcessMovePreviousView ()
+		bool ProcessMovePreviousView ()
 		{
 			ResetColumnTrack ();
 			return MovePreviousView ();
