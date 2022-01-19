@@ -251,9 +251,19 @@ namespace Terminal.Gui {
 		StartOfLine,
 
 		/// <summary>
+		/// Extends the selection to the start of line.
+		/// </summary>
+		StartOfLineExtend,
+
+		/// <summary>
 		/// Moves the cursor to the end of line.
 		/// </summary>
 		EndOfLine,
+
+		/// <summary>
+		/// Extends the selection to the end of line.
+		/// </summary>
+		EndOfLineExtend,
 
 		/// <summary>
 		/// Moves the cursor to the top of page.
@@ -318,6 +328,61 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Pastes the current selection.
 		/// </summary>
-		Paste
+		Paste,
+
+		/// <summary>
+		/// Quit a toplevel.
+		/// </summary>
+		QuitToplevel,
+
+		/// <summary>
+		/// Suspend a application (used on Linux).
+		/// </summary>
+		Suspend,
+
+		/// <summary>
+		/// Moves focus to the next view.
+		/// </summary>
+		NextView,
+
+		/// <summary>
+		/// Moves focuss to the previous view.
+		/// </summary>
+		PreviousView,
+
+		/// <summary>
+		/// Moves focus to the next view or toplevel (case of Mdi).
+		/// </summary>
+		NextViewOrTop,
+
+		/// <summary>
+		/// Moves focus to the next previous or toplevel (case of Mdi).
+		/// </summary>
+		PreviousViewOrTop,
+
+		/// <summary>
+		/// Refresh the application.
+		/// </summary>
+		Refresh,
+
+		/// <summary>
+		/// Toggles the extended selection.
+		/// </summary>
+		ToggleExtend,
+
+		/// <summary>
+		/// Inserts a new line.
+		/// </summary>
+		NewLine,
+
+		/// <summary>
+		/// Inserts a tab.
+		/// </summary>
+		Tab,
+
+		/// <summary>
+		/// Inserts a shift tab.
+		/// </summary>
+		BackTab
 	}
 }

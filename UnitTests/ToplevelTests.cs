@@ -316,5 +316,302 @@ namespace Terminal.Gui.Core {
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
 			Assert.Null (Toplevel.dragPosition);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Command ()
+		{
+			var isRunning = false;
+
+			var win1 = new Window ("Win1") { Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var lblTf1W1 = new Label ("Enter text in TextField on Win1:");
+			var tf1W1 = new TextField ("Text1 on Win1") { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
+			var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Y = Pos.Bottom (lblTf1W1) + 1 };
+			var tvW1 = new TextView () { X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
+			var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Y = Pos.Bottom (lblTvW1) + 1 };
+			var tf2W1 = new TextField ("Text2 on Win1") { X = Pos.Left (tf1W1), Width = Dim.Fill () };
+			win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
+
+			var win2 = new Window ("Win2") { X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var lblTf1W2 = new Label ("Enter text in TextField on Win2:");
+			var tf1W2 = new TextField ("Text1 on Win2") { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
+			var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Y = Pos.Bottom (lblTf1W2) + 1 };
+			var tvW2 = new TextView () { X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
+			var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Y = Pos.Bottom (lblTvW2) + 1 };
+			var tf2W2 = new TextField ("Text2 on Win2") { X = Pos.Left (tf1W2), Width = Dim.Fill () };
+			win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
+
+			var top = Application.Top;
+			top.Add (win1, win2);
+			top.Loaded += () => isRunning = true;
+			top.Closing += (_) => isRunning = false;
+			Application.Begin (top);
+			top.Running = true;
+
+			Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
+			Assert.Equal (new Rect (41, 0, 40, 25), win2.Frame);
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf1W1, top.MostFocused);
+
+			Assert.True (isRunning);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Application.QuitKey, new KeyModifiers ())));
+			Assert.False (isRunning);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (top.Focused.ProcessKey (new KeyEvent (Key.F5, new KeyModifiers ())));
+
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf1W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf1W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.I | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf1W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win2, top.Focused);
+			Assert.Equal (tf1W2, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.Equal (win2, top.Focused);
+			Assert.Equal (tf1W2, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
+
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Command_With_MdiTop ()
+		{
+			var top = Application.Top;
+			Assert.Null (Application.MdiTop);
+			top.IsMdiContainer = true;
+			Assert.Equal (Application.Top, Application.MdiTop);
+
+			var isRunning = true;
+
+			var win1 = new Window ("Win1") { Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var lblTf1W1 = new Label ("Enter text in TextField on Win1:");
+			var tf1W1 = new TextField ("Text1 on Win1") { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
+			var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Y = Pos.Bottom (lblTf1W1) + 1 };
+			var tvW1 = new TextView () { X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
+			var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Y = Pos.Bottom (lblTvW1) + 1 };
+			var tf2W1 = new TextField ("Text2 on Win1") { X = Pos.Left (tf1W1), Width = Dim.Fill () };
+			win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
+
+			var win2 = new Window ("Win2") { Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var lblTf1W2 = new Label ("Enter text in TextField on Win2:");
+			var tf1W2 = new TextField ("Text1 on Win2") { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
+			var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Y = Pos.Bottom (lblTf1W2) + 1 };
+			var tvW2 = new TextView () { X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
+			var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Y = Pos.Bottom (lblTvW2) + 1 };
+			var tf2W2 = new TextField ("Text2 on Win2") { X = Pos.Left (tf1W2), Width = Dim.Fill () };
+			win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
+
+			win1.Closing += (_) => isRunning = false;
+			Assert.Null (top.Focused);
+			Assert.Equal (top, Application.Current);
+			Assert.True (top.IsCurrentTop);
+			Assert.Equal (top, Application.MdiTop);
+			Application.Begin (win1);
+			Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
+			Assert.NotEqual (top, Application.Current);
+			Assert.False (top.IsCurrentTop);
+			Assert.Equal (win1, Application.Current);
+			Assert.True (win1.IsCurrentTop);
+			Assert.True (win1.IsMdiChild);
+			Assert.Null (top.Focused);
+			Assert.Null (top.MostFocused);
+			Assert.Equal (win1.Subviews [0], win1.Focused);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.Single (Application.MdiChildes);
+			Application.Begin (win2);
+			Assert.Equal (new Rect (0, 0, 40, 25), win2.Frame);
+			Assert.NotEqual (top, Application.Current);
+			Assert.False (top.IsCurrentTop);
+			Assert.Equal (win2, Application.Current);
+			Assert.True (win2.IsCurrentTop);
+			Assert.True (win2.IsMdiChild);
+			Assert.Null (top.Focused);
+			Assert.Null (top.MostFocused);
+			Assert.Equal (win2.Subviews [0], win2.Focused);
+			Assert.Equal (tf1W2, win2.MostFocused);
+			Assert.Equal (2, Application.MdiChildes.Count);
+
+			Application.ShowChild (win1);
+			Assert.Equal (win1, Application.Current);
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			win1.Running = true;
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.QuitKey, new KeyModifiers ())));
+			Assert.False (isRunning);
+			Assert.False (win1.Running);
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.F5, new KeyModifiers ())));
+
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (win1.IsCurrentTop);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf2W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.I | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf2W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf2W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win2, Application.MdiChildes [0]);
+			Assert.Equal (tf1W2, win2.MostFocused);
+			tf2W2.SetFocus ();
+			Assert.True (tf2W2.HasFocus);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.Equal (win2, Application.MdiChildes [0]);
+			Assert.Equal (tf2W2, win2.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
+		}
+
+		[Fact]
+		public void Added_Event_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
+		{
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
+			var wasAdded = false;
+
+			var view = new View ();
+			view.Added += View_Added;
+
+			void View_Added (View obj)
+			{
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e);
+				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (e) => quitKey = e);
+				Assert.False (wasAdded);
+				wasAdded = true;
+				view.Added -= View_Added;
+			}
+
+			var win = new Window ();
+			win.Add (view);
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var top = Application.Top;
+			top.Add (win);
+
+			Assert.True (wasAdded);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
+		{
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
+
+			var view = new View ();
+			view.Initialized += View_Initialized;
+
+			void View_Initialized (object sender, EventArgs e)
+			{
+				Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e;
+				Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e;
+				Application.Top.QuitKeyChanged += (e) => quitKey = e;
+			}
+
+			var win = new Window ();
+			win.Add (view);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.Equal (Key.Null, alternateForwardKey);
+			Assert.Equal (Key.Null, alternateBackwardKey);
+			Assert.Equal (Key.Null, quitKey);
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+
+			Application.AlternateForwardKey = Key.A;
+			Application.AlternateBackwardKey = Key.B;
+			Application.QuitKey = Key.C;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, alternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, alternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, quitKey);
+
+			Assert.Equal (Key.A, Application.AlternateForwardKey);
+			Assert.Equal (Key.B, Application.AlternateBackwardKey);
+			Assert.Equal (Key.C, Application.QuitKey);
+
+			// Replacing the defaults keys to avoid errors on others unit tests that are using it.
+			Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
+			Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
+			Application.QuitKey = Key.Q | Key.CtrlMask;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+		}
 	}
 }

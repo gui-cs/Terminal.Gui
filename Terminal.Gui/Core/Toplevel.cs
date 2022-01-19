@@ -197,6 +197,81 @@ namespace Terminal.Gui {
 		void Initialize ()
 		{
 			ColorScheme = Colors.TopLevel;
+
+			// Things this view knows how to do
+			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
+			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
+			AddCommand (Command.NextView, () => { MoveNextView (); return true; });
+			AddCommand (Command.PreviousView, () => { MovePreviousView (); return true; });
+			AddCommand (Command.NextViewOrTop, () => { MoveNextViewOrTop (); return true; });
+			AddCommand (Command.PreviousViewOrTop, () => { MovePreviousViewOrTop (); return true; });
+			AddCommand (Command.Refresh, () => { Application.Refresh (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
+			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
+
+			AddKeyBinding (Key.Tab, Command.NextView);
+			AddKeyBinding (Key.CursorRight, Command.NextView);
+			AddKeyBinding (Key.CursorDown, Command.NextView);
+			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
+
+			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.PreviousView);
+			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
+			AddKeyBinding (Key.CursorUp, Command.PreviousView);
+
+			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
+			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+
+			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
+			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+
+			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateForwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.AlternateForwardKey);
+			AlternateForwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateBackwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.AlternateBackwardKey);
+			AlternateBackwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
+		/// </summary>
+		public event Action<Key> QuitKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnQuitKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.QuitKey);
+			QuitKeyChanged?.Invoke (oldKey);
 		}
 
 		/// <summary>
@@ -293,85 +368,83 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (ShortcutHelper.GetModifiersKey (keyEvent)) {
-			case Key k when k == Application.QuitKey:
-				// FIXED: stop current execution of this container
-				if (Application.MdiTop != null) {
-					Application.MdiTop.RequestStop ();
-				} else {
-					Application.RequestStop ();
-				}
-				break;
-			case Key.Z | Key.CtrlMask:
-				Driver.Suspend ();
+			if (InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
+				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift })))
 				return true;
 
 #if false
-			case Key.F5:
+			if (keyEvent.Key == Key.F5) {
 				Application.DebugDrawBounds = !Application.DebugDrawBounds;
 				SetNeedsDisplay ();
 				return true;
-#endif
-			case Key.Tab:
-			case Key.CursorRight:
-			case Key.CursorDown:
-			case Key.I | Key.CtrlMask: // Unix
-				var old = GetDeepestFocusedSubview (Focused);
-				if (!FocusNext ())
-					FocusNext ();
-				if (old != Focused && old != Focused?.Focused) {
-					old?.SetNeedsDisplay ();
-					Focused?.SetNeedsDisplay ();
-				} else {
-					FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
-				}
-				return true;
-			case Key.BackTab | Key.ShiftMask:
-			case Key.CursorLeft:
-			case Key.CursorUp:
-				old = GetDeepestFocusedSubview (Focused);
-				if (!FocusPrev ())
-					FocusPrev ();
-				if (old != Focused && old != Focused?.Focused) {
-					old?.SetNeedsDisplay ();
-					Focused?.SetNeedsDisplay ();
-				} else {
-					FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
-				}
-				return true;
-			case Key.Tab | Key.CtrlMask:
-			case Key key when key == Application.AlternateForwardKey: // Needed on Unix
-				if (Application.MdiTop == null) {
-					var top = Modal ? this : Application.Top;
-					top.FocusNext ();
-					if (top.Focused == null) {
-						top.FocusNext ();
-					}
-					top.SetNeedsDisplay ();
-					Application.EnsuresTopOnFront ();
-				} else {
-					MoveNext ();
-				}
-				return true;
-			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
-			case Key key when key == Application.AlternateBackwardKey: // Needed on Unix
-				if (Application.MdiTop == null) {
-					var top = Modal ? this : Application.Top;
-					top.FocusPrev ();
-					if (top.Focused == null) {
-						top.FocusPrev ();
-					}
-					top.SetNeedsDisplay ();
-					Application.EnsuresTopOnFront ();
-				} else {
-					MovePrevious ();
-				}
-				return true;
-			case Key.L | Key.CtrlMask:
-				Application.Refresh ();
-				return true;
 			}
+#endif
 			return false;
+		}
+
+		private void MovePreviousViewOrTop ()
+		{
+			if (Application.MdiTop == null) {
+				var top = Modal ? this : Application.Top;
+				top.FocusPrev ();
+				if (top.Focused == null) {
+					top.FocusPrev ();
+				}
+				top.SetNeedsDisplay ();
+				Application.EnsuresTopOnFront ();
+			} else {
+				MovePrevious ();
+			}
+		}
+
+		private void MoveNextViewOrTop ()
+		{
+			if (Application.MdiTop == null) {
+				var top = Modal ? this : Application.Top;
+				top.FocusNext ();
+				if (top.Focused == null) {
+					top.FocusNext ();
+				}
+				top.SetNeedsDisplay ();
+				Application.EnsuresTopOnFront ();
+			} else {
+				MoveNext ();
+			}
+		}
+
+		private void MovePreviousView ()
+		{
+			var old = GetDeepestFocusedSubview (Focused);
+			if (!FocusPrev ())
+				FocusPrev ();
+			if (old != Focused && old != Focused?.Focused) {
+				old?.SetNeedsDisplay ();
+				Focused?.SetNeedsDisplay ();
+			} else {
+				FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
+			}
+		}
+
+		private void MoveNextView ()
+		{
+			var old = GetDeepestFocusedSubview (Focused);
+			if (!FocusNext ())
+				FocusNext ();
+			if (old != Focused && old != Focused?.Focused) {
+				old?.SetNeedsDisplay ();
+				Focused?.SetNeedsDisplay ();
+			} else {
+				FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
+			}
+		}
+
+		private void QuitToplevel ()
+		{
+			if (Application.MdiTop != null) {
+				Application.MdiTop.RequestStop ();
+			} else {
+				Application.RequestStop ();
+			}
 		}
 
 		///<inheritdoc/>
