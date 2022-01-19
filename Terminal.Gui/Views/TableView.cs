@@ -616,8 +616,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (HasFocus && CanFocus && InvokeKeybindings (keyEvent)) {
-
+			var result = InvokeKeybindings (keyEvent);
+			if (result != null) {
 				PositionCursor ();
 				return true;
 			}

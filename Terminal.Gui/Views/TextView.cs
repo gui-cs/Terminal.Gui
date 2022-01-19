@@ -960,9 +960,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDownExtend, () => { ProcessMoveDownExtend (); return true; });
 			AddCommand (Command.LineUp, () => { ProcessMoveUp (); return true; });
 			AddCommand (Command.LineUpExtend, () => { ProcessMoveUpExtend (); return true; });
-			AddCommand (Command.Right, () => { ProcessMoveRight (); return true; });
+			AddCommand (Command.Right, () => ProcessMoveRight ());
 			AddCommand (Command.RightExtend, () => { ProcessMoveRightExtend (); return true; });
-			AddCommand (Command.Left, () => { ProcessMoveLeft (); return true; });
+			AddCommand (Command.Left, () => ProcessMoveLeft ());
 			AddCommand (Command.LeftExtend, () => { ProcessMoveLeftExtend (); return true; });
 			AddCommand (Command.DeleteCharLeft, () => { ProcessDeleteCharLeft (); return true; });
 			AddCommand (Command.StartOfLine, () => { ProcessMoveStartOfLine (); return true; });
@@ -2204,33 +2204,17 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// if the user presses Left (without any control keys) and they are at the start of the text
-			if (kb.Key == Key.CursorLeft && currentColumn == 0 && currentRow == 0) {
-				// do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
-				return false;
-			}
 
-			// if the user presses Right (without any control keys)
-			if (kb.Key == Key.CursorRight) {
-
-				// determine where the last cursor position in the text is
-				var lastRow = model.Count - 1;
-				var lastCol = model.GetLine (lastRow).Count;
-
-				// if they are at the very end of all the text do not respond (this lets the key press fall through to navigation system - which usually changes focus forward)
-				if (currentColumn == lastCol && currentRow == lastRow) {
-					return false;
-				}
-			}
 
 			// Give autocomplete first opportunity to respond to key presses
 			if (Autocomplete.ProcessKey (this, kb)) {
 				return true;
 			}
 
-			if (InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
-				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift })))
-				return true;
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
+				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			if (result != null)
+				return (bool)result;
 
 			ResetColumnTrack ();
 			// Ignore control characters and other special keys
@@ -2422,13 +2406,20 @@ namespace Terminal.Gui {
 			MoveLeft ();
 		}
 
-		void ProcessMoveLeft ()
+		bool ProcessMoveLeft ()
 		{
+			// if the user presses Left (without any control keys) and they are at the start of the text
+			if (currentColumn == 0 && currentRow == 0) {
+				// do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
+				return false;
+			}
+
 			ResetAllTrack ();
 			if (shiftSelecting && selecting) {
 				StopSelecting ();
 			}
 			MoveLeft ();
+			return true;
 		}
 
 		void ProcessMoveRightExtend ()
@@ -2438,13 +2429,24 @@ namespace Terminal.Gui {
 			MoveRight ();
 		}
 
-		void ProcessMoveRight ()
+		bool ProcessMoveRight ()
 		{
+			// if the user presses Right (without any control keys)
+			// determine where the last cursor position in the text is
+			var lastRow = model.Count - 1;
+			var lastCol = model.GetLine (lastRow).Count;
+
+			// if they are at the very end of all the text do not respond (this lets the key press fall through to navigation system - which usually changes focus forward)
+			if (currentColumn == lastCol && currentRow == lastRow) {
+				return false;
+			}
+
 			ResetAllTrack ();
 			if (shiftSelecting && selecting) {
 				StopSelecting ();
 			}
 			MoveRight ();
+			return true;
 		}
 
 		void ProcessMoveUpExtend ()

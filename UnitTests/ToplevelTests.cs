@@ -402,6 +402,23 @@ namespace Terminal.Gui.Core {
 			Assert.True (top.Focused.ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf1W1, top.MostFocused);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tvW1, top.MostFocused);
+			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
+			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, top.Focused);
+			Assert.Equal (tf2W1, top.MostFocused);
 
 			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
 		}
@@ -524,6 +541,23 @@ namespace Terminal.Gui.Core {
 			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
 			Assert.Equal (win1, Application.MdiChildes [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tvW1, win1.MostFocused);
+			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
+			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (tf2W1, win1.MostFocused);
 
 			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
 		}

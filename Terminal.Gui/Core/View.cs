@@ -1567,7 +1567,7 @@ namespace Terminal.Gui {
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent">The key event passed.</param>
-		protected bool InvokeKeybindings (KeyEvent keyEvent)
+		protected bool? InvokeKeybindings (KeyEvent keyEvent)
 		{
 			if (KeyBindings.ContainsKey (keyEvent.Key)) {
 				var command = KeyBindings [keyEvent.Key];
@@ -1579,7 +1579,7 @@ namespace Terminal.Gui {
 				return CommandImplementations [command] ();
 			}
 
-			return false;
+			return null;
 		}
 
 

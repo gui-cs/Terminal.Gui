@@ -546,9 +546,9 @@ namespace Terminal.Gui {
 			}
 
 			try {
-				if (InvokeKeybindings (keyEvent)) {
-					return true;
-				}
+				var result = InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
 			} finally {
 
 				PositionCursor ();
