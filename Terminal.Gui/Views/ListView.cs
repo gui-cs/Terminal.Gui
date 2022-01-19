@@ -404,8 +404,9 @@ namespace Terminal.Gui {
 			if (source == null)
 				return base.ProcessKey (kb);
 
-			if (InvokeKeybindings (kb))
-				return true;
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
 			return false;
 		}

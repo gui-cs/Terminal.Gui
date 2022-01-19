@@ -569,8 +569,9 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (InvokeKeybindings (kb))
-				return true;
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
 			// TODO: rune-ify
 			if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
@@ -1504,7 +1505,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (InvokeKeybindings (kb))
+			if (InvokeKeybindings (kb) == true)
 				return true;
 
 			var key = kb.KeyValue;

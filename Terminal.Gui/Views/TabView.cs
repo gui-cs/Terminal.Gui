@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 			base.Add (contentView);
 
 			// Things this view knows how to do
-			AddCommand (Command.Left, () => { SwitchTabBy(-1); return true; });
+			AddCommand (Command.Left, () => { SwitchTabBy (-1); return true; });
 			AddCommand (Command.Right, () => { SwitchTabBy (1); return true; });
 			AddCommand (Command.LeftHome, () => { SelectedTab = Tabs.FirstOrDefault (); return true; });
 			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
@@ -192,7 +192,7 @@ namespace Terminal.Gui {
 
 			if (Tabs.Any ()) {
 				tabsBar.Redraw (tabsBar.Bounds);
-				contentView.SetNeedsDisplay();
+				contentView.SetNeedsDisplay ();
 				contentView.Redraw (contentView.Bounds);
 			}
 		}
@@ -228,8 +228,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (HasFocus && CanFocus && Focused == tabsBar && InvokeKeybindings (keyEvent))
-				return true;
+			if (HasFocus && CanFocus && Focused == tabsBar) {
+				var result = InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
+			}
 
 			return base.ProcessKey (keyEvent);
 		}
@@ -671,7 +674,7 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
-				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && 
+				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 					return false;

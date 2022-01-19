@@ -221,8 +221,9 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (InvokeKeybindings (kb))
-				return true;
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
 			return base.ProcessKey (kb);
 		}

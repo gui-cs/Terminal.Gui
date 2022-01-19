@@ -249,8 +249,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (InvokeKeybindings (kb))
-				return true;
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
 			// Ignore non-numeric characters.
 			if (kb.Key < (Key)((int)Key.D0) || kb.Key > (Key)((int)Key.D9))

@@ -245,10 +245,12 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (HasFocus && CanFocus && InvokeKeybindings (keyEvent)) {
-				return true;
-			}
+			if (HasFocus && CanFocus) {
+				var result =  InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
 
+			}
 			return base.ProcessKey (keyEvent);
 		}
 

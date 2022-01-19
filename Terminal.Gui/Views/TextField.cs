@@ -424,9 +424,10 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			oldCursorPos = point;
 
-			if (InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
-				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift })))
-				return true;
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
+				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			if (result != null)
+				return (bool)result;
 
 			// Ignore other control characters.
 			if (kb.Key < Key.Space || kb.Key > Key.CharMask)

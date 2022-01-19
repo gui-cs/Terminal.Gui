@@ -425,23 +425,28 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (InvokeKeybindings (keyEvent))
-				return true;
+			var result = InvokeKeybindings (keyEvent);
+			if (result != null)
+				return (bool)result;
 
 			if (!AllowEdits)
 				return false;
 
-			if (leftSide) {
-				int value;
-				var k = (char)keyEvent.Key;
-				if (k >= 'A' && k <= 'F')
-					value = k - 'A' + 10;
-				else if (k >= 'a' && k <= 'f')
-					value = k - 'a' + 10;
-				else if (k >= '0' && k <= '9')
-					value = k - '0';
-				else
+				// Ignore control characters and other special keys
+				if (keyEvent.Key < Key.Space || keyEvent.Key > Key.CharMask)
 					return false;
+
+				if (leftSide) {
+					int value;
+					var k = (char)keyEvent.Key;
+					if (k >= 'A' && k <= 'F')
+						value = k - 'A' + 10;
+					else if (k >= 'a' && k <= 'f')
+						value = k - 'a' + 10;
+					else if (k >= '0' && k <= '9')
+						value = k - '0';
+					else
+						return false;
 
 				byte b;
 				if (!edits.TryGetValue (position, out b)) {

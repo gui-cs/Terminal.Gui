@@ -212,13 +212,17 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
 
 			AddKeyBinding (Key.Tab, Command.NextView);
+
 			AddKeyBinding (Key.CursorRight, Command.NextView);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);
+
 			AddKeyBinding (Key.CursorDown, Command.NextView);
 			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
 
 			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.PreviousView);
 			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
 			AddKeyBinding (Key.CursorUp, Command.PreviousView);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);
 
 			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
 			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
@@ -368,9 +372,10 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			if (InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
-				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift })))
-				return true;
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
+				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
+			if (result != null)
+				return (bool)result;
 
 #if false
 			if (keyEvent.Key == Key.F5) {
