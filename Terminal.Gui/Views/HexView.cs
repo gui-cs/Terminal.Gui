@@ -423,6 +423,10 @@ namespace Terminal.Gui {
 				if (!AllowEdits)
 					return false;
 
+				// Ignore control characters and other special keys
+				if (keyEvent.Key < Key.Space || keyEvent.Key > Key.CharMask)
+					return false;
+
 				if (leftSide) {
 					int value;
 					var k = (char)keyEvent.Key;
