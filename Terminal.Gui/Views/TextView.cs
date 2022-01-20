@@ -913,7 +913,7 @@ namespace Terminal.Gui {
 		/// Provides autocomplete context menu based on suggestions at the current cursor
 		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
 		/// </summary>
-		public Autocomplete Autocomplete { get; protected set; } = new Autocomplete ();
+		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
 #if false
 		/// <summary>
@@ -948,8 +948,6 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			Used = true;
-
-			Add (Autocomplete);
 
 			Initialized += TextView_Initialized;
 
@@ -3573,6 +3571,199 @@ namespace Terminal.Gui {
 			}
 
 			return base.OnLeave (view);
+		}
+	}
+
+	/// <summary>
+	/// Renders an overlay on another view at a given point that allows selecting
+	/// from a range of 'autocomplete' options.
+	/// An implementation on a TextView.
+	/// </summary>
+	public class TextViewAutocomplete : Autocomplete {
+
+		/// <inheritdoc/>
+		public override void RenderOverlay (View view, Point renderAt)
+		{
+			if (!Visible || !view.HasFocus || Suggestions.Count == 0) {
+				return;
+			}
+
+			view.Move (renderAt.X, renderAt.Y);
+
+			// don't overspill vertically
+			var height = Math.Min (view.Bounds.Height - renderAt.Y, MaxHeight);
+
+			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
+
+			if (toRender.Length == 0) {
+				return;
+			}
+
+			var width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
+
+			// don't overspill horizontally
+			width = Math.Min (view.Bounds.Width - renderAt.X, width);
+
+			for (int i = 0; i < toRender.Length; i++) {
+
+				if (i == SelectedIdx - ScrollOffset) {
+					Application.Driver.SetAttribute (ColorScheme.Focus);
+				} else {
+					Application.Driver.SetAttribute (ColorScheme.Normal);
+				}
+
+				view.Move (renderAt.X, renderAt.Y + i);
+
+				var text = TextFormatter.ClipOrPad (toRender [i], width);
+
+				Application.Driver.AddStr (text);
+			}
+		}
+
+		/// <inheritdoc/>
+		public override bool ProcessKey (View hostControl, KeyEvent kb)
+		{
+			if (IsWordChar ((char)kb.Key)) {
+				Visible = true;
+			}
+
+			if (!Visible || Suggestions.Count == 0) {
+				return false;
+			}
+
+			var host = (TextView)hostControl;
+
+			if (kb.Key == Key.CursorDown) {
+				MoveDown (host);
+				return true;
+			}
+
+			if (kb.Key == Key.CursorUp) {
+				MoveUp (host);
+				return true;
+			}
+
+			if (kb.Key == SelectionKey) {
+				return Select (host);
+			}
+
+			if (kb.Key == CloseKey) {
+				Close (host);
+				return true;
+			}
+
+			return false;
+		}
+
+		private void Close (TextView hostControl)
+		{
+			ClearSuggestions ();
+			Visible = false;
+			hostControl.SetNeedsDisplay ();
+		}
+
+		private bool Select (TextView hostControl)
+		{
+			if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count) {
+				var accepted = Suggestions [SelectedIdx];
+
+				var typedSoFar = GetCurrentWord (hostControl) ?? "";
+
+				if (typedSoFar.Length < accepted.Length) {
+
+					// delete the text
+					for (int i = 0; i < typedSoFar.Length; i++) {
+						hostControl.DeleteTextBackwards ();
+					}
+
+					hostControl.InsertText (accepted);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private void MoveUp (TextView hostControl)
+		{
+			SelectedIdx--;
+			if (SelectedIdx < 0) {
+				SelectedIdx = Suggestions.Count - 1;
+			}
+			EnsureSelectedIdxIsValid ();
+			hostControl.SetNeedsDisplay ();
+		}
+
+		private void MoveDown (TextView hostControl)
+		{
+			SelectedIdx++;
+			if (SelectedIdx > Suggestions.Count - 1) {
+				SelectedIdx = 0;
+			}
+			EnsureSelectedIdxIsValid ();
+			hostControl.SetNeedsDisplay ();
+		}
+
+		/// <inheritdoc/>
+		public override void GenerateSuggestions (View hostControl)
+		{
+			// if there is nothing to pick from
+			if (AllSuggestions.Count == 0) {
+				ClearSuggestions ();
+				return;
+			}
+
+			var currentWord = GetCurrentWord ((TextView)hostControl);
+
+			if (string.IsNullOrWhiteSpace (currentWord)) {
+				ClearSuggestions ();
+			} else {
+				Suggestions = AllSuggestions.Where (o =>
+				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
+				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
+				).ToList ().AsReadOnly ();
+
+				EnsureSelectedIdxIsValid ();
+			}
+		}
+
+		private string GetCurrentWord (TextView hostControl)
+		{
+			var currentLine = hostControl.GetCurrentLine ();
+			var cursorPosition = Math.Min (hostControl.CurrentColumn, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition);
+		}
+
+		private string IdxToWord (List<Rune> line, int idx)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			// do not generate suggestions if the cursor is positioned in the middle of a word
+			bool areMidWord;
+
+			if (idx == line.Count) {
+				// the cursor positioned at the very end of the line
+				areMidWord = false;
+			} else {
+				// we are in the middle of a word if the cursor is over a letter/number
+				areMidWord = IsWordChar (line [idx]);
+			}
+
+			// if we are in the middle of a word then there is no way to autocomplete that word
+			if (areMidWord) {
+				return null;
+			}
+
+			// we are at the end of a word.  Work out what has been typed so far
+			while (idx-- > 0) {
+
+				if (IsWordChar (line [idx])) {
+					sb.Insert (0, (char)line [idx]);
+				} else {
+					break;
+				}
+			}
+			return sb.ToString ();
 		}
 	}
 }

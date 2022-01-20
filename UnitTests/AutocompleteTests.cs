@@ -14,7 +14,7 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Test_GenerateSuggestions_Simple ()
 		{
-			var ac = new Autocomplete ();
+			var ac = new TextViewAutocomplete ();
 			ac.AllSuggestions = new List<string> { "fish", "const", "Cobble" };
 
 			var tv = new TextView ();
