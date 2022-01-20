@@ -1635,6 +1635,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>
+		/// </summary>
+		/// <param name="key"></param>
+		public void ClearKeybinding (Key key)
+		{
+			KeyBindings.Remove (key);
+		}
+
+		/// <summary>
+		/// Removes all key bindings that trigger the given command.  Views can have multiple different
+		/// keys bound to the same command and this method will clear all of them.
+		/// </summary>
+		/// <param name="command"></param>
+		public void ClearKeybinding (Command command)
+		{
+			foreach(var kvp in KeyBindings.Where(kvp=>kvp.Value == command).ToArray())
+			{
+				KeyBindings.Remove (kvp.Key);
+			}
+			
+		}
+
+		/// <summary>
 		/// <para>States that the given <see cref="View"/> supports a given <paramref name="command"/>
 		/// and what <paramref name="f"/> to perform to make that command happen
 		/// </para>
