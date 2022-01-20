@@ -465,7 +465,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///inheritdoc/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			var (left, _) = GetMargins (Frame.Width);
