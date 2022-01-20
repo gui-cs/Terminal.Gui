@@ -11,7 +11,24 @@ namespace Terminal.Gui {
 	/// Renders an overlay on another view at a given point that allows selecting
 	/// from a range of 'autocomplete' options.
 	/// </summary>
-	public class Autocomplete {
+	public class Autocomplete : View {
+		/// <summary>
+		/// Initializes the defaults settings for this <see cref="Autocomplete"/>.
+		/// </summary>
+		public Autocomplete ()
+		{
+			// Things this view knows how to do
+			AddCommand (Command.LineDown, () => { MoveDown (); return true; });
+			AddCommand (Command.LineUp, () => { MoveUp (); return true; });
+			AddCommand (Command.Accept, () => Select ());
+			AddCommand (Command.Cancel, () => { Close (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (SelectionKey, Command.Accept);
+			AddKeyBinding (CloseKey, Command.Cancel);
+		}
 
 		/// <summary>
 		/// The maximum width of the autocomplete dropdown
@@ -26,19 +43,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// True if the autocomplete should be considered open and visible
 		/// </summary>
-		protected bool Visible { get; set; } = true;
+		public override bool Visible { get; set; } = true;
 
 		/// <summary>
 		/// The strings that form the current list of suggestions to render
 		/// based on what the user has typed so far.
 		/// </summary>
-		public ReadOnlyCollection<string> Suggestions { get; protected set; } = new ReadOnlyCollection<string>(new string[0]);
+		public ReadOnlyCollection<string> Suggestions { get; protected set; } = new ReadOnlyCollection<string> (new string [0]);
 
 		/// <summary>
 		/// The full set of all strings that can be suggested.
 		/// </summary>
 		/// <returns></returns>
-		public List<string> AllSuggestions { get; set; } = new List<string>();
+		public List<string> AllSuggestions { get; set; } = new List<string> ();
 
 		/// <summary>
 		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
@@ -50,38 +67,53 @@ namespace Terminal.Gui {
 		/// can scroll down the dropdown list.  This indicates how far down they
 		/// have gone
 		/// </summary>
-		public int ScrollOffset {get;set;}
+		public int ScrollOffset { get; set; }
 
 		/// <summary>
 		/// The colors to use to render the overlay.  Accessing this property before
-		/// the Application has been initialised will cause an error
+		/// the Application has been initialized will cause an error
 		/// </summary>
-		public ColorScheme ColorScheme { 
-			get
-			{
-				if(colorScheme == null)
-				{
+		public override ColorScheme ColorScheme {
+			get {
+				if (colorScheme == null) {
 					colorScheme = Colors.Menu;
 				}
 				return colorScheme;
 			}
-		 	set
-			{
+			set {
 				colorScheme = value;
 			}
 		}
 
 		private ColorScheme colorScheme;
+		private Key selectionKey = Key.Enter;
+		private Key closeKey = Key.Esc;
 
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
-		public Key SelectionKey { get; set; } = Key.Enter;
+		public Key SelectionKey {
+			get => selectionKey;
+			set {
+				if (selectionKey != value) {
+					ReplaceKeyBinding(selectionKey, value);
+					selectionKey = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// The key that the user can press to close the currently popped autocomplete menu
 		/// </summary>
-		public Key CloseKey {get;set;} = Key.Esc;
+		public Key CloseKey {
+			get => closeKey;
+			set {
+				if (closeKey != value) {
+					ReplaceKeyBinding (closeKey, value);
+					closeKey = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Renders the autocomplete dialog inside the given <paramref name="view"/> at the
@@ -98,119 +130,129 @@ namespace Terminal.Gui {
 			view.Move (renderAt.X, renderAt.Y);
 
 			// don't overspill vertically
-			var height = Math.Min(view.Bounds.Height - renderAt.Y,MaxHeight);
+			var height = Math.Min (view.Bounds.Height - renderAt.Y, MaxHeight);
 
-			var toRender = Suggestions.Skip(ScrollOffset).Take(height).ToArray();
+			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
 
-			if(toRender.Length == 0)
-			{
+			if (toRender.Length == 0) {
 				return;
 			}
 
-			var width = Math.Min(MaxWidth,toRender.Max(s=>s.Length));
+			var width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
 
 			// don't overspill horizontally
-			width = Math.Min(view.Bounds.Width - renderAt.X ,width);
+			width = Math.Min (view.Bounds.Width - renderAt.X, width);
 
-			for(int i=0;i<toRender.Length; i++) {
+			for (int i = 0; i < toRender.Length; i++) {
 
-				if(i ==  SelectedIdx - ScrollOffset) {
+				if (i == SelectedIdx - ScrollOffset) {
 					Application.Driver.SetAttribute (ColorScheme.Focus);
-				}
-				else {
+				} else {
 					Application.Driver.SetAttribute (ColorScheme.Normal);
 				}
 
-				view.Move (renderAt.X, renderAt.Y+i);
+				view.Move (renderAt.X, renderAt.Y + i);
 
-				var text = TextFormatter.ClipOrPad(toRender[i],width);
+				var text = TextFormatter.ClipOrPad (toRender [i], width);
 
-				Application.Driver.AddStr (text );
+				Application.Driver.AddStr (text);
 			}
 		}
 
 		/// <summary>
 		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
 		/// </summary>
-		public void EnsureSelectedIdxIsValid()
-		{				
-			SelectedIdx = Math.Max (0,Math.Min (Suggestions.Count - 1, SelectedIdx));
-			
+		public void EnsureSelectedIdxIsValid ()
+		{
+			SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx));
+
 			// if user moved selection up off top of current scroll window
-			if(SelectedIdx < ScrollOffset)
-			{
+			if (SelectedIdx < ScrollOffset) {
 				ScrollOffset = SelectedIdx;
 			}
 
 			// if user moved selection down past bottom of current scroll window
-			while(SelectedIdx >= ScrollOffset + MaxHeight ){
+			while (SelectedIdx >= ScrollOffset + MaxHeight) {
 				ScrollOffset++;
 			}
 		}
 
+		TextView host;
+
 		/// <summary>
 		/// Handle key events before <paramref name="hostControl"/> e.g. to make key events like
-		/// up/down apply to the autocomplete control instead of changing the cursor position in 
+		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="hostControl"></param>
-		/// <param name="kb"></param>
-		/// <returns></returns>
+		/// <param name="hostControl">The host control.</param>
+		/// <param name="kb">The key event.</param>
+		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
 		public bool ProcessKey (TextView hostControl, KeyEvent kb)
 		{
-			if(IsWordChar((char)kb.Key))
-			{
+			if (IsWordChar ((char)kb.Key)) {
 				Visible = true;
 			}
 
-			if(!Visible || Suggestions.Count == 0) {
+			if (!Visible || Suggestions.Count == 0) {
 				return false;
 			}
 
-			if (kb.Key == Key.CursorDown) {
-				SelectedIdx++;
-				EnsureSelectedIdxIsValid();
-				hostControl.SetNeedsDisplay ();
-				return true;
-			}
+			host = hostControl;
 
-			if (kb.Key == Key.CursorUp) {
-				SelectedIdx--;
-				EnsureSelectedIdxIsValid();
-				hostControl.SetNeedsDisplay ();
-				return true;
-			}
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			if(kb.Key == SelectionKey && SelectedIdx >=0 && SelectedIdx < Suggestions.Count) {
+			return false;
+		}
 
+		private void Close ()
+		{
+			ClearSuggestions ();
+			Visible = false;
+			host.SetNeedsDisplay ();
+		}
+
+		private bool Select ()
+		{
+			if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count) {
 				var accepted = Suggestions [SelectedIdx];
-								
-				var typedSoFar = GetCurrentWord (hostControl) ?? "";
-				
-				if(typedSoFar.Length < accepted.Length) {
+
+				var typedSoFar = GetCurrentWord (host) ?? "";
+
+				if (typedSoFar.Length < accepted.Length) {
 
 					// delete the text
-					for(int i=0;i<typedSoFar.Length;i++)
-					{
-						hostControl.DeleteTextBackwards();
+					for (int i = 0; i < typedSoFar.Length; i++) {
+						host.DeleteTextBackwards ();
 					}
 
-					hostControl.InsertText (accepted);
+					host.InsertText (accepted);
 					return true;
 				}
-
-				return false;
-			}
-
-			if(kb.Key == CloseKey)
-			{
-				ClearSuggestions ();
-				Visible = false;
-				hostControl.SetNeedsDisplay();
-				return true;
 			}
 
 			return false;
+		}
+
+		private void MoveUp ()
+		{
+			SelectedIdx--;
+			if (SelectedIdx < 0) {
+				SelectedIdx = Suggestions.Count - 1;
+			}
+			EnsureSelectedIdxIsValid ();
+			host.SetNeedsDisplay ();
+		}
+
+		private void MoveDown ()
+		{
+			SelectedIdx++;
+			if (SelectedIdx > Suggestions.Count - 1) {
+				SelectedIdx = 0;
+			}
+			EnsureSelectedIdxIsValid ();
+			host.SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -230,23 +272,22 @@ namespace Terminal.Gui {
 		public void GenerateSuggestions (TextView hostControl)
 		{
 			// if there is nothing to pick from
-			if(AllSuggestions.Count == 0) {
+			if (AllSuggestions.Count == 0) {
 				ClearSuggestions ();
 				return;
 			}
 
-			var currentWord = GetCurrentWord (hostControl); 
+			var currentWord = GetCurrentWord (hostControl);
 
-			if(string.IsNullOrWhiteSpace(currentWord)) {
+			if (string.IsNullOrWhiteSpace (currentWord)) {
 				ClearSuggestions ();
-			}
-			else {
-				Suggestions = AllSuggestions.Where (o => 
+			} else {
+				Suggestions = AllSuggestions.Where (o =>
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
-				!o.Equals(currentWord,StringComparison.CurrentCultureIgnoreCase)
-				).ToList ().AsReadOnly();
+				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
+				).ToList ().AsReadOnly ();
 
-				EnsureSelectedIdxIsValid();
+				EnsureSelectedIdxIsValid ();
 			}
 		}
 
@@ -264,27 +305,25 @@ namespace Terminal.Gui {
 			// do not generate suggestions if the cursor is positioned in the middle of a word
 			bool areMidWord;
 
-			if(idx == line.Count) {
+			if (idx == line.Count) {
 				// the cursor positioned at the very end of the line
 				areMidWord = false;
-			}
-			else {
+			} else {
 				// we are in the middle of a word if the cursor is over a letter/number
 				areMidWord = IsWordChar (line [idx]);
 			}
 
 			// if we are in the middle of a word then there is no way to autocomplete that word
-			if(areMidWord) {
+			if (areMidWord) {
 				return null;
 			}
 
 			// we are at the end of a word.  Work out what has been typed so far
-			while(idx-- > 0) {
+			while (idx-- > 0) {
 
-				if(IsWordChar(line [idx])) {
-					sb.Insert(0,(char)line [idx]);
-				}
-				else {
+				if (IsWordChar (line [idx])) {
+					sb.Insert (0, (char)line [idx]);
+				} else {
 					break;
 				}
 			}
@@ -293,7 +332,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Return true if the given symbol should be considered part of a word
-		/// and can be contained in matches.  Base behaviour is to use <see cref="char.IsLetterOrDigit(char)"/>
+		/// and can be contained in matches.  Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
 		/// </summary>
 		/// <param name="rune"></param>
 		/// <returns></returns>

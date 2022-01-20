@@ -949,6 +949,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 
+			Add (Autocomplete);
+
 			Initialized += TextView_Initialized;
 
 			// Things this view knows how to do
@@ -2203,8 +2205,6 @@ namespace Terminal.Gui {
 			if (!CanFocus) {
 				return true;
 			}
-
-
 
 			// Give autocomplete first opportunity to respond to key presses
 			if (Autocomplete.ProcessKey (this, kb)) {
@@ -3575,5 +3575,4 @@ namespace Terminal.Gui {
 			return base.OnLeave (view);
 		}
 	}
-
 }
