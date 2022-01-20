@@ -313,6 +313,7 @@ namespace UICatalog {
 			menuItems.Add (CreateSizeStyle ());
 			menuItems.Add (CreateAlwaysSetPosition ());
 			menuItems.Add (CreateDisabledEnabledMouse ());
+			menuItems.Add (CreateKeybindings ());
 			return menuItems;
 		}
 
@@ -327,6 +328,22 @@ namespace UICatalog {
 			item.Action += () => {
 				item.Checked = Application.IsMouseDisabled = !item.Checked;
 			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+		private static MenuItem[] CreateKeybindings()
+		{
+
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "Keybindings";
+			item.Action += () => {
+				var dlg = new KeyBindingsDialog ();
+				Application.Run (dlg);
+			};
+
+			menuItems.Add (null);
 			menuItems.Add (item);
 
 			return menuItems.ToArray ();
