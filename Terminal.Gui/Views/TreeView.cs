@@ -122,7 +122,15 @@ namespace Terminal.Gui {
 		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.
 		/// Defaults to Enter
 		/// </summary>
-		public Key ObjectActivationKey { get; set; } = Key.Enter;
+		public Key ObjectActivationKey {
+			get => objectActivationKey;
+			set {
+				if (objectActivationKey != value) {
+					ReplaceKeyBinding (ObjectActivationKey, value);
+					objectActivationKey = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>.
@@ -148,6 +156,7 @@ namespace Terminal.Gui {
 		/// (nodes added but no tree builder set)
 		/// </summary>
 		public static ustring NoBuilderError = "ERROR: TreeBuilder Not Set";
+		private Key objectActivationKey = Key.Enter;
 
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes
@@ -221,7 +230,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.ExpandAll, () => { ExpandAll (SelectedObject); return true; });
 			AddCommand (Command.Collapse, () => { CursorLeft (false); return true; });
 			AddCommand (Command.CollapseAll, () => { CursorLeft (true); return true; });
-			AddCommand (Command.LineUp, () => { AdjustSelection (-1,false); return true; });
+			AddCommand (Command.LineUp, () => { AdjustSelection (-1, false); return true; });
 			AddCommand (Command.LineUpExtend, () => { AdjustSelection (-1, true); return true; });
 			AddCommand (Command.LineUpToFirstBranch, () => { AdjustSelectionToBranchStart (); return true; });
 
@@ -235,6 +244,7 @@ namespace Terminal.Gui {
 
 			AddCommand (Command.ScrollUp, () => { ScrollUp (); return true; });
 			AddCommand (Command.ScrollDown, () => { ScrollDown (); return true; });
+			AddCommand (Command.Accept, () => { ActivateSelectedObjectIfAny (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.PageUp, Command.PageUp);
@@ -245,7 +255,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.ExpandAll);
 			AddKeyBinding (Key.CursorLeft, Command.Collapse);
 			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.CollapseAll);
-			
+
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
 			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LineUpToFirstBranch);
@@ -257,6 +267,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Home, Command.TopHome);
 			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
+			AddKeyBinding (ObjectActivationKey, Command.Accept);
 		}
 
 		/// <summary>
@@ -528,12 +539,6 @@ namespace Terminal.Gui {
 		{
 			if (!Enabled) {
 				return false;
-			}
-
-			if (keyEvent.Key == ObjectActivationKey) {
-
-				ActivateSelectedObjectIfAny ();
-				return true;
 			}
 
 			// if it is a single character pressed without any control keys
@@ -1132,7 +1137,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Collapse ()
 		{
-			Collapse(selectedObject);
+			Collapse (selectedObject);
 		}
 
 		/// <summary>

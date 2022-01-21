@@ -249,8 +249,8 @@ namespace Terminal.Gui {
 				var result =  InvokeKeybindings (keyEvent);
 				if (result != null)
 					return (bool)result;
-
 			}
+
 			return base.ProcessKey (keyEvent);
 		}
 

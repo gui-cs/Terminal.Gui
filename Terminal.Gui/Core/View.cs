@@ -1332,7 +1332,7 @@ namespace Terminal.Gui {
 		/// The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s
 		/// color scheme.
 		/// </summary>
-		public ColorScheme ColorScheme {
+		public virtual ColorScheme ColorScheme {
 			get {
 				if (colorScheme == null)
 					return SuperView?.ColorScheme;

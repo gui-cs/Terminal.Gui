@@ -58,6 +58,7 @@ namespace Terminal.Gui {
 		private int selectedColumn;
 		private DataTable table;
 		private TableStyle style = new TableStyle ();
+		private Key cellActivationKey = Key.Enter;
 
 		/// <summary>
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
@@ -171,7 +172,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
 		/// </summary>
-		public Key CellActivationKey { get; set; } = Key.Enter;
+		public Key CellActivationKey {
+			get => cellActivationKey;
+			set {
+				if (cellActivationKey != value) {
+					ReplaceKeyBinding (cellActivationKey, value);
+					cellActivationKey = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
@@ -213,6 +222,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.BottomEndExtend, () => { ChangeSelectionToEndOfTable (true); return true; });
 
 			AddCommand (Command.SelectAll, () => { SelectAll(); return true; });
+			AddCommand (Command.Accept, () => { new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.CursorLeft, Command.Left);
@@ -238,6 +248,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
 
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
+			AddKeyBinding (CellActivationKey, Command.Accept);
 		}
 
 		///<inheritdoc/>
@@ -609,11 +620,6 @@ namespace Terminal.Gui {
 			if (Table == null) {
 				PositionCursor ();
 				return false;
-			}
-
-			if (keyEvent.Key == CellActivationKey && Table != null) {
-				OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
-				return true;
 			}
 
 			var result = InvokeKeybindings (keyEvent);
