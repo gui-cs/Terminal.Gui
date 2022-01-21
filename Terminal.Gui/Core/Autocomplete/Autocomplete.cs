@@ -86,7 +86,44 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="view">The view the overlay should be rendered into</param>
 		/// <param name="renderAt"></param>
-		public abstract void RenderOverlay (View view, Point renderAt);
+		/// <inheritdoc/>
+		public virtual void RenderOverlay (View view, Point renderAt)
+		{
+			if (!Visible || !view.HasFocus || Suggestions.Count == 0) {
+				return;
+			}
+
+			view.Move (renderAt.X, renderAt.Y);
+
+			// don't overspill vertically
+			var height = Math.Min (view.Bounds.Height - renderAt.Y, MaxHeight);
+
+			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
+
+			if (toRender.Length == 0) {
+				return;
+			}
+
+			var width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
+
+			// don't overspill horizontally
+			width = Math.Min (view.Bounds.Width - renderAt.X, width);
+
+			for (int i = 0; i < toRender.Length; i++) {
+
+				if (i == SelectedIdx - ScrollOffset) {
+					Application.Driver.SetAttribute (ColorScheme.Focus);
+				} else {
+					Application.Driver.SetAttribute (ColorScheme.Normal);
+				}
+
+				view.Move (renderAt.X, renderAt.Y + i);
+
+				var text = TextFormatter.ClipOrPad (toRender [i], width);
+
+				Application.Driver.AddStr (text);
+			}
+		}
 
 		/// <summary>
 		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
@@ -114,7 +151,37 @@ namespace Terminal.Gui {
 		/// <param name="hostControl">The host control.</param>
 		/// <param name="kb">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public abstract bool ProcessKey (View hostControl, KeyEvent kb);
+		public virtual bool ProcessKey (View hostControl, KeyEvent kb)
+		{
+			if (IsWordChar ((char)kb.Key)) {
+				Visible = true;
+			}
+
+			if (!Visible || Suggestions.Count == 0) {
+				return false;
+			}
+
+			if (kb.Key == Key.CursorDown) {
+				MoveDown (hostControl);
+				return true;
+			}
+
+			if (kb.Key == Key.CursorUp) {
+				MoveUp (hostControl);
+				return true;
+			}
+
+			if (kb.Key == SelectionKey) {
+				return Select (hostControl);
+			}
+
+			if (kb.Key == CloseKey) {
+				Close (hostControl);
+				return true;
+			}
+
+			return false;
+		}
 
 		/// <summary>
 		/// Clears <see cref="Suggestions"/>
@@ -130,7 +197,29 @@ namespace Terminal.Gui {
 		/// match with the current cursor position/text in the <paramref name="hostControl"/>
 		/// </summary>
 		/// <param name="hostControl">The text view that you want suggestions for</param>
-		public abstract void GenerateSuggestions (View hostControl);
+		/// <inheritdoc/>
+		public virtual void GenerateSuggestions (View hostControl)
+		{
+			// if there is nothing to pick from
+			if (AllSuggestions.Count == 0) {
+				ClearSuggestions ();
+				return;
+			}
+
+			var currentWord = GetCurrentWord(hostControl);
+
+			if (string.IsNullOrWhiteSpace (currentWord)) {
+				ClearSuggestions ();
+			} else {
+				Suggestions = AllSuggestions.Where (o =>
+				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
+				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
+				).ToList ().AsReadOnly ();
+
+				EnsureSelectedIdxIsValid ();
+			}
+		}
+
 
 		/// <summary>
 		/// Return true if the given symbol should be considered part of a word
@@ -141,6 +230,128 @@ namespace Terminal.Gui {
 		public virtual bool IsWordChar (Rune rune)
 		{
 			return Char.IsLetterOrDigit ((char)rune);
+		}
+
+		/// <summary>
+		/// Completes the autocomplete selection process.  Called when user hits the <see cref="SelectionKey"/>.
+		/// </summary>
+		/// <param name="hostControl"></param>
+		/// <returns></returns>
+		protected bool Select (View hostControl)
+		{
+			if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count) {
+				var accepted = Suggestions [SelectedIdx];
+
+				return InsertSelection (hostControl,accepted);
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Called when the user confirms a selection at the current cursor location in
+		/// the <paramref name="hostControl"/>.  The <paramref name="accepted"/> string
+		/// is the full autocomplete word to be inserted.  Typically a host will have to
+		/// remove some characters such that the <paramref name="accepted"/> string 
+		/// completes the word instead of simply being appended.
+		/// </summary>
+		/// <param name="hostControl"></param>
+		/// <param name="accepted"></param>
+		/// <returns>True if the insertion was possible otherwise false</returns>
+		protected abstract bool InsertSelection (View hostControl, string accepted);
+
+
+		/// <summary>
+		/// Returns the currently selected word in the <paramref name="hostControl"/>.
+		/// <para>
+		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int)"/>
+		/// </para
+		/// </summary>
+		/// <param name="hostControl"></param>
+		/// <returns></returns>
+		protected abstract string GetCurrentWord (View hostControl);
+
+		/// <summary>
+		/// <para>
+		/// Given a <paramref name="line"/> of characters, returns the word which ends at <paramref name="idx"/> 
+		/// or null.  Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
+		/// </para>
+		/// 
+		/// <para>Use this method to determine whether autocomplete should be shown when the cursor is at
+		/// a given point in a line and to get the word from which suggestions should be generated.</para>
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		/// <returns></returns>
+		protected virtual string IdxToWord (List<Rune> line, int idx)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			// do not generate suggestions if the cursor is positioned in the middle of a word
+			bool areMidWord;
+
+			if (idx == line.Count) {
+				// the cursor positioned at the very end of the line
+				areMidWord = false;
+			} else {
+				// we are in the middle of a word if the cursor is over a letter/number
+				areMidWord = IsWordChar (line [idx]);
+			}
+
+			// if we are in the middle of a word then there is no way to autocomplete that word
+			if (areMidWord) {
+				return null;
+			}
+
+			// we are at the end of a word.  Work out what has been typed so far
+			while (idx-- > 0) {
+
+				if (IsWordChar (line [idx])) {
+					sb.Insert (0, (char)line [idx]);
+				} else {
+					break;
+				}
+			}
+			return sb.ToString ();
+		}
+	
+		/// <summary>
+		/// Closes the Autocomplete context menu if it is showing and <see cref="ClearSuggestions"/>
+		/// </summary>
+		/// <param name="hostControl"></param>
+		protected void Close (View hostControl)
+		{
+			ClearSuggestions ();
+			Visible = false;
+			hostControl.SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Moves the selection in the Autocomplete context menu up one
+		/// </summary>
+		/// <param name="hostControl"></param>
+		protected void MoveUp (View hostControl)
+		{
+			SelectedIdx--;
+			if (SelectedIdx < 0) {
+				SelectedIdx = Suggestions.Count - 1;
+			}
+			EnsureSelectedIdxIsValid ();
+			hostControl.SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Moves the selection in the Autocomplete context menu down one
+		/// </summary>
+		/// <param name="hostControl"></param>
+		protected void MoveDown (View hostControl)
+		{
+			SelectedIdx++;
+			if (SelectedIdx > Suggestions.Count - 1) {
+				SelectedIdx = 0;
+			}
+			EnsureSelectedIdxIsValid ();
+			hostControl.SetNeedsDisplay ();
 		}
 	}
 }
