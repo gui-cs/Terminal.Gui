@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 						col++;
 					}
 					break;
-				} else if (end < t.Count && col > 0 && start < end && col == start) {
+				} else if ((end < t.Count && col > 0 && start < end && col == start) || (end - col == width - 1)) {
 					break;
 				}
 				col = i;
