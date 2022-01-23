@@ -1814,7 +1814,7 @@ namespace Terminal.Gui.Views {
 						col++;
 					}
 					break;
-				} else if (cCol < line.Length && col > 0 && start < cCol && col == start) {
+				} else if ((cCol < line.Length && col > 0 && start < cCol && col == start) || (cCol - col == width - 1)) {
 					break;
 				}
 				col = i;
