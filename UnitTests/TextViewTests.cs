@@ -2271,6 +2271,27 @@ line.
 		}
 
 		[Fact]
+		public void LeftColumn_Add_One_If_Text_Length_Is_Equal_To_Width ()
+		{
+			var tv = new TextView () {
+				Width = 10,
+				Text = "1234567890"
+			};
+
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			tv.CursorPosition = new Point (9, 0);
+			Assert.Equal (new Point (9, 0), tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			tv.CursorPosition = new Point (10, 0);
+			Assert.Equal (new Point (10, 0), tv.CursorPosition);
+			Assert.Equal (1, tv.LeftColumn);
+		}
+
+		[Fact]
 		[AutoInitShutdown]
 		public void KeyBindings_Command ()
 		{
