@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NStack;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -94,6 +95,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+
+			Initialized += TextField_Initialized;
 
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
@@ -190,6 +193,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 		}
 
+
+		void TextField_Initialized (object sender, EventArgs e)
+		{
+			Autocomplete.HostControl = this;
+			Autocomplete.PopupInsideContainer = false;
+		}
+
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
@@ -200,6 +210,12 @@ namespace Terminal.Gui {
 
 			return base.OnLeave (view);
 		}
+
+		/// <summary>
+		/// Provides autocomplete context menu based on suggestions at the current cursor
+		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature.
+		/// </summary>
+		public IAutocomplete Autocomplete { get; protected set; } = new TextFieldAutocomplete ();
 
 		///<inheritdoc/>
 		public override Rect Frame {
@@ -283,6 +299,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets the left offset position.
+		/// </summary>
+		public int ScrollOffset => first;
+
+		/// <summary>
 		///   Sets the cursor position.
 		/// </summary>
 		public override void PositionCursor ()
@@ -342,6 +363,16 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
+
+			// draw autocomplete
+			Autocomplete.GenerateSuggestions ();
+
+			//var renderAt = new Point (
+			//	CursorPosition - ScrollOffset, Frame.Bottom + 1);
+			var renderAt = new Point (
+				CursorPosition - ScrollOffset + 1, Frame.Bottom);
+
+			Autocomplete.RenderOverlay (renderAt);
 		}
 
 		Attribute GetReadOnlyColor ()
@@ -424,6 +455,11 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			oldCursorPos = point;
 
+			// Give autocomplete first opportunity to respond to key presses
+			if (Autocomplete.ProcessKey (kb)) {
+				return true;
+			}
+
 			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
 				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
 			if (result != null)
@@ -436,8 +472,18 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
+			InsertText (kb);
+
+			return true;
+		}
+
+		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
+		{
 			if (length > 0) {
 				DeleteSelectedText ();
+				oldCursorPos = point;
+			}
+			if (!useOldCursorPos) {
 				oldCursorPos = point;
 			}
 			var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
@@ -456,8 +502,6 @@ namespace Terminal.Gui {
 				point++;
 			}
 			Adjust ();
-
-			return true;
 		}
 
 		void SetOverwrite (bool overwrite)
@@ -466,7 +510,10 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		void KillWordBackwards ()
+		/// <summary>
+		/// Deletes word backwards.
+		/// </summary>
+		public virtual void KillWordBackwards ()
 		{
 			ClearAllSelection ();
 			int bw = WordBackward (point);
@@ -477,7 +524,10 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void KillWordForwards ()
+		/// <summary>
+		/// Deletes word forwards.
+		/// </summary>
+		public virtual void KillWordForwards ()
 		{
 			ClearAllSelection ();
 			int fw = WordForward (point);
@@ -671,7 +721,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void DeleteCharLeft ()
+		/// <summary>
+		/// Deletes the left character.
+		/// </summary>
+		public virtual void DeleteCharLeft (bool useOldCursorPos = true)
 		{
 			if (ReadOnly)
 				return;
@@ -680,6 +733,9 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return;
 
+				if (!useOldCursorPos) {
+					oldCursorPos = point;
+				}
 				point--;
 				if (oldCursorPos < text.Count) {
 					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
@@ -692,7 +748,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void DeleteCharRight ()
+		/// <summary>
+		/// Deletes the right character.
+		/// </summary>
+		public virtual void DeleteCharRight ()
 		{
 			if (ReadOnly)
 				return;
@@ -834,6 +893,11 @@ namespace Terminal.Gui {
 			}
 
 			if (!CanFocus) {
+				return true;
+			}
+
+			// Give autocomplete first opportunity to respond to mouse clicks
+			if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true)) {
 				return true;
 			}
 
@@ -1068,6 +1132,29 @@ namespace Terminal.Gui {
 
 			return base.OnEnter (view);
 		}
+
+		/// <summary>
+		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
+		/// exactly as if the user had just typed it
+		/// </summary>
+		/// <param name="toAdd">Text to add</param>
+		/// <param name="useOldCursorPos">If uses the <see cref="oldCursorPos"/>.</param>
+		public void InsertText (string toAdd, bool useOldCursorPos = true)
+		{
+			foreach (var ch in toAdd) {
+
+				Key key;
+
+				try {
+					key = (Key)ch;
+				} catch (Exception) {
+
+					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
+				}
+
+				InsertText (new KeyEvent () { Key = key }, useOldCursorPos);
+			}
+		}
 	}
 
 	/// <summary>
@@ -1090,6 +1177,42 @@ namespace Terminal.Gui {
 		public TextChangingEventArgs (ustring newText)
 		{
 			NewText = newText;
+		}
+	}
+
+	/// <summary>
+	/// Renders an overlay on another view at a given point that allows selecting
+	/// from a range of 'autocomplete' options.
+	/// An implementation on a TextField.
+	/// </summary>
+	public class TextFieldAutocomplete : Autocomplete {
+		/// <inheritdoc/>
+		protected override Point GetCursorPosition ()
+		{
+			var host = (TextField)HostControl;
+			return new Point (
+				host.CursorPosition - host.ScrollOffset, 0);
+		}
+
+		/// <inheritdoc/>
+		protected override void DeleteTextBackwards ()
+		{
+			((TextField)HostControl).DeleteCharLeft (false);
+		}
+
+		/// <inheritdoc/>
+		protected override string GetCurrentWord ()
+		{
+			var host = (TextField)HostControl;
+			var currentLine = host.Text.ToRuneList ();
+			var cursorPosition = Math.Min (host.CursorPosition, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition);
+		}
+
+		/// <inheritdoc/>
+		protected override void InsertText (string accepted)
+		{
+			((TextField)HostControl).InsertText (accepted, false);
 		}
 	}
 }

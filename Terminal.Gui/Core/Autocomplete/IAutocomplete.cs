@@ -12,6 +12,16 @@ namespace Terminal.Gui {
 	public interface IAutocomplete {
 
 		/// <summary>
+		/// The host control that will use autocomplete.
+		/// </summary>
+		View HostControl { get; set; }
+
+		/// <summary>
+		/// Gets or sets where the popup will be displayed.
+		/// </summary>
+		bool PopupInsideContainer { get; set; }
+
+		/// <summary>
 		/// The maximum width of the autocomplete dropdown
 		/// </summary>
 		int MaxWidth { get; set; }
@@ -66,12 +76,16 @@ namespace Terminal.Gui {
 		Key CloseKey { get; set; }
 
 		/// <summary>
-		/// Renders the autocomplete dialog inside the given <paramref name="view"/> at the
+		/// The key that the user can press to reopen the currently popped autocomplete menu
+		/// </summary>
+		Key Reopen { get; set; }
+
+		/// <summary>
+		/// Renders the autocomplete dialog inside the given <see cref="HostControl"/> at the
 		/// given point.
 		/// </summary>
-		/// <param name="view">The view the overlay should be rendered into</param>
 		/// <param name="renderAt"></param>
-		void RenderOverlay (View view, Point renderAt);
+		void RenderOverlay (Point renderAt);
 
 		/// <summary>
 		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
@@ -79,14 +93,23 @@ namespace Terminal.Gui {
 		void EnsureSelectedIdxIsValid ();
 
 		/// <summary>
-		/// Handle key events before <paramref name="hostControl"/> e.g. to make key events like
+		/// Handle key events before <see cref="HostControl"/> e.g. to make key events like
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="hostControl">The host control.</param>
 		/// <param name="kb">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		bool ProcessKey (View hostControl, KeyEvent kb);
+		bool ProcessKey (KeyEvent kb);
+
+		/// <summary>
+		/// Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like
+		/// report/click apply to the autocomplete control instead of changing the cursor position in
+		/// the underlying text view.
+		/// </summary>
+		/// <param name="me">The mouse event.</param>
+		/// <param name="fromHost">If was called from the popup or from the host.</param>
+		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
+		bool MouseEvent (MouseEvent me, bool fromHost = false);
 
 		/// <summary>
 		/// Clears <see cref="Suggestions"/>
@@ -95,10 +118,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <paramref name="hostControl"/>
+		/// match with the current cursor position/text in the <see cref="HostControl"/>.
 		/// </summary>
-		/// <param name="hostControl">The text view that you want suggestions for</param>
-		void GenerateSuggestions (View hostControl);
+		void GenerateSuggestions ();
 
 		/// <summary>
 		/// Return true if the given symbol should be considered part of a word

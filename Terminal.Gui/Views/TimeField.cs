@@ -79,8 +79,8 @@ namespace Terminal.Gui {
 			TextChanged += TextField_TextChanged;
 
 			// Things this view knows how to do
-			AddCommand (Command.DeleteCharRight, () => DeleteCharRight ());
-			AddCommand (Command.DeleteCharLeft, () => DeleteCharLeft ());
+			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
 			AddCommand (Command.LeftHome, () => MoveHome ());
 			AddCommand (Command.Left, () => MoveLeft ());
 			AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -291,23 +291,25 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool DeleteCharLeft ()
+		/// <inheritdoc/>
+		public override void DeleteCharLeft (bool useOldCursorPos = true)
 		{
 			if (ReadOnly)
-				return true;
+				return;
 
 			SetText ('0');
 			DecCursorPosition ();
-			return true;
+			return;
 		}
 
-		bool DeleteCharRight ()
+		/// <inheritdoc/>
+		public override void DeleteCharRight ()
 		{
 			if (ReadOnly)
-				return true;
+				return;
 
 			SetText ('0');
-			return true;
+			return;
 		}
 
 		///<inheritdoc/>
