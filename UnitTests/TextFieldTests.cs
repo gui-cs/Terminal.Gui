@@ -719,18 +719,22 @@ namespace Terminal.Gui.Views {
 			var tf = new TextField ("ABC");
 			tf.EnsureFocus ();
 			Assert.Equal ("ABC", tf.Text);
+			Assert.Equal (3, tf.CursorPosition);
 
 			// now delete the C
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
 			Assert.Equal ("AB", tf.Text);
+			Assert.Equal (2, tf.CursorPosition);
 
 			// then delete the B
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
 			Assert.Equal ("A", tf.Text);
+			Assert.Equal (1, tf.CursorPosition);
 
 			// then delete the A
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
 			Assert.Equal ("", tf.Text);
+			Assert.Equal (0, tf.CursorPosition);
 		}
 
 		[Fact]

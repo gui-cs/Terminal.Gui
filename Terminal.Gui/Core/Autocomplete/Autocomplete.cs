@@ -13,6 +13,111 @@ namespace Terminal.Gui {
 	/// </summary>
 	public abstract class Autocomplete : IAutocomplete {
 
+		private class Popup : View {
+			Autocomplete autocomplete;
+
+			public Popup (Autocomplete autocomplete)
+			{
+				this.autocomplete = autocomplete;
+				CanFocus = true;
+				WantMousePositionReports = true;
+			}
+
+			public override Rect Frame {
+				get => base.Frame;
+				set {
+					base.Frame = value;
+					X = value.X;
+					Y = value.Y;
+					Width = value.Width;
+					Height = value.Height;
+				}
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				if (autocomplete.LastPopupPos == null) {
+					return;
+				}
+
+				autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
+			}
+
+			public override bool MouseEvent (MouseEvent mouseEvent)
+			{
+				return autocomplete.MouseEvent (mouseEvent);
+			}
+		}
+
+		private View top, popup;
+		private bool closed;
+
+		private Point? LastPopupPos { get; set; }
+
+		private ColorScheme colorScheme;
+		private View hostControl;
+
+		/// <summary>
+		/// The host control to handle.
+		/// </summary>
+		public virtual View HostControl {
+			get => hostControl;
+			set {
+				hostControl = value;
+				top = hostControl.SuperView;
+				if (top != null) {
+					top.DrawContent += Top_DrawContent;
+					top.DrawContentComplete += Top_DrawContentComplete;
+					top.Removed += Top_Removed;
+				}
+			}
+		}
+
+		private void Top_Removed (View obj)
+		{
+			Visible = false;
+			ManipulatePopup ();
+		}
+
+		private void Top_DrawContentComplete (Rect obj)
+		{
+			ManipulatePopup ();
+		}
+
+		private void Top_DrawContent (Rect obj)
+		{
+			if (!closed) {
+				ReopenSuggestions ();
+			}
+			ManipulatePopup ();
+			if (Visible) {
+				top.BringSubviewToFront (popup);
+			}
+		}
+
+		private void ManipulatePopup ()
+		{
+			if (Visible && popup == null) {
+				popup = new Popup (this) {
+					Frame = new Rect (Point.Empty, new Size (1, 1))
+				};
+				if (top != null) {
+					top.Add (popup);
+				}
+			}
+
+			if (!Visible && popup != null) {
+				top.Remove (popup);
+				popup.Dispose ();
+				popup = null;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets If the popup is displayed inside or outside the host limits.
+		/// </summary>
+		public bool PopupInsideContainer { get; set; } = true;
+
 		/// <summary>
 		/// The maximum width of the autocomplete dropdown
 		/// </summary>
@@ -26,7 +131,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// True if the autocomplete should be considered open and visible
 		/// </summary>
-		public virtual bool Visible { get; set; } = true;
+		public virtual bool Visible { get; set; }
 
 		/// <summary>
 		/// The strings that form the current list of suggestions to render
@@ -68,8 +173,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private ColorScheme colorScheme;
-
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
@@ -81,22 +184,38 @@ namespace Terminal.Gui {
 		public virtual Key CloseKey { get; set; } = Key.Esc;
 
 		/// <summary>
-		/// Renders the autocomplete dialog inside the given <paramref name="view"/> at the
+		/// The key that the user can press to reopen the currently popped autocomplete menu
+		/// </summary>
+		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
+
+		/// <summary>
+		/// Renders the autocomplete dialog inside or outside the given <see cref="HostControl"/> at the
 		/// given point.
 		/// </summary>
-		/// <param name="view">The view the overlay should be rendered into</param>
 		/// <param name="renderAt"></param>
-		/// <inheritdoc/>
-		public virtual void RenderOverlay (View view, Point renderAt)
+		public virtual void RenderOverlay (Point renderAt)
 		{
-			if (!Visible || !view.HasFocus || Suggestions.Count == 0) {
+			if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
+				LastPopupPos = null;
+				Visible = false;
 				return;
 			}
 
-			view.Move (renderAt.X, renderAt.Y);
+			LastPopupPos = renderAt;
 
-			// don't overspill vertically
-			var height = Math.Min (view.Bounds.Height - renderAt.Y, MaxHeight);
+			int height, width;
+
+			if (PopupInsideContainer) {
+				// don't overspill vertically
+				height = Math.Min (HostControl.Bounds.Height - renderAt.Y, MaxHeight);
+				// There is no space below then popup on top
+				if (height <= Suggestions.Count && HostControl.Bounds.Height >= Suggestions.Count) {
+					renderAt.Y -= Math.Min (Suggestions.Count + 1, MaxHeight);
+					height = Math.Min (Suggestions.Count, MaxHeight);
+				}
+			} else {
+				height = Math.Min (Math.Min (popup.SuperView.Bounds.Height - renderAt.Y, MaxHeight), Suggestions.Count);
+			}
 
 			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
 
@@ -104,10 +223,21 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
+			width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
 
-			// don't overspill horizontally
-			width = Math.Min (view.Bounds.Width - renderAt.X, width);
+			if (PopupInsideContainer) {
+				// don't overspill horizontally and places on the left
+				if (width >= HostControl.Bounds.Width - renderAt.X) {
+					renderAt.X -= width;
+				}
+			} else {
+				width = Math.Min (popup.SuperView.Bounds.Width - popup.Frame.X, width);
+			}
+
+			popup.Frame = new Rect (
+				new Point (renderAt.X, renderAt.Y), new Size (width, height));
+
+			popup.Move (0, 0);
 
 			for (int i = 0; i < toRender.Length; i++) {
 
@@ -117,7 +247,7 @@ namespace Terminal.Gui {
 					Application.Driver.SetAttribute (ColorScheme.Normal);
 				}
 
-				view.Move (renderAt.X, renderAt.Y + i);
+				popup.Move (0, i);
 
 				var text = TextFormatter.ClipOrPad (toRender [i], width);
 
@@ -144,40 +274,92 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Handle key events before <paramref name="hostControl"/> e.g. to make key events like
+		/// Handle key events before <see cref="HostControl"/> e.g. to make key events like
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="hostControl">The host control.</param>
 		/// <param name="kb">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public virtual bool ProcessKey (View hostControl, KeyEvent kb)
+		public virtual bool ProcessKey (KeyEvent kb)
 		{
 			if (IsWordChar ((char)kb.Key)) {
 				Visible = true;
+				closed = false;
 			}
 
-			if (!Visible || Suggestions.Count == 0) {
+			if (kb.Key == Reopen) {
+				return ReopenSuggestions ();
+			}
+
+			if (Suggestions.Count == 0) {
+				Visible = false;
 				return false;
 			}
 
 			if (kb.Key == Key.CursorDown) {
-				MoveDown (hostControl);
+				MoveDown ();
 				return true;
 			}
 
 			if (kb.Key == Key.CursorUp) {
-				MoveUp (hostControl);
+				MoveUp ();
 				return true;
 			}
 
 			if (kb.Key == SelectionKey) {
-				return Select (hostControl);
+				return Select ();
 			}
 
 			if (kb.Key == CloseKey) {
-				Close (hostControl);
+				Close ();
 				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like
+		/// report/click apply to the autocomplete control instead of changing the cursor position in
+		/// the underlying text view.
+		/// </summary>
+		/// <param name="me">The mouse event.</param>
+		/// <param name="fromHost">If was called from the popup or from the host.</param>
+		/// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
+		public virtual bool MouseEvent (MouseEvent me, bool fromHost = false)
+		{
+			if (fromHost) {
+				GenerateSuggestions ();
+				if (Visible && Suggestions.Count == 0) {
+					Visible = false;
+					HostControl.SetNeedsDisplay ();
+					return true;
+				} else if (!Visible && Suggestions.Count > 0) {
+					Visible = true;
+					HostControl.SetNeedsDisplay ();
+					Application.UngrabMouse ();
+					return true;
+				}
+				return false;
+			}
+
+			if (popup == null || Suggestions.Count == 0) {
+				ManipulatePopup ();
+				return false;
+			}
+
+			if (me.Flags == MouseFlags.ReportMousePosition) {
+				if (SelectedIdx != me.Y - ScrollOffset) {
+					SelectedIdx = me.Y - ScrollOffset;
+					if (LastPopupPos != null) {
+						RenderOverlay ((Point)LastPopupPos);
+					}
+				}
+			}
+
+			if (me.Flags == MouseFlags.Button1Clicked) {
+				SelectedIdx = me.Y - ScrollOffset;
+				return Select ();
 			}
 
 			return false;
@@ -194,11 +376,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <paramref name="hostControl"/>
+		/// match with the current cursor position/text in the <see cref="HostControl"/>
 		/// </summary>
-		/// <param name="hostControl">The text view that you want suggestions for</param>
-		/// <inheritdoc/>
-		public virtual void GenerateSuggestions (View hostControl)
+		public virtual void GenerateSuggestions ()
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
@@ -206,7 +386,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var currentWord = GetCurrentWord(hostControl);
+			var currentWord = GetCurrentWord ();
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				ClearSuggestions ();
@@ -235,14 +415,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Completes the autocomplete selection process.  Called when user hits the <see cref="SelectionKey"/>.
 		/// </summary>
-		/// <param name="hostControl"></param>
 		/// <returns></returns>
-		protected bool Select (View hostControl)
+		protected bool Select ()
 		{
 			if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count) {
 				var accepted = Suggestions [SelectedIdx];
 
-				return InsertSelection (hostControl,accepted);
+				return InsertSelection (accepted);
+
 			}
 
 			return false;
@@ -250,26 +430,39 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Called when the user confirms a selection at the current cursor location in
-		/// the <paramref name="hostControl"/>.  The <paramref name="accepted"/> string
+		/// the <see cref="HostControl"/>.  The <paramref name="accepted"/> string
 		/// is the full autocomplete word to be inserted.  Typically a host will have to
 		/// remove some characters such that the <paramref name="accepted"/> string 
 		/// completes the word instead of simply being appended.
 		/// </summary>
-		/// <param name="hostControl"></param>
 		/// <param name="accepted"></param>
 		/// <returns>True if the insertion was possible otherwise false</returns>
-		protected abstract bool InsertSelection (View hostControl, string accepted);
+		protected virtual bool InsertSelection (string accepted)
+		{
+			var typedSoFar = GetCurrentWord () ?? "";
 
+			if (typedSoFar.Length < accepted.Length) {
+
+				// delete the text
+				for (int i = 0; i < typedSoFar.Length; i++) {
+					DeleteTextBackwards ();
+				}
+
+				InsertText (accepted);
+				return true;
+			}
+
+			return false;
+		}
 
 		/// <summary>
-		/// Returns the currently selected word in the <paramref name="hostControl"/>.
+		/// Returns the currently selected word from the <see cref="HostControl"/>.
 		/// <para>
 		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int)"/>
-		/// </para
+		/// </para>
 		/// </summary>
-		/// <param name="hostControl"></param>
 		/// <returns></returns>
-		protected abstract string GetCurrentWord (View hostControl);
+		protected abstract string GetCurrentWord ();
 
 		/// <summary>
 		/// <para>
@@ -314,44 +507,75 @@ namespace Terminal.Gui {
 			}
 			return sb.ToString ();
 		}
-	
+
+		/// <summary>
+		/// Get the cursor position from the <see cref="HostControl"/>.
+		/// </summary>
+		/// <returns>The cursor position.</returns>
+		protected abstract Point GetCursorPosition ();
+
+		/// <summary>
+		/// Deletes the text backwards before insert the selected text in the <see cref="HostControl"/>.
+		/// </summary>
+		protected abstract void DeleteTextBackwards ();
+
+		/// <summary>
+		/// Inser the selected text in the <see cref="HostControl"/>.
+		/// </summary>
+		/// <param name="accepted"></param>
+		protected abstract void InsertText (string accepted);
+
 		/// <summary>
 		/// Closes the Autocomplete context menu if it is showing and <see cref="ClearSuggestions"/>
 		/// </summary>
-		/// <param name="hostControl"></param>
-		protected void Close (View hostControl)
+		protected void Close ()
 		{
 			ClearSuggestions ();
 			Visible = false;
-			hostControl.SetNeedsDisplay ();
+			closed = true;
+			HostControl.SetNeedsDisplay ();
+			ManipulatePopup ();
 		}
 
 		/// <summary>
 		/// Moves the selection in the Autocomplete context menu up one
 		/// </summary>
-		/// <param name="hostControl"></param>
-		protected void MoveUp (View hostControl)
+		protected void MoveUp ()
 		{
 			SelectedIdx--;
 			if (SelectedIdx < 0) {
 				SelectedIdx = Suggestions.Count - 1;
 			}
 			EnsureSelectedIdxIsValid ();
-			hostControl.SetNeedsDisplay ();
+			HostControl.SetNeedsDisplay ();
 		}
 
 		/// <summary>
 		/// Moves the selection in the Autocomplete context menu down one
 		/// </summary>
-		/// <param name="hostControl"></param>
-		protected void MoveDown (View hostControl)
+		protected void MoveDown ()
 		{
 			SelectedIdx++;
 			if (SelectedIdx > Suggestions.Count - 1) {
 				SelectedIdx = 0;
 			}
 			EnsureSelectedIdxIsValid ();
-			hostControl.SetNeedsDisplay ();
+			HostControl.SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Reopen the popup after it has been closed.
+		/// </summary>
+		/// <returns></returns>
+		protected bool ReopenSuggestions ()
+		{
+			GenerateSuggestions ();
+			if (Suggestions.Count > 0) {
+				Visible = true;
+				HostControl.SetNeedsDisplay ();
+				return true;
+			}
+			return false;
 		}
 	}
 }

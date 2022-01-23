@@ -1090,6 +1090,8 @@ namespace Terminal.Gui {
 
 		void TextView_Initialized (object sender, EventArgs e)
 		{
+			Autocomplete.HostControl = this;
+
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
 		}
@@ -1941,13 +1943,13 @@ namespace Terminal.Gui {
 			PositionCursor ();
 
 			// draw autocomplete
-			Autocomplete.GenerateSuggestions (this);
+			Autocomplete.GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition.X - LeftColumn,
-			(CursorPosition.Y + 1) - TopRow);
+				(CursorPosition.Y + 1) - TopRow);
 
-			Autocomplete.RenderOverlay (this, renderAt);
+			Autocomplete.RenderOverlay (renderAt);
 		}
 
 		///<inheritdoc/>
@@ -2205,7 +2207,7 @@ namespace Terminal.Gui {
 			}
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (Autocomplete.ProcessKey (this, kb)) {
+			if (Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
 
@@ -3418,6 +3420,11 @@ namespace Terminal.Gui {
 
 			continuousFind = false;
 
+			// Give autocomplete first opportunity to respond to mouse clicks
+			if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true)) {
+				return true;
+			}
+
 			if (ev.Flags == MouseFlags.Button1Clicked) {
 				if (shiftSelecting) {
 					shiftSelecting = false;
@@ -3580,36 +3587,31 @@ namespace Terminal.Gui {
 	/// An implementation on a TextView.
 	/// </summary>
 	public class TextViewAutocomplete : Autocomplete {
-
-		/// <inheritdoc/>
-		protected override bool InsertSelection (View hostView, string accepted)
+		///<inheritdoc/>
+		protected override Point GetCursorPosition ()
 		{
-			TextView host = (TextView)hostView;
-
-			var typedSoFar = GetCurrentWord (host) ?? "";
-
-			if (typedSoFar.Length < accepted.Length) {
-
-				// delete the text
-				for (int i = 0; i < typedSoFar.Length; i++) {
-					host.DeleteTextBackwards ();
-				}
-
-				host.InsertText (accepted);
-				return true;
-			}
-
-			return false;
+			return ((TextView)HostControl).CursorPosition;
 		}
 
-		/// <inheritdoc/>
-		protected override string GetCurrentWord (View hostControl)
+		///<inheritdoc/>
+		protected override string GetCurrentWord ()
 		{
-			TextView host = (TextView)hostControl;
-
+			var host = (TextView)HostControl;
 			var currentLine = host.GetCurrentLine ();
 			var cursorPosition = Math.Min (host.CurrentColumn, currentLine.Count);
 			return IdxToWord (currentLine, cursorPosition);
+		}
+
+		/// <inheritdoc/>
+		protected override void DeleteTextBackwards ()
+		{
+			((TextView)HostControl).DeleteTextBackwards ();
+		}
+
+		/// <inheritdoc/>
+		protected override void InsertText (string accepted)
+		{
+			((TextView)HostControl).InsertText (accepted);
 		}
 	}
 }

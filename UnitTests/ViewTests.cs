@@ -1574,5 +1574,20 @@ namespace Terminal.Gui.Views {
 				return runesCount;
 			}
 		}
+
+		[Fact]
+		public void GetTopSuperView_Test ()
+		{
+			var v1 = new View ();
+			var f = new FrameView ();
+			f.Add (v1);
+			var v2 = new View ();
+			var w = new Window ();
+			w.Add (f, v2);
+			var top=new Toplevel ();
+			top.Add (w);
+
+			Assert.Equal (top, v1.GetTopSuperView ());
+		}
 	}
 }

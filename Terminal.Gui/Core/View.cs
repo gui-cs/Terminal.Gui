@@ -1437,6 +1437,10 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+
+			// Invoke DrawContentCompleteEvent
+			OnDrawContentComplete (bounds);
+
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
@@ -1464,6 +1468,31 @@ namespace Terminal.Gui {
 		public virtual void OnDrawContent (Rect viewport)
 		{
 			DrawContent?.Invoke (viewport);
+		}
+
+		/// <summary>
+		/// Event invoked when the content area of the View is completed drawing.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Will be invoked after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.
+		/// </para>
+		/// <para>
+		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
+		/// </para>
+		/// </remarks>
+		public event Action<Rect> DrawContentComplete;
+
+		/// <summary>
+		/// Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
+		/// </summary>
+		/// <param name="viewport">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
+		/// <remarks>
+		/// This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.
+		/// </remarks>
+		public virtual void OnDrawContentComplete (Rect viewport)
+		{
+			DrawContentComplete?.Invoke (viewport);
 		}
 
 		/// <summary>
@@ -2692,6 +2721,22 @@ namespace Terminal.Gui {
 		public Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+		}
+
+		/// <summary>
+		/// Get the top superview of a given <see cref="View"/>.
+		/// </summary>
+		/// <returns>The superview view.</returns>
+		public View GetTopSuperView ()
+		{
+			View top = Application.Top;
+			for (var v = this?.SuperView; v != null; v = v.SuperView) {
+				if (v != null) {
+					top = v;
+				}
+			}
+
+			return top;
 		}
 	}
 }
