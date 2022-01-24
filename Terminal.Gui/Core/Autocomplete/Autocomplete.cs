@@ -51,6 +51,7 @@ namespace Terminal.Gui {
 
 		private View top, popup;
 		private bool closed;
+		int toRenderLength;
 
 		private Point? LastPopupPos { get; set; }
 
@@ -99,11 +100,9 @@ namespace Terminal.Gui {
 		{
 			if (Visible && popup == null) {
 				popup = new Popup (this) {
-					Frame = new Rect (Point.Empty, new Size (1, 1))
+					Frame = Rect.Empty
 				};
-				if (top != null) {
-					top.Add (popup);
-				}
+				top?.Add (popup);
 			}
 
 			if (!Visible && popup != null) {
@@ -208,16 +207,29 @@ namespace Terminal.Gui {
 			if (PopupInsideContainer) {
 				// don't overspill vertically
 				height = Math.Min (HostControl.Bounds.Height - renderAt.Y, MaxHeight);
-				// There is no space below then popup on top
-				if (height <= Suggestions.Count && HostControl.Bounds.Height >= Suggestions.Count) {
-					renderAt.Y -= Math.Min (Suggestions.Count + 1, MaxHeight);
-					height = Math.Min (Suggestions.Count, MaxHeight);
+				// There is no space below, lets see if can popup on top
+				if (height < Suggestions.Count && HostControl.Bounds.Height - renderAt.Y >= height) {
+					// Verifies that the upper limit available is greater than the lower limit
+					if (renderAt.Y > HostControl.Bounds.Height - renderAt.Y) {
+						renderAt.Y = Math.Max (renderAt.Y - Math.Min (Suggestions.Count + 1, MaxHeight + 1), 0);
+						height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), LastPopupPos.Value.Y - 1);
+					}
 				}
 			} else {
-				height = Math.Min (Math.Min (popup.SuperView.Bounds.Height - renderAt.Y, MaxHeight), Suggestions.Count);
+				// don't overspill vertically
+				height = Math.Min (Math.Min (top.Bounds.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
+				// There is no space below, lets see if can popup on top
+				if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height) {
+					// Verifies that the upper limit available is greater than the lower limit
+					if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y) {
+						renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
+						height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y - 1);
+					}
+				}
 			}
 
 			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
+			toRenderLength = toRender.Length;
 
 			if (toRender.Length == 0) {
 				return;
@@ -226,16 +238,38 @@ namespace Terminal.Gui {
 			width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
 
 			if (PopupInsideContainer) {
-				// don't overspill horizontally and places on the left
-				if (width >= HostControl.Bounds.Width - renderAt.X) {
-					renderAt.X -= width;
+				// don't overspill horizontally, let's see if can be displayed on the left
+				if (width > HostControl.Bounds.Width - renderAt.X) {
+					// Verifies that the left limit available is greater than the right limit
+					if (renderAt.X > HostControl.Bounds.Width - renderAt.X) {
+						renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
+						width = Math.Min (width, LastPopupPos.Value.X);
+					} else {
+						width = Math.Min (width, HostControl.Bounds.Width - renderAt.X);
+					}
 				}
 			} else {
-				width = Math.Min (popup.SuperView.Bounds.Width - popup.Frame.X, width);
+				// don't overspill horizontally, let's see if can be displayed on the left
+				if (width > top.Bounds.Width - (renderAt.X + HostControl.Frame.X)) {
+					// Verifies that the left limit available is greater than the right limit
+					if (renderAt.X + HostControl.Frame.X > top.Bounds.Width - (renderAt.X + HostControl.Frame.X)) {
+						renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
+						width = Math.Min (width, LastPopupPos.Value.X);
+					} else {
+						width = Math.Min (width, top.Bounds.Width - renderAt.X);
+					}
+				}
 			}
 
-			popup.Frame = new Rect (
-				new Point (renderAt.X, renderAt.Y), new Size (width, height));
+			if (PopupInsideContainer) {
+				popup.Frame = new Rect (
+					new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
+					new Size (width, height));
+			} else {
+				popup.Frame = new Rect (
+					new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
+					new Size (width, height));
+			}
 
 			popup.Move (0, 0);
 
@@ -268,7 +302,7 @@ namespace Terminal.Gui {
 			}
 
 			// if user moved selection down past bottom of current scroll window
-			while (SelectedIdx >= ScrollOffset + MaxHeight) {
+			while (toRenderLength > 0 && SelectedIdx >= ScrollOffset + toRenderLength) {
 				ScrollOffset++;
 			}
 		}
@@ -291,7 +325,7 @@ namespace Terminal.Gui {
 				return ReopenSuggestions ();
 			}
 
-			if (Suggestions.Count == 0) {
+			if (closed || Suggestions.Count == 0) {
 				Visible = false;
 				return false;
 			}
@@ -332,13 +366,20 @@ namespace Terminal.Gui {
 				GenerateSuggestions ();
 				if (Visible && Suggestions.Count == 0) {
 					Visible = false;
-					HostControl.SetNeedsDisplay ();
+					HostControl?.SetNeedsDisplay ();
 					return true;
 				} else if (!Visible && Suggestions.Count > 0) {
 					Visible = true;
-					HostControl.SetNeedsDisplay ();
+					HostControl?.SetNeedsDisplay ();
 					Application.UngrabMouse ();
-					return true;
+					return false;
+				} else {
+					// not in the popup
+					if (Visible && HostControl != null) {
+						Visible = false;
+						closed = false;
+					}
+					HostControl?.SetNeedsDisplay ();
 				}
 				return false;
 			}
@@ -349,12 +390,8 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags == MouseFlags.ReportMousePosition) {
-				if (SelectedIdx != me.Y - ScrollOffset) {
-					SelectedIdx = me.Y - ScrollOffset;
-					if (LastPopupPos != null) {
-						RenderOverlay ((Point)LastPopupPos);
-					}
-				}
+				RenderSelectedIdxByMouse (me);
+				return true;
 			}
 
 			if (me.Flags == MouseFlags.Button1Clicked) {
@@ -362,7 +399,31 @@ namespace Terminal.Gui {
 				return Select ();
 			}
 
+			if (me.Flags == MouseFlags.WheeledDown) {
+				MoveDown ();
+				return true;
+			}
+
+			if (me.Flags == MouseFlags.WheeledUp) {
+				MoveUp ();
+				return true;
+			}
+
 			return false;
+		}
+
+		/// <summary>
+		/// Render the current selection in the Autocomplete context menu by the mouse reporting.
+		/// </summary>
+		/// <param name="me"></param>
+		protected void RenderSelectedIdxByMouse (MouseEvent me)
+		{
+			if (SelectedIdx != me.Y - ScrollOffset) {
+				SelectedIdx = me.Y - ScrollOffset;
+				if (LastPopupPos != null) {
+					RenderOverlay ((Point)LastPopupPos);
+				}
+			}
 		}
 
 		/// <summary>
@@ -527,7 +588,7 @@ namespace Terminal.Gui {
 			ClearSuggestions ();
 			Visible = false;
 			closed = true;
-			HostControl.SetNeedsDisplay ();
+			HostControl?.SetNeedsDisplay ();
 			ManipulatePopup ();
 		}
 
@@ -541,7 +602,7 @@ namespace Terminal.Gui {
 				SelectedIdx = Suggestions.Count - 1;
 			}
 			EnsureSelectedIdxIsValid ();
-			HostControl.SetNeedsDisplay ();
+			HostControl?.SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -554,7 +615,7 @@ namespace Terminal.Gui {
 				SelectedIdx = 0;
 			}
 			EnsureSelectedIdxIsValid ();
-			HostControl.SetNeedsDisplay ();
+			HostControl?.SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -566,7 +627,8 @@ namespace Terminal.Gui {
 			GenerateSuggestions ();
 			if (Suggestions.Count > 0) {
 				Visible = true;
-				HostControl.SetNeedsDisplay ();
+				closed = false;
+				HostControl?.SetNeedsDisplay ();
 				return true;
 			}
 			return false;

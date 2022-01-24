@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="me">The mouse event.</param>
 		/// <param name="fromHost">If was called from the popup or from the host.</param>
-		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
+		/// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
 		bool MouseEvent (MouseEvent me, bool fromHost = false);
 
 		/// <summary>

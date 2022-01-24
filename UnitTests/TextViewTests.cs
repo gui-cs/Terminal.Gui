@@ -1490,7 +1490,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[InitShutdown]
-		public void Multiline_Setting_Changes_AllowsReturn_And_AllowsTab_And_Height ()
+		public void Multiline_Setting_Changes_AllowsReturn_AllowsTab_Height_WordWrap ()
 		{
 			Assert.True (_textView.Multiline);
 			Assert.True (_textView.AllowsReturn);
@@ -1498,7 +1498,10 @@ namespace Terminal.Gui.Views {
 			Assert.True (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 
+			_textView.WordWrap = true;
+			Assert.True (_textView.WordWrap);
 			_textView.Multiline = false;
 			Assert.False (_textView.Multiline);
 			Assert.False (_textView.AllowsReturn);
@@ -1506,7 +1509,10 @@ namespace Terminal.Gui.Views {
 			Assert.False (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(1)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 
+			_textView.WordWrap = true;
+			Assert.False (_textView.WordWrap);
 			_textView.Multiline = true;
 			Assert.True (_textView.Multiline);
 			Assert.True (_textView.AllowsReturn);
@@ -1514,6 +1520,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 		}
 
 		[Fact]

@@ -364,13 +364,14 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 
+			if (SelectedLength > 0)
+				return;
+
 			// draw autocomplete
 			Autocomplete.GenerateSuggestions ();
 
-			//var renderAt = new Point (
-			//	CursorPosition - ScrollOffset, Frame.Bottom + 1);
 			var renderAt = new Point (
-				CursorPosition - ScrollOffset + 1, Frame.Bottom);
+				CursorPosition - ScrollOffset, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
 		}
@@ -456,7 +457,7 @@ namespace Terminal.Gui {
 			oldCursorPos = point;
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
 

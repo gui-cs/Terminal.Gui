@@ -51,6 +51,14 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Dialog
 			};
 			textView.Text = s;
+			textView.DrawContent += TextView_DrawContent;
+
+			void TextView_DrawContent (Rect e)
+			{
+				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			}
 			Win.Add (textView);
 
 			var labelMirroringTextView = new Label (textView.Text) {
