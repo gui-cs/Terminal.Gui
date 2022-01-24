@@ -509,12 +509,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the cursor position from the <see cref="HostControl"/>.
-		/// </summary>
-		/// <returns>The cursor position.</returns>
-		protected abstract Point GetCursorPosition ();
-
-		/// <summary>
 		/// Deletes the text backwards before insert the selected text in the <see cref="HostControl"/>.
 		/// </summary>
 		protected abstract void DeleteTextBackwards ();

@@ -3587,12 +3587,7 @@ namespace Terminal.Gui {
 	/// An implementation on a TextView.
 	/// </summary>
 	public class TextViewAutocomplete : Autocomplete {
-		///<inheritdoc/>
-		protected override Point GetCursorPosition ()
-		{
-			return ((TextView)HostControl).CursorPosition;
-		}
-
+		
 		///<inheritdoc/>
 		protected override string GetCurrentWord ()
 		{
