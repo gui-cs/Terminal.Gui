@@ -53,13 +53,6 @@ namespace Terminal.Gui {
 		int SelectedIdx { get; set; }
 
 		/// <summary>
-		/// When more suggestions are available than can be rendered the user
-		/// can scroll down the dropdown list.  This indicates how far down they
-		/// have gone
-		/// </summary>
-		int ScrollOffset { get; set; }
-
-		/// <summary>
 		/// The colors to use to render the overlay.  Accessing this property before
 		/// the Application has been initialized will cause an error
 		/// </summary>
@@ -87,10 +80,6 @@ namespace Terminal.Gui {
 		/// <param name="renderAt"></param>
 		void RenderOverlay (Point renderAt);
 
-		/// <summary>
-		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
-		/// </summary>
-		void EnsureSelectedIdxIsValid ();
 
 		/// <summary>
 		/// Handle key events before <see cref="HostControl"/> e.g. to make key events like
@@ -121,13 +110,5 @@ namespace Terminal.Gui {
 		/// match with the current cursor position/text in the <see cref="HostControl"/>.
 		/// </summary>
 		void GenerateSuggestions ();
-
-		/// <summary>
-		/// Return true if the given symbol should be considered part of a word
-		/// and can be contained in matches.  Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
-		/// </summary>
-		/// <param name="rune"></param>
-		/// <returns><c>true</c> if rune is part of a word contained in matches, <c>false</c>otherwise.</returns>
-		bool IsWordChar (Rune rune);
 	}
 }
