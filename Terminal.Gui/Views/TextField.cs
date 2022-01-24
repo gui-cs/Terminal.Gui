@@ -1186,13 +1186,6 @@ namespace Terminal.Gui {
 	/// An implementation on a TextField.
 	/// </summary>
 	public class TextFieldAutocomplete : Autocomplete {
-		/// <inheritdoc/>
-		protected override Point GetCursorPosition ()
-		{
-			var host = (TextField)HostControl;
-			return new Point (
-				host.CursorPosition - host.ScrollOffset, 0);
-		}
 
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()
