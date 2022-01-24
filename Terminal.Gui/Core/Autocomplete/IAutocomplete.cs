@@ -51,6 +51,8 @@ namespace Terminal.Gui {
 		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
 		/// </summary>
 		int SelectedIdx { get; set; }
+
+		/// <summary>
 		/// The colors to use to render the overlay.  Accessing this property before
 		/// the Application has been initialized will cause an error
 		/// </summary>
