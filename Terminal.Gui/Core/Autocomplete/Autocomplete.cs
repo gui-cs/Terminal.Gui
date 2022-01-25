@@ -225,6 +225,8 @@ namespace Terminal.Gui {
 						renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
 						height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y - 1);
 					}
+				} else {
+					renderAt.Y = HostControl.Frame.Bottom;
 				}
 			}
 
