@@ -1490,7 +1490,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[InitShutdown]
-		public void Multiline_Setting_Changes_AllowsReturn_And_AllowsTab_And_Height ()
+		public void Multiline_Setting_Changes_AllowsReturn_AllowsTab_Height_WordWrap ()
 		{
 			Assert.True (_textView.Multiline);
 			Assert.True (_textView.AllowsReturn);
@@ -1498,7 +1498,10 @@ namespace Terminal.Gui.Views {
 			Assert.True (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 
+			_textView.WordWrap = true;
+			Assert.True (_textView.WordWrap);
 			_textView.Multiline = false;
 			Assert.False (_textView.Multiline);
 			Assert.False (_textView.AllowsReturn);
@@ -1506,7 +1509,10 @@ namespace Terminal.Gui.Views {
 			Assert.False (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(1)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 
+			_textView.WordWrap = true;
+			Assert.False (_textView.WordWrap);
 			_textView.Multiline = true;
 			Assert.True (_textView.Multiline);
 			Assert.True (_textView.AllowsReturn);
@@ -1514,6 +1520,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (_textView.AllowsTab);
 			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
 			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.False (_textView.WordWrap);
 		}
 
 		[Fact]
@@ -1821,7 +1828,7 @@ namespace Terminal.Gui.Views {
 						col++;
 					}
 					break;
-				} else if (cCol < line.Length && col > 0 && start < cCol && col == start) {
+				} else if ((cCol < line.Length && col > 0 && start < cCol && col == start) || (cCol - col == width - 1)) {
 					break;
 				}
 				col = i;
@@ -2268,6 +2275,27 @@ line.
 					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
 				}
 			}
+		}
+
+		[Fact]
+		public void LeftColumn_Add_One_If_Text_Length_Is_Equal_To_Width ()
+		{
+			var tv = new TextView () {
+				Width = 10,
+				Text = "1234567890"
+			};
+
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			tv.CursorPosition = new Point (9, 0);
+			Assert.Equal (new Point (9, 0), tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			tv.CursorPosition = new Point (10, 0);
+			Assert.Equal (new Point (10, 0), tv.CursorPosition);
+			Assert.Equal (1, tv.LeftColumn);
 		}
 
 		[Fact]

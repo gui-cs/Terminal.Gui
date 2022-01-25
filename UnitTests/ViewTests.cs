@@ -1579,15 +1579,25 @@ namespace Terminal.Gui.Views {
 		public void GetTopSuperView_Test ()
 		{
 			var v1 = new View ();
-			var f = new FrameView ();
-			f.Add (v1);
-			var v2 = new View ();
-			var w = new Window ();
-			w.Add (f, v2);
-			var top=new Toplevel ();
-			top.Add (w);
+			var fv1 = new FrameView ();
+			fv1.Add (v1);
+			var tf1 = new TextField ();
+			var w1 = new Window ();
+			w1.Add (fv1, tf1);
+			var top1 = new Toplevel ();
+			top1.Add (w1);
 
-			Assert.Equal (top, v1.GetTopSuperView ());
+			var v2 = new View ();
+			var fv2 = new FrameView ();
+			fv2.Add (v2);
+			var tf2 = new TextField ();
+			var w2 = new Window ();
+			w2.Add (fv2, tf2);
+			var top2 = new Toplevel ();
+			top2.Add (w2);
+
+			Assert.Equal (top1, v1.GetTopSuperView ());
+			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
 	}
 }

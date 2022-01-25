@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 						col++;
 					}
 					break;
-				} else if (end < t.Count && col > 0 && start < end && col == start) {
+				} else if ((end < t.Count && col > 0 && start < end && col == start) || (end - col == width - 1)) {
 					break;
 				}
 				col = i;
@@ -1275,6 +1275,9 @@ namespace Terminal.Gui {
 				if (value == wordWrap) {
 					return;
 				}
+				if (value && !multiline) {
+					return;
+				}
 				wordWrap = value;
 				ResetPosition ();
 				if (wordWrap) {
@@ -1390,6 +1393,7 @@ namespace Terminal.Gui {
 				if (!multiline) {
 					AllowsReturn = false;
 					AllowsTab = false;
+					WordWrap = false;
 					currentColumn = 0;
 					currentRow = 0;
 					savedHeight = Height;
@@ -1399,6 +1403,7 @@ namespace Terminal.Gui {
 					}
 					Height = 1;
 					LayoutStyle = lyout;
+					Autocomplete.PopupInsideContainer = false;
 					SetNeedsDisplay ();
 				} else if (multiline && savedHeight != null) {
 					var lyout = LayoutStyle;
@@ -1407,6 +1412,7 @@ namespace Terminal.Gui {
 					}
 					Height = savedHeight;
 					LayoutStyle = lyout;
+					Autocomplete.PopupInsideContainer = true;
 					SetNeedsDisplay ();
 				}
 			}
@@ -1942,12 +1948,17 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 
+			if (SelectedLength > 0)
+				return;
+
 			// draw autocomplete
 			Autocomplete.GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition.X - LeftColumn,
-				(CursorPosition.Y + 1) - TopRow);
+				Autocomplete.PopupInsideContainer
+					? (CursorPosition.Y + 1) - TopRow
+					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
 		}
@@ -2207,7 +2218,7 @@ namespace Terminal.Gui {
 			}
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
 
