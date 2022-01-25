@@ -237,7 +237,110 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing Shift-Z
 		/// </summary>
 		Z,
-
+		/// <summary>
+		/// The key code for the user pressing a
+		/// </summary>
+		a = 97,
+		/// <summary>
+		/// The key code for the user pressing b
+		/// </summary>
+		b,
+		/// <summary>
+		/// The key code for the user pressing c
+		/// </summary>
+		c,
+		/// <summary>
+		/// The key code for the user pressing d
+		/// </summary>
+		d,
+		/// <summary>
+		/// The key code for the user pressing e
+		/// </summary>
+		e,
+		/// <summary>
+		/// The key code for the user pressing f
+		/// </summary>
+		f,
+		/// <summary>
+		/// The key code for the user pressing g
+		/// </summary>
+		g,
+		/// <summary>
+		/// The key code for the user pressing h
+		/// </summary>
+		h,
+		/// <summary>
+		/// The key code for the user pressing i
+		/// </summary>
+		i,
+		/// <summary>
+		/// The key code for the user pressing j
+		/// </summary>
+		j,
+		/// <summary>
+		/// The key code for the user pressing k
+		/// </summary>
+		k,
+		/// <summary>
+		/// The key code for the user pressing l
+		/// </summary>
+		l,
+		/// <summary>
+		/// The key code for the user pressing m
+		/// </summary>
+		m,
+		/// <summary>
+		/// The key code for the user pressing n
+		/// </summary>
+		n,
+		/// <summary>
+		/// The key code for the user pressing 0
+		/// </summary>
+		o,
+		/// <summary>
+		/// The key code for the user pressing p
+		/// </summary>
+		p,
+		/// <summary>
+		/// The key code for the user pressing q
+		/// </summary>
+		q,
+		/// <summary>
+		/// The key code for the user pressing r
+		/// </summary>
+		r,
+		/// <summary>
+		/// The key code for the user pressing s
+		/// </summary>
+		s,
+		/// <summary>
+		/// The key code for the user pressing t
+		/// </summary>
+		t,
+		/// <summary>
+		/// The key code for the user pressing u
+		/// </summary>
+		u,
+		/// <summary>
+		/// The key code for the user pressing v
+		/// </summary>
+		v,
+		/// <summary>
+		/// The key code for the user pressing w
+		/// </summary>
+		w,
+		/// <summary>
+		/// The key code for the user pressing x
+		/// </summary>
+		x,
+		/// <summary>
+		/// The key code for the user pressing y
+		/// </summary>
+		y,
+		/// <summary>
+		/// The key code for the user pressing z
+		/// </summary>
+		z,
 		/// <summary>
 		/// The key code for the user pressing the delete key.
 		/// </summary>

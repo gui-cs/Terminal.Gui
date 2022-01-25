@@ -135,5 +135,24 @@ namespace Terminal.Gui.Core {
 				break;
 			}
 		}
+
+		[Fact]
+		public void Key_ToString ()
+		{
+			var k = Key.Y | Key.CtrlMask;
+			Assert.Equal ("Y, CtrlMask", k.ToString ());
+
+			k = Key.CtrlMask | Key.Y;
+			Assert.Equal ("Y, CtrlMask", k.ToString ());
+
+			k = Key.Space;
+			Assert.Equal ("Space", k.ToString ());
+
+			k = Key.Space | Key.D;
+			Assert.Equal ("d", k.ToString ());
+
+			k = (Key)'d';
+			Assert.Equal ("d", k.ToString ());
+		}
 	}
 }
