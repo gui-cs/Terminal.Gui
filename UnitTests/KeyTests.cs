@@ -153,6 +153,15 @@ namespace Terminal.Gui.Core {
 
 			k = (Key)'d';
 			Assert.Equal ("d", k.ToString ());
+
+			k = Key.d;
+			Assert.Equal ("d", k.ToString ());
+
+			k = Key.D;
+			Assert.Equal ("D", k.ToString ());
+
+			k = Key.D | Key.ShiftMask;
+			Assert.Equal ("D, ShiftMask", k.ToString ());
 		}
 	}
 }
