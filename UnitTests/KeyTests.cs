@@ -160,8 +160,13 @@ namespace Terminal.Gui.Core {
 			k = Key.D;
 			Assert.Equal ("D", k.ToString ());
 
+			// In a console this will always returns Key.D
 			k = Key.D | Key.ShiftMask;
 			Assert.Equal ("D, ShiftMask", k.ToString ());
+
+			// In a console this will always returns Key.D
+			k = Key.d | Key.ShiftMask;
+			Assert.Equal ("d, ShiftMask", k.ToString ());
 		}
 	}
 }

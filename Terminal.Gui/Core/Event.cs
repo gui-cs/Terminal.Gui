@@ -238,107 +238,107 @@ namespace Terminal.Gui {
 		/// </summary>
 		Z,
 		/// <summary>
-		/// The key code for the user pressing a
+		/// The key code for the user pressing A
 		/// </summary>
 		a = 97,
 		/// <summary>
-		/// The key code for the user pressing b
+		/// The key code for the user pressing B
 		/// </summary>
 		b,
 		/// <summary>
-		/// The key code for the user pressing c
+		/// The key code for the user pressing C
 		/// </summary>
 		c,
 		/// <summary>
-		/// The key code for the user pressing d
+		/// The key code for the user pressing D
 		/// </summary>
 		d,
 		/// <summary>
-		/// The key code for the user pressing e
+		/// The key code for the user pressing E
 		/// </summary>
 		e,
 		/// <summary>
-		/// The key code for the user pressing f
+		/// The key code for the user pressing F
 		/// </summary>
 		f,
 		/// <summary>
-		/// The key code for the user pressing g
+		/// The key code for the user pressing G
 		/// </summary>
 		g,
 		/// <summary>
-		/// The key code for the user pressing h
+		/// The key code for the user pressing H
 		/// </summary>
 		h,
 		/// <summary>
-		/// The key code for the user pressing i
+		/// The key code for the user pressing I
 		/// </summary>
 		i,
 		/// <summary>
-		/// The key code for the user pressing j
+		/// The key code for the user pressing J
 		/// </summary>
 		j,
 		/// <summary>
-		/// The key code for the user pressing k
+		/// The key code for the user pressing K
 		/// </summary>
 		k,
 		/// <summary>
-		/// The key code for the user pressing l
+		/// The key code for the user pressing L
 		/// </summary>
 		l,
 		/// <summary>
-		/// The key code for the user pressing m
+		/// The key code for the user pressing M
 		/// </summary>
 		m,
 		/// <summary>
-		/// The key code for the user pressing n
+		/// The key code for the user pressing N
 		/// </summary>
 		n,
 		/// <summary>
-		/// The key code for the user pressing 0
+		/// The key code for the user pressing O
 		/// </summary>
 		o,
 		/// <summary>
-		/// The key code for the user pressing p
+		/// The key code for the user pressing P
 		/// </summary>
 		p,
 		/// <summary>
-		/// The key code for the user pressing q
+		/// The key code for the user pressing Q
 		/// </summary>
 		q,
 		/// <summary>
-		/// The key code for the user pressing r
+		/// The key code for the user pressing R
 		/// </summary>
 		r,
 		/// <summary>
-		/// The key code for the user pressing s
+		/// The key code for the user pressing S
 		/// </summary>
 		s,
 		/// <summary>
-		/// The key code for the user pressing t
+		/// The key code for the user pressing T
 		/// </summary>
 		t,
 		/// <summary>
-		/// The key code for the user pressing u
+		/// The key code for the user pressing U
 		/// </summary>
 		u,
 		/// <summary>
-		/// The key code for the user pressing v
+		/// The key code for the user pressing V
 		/// </summary>
 		v,
 		/// <summary>
-		/// The key code for the user pressing w
+		/// The key code for the user pressing W
 		/// </summary>
 		w,
 		/// <summary>
-		/// The key code for the user pressing x
+		/// The key code for the user pressing X
 		/// </summary>
 		x,
 		/// <summary>
-		/// The key code for the user pressing y
+		/// The key code for the user pressing Y
 		/// </summary>
 		y,
 		/// <summary>
-		/// The key code for the user pressing z
+		/// The key code for the user pressing Z
 		/// </summary>
 		z,
 		/// <summary>
