@@ -767,12 +767,15 @@ namespace Terminal.Gui {
 		IList src;
 		BitArray marks;
 		int count, len;
+		Color[] fore, back;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ListWrapper"/> given an <see cref="IList"/>
 		/// </summary>
 		/// <param name="source"></param>
-		public ListWrapper (IList source)
+		/// <param name="fore"></param>
+		/// <param name="back"></param>
+		public ListWrapper (IList source, Color[] fore = null, Color[] back = null)
 		{
 			if (source != null) {
 				count = source.Count;
@@ -780,6 +783,16 @@ namespace Terminal.Gui {
 				src = source;
 				len = GetMaxLengthItem ();
 			}
+
+			if (fore.Length == source.Count)
+				this.fore = fore;
+			else
+				throw new ArgumentException ("Size must be the same as source", "fore");
+
+			if (back.Length == source.Count)
+				this.back = back;
+			else
+				throw new ArgumentException ("Size must be the same as source", "back");
 		}
 
 		/// <summary>
@@ -854,6 +867,10 @@ namespace Terminal.Gui {
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
+				if (item != container.SelectedItem) {
+					driver.SetAttribute (new Attribute (fore[item], back[item]));
+				}
+
 				if (t is ustring u) {
 					RenderUstr (driver, u, col, line, width, start);
 				} else if (t is string s) {
