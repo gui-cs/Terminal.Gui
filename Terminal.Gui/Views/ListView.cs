@@ -347,6 +347,12 @@ namespace Terminal.Gui {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
+					var rowEventArgs = new ListViewRowEventArgs (item);
+					OnRowRender (rowEventArgs);
+					if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+						current = (Attribute)rowEventArgs.RowAttribute;
+						Driver.SetAttribute (current);
+					}
 					if (allowsMarking) {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
@@ -365,6 +371,11 @@ namespace Terminal.Gui {
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
+
+		/// <summary>
+		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
+		/// </summary>
+		public event Action<ListViewRowEventArgs> RowRender;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -665,6 +676,15 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="RowRender"/>.
+		/// </summary>
+		/// <param name="rowEventArgs"></param>
+		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
+		{
+			RowRender?.Invoke (rowEventArgs);
+		}
+
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
@@ -767,15 +787,12 @@ namespace Terminal.Gui {
 		IList src;
 		BitArray marks;
 		int count, len;
-		Color[] fore, back;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ListWrapper"/> given an <see cref="IList"/>
 		/// </summary>
 		/// <param name="source"></param>
-		/// <param name="fore"></param>
-		/// <param name="back"></param>
-		public ListWrapper (IList source, Color[] fore = null, Color[] back = null)
+		public ListWrapper (IList source)
 		{
 			if (source != null) {
 				count = source.Count;
@@ -783,16 +800,6 @@ namespace Terminal.Gui {
 				src = source;
 				len = GetMaxLengthItem ();
 			}
-
-			if (fore.Length == source.Count)
-				this.fore = fore;
-			else
-				throw new ArgumentException ("Size must be the same as source", "fore");
-
-			if (back.Length == source.Count)
-				this.back = back;
-			else
-				throw new ArgumentException ("Size must be the same as source", "back");
 		}
 
 		/// <summary>
@@ -867,10 +874,6 @@ namespace Terminal.Gui {
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
-				if (item != container.SelectedItem) {
-					driver.SetAttribute (new Attribute (fore[item], back[item]));
-				}
-
 				if (t is ustring u) {
 					RenderUstr (driver, u, col, line, width, start);
 				} else if (t is string s) {
@@ -936,6 +939,30 @@ namespace Terminal.Gui {
 		{
 			Item = item;
 			Value = value;
+		}
+	}
+
+	/// <summary>
+	/// <see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.
+	/// </summary>
+	public class ListViewRowEventArgs : EventArgs {
+		/// <summary>
+		/// The current row being rendered.
+		/// </summary>
+		public int Row { get; }
+		/// <summary>
+		/// The <see cref="Attribute"/> used by current row or
+		/// null to maintain the current attribute.
+		/// </summary>
+		public Attribute? RowAttribute { get; set; }
+
+		/// <summary>
+		/// Initializes with the current row.
+		/// </summary>
+		/// <param name="row"></param>
+		public ListViewRowEventArgs (int row)
+		{
+			Row = row;
 		}
 	}
 }
