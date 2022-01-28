@@ -44,7 +44,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (textViewTopLeft);
 
 			textViewTopRight = new TextView () {
-				X = Pos.AnchorEnd () - width,
+				X = Pos.AnchorEnd (width),
 				Width = width,
 				Height = height,
 				ColorScheme = colorScheme,
@@ -54,7 +54,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (textViewTopRight);
 
 			textViewBottomLeft = new TextView () {
-				Y = Pos.Bottom (Win) - height - 3,
+				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
 				ColorScheme = colorScheme,
@@ -64,8 +64,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (textViewBottomLeft);
 
 			textViewBottomRight = new TextView () {
-				X = Pos.Right (Win) - width - 2,
-				Y = Pos.Bottom (Win) - height - 3,
+				X = Pos.AnchorEnd (width),
+				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
 				ColorScheme = colorScheme,
@@ -110,7 +110,7 @@ namespace UICatalog.Scenarios {
 			} else {
 				height = 1;
 			}
-			textViewBottomLeft.Y = textViewBottomRight.Y = Pos.Bottom (Win) - height - 3;
+			textViewBottomLeft.Y = textViewBottomRight.Y = Pos.AnchorEnd (height);
 		}
 
 		private void SetMultilineStatusText ()
