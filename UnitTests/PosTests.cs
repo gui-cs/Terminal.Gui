@@ -48,6 +48,134 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
+		public void AnchorEnd_Equal_Inside_Window ()
+		{
+			var viewWidth = 10;
+			var viewHeight = 1;
+			var tv = new TextView () {
+				X = Pos.AnchorEnd (viewWidth),
+				Y = Pos.AnchorEnd (viewHeight),
+				Width = viewWidth,
+				Height = viewHeight
+			};
+
+			var win = new Window ();
+
+			win.Add (tv);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews[0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString());
+			Assert.Equal (new Rect (1, 1, 79, 24), new Rect (
+				win.Subviews[0].Frame.Left, win.Subviews [0].Frame.Top,
+				win.Subviews [0].Frame.Right, win.Subviews[0].Frame.Bottom));
+			Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void AnchorEnd_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+		{
+			var viewWidth = 10;
+			var viewHeight = 1;
+			var tv = new TextView () {
+				X = Pos.AnchorEnd (viewWidth),
+				Y = Pos.AnchorEnd (viewHeight),
+				Width = viewWidth,
+				Height = viewHeight
+			};
+
+			var win = new Window ();
+
+			win.Add (tv);
+
+			var menu = new MenuBar ();
+			var status = new StatusBar ();
+			var top = Application.Top;
+			top.Add (win, menu, status);
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+			Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+			Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+			Assert.Equal (new Rect (1, 1, 78, 21), win.Subviews [0].Frame);
+			Assert.Equal (new Rect (1, 1, 79, 22), new Rect (
+				win.Subviews [0].Frame.Left, win.Subviews [0].Frame.Top,
+				win.Subviews [0].Frame.Right, win.Subviews [0].Frame.Bottom));
+			Assert.Equal (new Rect (68, 20, 10, 1), tv.Frame);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Bottom_Equal_Inside_Window ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the last line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Bottom (win) - 4  // two lines top border more two lines above border
+			};
+
+			win.Add (label);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 80, 25), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 21, 78, 1), label.Frame);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the last line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Bottom (win) - 4  // two lines top border more two lines above border
+			};
+
+			win.Add (label);
+
+			var menu = new MenuBar ();
+			var status = new StatusBar ();
+			var top = Application.Top;
+			top.Add (win, menu, status);
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+			Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+			Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+			Assert.Equal (new Rect (1, 1, 78, 21), win.Subviews [0].Frame);
+			Assert.Equal (new Rect (0, 1, 80, 24), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
+		}
+
+		[Fact]
 		public void AnchorEnd_Negative_Throws ()
 		{
 			Pos pos;
