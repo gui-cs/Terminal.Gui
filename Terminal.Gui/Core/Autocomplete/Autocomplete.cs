@@ -223,13 +223,16 @@ namespace Terminal.Gui {
 					// Verifies that the upper limit available is greater than the lower limit
 					if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y) {
 						renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
-						height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y - 1);
+						height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y);
 					}
 				} else {
 					renderAt.Y = HostControl.Frame.Bottom;
 				}
 			}
 
+			if (ScrollOffset > Suggestions.Count - height) {
+				ScrollOffset = 0;
+			}
 			var toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
 			toRenderLength = toRender.Length;
 
