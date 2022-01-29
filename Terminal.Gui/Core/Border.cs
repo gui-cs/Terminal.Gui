@@ -16,7 +16,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The border is drawn with a double line limits.
 		/// </summary>
-		Double
+		Double,
+		/// <summary>
+		/// The border is drawn with a single line and rounded corners limits.
+		/// </summary>
+		Rounded
 	}
 
 	/// <summary>
