@@ -406,6 +406,8 @@ namespace Terminal.Gui {
 		{
 			isShow = false;
 			listview.TabStop = false;
+			HideList ();
+
 			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
 				return;
@@ -513,6 +515,7 @@ namespace Terminal.Gui {
 			Reset (SelectedItem > -1);
 			listview.Clear (rect);
 			listview.TabStop = false;
+			SuperView?.SendSubviewToBack (this);
 			SuperView?.SetNeedsDisplay (rect);
 		}
 
