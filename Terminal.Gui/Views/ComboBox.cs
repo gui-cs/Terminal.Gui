@@ -34,6 +34,8 @@ namespace Terminal.Gui {
 
 				// Only need to refresh list if its been added to a container view
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
+					SelectedItem = 0;
+					search.Text = "";
 					Search_Changed ("");
 					SetNeedsDisplay ();
 				}
@@ -185,13 +187,30 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
 
+		bool isShow = false;
+
+		private int selectedItem;
+
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
 		/// </summary>
 		/// <value>The selected item or -1 none selected.</value>
-		public int SelectedItem { get; private set; } = -1;
+		public int SelectedItem {
+			get => selectedItem;
+			set {
+				if (selectedItem != value && (value == -1
+					|| (source != null && value > -1 && value < source.Count))) {
 
-		bool isShow = false;
+					selectedItem = value;
+					if (selectedItem != -1) {
+						Text = source.ToList () [selectedItem].ToString ();
+					} else {
+						Text = "";
+					}
+					OnSelectedChanged ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets the drop down list state, expanded or collapsed.
@@ -496,7 +515,7 @@ namespace Terminal.Gui {
 			this.text = search.Text = text.ToString ();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
-			SelectedItem = GetSelectedItemFromSource (this.text);
+			selectedItem = GetSelectedItemFromSource (this.text);
 			OnSelectedChanged ();
 		}
 
