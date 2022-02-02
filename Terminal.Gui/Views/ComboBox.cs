@@ -31,6 +31,8 @@ namespace Terminal.Gui {
 
 				// Only need to refresh list if its been added to a container view
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
+					SelectedItem = 0;
+					search.Text = "";
 					Search_Changed ("");
 					SetNeedsDisplay ();
 				}
@@ -64,7 +66,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
-        readonly IList searchset = new List<object> ();
+		readonly IList searchset = new List<object> ();
 		ustring text = "";
 		readonly TextField search;
 		readonly ListView listview;
@@ -156,13 +158,30 @@ namespace Terminal.Gui {
 			};
 		}
 
+		bool isShow = false;
+
+		private int selectedItem;
+
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
 		/// </summary>
 		/// <value>The selected item or -1 none selected.</value>
-		public int SelectedItem { private set; get; }
+		public int SelectedItem {
+			get => selectedItem;
+			set {
+				if (selectedItem != value && (value == -1
+					|| (source != null && value > -1 && value < source.Count))) {
 
-		bool isShow = false;
+					selectedItem = value;
+					if (selectedItem != -1) {
+						Text = source.ToList () [selectedItem].ToString ();
+					} else {
+						Text = "";
+					}
+					OnSelectedChanged ();
+				}
+			}
+		}
 
 		///<inheritdoc/>
 		public new ColorScheme ColorScheme {
@@ -398,7 +417,7 @@ namespace Terminal.Gui {
 			this.text = search.Text = text.ToString ();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
-			SelectedItem = GetSelectedItemFromSource (this.text);
+			selectedItem = GetSelectedItemFromSource (this.text);
 			OnSelectedChanged ();
 		}
 
@@ -454,7 +473,7 @@ namespace Terminal.Gui {
 
 		private void ResetSearchSet (bool noCopy = false)
 		{
-            searchset.Clear ();
+			searchset.Clear ();
 
 			if (autoHide || noCopy)
 				return;
@@ -498,7 +517,7 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void ShowList ()
 		{
-            listview.SetSource (searchset);
+			listview.SetSource (searchset);
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
 			this.SuperView?.BringSubviewToFront (this);
