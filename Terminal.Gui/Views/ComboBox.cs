@@ -28,13 +28,10 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
-				if (source == null || source?.Count == 0) {
-					SelectedItem = -1;
-				}
 
 				// Only need to refresh list if its been added to a container view
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
-					SelectedItem = 0;
+					SelectedItem = -1;
 					search.Text = "";
 					Search_Changed ("");
 					SetNeedsDisplay ();
@@ -187,9 +184,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
 
-		bool isShow = false;
-
-		private int selectedItem;
+		private bool isShow = false;
+		private int selectedItem = -1;
 
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
@@ -203,9 +199,9 @@ namespace Terminal.Gui {
 
 					selectedItem = value;
 					if (selectedItem != -1) {
-						Text = source.ToList () [selectedItem].ToString ();
+						SetValue (source.ToList () [selectedItem].ToString (), true);
 					} else {
-						Text = "";
+						SetValue ("", true);
 					}
 					OnSelectedChanged ();
 				}
@@ -509,24 +505,26 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SetValue (object text)
+		private void SetValue (object text, bool isFromSelectedItem = false)
 		{
 			search.TextChanged -= Search_Changed;
 			this.text = search.Text = text.ToString ();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
-			selectedItem = GetSelectedItemFromSource (this.text);
-			OnSelectedChanged ();
+			if (!isFromSelectedItem) {
+				selectedItem = GetSelectedItemFromSource (this.text);
+				OnSelectedChanged ();
+			}
 		}
 
 		private void Selected ()
 		{
 			isShow = false;
 			listview.TabStop = false;
-			HideList ();
 
 			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
+				HideList ();
 				return;
 			}
 
@@ -535,6 +533,7 @@ namespace Terminal.Gui {
 			Search_Changed (search.Text);
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
+			HideList ();
 		}
 
 		private int GetSelectedItemFromSource (ustring value)
