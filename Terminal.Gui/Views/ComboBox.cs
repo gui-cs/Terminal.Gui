@@ -404,7 +404,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool MoveUp ()
+		bool? MoveUp ()
 		{
 			if (search.HasFocus) { // stop odd behavior on KeyUp when search has focus
 				return true;
@@ -416,23 +416,23 @@ namespace Terminal.Gui {
 				search.SetFocus ();
 				return true;
 			}
-			return false;
+			return null;
 		}
 
-		bool MoveDown ()
+		bool? MoveDown ()
 		{
 			if (search.HasFocus) { // jump to list
 				if (searchset?.Count > 0) {
 					listview.TabStop = true;
 					listview.SetFocus ();
 					SetValue (searchset [listview.SelectedItem]);
-					return true;
 				} else {
 					listview.TabStop = false;
 					SuperView?.FocusNext ();
 				}
+				return true;
 			}
-			return false;
+			return null;
 		}
 
 		/// <summary>
