@@ -293,6 +293,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
+			if (source?.Count > 0 && selectedItem > -1 && selectedItem < source.Count - 1
+				&& text != source.ToList () [selectedItem].ToString ()) {
+
+				SetValue (source.ToList () [selectedItem].ToString ());
+			}
 			if (autoHide && isShow && view != this && view != search && view != listview) {
 				isShow = false;
 				HideList ();
