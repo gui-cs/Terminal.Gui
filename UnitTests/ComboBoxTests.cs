@@ -71,21 +71,77 @@ namespace Terminal.Gui.Views {
 			Assert.True (cb.IsShow);
 			cb.Collapse ();
 			Assert.False (cb.IsShow);
-			Assert.False (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()))); // losing focus
+			Assert.True (cb.HasFocus);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()))); // losing focus
+			Assert.False (cb.IsShow);
+			Assert.False (cb.HasFocus);
 			Application.Top.FocusFirst (); // Gets focus again
-			cb.Text = "O";
+			Assert.False (cb.IsShow);
+			Assert.True (cb.HasFocus);
+			cb.Expand ();
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (cb.IsShow);
-			cb.Collapse ();
+			Assert.Equal (1, cb.SelectedItem);
+			Assert.Equal ("Two", cb.Text);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
-			cb.Expand ();
+			Assert.True (cb.IsShow);
+			Assert.Equal (1, cb.SelectedItem);
+			Assert.Equal ("Two", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (1, cb.SelectedItem);
+			Assert.Equal ("Two", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
-			Assert.True (cb.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Esc, new KeyModifiers ())));
+			Assert.False (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()))); // losing focus
+			Assert.False (cb.HasFocus);
+			Assert.False (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
+			Application.Top.FocusFirst (); // Gets focus again
+			Assert.True (cb.HasFocus);
+			Assert.False (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.U | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (cb.HasFocus);
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
+			Assert.Equal (3, cb.Source.Count);
 		}
 
 		[Fact]
@@ -113,11 +169,16 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			cb.Text = "T";
+			Assert.True (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("T", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.Source.Count);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Esc, new KeyModifiers ())));
+			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem); // retains last accept selected item
 			Assert.Equal ("", cb.Text); // clear text
 			cb.SetSource(new List<string> ());

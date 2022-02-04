@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 		/// Configurable keybindings supported by the control
 		/// </summary>
 		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
-		private Dictionary<Command, Func<bool>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool>> ();
+		private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
@@ -1695,7 +1695,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="command">The command.</param>
 		/// <param name="f">The function.</param>
-		protected void AddCommand (Command command, Func<bool> f)
+		protected void AddCommand (Command command, Func<bool?> f)
 		{
 			// if there is already an implementation of this command
 			if (CommandImplementations.ContainsKey (command)) {
