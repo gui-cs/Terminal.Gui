@@ -31,6 +31,8 @@ namespace Terminal.Gui {
 
 				// Only need to refresh list if its been added to a container view
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
+					SelectedItem = -1;
+					search.Text = "";
 					Search_Changed ("");
 					SetNeedsDisplay ();
 				}
@@ -64,7 +66,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
-        readonly IList searchset = new List<object> ();
+		readonly IList searchset = new List<object> ();
 		ustring text = "";
 		readonly TextField search;
 		readonly ListView listview;
@@ -156,13 +158,29 @@ namespace Terminal.Gui {
 			};
 		}
 
+		private bool isShow = false;
+		private int selectedItem = -1;
+
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
 		/// </summary>
 		/// <value>The selected item or -1 none selected.</value>
-		public int SelectedItem { private set; get; }
+		public int SelectedItem {
+			get => selectedItem;
+			set {
+				if (selectedItem != value && (value == -1
+					|| (source != null && value > -1 && value < source.Count))) {
 
-		bool isShow = false;
+					selectedItem = value;
+					if (selectedItem != -1) {
+						SetValue (source.ToList () [selectedItem].ToString (), true);
+					} else {
+						SetValue ("", true);
+					}
+					OnSelectedChanged ();
+				}
+			}
+		}
 
 		///<inheritdoc/>
 		public new ColorScheme ColorScheme {
@@ -244,6 +262,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
+			if (source?.Count > 0 && selectedItem > -1 && selectedItem < source.Count - 1
+				&& text != source.ToList () [selectedItem].ToString ()) {
+
+				SetValue (source.ToList () [selectedItem].ToString ());
+			}
 			if (autoHide && isShow && view != this && view != search && view != listview) {
 				isShow = false;
 				HideList ();
@@ -392,22 +415,26 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SetValue (object text)
+		private void SetValue (object text, bool isFromSelectedItem = false)
 		{
 			search.TextChanged -= Search_Changed;
 			this.text = search.Text = text.ToString ();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
-			SelectedItem = GetSelectedItemFromSource (this.text);
-			OnSelectedChanged ();
+			if (!isFromSelectedItem) {
+				selectedItem = GetSelectedItemFromSource (this.text);
+				OnSelectedChanged ();
+			}
 		}
 
 		private void Selected ()
 		{
 			isShow = false;
 			listview.TabStop = false;
+
 			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
+				HideList ();
 				return;
 			}
 
@@ -416,6 +443,7 @@ namespace Terminal.Gui {
 			Search_Changed (search.Text);
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
+			HideList ();
 		}
 
 		private int GetSelectedItemFromSource (ustring value)
@@ -452,7 +480,7 @@ namespace Terminal.Gui {
 
 		private void ResetSearchSet (bool noCopy = false)
 		{
-            searchset.Clear ();
+			searchset.Clear ();
 
 			if (autoHide || noCopy)
 				return;
@@ -496,7 +524,7 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void ShowList ()
 		{
-            listview.SetSource (searchset);
+			listview.SetSource (searchset);
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
 			this.SuperView?.BringSubviewToFront (this);
@@ -513,6 +541,7 @@ namespace Terminal.Gui {
 			Reset (SelectedItem > -1);
 			listview.Clear (rect);
 			listview.TabStop = false;
+			SuperView?.SendSubviewToBack (this);
 			SuperView?.SetNeedsDisplay (rect);
 		}
 
