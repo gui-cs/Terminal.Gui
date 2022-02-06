@@ -1394,7 +1394,7 @@ namespace Terminal.Gui {
 				if (textFormatter != null) {
 					textFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				textFormatter?.Draw (ViewToScreen (bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
 			}
 
@@ -1411,8 +1411,14 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								view.OnDrawContent (view.Bounds);
-								view.Redraw (view.Bounds);
+								var rect = new Rect () {
+									X = Math.Min (view.Bounds.X, view.NeedDisplay.X),
+									Y = Math.Min (view.Bounds.Y, view.NeedDisplay.Y),
+									Width = Math.Max (view.Bounds.Width, view.NeedDisplay.Width),
+									Height = Math.Max (view.Bounds.Height, view.NeedDisplay.Height)
+								};
+								view.OnDrawContent (rect);
+								view.Redraw (rect);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -2081,6 +2087,7 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
+				var prevSize = frame.Size;
 				var canResize = ResizeView (autoSize);
 				if (canResize && textFormatter.Size != Bounds.Size) {
 					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
@@ -2088,7 +2095,8 @@ namespace Terminal.Gui {
 					textFormatter.Size = Bounds.Size;
 				}
 				SetNeedsLayout ();
-				SetNeedsDisplay ();
+				SetNeedsDisplay (new Rect (new Point (0, 0),
+					new Size (Math.Max (frame.Width, prevSize.Width), Math.Max (frame.Height, prevSize.Height))));
 			}
 		}
 

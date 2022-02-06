@@ -118,9 +118,9 @@ namespace Terminal.Gui {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-					Driver.HeightAsBuffer = value;
-				}
+				Driver.HeightAsBuffer = value;
 			}
+		}
 
 		/// <summary>
 		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
@@ -902,7 +902,7 @@ namespace Terminal.Gui {
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
 
-					EnsureModalAlwaysOnTop (state.Toplevel);
+					EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 					if ((state.Toplevel != Current && Current?.Modal == true)
 						|| (state.Toplevel != Current && Current?.Modal == false)) {
 						MdiTop?.OnDeactivate (state.Toplevel);
@@ -940,9 +940,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static void EnsureModalAlwaysOnTop (Toplevel toplevel)
+		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel toplevel)
 		{
-			if (!toplevel.Running || toplevel == Current || MdiTop == null || toplevels.Peek ().Modal) {
+			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || toplevels.Peek ().Modal) {
 				return;
 			}
 
@@ -951,6 +951,9 @@ namespace Terminal.Gui {
 					MoveCurrent (top);
 					return;
 				}
+			}
+			if (!toplevel.Visible && toplevel == Current) {
+				MoveNext ();
 			}
 		}
 
@@ -1200,7 +1203,14 @@ namespace Terminal.Gui {
 			if (MdiTop != null && !Current.Modal) {
 				lock (toplevels) {
 					toplevels.MoveNext ();
+					var isMdi = false;
 					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
+						if (!isMdi && toplevels.Peek () == MdiTop) {
+							isMdi = true;
+						} else if (isMdi && toplevels.Peek () == MdiTop) {
+							MoveCurrent (Top);
+							break;
+						}
 						toplevels.MoveNext ();
 					}
 					Current = toplevels.Peek ();
@@ -1216,10 +1226,15 @@ namespace Terminal.Gui {
 			if (MdiTop != null && !Current.Modal) {
 				lock (toplevels) {
 					toplevels.MovePrevious ();
+					var isMdi = false;
 					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
-						lock (toplevels) {
-							toplevels.MovePrevious ();
+						if (!isMdi && toplevels.Peek () == MdiTop) {
+							isMdi = true;
+						} else if (isMdi && toplevels.Peek () == MdiTop) {
+							MoveCurrent (Top);
+							break;
 						}
+						toplevels.MovePrevious ();
 					}
 					Current = toplevels.Peek ();
 				}
