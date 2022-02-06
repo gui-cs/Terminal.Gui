@@ -162,6 +162,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.Init
   nameWithType: Application.Init
+- uid: Terminal.Gui.Application.IsMouseDisabled
+  name: IsMouseDisabled
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_IsMouseDisabled
+  commentId: P:Terminal.Gui.Application.IsMouseDisabled
+  fullName: Terminal.Gui.Application.IsMouseDisabled
+  nameWithType: Application.IsMouseDisabled
+- uid: Terminal.Gui.Application.IsMouseDisabled*
+  name: IsMouseDisabled
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_IsMouseDisabled_
+  commentId: Overload:Terminal.Gui.Application.IsMouseDisabled
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.IsMouseDisabled
+  nameWithType: Application.IsMouseDisabled
 - uid: Terminal.Gui.Application.Iteration
   name: Iteration
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Iteration
