@@ -203,6 +203,22 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public AspectGetterDelegate<T> AspectGetter { get; set; } = (o) => o.ToString () ?? "";
 
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the tree is focused
+		/// </summary>
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
+			set {
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (value);
+				}
+
+				desiredCursorVisibility = value;
+			}
+		}
+
 		/// <summary>
 		/// Creates a new tree view with absolute positioning.  
 		/// Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
@@ -221,6 +237,14 @@ namespace Terminal.Gui {
 		public TreeView (ITreeBuilder<T> builder) : this ()
 		{
 			TreeBuilder = builder;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+
+			return base.OnEnter (view);
 		}
 
 		/// <summary>
