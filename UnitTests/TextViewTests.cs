@@ -974,7 +974,7 @@ namespace Terminal.Gui.Views {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
@@ -1809,9 +1809,12 @@ namespace Terminal.Gui.Views {
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
-				if (sumLength >= width) {
+				if (sumLength > width) {
+					if (col + width == cCol) {
+						col++;
+					}
 					break;
-				} else if (cCol < line.Length && col > 0 && start < cCol && col == start) {
+				} else if ((cCol < line.Length && col > 0 && start < cCol && col == start) || (cCol - col == width - 1)) {
 					break;
 				}
 				col = i;
@@ -1987,9 +1990,9 @@ line.
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
 
-			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
-			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
-			Assert.Equal (3, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
+			Assert.Equal (0, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
+			Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
+			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
 			var tm = new TextModel ();
 			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
@@ -2258,6 +2261,27 @@ line.
 					Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
 				}
 			}
+		}
+
+		[Fact]
+		public void LeftColumn_Add_One_If_Text_Length_Is_Equal_To_Width ()
+		{
+			var tv = new TextView () {
+				Width = 10,
+				Text = "1234567890"
+			};
+
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			tv.CursorPosition = new Point (9, 0);
+			Assert.Equal (new Point (9, 0), tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			tv.CursorPosition = new Point (10, 0);
+			Assert.Equal (new Point (10, 0), tv.CursorPosition);
+			Assert.Equal (1, tv.LeftColumn);
 		}
 	}
 }

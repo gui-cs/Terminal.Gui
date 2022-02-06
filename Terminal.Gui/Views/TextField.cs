@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 
 			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
-			first = point > w ? point - w : 0;
+			first = point > w + 1 ? point - w + 1 : 0;
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
@@ -303,6 +303,8 @@ namespace Terminal.Gui {
 				Clipboard.Contents = ustring.Make (text.ToList ());
 		}
 
+		int oldCursorPos;
+
 		/// <summary>
 		/// Processes key presses for the <see cref="TextField"/>.
 		/// </summary>
@@ -326,228 +328,117 @@ namespace Terminal.Gui {
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
-			var oldCursorPos = point;
+			oldCursorPos = point;
 
 			switch (ShortcutHelper.GetModifiersKey (kb)) {
-			case Key.Delete:
 			case Key.DeleteChar:
-			case Key.D | Key.CtrlMask:
-				if (ReadOnly)
-					return true;
-
-				if (length == 0) {
-					if (text.Count == 0 || text.Count == point)
-						return true;
-
-					SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
-					Adjust ();
-				} else {
-					DeleteSelectedText ();
-				}
+			case Key.D | Key.CtrlMask: // Delete
+				DeleteCharRight ();
 				break;
 
+			case Key.Delete:
 			case Key.Backspace:
-				if (ReadOnly)
-					return true;
-
-				if (length == 0) {
-					if (point == 0)
-						return true;
-
-					point--;
-					if (oldCursorPos < text.Count) {
-						SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
-					} else {
-						SetText (text.GetRange (0, oldCursorPos - 1));
-					}
-					Adjust ();
-				} else {
-					DeleteSelectedText ();
-				}
+				DeleteCharLeft ();
 				break;
 
 			case Key.Home | Key.ShiftMask:
 			case Key.Home | Key.ShiftMask | Key.CtrlMask:
 			case Key.A | Key.ShiftMask | Key.CtrlMask:
-				if (point > 0) {
-					int x = point;
-					point = 0;
-					PrepareSelection (x, point - x);
-				}
+				MoveHomeExtend ();
 				break;
 
 			case Key.End | Key.ShiftMask:
 			case Key.End | Key.ShiftMask | Key.CtrlMask:
 			case Key.E | Key.ShiftMask | Key.CtrlMask:
-				if (point <= text.Count) {
-					int x = point;
-					point = text.Count;
-					PrepareSelection (x, point - x);
-				}
+				MoveEndExtend ();
 				break;
 
 			// Home, C-A
 			case Key.Home:
 			case Key.Home | Key.CtrlMask:
 			case Key.A | Key.CtrlMask:
-				ClearAllSelection ();
-				point = 0;
-				Adjust ();
+				MoveHome ();
 				break;
 
 			case Key.CursorLeft | Key.ShiftMask:
 			case Key.CursorUp | Key.ShiftMask:
-				if (point > 0) {
-					PrepareSelection (point--, -1);
-				}
+				MoveLeftExtend ();
 				break;
 
 			case Key.CursorRight | Key.ShiftMask:
 			case Key.CursorDown | Key.ShiftMask:
-				if (point < text.Count) {
-					PrepareSelection (point++, 1);
-				}
+				MoveRightExtend ();
 				break;
 
 			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
 			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
-				if (point > 0) {
-					int x = Math.Min (start > -1 && start > point ? start : point, text.Count);
-					if (x > 0) {
-						int sbw = WordBackward (x);
-						if (sbw != -1)
-							point = sbw;
-						PrepareSelection (x, sbw - x);
-					}
-				}
+				MoveWordLeftExtend ();
 				break;
 
 			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
 			case (Key)((int)'F' + Key.ShiftMask | Key.AltMask):
-				if (point < text.Count) {
-					int x = start > -1 && start > point ? start : point;
-					int sfw = WordForward (x);
-					if (sfw != -1)
-						point = sfw;
-					PrepareSelection (x, sfw - x);
-				}
+				MoveWordRightExtend ();
 				break;
 
 			case Key.CursorLeft:
 			case Key.B | Key.CtrlMask:
-				ClearAllSelection ();
-				if (point > 0) {
-					point--;
-					Adjust ();
-				}
+				MoveLeft ();
 				break;
 
 			case Key.End:
 			case Key.End | Key.CtrlMask:
 			case Key.E | Key.CtrlMask: // End
-				ClearAllSelection ();
-				point = text.Count;
-				Adjust ();
+				MoveEnd ();
 				break;
 
 			case Key.CursorRight:
 			case Key.F | Key.CtrlMask:
-				ClearAllSelection ();
-				if (point == text.Count)
-					break;
-				point++;
-				Adjust ();
+				MoveRight ();
 				break;
 
 			case Key.K | Key.CtrlMask: // kill-to-end
-				if (ReadOnly)
-					return true;
+				KillToEnd ();
+				break;
 
-				ClearAllSelection ();
-				if (point >= text.Count)
-					return true;
-				SetClipboard (text.GetRange (point, text.Count - point));
-				SetText (text.GetRange (0, point));
-				Adjust ();
+			case Key.K | Key.AltMask: // kill-to-start
+				KillToStart ();
 				break;
 
 			// Undo
 			case Key.Z | Key.CtrlMask:
-				if (ReadOnly)
-					return true;
-
-				if (historyText != null && historyText.Count > 0) {
-					isFromHistory = true;
-					if (idxhistoryText > 0)
-						idxhistoryText--;
-					if (idxhistoryText > -1)
-						Text = historyText [idxhistoryText];
-					point = text.Count;
-					isFromHistory = false;
-				}
+			case Key.Backspace | Key.AltMask:
+				UndoChanges ();
 				break;
 
 			//Redo
 			case Key.Y | Key.CtrlMask: // Control-y, yank
-				if (ReadOnly)
-					return true;
-
-				if (historyText != null && historyText.Count > 0) {
-					isFromHistory = true;
-					if (idxhistoryText < historyText.Count - 1) {
-						idxhistoryText++;
-						if (idxhistoryText < historyText.Count) {
-							Text = historyText [idxhistoryText];
-						} else if (idxhistoryText == historyText.Count - 1) {
-							Text = historyText [historyText.Count - 1];
-						}
-						point = text.Count;
-					}
-					isFromHistory = false;
-				}
-
-				//if (Clipboard.Contents == null)
-				//	return true;
-				//var clip = TextModel.ToRunes (Clipboard.Contents);
-				//if (clip == null)
-				//	return true;
-
-				//if (point == text.Count) {
-				//	point = text.Count;
-				//	SetText(text.Concat(clip).ToList());
-				//} else {
-				//	point += clip.Count;
-				//	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
-				//}
-				//Adjust ();
-
+				RedoChanges ();
 				break;
 
 			case Key.CursorLeft | Key.CtrlMask:
 			case Key.CursorUp | Key.CtrlMask:
 			case (Key)((int)'B' + Key.AltMask):
-				ClearAllSelection ();
-				int bw = WordBackward (point);
-				if (bw != -1)
-					point = bw;
-				Adjust ();
+				MoveWordLeft ();
 				break;
 
 			case Key.CursorRight | Key.CtrlMask:
 			case Key.CursorDown | Key.CtrlMask:
 			case (Key)((int)'F' + Key.AltMask):
-				ClearAllSelection ();
-				int fw = WordForward (point);
-				if (fw != -1)
-					point = fw;
-				Adjust ();
+				MoveWordRight ();
+				break;
+
+			case Key.DeleteChar | Key.CtrlMask: // kill-word-forwards
+				KillWordForwards ();
+				break;
+
+			case Key.Backspace | Key.CtrlMask: // kill-word-backwards
+				KillWordBackwards ();
 				break;
 
 			case Key.InsertChar:
-				Used = !Used;
-				SetNeedsDisplay ();
+				InsertChar ();
 				break;
 
 			case Key.C | Key.CtrlMask:
@@ -555,9 +446,6 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.X | Key.CtrlMask:
-				if (ReadOnly)
-					return true;
-
 				Cut ();
 				break;
 
@@ -603,6 +491,254 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		void InsertChar ()
+		{
+			Used = !Used;
+			SetNeedsDisplay ();
+		}
+
+		void KillWordBackwards ()
+		{
+			ClearAllSelection ();
+			int bw = WordBackward (point);
+			if (bw != -1) {
+				SetText (text.GetRange (0, bw).Concat (text.GetRange (point, text.Count - point)));
+				point = bw;
+			}
+			Adjust ();
+		}
+
+		void KillWordForwards ()
+		{
+			ClearAllSelection ();
+			int fw = WordForward (point);
+			if (fw != -1) {
+				SetText (text.GetRange (0, point).Concat (text.GetRange (fw, text.Count - fw)));
+			}
+			Adjust ();
+		}
+
+		void MoveWordRight ()
+		{
+			ClearAllSelection ();
+			int fw = WordForward (point);
+			if (fw != -1)
+				point = fw;
+			Adjust ();
+		}
+
+		void MoveWordLeft ()
+		{
+			ClearAllSelection ();
+			int bw = WordBackward (point);
+			if (bw != -1)
+				point = bw;
+			Adjust ();
+		}
+
+		void RedoChanges ()
+		{
+			if (ReadOnly)
+				return;
+
+			if (historyText != null && historyText.Count > 0) {
+				isFromHistory = true;
+				if (idxhistoryText < historyText.Count - 1) {
+					idxhistoryText++;
+					if (idxhistoryText < historyText.Count) {
+						Text = historyText [idxhistoryText];
+					} else if (idxhistoryText == historyText.Count - 1) {
+						Text = historyText [historyText.Count - 1];
+					}
+					point = text.Count;
+				}
+				isFromHistory = false;
+			}
+
+			//if (Clipboard.Contents == null)
+			//	return true;
+			//var clip = TextModel.ToRunes (Clipboard.Contents);
+			//if (clip == null)
+			//	return true;
+
+			//if (point == text.Count) {
+			//	point = text.Count;
+			//	SetText(text.Concat(clip).ToList());
+			//} else {
+			//	point += clip.Count;
+			//	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
+			//}
+			//Adjust ();
+		}
+
+		void UndoChanges ()
+		{
+			if (ReadOnly)
+				return;
+
+			if (historyText != null && historyText.Count > 0) {
+				isFromHistory = true;
+				if (idxhistoryText > 0)
+					idxhistoryText--;
+				if (idxhistoryText > -1)
+					Text = historyText [idxhistoryText];
+				point = text.Count;
+				isFromHistory = false;
+			}
+		}
+
+		void KillToStart ()
+		{
+			if (ReadOnly)
+				return;
+
+			ClearAllSelection ();
+			if (point == 0)
+				return;
+			SetClipboard (text.GetRange (0, point));
+			SetText (text.GetRange (point, text.Count - point));
+			point = 0;
+			Adjust ();
+		}
+
+		void KillToEnd ()
+		{
+			if (ReadOnly)
+				return;
+
+			ClearAllSelection ();
+			if (point >= text.Count)
+				return;
+			SetClipboard (text.GetRange (point, text.Count - point));
+			SetText (text.GetRange (0, point));
+			Adjust ();
+		}
+
+		void MoveRight ()
+		{
+			ClearAllSelection ();
+			if (point == text.Count)
+				return;
+			point++;
+			Adjust ();
+		}
+
+		void MoveEnd ()
+		{
+			ClearAllSelection ();
+			point = text.Count;
+			Adjust ();
+		}
+
+		void MoveLeft ()
+		{
+			ClearAllSelection ();
+			if (point > 0) {
+				point--;
+				Adjust ();
+			}
+		}
+
+		void MoveWordRightExtend ()
+		{
+			if (point < text.Count) {
+				int x = start > -1 && start > point ? start : point;
+				int sfw = WordForward (x);
+				if (sfw != -1)
+					point = sfw;
+				PrepareSelection (x, sfw - x);
+			}
+		}
+
+		void MoveWordLeftExtend ()
+		{
+			if (point > 0) {
+				int x = Math.Min (start > -1 && start > point ? start : point, text.Count);
+				if (x > 0) {
+					int sbw = WordBackward (x);
+					if (sbw != -1)
+						point = sbw;
+					PrepareSelection (x, sbw - x);
+				}
+			}
+		}
+
+		void MoveRightExtend ()
+		{
+			if (point < text.Count) {
+				PrepareSelection (point++, 1);
+			}
+		}
+
+		void MoveLeftExtend ()
+		{
+			if (point > 0) {
+				PrepareSelection (point--, -1);
+			}
+		}
+
+		void MoveHome ()
+		{
+			ClearAllSelection ();
+			point = 0;
+			Adjust ();
+		}
+
+		void MoveEndExtend ()
+		{
+			if (point <= text.Count) {
+				int x = point;
+				point = text.Count;
+				PrepareSelection (x, point - x);
+			}
+		}
+
+		void MoveHomeExtend ()
+		{
+			if (point > 0) {
+				int x = point;
+				point = 0;
+				PrepareSelection (x, point - x);
+			}
+		}
+
+		void DeleteCharLeft ()
+		{
+			if (ReadOnly)
+				return;
+
+			if (length == 0) {
+				if (point == 0)
+					return;
+
+				point--;
+				if (oldCursorPos < text.Count) {
+					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
+				} else {
+					SetText (text.GetRange (0, oldCursorPos - 1));
+				}
+				Adjust ();
+			} else {
+				DeleteSelectedText ();
+			}
+		}
+
+		void DeleteCharRight ()
+		{
+			if (ReadOnly)
+				return;
+
+			if (length == 0) {
+				if (text.Count == 0 || text.Count == point)
+					return;
+
+				SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
+				Adjust ();
+			} else {
+				DeleteSelectedText ();
+			}
+		}
+
 		int WordForward (int p)
 		{
 			if (p >= text.Count)
@@ -627,7 +763,7 @@ namespace Terminal.Gui {
 						break;
 				}
 				for (; i < text.Count; i++) {
-					if (Rune.IsLetterOrDigit (text [i]) || 
+					if (Rune.IsLetterOrDigit (text [i]) ||
 						(Rune.IsPunctuation (text [i]) && Rune.IsWhiteSpace (text [i - 1])))
 						break;
 				}
@@ -831,8 +967,10 @@ namespace Terminal.Gui {
 					if (first > start) {
 						first = start;
 					}
+				} else if (start > -1 && length == 0) {
+					selectedText = null;
 				}
-			} else if (length > 0) {
+			} else if (length > 0 || selectedText != null) {
 				ClearAllSelection ();
 			}
 			Adjust ();
@@ -843,7 +981,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (selectedStart == -1 && length == 0)
+			if (selectedStart == -1 && length == 0 && selectedText == "")
 				return;
 
 			selectedStart = -1;
@@ -879,7 +1017,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Cut ()
 		{
-			if (Secret || length == 0)
+			if (ReadOnly || Secret || length == 0)
 				return;
 
 			Clipboard.Contents = SelectedText;

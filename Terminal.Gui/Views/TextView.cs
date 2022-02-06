@@ -303,9 +303,12 @@ namespace Terminal.Gui {
 				if (rune == '\t') {
 					size += tabWidth + 1;
 				}
-				if (size >= width) {
+				if (size > width) {
+					if (col + width == end) {
+						col++;
+					}
 					break;
-				} else if (end < t.Count && col > 0 && start < end && col == start) {
+				} else if ((end < t.Count && col > 0 && start < end && col == start) || (end - col == width - 1)) {
 					break;
 				}
 				col = i;
@@ -1359,7 +1362,7 @@ namespace Terminal.Gui {
 			}
 			var posX = currentColumn - leftColumn;
 			var posY = currentRow - topRow;
-			if ( posX > -1 && col >= posX && posX < Frame.Width - RightOffset
+			if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset
 				&& topRow <= currentRow && posY < Frame.Height - BottomOffset) {
 				ResetCursorVisibility ();
 				Move (col, currentRow - topRow);
@@ -2332,7 +2335,7 @@ namespace Terminal.Gui {
 				lastWasKill = setLastWasKill;
 				break;
 
-			case Key.Backspace | Key.CtrlMask | Key.ShiftMask: // kill-to-start
+			case Key.K | Key.AltMask: // kill-to-start
 				if (isReadOnly)
 					break;
 				currentLine = GetCurrentLine ();
@@ -2564,6 +2567,22 @@ namespace Terminal.Gui {
 					}
 				}
 				break;
+
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == (Key.Tab | Key.CtrlMask):
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == Application.AlternateForwardKey:
+				if (Application.MdiTop != null) {
+					return SuperView?.FocusNext () == true;
+				}
+
+				return false;
+
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == (Key.Tab | Key.CtrlMask | Key.ShiftMask):
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == Application.AlternateBackwardKey:
+				if (Application.MdiTop != null) {
+					return SuperView?.FocusPrev () == true;
+				}
+
+				return false;
 
 			default:
 				// Ignore control characters and other special keys
