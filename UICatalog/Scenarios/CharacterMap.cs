@@ -166,5 +166,22 @@ namespace UICatalog.Scenarios {
 			base.OnDrawContent (viewport);
 		}
 #endif
+
+		public override bool ProcessKey (KeyEvent kb)
+		{
+			if (kb.Key == Key.PageDown) {
+				ContentOffset = new Point (0, ContentOffset.Y - Bounds.Height / 2 + 1);
+				return true;
+			}
+			if (kb.Key == Key.PageUp) {
+				if (ContentOffset.Y + Bounds.Height / 2 - 1 < 0) {
+					ContentOffset = new Point (0, ContentOffset.Y + Bounds.Height / 2 - 1);
+				} else {
+					ContentOffset = Point.Empty;
+				}
+				return true;
+			}
+			return base.ProcessKey (kb);
+		}
 	}
 }

@@ -1385,7 +1385,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Border != null) {
-				Border.DrawContent ();
+				Border.DrawContent (this);
 			}
 
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {

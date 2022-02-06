@@ -538,5 +538,23 @@ namespace Terminal.Gui.Core {
 				}
 			}
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void BorderOnControlWithNoChildren ()
+		{
+			var label = new TextField ("Loading...") {
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
+					DrawMarginFrame = true,
+					Padding = new Thickness (1),
+					BorderBrush = Color.White
+				}
+			};
+
+			Application.Top.Add (label);
+
+			Assert.Null (Record.Exception (() => label.Redraw (label.Bounds)));
+		}
 	}
 }
