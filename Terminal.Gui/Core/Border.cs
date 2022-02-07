@@ -16,7 +16,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The border is drawn with a double line limits.
 		/// </summary>
-		Double
+		Double,
+		/// <summary>
+		/// The border is drawn with a single line and rounded corners limits.
+		/// </summary>
+		Rounded
 	}
 
 	/// <summary>
@@ -74,6 +78,13 @@ namespace Terminal.Gui {
 			Top = top;
 			Right = right;
 			Bottom = bottom;
+		}
+
+		/// <summary>Returns the fully qualified type name of this instance.</summary>
+		/// <returns>The fully qualified type name.</returns>
+		public override string ToString ()
+		{
+			return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})";
 		}
 	}
 
@@ -295,6 +306,8 @@ namespace Terminal.Gui {
 		private bool drawMarginFrame;
 		private Thickness borderThickness;
 		private Thickness padding;
+		private bool effect3D;
+		private Point effect3DOffset = new Point (1, 1);
 
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
@@ -406,13 +419,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the 3D effect around the <see cref="Border"/>.
 		/// </summary>
-		public bool Effect3D { get; set; }
+		public bool Effect3D {
+			get => effect3D;
+			set {
+				effect3D = value;
+				OnBorderChanged ();
+			}
+		}
 
 		/// <summary>
 		/// Get or sets the offset start position for the <see cref="Effect3D"/>
 		/// </summary>
-		public Point Effect3DOffset { get; set; } = new Point (1, 1);
-
+		public Point Effect3DOffset {
+			get => effect3DOffset;
+			set {
+				effect3DOffset = value;
+				OnBorderChanged ();
+			}
+		}
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
@@ -436,8 +460,11 @@ namespace Terminal.Gui {
 		/// Drawn the <see cref="BorderThickness"/> more the <see cref="Padding"/>
 		///  more the <see cref="Border.BorderStyle"/> and the <see cref="Effect3D"/>.
 		/// </summary>
-		public void DrawContent ()
+		public void DrawContent (View view = null)
 		{
+			if (Child == null) {
+				Child = view;
+			}
 			if (Parent?.Border != null) {
 				DrawParentBorder (Parent.ViewToScreen (Parent.Bounds));
 			} else {
@@ -644,9 +671,9 @@ namespace Terminal.Gui {
 
 				// Draw the upper Effect3D
 				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
+					r >= 0 && r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
@@ -654,9 +681,9 @@ namespace Terminal.Gui {
 
 				// Draw the left Effect3D
 				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
+						c >= 0 && c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
@@ -664,9 +691,9 @@ namespace Terminal.Gui {
 
 				// Draw the right Effect3D
 				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
 					for (int c = frame.Right + drawMarginFrame + sumThickness.Right;
-						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
@@ -674,14 +701,15 @@ namespace Terminal.Gui {
 
 				// Draw the lower Effect3D
 				for (int r = frame.Bottom + drawMarginFrame + sumThickness.Bottom;
-					r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
 					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
 
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
 			}
+			driver.SetAttribute (savedAttribute);
 		}
 
 		private void DrawParentBorder (Rect frame)
@@ -833,6 +861,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+			driver.SetAttribute (savedAttribute);
 		}
 
 		private Attribute GetEffect3DBrush ()

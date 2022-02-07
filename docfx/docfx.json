@@ -37,7 +37,7 @@
       "dest": "api/UICatalog",
       "shouldSkipMarkup": false,
       "properties": {
-          "TargetFramework": "net5.0"
+          "TargetFramework": "net6.0"
       }
     }
   ],

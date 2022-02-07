@@ -379,6 +379,12 @@ namespace Terminal.Gui {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
+					var rowEventArgs = new ListViewRowEventArgs (item);
+					OnRowRender (rowEventArgs);
+					if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+						current = (Attribute)rowEventArgs.RowAttribute;
+						Driver.SetAttribute (current);
+					}
 					if (allowsMarking) {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
@@ -397,6 +403,11 @@ namespace Terminal.Gui {
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
+
+		/// <summary>
+		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
+		/// </summary>
+		public event Action<ListViewRowEventArgs> RowRender;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -670,6 +681,15 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="RowRender"/>.
+		/// </summary>
+		/// <param name="rowEventArgs"></param>
+		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
+		{
+			RowRender?.Invoke (rowEventArgs);
+		}
+
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
@@ -924,6 +944,30 @@ namespace Terminal.Gui {
 		{
 			Item = item;
 			Value = value;
+		}
+	}
+
+	/// <summary>
+	/// <see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.
+	/// </summary>
+	public class ListViewRowEventArgs : EventArgs {
+		/// <summary>
+		/// The current row being rendered.
+		/// </summary>
+		public int Row { get; }
+		/// <summary>
+		/// The <see cref="Attribute"/> used by current row or
+		/// null to maintain the current attribute.
+		/// </summary>
+		public Attribute? RowAttribute { get; set; }
+
+		/// <summary>
+		/// Initializes with the current row.
+		/// </summary>
+		/// <param name="row"></param>
+		public ListViewRowEventArgs (int row)
+		{
+			Row = row;
 		}
 	}
 }

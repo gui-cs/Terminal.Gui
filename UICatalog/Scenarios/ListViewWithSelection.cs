@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
@@ -53,6 +54,7 @@ namespace UICatalog.Scenarios {
 				AllowsMarking = false,
 				AllowsMultipleSelection = false
 			};
+			_listView.RowRender += ListView_RowRender;
 			Win.Add (_listView);
 
 			var _scrollBar = new ScrollBarView (_listView, true);
@@ -90,6 +92,22 @@ namespace UICatalog.Scenarios {
 			};
 			keepCheckBox.Toggled += (_) => _scrollBar.KeepContentAlwaysInViewport = keepCheckBox.Checked;
 			Win.Add (keepCheckBox);
+		}
+
+		private void ListView_RowRender (ListViewRowEventArgs obj)
+		{
+			if (obj.Row == _listView.SelectedItem) {
+				return;
+			}
+			if (_listView.AllowsMarking && _listView.Source.IsMarked (obj.Row)) {
+				obj.RowAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
+				return;
+			}
+			if (obj.Row % 2 == 0) {
+				obj.RowAttribute = new Attribute (Color.BrightGreen, Color.Magenta);
+			} else {
+				obj.RowAttribute = new Attribute (Color.BrightMagenta, Color.Green);
+			}
 		}
 
 		private void _customRenderCB_Toggled (bool prev)

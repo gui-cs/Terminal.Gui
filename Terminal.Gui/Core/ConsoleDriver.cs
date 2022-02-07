@@ -910,12 +910,41 @@ namespace Terminal.Gui {
 
 			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
 
-			Rune hLine = border ? (borderStyle == BorderStyle.Single ? HLine : HDLine) : clearChar;
-			Rune vLine = border ? (borderStyle == BorderStyle.Single ? VLine : VDLine) : clearChar;
-			Rune uRCorner = border ? (borderStyle == BorderStyle.Single ? URCorner : URDCorner) : clearChar;
-			Rune uLCorner = border ? (borderStyle == BorderStyle.Single ? ULCorner : ULDCorner) : clearChar;
-			Rune lLCorner = border ? (borderStyle == BorderStyle.Single ? LLCorner : LLDCorner) : clearChar;
-			Rune lRCorner = border ? (borderStyle == BorderStyle.Single ? LRCorner : LRDCorner) : clearChar;
+			Rune hLine = default, vLine = default,
+				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
+
+			if (border) {
+				switch (borderStyle) {
+				case BorderStyle.None:
+					break;
+				case BorderStyle.Single:
+					hLine = HLine;
+					vLine = VLine;
+					uRCorner = URCorner;
+					uLCorner = ULCorner;
+					lLCorner = LLCorner;
+					lRCorner = LRCorner;
+					break;
+				case BorderStyle.Double:
+					hLine = HDLine;
+					vLine = VDLine;
+					uRCorner = URDCorner;
+					uLCorner = ULDCorner;
+					lLCorner = LLDCorner;
+					lRCorner = LRDCorner;
+					break;
+				case BorderStyle.Rounded:
+					hLine = HRLine;
+					vLine = VRLine;
+					uRCorner = URRCorner;
+					uLCorner = ULRCorner;
+					lLCorner = LLRCorner;
+					lRCorner = LRRCorner;
+					break;
+				}
+			} else {
+				hLine = vLine = uRCorner = uLCorner = lLCorner = lRCorner = clearChar;
+			}
 
 			// Outside top
 			if (paddingTop > 1) {
@@ -1234,6 +1263,36 @@ namespace Terminal.Gui {
 		/// Lower right double corner
 		/// </summary>
 		public Rune LRDCorner = '\u255d';
+
+		/// <summary>
+		/// Horizontal line character for rounded corners.
+		/// </summary>
+		public Rune HRLine = '\u2500';
+
+		/// <summary>
+		/// Vertical line character for rounded corners.
+		/// </summary>
+		public Rune VRLine = '\u2502';
+
+		/// <summary>
+		/// Upper left rounded corner
+		/// </summary>
+		public Rune ULRCorner = '\u256d';
+
+		/// <summary>
+		/// Lower left rounded corner
+		/// </summary>
+		public Rune LLRCorner = '\u2570';
+
+		/// <summary>
+		/// Upper right rounded corner
+		/// </summary>
+		public Rune URRCorner = '\u256e';
+
+		/// <summary>
+		/// Lower right rounded corner
+		/// </summary>
+		public Rune LRRCorner = '\u256f';
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
