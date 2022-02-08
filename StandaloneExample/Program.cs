@@ -1,8 +1,8 @@
 ﻿using Terminal.Gui;
 using System;
-using Mono.Terminal;
+using NStack;
 
-class Demo {
+static class Demo {
 	class Box10x : View {
 		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
 		{
@@ -118,10 +118,10 @@ class Demo {
 			loginText,
 			password,
 			passText,
-			new FrameView (new Rect (3, 10, 25, 6), "Options"){
+			new FrameView (new Rect (3, 10, 25, 6), "Options", new View[] {
 				new CheckBox (1, 0, "Remember me"),
-				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
-			},
+				new RadioGroup (1, 2, new ustring [] { "_Personal", "_Company" }) }
+			),
 			new ListView (new Rect (60, 6, 16, 4), new string [] {
 				"First row",
 				"<>",
