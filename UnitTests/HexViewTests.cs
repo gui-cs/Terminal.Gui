@@ -395,5 +395,63 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 			Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Command ()
+		{
+			var hv = new HexView (LoadStream ()) { Width = 20, Height = 10 };
+			Application.Top.Add (hv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (63, hv.Source.Length);
+			Assert.Equal (1, hv.Position);
+			Assert.Equal (4, hv.BytesPerLine);
+
+			// right side only needed to press one time
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.Equal (2, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (5, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.V | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (41, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent ('v' + Key.AltMask, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.Equal (41, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.Equal (64, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (4, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (37, hv.Position);
+
+			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorUp | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (1, hv.Position);
+		}
 	}
 }

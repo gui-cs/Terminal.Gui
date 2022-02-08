@@ -41,11 +41,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center () - 3,
 			};
-			var tf2 = new TextField ("1234567890") {
-				X = Pos.AnchorEnd (10),
-				Y = Pos.AnchorEnd (1),
-				Width = 10
-			};
 			var tv = new TextView () {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
@@ -53,7 +48,12 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
-			win.Add (tf1, button, label, tf2, tv);
+			var tf2 = new TextField ("1234567890") {
+				X = Pos.AnchorEnd (10),
+				Y = Pos.AnchorEnd (1),
+				Width = 10
+			};
+			win.Add (tf1, button, label, tv, tf2);
 			top.Add (win);
 
 			var top2 = new Border.ToplevelContainer (new Rect (50, 5, 40, 20),
@@ -81,11 +81,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center () - 3,
 			};
-			var tf4 = new TextField ("1234567890") {
-				X = Pos.AnchorEnd (10),
-				Y = Pos.AnchorEnd (1),
-				Width = 10
-			};
 			var tv2 = new TextView () {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
@@ -93,7 +88,12 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
-			top2.Add (tf3, button2, label2, tf4, tv2);
+			var tf4 = new TextField ("1234567890") {
+				X = Pos.AnchorEnd (10),
+				Y = Pos.AnchorEnd (1),
+				Width = 10
+			};
+			top2.Add (tf3, button2, label2, tv2, tf4);
 			top.Add (top2);
 
 			var frm = new FrameView (new Rect (95, 5, 40, 20), "Test3", null,
@@ -118,11 +118,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center () - 3,
 			};
-			var tf6 = new TextField ("1234567890") {
-				X = Pos.AnchorEnd (10),
-				Y = Pos.AnchorEnd (1),
-				Width = 10
-			};
 			var tv3 = new TextView () {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
@@ -130,7 +125,12 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
-			frm.Add (tf5, button3, label3, tf6, tv3);
+			var tf6 = new TextField ("1234567890") {
+				X = Pos.AnchorEnd (10),
+				Y = Pos.AnchorEnd (1),
+				Width = 10
+			};
+			frm.Add (tf5, button3, label3, tv3, tf6);
 			top.Add (frm);
 
 			Application.Run ();

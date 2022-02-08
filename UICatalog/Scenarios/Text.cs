@@ -1,5 +1,8 @@
-﻿using System;
+﻿using NStack;
+using System;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
 
@@ -19,6 +22,14 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (50),
 				//ColorScheme = Colors.Dialog
 			};
+			textField.TextChanging += TextField_TextChanging;
+
+			void TextField_TextChanging (TextChangingEventArgs e)
+			{
+				textField.Autocomplete.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			}
 			Win.Add (textField);
 
 			var labelMirroringTextField = new Label (textField.Text) {
@@ -40,6 +51,14 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Dialog
 			};
 			textView.Text = s;
+			textView.DrawContent += TextView_DrawContent;
+
+			void TextView_DrawContent (Rect e)
+			{
+				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			}
 			Win.Add (textView);
 
 			var labelMirroringTextView = new Label (textView.Text) {

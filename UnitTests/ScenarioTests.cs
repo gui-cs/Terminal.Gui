@@ -6,17 +6,21 @@ using System.Reflection;
 using Terminal.Gui;
 using UICatalog;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ScenarioTests {
-		public ScenarioTests ()
+		readonly ITestOutputHelper output;
+
+		public ScenarioTests (ITestOutputHelper output)
 		{
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
 #endif
+			this.output = output;
 		}
 
 		int CreateInput (string input)
@@ -83,6 +87,10 @@ namespace Terminal.Gui {
 
 				// Shutdown must be called to safely clean up Application if Init has been called
 				Application.Shutdown ();
+				
+				if(abortCount != 0) {
+					output.WriteLine ($"Scenario {scenarioClass} had abort count of {abortCount}");
+				}
 
 				Assert.Equal (0, abortCount);
 				// # of key up events should match # of iterations

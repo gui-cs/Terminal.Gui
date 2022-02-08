@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NStack;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -94,6 +95,109 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+
+			Initialized += TextField_Initialized;
+
+			// Things this view knows how to do
+			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
+			AddCommand (Command.LeftHomeExtend, () => { MoveHomeExtend (); return true; });
+			AddCommand (Command.RightEndExtend, () => { MoveEndExtend (); return true; });
+			AddCommand (Command.LeftHome, () => { MoveHome (); return true; });
+			AddCommand (Command.LeftExtend, () => { MoveLeftExtend (); return true; });
+			AddCommand (Command.RightExtend, () => { MoveRightExtend (); return true; });
+			AddCommand (Command.WordLeftExtend, () => { MoveWordLeftExtend (); return true; });
+			AddCommand (Command.WordRightExtend, () => { MoveWordRightExtend (); return true; });
+			AddCommand (Command.Left, () => { MoveLeft (); return true; });
+			AddCommand (Command.RightEnd, () => { MoveEnd (); return true; });
+			AddCommand (Command.Right, () => { MoveRight (); return true; });
+			AddCommand (Command.CutToEndLine, () => { KillToEnd (); return true; });
+			AddCommand (Command.CutToStartLine, () => { KillToStart (); return true; });
+			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
+			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.WordLeft, () => { MoveWordLeft (); return true; });
+			AddCommand (Command.WordRight, () => { MoveWordRight (); return true; });
+			AddCommand (Command.KillWordForwards, () => { KillWordForwards (); return true; });
+			AddCommand (Command.KillWordBackwards, () => { KillWordBackwards (); return true; });
+			AddCommand (Command.ToggleOverwrite, () => { SetOverwrite (!Used); return true; });
+			AddCommand (Command.EnableOverwrite, () => { SetOverwrite (true); return true; });
+			AddCommand (Command.DisableOverwrite, () => { SetOverwrite (false); return true; });
+			AddCommand (Command.Copy, () => { Copy (); return true; });
+			AddCommand (Command.Cut, () => { Cut (); return true; });
+			AddCommand (Command.Paste, () => { Paste (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
+			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+
+			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
+			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+
+			AddKeyBinding (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
+			AddKeyBinding (Key.Home | Key.ShiftMask | Key.CtrlMask, Command.LeftHomeExtend);
+			AddKeyBinding (Key.A | Key.ShiftMask | Key.CtrlMask, Command.LeftHomeExtend);
+
+			AddKeyBinding (Key.End | Key.ShiftMask, Command.RightEndExtend);
+			AddKeyBinding (Key.End | Key.ShiftMask | Key.CtrlMask, Command.RightEndExtend);
+			AddKeyBinding (Key.E | Key.ShiftMask | Key.CtrlMask, Command.RightEndExtend);
+
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
+			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
+
+			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
+			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LeftExtend);
+
+			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
+			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.RightExtend);
+
+			AddKeyBinding (Key.CursorLeft | Key.ShiftMask | Key.CtrlMask, Command.WordLeftExtend);
+			AddKeyBinding (Key.CursorUp | Key.ShiftMask | Key.CtrlMask, Command.WordLeftExtend);
+			AddKeyBinding ((Key)((int)'B' + Key.ShiftMask | Key.AltMask), Command.WordLeftExtend);
+
+			AddKeyBinding (Key.CursorRight | Key.ShiftMask | Key.CtrlMask, Command.WordRightExtend);
+			AddKeyBinding (Key.CursorDown | Key.ShiftMask | Key.CtrlMask, Command.WordRightExtend);
+			AddKeyBinding ((Key)((int)'F' + Key.ShiftMask | Key.AltMask), Command.WordRightExtend);
+
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
+
+			AddKeyBinding (Key.End, Command.RightEnd);
+			AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
+			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
+
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
+
+			AddKeyBinding (Key.K | Key.CtrlMask, Command.CutToEndLine);
+			AddKeyBinding (Key.K | Key.AltMask, Command.CutToStartLine);
+
+			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
+			AddKeyBinding (Key.Backspace | Key.AltMask, Command.Undo);
+
+			AddKeyBinding (Key.Y | Key.CtrlMask, Command.Redo);
+
+			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.WordLeft);
+			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.WordLeft);
+			AddKeyBinding ((Key)((int)'B' + Key.AltMask), Command.WordLeft);
+
+			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.WordRight);
+			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.WordRight);
+			AddKeyBinding ((Key)((int)'F' + Key.AltMask), Command.WordRight);
+
+			AddKeyBinding (Key.DeleteChar | Key.CtrlMask, Command.KillWordForwards);
+			AddKeyBinding (Key.Backspace | Key.CtrlMask, Command.KillWordBackwards);
+			AddKeyBinding (Key.InsertChar, Command.ToggleOverwrite);
+			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
+			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
+		}
+
+
+		void TextField_Initialized (object sender, EventArgs e)
+		{
+			Autocomplete.HostControl = this;
+			Autocomplete.PopupInsideContainer = false;
 		}
 
 		///<inheritdoc/>
@@ -106,6 +210,12 @@ namespace Terminal.Gui {
 
 			return base.OnLeave (view);
 		}
+
+		/// <summary>
+		/// Provides autocomplete context menu based on suggestions at the current cursor
+		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature.
+		/// </summary>
+		public IAutocomplete Autocomplete { get; protected set; } = new TextFieldAutocomplete ();
 
 		///<inheritdoc/>
 		public override Rect Frame {
@@ -174,7 +284,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///    Sets or gets the current cursor position.
 		/// </summary>
-		public int CursorPosition {
+		public virtual int CursorPosition {
 			get { return point; }
 			set {
 				if (value < 0) {
@@ -187,6 +297,11 @@ namespace Terminal.Gui {
 				PrepareSelection (selectedStart, point - selectedStart);
 			}
 		}
+
+		/// <summary>
+		/// Gets the left offset position.
+		/// </summary>
+		public int ScrollOffset => first;
 
 		/// <summary>
 		///   Sets the cursor position.
@@ -248,6 +363,17 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
+
+			if (SelectedLength > 0)
+				return;
+
+			// draw autocomplete
+			Autocomplete.GenerateSuggestions ();
+
+			var renderAt = new Point (
+				CursorPosition - ScrollOffset, 0);
+
+			Autocomplete.RenderOverlay (renderAt);
 		}
 
 		Attribute GetReadOnlyColor ()
@@ -330,174 +456,65 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			oldCursorPos = point;
 
-			switch (ShortcutHelper.GetModifiersKey (kb)) {
-			case Key.DeleteChar:
-			case Key.D | Key.CtrlMask: // Delete
-				DeleteCharRight ();
-				break;
-
-			case Key.Delete:
-			case Key.Backspace:
-				DeleteCharLeft ();
-				break;
-
-			case Key.Home | Key.ShiftMask:
-			case Key.Home | Key.ShiftMask | Key.CtrlMask:
-			case Key.A | Key.ShiftMask | Key.CtrlMask:
-				MoveHomeExtend ();
-				break;
-
-			case Key.End | Key.ShiftMask:
-			case Key.End | Key.ShiftMask | Key.CtrlMask:
-			case Key.E | Key.ShiftMask | Key.CtrlMask:
-				MoveEndExtend ();
-				break;
-
-			// Home, C-A
-			case Key.Home:
-			case Key.Home | Key.CtrlMask:
-			case Key.A | Key.CtrlMask:
-				MoveHome ();
-				break;
-
-			case Key.CursorLeft | Key.ShiftMask:
-			case Key.CursorUp | Key.ShiftMask:
-				MoveLeftExtend ();
-				break;
-
-			case Key.CursorRight | Key.ShiftMask:
-			case Key.CursorDown | Key.ShiftMask:
-				MoveRightExtend ();
-				break;
-
-			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
-			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
-			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
-				MoveWordLeftExtend ();
-				break;
-
-			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
-			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
-			case (Key)((int)'F' + Key.ShiftMask | Key.AltMask):
-				MoveWordRightExtend ();
-				break;
-
-			case Key.CursorLeft:
-			case Key.B | Key.CtrlMask:
-				MoveLeft ();
-				break;
-
-			case Key.End:
-			case Key.End | Key.CtrlMask:
-			case Key.E | Key.CtrlMask: // End
-				MoveEnd ();
-				break;
-
-			case Key.CursorRight:
-			case Key.F | Key.CtrlMask:
-				MoveRight ();
-				break;
-
-			case Key.K | Key.CtrlMask: // kill-to-end
-				KillToEnd ();
-				break;
-
-			case Key.K | Key.AltMask: // kill-to-start
-				KillToStart ();
-				break;
-
-			// Undo
-			case Key.Z | Key.CtrlMask:
-			case Key.Backspace | Key.AltMask:
-				UndoChanges ();
-				break;
-
-			//Redo
-			case Key.Y | Key.CtrlMask: // Control-y, yank
-				RedoChanges ();
-				break;
-
-			case Key.CursorLeft | Key.CtrlMask:
-			case Key.CursorUp | Key.CtrlMask:
-			case (Key)((int)'B' + Key.AltMask):
-				MoveWordLeft ();
-				break;
-
-			case Key.CursorRight | Key.CtrlMask:
-			case Key.CursorDown | Key.CtrlMask:
-			case (Key)((int)'F' + Key.AltMask):
-				MoveWordRight ();
-				break;
-
-			case Key.DeleteChar | Key.CtrlMask: // kill-word-forwards
-				KillWordForwards ();
-				break;
-
-			case Key.Backspace | Key.CtrlMask: // kill-word-backwards
-				KillWordBackwards ();
-				break;
-
-			case Key.InsertChar:
-				InsertChar ();
-				break;
-
-			case Key.C | Key.CtrlMask:
-				Copy ();
-				break;
-
-			case Key.X | Key.CtrlMask:
-				Cut ();
-				break;
-
-			case Key.V | Key.CtrlMask:
-				Paste ();
-				break;
-
-			// MISSING:
-			// Alt-D, Alt-backspace
-			// Alt-Y
-			// Delete adding to kill buffer
-
-			default:
-				// Ignore other control characters.
-				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
-					return false;
-
-				if (ReadOnly)
-					return true;
-
-				if (length > 0) {
-					DeleteSelectedText ();
-					oldCursorPos = point;
-				}
-				var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
-				if (Used) {
-					point++;
-					if (point == text.Count + 1) {
-						SetText (text.Concat (kbstr).ToList ());
-					} else {
-						if (oldCursorPos > text.Count) {
-							oldCursorPos = text.Count;
-						}
-						SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
-					}
-				} else {
-					SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (Math.Min (oldCursorPos + 1, text.Count), Math.Max (text.Count - oldCursorPos - 1, 0))));
-					point++;
-				}
-				Adjust ();
+			// Give autocomplete first opportunity to respond to key presses
+			if (SelectedLength == 0 && Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
+
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
+				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			if (result != null)
+				return (bool)result;
+
+			// Ignore other control characters.
+			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+				return false;
+
+			if (ReadOnly)
+				return true;
+
+			InsertText (kb);
+
 			return true;
 		}
 
-		void InsertChar ()
+		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
 		{
-			Used = !Used;
+			if (length > 0) {
+				DeleteSelectedText ();
+				oldCursorPos = point;
+			}
+			if (!useOldCursorPos) {
+				oldCursorPos = point;
+			}
+			var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
+			if (Used) {
+				point++;
+				if (point == text.Count + 1) {
+					SetText (text.Concat (kbstr).ToList ());
+				} else {
+					if (oldCursorPos > text.Count) {
+						oldCursorPos = text.Count;
+					}
+					SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
+				}
+			} else {
+				SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (Math.Min (oldCursorPos + 1, text.Count), Math.Max (text.Count - oldCursorPos - 1, 0))));
+				point++;
+			}
+			Adjust ();
+		}
+
+		void SetOverwrite (bool overwrite)
+		{
+			Used = overwrite;
 			SetNeedsDisplay ();
 		}
 
-		void KillWordBackwards ()
+		/// <summary>
+		/// Deletes word backwards.
+		/// </summary>
+		public virtual void KillWordBackwards ()
 		{
 			ClearAllSelection ();
 			int bw = WordBackward (point);
@@ -508,7 +525,10 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void KillWordForwards ()
+		/// <summary>
+		/// Deletes word forwards.
+		/// </summary>
+		public virtual void KillWordForwards ()
 		{
 			ClearAllSelection ();
 			int fw = WordForward (point);
@@ -702,7 +722,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void DeleteCharLeft ()
+		/// <summary>
+		/// Deletes the left character.
+		/// </summary>
+		public virtual void DeleteCharLeft (bool useOldCursorPos = true)
 		{
 			if (ReadOnly)
 				return;
@@ -711,6 +734,9 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return;
 
+				if (!useOldCursorPos) {
+					oldCursorPos = point;
+				}
 				point--;
 				if (oldCursorPos < text.Count) {
 					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
@@ -723,7 +749,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void DeleteCharRight ()
+		/// <summary>
+		/// Deletes the right character.
+		/// </summary>
+		public virtual void DeleteCharRight ()
 		{
 			if (ReadOnly)
 				return;
@@ -865,6 +894,11 @@ namespace Terminal.Gui {
 			}
 
 			if (!CanFocus) {
+				return true;
+			}
+
+			// Give autocomplete first opportunity to respond to mouse clicks
+			if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true)) {
 				return true;
 			}
 
@@ -1099,6 +1133,29 @@ namespace Terminal.Gui {
 
 			return base.OnEnter (view);
 		}
+
+		/// <summary>
+		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
+		/// exactly as if the user had just typed it
+		/// </summary>
+		/// <param name="toAdd">Text to add</param>
+		/// <param name="useOldCursorPos">If uses the <see cref="oldCursorPos"/>.</param>
+		public void InsertText (string toAdd, bool useOldCursorPos = true)
+		{
+			foreach (var ch in toAdd) {
+
+				Key key;
+
+				try {
+					key = (Key)ch;
+				} catch (Exception) {
+
+					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
+				}
+
+				InsertText (new KeyEvent () { Key = key }, useOldCursorPos);
+			}
+		}
 	}
 
 	/// <summary>
@@ -1121,6 +1178,35 @@ namespace Terminal.Gui {
 		public TextChangingEventArgs (ustring newText)
 		{
 			NewText = newText;
+		}
+	}
+
+	/// <summary>
+	/// Renders an overlay on another view at a given point that allows selecting
+	/// from a range of 'autocomplete' options.
+	/// An implementation on a TextField.
+	/// </summary>
+	public class TextFieldAutocomplete : Autocomplete {
+
+		/// <inheritdoc/>
+		protected override void DeleteTextBackwards ()
+		{
+			((TextField)HostControl).DeleteCharLeft (false);
+		}
+
+		/// <inheritdoc/>
+		protected override string GetCurrentWord ()
+		{
+			var host = (TextField)HostControl;
+			var currentLine = host.Text.ToRuneList ();
+			var cursorPosition = Math.Min (host.CursorPosition, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition);
+		}
+
+		/// <inheritdoc/>
+		protected override void InsertText (string accepted)
+		{
+			((TextField)HostControl).InsertText (accepted, false);
 		}
 	}
 }

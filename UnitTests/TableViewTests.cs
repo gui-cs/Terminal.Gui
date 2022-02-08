@@ -231,15 +231,10 @@ namespace Terminal.Gui.Views {
 			Assert.False (tableView.IsSelected (2, 2));
 		}
 
+		[AutoInitShutdown]
 		[Fact]
 		public void PageDown_ExcludesHeaders ()
 		{
-
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
-
-
 			var tableView = new TableView () {
 				Table = BuildTable (25, 50),
 				MultiSelect = true,
@@ -250,6 +245,11 @@ namespace Terminal.Gui.Views {
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.Style.AlwaysShowHeaders = false;
+
+			// ensure that TableView has the input focus
+			Application.Top.Add (tableView);
+			Application.Top.FocusFirst ();
+			Assert.True (tableView.HasFocus);
 
 			Assert.Equal (0, tableView.RowOffset);
 
@@ -262,9 +262,6 @@ namespace Terminal.Gui.Views {
 			tableView.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ()));
 
 			Assert.Equal (8, tableView.RowOffset);
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 
 		[Fact]

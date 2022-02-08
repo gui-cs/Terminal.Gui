@@ -156,6 +156,32 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				Search_Changed (Text);
 			};
+
+			// Things this view knows how to do
+			AddCommand (Command.Accept, () => ActivateSelected ());
+			AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
+			AddCommand (Command.Expand, () => Expand ());
+			AddCommand (Command.Collapse, () => Collapse ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.PageDown, () => PageDown ());
+			AddCommand (Command.PageUp, () => PageUp ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
+			AddCommand (Command.Cancel, () => CancelSelected ());
+			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.F4, Command.ToggleExpandCollapse);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.PageUp, Command.PageUp);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
+			AddKeyBinding (Key.Esc, Command.Cancel);
+			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
 
 		private bool isShow = false;
@@ -181,6 +207,11 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets the drop down list state, expanded or collapsed.
+		/// </summary>
+		public bool IsShow => isShow;
 
 		///<inheritdoc/>
 		public new ColorScheme ColorScheme {
@@ -318,89 +349,153 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent e)
 		{
-			if (e.Key == Key.Enter && listview.SelectedItem > -1) {
-				Selected ();
+			var result = InvokeKeybindings (e);
+			if (result != null)
+				return (bool)result;
+
+			return base.ProcessKey (e);
+		}
+
+		bool UnixEmulation ()
+		{
+			// Unix emulation
+			Reset ();
+			return true;
+		}
+
+		bool CancelSelected ()
+		{
+			search.SetFocus ();
+			search.Text = text = "";
+			OnSelectedChanged ();
+			Collapse ();
+			return true;
+		}
+
+		bool MoveEnd ()
+		{
+			if (HasItems ()) {
+				listview.MoveEnd ();
+			}
+			return true;
+		}
+
+		bool MoveHome ()
+		{
+			if (HasItems ()) {
+				listview.MoveHome ();
+			}
+			return true;
+		}
+
+		bool PageUp ()
+		{
+			if (HasItems ()) {
+				listview.MovePageUp ();
+			}
+			return true;
+		}
+
+		bool PageDown ()
+		{
+			if (HasItems ()) {
+				listview.MovePageDown ();
+			}
+			return true;
+		}
+
+		bool? MoveUp ()
+		{
+			if (search.HasFocus) { // stop odd behavior on KeyUp when search has focus
 				return true;
 			}
 
-			if (e.Key == Key.F4 && (search.HasFocus || listview.HasFocus)) {
-				if (!isShow) {
-					SetSearchSet ();
-					isShow = true;
-					ShowList ();
-					FocusSelectedItem ();
-				} else {
-					isShow = false;
-					HideList ();
-				}
-				return true;
-			}
-
-			if (e.Key == Key.CursorDown && search.HasFocus) { // jump to list
-				if (searchset?.Count > 0) {
-					listview.TabStop = true;
-					listview.SetFocus ();
-					SetValue (searchset [listview.SelectedItem]);
-					return true;
-				} else {
-					listview.TabStop = false;
-					SuperView.FocusNext ();
-				}
-			}
-
-			if (e.Key == Key.CursorUp && search.HasFocus) { // stop odd behavior on KeyUp when search has focus
-				return true;
-			}
-
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
+			if (listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
 			{
 				search.CursorPosition = search.Text.RuneCount;
 				search.SetFocus ();
 				return true;
 			}
+			return null;
+		}
 
-			if (e.Key == Key.PageDown) {
-				if (listview.SelectedItem != -1) {
-					listview.MovePageDown ();
+		bool? MoveDown ()
+		{
+			if (search.HasFocus) { // jump to list
+				if (searchset?.Count > 0) {
+					listview.TabStop = true;
+					listview.SetFocus ();
+					SetValue (searchset [listview.SelectedItem]);
+				} else {
+					listview.TabStop = false;
+					SuperView?.FocusNext ();
 				}
 				return true;
 			}
+			return null;
+		}
 
-			if (e.Key == Key.PageUp) {
-				if (listview.SelectedItem != -1) {
-					listview.MovePageUp ();
+		/// <summary>
+		/// Toggles the expand/collapse state of the sublist in the combo box
+		/// </summary>
+		/// <returns></returns>
+		bool ExpandCollapse ()
+		{
+			if (search.HasFocus || listview.HasFocus) {
+				if (!isShow) {
+					return Expand ();
+				} else {
+					return Collapse ();
 				}
+			}
+			return false;
+		}
+
+		bool ActivateSelected ()
+		{
+			if (HasItems ()) {
+				Selected ();
 				return true;
 			}
+			return false;
+		}
 
-			if (e.Key == Key.Home) {
-				if (listview.SelectedItem != -1) {
-					listview.MoveHome ();
-				}
-				return true;
+		bool HasItems ()
+		{
+			return Source?.Count > 0;
+		}
+
+		/// <summary>
+		/// Collapses the drop down list.  Returns true if the state chagned or false
+		/// if it was already collapsed and no action was taken
+		/// </summary>
+		public virtual bool Collapse ()
+		{
+			if (!isShow) {
+				return false;
 			}
 
-			if (e.Key == Key.End) {
-				if (listview.SelectedItem != -1) {
-					listview.MoveEnd ();
-				}
-				return true;
+			isShow = false;
+			HideList ();
+			return true;
+		}
+
+		/// <summary>
+		/// Expands the drop down list.  Returns true if the state chagned or false
+		/// if it was already expanded and no action was taken
+		/// </summary>
+		public virtual bool Expand ()
+		{
+			if (isShow) {
+				return false;
 			}
 
-			if (e.Key == Key.Esc) {
-				search.SetFocus ();
-				search.Text = text = "";
-				OnSelectedChanged ();
-				return true;
-			}
+			SetSearchSet ();
+			isShow = true;
+			ShowList ();
+			FocusSelectedItem ();
 
-			// Unix emulation
-			if (e.Key == (Key.U | Key.CtrlMask)) {
-				Reset ();
-				return true;
-			}
-
-			return base.ProcessKey (e);
+			return true;
 		}
 
 		/// <summary>
@@ -489,6 +584,7 @@ namespace Terminal.Gui {
 
 		private void SetSearchSet ()
 		{
+			if (Source == null) { return; }
 			// force deep copy
 			foreach (var item in Source.ToList ()) {
 				searchset.Add (item);

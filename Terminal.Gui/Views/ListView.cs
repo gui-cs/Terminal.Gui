@@ -317,6 +317,38 @@ namespace Terminal.Gui {
 		{
 			Source = source;
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
+			AddCommand (Command.PageUp, () => MovePageUp ());
+			AddCommand (Command.PageDown, () => MovePageDown ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
+
+			// Default keybindings for all ListViews
+			AddKeyBinding (Key.CursorUp,Command.LineUp);
+			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
+
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+
+			AddKeyBinding(Key.PageUp,Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.Home, Command.TopHome);
+
+			AddKeyBinding (Key.End, Command.BottomEnd);
+
+			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		///<inheritdoc/>
@@ -383,42 +415,11 @@ namespace Terminal.Gui {
 			if (source == null)
 				return base.ProcessKey (kb);
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-			case Key.P | Key.CtrlMask:
-				return MoveUp ();
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			case Key.CursorDown:
-			case Key.N | Key.CtrlMask:
-				return MoveDown ();
-
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return MovePageDown ();
-
-			case Key.PageUp:
-				return MovePageUp ();
-
-			case Key.Space:
-				if (MarkUnmarkRow ())
-					return true;
-				else
-					break;
-
-			case Key.Enter:
-				return OnOpenSelectedItem ();
-
-			case Key.End:
-				return MoveEnd ();
-
-			case Key.Home:
-				return MoveHome ();
-
-			default:
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
 		/// <summary>
@@ -602,40 +603,44 @@ namespace Terminal.Gui {
 		/// Scrolls the view down.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll down.</param>
-		public virtual void ScrollDown (int lines)
+		public virtual bool ScrollDown (int lines)
 		{
 			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll up.</param>
-		public virtual void ScrollUp (int lines)
+		public virtual bool ScrollUp (int lines)
 		{
 			top = Math.Max (top - lines, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view right.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll right.</param>
-		public virtual void ScrollRight (int cols)
+		public virtual bool ScrollRight (int cols)
 		{
 			left = Math.Max (Math.Min (left + cols, Maxlength - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view left.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll left.</param>
-		public virtual void ScrollLeft (int cols)
+		public virtual bool ScrollLeft (int cols)
 		{
 			left = Math.Max (left - cols, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		int lastSelectedItem = -1;

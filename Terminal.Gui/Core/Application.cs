@@ -140,18 +140,74 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateForwardKey { get; set; } = Key.PageDown | Key.CtrlMask;
+		public static Key AlternateForwardKey {
+			get => alternateForwardKey;
+			set {
+				if (alternateForwardKey != value) {
+					var oldKey = alternateForwardKey;
+					alternateForwardKey = value;
+					OnAlternateForwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		static void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnAlternateForwardKeyChanged (oldKey);
+			}
+		}
+
+		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateBackwardKey { get; set; } = Key.PageUp | Key.CtrlMask;
+		public static Key AlternateBackwardKey {
+			get => alternateBackwardKey;
+			set {
+				if (alternateBackwardKey != value) {
+					var oldKey = alternateBackwardKey;
+					alternateBackwardKey = value;
+					OnAlternateBackwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		static void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnAlternateBackwardKeyChanged (oldKey);
+			}
+		}
+
+		static Key quitKey = Key.Q | Key.CtrlMask;
+
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
+		public static Key QuitKey {
+			get => quitKey;
+			set {
+				if (quitKey != value) {
+					var oldKey = quitKey;
+					quitKey = value;
+					OnQuitKeyChanged (oldKey);
+				}
+			}
+		}
+
+		static void OnQuitKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnQuitKeyChanged (oldKey);
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
