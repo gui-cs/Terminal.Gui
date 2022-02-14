@@ -321,8 +321,11 @@ namespace UICatalog.Scenarios {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
+				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
+
+			System.Diagnostics.Debug.Assert (_textView.IsDirty);
 
 			var r = MessageBox.ErrorQuery ("Save File",
 				$"Do you want save changes in {Win.Title}?", "Yes", "No", "Cancel");
