@@ -1902,8 +1902,7 @@ namespace Terminal.Gui {
 					Marshal.Copy (pointer, buff, 0, size);
 
 					return System.Text.Encoding.Unicode.GetString (buff)
-						.TrimEnd ('\0')
-						.Replace ("\r\n", "\n");
+						.TrimEnd ('\0');
 				} finally {
 					if (pointer != IntPtr.Zero)
 						GlobalUnlock (handle);
