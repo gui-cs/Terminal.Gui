@@ -397,6 +397,7 @@ namespace UICatalog.Scenarios {
 				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
 				_originalText = _textView.Text.ToByteArray ();
 				_saved = true;
+				_textView.ClearHistoryChanges ();
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
 
 			} catch (Exception ex) {

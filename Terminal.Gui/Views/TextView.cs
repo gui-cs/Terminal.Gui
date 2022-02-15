@@ -549,6 +549,7 @@ namespace Terminal.Gui {
 			public LineStatus LineStatus;
 			public bool IsUndoing;
 			public Point FinalCursorPosition;
+			public HistoryTextItem RemovedOnAdded;
 
 			public HistoryTextItem (List<List<Rune>> lines, Point curPos, LineStatus linesStatus)
 			{
@@ -653,25 +654,42 @@ namespace Terminal.Gui {
 					historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Original))) {
 
 					idxHistoryText--;
+
+					while (historyTextItems [idxHistoryText].LineStatus == LineStatus.Added
+						&& historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+
+						idxHistoryText--;
+					}
 					historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
 					historyTextItem.IsUndoing = true;
 					historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 				}
 
+				if (historyTextItem.LineStatus == LineStatus.Removed && historyTextItems [idxHistoryText + 1].LineStatus == LineStatus.Added) {
+					historyTextItem.RemovedOnAdded = new HistoryTextItem (historyTextItems [idxHistoryText + 1]);
+				}
+
 				if ((historyTextItem.LineStatus == LineStatus.Added && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Original)
-					|| (historyTextItem.LineStatus == LineStatus.Removed && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Original)) {
+					|| (historyTextItem.LineStatus == LineStatus.Removed && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Original)
+					|| (historyTextItem.LineStatus == LineStatus.Added && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Removed)) {
 
 					if (!historyTextItem.Lines [0].SequenceEqual (historyTextItems [idxHistoryText - 1].Lines [0])
 						&& historyTextItem.CursorPosition == historyTextItems [idxHistoryText - 1].CursorPosition) {
 						historyTextItem.Lines [0] = new List<Rune> (historyTextItems [idxHistoryText - 1].Lines [0]);
 					}
-					historyTextItem.FinalCursorPosition = historyTextItems [idxHistoryText - 1].CursorPosition;
+					if (historyTextItem.LineStatus == LineStatus.Added && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+						historyTextItem.FinalCursorPosition = historyTextItems [idxHistoryText - 2].CursorPosition;
+					} else {
+						historyTextItem.FinalCursorPosition = historyTextItems [idxHistoryText - 1].CursorPosition;
+					}
 				} else {
 					historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 				}
 
 				OnChangeText (historyTextItem);
-				if (historyTextItem.LineStatus == LineStatus.Removed || historyTextItem.LineStatus == LineStatus.Added) {
+				while (historyTextItems [idxHistoryText].LineStatus == LineStatus.Removed
+					|| historyTextItems [idxHistoryText].LineStatus == LineStatus.Added) {
+
 					idxHistoryText--;
 				}
 			} else if (!historyTextItem.IsUndoing) {
@@ -683,6 +701,10 @@ namespace Terminal.Gui {
 					historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
 					historyTextItem.IsUndoing = false;
 					historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
+				}
+
+				if (historyTextItem.LineStatus == LineStatus.Added && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+					historyTextItem.RemovedOnAdded = new HistoryTextItem (historyTextItems [idxHistoryText - 1]);
 				}
 
 				if ((historyTextItem.LineStatus == LineStatus.Removed && historyTextItems [idxHistoryText + 1].LineStatus == LineStatus.Replaced)
@@ -699,7 +721,9 @@ namespace Terminal.Gui {
 				}
 
 				OnChangeText (historyTextItem);
-				if (historyTextItem.LineStatus == LineStatus.Removed || historyTextItem.LineStatus == LineStatus.Added) {
+				while (historyTextItems [idxHistoryText].LineStatus == LineStatus.Removed
+					|| historyTextItems [idxHistoryText].LineStatus == LineStatus.Added) {
+
 					idxHistoryText++;
 				}
 			}
@@ -1313,6 +1337,22 @@ namespace Terminal.Gui {
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
 			var startLine = obj.CursorPosition.Y;
+
+			if (obj.RemovedOnAdded != null) {
+				int offset;
+				if (obj.IsUndoing) {
+					offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
+				} else {
+					offset = obj.RemovedOnAdded.Lines.Count - 1;
+				}
+				for (int i = 0; i < offset; i++) {
+					if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
+						model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+					} else {
+						break;
+					}
+				}
+			}
 
 			for (int i = 0; i < obj.Lines.Count; i++) {
 				if (i == 0) {
@@ -2532,7 +2572,7 @@ namespace Terminal.Gui {
 
 		void RedoChanges ()
 		{
-			if (ReadOnly)
+			if (ReadOnly || wordWrap)
 				return;
 
 			historyText.Redo ();
@@ -2540,7 +2580,7 @@ namespace Terminal.Gui {
 
 		void UndoChanges ()
 		{
-			if (ReadOnly)
+			if (ReadOnly || wordWrap)
 				return;
 
 			historyText.Undo ();
@@ -2896,10 +2936,15 @@ namespace Terminal.Gui {
 			}
 			if (isReadOnly)
 				return true;
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
+			if (selecting) {
+				ClearSelectedRegion ();
+				currentLine = GetCurrentLine ();
+			}
 			var restCount = currentLine.Count - currentColumn;
 			var rest = currentLine.GetRange (currentColumn, restCount);
 			currentLine.RemoveRange (currentColumn, restCount);
@@ -2918,15 +2963,16 @@ namespace Terminal.Gui {
 			}
 			currentRow++;
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
-				HistoryText.LineStatus.Replaced);
-
 			bool fullNeedsDisplay = false;
 			if (currentRow >= topRow + Frame.Height) {
 				topRow++;
 				fullNeedsDisplay = true;
 			}
 			currentColumn = 0;
+
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				HistoryText.LineStatus.Replaced);
+
 			if (!wordWrap && currentColumn < leftColumn) {
 				fullNeedsDisplay = true;
 				leftColumn = 0;
