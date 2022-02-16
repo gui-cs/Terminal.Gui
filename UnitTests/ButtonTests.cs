@@ -99,5 +99,43 @@ namespace Terminal.Gui.Views {
 			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (clicked);
 		}
+
+
+		/// <summary>
+		/// This test demonstrates how to change the activation key for Button
+		/// as described in the README.md keyboard handling section
+		/// </summary>
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindingExample ()
+		{
+			int pressed = 0;
+			var btn = new Button ("Press Me");
+			btn.Clicked += () => pressed++;
+
+			// The Button class supports the Accept command
+			Assert.Contains(Command.Accept,btn.GetSupportedCommands ());
+
+			Application.Top.Add (btn);
+			Application.Begin (Application.Top);
+
+			// default keybinding is Enter which results in keypress
+			Application.Driver.SendKeys ('\n',ConsoleKey.Enter,false,false,false);
+			Assert.Equal (1, pressed);
+
+			// remove the default keybinding (Enter)
+			btn.ClearKeybinding (Command.Accept);
+			
+			// After clearing the default keystroke the Enter button no longer does anything for the Button
+			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+			Assert.Equal (1, pressed);
+
+			// Set a new binding of b for the click (Accept) event
+			btn.AddKeyBinding (Key.b, Command.Accept);
+
+			// now pressing B should call the button click event
+			Application.Driver.SendKeys ('b', ConsoleKey.B, false, false, false);
+			Assert.Equal (2, pressed);
+		}
 	}
 }
