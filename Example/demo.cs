@@ -564,8 +564,13 @@ static class Demo {
 	#endregion
 
 	public static Action running = MainApp;
-	static void Main ()
+	static void Main(string[] args)
 	{
+		if (args.Length > 0 && args.Contains("-usc"))
+		{
+			Application.UseSystemConsole = true;
+		}
+
 		Console.OutputEncoding = System.Text.Encoding.Default;
 
 		while (running != null) {
@@ -582,8 +587,6 @@ static class Demo {
 	{
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-
-		Application.UseSystemConsole = true;
 
 		Application.Init();
 		Application.HeightAsBuffer = true;
@@ -685,7 +688,8 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", Load),
 			new StatusItem(Key.F3, "~F3~ Save", Save),
-			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
+			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } }),
+			new StatusItem(Key.Null, Application.Driver.GetType().Name, null)
 		});
 
 		win.Add (drag, dragText);
