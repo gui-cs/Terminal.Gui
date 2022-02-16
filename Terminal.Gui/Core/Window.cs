@@ -88,6 +88,15 @@ namespace Terminal.Gui {
 				this.instance = instance;
 			}
 
+			public override void OnCanFocusChanged ()
+			{
+				if (MostFocused == null && CanFocus && Visible) {
+					EnsureFocus ();
+				}
+
+				base.OnCanFocusChanged ();
+			}
+
 			public override bool MouseEvent (MouseEvent mouseEvent)
 			{
 				return instance.MouseEvent (mouseEvent);

@@ -771,6 +771,9 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
+			foreach (var view in Subviews) {
+				view.SetNeedsLayout ();
+			}
 			textFormatter.NeedsFormat = true;
 		}
 
