@@ -180,7 +180,7 @@ namespace Terminal.Gui {
 					
 					// of API user is mixing and matching old and new methods of keybinding then they may have lost
 					// the old binding (e.g. with ClearKeybindings) so ReplaceKeyBinding alone will fail
-					AddKeyBinding (cellActivationKey, Command.Accept);
+					AddKeyBinding (value, Command.Accept);
 					cellActivationKey = value;
 				}
 			}
