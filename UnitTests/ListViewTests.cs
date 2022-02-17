@@ -84,5 +84,22 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
 			Assert.Equal (0, lv.SelectedItem);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void RowRender_Event ()
+		{
+			var rendered = false;
+			var source = new List<string> () { "one", "two", "three" };
+			var lv = new ListView () { Width = Dim.Fill (), Height = Dim.Fill () };
+			lv.RowRender += _ => rendered = true;
+			Application.Top.Add (lv);
+			Application.Begin (Application.Top);
+			Assert.False(rendered);
+
+			lv.SetSource (source);
+			lv.Redraw (lv.Bounds);
+			Assert.True(rendered);
+		}
 	}
 }
