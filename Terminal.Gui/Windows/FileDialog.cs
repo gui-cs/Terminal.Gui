@@ -94,6 +94,21 @@ namespace Terminal.Gui {
 			return valid;
 		}
 
+		private bool _disposedValue;
+		protected override void Dispose (bool disposing)
+		{
+			if (!_disposedValue) {
+				if (disposing) {
+					watcher?.Dispose ();
+				}
+
+				_disposedValue = true;
+			}
+
+			// Call base class implementation.
+			base.Dispose (disposing);
+		}
+
 		void Watcher_Error (object sender, ErrorEventArgs e)
 		{
 			Application.MainLoop.Invoke (() => Reload ());
