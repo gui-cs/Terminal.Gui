@@ -493,6 +493,44 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
+		public void TableView_Activate()
+		{
+			string activatedValue = null;
+			var tv = new TableView (BuildTable(1,1));
+			tv.CellActivated += (c) => activatedValue = c.Table.Rows[c.Row][c.Col].ToString();
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			// pressing enter should activate the first cell (selected cell)
+			tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			Assert.Equal ("R0C0",activatedValue);
+
+			// reset the test
+			activatedValue = null;
+
+			// clear keybindings and ensure that Enter does not trigger the event anymore
+			tv.ClearKeybindings ();
+			tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			Assert.Null(activatedValue);
+
+			// New method for changing the activation key
+			tv.AddKeyBinding (Key.z, Command.Accept);
+			tv.ProcessKey (new KeyEvent (Key.z, new KeyModifiers ()));
+			Assert.Equal ("R0C0", activatedValue);
+
+			// reset the test
+			activatedValue = null;
+			tv.ClearKeybindings ();
+
+			// Old method for changing the activation key
+			tv.CellActivationKey = Key.z;
+			tv.ProcessKey (new KeyEvent (Key.z, new KeyModifiers ()));
+			Assert.Equal ("R0C0", activatedValue);
+		}
+
+		[Fact]
 		public void TableView_ColorsTest_ColorGetter ()
 		{
 			var tv = SetUpMiniTable ();

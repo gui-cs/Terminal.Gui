@@ -177,6 +177,10 @@ namespace Terminal.Gui {
 			set {
 				if (cellActivationKey != value) {
 					ReplaceKeyBinding (cellActivationKey, value);
+					
+					// of API user is mixing and matching old and new methods of keybinding then they may have lost
+					// the old binding (e.g. with ClearKeybindings) so ReplaceKeyBinding alone will fail
+					AddKeyBinding (value, Command.Accept);
 					cellActivationKey = value;
 				}
 			}
@@ -222,7 +226,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.BottomEndExtend, () => { ChangeSelectionToEndOfTable (true); return true; });
 
 			AddCommand (Command.SelectAll, () => { SelectAll(); return true; });
-			AddCommand (Command.Accept, () => { new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow); return true; });
+			AddCommand (Command.Accept, () => { OnCellActivated(new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.CursorLeft, Command.Left);
