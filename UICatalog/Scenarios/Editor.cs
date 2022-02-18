@@ -321,8 +321,11 @@ namespace UICatalog.Scenarios {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
+				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
+
+			System.Diagnostics.Debug.Assert (_textView.IsDirty);
 
 			var r = MessageBox.ErrorQuery ("Save File",
 				$"Do you want save changes in {Win.Title}?", "Yes", "No", "Cancel");
@@ -394,6 +397,7 @@ namespace UICatalog.Scenarios {
 				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
 				_originalText = _textView.Text.ToByteArray ();
 				_saved = true;
+				_textView.ClearHistoryChanges ();
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
 
 			} catch (Exception ex) {

@@ -1481,7 +1481,10 @@ namespace Terminal.Gui {
 					Curses.raw ();
 					Curses.noecho ();
 				}
-				return result.TrimEnd ();
+				if (result.EndsWith ("\r\n")) {
+					result = result.Substring (0, result.Length - 2);
+				}
+				return result;
 			}
 		}
 
