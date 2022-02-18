@@ -69,6 +69,20 @@ To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or
 
 `CTRL-Q` is used for exiting views (and apps).
 
+**Terminal.Gui** supports rebinding keys.  For example the default key for activating a button is Enter.  You can change this using the `ClearKeybinding` and `AddKeybinding` methods:
+
+```csharp
+var btn = new Button ("Press Me");
+btn.ClearKeybinding (Command.Accept);
+btn.AddKeyBinding (Key.b, Command.Accept);
+```
+
+The `Command` enum lists generic operations that are implemented by views.  For example `Command.Accept` in a Button results in the `Clicked` event firing while in `TableView` it is bound to `CellActivated`.  Not all commands are implemented by all views (e.g. you cannot scroll in a Button).  To see which commands are implemented by a View you can use the `GetSupportedCommands()` method.
+
+Not all controls have the same key bound for a given command, for example `Command.Accept` defaults to `Key.Enter` in a `Button` but defaults to `Key.Space` in `RadioGroup`.
+
+Keybindings only operate while a view has focus.  To register global hotkeys you can override a view's `bool ProcessHotKey (KeyEvent kb)` method.
+
 ### Driver model
 
 **Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/CursesDriver/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/WindowsDriver.cs) front-end.
