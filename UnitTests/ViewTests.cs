@@ -747,6 +747,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void CanFocus_Faced_With_Container ()
 		{
 			var t = new Toplevel ();
@@ -1576,6 +1577,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void GetTopSuperView_Test ()
 		{
 			var v1 = new View ();

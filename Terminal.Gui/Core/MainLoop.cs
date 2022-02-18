@@ -117,8 +117,8 @@ namespace Terminal.Gui {
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			var k = (DateTime.UtcNow + time).Ticks;
 			lock (timeouts) {
+				var k = (DateTime.UtcNow + time).Ticks;
 				while (timeouts.ContainsKey (k)) {
 					k = (DateTime.UtcNow + time).Ticks;
 				}
