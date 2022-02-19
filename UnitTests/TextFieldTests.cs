@@ -1093,5 +1093,27 @@ namespace Terminal.Gui.Views {
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("to jump between text ", tf.Text);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Adjust_First ()
+		{
+			TextField tf = new TextField ();
+			tf.Width = Dim.Fill ();
+			tf.Text = "This is a test.";
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("This is a test. ", GetContents ());
+
+			string GetContents ()
+			{
+				var item = "";
+				for (int i = 0; i < 16; i++) {
+					item += (char)Application.Driver.Contents [0, i, 0];
+				}
+				return item;
+			}
+		}
 	}
 }

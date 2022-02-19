@@ -18,7 +18,7 @@ namespace Terminal.Gui.Views {
 			lv = new ListView (new List<string> () { "One", "Two", "Three" });
 			Assert.NotNull (lv.Source);
 
-			lv = new ListView (new NewListDataSource());
+			lv = new ListView (new NewListDataSource ());
 			Assert.NotNull (lv.Source);
 
 			lv = new ListView (new Rect (0, 1, 10, 20), new List<string> () { "One", "Two", "Three" });
@@ -95,11 +95,40 @@ namespace Terminal.Gui.Views {
 			lv.RowRender += _ => rendered = true;
 			Application.Top.Add (lv);
 			Application.Begin (Application.Top);
-			Assert.False(rendered);
+			Assert.False (rendered);
 
 			lv.SetSource (source);
 			lv.Redraw (lv.Bounds);
-			Assert.True(rendered);
+			Assert.True (rendered);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void EnsuresVisibilitySelectedItem_Top ()
+		{
+			var source = new List<string> () { "First", "Second" };
+			ListView lv = new ListView (source) { Width = Dim.Fill (), Height = 1 };
+			lv.SelectedItem = 1;
+			Application.Top.Add (lv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("Second ", GetContents (0));
+			Assert.Equal (new (' ', 7), GetContents (1));
+
+			lv.MoveUp ();
+			lv.Redraw (lv.Bounds);
+
+			Assert.Equal ("First  ", GetContents (0));
+			Assert.Equal (new (' ', 7), GetContents (1));
+
+			string GetContents (int line)
+			{
+				var item = "";
+				for (int i = 0; i < 7; i++) {
+					item += (char)Application.Driver.Contents [line, i, 0];
+				}
+				return item;
+			}
 		}
 	}
 }

@@ -76,12 +76,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Public constructor
 		/// </summary>
-		public ComboBox () : base ()
+		public ComboBox () : this (string.Empty)
 		{
-			search = new TextField ("");
-			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
-
-			Initialize ();
 		}
 
 		/// <summary>
@@ -244,7 +240,7 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.X == Bounds.Right - 1 && me.Y == Bounds.Top && me.Flags == MouseFlags.Button1Pressed
-			&& autoHide) {
+				&& autoHide) {
 
 				if (isShow) {
 					isShow = false;
@@ -372,16 +368,22 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool MoveEnd ()
+		bool? MoveEnd ()
 		{
+			if (!isShow && search.HasFocus) {
+				return null;
+			}
 			if (HasItems ()) {
 				listview.MoveEnd ();
 			}
 			return true;
 		}
 
-		bool MoveHome ()
+		bool? MoveHome ()
 		{
+			if (!isShow && search.HasFocus) {
+				return null;
+			}
 			if (HasItems ()) {
 				listview.MoveHome ();
 			}

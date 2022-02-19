@@ -719,7 +719,7 @@ namespace Terminal.Gui {
 			if (selected < top) {
 				top = selected;
 			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
-				top = Math.Max (selected - Frame.Height + 2, 0);
+				top = Math.Max (selected - Frame.Height + 1, 0);
 			}
 		}
 
