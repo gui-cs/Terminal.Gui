@@ -1409,12 +1409,12 @@ namespace Terminal.Gui {
 			}
 
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
-				Clear ();
+				Clear (ViewToScreen (bounds));
 				// Draw any Text
 				if (textFormatter != null) {
 					textFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
 			}
 
