@@ -1613,7 +1613,10 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("123 ", GetContents ());
 
 			lbl.Text = "12";
-			lbl.Redraw (lbl.NeedDisplay);
+
+			if (!lbl.SuperView.NeedDisplay.IsEmpty) {
+				lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
+			}
 
 			Assert.Equal ("12  ", GetContents ());
 

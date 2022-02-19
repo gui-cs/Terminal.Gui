@@ -1409,7 +1409,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
-				Clear (ViewToScreen (bounds));
+				Clear ();
 				// Draw any Text
 				if (textFormatter != null) {
 					textFormatter.NeedsFormat = true;
