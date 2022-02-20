@@ -162,7 +162,9 @@ namespace Terminal.Gui {
 			var idx = timeouts.IndexOfValue (token as Timeout);
 			if (idx == -1)
 				return false;
-			timeouts.RemoveAt (idx);
+			lock (timeouts) {
+				timeouts.RemoveAt (idx);
+			}
 			return true;
 		}
 
@@ -177,8 +179,11 @@ namespace Terminal.Gui {
 				if (k < now) {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);
-				} else
-					timeouts.Add (k, timeout);
+				} else {
+					lock (timeouts) {
+						timeouts.Add (k, timeout);
+					}
+				}
 			}
 		}
 
