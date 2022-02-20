@@ -66,7 +66,12 @@ namespace Terminal.Gui {
 					}
 				};
 
-				var ms = 1000;
+				int ms;
+				if (scenarioClass.Name == "CharacterMap") {
+					ms = 1500;
+				}else {
+					ms = 1000;
+				}
 				var abortCount = 0;
 				Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
 					abortCount++;
