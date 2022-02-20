@@ -186,5 +186,11 @@ namespace UICatalog.Scenarios {
 			}
 			return base.ProcessKey (kb);
 		}
+
+		protected override void Dispose (bool disposing)
+		{
+			DrawContent -= CharMap_DrawContent;
+			base.Dispose (disposing);
+		}
 	}
 }
