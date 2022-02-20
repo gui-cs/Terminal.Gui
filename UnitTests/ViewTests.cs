@@ -1601,5 +1601,33 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (top1, v1.GetTopSuperView ());
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Excess_Text_Is_Erased_When_The_Width_Is_Reduced ()
+		{
+			var lbl = new Label ("123");
+			Application.Top.Add (lbl);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("123 ", GetContents ());
+
+			lbl.Text = "12";
+
+			if (!lbl.SuperView.NeedDisplay.IsEmpty) {
+				lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
+			}
+
+			Assert.Equal ("12  ", GetContents ());
+
+			string GetContents ()
+			{
+				var text = "";
+				for (int i = 0; i < 4; i++) {
+					text += (char)Application.Driver.Contents [0, i, 0];
+				}
+				return text;
+			}
+		}
 	}
 }
