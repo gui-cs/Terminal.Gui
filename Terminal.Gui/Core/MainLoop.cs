@@ -159,10 +159,10 @@ namespace Terminal.Gui {
 		/// This method also returns <c>false</c> if the timeout is not found.
 		public bool RemoveTimeout (object token)
 		{
-			var idx = timeouts.IndexOfValue (token as Timeout);
-			if (idx == -1)
-				return false;
 			lock (timeouts) {
+				var idx = timeouts.IndexOfValue (token as Timeout);
+				if (idx == -1)
+					return false;
 				timeouts.RemoveAt (idx);
 			}
 			return true;
