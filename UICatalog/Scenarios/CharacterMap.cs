@@ -140,7 +140,6 @@ namespace UICatalog.Scenarios {
 			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16 + Frame.Height - 1);
 
 			for (int header = 0; header < 16; header++) {
-				int val = (-viewport.Y) * 16;
 				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
