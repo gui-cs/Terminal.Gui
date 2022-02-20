@@ -406,8 +406,9 @@ namespace Terminal.Gui {
 			int offB = OffSetBackground ();
 			if (point < first) {
 				first = point;
-			} else if (first + point - (Frame.Width + offB) == 0 ||
-				  TextModel.DisplaySize (text, first, point).size >= Frame.Width + offB) {
+			} else if (Frame.Width > 0 && (first + point - (Frame.Width + offB) == 0 ||
+				  TextModel.DisplaySize (text, first, point).size >= Frame.Width + offB)) {
+
 				first = Math.Max (TextModel.CalculateLeftColumn (text, first,
 					point, Frame.Width + offB), 0);
 			}

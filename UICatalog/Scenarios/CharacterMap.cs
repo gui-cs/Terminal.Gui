@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 		public const int H_SPACE = 2;
 		public const int V_SPACE = 2;
 
-		public static int MaxCodePointVal => 0xE0FFF;
+		public static int MaxCodePointVal => 0x10FFFF;
 
 		// Row Header + space + (space + char + space)
 		public static int RowHeaderWidth => $"U+{MaxCodePointVal:x5}".Length;
@@ -145,6 +145,9 @@ namespace UICatalog.Scenarios {
 			}
 			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y+= V_SPACE) {
 				int val = (-viewport.Y + row) * 16;
+				if (val >= 0x00D800 && val <= 0x00DFFF) {
+					continue;
+				}
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
 					Move (0, y + 1);
@@ -182,6 +185,12 @@ namespace UICatalog.Scenarios {
 				return true;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			DrawContent -= CharMap_DrawContent;
+			base.Dispose (disposing);
 		}
 	}
 }
