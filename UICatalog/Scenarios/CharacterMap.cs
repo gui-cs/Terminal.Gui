@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 		public const int H_SPACE = 2;
 		public const int V_SPACE = 2;
 
-		public static int MaxCodePointVal => 0xE0FFF;
+		public static int MaxCodePointVal => 0x10FFFF;
 
 		// Row Header + space + (space + char + space)
 		public static int RowHeaderWidth => $"U+{MaxCodePointVal:x5}".Length;
@@ -140,11 +140,15 @@ namespace UICatalog.Scenarios {
 			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16 + Frame.Height - 1);
 
 			for (int header = 0; header < 16; header++) {
+				int val = (-viewport.Y) * 16;
 				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
 			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y+= V_SPACE) {
 				int val = (-viewport.Y + row) * 16;
+				if (val >= 0x00D800 && val <= 0x00DFFF) {
+					continue;
+				}
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
 					Move (0, y + 1);
