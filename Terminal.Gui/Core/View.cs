@@ -356,18 +356,16 @@ namespace Terminal.Gui {
 					}
 					TabStop = value;
 
-					if (!value && Application.Top?.Focused == this) {
-						Application.Top.focused = null;
+					if (!value && SuperView?.Focused == this) {
+						SuperView.focused = null;
 					}
 					if (!value && HasFocus) {
 						SetHasFocus (false, this);
-						EnsureFocus ();
-						if (Focused == null) {
-							if (Application.Top.Focused == null) {
-								Application.Top.FocusNext ();
-							} else {
-								var v = Application.Top.GetMostFocused (Application.Top.Focused);
-								v.SetHasFocus (true, null, true);
+						SuperView?.EnsureFocus ();
+						if (SuperView != null && SuperView?.Focused == null) {
+							SuperView.FocusNext ();
+							if (SuperView.Focused == null) {
+								Application.Current.FocusNext ();
 							}
 							Application.EnsuresTopOnFront ();
 						}
@@ -1688,11 +1686,10 @@ namespace Terminal.Gui {
 		/// <param name="command"></param>
 		public void ClearKeybinding (Command command)
 		{
-			foreach(var kvp in KeyBindings.Where(kvp=>kvp.Value == command).ToArray())
-			{
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);
 			}
-			
+
 		}
 
 		/// <summary>

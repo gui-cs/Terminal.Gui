@@ -1629,5 +1629,50 @@ namespace Terminal.Gui.Views {
 				return text;
 			}
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_Does_Not_Sets_HasFocus_To_True ()
+		{
+			var view = new View () { CanFocus = true };
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+
+			Assert.True (view.CanFocus);
+			Assert.True (view.HasFocus);
+
+			view.CanFocus = false;
+			Assert.False (view.CanFocus);
+			Assert.False (view.HasFocus);
+			Assert.Null (Application.Current.Focused);
+			Assert.Null (Application.Current.MostFocused);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_On_Single_View_Focus_View_On_Another_Toplevel ()
+		{
+			var view1 = new View () { Width = 10, Height = 1, CanFocus = true };
+			var win1 = new Window () { Width = Dim.Percent (50), Height = Dim.Fill () };
+			win1.Add (view1);
+			var view2 = new View () { Width = 20, Height = 2, CanFocus = true };
+			var win2 = new Window () { X = Pos.Right (win1),  Width = Dim.Fill (), Height = Dim.Fill () };
+			win2.Add (view2);
+			Application.Top.Add (win1, win2);
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			view1.CanFocus = false;
+			Assert.False (view1.CanFocus);
+			Assert.False (view1.HasFocus);
+			Assert.Equal (win2, Application.Current.Focused);
+			Assert.Equal (view2, Application.Current.MostFocused);
+		}
 	}
 }
