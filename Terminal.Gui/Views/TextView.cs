@@ -2900,8 +2900,14 @@ namespace Terminal.Gui {
 			if (currentColumn > 0) {
 				var currentLine = GetCurrentLine ();
 				if (currentLine.Count > 0 && currentLine [currentColumn - 1] == '\t') {
+
+					historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+
 					currentLine.RemoveAt (currentColumn - 1);
 					currentColumn--;
+
+					historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+						HistoryText.LineStatus.Replaced);
 				}
 			}
 			DoNeededAction ();
