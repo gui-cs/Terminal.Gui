@@ -99,6 +99,8 @@ namespace Terminal.Gui {
 
 			historyText.ChangeText += HistoryText_ChangeText;
 
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
 			Initialized += TextField_Initialized;
 
 			// Things this view knows how to do
@@ -128,6 +130,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.Copy, () => { Copy (); return true; });
 			AddCommand (Command.Cut, () => { Cut (); return true; });
 			AddCommand (Command.Paste, () => { Paste (); return true; });
+			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
+			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
+			AddCommand (Command.Accept, () => { ShowContextMenu (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
@@ -194,6 +199,14 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
+			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
+			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private void ContextMenu_KeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (obj, ContextMenu.Key);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
@@ -319,6 +332,11 @@ namespace Terminal.Gui {
 		/// <see langword="true"/> if the text has history changes <see langword="false"/> otherwise.
 		/// </summary>
 		public bool HasHistoryChanges => historyText.HasHistoryChanges;
+
+		/// <summary>
+		/// Get or sets the <see cref="ContextMenu"/> for this view.
+		/// </summary>
+		public ContextMenu ContextMenu { get; set; } = new ContextMenu ();
 
 		/// <summary>
 		///   Sets the cursor position.
@@ -854,6 +872,51 @@ namespace Terminal.Gui {
 			return -1;
 		}
 
+		void ShowContextMenu ()
+		{
+			ContextMenu = new ContextMenu (Frame.X + 1, Frame.Y + 1,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("_Select All", "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem ("_Delete All", "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem ("_Copy", "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem ("Cu_t", "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem ("_Paste", "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem ("_Undo", "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem ("_Redo", "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				})
+			);
+			ContextMenu.Show ();
+		}
+
+		/// <summary>
+		/// Selects all text.
+		/// </summary>
+		public void SelectAll ()
+		{
+			if (text.Count == 0) {
+				return;
+			}
+
+			selectedStart = 0;
+			MoveEndExtend ();
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Deletes all text.
+		/// </summary>
+		public void DeleteAll ()
+		{
+			if (text.Count == 0) {
+				return;
+			}
+
+			selectedStart = 0;
+			MoveEndExtend ();
+			DeleteCharLeft ();
+			SetNeedsDisplay ();
+		}
+
 		/// <summary>
 		/// Start position of the selected text.
 		/// </summary>
@@ -893,7 +956,7 @@ namespace Terminal.Gui {
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
 				!ev.Flags.HasFlag (MouseFlags.Button1Released) && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
+				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked) && !ev.Flags.HasFlag (ContextMenu.MouseFlags)) {
 				return false;
 			}
 
@@ -949,6 +1012,8 @@ namespace Terminal.Gui {
 				PositionCursor (0);
 				ClearAllSelection ();
 				PrepareSelection (0, text.Count);
+			} else if (ev.Flags == ContextMenu.MouseFlags) {
+				ShowContextMenu ();
 			}
 
 			SetNeedsDisplay ();

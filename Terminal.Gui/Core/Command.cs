@@ -241,9 +241,14 @@ namespace Terminal.Gui {
 		DeleteCharLeft,
 
 		/// <summary>
-		/// Selects all objects in the control
+		/// Selects all objects in the control.
 		/// </summary>
 		SelectAll,
+
+		/// <summary>
+		/// Deletes all objects in the control.
+		/// </summary>
+		DeleteAll,
 
 		/// <summary>
 		/// Moves the cursor to the start of line.

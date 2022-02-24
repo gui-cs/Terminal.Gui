@@ -1092,6 +1092,10 @@ namespace Terminal.Gui.Views {
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("to jump between text ", tf.Text);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.T | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal ("to jump between text ", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.D | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal ("", tf.Text);
 		}
 
 		[Fact]

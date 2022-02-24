@@ -97,9 +97,9 @@ namespace Terminal.Gui {
 				base.OnCanFocusChanged ();
 			}
 
-			public override bool MouseEvent (MouseEvent mouseEvent)
+			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
-				return instance.MouseEvent (mouseEvent);
+				return instance.OnMouseEvent (mouseEvent);
 			}
 		}
 

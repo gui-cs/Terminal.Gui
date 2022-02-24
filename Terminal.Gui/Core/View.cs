@@ -1689,7 +1689,6 @@ namespace Terminal.Gui {
 			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);
 			}
-
 		}
 
 		/// <summary>
@@ -1720,6 +1719,16 @@ namespace Terminal.Gui {
 		public IEnumerable<Command> GetSupportedCommands ()
 		{
 			return CommandImplementations.Keys;
+		}
+
+		/// <summary>
+		/// Gets the key used by a command.
+		/// </summary>
+		/// <param name="command">The command to search.</param>
+		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
+		public Key GetKeyFromCommand(Command command)
+		{
+			return KeyBindings.First (x => x.Value == command).Key;
 		}
 
 		/// <inheritdoc/>
