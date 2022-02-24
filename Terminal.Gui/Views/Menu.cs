@@ -381,7 +381,7 @@ namespace Terminal.Gui {
 		internal int current;
 		internal View previousSubFocused;
 
-		static Rect MakeFrame (int x, int y, MenuItem [] items)
+		internal static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
 			if (items == null || items.Length == 0) {
 				return new Rect ();
@@ -736,7 +736,7 @@ namespace Terminal.Gui {
 					host.CloseMenu (false, true);
 				}
 				host.Activate (host.selected, pos, subMenu);
-			} else if (host.openSubMenu?.Last ().barItems.IsSubMenuOf (barItems.Children [current]) == false) {
+			} else if (host.openSubMenu?.Count == 0 || host.openSubMenu?.Last ().barItems.IsSubMenuOf (barItems.Children [current]) == false) {
 				host.CloseMenu (false, true);
 			} else {
 				SetNeedsDisplay ();
@@ -889,7 +889,7 @@ namespace Terminal.Gui {
 					IsMenuOpen = true;
 					selected = 0;
 					CanFocus = true;
-					lastFocused = SuperView.MostFocused;
+					lastFocused = SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused;
 					SetFocus ();
 					SetNeedsDisplay ();
 					Application.GrabMouse (this);
@@ -1009,7 +1009,9 @@ namespace Terminal.Gui {
 			set {
 				if (ocm != value) {
 					ocm = value;
-					OnMenuOpened ();
+					if (ocm.current > -1) {
+						OnMenuOpened ();
+					}
 				}
 			}
 		}
@@ -1075,21 +1077,29 @@ namespace Terminal.Gui {
 			int pos = 0;
 			switch (subMenu) {
 			case null:
-				lastFocused = lastFocused ?? SuperView?.MostFocused;
+				lastFocused = lastFocused ?? (SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused);
 				if (openSubMenu != null)
 					CloseMenu (false, true);
 				if (openMenu != null) {
-					SuperView.Remove (openMenu);
+					if (SuperView == null) {
+						Application.Current.Remove (openMenu);
+					} else {
+						SuperView.Remove (openMenu);
+					}
 					openMenu.Dispose ();
 				}
 
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].Title.RuneCount + (Menus [i].Help.RuneCount > 0 ? Menus [i].Help.RuneCount + 2 : 0) + 2;
-				openMenu = new Menu (this, pos, 1, Menus [index]);
+				openMenu = new Menu (this, Frame.X + pos, Frame.Y + 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
 
-				SuperView.Add (openMenu);
+				if (SuperView == null) {
+					Application.Current.Add (openMenu);
+				} else {
+					SuperView.Add (openMenu);
+				}
 				openMenu.SetFocus ();
 				break;
 			default:
@@ -1102,7 +1112,11 @@ namespace Terminal.Gui {
 					openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width, last.Frame.Top + 1 + last.current, subMenu);
 					openCurrentMenu.previousSubFocused = last.previousSubFocused;
 					openSubMenu.Add (openCurrentMenu);
-					SuperView.Add (openCurrentMenu);
+					if (SuperView == null) {
+						Application.Current.Add (openCurrentMenu);
+					} else {
+						SuperView.Add (openCurrentMenu);
+					}
 				}
 				selectedSub = openSubMenu.Count - 1;
 				if (selectedSub > -1 && SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
@@ -1124,7 +1138,7 @@ namespace Terminal.Gui {
 			selected = 0;
 			SetNeedsDisplay ();
 
-			previousFocused = SuperView.Focused;
+			previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 			OpenMenu (selected);
 			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
 				CloseMenu ();
@@ -1140,7 +1154,7 @@ namespace Terminal.Gui {
 			selected = idx;
 			selectedSub = sIdx;
 			if (openMenu == null)
-				previousFocused = SuperView.Focused;
+				previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 
 			OpenMenu (idx, sIdx, subMenu);
 			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
@@ -1213,7 +1227,11 @@ namespace Terminal.Gui {
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null) {
-					SuperView?.Remove (openMenu);
+					if (SuperView == null) {
+						Application.Current.Remove (openMenu);
+					} else {
+						SuperView?.Remove (openMenu);
+					}
 				}
 				SetNeedsDisplay ();
 				if (previousFocused != null && previousFocused is Menu && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
@@ -1265,7 +1283,11 @@ namespace Terminal.Gui {
 				openCurrentMenu.SetFocus ();
 				if (openSubMenu != null) {
 					menu = openSubMenu [i];
-					SuperView.Remove (menu);
+					if (SuperView == null) {
+						Application.Current.Remove (menu);
+					} else {
+						SuperView.Remove (menu);
+					}
 					openSubMenu.Remove (menu);
 					menu.Dispose ();
 				}
@@ -1301,7 +1323,11 @@ namespace Terminal.Gui {
 		{
 			if (openSubMenu != null) {
 				foreach (var item in openSubMenu) {
-					SuperView.Remove (item);
+					if (SuperView == null) {
+						Application.Current.Remove (item);
+					} else {
+						SuperView.Remove (item);
+					}
 					item.Dispose ();
 				}
 			}
@@ -1609,6 +1635,7 @@ namespace Terminal.Gui {
 		}
 
 		internal bool handled;
+		internal bool isContextMenuLoading;
 
 		internal bool HandleGrabView (MouseEvent me, View current)
 		{
@@ -1641,14 +1668,16 @@ namespace Terminal.Gui {
 						v.MouseEvent (nme);
 						return false;
 					}
-				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
-					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked)) {
+				} else if (!isContextMenuLoading && !(me.View is MenuBar || me.View is Menu)
+					&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
+
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
 					return false;
 				} else {
 					handled = false;
+					isContextMenuLoading = false;
 					return false;
 				}
 			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
