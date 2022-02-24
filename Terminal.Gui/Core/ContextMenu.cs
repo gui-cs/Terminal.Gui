@@ -64,10 +64,10 @@ namespace Terminal.Gui {
 			container.Closing += Container_Closing;
 			var frame = container.Frame;
 			var rect = Menu.MakeFrame (position.X, position.Y, MenuItens.Children);
-			if (rect.Right > frame.Right) {
+			if (rect.Right >= frame.Right) {
 				position.X = frame.Right - rect.Width;
 			}
-			if (rect.Bottom > frame.Bottom) {
+			if (rect.Bottom >= frame.Bottom) {
 				position.Y = frame.Bottom - rect.Height - 1;
 			}
 
