@@ -1730,15 +1730,12 @@ namespace Terminal.Gui {
 			}
 
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (args);
+			if (MostFocused?.Enabled == true) {
+				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
@@ -1759,12 +1756,12 @@ namespace Terminal.Gui {
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (args);
+			if (MostFocused?.Enabled == true) {
+				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;

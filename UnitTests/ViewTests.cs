@@ -1727,5 +1727,106 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (win2, Application.Current.Focused);
 			Assert.Equal (view2, Application.Current.MostFocused);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+		{
+			var sbQuiting = false;
+			var tfQuiting = false;
+			var topQuiting = false;
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+			});
+			var tf = new TextField ();
+			tf.KeyPress += Tf_KeyPress;
+
+			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = tfQuiting = true;
+				}
+			}
+
+			var win = new Window ();
+			win.Add (sb, tf);
+			var top = Application.Top;
+			top.KeyPress += Top_KeyPress;
+
+			void Top_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = topQuiting = true;
+				}
+			}
+
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.False (topQuiting);
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (sbQuiting);
+			Assert.True (tfQuiting);
+			Assert.False (topQuiting);
+
+			tf.KeyPress -= Tf_KeyPress;
+			tfQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.True (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.False (topQuiting);
+
+			sb.RemoveItem (0);
+			sbQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.True (topQuiting);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+		{
+			var sbQuiting = false;
+			var tfQuiting = false;
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+			});
+			var tf = new TextField ();
+			tf.KeyPress += Tf_KeyPress;
+
+			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = tfQuiting = true;
+				}
+			}
+
+			var win = new Window ();
+			win.Add (sb, tf);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (sbQuiting);
+			Assert.True (tfQuiting);
+
+			tf.KeyPress -= Tf_KeyPress;
+			tfQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.True (sbQuiting);
+			Assert.False (tfQuiting);
+		}
 	}
 }
