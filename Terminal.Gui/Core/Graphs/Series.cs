@@ -42,7 +42,7 @@ namespace Terminal.Gui.Graphs {
 		/// </summary>
 		public void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
 		{
-			if (Fill.Color.HasValue) {
+			if (Fill.Color != null) {
 				Application.Driver.SetAttribute (Fill.Color.Value);
 			}
 
@@ -173,7 +173,7 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Overrides the <see cref="Bar.Fill"/> with a fixed color
 		/// </summary>
-		public Attribute? OverrideBarColor { get; set; }
+		public Attribute OverrideBarColor { get; set; }
 
 		/// <summary>
 		/// True to draw <see cref="Bar.Text"/> along the axis under the bar.  Defaults
@@ -188,7 +188,7 @@ namespace Terminal.Gui.Graphs {
 		/// <returns></returns>
 		protected virtual GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender)
 		{
-			if (OverrideBarColor.HasValue) {
+			if (OverrideBarColor != null) {
 				graphCellToRender.Color = OverrideBarColor;
 			}
 
@@ -274,7 +274,7 @@ namespace Terminal.Gui.Graphs {
 		{
 			var adjusted = AdjustColor (beingDrawn.Fill);
 
-			if (adjusted.Color.HasValue) {
+			if (adjusted.Color != null) {
 				Application.Driver.SetAttribute (adjusted.Color.Value);
 			}
 

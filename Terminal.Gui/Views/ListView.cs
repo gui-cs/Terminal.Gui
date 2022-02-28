@@ -959,7 +959,7 @@ namespace Terminal.Gui {
 		/// The <see cref="Attribute"/> used by current row or
 		/// null to maintain the current attribute.
 		/// </summary>
-		public Attribute? RowAttribute { get; set; }
+		public Attribute RowAttribute { get; set; }
 
 		/// <summary>
 		/// Initializes with the current row.

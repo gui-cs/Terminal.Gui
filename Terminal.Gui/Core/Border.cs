@@ -440,7 +440,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
-		public Attribute? Effect3DBrush { get; set; }
+		public Attribute Effect3DBrush { get; set; }
 
 		/// <summary>
 		/// Calculate the sum of the <see cref="Padding"/> and the <see cref="BorderThickness"/>

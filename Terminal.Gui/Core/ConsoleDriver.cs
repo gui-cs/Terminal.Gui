@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 	///   scenarios, they encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
-	public struct Attribute {
+	public class Attribute {
 		/// <summary>
 		/// The color attribute value.
 		/// </summary>
@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The integer value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) => c.Value;
+		public static implicit operator int (Attribute c) => c?.Value ?? 0;
 
 		/// <summary>
 		/// Implicitly convert an integer value into an <see cref="Attribute"/>

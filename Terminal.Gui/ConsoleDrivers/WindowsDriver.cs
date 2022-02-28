@@ -60,6 +60,8 @@ namespace Terminal.Gui {
 			ConsoleMode = newConsoleMode;
 		}
 
+		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
+
 		public CharInfo [] OriginalStdOutChars;
 
 		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
