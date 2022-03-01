@@ -90,8 +90,14 @@ namespace Terminal.Gui.Views {
 			clicked = false;
 			Assert.True (btn.ProcessKey (new KeyEvent ((Key)'t', new KeyModifiers ())));
 			Assert.True (clicked);
+			clicked = false;
+			Assert.True (btn.ProcessKey (new KeyEvent (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (clicked);
+			btn.Text = "Te_st";
+			clicked = false;
+			Assert.True (btn.ProcessKey (new KeyEvent (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (clicked);
 		}
-
 
 		[Fact]
 		[AutoInitShutdown]
@@ -162,6 +168,22 @@ namespace Terminal.Gui.Views {
 
 			// with cast
 			Assert.Equal ("heya", ((Button)b).Text);
+		}
+
+		[Fact]
+		public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
+		{
+			var btn = new Button ("Test");
+			Assert.Equal ("Test", btn.Text);
+			Assert.Equal (Key.T, btn.HotKey);
+
+			btn.Text = string.Empty;
+			Assert.Equal ("", btn.Text);
+			Assert.Equal (Key.Null, btn.HotKey);
+
+			btn.Text = "Te_st";
+			Assert.Equal ("Te_st", btn.Text);
+			Assert.Equal (Key.S, btn.HotKey);
 		}
 	}
 }

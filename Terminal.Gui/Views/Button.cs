@@ -135,7 +135,7 @@ namespace Terminal.Gui {
 			set {
 				text = value;
 				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
-				if (hk != Key.Unknown && hotKey != hk) {
+				if (hotKey != hk) {
 					HotKey = hk;
 				}
 				Update ();
@@ -158,13 +158,18 @@ namespace Terminal.Gui {
 		public override Key HotKey {
 			get => hotKey;
 			set {
-				if (value != Key.Null) {
-					if (ContainsKeyBinding (hotKey)) {
-						ReplaceKeyBinding (Key.Space | hotKey, Key.Space | value);
-					} else {
-						AddKeyBinding (Key.Space | value, Command.Accept);
+				if (hotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					if (ContainsKeyBinding (Key.Space | hotKey)) {
+						if (v == Key.Null) {
+							ClearKeybinding (Key.Space | hotKey);
+						} else {
+							ReplaceKeyBinding (Key.Space | hotKey, Key.Space | v);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v, Command.Accept);
 					}
-					hotKey = value;
+					hotKey = v;
 				}
 			}
 		}
