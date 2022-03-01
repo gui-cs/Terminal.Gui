@@ -12,7 +12,6 @@ namespace Terminal.Gui {
 	/// </summary>
 	public sealed class ContextMenu : IDisposable {
 		private static MenuBar menuBar;
-		private Point position;
 		private Key key = Key.F10 | Key.ShiftMask;
 		private MouseFlags mouseFlags = MouseFlags.Button3Clicked;
 		private Toplevel container;
@@ -21,6 +20,17 @@ namespace Terminal.Gui {
 		/// Initialize a context menu with empty menu items.
 		/// </summary>
 		public ContextMenu () : this (0, 0, new MenuBarItem ()) { }
+
+		/// <summary>
+		/// Initialize a context menu with menu items from a host <see cref="View"/>.
+		/// </summary>
+		/// <param name="host">The host view.</param>
+		/// <param name="menuItems">The menu items.</param>
+		public ContextMenu (View host, MenuBarItem menuItems) :
+			this (host.Frame.X + 1, host.Frame.Bottom, menuItems)
+		{
+			Host = host;
+		}
 
 		/// <summary>
 		/// Initialize a context menu with menu items.
@@ -49,6 +59,7 @@ namespace Terminal.Gui {
 			IsShow = false;
 			if (container != null) {
 				container.Closing -= Container_Closing;
+				container.LayoutComplete -= Container_LayoutComplete;
 			}
 		}
 
@@ -62,13 +73,30 @@ namespace Terminal.Gui {
 			}
 			container = Application.Current;
 			container.Closing += Container_Closing;
+			container.LayoutComplete += Container_LayoutComplete;
 			var frame = container.Frame;
+			var position = Position;
+			if (Host != null && position != new Point (Host.Frame.X + 1, Host.Frame.Bottom)) {
+				Position = position = new Point (Host.Frame.X + 1, Host.Frame.Bottom);
+			}
 			var rect = Menu.MakeFrame (position.X, position.Y, MenuItens.Children);
 			if (rect.Right >= frame.Right) {
-				position.X = frame.Right - rect.Width;
+				if (frame.Right - rect.Width >= 0) {
+					position.X = frame.Right - rect.Width;
+				} else {
+					position.X = 0;
+				}
 			}
 			if (rect.Bottom >= frame.Bottom) {
-				position.Y = frame.Bottom - rect.Height - 1;
+				if (frame.Bottom - rect.Height - 1 >= 0) {
+					if (Host == null) {
+						position.Y = frame.Bottom - rect.Height - 1;
+					} else {
+						position.Y = Host.Frame.Y - rect.Height;
+					}
+				} else {
+					position.Y = 0;
+				}
 			}
 
 			menuBar = new MenuBar (new [] { MenuItens }) {
@@ -82,6 +110,13 @@ namespace Terminal.Gui {
 			menuBar.MenuClosing += MenuBar_MenuClosing;
 			IsShow = true;
 			menuBar.OpenMenu ();
+		}
+
+		private void Container_LayoutComplete (View.LayoutEventArgs obj)
+		{
+			if (IsShow) {
+				Show ();
+			}
 		}
 
 		private void Container_Closing (ToplevelClosingEventArgs obj)
@@ -111,10 +146,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or set the menu position.
 		/// </summary>
-		public Point Position {
-			get => position;
-			set => position = value;
-		}
+		public Point Position { get; set; }
 
 		/// <summary>
 		/// Gets or sets the menu items for this context menu.
@@ -149,5 +181,11 @@ namespace Terminal.Gui {
 		/// Gets information whether menu is showing or not.
 		/// </summary>
 		public static bool IsShow { get; private set; }
+
+		/// <summary>
+		/// The host <see cref="View "/> which position will be used,
+		/// otherwise if it's null the container will be used.
+		/// </summary>
+		public View Host { get; set; }
 	}
 }

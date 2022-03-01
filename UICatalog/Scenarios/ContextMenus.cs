@@ -8,16 +8,45 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			var tf = new TextField ("Context Menu") {
+			var text = "Context Menu";
+			var width = 20;
+
+			var tfTopLeft = new TextField (text) {
+				Width = width
+			};
+			Win.Add (tfTopLeft);
+
+			var tfTopRight = new TextField (text) {
+				X = Pos.AnchorEnd (width),
+				Width = width
+			};
+			Win.Add (tfTopRight);
+
+			var tfMiddle = new TextField (text) {
 				X = Pos.Center (),
 				Y = Pos.Center (),
-				Width = 30
+				Width = width
 			};
-			Win.Add (tf);
+			Win.Add (tfMiddle);
+
+			var tfBottomLeft = new TextField (text) {
+				Y = Pos.AnchorEnd (1),
+				Width = width
+			};
+			Win.Add (tfBottomLeft);
+
+			var tfBottomRight = new TextField (text) {
+				X = Pos.AnchorEnd (width),
+				Y = Pos.AnchorEnd (1),
+				Width = width
+			};
+			Win.Add (tfBottomRight);
+
+			Point mousePos = default;
 
 			Win.KeyPress += (e) => {
-				if (e.KeyEvent.Key == contextMenu.Key && !ContextMenu.IsShow) {
-					ShowContextMenu (tf.Frame.X, tf.Frame.Bottom);
+				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask) && !ContextMenu.IsShow) {
+					ShowContextMenu (mousePos.X, mousePos.Y);
 					e.Handled = true;
 				}
 			};
@@ -27,7 +56,10 @@ namespace UICatalog.Scenarios {
 					ShowContextMenu (e.MouseEvent.X, e.MouseEvent.Y);
 					e.Handled = true;
 				}
+				mousePos = new Point (e.MouseEvent.X, e.MouseEvent.Y);
 			};
+
+			Win.WantMousePositionReports = true;
 		}
 
 		private void ShowContextMenu (int x, int y)

@@ -116,6 +116,50 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		public static Point AssertDriverContentsWithPosAre (string expectedLook, ITestOutputHelper output)
+		{
+			var sb = new StringBuilder ();
+			var driver = ((FakeDriver)Application.Driver);
+			var x = -1;
+			var y = -1;
+
+			var contents = driver.Contents;
+
+			for (int r = 0; r < driver.Rows; r++) {
+				for (int c = 0; c < driver.Cols; c++) {
+					var rune = (char)contents [r, c, 0];
+					if (x == -1 && rune != ' ') {
+						x = c;
+						y = r;
+					}
+					sb.Append (rune);
+				}
+				sb.AppendLine ();
+			}
+
+			var actualLook = sb.ToString ();
+
+			if (!string.Equals (expectedLook, actualLook)) {
+
+				// ignore trailing whitespace on each line
+				var trailingWhitespace = new Regex (@"\s+$", RegexOptions.Multiline);
+
+				// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
+				expectedLook = trailingWhitespace.Replace (expectedLook, "").Trim ();
+				actualLook = trailingWhitespace.Replace (actualLook, "").Trim ();
+
+				// standardise line endings for the comparison
+				expectedLook = expectedLook.Replace ("\r\n", "\n");
+				actualLook = actualLook.Replace ("\r\n", "\n");
+
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+
+				Assert.Equal (expectedLook, actualLook);
+			}
+			return new Point (x, y);
+		}
+
 #pragma warning disable xUnit1013 // Public method should be marked as test
 		/// <summary>
 		/// Verifies the console was rendered using the given <paramref name="expectedColors"/> at the given locations.

@@ -234,7 +234,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Show_Ensures_Display_Inside_The_Container ()
+		public void Show_Ensures_Display_Inside_The_Container_But_Preserves_Position ()
 		{
 			var cm = new ContextMenu (80, 25,
 				new MenuBarItem (new MenuItem [] {
@@ -246,10 +246,21 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Point (80, 25), cm.Position);
 
 			cm.Show ();
-			Assert.Equal (new Point (72, 20), cm.Position);
+			Assert.Equal (new Point (80, 25), cm.Position);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+                                                                        ┌──────┐
+                                                                        │ One  │
+                                                                        │ Two  │
+                                                                        └──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (72, 21), pos);
 
 			cm.Hide ();
-			Assert.Equal (new Point (72, 20), cm.Position);
+			Assert.Equal (new Point (80, 25), cm.Position);
 		}
 
 		[Fact, AutoInitShutdown]
