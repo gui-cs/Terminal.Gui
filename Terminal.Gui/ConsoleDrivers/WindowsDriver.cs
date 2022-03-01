@@ -1571,8 +1571,18 @@ namespace Terminal.Gui {
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
+		CursorVisibility savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (ccol < 0 || crow < 0 || ccol > Cols || crow > Rows) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return;
+			}
+
+			SetCursorVisibility (savedCursorVisibility);
 			var position = new WindowsConsole.Coord () {
 				X = (short)ccol,
 				Y = (short)crow

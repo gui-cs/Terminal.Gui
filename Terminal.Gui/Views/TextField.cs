@@ -96,6 +96,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+			savedCursorVisibility = desiredCursorVisibility;
 
 			historyText.ChangeText += HistoryText_ChangeText;
 
@@ -350,7 +351,35 @@ namespace Terminal.Gui {
 				var cols = Rune.ColumnWidth (text [idx]);
 				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
-			Move (col, 0);
+			var pos = point - first + Math.Min (Frame.X, 0);
+			var offB = OffSetBackground ();
+			if (pos > -1 && col >= pos && pos < Frame.Width + offB) {
+				RestoreCursorVisibility ();
+				Move (col, 0);
+			} else {
+				HideCursorVisibility ();
+				if (pos < 0) {
+					Move (pos, 0, false);
+				} else {
+					Move (pos - offB, 0, false);
+				}
+			}
+		}
+
+		CursorVisibility savedCursorVisibility;
+
+		void HideCursorVisibility ()
+		{
+			if (desiredCursorVisibility != CursorVisibility.Invisible) {
+				DesiredCursorVisibility = CursorVisibility.Invisible;
+			}
+		}
+
+		void RestoreCursorVisibility ()
+		{
+			if (desiredCursorVisibility != savedCursorVisibility) {
+				DesiredCursorVisibility = savedCursorVisibility;
+			}
 		}
 
 		///<inheritdoc/>
@@ -874,7 +903,7 @@ namespace Terminal.Gui {
 
 		void ShowContextMenu ()
 		{
-			ContextMenu = new ContextMenu (Frame.X + 1, Frame.Y + 1,
+			ContextMenu = new ContextMenu (this,
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("_Select All", "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
 					new MenuItem ("_Delete All", "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
@@ -962,6 +991,10 @@ namespace Terminal.Gui {
 
 			if (!CanFocus) {
 				return true;
+			}
+
+			if (!HasFocus && ev.Flags != MouseFlags.ReportMousePosition) {
+				SetFocus ();
 			}
 
 			// Give autocomplete first opportunity to respond to mouse clicks
