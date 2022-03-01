@@ -58,19 +58,83 @@ namespace Terminal.Gui {
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 			newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
 			ConsoleMode = newConsoleMode;
+
+			uint newOutputConsoleMode = OutputConsoleMode;
+			newOutputConsoleMode |= (uint)(OutputConsoleModes.EnableProcessedOutput | OutputConsoleModes.EnableVirtualTerminalProcessing | OutputConsoleModes.DisableNewLineAutoReturn);
+			newOutputConsoleMode &= ~(uint)(OutputConsoleModes.EnableWrapAtEolOutput);
+			OutputConsoleMode = newOutputConsoleMode;
 		}
 
 		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
 
-		public CharInfo [] OriginalStdOutChars;
-
-		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
 			}
 
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			if (!SupportTrueColor) {
+				var ci = charInfoBuffer.Select (info =>
+					new CharInfo () {
+						Char = new CharUnion () { UnicodeChar = info.Char },
+						Attributes = (ushort)(int)info.Attribute
+					}).ToArray ();
+				return WriteConsoleOutput (ScreenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			}
+
+			return WriteConsoleTrueColor (charInfoBuffer);
+		}
+
+		readonly System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder (256*1024);
+		readonly char [] SafeCursor = new [] { '\x1b', '7', '\x1b', '[', '0', ';', '0', 'H' };
+		readonly char [] RestoreCursor = new [] { '\x1b', '8' };
+		readonly char [] SendTrueColorFg = new [] { '\x1b', '[', '3', '8', ';', '2', ';' };
+		readonly char [] SendTrueColorBg = new [] { ';', '4', '8', ';', '2', ';' };
+		readonly char [] SendColorFg = new [] { '\x1b', '[', '3', '8', ';', '5', ';' };
+		readonly char [] SendColorBg = new [] { ';', '4', '8', ';', '5', ';' };
+
+		private bool WriteConsoleTrueColor(ExtendedCharInfo [] charInfoBuffer)
+		{
+			stringBuilder.Clear ();
+
+			stringBuilder.Append (SafeCursor);
+
+			Attribute prev = null;
+			foreach (var info in charInfoBuffer) {
+				var attr = info.Attribute;
+
+				if (attr != prev) {
+					prev = attr;
+					if (attr is TrueColorAttribute tca) {
+						stringBuilder.Append (SendTrueColorFg);
+						stringBuilder.Append (tca.TureColorForeground.R);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TureColorForeground.G);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TureColorForeground.B);
+						stringBuilder.Append (SendTrueColorBg);
+						stringBuilder.Append (tca.TrueColorBackground.R);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorBackground.G);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorBackground.B);
+						stringBuilder.Append ('m');
+					} else {
+						stringBuilder.Append (SendColorFg);
+						stringBuilder.Append (TrueColor.Code4ToCode8 ((int)attr % 16));
+						stringBuilder.Append (SendColorBg);
+						stringBuilder.Append (TrueColor.Code4ToCode8 ((int)attr / 16));
+						stringBuilder.Append ('m');
+					}
+				}
+
+				stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
+			}
+
+			stringBuilder.Append (RestoreCursor);
+
+			string s = stringBuilder.ToString ();
+			return WriteConsole (ScreenBuffer, s, (uint)(s.Length), out uint _, null);
 		}
 
 		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -94,12 +158,6 @@ namespace Terminal.Gui {
 			}
 
 			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-			}
-
-			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
-
-			if (!ReadConsoleOutput (ScreenBuffer, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
@@ -304,12 +362,31 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public uint OutputConsoleMode {
+			get {
+				GetConsoleMode (OutputHandle, out uint v);
+				return v;
+			}
+			set {
+				SetConsoleMode (OutputHandle, value);
+			}
+		}
+
 		[Flags]
 		public enum ConsoleModes : uint {
 			EnableProcessedInput = 1,
+			EnableWindowInput = 8,
 			EnableMouseInput = 16,
 			EnableQuickEditMode = 64,
 			EnableExtendedFlags = 128,
+		}
+
+		[Flags]
+		public enum OutputConsoleModes : uint {
+			EnableProcessedOutput = 1,
+			EnableWrapAtEolOutput = 2,
+			EnableVirtualTerminalProcessing = 4,
+			DisableNewLineAutoReturn = 8,
 		}
 
 		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
@@ -484,6 +561,11 @@ namespace Terminal.Gui {
 			[FieldOffset (2)] public ushort Attributes;
 		}
 
+		public struct ExtendedCharInfo {
+			public char Char { get; set; }
+			public Attribute Attribute { get; set; }
+		}
+
 		[StructLayout (LayoutKind.Sequential)]
 		public struct SmallRect {
 			public short Left;
@@ -574,6 +656,15 @@ namespace Terminal.Gui {
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpWriteRegion
+		);
+
+		[DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool WriteConsole (
+			IntPtr hConsoleOutput,
+			String lpbufer,
+			UInt32 NumberOfCharsToWriten,
+			out UInt32 lpNumberOfCharsWritten,
+			object lpReserved
 		);
 
 		[DllImport ("kernel32.dll")]
@@ -721,8 +812,9 @@ namespace Terminal.Gui {
 	}
 
 	internal class WindowsDriver : ConsoleDriver {
+
 		static bool sync = false;
-		WindowsConsole.CharInfo [] OutputBuffer;
+		WindowsConsole.ExtendedCharInfo [] OutputBuffer;
 		int cols, rows, left, top;
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
@@ -1436,7 +1528,7 @@ namespace Terminal.Gui {
 
 		void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			OutputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 			Clip = new Rect (0, 0, Cols, Rows);
 			damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
@@ -1453,10 +1545,10 @@ namespace Terminal.Gui {
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
-					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
-					OutputBuffer [position].Char.UnicodeChar = ' ';
-					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
-					contents [row, col, 1] = OutputBuffer [position].Attributes;
+					OutputBuffer [position].Attribute = Colors.TopLevel.Normal;
+					OutputBuffer [position].Char = ' ';
+					contents [row, col, 0] = OutputBuffer [position].Char;
+					contents [row, col, 1] = OutputBuffer [position].Attribute;
 					contents [row, col, 2] = 0;
 				}
 			}
@@ -1475,8 +1567,8 @@ namespace Terminal.Gui {
 			var position = crow * Cols + ccol;
 
 			if (Clip.Contains (ccol, crow)) {
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				OutputBuffer [position].Char.UnicodeChar = (char)rune;
+				OutputBuffer [position].Attribute = currentAttribute;
+				OutputBuffer [position].Char = (char)rune;
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;

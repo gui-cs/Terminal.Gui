@@ -83,6 +83,117 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// 24bit color. Support translate it to 4bit(Windows) and 8bit(Linux) color
+	/// </summary>
+	public struct TrueColor {
+		public int R { get; private set; }
+		public int G { get; private set; }
+		public int B { get; private set; }
+		public TrueColor (int r, int g, int b)
+		{
+			R = r;
+			G = g;
+			B = b;
+		}
+
+		/// <summary>
+		/// Get color by code in 256 colors palette
+		/// </summary>
+		public static TrueColor Color8 (int code)
+		{
+			if (code == 7)
+				code = 8;
+			else if (code == 8)
+				code = 7;
+			if (code == 8)
+				return new TrueColor (192, 192, 192);
+			if (code <= 15) {
+				int k = 128;
+				if (code >= 9)
+					k = 255;
+				return new TrueColor (code % 2 * k, code / 2 % 2 * k, code / 4 % 2 * k);
+			}
+			if (code <= 231) {
+				code -= 16;
+				int b = code % 6 * 40;
+				if (b > 0)
+					b += 45;
+				int g = code / 6 % 6 * 40;
+				if (g > 0)
+					g += 45;
+				int r = code / 36 % 6 * 40;
+				if (r > 0)
+					r += 45;
+				return new TrueColor (r, g, b);
+			}
+			{
+				code -= 231;
+				return new TrueColor (8 + code * 10, 8 + code * 10, 8 + code * 10);
+			}
+		}
+
+		/// <summary>
+		/// Get color by 16 colors palette
+		/// </summary>
+		public static TrueColor Color4 (int code)
+		{
+			if (code == 7)
+				code = 8;
+			else if (code == 8)
+				code = 7;
+			if (code == 8)
+				return new TrueColor (192, 192, 192);
+			int k = 128;
+			if (code >= 9)
+				k = 255;
+			return new TrueColor (code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
+		}
+
+		/// <summary>
+		/// Return color diff
+		/// </summary>
+		public static int Diff (TrueColor c1, TrueColor c2)
+		{
+			//TODO: upgrade to CIEDE2000
+			return (c1.R - c2.R) * (c1.R - c2.R) + (c1.G - c2.G) * (c1.G - c2.G) + (c1.B - c2.B) * (c1.B - c2.B);
+		}
+
+		/// <summary>
+		/// Get color code in 256 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode8 (TrueColor c)
+		{
+			int ans = 0;
+			for (int i = 1; i < 255; i++)
+				if (Diff (Color8 (i), c) < Diff (Color8 (ans), c))
+					ans = i;
+			return ans;
+		}
+
+		/// <summary>
+		/// Get color code in 16 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode4 (TrueColor c)
+		{
+			int ans = 0;
+			for (int i = 1; i < 16; i++)
+				if (Diff (Color4 (i), c) < Diff (Color4 (ans), c))
+					ans = i;
+			return ans;
+		}
+
+		/// <summary>
+		/// Convert code in 16 colors palette to 256 colors palette
+		/// </summary>
+		public static int Code4ToCode8 (int code)
+		{
+			if (code == 0 || code == 7 || code == 8 || code == 15)
+				return code;
+			return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
+		}
+	}
+
+	/// <summary>
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
@@ -98,11 +209,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		public Color Foreground { get; }
+		public virtual Color Foreground { get; }
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		public Color Background { get; }
+		public virtual Color Background { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
@@ -191,6 +302,29 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.GetAttribute ();
 		}
+	}
+
+	/// <summary>
+	/// Defines a true color attribute.
+	/// </summary>
+	public class TrueColorAttribute : Attribute {
+		/// <summary>
+		/// The foreground color.
+		/// </summary>
+		public override Color Foreground => (Color)TrueColor.GetCode4 (TureColorForeground);
+		/// <summary>
+		/// The background color.
+		/// </summary>
+		public override Color Background => (Color)TrueColor.GetCode4 (TrueColorBackground);
+
+		/// <summary>
+		/// The foreground color.
+		/// </summary>
+		public TrueColor TureColorForeground { get; set; }
+		/// <summary>
+		/// The background color.
+		/// </summary>
+		public TrueColor TrueColorBackground { get; set; }
 	}
 
 	/// <summary>
