@@ -33,6 +33,7 @@ namespace Terminal.Gui {
 	public class Button : View {
 		ustring text;
 		bool is_default;
+		TextFormatter textFormatter = new TextFormatter ();
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -96,6 +97,8 @@ namespace Terminal.Gui {
 		Rune _rightBracket;
 		Rune _leftDefault;
 		Rune _rightDefault;
+		private Key hotKey = Key.Null;
+		private Rune hotKeySpecifier;
 
 		void Initialize (ustring text, bool is_default)
 		{
@@ -113,8 +116,6 @@ namespace Terminal.Gui {
 			this.text = text ?? string.Empty;
 			Update ();
 
-			HotKeyChanged += Button_HotKeyChanged;
-
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
 
@@ -126,27 +127,17 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Button_HotKeyChanged (Key obj)
-		{
-			if (HotKey != Key.Null) {
-				if (ContainsKeyBinding (obj)) {
-					ReplaceKeyBinding (Key.Space | obj, Key.Space | HotKey);
-				} else {
-					AddKeyBinding (Key.Space | HotKey, Command.Accept);
-				}
-			}
-		}
-
-		/// <summary>
-		///   The text displayed by this <see cref="Button"/>.
-		/// </summary>
-		public new ustring Text {
+		/// <inheritdoc/>>
+		public override ustring Text {
 			get {
 				return text;
 			}
-
 			set {
 				text = value;
+				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
+				if (hk != Key.Unknown && hotKey != hk) {
+					HotKey = hk;
+				}
 				Update ();
 			}
 		}
@@ -163,14 +154,46 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => hotKey;
+			set {
+				if (value != Key.Null) {
+					if (ContainsKeyBinding (hotKey)) {
+						ReplaceKeyBinding (Key.Space | hotKey, Key.Space | value);
+					} else {
+						AddKeyBinding (Key.Space | value, Command.Accept);
+					}
+					hotKey = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Rune HotKeySpecifier {
+			get => hotKeySpecifier;
+			set {
+				hotKeySpecifier = textFormatter.HotKeySpecifier = value;
+			}
+		}
+
+		/// <inheritdoc/>
+		public override bool AutoSize {
+			get => base.AutoSize;
+			set {
+				base.AutoSize = value;
+				Update ();
+			}
+		}
+
 		internal void Update ()
 		{
 			if (IsDefault)
-				base.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				textFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
+				textFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			int w = textFormatter.Text.RuneCount - (textFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
 			GetCurrentWidth (out int cWidth);
 			var canSetWidth = SetWidth (w, out int rWidth);
 			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
@@ -192,6 +215,25 @@ namespace Terminal.Gui {
 			}
 			Frame = new Rect (Frame.Location, new Size (w, 1));
 			SetNeedsDisplay ();
+		}
+
+		/// <inheritdoc/>
+		public override void Redraw (Rect bounds)
+		{
+			if (ColorScheme != null) {
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
+
+			if (Border != null) {
+				Border.DrawContent (this);
+			}
+
+			if (!ustring.IsNullOrEmpty (textFormatter.Text)) {
+				Clear ();
+				textFormatter.NeedsFormat = true;
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
+			}
 		}
 
 		///<inheritdoc/>
@@ -294,8 +336,8 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (HotKey == Key.Unknown && text != "") {
-				for (int i = 0; i < base.Text.RuneCount; i++) {
-					if (base.Text [i] == text [0]) {
+				for (int i = 0; i < textFormatter.Text.RuneCount; i++) {
+					if (textFormatter.Text [i] == text [0]) {
 						Move (i, 0);
 						return;
 					}

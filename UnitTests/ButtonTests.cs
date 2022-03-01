@@ -7,12 +7,14 @@ using Xunit;
 
 namespace Terminal.Gui.Views {
 	public class ButtonTests {
-		[Fact]
+		[Fact, AutoInitShutdown]
 		public void Constructors_Defaults ()
 		{
 			var btn = new Button ();
 			Assert.Equal (string.Empty, btn.Text);
-			Assert.Equal ("[  ]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
+			Application.Top.Add (btn);
+			btn.Redraw (btn.Bounds);
+			Assert.Equal ("[  ]", GetContents (btn.Bounds.Width));
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
@@ -22,23 +24,36 @@ namespace Terminal.Gui.Views {
 
 			btn = new Button ("Test", true);
 			Assert.Equal ("Test", btn.Text);
-			Assert.Equal ("[< Test >]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
+			Application.Top.Add (btn);
+			btn.Redraw (btn.Bounds);
+			Assert.Equal ("[◦ Test ◦]", GetContents (btn.Bounds.Width));
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
-			Assert.Equal (Key.Null, btn.HotKey);
+			Assert.Equal (Key.T, btn.HotKey);
 
 			btn = new Button (3, 4, "Test", true);
 			Assert.Equal ("Test", btn.Text);
-			Assert.Equal ("[< Test >]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
+			Application.Top.Add (btn);
+			btn.Redraw (btn.Bounds);
+			Assert.Equal ("[◦ Test ◦]", GetContents (btn.Bounds.Width));
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
-			Assert.Equal (Key.Null, btn.HotKey);
+			Assert.Equal (Key.T, btn.HotKey);
+		}
+
+		private string GetContents (int width)
+		{
+			string output = "";
+			for (int i = 0; i < width; i++) {
+				output += (char)Application.Driver.Contents [0, i, 0];
+			}
+			return output;
 		}
 
 		[Fact]
@@ -114,18 +129,18 @@ namespace Terminal.Gui.Views {
 			btn.Clicked += () => pressed++;
 
 			// The Button class supports the Accept command
-			Assert.Contains(Command.Accept,btn.GetSupportedCommands ());
+			Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
 			// default keybinding is Enter which results in keypress
-			Application.Driver.SendKeys ('\n',ConsoleKey.Enter,false,false,false);
+			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Enter)
 			btn.ClearKeybinding (Command.Accept);
-			
+
 			// After clearing the default keystroke the Enter button no longer does anything for the Button
 			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
 			Assert.Equal (1, pressed);
@@ -136,6 +151,17 @@ namespace Terminal.Gui.Views {
 			// now pressing B should call the button click event
 			Application.Driver.SendKeys ('b', ConsoleKey.B, false, false, false);
 			Assert.Equal (2, pressed);
+		}
+
+		[Fact]
+		public void TestAssignTextToButton ()
+		{
+			View b = new Button ();
+			b.Text = "heya";
+			Assert.Equal ("heya", b.Text);
+
+			// with cast
+			Assert.Equal ("heya", ((Button)b).Text);
 		}
 	}
 }
