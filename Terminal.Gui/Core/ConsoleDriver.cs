@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 	///   scenarios, they encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
-	public class Attribute {
+	public class Attribute : IEquatable<Attribute> {
 		/// <summary>
 		/// The color attribute value.
 		/// </summary>
@@ -236,7 +236,7 @@ namespace Terminal.Gui {
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value)
+		public Attribute (int value = 0)
 		{
 			Color foreground = default;
 			Color background = default;
@@ -267,7 +267,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (Color foreground = new Color (), Color background = new Color ())
+		public Attribute (Color foreground, Color background)
 		{
 			Value = Make (foreground, background).Value;
 			Foreground = foreground;
@@ -317,6 +317,12 @@ namespace Terminal.Gui {
 			if (Application.Driver == null)
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.GetAttribute ();
+		}
+
+		/// <inheritdoc/>
+		public bool Equals (Attribute other)
+		{
+			return (Value == other.Value) && (Foreground == other.Foreground) && (Background == other.Background);
 		}
 	}
 
@@ -396,18 +402,18 @@ namespace Terminal.Gui {
 			case "TopLevel":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -415,19 +421,19 @@ namespace Terminal.Gui {
 			case "Base":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -435,31 +441,31 @@ namespace Terminal.Gui {
 			case "Menu":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				case "Disabled":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -467,24 +473,24 @@ namespace Terminal.Gui {
 			case "Dialog":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					if (Normal.Foreground != attribute.Background)
-						Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					if (Normal?.Foreground != attribute.Background)
+						Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -492,13 +498,13 @@ namespace Terminal.Gui {
 			case "Error":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
 				case "HotFocus":
 					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
