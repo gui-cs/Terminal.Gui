@@ -503,14 +503,17 @@ namespace Terminal.Gui {
 
 				// The help string
 				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
-				Move (Frame.Width - l - 2, 1 + i);
-				Driver.AddStr (item.Help);
+				var col = Frame.Width - l - 2;
+				if (col < Driver.Cols) {
+					Move (col, 1 + i);
+					Driver.AddStr (item.Help);
 
-				// The shortcut tag string
-				if (!item.ShortcutTag.IsEmpty) {
-					l = item.ShortcutTag.RuneCount;
-					Move (Frame.Width - l - 2, 1 + i);
-					Driver.AddStr (item.ShortcutTag);
+					// The shortcut tag string
+					if (!item.ShortcutTag.IsEmpty) {
+						l = item.ShortcutTag.RuneCount;
+						Move (Frame.Width - l - 2, 1 + i);
+						Driver.AddStr (item.ShortcutTag);
+					}
 				}
 			}
 			PositionCursor ();
