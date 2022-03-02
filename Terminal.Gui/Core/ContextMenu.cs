@@ -15,6 +15,7 @@ namespace Terminal.Gui {
 		private Key key = Key.F10 | Key.ShiftMask;
 		private MouseFlags mouseFlags = MouseFlags.Button3Clicked;
 		private Toplevel container;
+		private Size lastContainerSize;
 
 		/// <summary>
 		/// Initialize a context menu with empty menu items.
@@ -72,6 +73,7 @@ namespace Terminal.Gui {
 				Hide ();
 			}
 			container = Application.Current;
+			lastContainerSize = container.Bounds.Size;
 			container.Closing += Container_Closing;
 			container.LayoutComplete += Container_LayoutComplete;
 			var frame = container.Frame;
@@ -114,7 +116,7 @@ namespace Terminal.Gui {
 
 		private void Container_LayoutComplete (View.LayoutEventArgs obj)
 		{
-			if (IsShow) {
+			if (IsShow && lastContainerSize != Application.Current.Bounds.Size) {
 				Show ();
 			}
 		}
