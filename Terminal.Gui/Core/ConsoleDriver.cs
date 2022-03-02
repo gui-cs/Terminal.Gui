@@ -281,6 +281,12 @@ namespace Terminal.Gui {
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
 
+		/// <inheritdoc/>
+		public bool Equals (Attribute other)
+		{
+			return (Value == other.Value) && (Foreground == other.Foreground) && (Background == other.Background);
+		}
+
 		/// <summary>
 		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
 		/// </summary>
@@ -319,11 +325,10 @@ namespace Terminal.Gui {
 			return Application.Driver.GetAttribute ();
 		}
 
-		/// <inheritdoc/>
-		public bool Equals (Attribute other)
-		{
-			return (Value == other.Value) && (Foreground == other.Foreground) && (Background == other.Background);
-		}
+		/// <summary>
+		/// Default empty attribute.
+		/// </summary>
+		public static readonly Attribute Default = new Attribute ();
 	}
 
 	/// <summary>
@@ -355,11 +360,11 @@ namespace Terminal.Gui {
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal;
-		Attribute _focus;
-		Attribute _hotNormal;
-		Attribute _hotFocus;
-		Attribute _disabled;
+		Attribute _normal = Attribute.Default;
+		Attribute _focus = Attribute.Default;
+		Attribute _hotNormal = Attribute.Default;
+		Attribute _hotFocus = Attribute.Default;
+		Attribute _disabled = Attribute.Default;
 		internal string caller = "";
 
 		/// <summary>
