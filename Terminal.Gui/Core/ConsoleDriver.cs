@@ -818,6 +818,23 @@ namespace Terminal.Gui {
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		internal abstract int [,,] Contents { get; }
 
+
+		/// <summary>
+		/// Determinates if the current console driver supports TrueColor output-
+		/// </summary>
+		public virtual bool SupportsTrueColorOutput { get => false; }
+
+		bool useTrueColor;
+
+		/// <summary>
+		/// Controls the TureColor output mode. Can be only enabled if the underlying ConsoleDriver supports it.
+		/// Note this will be enabled automaticaly if supported. See also <see cref="SupportsTrueColorOutput"/>
+		/// </summary>
+		public bool UseTrueColor {
+			get => useTrueColor;
+			set => this.useTrueColor = value && SupportsTrueColorOutput;
+		}
+
 		/// <summary>
 		/// Initializes the driver
 		/// </summary>

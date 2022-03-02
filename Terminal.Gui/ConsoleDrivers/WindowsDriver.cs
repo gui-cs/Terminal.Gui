@@ -67,13 +67,13 @@ namespace Terminal.Gui {
 
 		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
 
-		public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool forceUseBasicColor)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
 			}
 
-			if (!SupportTrueColor) {
+			if (!SupportTrueColor || forceUseBasicColor) {
 				var i = 0;
 				var ci = new CharInfo [charInfoBuffer.Length];
 				foreach (var info in charInfoBuffer) {
@@ -833,6 +833,8 @@ namespace Terminal.Gui {
 		public override IClipboard Clipboard => clipboard;
 		internal override int [,,] Contents => contents;
 
+		public override bool SupportsTrueColorOutput => WinConsole.SupportTrueColor;
+
 		public WindowsConsole WinConsole { get; private set; }
 
 		Action<KeyEvent> keyHandler;
@@ -844,6 +846,7 @@ namespace Terminal.Gui {
 		{
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
+			UseTrueColor = true;
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1665,7 +1668,7 @@ namespace Terminal.Gui {
 			//};
 
 			UpdateCursor ();
-			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion, !UseTrueColor);
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}

@@ -18,6 +18,8 @@ namespace Terminal.Gui {
 		IntPtr InputHandle, OutputHandle, ErrorHandle;
 		uint originalInputConsoleMode, originalOutputConsoleMode, originalErrorConsoleMode;
 
+		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
+
 		public NetWinVTConsole ()
 		{
 			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
@@ -1187,6 +1189,9 @@ namespace Terminal.Gui {
 		public override IClipboard Clipboard { get; }
 		internal override int [,,] Contents => contents;
 
+		readonly bool supportsTrueColorOutput;
+		public override bool SupportsTrueColorOutput => supportsTrueColorOutput;
+
 		int largestWindowHeight;
 
 		public NetDriver ()
@@ -1195,6 +1200,7 @@ namespace Terminal.Gui {
 			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
+				supportsTrueColorOutput = NetWinConsole.SupportTrueColor;
 			}
 			//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 			largestWindowHeight = Console.BufferHeight;
@@ -1209,6 +1215,7 @@ namespace Terminal.Gui {
 					Clipboard = new CursesClipboard ();
 				}
 			}
+			UseTrueColor = true;
 		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
