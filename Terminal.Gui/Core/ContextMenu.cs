@@ -56,6 +56,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public void Dispose ()
 		{
+			menuBar.MenuClosing -= MenuBar_MenuClosing;
 			menuBar.Dispose ();
 			IsShow = false;
 			if (container != null) {
