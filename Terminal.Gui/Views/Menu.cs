@@ -455,7 +455,7 @@ namespace Terminal.Gui {
 				if (item == null) {
 					Move (0, i + 1);
 					Driver.AddRune (Driver.LeftTee);
-				} else
+				} else if (Frame.X + 1 < Driver.Cols)
 					Move (1, i + 1);
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
@@ -493,26 +493,30 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
-				Move (2, i + 1);
-				if (!item.IsEnabled ())
-					DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
-				else
-					DrawHotString (textToDraw,
-					       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-					       i == current ? ColorScheme.Focus : GetNormalColor ());
+				ViewToScreen (2, i + 1, out int vtsCol, out _, false);
+				if (vtsCol < Driver.Cols) {
+					Move (2, i + 1);
+					if (!item.IsEnabled ())
+						DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
+					else
+						DrawHotString (textToDraw,
+						       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+						       i == current ? ColorScheme.Focus : GetNormalColor ());
 
-				// The help string
-				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
-				var col = Frame.Width - l - 2;
-				if (col < Driver.Cols) {
-					Move (col, 1 + i);
-					Driver.AddStr (item.Help);
+					// The help string
+					var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
+					var col = Frame.Width - l - 2;
+					ViewToScreen (col, i + 1, out vtsCol, out _, false);
+					if (vtsCol < Driver.Cols) {
+						Move (col, 1 + i);
+						Driver.AddStr (item.Help);
 
-					// The shortcut tag string
-					if (!item.ShortcutTag.IsEmpty) {
-						l = item.ShortcutTag.RuneCount;
-						Move (Frame.Width - l - 2, 1 + i);
-						Driver.AddStr (item.ShortcutTag);
+						// The shortcut tag string
+						if (!item.ShortcutTag.IsEmpty) {
+							l = item.ShortcutTag.RuneCount;
+							Move (Frame.Width - l - 2, 1 + i);
+							Driver.AddStr (item.ShortcutTag);
+						}
 					}
 				}
 			}
