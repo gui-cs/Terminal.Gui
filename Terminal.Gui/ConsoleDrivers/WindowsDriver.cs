@@ -1565,8 +1565,8 @@ namespace Terminal.Gui {
 			//	Bottom = (short)Clip.Bottom
 			//};
 
-			UpdateCursor ();
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+			UpdateCursor ();
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
