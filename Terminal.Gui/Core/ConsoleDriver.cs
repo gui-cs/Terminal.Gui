@@ -86,14 +86,30 @@ namespace Terminal.Gui {
 	/// 24bit color. Support translate it to 4bit(Windows) and 8bit(Linux) color
 	/// </summary>
 	public struct TrueColor {
-		public int R { get; private set; }
-		public int G { get; private set; }
-		public int B { get; private set; }
-		public TrueColor (int r, int g, int b)
+		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int Red { get; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int Green { get; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int Blue { get; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public TrueColor (int red, int green, int blue)
 		{
-			R = r;
-			G = g;
-			B = b;
+			Red = red;
+			Green = green;
+			Blue = blue;
 		}
 
 		/// <summary>
@@ -155,7 +171,7 @@ namespace Terminal.Gui {
 		public static int Diff (TrueColor c1, TrueColor c2)
 		{
 			//TODO: upgrade to CIEDE2000
-			return (c1.R - c2.R) * (c1.R - c2.R) + (c1.G - c2.G) * (c1.G - c2.G) + (c1.B - c2.B) * (c1.B - c2.B);
+			return (c1.Red - c2.Red) * (c1.Red - c2.Red) + (c1.Green - c2.Green) * (c1.Green - c2.Green) + (c1.Blue - c2.Blue) * (c1.Blue - c2.Blue);
 		}
 
 		/// <summary>
@@ -216,7 +232,7 @@ namespace Terminal.Gui {
 		public virtual Color Background { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
+		/// Initializes a new instance of the <see cref="Attribute"/> class with only the value passed to
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
