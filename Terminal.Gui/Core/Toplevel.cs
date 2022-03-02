@@ -107,6 +107,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<Toplevel> ChildUnloaded;
 
+		/// <summary>
+		/// Invoked when the terminal was resized. The new <see cref="Size"/> of the terminal is provided.
+		/// </summary>
+		public event Action<Size> Resized;
+
+		internal virtual void OnResized (Size size)
+		{
+			Resized?.Invoke (size);
+		}
+
 		internal virtual void OnChildUnloaded (Toplevel top)
 		{
 			ChildUnloaded?.Invoke (top);
