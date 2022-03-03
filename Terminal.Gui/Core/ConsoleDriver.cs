@@ -225,11 +225,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		public virtual Color Foreground { get; }
+		public Color Foreground { get; }
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		public virtual Color Background { get; }
+		public Color Background { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> class with only the value passed to
@@ -336,22 +336,32 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TrueColorAttribute : Attribute {
 		/// <summary>
-		/// The foreground color.
+		/// Initializes a new instance of the <see cref="TrueColorAttribute"/> struct.
 		/// </summary>
-		public override Color Foreground => (Color)TrueColor.GetCode4 (TureColorForeground);
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public TrueColorAttribute (TrueColor foreground, TrueColor background)
+			: base((Color)TrueColor.GetCode4 (foreground), (Color)TrueColor.GetCode4 (background))
+		{
+			TureColorForeground = foreground;
+			TrueColorBackground = background;
+		}
+
 		/// <summary>
-		/// The background color.
+		/// Initializes a new instance of the <see cref="TrueColorAttribute"/> struct
+		///  with the same colors for the foreground and background.
 		/// </summary>
-		public override Color Background => (Color)TrueColor.GetCode4 (TrueColorBackground);
+		/// <param name="color">The color.</param>
+		public TrueColorAttribute (TrueColor color) : this(color, color) { }
 
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		public TrueColor TureColorForeground { get; set; }
+		public TrueColor TureColorForeground { get; }
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		public TrueColor TrueColorBackground { get; set; }
+		public TrueColor TrueColorBackground { get; }
 	}
 
 	/// <summary>
