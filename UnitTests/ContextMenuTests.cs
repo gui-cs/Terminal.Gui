@@ -1,7 +1,8 @@
 ﻿using Xunit;
 using Xunit.Abstractions;
+using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
-namespace Terminal.Gui.Views {
+namespace Terminal.Gui.Core {
 	public class ContextMenuTests {
 		readonly ITestOutputHelper output;
 
