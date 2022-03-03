@@ -588,8 +588,9 @@ namespace Terminal.Gui {
 				foreach (var item in barItems.Children) {
 					if (item == null) continue;
 					if (item.IsEnabled () && item.HotKey == x) {
-						host.CloseMenu ();
-						Run (item.Action);
+						if (host.CloseMenu ()) {
+							Run (item.Action);
+						}
 						return true;
 					}
 				}
@@ -636,7 +637,8 @@ namespace Terminal.Gui {
 				}
 				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
-					CheckSubMenu ();
+					if (!CheckSubMenu ())
+						return false;
 					break;
 				}
 				if (!host.IsMenuOpen) {
@@ -671,8 +673,8 @@ namespace Terminal.Gui {
 					current = barItems.Children.Length - 1;
 				if (!host.SelectEnabledItem (barItems.Children, current, out current, false)) {
 					current = 0;
-					if (!host.SelectEnabledItem (barItems.Children, current, out current)) {
-						host.CloseMenu ();
+					if (!host.SelectEnabledItem (barItems.Children, current, out current) && !host.CloseMenu ()) {
+						return false;
 					}
 					break;
 				}
@@ -684,7 +686,8 @@ namespace Terminal.Gui {
 				}
 				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
-					CheckSubMenu ();
+					if (!CheckSubMenu ())
+						return false;
 					break;
 				}
 			} while (barItems.Children [current] == null || disabled);
@@ -701,6 +704,8 @@ namespace Terminal.Gui {
 			host.handled = false;
 			bool disabled;
 			if (me.Flags == MouseFlags.Button1Clicked) {
+				if (this != host.openCurrentMenu)
+					return true;
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -721,19 +726,22 @@ namespace Terminal.Gui {
 				}
 				var item = barItems.Children [me.Y - 1];
 				if (item == null || !item.IsEnabled ()) disabled = true;
+				if (item != null && !disabled && current == me.Y - 1)
+					return true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
-				CheckSubMenu ();
+				if (!CheckSubMenu ())
+					return true;
 				host.OnMenuOpened ();
 				return true;
 			}
 			return false;
 		}
 
-		internal void CheckSubMenu ()
+		internal bool CheckSubMenu ()
 		{
 			if (current == -1 || barItems.Children [current] == null) {
-				return;
+				return true;
 			}
 			var subMenu = barItems.SubMenu (barItems.Children [current]);
 			if (subMenu != null) {
@@ -741,15 +749,19 @@ namespace Terminal.Gui {
 				if (host.openSubMenu != null) {
 					pos = host.openSubMenu.FindIndex (o => o?.barItems == subMenu);
 				}
-				if (pos == -1 && this != host.openCurrentMenu && subMenu.Children != host.openCurrentMenu.barItems.Children) {
-					host.CloseMenu (false, true);
+				if (((pos == -1 && this != host.openCurrentMenu && subMenu.Children != host.openCurrentMenu.barItems.Children)
+					|| (pos > -1 && this != host.openCurrentMenu && subMenu.Children == host.openCurrentMenu.barItems.Children))
+					&& !host.CloseMenu (false, true)) {
+
+					return false;
 				}
 				host.Activate (host.selected, pos, subMenu);
 			} else if (host.openSubMenu?.Count == 0 || host.openSubMenu?.Last ().barItems.IsSubMenuOf (barItems.Children [current]) == false) {
-				host.CloseMenu (false, true);
+				return host.CloseMenu (false, true);
 			} else {
 				SetNeedsDisplay ();
 			}
+			return true;
 		}
 
 		int GetSubMenuIndex (MenuBarItem subMenu)
@@ -1007,10 +1019,14 @@ namespace Terminal.Gui {
 		public event Action<MenuItem> MenuOpened;
 
 		/// <summary>
-		/// Raised when a menu is closing passing <see langword="true"/>
-		/// if it's closing a sub-menu, <see langword="false"/> otherwise.
+		/// Raised when a menu is closing passing <see cref="MenuClosingEventArgs"/>.
 		/// </summary>
-		public event Action<bool> MenuClosing;
+		public event Action<MenuClosingEventArgs> MenuClosing;
+
+		/// <summary>
+		/// Raised when all the menu are closed.
+		/// </summary>
+		public event Action MenuAllClosed;
 
 		internal Menu openMenu;
 		Menu ocm;
@@ -1062,10 +1078,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Virtual method that will invoke the <see cref="MenuClosing"/>
 		/// </summary>
-		/// <param name="isSubMenu">Whatever is a sub-menu or not.</param>
-		public virtual void OnMenuClosing (bool isSubMenu = false)
+		/// <param name="currentMenu">The current menu to be closed.</param>
+		/// <param name="reopen">Whether the current menu will be reopen.</param>
+		/// <param name="isSubMenu">Whether is a sub-menu or not.</param>
+		public virtual MenuClosingEventArgs OnMenuClosing (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
 		{
-			MenuClosing?.Invoke (isSubMenu);
+			var ev = new MenuClosingEventArgs (currentMenu, reopen, isSubMenu);
+			MenuClosing?.Invoke (ev);
+			return ev;
+		}
+
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="MenuAllClosed"/>
+		/// </summary>
+		public virtual void OnMenuAllClosed ()
+		{
+			MenuAllClosed?.Invoke ();
 		}
 
 		View lastFocused;
@@ -1080,6 +1108,7 @@ namespace Terminal.Gui {
 			isMenuOpening = true;
 			var newMenu = OnMenuOpening (Menus [index]);
 			if (newMenu.Cancel) {
+				isMenuOpening = false;
 				return;
 			}
 			if (newMenu.NewMenuBarItem != null) {
@@ -1089,8 +1118,8 @@ namespace Terminal.Gui {
 			switch (subMenu) {
 			case null:
 				lastFocused = lastFocused ?? (SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused);
-				if (openSubMenu != null)
-					CloseMenu (false, true);
+				if (openSubMenu != null && !CloseMenu (false, true))
+					return;
 				if (openMenu != null) {
 					if (SuperView == null) {
 						Application.Current.Remove (openMenu);
@@ -1151,10 +1180,11 @@ namespace Terminal.Gui {
 
 			previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 			OpenMenu (selected);
-			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-				CloseMenu ();
+			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu ()) {
+				return;
 			}
-			openCurrentMenu.CheckSubMenu ();
+			if (!openCurrentMenu.CheckSubMenu ())
+				return;
 			Application.GrabMouse (this);
 		}
 
@@ -1168,10 +1198,10 @@ namespace Terminal.Gui {
 				previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 
 			OpenMenu (idx, sIdx, subMenu);
-			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-				if (subMenu == null) {
-					CloseMenu ();
-				}
+			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
+				&& subMenu == null && !CloseMenu ()) {
+
+				return;
 			}
 			SetNeedsDisplay ();
 		}
@@ -1221,20 +1251,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Closes the current Menu programatically, if open.
+		/// Closes the current Menu programatically, if open and not canceled.
 		/// </summary>
-		public void CloseMenu ()
+		public bool CloseMenu ()
 		{
-			CloseMenu (false, false);
+			return CloseMenu (false, false);
 		}
 
 		bool reopen;
 
-		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
+		internal bool CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
 			this.reopen = reopen;
-			OnMenuClosing (isSubMenu);
+			var args = OnMenuClosing (
+				isSubMenu ? openCurrentMenu.barItems : openMenu.barItems, reopen, isSubMenu);
+			if (args.Cancel) {
+				isMenuClosing = false;
+				if (args.CurrentMenu.Parent != null)
+					openMenu.current = ((MenuBarItem)args.CurrentMenu.Parent).Children.IndexOf (args.CurrentMenu);
+				return false;
+			}
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null) {
@@ -1277,6 +1314,7 @@ namespace Terminal.Gui {
 			}
 			this.reopen = false;
 			isMenuClosing = false;
+			return true;
 		}
 
 		void RemoveSubMenu (int index)
@@ -1347,15 +1385,17 @@ namespace Terminal.Gui {
 		internal void CloseAllMenus ()
 		{
 			if (!isMenuOpening && !isMenuClosing) {
-				if (openSubMenu != null)
-					CloseMenu (false, true);
-				CloseMenu ();
+				if (openSubMenu != null && !CloseMenu (false, true))
+					return;
+				if (!CloseMenu ())
+					return;
 				if (LastFocused != null && LastFocused != this)
 					selected = -1;
 			}
 			IsMenuOpen = false;
 			openedByHotKey = false;
 			openedByAltKey = false;
+			OnMenuAllClosed ();
 		}
 
 		View FindDeepestMenu (View view, ref int count)
@@ -1379,15 +1419,14 @@ namespace Terminal.Gui {
 				else
 					selected--;
 
-				if (selected > -1)
-					CloseMenu (true, false);
+				if (selected > -1 && !CloseMenu (true, false))
+					return;
 				OpenMenu (selected);
 				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
 					openCurrentMenu.current = 0;
 					if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
 						CloseMenu ();
 					}
-					break;
 				}
 				break;
 			case true:
@@ -1413,20 +1452,21 @@ namespace Terminal.Gui {
 				else
 					selected++;
 
-				if (selected > -1)
-					CloseMenu (true);
+				if (selected > -1 && !CloseMenu (true))
+					return;
 				OpenMenu (selected);
 				SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current);
 				break;
 			case true:
 				if (UseKeysUpDownAsKeysLeftRight) {
-					CloseMenu (false, true);
-					NextMenu ();
+					if (CloseMenu (false, true)) {
+						NextMenu ();
+					}
 				} else {
 					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
-						if (openSubMenu != null)
-							CloseMenu (false, true);
+						if (openSubMenu != null && !CloseMenu (false, true))
+							return;
 						NextMenu ();
 					} else if (subMenu != null ||
 						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
@@ -1506,10 +1546,11 @@ namespace Terminal.Gui {
 				Application.GrabMouse (this);
 				selected = i;
 				OpenMenu (i);
-				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-					CloseMenu ();
+				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu ()) {
+					return;
 				}
-				openCurrentMenu.CheckSubMenu ();
+				if (!openCurrentMenu.CheckSubMenu ())
+					return;
 			}
 			SetNeedsDisplay ();
 		}
@@ -1570,7 +1611,8 @@ namespace Terminal.Gui {
 
 		void CloseMenuBar ()
 		{
-			CloseMenu ();
+			if (!CloseMenu ())
+				return;
 			if (openedByAltKey) {
 				openedByAltKey = false;
 				LastFocused?.SetFocus ();
@@ -1630,7 +1672,9 @@ namespace Terminal.Gui {
 						} else if (selected != i && selected > -1 && (me.Flags == MouseFlags.ReportMousePosition ||
 							me.Flags == MouseFlags.Button1Pressed && me.Flags == MouseFlags.ReportMousePosition)) {
 							if (IsMenuOpen) {
-								CloseMenu (true, false);
+								if (!CloseMenu (true, false)) {
+									return true;
+								}
 								Activate (i);
 							}
 						} else {
@@ -1780,6 +1824,44 @@ namespace Terminal.Gui {
 		public MenuOpeningEventArgs (MenuBarItem currentMenu)
 		{
 			CurrentMenu = currentMenu;
+		}
+	}
+
+	/// <summary>
+	/// An <see cref="EventArgs"/> which allows passing a cancelable menu closing event.
+	/// </summary>
+	public class MenuClosingEventArgs : EventArgs {
+		/// <summary>
+		/// The current <see cref="MenuBarItem"/> parent.
+		/// </summary>
+		public MenuBarItem CurrentMenu { get; }
+
+		/// <summary>
+		/// Indicates whether the current menu will be reopen.
+		/// </summary>
+		public bool Reopen { get; }
+
+		/// <summary>
+		/// Indicates whether the current menu is a sub-menu.
+		/// </summary>
+		public bool IsSubMenu { get; }
+
+		/// <summary>
+		/// Flag that allows you to cancel the opening of the menu.
+		/// </summary>
+		public bool Cancel { get; set; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="MenuClosingEventArgs"/>
+		/// </summary>
+		/// <param name="currentMenu">The current <see cref="MenuBarItem"/> parent.</param>
+		/// <param name="reopen">Whether the current menu will be reopen.</param>
+		/// <param name="isSubMenu">Indicates whether it is a sub-menu.</param>
+		public MenuClosingEventArgs (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
+		{
+			CurrentMenu = currentMenu;
+			Reopen = reopen;
+			IsSubMenu = isSubMenu;
 		}
 	}
 }

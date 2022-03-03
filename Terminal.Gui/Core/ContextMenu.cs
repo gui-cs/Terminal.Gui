@@ -1,9 +1,4 @@
-﻿using NStack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -47,19 +42,16 @@ namespace Terminal.Gui {
 			Position = new Point (x, y);
 		}
 
-		private void MenuBar_MenuClosing (bool obj)
+		private void MenuBar_MenuAllClosed ()
 		{
-			// Only dispose if it isn't a sub-menu.
-			if (!obj) {
-				Dispose ();
-			}
+			Dispose ();
 		}
 
 		/// <inheritdoc/>
 		public void Dispose ()
 		{
 			if (IsShow) {
-				menuBar.MenuClosing -= MenuBar_MenuClosing;
+				menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
 				menuBar.Dispose ();
 				menuBar = null;
 				IsShow = false;
@@ -114,7 +106,7 @@ namespace Terminal.Gui {
 			};
 
 			menuBar.isContextMenuLoading = true;
-			menuBar.MenuClosing += MenuBar_MenuClosing;
+			menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
 			IsShow = true;
 			menuBar.OpenMenu ();
 		}
