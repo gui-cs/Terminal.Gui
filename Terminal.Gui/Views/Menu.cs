@@ -1007,9 +1007,10 @@ namespace Terminal.Gui {
 		public event Action<MenuItem> MenuOpened;
 
 		/// <summary>
-		/// Raised when a menu is closing.
+		/// Raised when a menu is closing passing <see langword="true"/>
+		/// if it's closing a sub-menu, <see langword="false"/> otherwise.
 		/// </summary>
-		public event Action MenuClosing;
+		public event Action<bool> MenuClosing;
 
 		internal Menu openMenu;
 		Menu ocm;
@@ -1061,9 +1062,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Virtual method that will invoke the <see cref="MenuClosing"/>
 		/// </summary>
-		public virtual void OnMenuClosing ()
+		/// <param name="isSubMenu">Whatever is a sub-menu or not.</param>
+		public virtual void OnMenuClosing (bool isSubMenu = false)
 		{
-			MenuClosing?.Invoke ();
+			MenuClosing?.Invoke (isSubMenu);
 		}
 
 		View lastFocused;
@@ -1232,7 +1234,7 @@ namespace Terminal.Gui {
 		{
 			isMenuClosing = true;
 			this.reopen = reopen;
-			OnMenuClosing ();
+			OnMenuClosing (isSubMenu);
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null) {

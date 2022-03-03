@@ -47,9 +47,12 @@ namespace Terminal.Gui {
 			Position = new Point (x, y);
 		}
 
-		private void MenuBar_MenuClosing ()
+		private void MenuBar_MenuClosing (bool obj)
 		{
-			Dispose ();
+			// Only dispose if it isn't a sub-menu.
+			if (!obj) {
+				Dispose ();
+			}
 		}
 
 		/// <inheritdoc/>

@@ -119,7 +119,7 @@ namespace Terminal.Gui.Views {
 				e.Action ();
 				Assert.Equal ("Copy", miAction);
 			};
-			menu.MenuClosing += () => {
+			menu.MenuClosing += (_) => {
 				Assert.False (isMenuClosed);
 				isMenuClosed = true;
 			};
@@ -249,7 +249,7 @@ namespace Terminal.Gui.Views {
 				miCurrent = e;
 				mCurrent = menu.openCurrentMenu;
 			};
-			menu.MenuClosing += () => {
+			menu.MenuClosing += (_) => {
 				mbiCurrent = null;
 				miCurrent = null;
 				mCurrent = null;
