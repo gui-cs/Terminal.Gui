@@ -1727,7 +1727,8 @@ namespace Terminal.Gui {
 					&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 					Application.UngrabMouse ();
-					CloseAllMenus ();
+					if (IsMenuOpen)
+						CloseAllMenus ();
 					handled = false;
 					return false;
 				} else {
