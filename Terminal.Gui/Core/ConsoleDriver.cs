@@ -113,55 +113,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get color by code in 256 colors palette
-		/// </summary>
-		public static TrueColor Color8 (int code)
-		{
-			if (code == 7)
-				code = 8;
-			else if (code == 8)
-				code = 7;
-			if (code == 8)
-				return new TrueColor (192, 192, 192);
-			if (code <= 15) {
-				int k = 128;
-				if (code >= 9)
-					k = 255;
-				return new TrueColor (code % 2 * k, code / 2 % 2 * k, code / 4 % 2 * k);
-			}
-			if (code <= 231) {
-				code -= 16;
-				int b = code % 6 * 40;
-				if (b > 0)
-					b += 45;
-				int g = code / 6 % 6 * 40;
-				if (g > 0)
-					g += 45;
-				int r = code / 36 % 6 * 40;
-				if (r > 0)
-					r += 45;
-				return new TrueColor (r, g, b);
-			}
-			{
-				code -= 231;
-				return new TrueColor (8 + code * 10, 8 + code * 10, 8 + code * 10);
-			}
-		}
-
-		/// <summary>
 		/// Get color by 16 colors palette
 		/// </summary>
 		public static TrueColor Color4 (int code)
 		{
-			if (code == 7)
-				code = 8;
-			else if (code == 8)
-				code = 7;
-			if (code == 8)
-				return new TrueColor (192, 192, 192);
-			int k = 128;
-			if (code >= 9)
-				k = 255;
+			if (code == 7) { code = 8; }
+			else if (code == 8) { code = 7; }
+
+			if (code == 8) { return new TrueColor (192, 192, 192); }
+
+			int k = (code > 8) ? 255 : 128;
+
 			return new TrueColor (code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
 		}
 
@@ -170,20 +132,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static int Diff (TrueColor c1, TrueColor c2)
 		{
-			//TODO: upgrade to CIEDE2000
-			return (c1.Red - c2.Red) * (c1.Red - c2.Red) + (c1.Green - c2.Green) * (c1.Green - c2.Green) + (c1.Blue - c2.Blue) * (c1.Blue - c2.Blue);
-		}
-
-		/// <summary>
-		/// Get color code in 256 colors palette (use approximation)
-		/// </summary>
-		public static int GetCode8 (TrueColor c)
-		{
-			int ans = 0;
-			for (int i = 1; i < 255; i++)
-				if (Diff (Color8 (i), c) < Diff (Color8 (ans), c))
-					ans = i;
-			return ans;
+			// TODO: maybe use CIEDE2000
+			return ((c1.Red - c2.Red) * (c1.Red - c2.Red))
+				+ ((c1.Green - c2.Green) * (c1.Green - c2.Green))
+				+ (c1.Blue - c2.Blue) * (c1.Blue - c2.Blue);
 		}
 
 		/// <summary>
@@ -192,9 +144,10 @@ namespace Terminal.Gui {
 		public static int GetCode4 (TrueColor c)
 		{
 			int ans = 0;
-			for (int i = 1; i < 16; i++)
-				if (Diff (Color4 (i), c) < Diff (Color4 (ans), c))
-					ans = i;
+			for (int i = 1; i < 16; i++) {
+				if (Diff (Color4 (i), c) < Diff (Color4 (ans), c)) { ans = i; }
+			}
+
 			return ans;
 		}
 

@@ -1518,7 +1518,6 @@ namespace Terminal.Gui {
 				sb.Append (tca.TrueColorBackground.Blue);
 				sb.Append ('m');
 			} else {
-
 				const string CSI = "\x1b[";
 				int bg = 0;
 				int fg = 0;
