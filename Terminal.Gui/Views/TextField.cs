@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NStack;
+using Terminal.Gui.Resources;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -905,13 +906,13 @@ namespace Terminal.Gui {
 		{
 			ContextMenu = new ContextMenu (this,
 				new MenuBarItem (new MenuItem [] {
-					new MenuItem ("_Select All", "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-					new MenuItem ("_Delete All", "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-					new MenuItem ("_Copy", "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-					new MenuItem ("Cu_t", "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-					new MenuItem ("_Paste", "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem ("_Undo", "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem ("_Redo", "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
 				})
 			);
 			ContextMenu.Show ();

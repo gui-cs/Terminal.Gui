@@ -1,10 +1,14 @@
-﻿using Terminal.Gui;
+﻿using System.Globalization;
+using System.Threading;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample")]
 	[ScenarioCategory ("Controls")]
 	public class ContextMenus : Scenario {
 		ContextMenu contextMenu = new ContextMenu ();
+		MenuItem miEn, miPt;
+		bool isEn = true;
 
 		public override void Setup ()
 		{
@@ -60,6 +64,8 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.WantMousePositionReports = true;
+
+			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void ShowContextMenu (int x, int y)
@@ -71,6 +77,23 @@ namespace UICatalog.Scenarios {
 						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok")),
 						new MenuItem ("_Maintenance", "Maintenance mode", () => MessageBox.Query (50, 5, "Info", "This would open maintenance dialog", "Ok")),
 					}),
+					new MenuBarItem ("_Languages", new MenuItem [] {
+						miEn = new MenuItem ("_English", "Default", () => {
+							Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
+							isEn = !isEn;
+							miEn.Checked = isEn;
+							miPt.Checked = !isEn;
+						})
+						{ CheckType = MenuItemCheckStyle.Checked, Checked = isEn },
+						miPt = new MenuItem ("_Portuguese", "pt-PT", () => {
+							Thread.CurrentThread.CurrentUICulture = new CultureInfo("pt-PT");
+							isEn = !isEn;
+							miEn.Checked = isEn;
+							miPt.Checked = !isEn;
+						})
+						{ CheckType = MenuItemCheckStyle.Checked, Checked = !isEn },
+					}),
+
 					null,
 					new MenuItem ("_Quit", "", () => Application.RequestStop ())
 				})
