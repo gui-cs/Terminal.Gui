@@ -1102,9 +1102,10 @@ namespace Terminal.Gui.Views {
 		[AutoInitShutdown]
 		public void Adjust_First ()
 		{
-			TextField tf = new TextField ();
-			tf.Width = Dim.Fill ();
-			tf.Text = "This is a test.";
+			TextField tf = new TextField () {
+				Width = Dim.Fill (),
+				Text = "This is a test."
+			};
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
@@ -1118,6 +1119,64 @@ namespace Terminal.Gui.Views {
 				}
 				return item;
 			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DeleteSelectedText_InsertText_DeleteCharLeft_DeleteCharRight_Cut ()
+		{
+			var newText = "";
+			var oldText = "";
+			var tf = new TextField () { Width = 10, Text = "-1" };
+
+			tf.TextChanging += (e) => newText = e.NewText.ToString ();
+			tf.TextChanged += (e) => oldText = e.ToString ();
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("-1", tf.Text);
+
+			// InsertText
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers ())));
+			Assert.Equal ("-2", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-2", tf.Text);
+
+			// DeleteCharLeft
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("2", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-2", oldText);
+			Assert.Equal ("-", tf.Text);
+
+			// DeleteCharRight
+			tf.Text = "-1";
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-", tf.Text);
+
+			// Cut
+			tf.Text = "-1";
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.X | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-", tf.Text);
 		}
 	}
 }

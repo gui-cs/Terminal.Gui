@@ -548,8 +548,9 @@ namespace Terminal.Gui {
 		{
 			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 
+			List<Rune> newText = text;
 			if (length > 0) {
-				DeleteSelectedText ();
+				newText = DeleteSelectedText ();
 				oldCursorPos = point;
 			}
 			if (!useOldCursorPos) {
@@ -558,16 +559,16 @@ namespace Terminal.Gui {
 			var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
 			if (Used) {
 				point++;
-				if (point == text.Count + 1) {
-					SetText (text.Concat (kbstr).ToList ());
+				if (point == newText.Count + 1) {
+					SetText (newText.Concat (kbstr).ToList ());
 				} else {
-					if (oldCursorPos > text.Count) {
-						oldCursorPos = text.Count;
+					if (oldCursorPos > newText.Count) {
+						oldCursorPos = newText.Count;
 					}
-					SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
+					SetText (newText.GetRange (0, oldCursorPos).Concat (kbstr).Concat (newText.GetRange (oldCursorPos, Math.Min (newText.Count - oldCursorPos, newText.Count))));
 				}
 			} else {
-				SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (Math.Min (oldCursorPos + 1, text.Count), Math.Max (text.Count - oldCursorPos - 1, 0))));
+				SetText (newText.GetRange (0, oldCursorPos).Concat (kbstr).Concat (newText.GetRange (Math.Min (oldCursorPos + 1, newText.Count), Math.Max (newText.Count - oldCursorPos - 1, 0))));
 				point++;
 			}
 			Adjust ();
@@ -795,7 +796,9 @@ namespace Terminal.Gui {
 				}
 				Adjust ();
 			} else {
-				DeleteSelectedText ();
+				var newText = DeleteSelectedText ();
+				Text = ustring.Make (newText);
+				Adjust ();
 			}
 		}
 
@@ -816,7 +819,9 @@ namespace Terminal.Gui {
 				SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
 				Adjust ();
 			} else {
-				DeleteSelectedText ();
+				var newText = DeleteSelectedText ();
+				Text = ustring.Make (newText);
+				Adjust ();
 			}
 		}
 
@@ -1158,10 +1163,12 @@ namespace Terminal.Gui {
 				return;
 
 			Clipboard.Contents = SelectedText;
-			DeleteSelectedText ();
+			var newText = DeleteSelectedText ();
+			Text = ustring.Make (newText);
+			Adjust ();
 		}
 
-		void DeleteSelectedText ()
+		List<Rune> DeleteSelectedText ()
 		{
 			ustring actualText = Text;
 			SetSelectedStartSelectedLength ();
@@ -1169,11 +1176,11 @@ namespace Terminal.Gui {
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			Text = actualText [0, len] +
+			var newText = actualText [0, len] +
 				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
-			point = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
-			Adjust ();
+			point = selStart >= newText.RuneCount ? newText.RuneCount : selStart;
+			return newText.ToRuneList ();
 		}
 
 		/// <summary>
