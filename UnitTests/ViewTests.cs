@@ -1828,5 +1828,28 @@ namespace Terminal.Gui.Views {
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 		}
+		
+		[Fact]
+		[AutoInitShutdown]
+		public void WindowDispose_CanFocusProblem ()
+		{
+			// Arrange
+			Application.Init();
+			using var top = Toplevel.Create();
+			using var view = new View (
+				x: 0,
+				y: 1,
+				text: nameof (WindowDispose_CanFocusProblem));
+			using var window = new Window ();
+			top.Add(window);
+			window.Add (view);
+
+			// Act
+			Application.Begin(top);
+			Application.Shutdown ();
+
+			// Assert does Not throw NullReferenceException
+			top.SetFocus ();
+		}
 	}
 }
