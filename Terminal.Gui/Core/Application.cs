@@ -13,12 +13,13 @@
 // Optimizations
 //   - Add rendering limitation to the exposed area
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using NStack;
 using System.ComponentModel;
+using System.Globalization;
+using System.Reflection;
+using System.IO;
 
 namespace Terminal.Gui {
 
@@ -202,6 +203,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private static List<CultureInfo> supportedCultures;
+
+		/// <summary>
+		/// Gets all supported cultures by the application without the invariant language.
+		/// </summary>
+		public static List<CultureInfo> SupportedCultures => supportedCultures;
+
 		static void OnQuitKeyChanged (Key oldKey)
 		{
 			foreach (var top in toplevels) {
@@ -346,6 +354,7 @@ namespace Terminal.Gui {
 			}
 			Top = topLevelFactory ();
 			Current = Top;
+			supportedCultures = GetSupportedCultures ();
 			_initialized = true;
 		}
 
@@ -1330,6 +1339,27 @@ namespace Terminal.Gui {
 			if (top != null && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top) {
 				Top.BringSubviewToFront (top);
 			}
+		}
+
+		internal static List<CultureInfo> GetSupportedCultures ()
+		{
+			CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+			// Get the assembly
+			Assembly assembly = Assembly.GetExecutingAssembly ();
+
+			//Find the location of the assembly
+			string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
+
+			// Find the resource file name of the assembly
+			string resourceFilename = $"{Path.GetFileNameWithoutExtension (assembly.Location)}.resources.dll";
+
+			// Return all culture for which satellite folder found with culture code.
+			return culture.Where (cultureInfo =>
+			     assemblyLocation != null &&
+			     Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
+			     File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+			).ToList ();
 		}
 	}
 }

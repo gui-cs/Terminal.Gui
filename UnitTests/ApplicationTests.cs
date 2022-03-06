@@ -1279,5 +1279,12 @@ namespace Terminal.Gui.Core {
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
 			Assert.Null (Toplevel.dragPosition);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void GetSupportedCultures_Method ()
+		{
+			var cultures = Application.GetSupportedCultures ();
+			Assert.Equal (cultures.Count, Application.SupportedCultures.Count);
+		}
 	}
 }
