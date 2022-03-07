@@ -377,7 +377,7 @@ namespace Terminal.Gui {
 
 	class Menu : View {
 		internal MenuBarItem barItems;
-		MenuBar host;
+		internal MenuBar host;
 		internal int current;
 		internal View previousSubFocused;
 
@@ -905,6 +905,11 @@ namespace Terminal.Gui {
 					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
 
+					var mbar = GetMouseGrabViewInstance (this);
+					if (mbar != null) {
+						mbar.CleanUp ();
+					}
+
 					//Activate (0);
 					//StartMenu ();
 					IsMenuOpen = true;
@@ -1173,6 +1178,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void OpenMenu ()
 		{
+			var mbar = GetMouseGrabViewInstance (this);
+			if (mbar != null) {
+				mbar.CleanUp ();
+			}
+
 			if (openMenu != null)
 				return;
 			selected = 0;
@@ -1662,6 +1672,8 @@ namespace Terminal.Gui {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
 								menu.Dispose ();
+							} else if (!IsMenuOpen) {
+								Activate (i);
 							}
 						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked) {
 							if (IsMenuOpen && !Menus [i].IsTopLevel) {
@@ -1696,6 +1708,16 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null) {
 				if (me.View is MenuBar || me.View is Menu) {
+					var mbar = GetMouseGrabViewInstance (me.View);
+					if (mbar != null) {
+						if (me.Flags == MouseFlags.Button1Clicked) {
+							mbar.CleanUp ();
+							Application.GrabMouse (me.View);
+						} else {
+							handled = false;
+							return false;
+						}
+					}
 					if (me.View != current) {
 						Application.UngrabMouse ();
 						var v = me.View;
@@ -1789,6 +1811,30 @@ namespace Terminal.Gui {
 			handled = true;
 
 			return true;
+		}
+
+		MenuBar GetMouseGrabViewInstance (View view)
+		{
+			if (view == null || Application.mouseGrabView == null) {
+				return null;
+			}
+
+			MenuBar hostView = null;
+			if (view is MenuBar) {
+				hostView = (MenuBar)view;
+			} else if (view is Menu) {
+				hostView = ((Menu)view).host;
+			}
+
+			var grabView = Application.mouseGrabView;
+			MenuBar hostGrabView = null;
+			if (grabView is MenuBar) {
+				hostGrabView = (MenuBar)grabView;
+			} else if (grabView is Menu) {
+				hostGrabView = ((Menu)grabView).host;
+			}
+
+			return hostView != hostGrabView ? hostGrabView : null;
 		}
 
 		///<inheritdoc/>
