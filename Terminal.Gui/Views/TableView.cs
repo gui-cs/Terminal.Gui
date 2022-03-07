@@ -1082,9 +1082,18 @@ namespace Terminal.Gui {
 			if (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
 
 				if(Style.SmoothHorizontalScrolling) {
+
+					// Scroll right 1 column at a time until the users selected column is visible
 					while(SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+
 						ColumnOffset++;
 						columnsToRender = CalculateViewport (Bounds).ToArray ();
+
+						// if we are already scrolled to the last column then break
+						// this will prevent any theoretical infinite loop
+						if (ColumnOffset >= Table.Columns.Count - 1)
+							break;
+
 					}
 				}
 				else {
