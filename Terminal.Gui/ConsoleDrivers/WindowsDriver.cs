@@ -1565,14 +1565,24 @@ namespace Terminal.Gui {
 			//	Bottom = (short)Clip.Bottom
 			//};
 
-			UpdateCursor ();
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+			UpdateCursor ();
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
+		CursorVisibility savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (ccol < 0 || crow < 0 || ccol > Cols || crow > Rows) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return;
+			}
+
+			SetCursorVisibility (savedCursorVisibility);
 			var position = new WindowsConsole.Coord () {
 				X = (short)ccol,
 				Y = (short)crow

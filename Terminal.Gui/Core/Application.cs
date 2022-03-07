@@ -1227,6 +1227,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
+				t.OnResized (full.Size);
 			}
 			Refresh ();
 		}

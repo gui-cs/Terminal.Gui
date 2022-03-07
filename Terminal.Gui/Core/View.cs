@@ -1179,13 +1179,15 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
-		public void Move (int col, int row)
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
+		///  if set to <c>true</c>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		public void Move (int col, int row, bool clipped = true)
 		{
 			if (Driver.Rows == 0) {
 				return;
 			}
 
-			ViewToScreen (col, row, out var rcol, out var rrow);
+			ViewToScreen (col, row, out var rcol, out var rrow, clipped);
 			Driver.Move (rcol, rrow);
 		}
 
@@ -1689,7 +1691,6 @@ namespace Terminal.Gui {
 			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);
 			}
-
 		}
 
 		/// <summary>
@@ -1720,6 +1721,16 @@ namespace Terminal.Gui {
 		public IEnumerable<Command> GetSupportedCommands ()
 		{
 			return CommandImplementations.Keys;
+		}
+
+		/// <summary>
+		/// Gets the key used by a command.
+		/// </summary>
+		/// <param name="command">The command to search.</param>
+		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
+		public Key GetKeyFromCommand(Command command)
+		{
+			return KeyBindings.First (x => x.Value == command).Key;
 		}
 
 		/// <inheritdoc/>

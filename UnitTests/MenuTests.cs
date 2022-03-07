@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class MenuTests {
+		readonly ITestOutputHelper output;
+
+		public MenuTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constuctors_Defaults ()
 		{
@@ -95,6 +100,8 @@ namespace Terminal.Gui.Views {
 		{
 			var miAction = "";
 			var isMenuClosed = true;
+			var cancelClosing = false;
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_New", "Creates new file.", New)
@@ -119,9 +126,14 @@ namespace Terminal.Gui.Views {
 				e.Action ();
 				Assert.Equal ("Copy", miAction);
 			};
-			menu.MenuClosing += () => {
+			menu.MenuClosing += (e) => {
 				Assert.False (isMenuClosed);
-				isMenuClosed = true;
+				if (cancelClosing) {
+					e.Cancel = true;
+					isMenuClosed = false;
+				} else {
+					isMenuClosed = true;
+				}
 			};
 			Application.Top.Add (menu);
 
@@ -129,10 +141,37 @@ namespace Terminal.Gui.Views {
 			Assert.True (menu.IsMenuOpen);
 			isMenuClosed = !menu.IsMenuOpen;
 			Assert.False (isMenuClosed);
+			Application.Top.Redraw (Application.Top.Bounds);
+			var expected = @"
+Edit
+┌─────────────────────────────┐
+│ Copy  Copies the selection. │
+└─────────────────────────────┘
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+			cancelClosing = true;
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+			Assert.False (isMenuClosed);
+			Application.Top.Redraw (Application.Top.Bounds);
+			expected = @"
+Edit
+┌─────────────────────────────┐
+│ Copy  Copies the selection. │
+└─────────────────────────────┘
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			cancelClosing = false;
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (isMenuClosed);
+			Application.Top.Redraw (Application.Top.Bounds);
+			expected = @"
+Edit
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 			void New () => miAction = "New";
 			void Copy () => miAction = "Copy";
@@ -249,7 +288,7 @@ namespace Terminal.Gui.Views {
 				miCurrent = e;
 				mCurrent = menu.openCurrentMenu;
 			};
-			menu.MenuClosing += () => {
+			menu.MenuClosing += (_) => {
 				mbiCurrent = null;
 				miCurrent = null;
 				mCurrent = null;
@@ -449,6 +488,106 @@ namespace Terminal.Gui.Views {
 			{
 				return miCurrent != null ? miCurrent.Title.ToString () : "None";
 			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Positive_Positions ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			});
+
+			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
+
+			menu.OpenMenu ();
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌──────┐
+│ One  │
+│ Two  │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Negative_Positions ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			}) {
+				X = -1,
+				Y = -1
+			};
+
+			Assert.Equal (new Point (-1, -1), new Point (menu.Frame.X, menu.Frame.Y));
+
+			menu.OpenMenu ();
+			Application.Begin (Application.Top);
+
+			var expected = @"
+──────┐
+ One  │
+ Two  │
+──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (-1, -2, menu.Frame.Width, menu.Frame.Height);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+ One  │
+ Two  │
+──────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (1, 0), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 5);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+└──────
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
 		}
 	}
 }
