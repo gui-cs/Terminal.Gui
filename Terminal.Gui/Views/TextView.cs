@@ -25,11 +25,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using NStack;
-
+using Terminal.Gui.Resources;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -1136,6 +1138,7 @@ namespace Terminal.Gui {
 		bool allowsReturn = true;
 		bool multiline = true;
 		HistoryText historyText = new HistoryText ();
+		CultureInfo currentCulture;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
@@ -1233,6 +1236,12 @@ namespace Terminal.Gui {
 			AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
 			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
 			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
+			AddCommand (Command.Accept, () => {
+				ContextMenu.Position = new Point (CursorPosition.X - leftColumn + 2, CursorPosition.Y - topRow + 2);
+				ShowContextMenu ();
+				return true;
+			});
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.PageDown, Command.PageDown);
@@ -1327,6 +1336,32 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
 			AddKeyBinding (Key.R | Key.CtrlMask, Command.Redo);
+			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+
+			currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+			ContextMenu = new ContextMenu () { MenuItens = BuildContextMenuBarItem () };
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
+			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private MenuBarItem BuildContextMenuBarItem ()
+		{
+			return new MenuBarItem (new MenuItem [] {
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				});
+		}
+
+		private void ContextMenu_KeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (obj, ContextMenu.Key);
 		}
 
 		private void Model_LinesLoaded ()
@@ -1713,6 +1748,11 @@ namespace Terminal.Gui {
 		/// <see langword="true"/> if the text has history changes <see langword="false"/> otherwise.
 		/// </summary>
 		public bool HasHistoryChanges => historyText.HasHistoryChanges;
+
+		/// <summary>
+		/// Get the <see cref="ContextMenu"/> for this view.
+		/// </summary>
+		public ContextMenu ContextMenu { get; private set; }
 
 		int GetSelectedLength ()
 		{
@@ -3428,6 +3468,33 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		void ShowContextMenu ()
+		{
+			if (currentCulture != Thread.CurrentThread.CurrentUICulture) {
+
+				currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+				ContextMenu.MenuItens = BuildContextMenuBarItem ();
+			}
+			ContextMenu.Show ();
+		}
+
+		/// <summary>
+		/// Deletes all text.
+		/// </summary>
+		public void DeleteAll ()
+		{
+			if (Lines == 0) {
+				return;
+			}
+
+			selectionStartColumn = 0;
+			selectionStartRow = 0;
+			MoveBottomEndExtend ();
+			DeleteCharLeft ();
+			SetNeedsDisplay ();
+		}
+
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEvent kb)
 		{
@@ -3942,7 +4009,8 @@ namespace Terminal.Gui {
 				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
-				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
+				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
+				&& !ev.Flags.HasFlag (ContextMenu.MouseFlags)) {
 				return false;
 			}
 
@@ -4079,6 +4147,9 @@ namespace Terminal.Gui {
 				PositionCursor ();
 				lastWasKill = false;
 				columnTrack = currentColumn;
+			} else if (ev.Flags == ContextMenu.MouseFlags) {
+				ContextMenu.Position = new Point (ev.X + 2, ev.Y + 2);
+				ShowContextMenu ();
 			}
 
 			return true;
