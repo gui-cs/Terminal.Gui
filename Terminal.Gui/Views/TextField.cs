@@ -101,8 +101,6 @@ namespace Terminal.Gui {
 
 			historyText.ChangeText += HistoryText_ChangeText;
 
-			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
-
 			Initialized += TextField_Initialized;
 
 			// Things this view knows how to do
@@ -203,6 +201,20 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+
+			ContextMenu = new ContextMenu (this,
+				new MenuBarItem (new MenuItem [] {
+								new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+								new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+								new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+								new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+								new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+								new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+								new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				})
+			);
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
 			AddKeyBinding (ContextMenu.Key, Command.Accept);
 		}
 
@@ -336,9 +348,9 @@ namespace Terminal.Gui {
 		public bool HasHistoryChanges => historyText.HasHistoryChanges;
 
 		/// <summary>
-		/// Get or sets the <see cref="ContextMenu"/> for this view.
+		/// Get the <see cref="ContextMenu"/> for this view.
 		/// </summary>
-		public ContextMenu ContextMenu { get; set; } = new ContextMenu ();
+		public ContextMenu ContextMenu { get; private set; }
 
 		/// <summary>
 		///   Sets the cursor position.
@@ -909,17 +921,6 @@ namespace Terminal.Gui {
 
 		void ShowContextMenu ()
 		{
-			ContextMenu = new ContextMenu (this,
-				new MenuBarItem (new MenuItem [] {
-					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
-				})
-			);
 			ContextMenu.Show ();
 		}
 

@@ -80,22 +80,26 @@ namespace Terminal.Gui {
 			}
 			var rect = Menu.MakeFrame (position.X, position.Y, MenuItens.Children);
 			if (rect.Right >= frame.Right) {
-				if (frame.Right - rect.Width >= 0) {
+				if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero) {
 					position.X = frame.Right - rect.Width;
-				} else {
+				} else if (ForceMinimumPosToZero) {
 					position.X = 0;
 				}
+			} else if (ForceMinimumPosToZero && position.X < 0) {
+				position.X = 0;
 			}
 			if (rect.Bottom >= frame.Bottom) {
-				if (frame.Bottom - rect.Height - 1 >= 0) {
+				if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero) {
 					if (Host == null) {
 						position.Y = frame.Bottom - rect.Height - 1;
 					} else {
 						position.Y = Host.Frame.Y - rect.Height;
 					}
-				} else {
+				} else if (ForceMinimumPosToZero) {
 					position.Y = 0;
 				}
+			} else if (ForceMinimumPosToZero && position.Y < 0) {
+				position.Y = 0;
 			}
 
 			menuBar = new MenuBar (new [] { MenuItens }) {
@@ -186,5 +190,11 @@ namespace Terminal.Gui {
 		/// otherwise if it's null the container will be used.
 		/// </summary>
 		public View Host { get; set; }
+
+		/// <summary>
+		/// Gets or sets whether forces the minimum position to zero
+		/// if the left or right position are negative.
+		/// </summary>
+		public bool ForceMinimumPosToZero { get; set; } = true;
 	}
 }

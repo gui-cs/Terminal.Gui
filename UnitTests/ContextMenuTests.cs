@@ -422,5 +422,46 @@ namespace Terminal.Gui.Core {
 			top.RequestStop ();
 			Assert.False (ContextMenu.IsShow);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void ForceMinimumPosToZero_True_False ()
+		{
+			var cm = new ContextMenu (-1, -2,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			);
+
+			Assert.Equal (new Point (-1, -2), cm.Position);
+
+			cm.Show ();
+			Assert.Equal (new Point (-1, -2), cm.Position);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌──────┐
+│ One  │
+│ Two  │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+
+			cm.ForceMinimumPosToZero = false;
+			cm.Show ();
+			Assert.Equal (new Point (-1, -2), cm.Position);
+			Application.Refresh ();
+
+			expected = @"
+ One  │
+ Two  │
+──────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (1, 0), pos);
+		}
 	}
 }

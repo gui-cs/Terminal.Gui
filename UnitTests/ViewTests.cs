@@ -1,16 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using Terminal.Gui;
+﻿using System;
 using Xunit;
+using Xunit.Abstractions;
+using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.Views {
+namespace Terminal.Gui.Core {
 	public class ViewTests {
+		readonly ITestOutputHelper output;
+
+		public ViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void New_Initializes ()
 		{
@@ -1658,7 +1662,7 @@ namespace Terminal.Gui.Views {
 			var win1 = new Window () { Width = Dim.Percent (50), Height = Dim.Fill () };
 			win1.Add (view1);
 			var view2 = new View () { Width = 20, Height = 2, CanFocus = true };
-			var win2 = new Window () { X = Pos.Right (win1),  Width = Dim.Fill (), Height = Dim.Fill () };
+			var win2 = new Window () { X = Pos.Right (win1), Width = Dim.Fill (), Height = Dim.Fill () };
 			win2.Add (view2);
 			Application.Top.Add (win1, win2);
 			Application.Begin (Application.Top);
@@ -1828,28 +1832,113 @@ namespace Terminal.Gui.Views {
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 		}
-		
+
 		[Fact]
 		[AutoInitShutdown]
 		public void WindowDispose_CanFocusProblem ()
 		{
 			// Arrange
-			Application.Init();
-			using var top = Toplevel.Create();
+			Application.Init ();
+			using var top = Toplevel.Create ();
 			using var view = new View (
 				x: 0,
 				y: 1,
 				text: nameof (WindowDispose_CanFocusProblem));
 			using var window = new Window ();
-			top.Add(window);
+			top.Add (window);
 			window.Add (view);
 
 			// Act
-			Application.Begin(top);
+			Application.Begin (top);
 			Application.Shutdown ();
 
 			// Assert does Not throw NullReferenceException
 			top.SetFocus ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Positive_Positions ()
+		{
+			var view = new View (new Rect (0, 0, 8, 4));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌──────┐
+│      │
+│      │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Negative_Positions ()
+		{
+			var view = new View (new Rect (-1, 0, 8, 4));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+──────┐
+      │
+      │
+──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
+
+			view.Frame = new Rect (-1, -1, 8, 4);
+			Application.Refresh ();
+
+			expected = @"
+      │
+      │
+──────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (6, 0), pos);
+
+			view.Frame = new Rect (0, 0, 8, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
+
+			expected = @"
+┌──────
+│      
+│      
+└──────
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
+
+			view.Frame = new Rect (0, 0, 8, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
+
+			expected = @"
+┌──────
+│      
+│      
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
 		}
 	}
 }

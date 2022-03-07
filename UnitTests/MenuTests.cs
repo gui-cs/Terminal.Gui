@@ -489,5 +489,105 @@ Edit
 				return miCurrent != null ? miCurrent.Title.ToString () : "None";
 			}
 		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Positive_Positions ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			});
+
+			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
+
+			menu.OpenMenu ();
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌──────┐
+│ One  │
+│ Two  │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Negative_Positions ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			}) {
+				X = -1,
+				Y = -1
+			};
+
+			Assert.Equal (new Point (-1, -1), new Point (menu.Frame.X, menu.Frame.Y));
+
+			menu.OpenMenu ();
+			Application.Begin (Application.Top);
+
+			var expected = @"
+──────┐
+ One  │
+ Two  │
+──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 0), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (-1, -2, menu.Frame.Width, menu.Frame.Height);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+ One  │
+ Two  │
+──────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (1, 0), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 5);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+└──────
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
+			Assert.Equal (new Point (0, 1), pos);
+		}
 	}
 }

@@ -446,9 +446,11 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (GetNormalColor ());
-			DrawFrame (bounds, padding: 0, fill: true);
+			DrawFrame (Bounds, padding: 0, fill: true);
 
-			for (int i = 0; i < barItems.Children.Length; i++) {
+			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
+				if (i < 0)
+					continue;
 				var item = barItems.Children [i];
 				Driver.SetAttribute (item == null ? GetNormalColor ()
 					: i == current ? ColorScheme.Focus : GetNormalColor ());
@@ -459,13 +461,16 @@ namespace Terminal.Gui {
 					Move (1, i + 1);
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
-				for (int p = 0; p < Frame.Width - 2; p++)
+				for (int p = Bounds.X; p < Frame.Width - 2; p++) {
+					if (p < 0)
+						continue;
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else if (p == Frame.Width - 3 && barItems.SubMenu (barItems.Children [i]) != null)
 						Driver.AddRune (Driver.RightArrow);
 					else
 						Driver.AddRune (' ');
+				}
 
 				if (item == null) {
 					if (SuperView?.Frame.Right - Frame.X > Frame.Width - 1) {
@@ -704,8 +709,6 @@ namespace Terminal.Gui {
 			host.handled = false;
 			bool disabled;
 			if (me.Flags == MouseFlags.Button1Clicked) {
-				if (this != host.openCurrentMenu)
-					return true;
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -725,9 +728,8 @@ namespace Terminal.Gui {
 					return true;
 				}
 				var item = barItems.Children [me.Y - 1];
+				if (item == null) return true;
 				if (item == null || !item.IsEnabled ()) disabled = true;
-				if (item != null && !disabled && current == me.Y - 1)
-					return true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
 				if (!CheckSubMenu ())
@@ -749,10 +751,8 @@ namespace Terminal.Gui {
 				if (host.openSubMenu != null) {
 					pos = host.openSubMenu.FindIndex (o => o?.barItems == subMenu);
 				}
-				if (((pos == -1 && this != host.openCurrentMenu && subMenu.Children != host.openCurrentMenu.barItems.Children)
-					|| (pos > -1 && this != host.openCurrentMenu && subMenu.Children == host.openCurrentMenu.barItems.Children))
+				if (pos == -1 && this != host.openCurrentMenu && subMenu.Children != host.openCurrentMenu.barItems.Children
 					&& !host.CloseMenu (false, true)) {
-
 					return false;
 				}
 				host.Activate (host.selected, pos, subMenu);
@@ -1265,7 +1265,7 @@ namespace Terminal.Gui {
 			isMenuClosing = true;
 			this.reopen = reopen;
 			var args = OnMenuClosing (
-				isSubMenu ? openCurrentMenu.barItems : openMenu.barItems, reopen, isSubMenu);
+				isSubMenu ? openCurrentMenu.barItems : openMenu?.barItems, reopen, isSubMenu);
 			if (args.Cancel) {
 				isMenuClosing = false;
 				if (args.CurrentMenu.Parent != null)
