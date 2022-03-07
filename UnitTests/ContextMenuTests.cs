@@ -463,5 +463,57 @@ namespace Terminal.Gui.Core {
 			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
 			Assert.Equal (new Point (1, 0), pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void ContextMenu_Is_Closed_If_Another_MenuBar_Is_Open_Or_Vice_Versa ()
+		{
+			var cm = new ContextMenu (10, 5,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				})
+			);
+
+			var menu = new MenuBar (new MenuBarItem [] {
+					new MenuBarItem ("File", "", null),
+					new MenuBarItem ("Edit", "", null)
+				});
+
+			Application.Top.Add (menu);
+
+			Assert.Null (Application.mouseGrabView);
+
+			cm.Show ();
+			Assert.True (ContextMenu.IsShow);
+			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.False (ContextMenu.IsShow);
+			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.True (menu.IsMenuOpen);
+
+			cm.Show ();
+			Assert.True (ContextMenu.IsShow);
+			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.False (menu.IsMenuOpen);
+			Assert.False (menu.OnKeyDown (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
+			Assert.True (menu.OnKeyUp (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
+			Assert.False (ContextMenu.IsShow);
+			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.True (menu.IsMenuOpen);
+
+			cm.Show ();
+			Assert.True (ContextMenu.IsShow);
+			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.False (menu.IsMenuOpen);
+			Assert.False (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
+			Assert.True (ContextMenu.IsShow);
+			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
+			Assert.False (ContextMenu.IsShow);
+			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.True (menu.IsMenuOpen);
+		}
 	}
 }

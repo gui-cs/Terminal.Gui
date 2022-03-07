@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Hide ()
 		{
-			menuBar.CloseAllMenus ();
+			menuBar.CleanUp ();
 			Dispose ();
 		}
 
@@ -196,5 +196,10 @@ namespace Terminal.Gui {
 		/// if the left or right position are negative.
 		/// </summary>
 		public bool ForceMinimumPosToZero { get; set; } = true;
+
+		/// <summary>
+		/// Gets the <see cref="Gui.MenuBar"/> that is hosting this context menu.
+		/// </summary>
+		public MenuBar MenuBar { get => menuBar; }
 	}
 }
