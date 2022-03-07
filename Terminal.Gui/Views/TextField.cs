@@ -207,8 +207,15 @@ namespace Terminal.Gui {
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-			ContextMenu = new ContextMenu (this,
-				new MenuBarItem (new MenuItem [] {
+			ContextMenu = new ContextMenu (this, BuildContextMenuBarItem ());
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
+			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private MenuBarItem BuildContextMenuBarItem ()
+		{
+			return new MenuBarItem (new MenuItem [] {
 					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
 					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
 					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
@@ -216,11 +223,7 @@ namespace Terminal.Gui {
 					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
 					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
 					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
-				})
-			);
-			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
-
-			AddKeyBinding (ContextMenu.Key, Command.Accept);
+				});
 		}
 
 		private void ContextMenu_KeyChanged (Key obj)
@@ -930,15 +933,7 @@ namespace Terminal.Gui {
 
 				currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-				ContextMenu.MenuItens = new MenuBarItem (new MenuItem [] {
-					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
-				});
+				ContextMenu.MenuItens = BuildContextMenuBarItem ();
 			}
 			ContextMenu.Show ();
 		}
