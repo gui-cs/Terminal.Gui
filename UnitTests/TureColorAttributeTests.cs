@@ -19,16 +19,16 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			var attr = new TrueColorAttribute (fg, bg);
 
-			Assert.Equal (fg, attr.TureColorForeground);
+			Assert.Equal (fg, attr.TrueColorForeground);
 			Assert.Equal (bg, attr.TrueColorBackground);
 
 			// Test unified color
 			attr = new TrueColorAttribute (fg);
-			Assert.Equal (fg, attr.TureColorForeground);
+			Assert.Equal (fg, attr.TrueColorForeground);
 			Assert.Equal (fg, attr.TrueColorBackground);
 
 			attr = new TrueColorAttribute (bg);
-			Assert.Equal (bg, attr.TureColorForeground);
+			Assert.Equal (bg, attr.TrueColorForeground);
 			Assert.Equal (bg, attr.TrueColorBackground);
 
 			driver.End ();

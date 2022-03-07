@@ -1505,11 +1505,11 @@ namespace Terminal.Gui {
 
 			if (attr is TrueColorAttribute tca) {
 				sb.Append (new [] { '\x1b', '[', '3', '8', ';', '2', ';' });
-				sb.Append (tca.TureColorForeground.Red);
+				sb.Append (tca.TrueColorForeground.Red);
 				sb.Append (';');
-				sb.Append (tca.TureColorForeground.Green);
+				sb.Append (tca.TrueColorForeground.Green);
 				sb.Append (';');
-				sb.Append (tca.TureColorForeground.Blue);
+				sb.Append (tca.TrueColorForeground.Blue);
 				sb.Append (new [] { ';', '4', '8', ';', '2', ';' });
 				sb.Append (tca.TrueColorBackground.Red);
 				sb.Append (';');

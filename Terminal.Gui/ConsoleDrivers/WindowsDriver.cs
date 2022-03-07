@@ -111,11 +111,11 @@ namespace Terminal.Gui {
 					prev = attr;
 					if (attr is TrueColorAttribute tca) {
 						stringBuilder.Append (SendTrueColorFg);
-						stringBuilder.Append (tca.TureColorForeground.Red);
+						stringBuilder.Append (tca.TrueColorForeground.Red);
 						stringBuilder.Append (';');
-						stringBuilder.Append (tca.TureColorForeground.Green);
+						stringBuilder.Append (tca.TrueColorForeground.Green);
 						stringBuilder.Append (';');
-						stringBuilder.Append (tca.TureColorForeground.Blue);
+						stringBuilder.Append (tca.TrueColorForeground.Blue);
 						stringBuilder.Append (SendTrueColorBg);
 						stringBuilder.Append (tca.TrueColorBackground.Red);
 						stringBuilder.Append (';');

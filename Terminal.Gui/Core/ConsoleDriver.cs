@@ -296,7 +296,7 @@ namespace Terminal.Gui {
 		public TrueColorAttribute (TrueColor foreground, TrueColor background)
 			: base((Color)TrueColor.GetCode4 (foreground), (Color)TrueColor.GetCode4 (background))
 		{
-			TureColorForeground = foreground;
+			TrueColorForeground = foreground;
 			TrueColorBackground = background;
 		}
 
@@ -310,7 +310,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		public TrueColor TureColorForeground { get; }
+		public TrueColor TrueColorForeground { get; }
 		/// <summary>
 		/// The background color.
 		/// </summary>
