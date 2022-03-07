@@ -256,12 +256,14 @@ namespace Terminal.Gui.Views {
 			tableView.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ()));
 
 			// window height is 5 rows 2 are header so page down should give 3 new rows
-			Assert.Equal (3, tableView.RowOffset);
+			Assert.Equal (3, tableView.SelectedRow);
+			Assert.Equal (1, tableView.RowOffset);
 
 			// header is no longer visible so page down should give 5 new rows
 			tableView.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ()));
 
-			Assert.Equal (8, tableView.RowOffset);
+			Assert.Equal (8, tableView.SelectedRow);
+			Assert.Equal (4, tableView.RowOffset);
 		}
 
 		[Fact]
@@ -602,6 +604,33 @@ namespace Terminal.Gui.Views {
 			};
 			return tv;
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ScrollDown_OneLineAtATime ()
+		{
+			var tableView = new TableView ();
+
+			// Set big table
+			tableView.Table = BuildTable (25, 50);
+
+			// 1 header + 4 rows visible
+			tableView.Bounds = new Rect (0, 0, 25, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+
+			// select last row
+			tableView.SelectedRow = 3;
+
+			// Scroll down
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorDown });
+
+			// The scroll should be valid at the moment
+			Assert.Equal(4,tableView.SelectedRow);
+			Assert.Equal (1, tableView.RowOffset);
+		}
+
 
 		/// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows

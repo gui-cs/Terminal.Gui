@@ -1085,7 +1085,7 @@ namespace Terminal.Gui {
 
 			//if we have scrolled too far down
 			if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight)) {
-				RowOffset = SelectedRow;
+				RowOffset = SelectedRow - (Bounds.Height - headerHeight) + 1;
 			}
 			//if we have scrolled too far up
 			if (SelectedRow < RowOffset) {
