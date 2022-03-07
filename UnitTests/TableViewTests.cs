@@ -621,12 +621,12 @@ namespace Terminal.Gui.Views {
 			tableView.Style.AlwaysShowHeaders = true;
 
 			// select last row
-			tableView.SelectedRow = 3;
+			tableView.SelectedRow = 3; // row is 0 indexed so this is the 4th visible row
 
 			// Scroll down
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorDown });
 
-			// The scroll should be valid at the moment
+			// Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
 			Assert.Equal(4,tableView.SelectedRow);
 			Assert.Equal (1, tableView.RowOffset);
 		}
