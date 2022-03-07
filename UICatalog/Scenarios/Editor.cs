@@ -27,7 +27,7 @@ namespace UICatalog.Scenarios {
 		private Window winDialog;
 		private TabView _tabView;
 		private MenuItem miForceMinimumPosToZero;
-		private bool forceMinimumPosToZero = true;
+		private bool forceMinimumPosToZero;
 		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 					miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
 						miForceMinimumPosToZero.Checked = forceMinimumPosToZero = !forceMinimumPosToZero;
 						_textView.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
-					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					}),
 					new MenuBarItem ("_Languages", GetSupportedCultures ())
 				})
 			});
