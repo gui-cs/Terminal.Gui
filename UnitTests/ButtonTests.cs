@@ -12,7 +12,6 @@ namespace Terminal.Gui.Views {
 		{
 			var btn = new Button ();
 			Assert.Equal (string.Empty, btn.Text);
-			Assert.Equal ("[  ]", ((View)btn).Text);
 			Assert.Equal ("[  ]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
