@@ -631,6 +631,135 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tableView.RowOffset);
 		}
 
+		[Fact]
+		public void ScrollRight_SmoothScrolling ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected = 
+				@"
+│A│B│C│
+│1│2│3│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			tableView.Redraw (tableView.Bounds);
+
+			// Note that with SmoothHorizontalScrolling only a single new column
+			// is exposed when scrolling right.  This is not always the case though
+			// sometimes if the leftmost column is long (i.e. A is a long column)
+			// then when A is pushed off the screen multiple new columns could be exposed
+			// (not just D but also E and F).  This is because TableView never shows
+			// 'half cells' or scrolls by console unit (scrolling is done by table row/column increments).
+
+			expected =
+				@"
+│B│C│D│
+│2│3│4│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void ScrollRight_WithoutSmoothScrolling ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = false;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│A│B│C│
+│1│2│3│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			tableView.Redraw (tableView.Bounds);
+
+			// notice that without smooth scrolling we just update the first column
+			// rendered in the table to the newly exposed column (D).  This is fast
+			// since we don't have to worry about repeatedly measuring the content
+			// area as we scroll until the new column (D) is exposed.  But it makes
+			// the view 'jump' to expose all new columns
+
+
+			expected =
+				@"
+│D│E│F│
+│4│5│6│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
 
 		/// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
