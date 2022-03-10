@@ -1178,5 +1178,38 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("-1", oldText);
 			Assert.Equal ("-", tf.Text);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Test_RootKeyEvent_Cancel()
+		{
+			Application.RootKeyEvent += SuppressKey;
+
+			var tf = new TextField();
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+			
+			Application.Driver.SendKeys('a',ConsoleKey.A,false,false,false);
+			Assert.Equal(tf.Text.ToString(),"a");
+
+			// SuppressKey suppresses the 'j' key
+			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
+			Assert.Equal(tf.Text.ToString(),"a");
+
+			Application.RootKeyEvent -= SuppressKey;
+
+			// Now that the delegate has been removed we can type j again
+			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
+			Assert.Equal(tf.Text.ToString(),"aj");
+		}
+
+		private bool SuppressKey (KeyEvent arg)
+		{
+			if(arg.KeyValue == 'j')
+				return true;
+
+			return false;
+		}
 	}
 }
