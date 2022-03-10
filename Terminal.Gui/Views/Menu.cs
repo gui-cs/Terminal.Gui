@@ -180,7 +180,7 @@ namespace Terminal.Gui {
 		{
 			bool nextIsHot = false;
 			foreach (var x in title) {
-				if (x == '_') {
+				if (x == MenuBar.HotKeySpecifier) {
 					nextIsHot = true;
 				} else {
 					if (nextIsHot) {
@@ -349,7 +349,7 @@ namespace Terminal.Gui {
 		{
 			int len = 0;
 			foreach (var ch in title) {
-				if (ch == '_')
+				if (ch == MenuBar.HotKeySpecifier)
 					continue;
 				len++;
 			}
@@ -419,8 +419,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
 			AddCommand (Command.Right, () => {
 				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
-					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu)
-					? true : false); return true;
+					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
+					current > -1 && host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
+				return true;
 			});
 			AddCommand (Command.Cancel, () => { CloseAllMenus (); return true; });
 			AddCommand (Command.Accept, () => { RunSelected (); return true; });
@@ -466,6 +467,8 @@ namespace Terminal.Gui {
 						continue;
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
+					else if (i == 0 && p == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null)
+						Driver.AddRune (Driver.LeftArrow);
 					else if (p == Frame.Width - 3 && barItems.SubMenu (barItems.Children [i]) != null)
 						Driver.AddRune (Driver.RightArrow);
 					else
@@ -501,12 +504,22 @@ namespace Terminal.Gui {
 				ViewToScreen (2, i + 1, out int vtsCol, out _, false);
 				if (vtsCol < Driver.Cols) {
 					Move (2, i + 1);
-					if (!item.IsEnabled ())
+					if (!item.IsEnabled ()) {
 						DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
-					else
+					} else if (i == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null) {
+						var tf = new TextFormatter () {
+							Alignment = TextAlignment.Centered,
+							HotKeySpecifier = MenuBar.HotKeySpecifier,
+							Text = textToDraw
+						};
+						tf.Draw (ViewToScreen (new Rect (2, i + 1, Frame.Width - 3, 1)),
+							i == current ? ColorScheme.Focus : GetNormalColor (),
+							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+					} else {
 						DrawHotString (textToDraw,
-						       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-						       i == current ? ColorScheme.Focus : GetNormalColor ());
+							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+							i == current ? ColorScheme.Focus : GetNormalColor ());
+					}
 
 					// The help string
 					var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
@@ -590,12 +603,13 @@ namespace Terminal.Gui {
 			// TODO: rune-ify
 			if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
 				var x = Char.ToUpper ((char)kb.KeyValue);
+				var idx = -1;
 				foreach (var item in barItems.Children) {
+					idx++;
 					if (item == null) continue;
 					if (item.IsEnabled () && item.HotKey == x) {
-						if (host.CloseMenu ()) {
-							Run (item.Action);
-						}
+						current = idx;
+						RunSelected ();
 						return true;
 					}
 				}
@@ -607,8 +621,15 @@ namespace Terminal.Gui {
 		{
 			if (barItems.IsTopLevel) {
 				Run (barItems.Action);
-			} else if (current > -1) {
+			} else if (current > -1 && barItems.Children [current].Action != null) {
 				Run (barItems.Children [current].Action);
+			} else if (current == 0 && host.UseSubMenusSingleFrame
+				&& barItems.Children [current].Parent.Parent != null) {
+
+				host.PreviousMenu (barItems.Children [current].Parent.IsFromSubMenu, true);
+			} else if (current > -1 && barItems.SubMenu (barItems.Children [current]) != null) {
+
+				CheckSubMenu ();
 			}
 		}
 
@@ -640,7 +661,7 @@ namespace Terminal.Gui {
 				} else {
 					disabled = false;
 				}
-				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
+				if (!host.UseSubMenusSingleFrame && host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
 					if (!CheckSubMenu ())
 						return false;
@@ -651,7 +672,8 @@ namespace Terminal.Gui {
 				}
 			} while (barItems.Children [current] == null || disabled);
 			SetNeedsDisplay ();
-			host.OnMenuOpened ();
+			if (!host.UseSubMenusSingleFrame)
+				host.OnMenuOpened ();
 			return true;
 		}
 
@@ -663,7 +685,7 @@ namespace Terminal.Gui {
 			bool disabled;
 			do {
 				current--;
-				if (host.UseKeysUpDownAsKeysLeftRight) {
+				if (host.UseKeysUpDownAsKeysLeftRight && !host.UseSubMenusSingleFrame) {
 					if ((current == -1 || this != host.openCurrentMenu) && barItems.Children [current + 1].IsFromSubMenu && host.selectedSub > -1) {
 						current++;
 						host.PreviousMenu (true);
@@ -678,7 +700,7 @@ namespace Terminal.Gui {
 					current = barItems.Children.Length - 1;
 				if (!host.SelectEnabledItem (barItems.Children, current, out current, false)) {
 					current = 0;
-					if (!host.SelectEnabledItem (barItems.Children, current, out current) && !host.CloseMenu ()) {
+					if (!host.SelectEnabledItem (barItems.Children, current, out current) && !host.CloseMenu (false)) {
 						return false;
 					}
 					break;
@@ -689,7 +711,7 @@ namespace Terminal.Gui {
 				} else {
 					disabled = false;
 				}
-				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
+				if (!host.UseSubMenusSingleFrame && host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
 					if (!CheckSubMenu ())
 						return false;
@@ -697,7 +719,8 @@ namespace Terminal.Gui {
 				}
 			} while (barItems.Children [current] == null || disabled);
 			SetNeedsDisplay ();
-			host.OnMenuOpened ();
+			if (!host.UseSubMenusSingleFrame)
+				host.OnMenuOpened ();
 			return true;
 		}
 
@@ -717,12 +740,14 @@ namespace Terminal.Gui {
 					return true;
 				var item = barItems.Children [meY];
 				if (item == null || !item.IsEnabled ()) disabled = true;
+				current = meY;
 				if (item != null && !disabled)
-					Run (barItems.Children [meY].Action);
+					RunSelected ();
 				return true;
 			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
 				me.Flags == MouseFlags.Button1TripleClicked || me.Flags == MouseFlags.ReportMousePosition ||
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+
 				disabled = false;
 				if (me.Y < 1 || me.Y - 1 >= barItems.Children.Length) {
 					return true;
@@ -732,7 +757,7 @@ namespace Terminal.Gui {
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
-				if (!CheckSubMenu ())
+				if (host.UseSubMenusSingleFrame || !CheckSubMenu ())
 					return true;
 				host.OnMenuOpened ();
 				return true;
@@ -803,15 +828,14 @@ namespace Terminal.Gui {
 	///	</para>
 	/// </remarks>
 	public class MenuBar : View {
-		/// <summary>
-		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this when the <see cref="MenuBar"/> is vislble.
-		/// </summary>
-		/// <value>The menu array.</value>
-		public MenuBarItem [] Menus { get; set; }
 		internal int selected;
 		internal int selectedSub;
 
-		Action action;
+		/// <summary>
+		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this when the <see cref="MenuBar"/> is visible.
+		/// </summary>
+		/// <value>The menu array.</value>
+		public MenuBarItem [] Menus { get; set; }
 
 		/// <summary>
 		/// Used for change the navigation key style.
@@ -830,6 +854,16 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <summary>
+		/// The specifier character for the hotkey to all menus.
+		/// </summary>
+		new public static Rune HotKeySpecifier => '_';
+
+		/// <summary>
+		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
+		/// </summary>
+		public bool UseSubMenusSingleFrame { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
@@ -897,7 +931,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			if (keyEvent.IsAlt || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
+			if (keyEvent.IsAlt || keyEvent.Key == Key.AltMask || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
 				if (openedByAltKey && !IsMenuOpen && openMenu == null && (((uint)keyEvent.Key & (uint)Key.CharMask) == 0
 					|| ((uint)keyEvent.Key & (uint)Key.CharMask) == (uint)Key.Space)) {
@@ -1004,13 +1038,23 @@ namespace Terminal.Gui {
 					pos += 2 + Menus [i].TitleLength + (Menus [i].Help.Length > 0 ? Menus [i].Help.Length + 2 : 0) + 1;
 				}
 			}
-			//Move (0, 0);
 		}
 
 		void Selected (MenuItem item)
 		{
-			// TODO: Running = false;
-			action = item.Action;
+			var action = item.Action;
+
+			if (action == null)
+				return;
+
+			Application.UngrabMouse ();
+			CloseAllMenus ();
+			Application.Refresh ();
+
+			Application.MainLoop.AddIdle (() => {
+				action ();
+				return false;
+			});
 		}
 
 		/// <summary>
@@ -1154,7 +1198,21 @@ namespace Terminal.Gui {
 					RemoveSubMenu (sIndex);
 				} else {
 					var last = openSubMenu.Count > 0 ? openSubMenu.Last () : openMenu;
-					openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width, last.Frame.Top + 1 + last.current, subMenu);
+					if (!UseSubMenusSingleFrame) {
+						openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width, last.Frame.Top + 1 + last.current, subMenu);
+					} else {
+						var first = openSubMenu.Count > 0 ? openSubMenu.First () : openMenu;
+						var mbi = new MenuItem [2 + subMenu.Children.Length];
+						mbi [0] = new MenuItem () { Title = subMenu.Title, Parent = subMenu };
+						mbi [1] = null;
+						for (int j = 0; j < subMenu.Children.Length; j++) {
+							mbi [j + 2] = subMenu.Children [j];
+						}
+						var newSubMenu = new MenuBarItem (mbi);
+						openCurrentMenu = new Menu (this, first.Frame.Left, first.Frame.Top, newSubMenu);
+						last.Visible = false;
+						Application.GrabMouse (openCurrentMenu);
+					}
 					openCurrentMenu.previousSubFocused = last.previousSubFocused;
 					openSubMenu.Add (openCurrentMenu);
 					if (SuperView == null) {
@@ -1190,7 +1248,7 @@ namespace Terminal.Gui {
 
 			previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 			OpenMenu (selected);
-			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu ()) {
+			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu (false)) {
 				return;
 			}
 			if (!openCurrentMenu.CheckSubMenu ())
@@ -1209,7 +1267,7 @@ namespace Terminal.Gui {
 
 			OpenMenu (idx, sIdx, subMenu);
 			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
-				&& subMenu == null && !CloseMenu ()) {
+				&& subMenu == null && !CloseMenu (false)) {
 
 				return;
 			}
@@ -1263,19 +1321,23 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Closes the current Menu programatically, if open and not canceled.
 		/// </summary>
-		public bool CloseMenu ()
+		public bool CloseMenu (bool ignoreUseSubMenusSingleFrame = false)
 		{
-			return CloseMenu (false, false);
+			return CloseMenu (false, false, ignoreUseSubMenusSingleFrame);
 		}
 
 		bool reopen;
 
-		internal bool CloseMenu (bool reopen = false, bool isSubMenu = false)
+		internal bool CloseMenu (bool reopen = false, bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
 		{
+			var mbi = isSubMenu ? openCurrentMenu.barItems : openMenu?.barItems;
+			if (UseSubMenusSingleFrame && mbi != null &&
+				!ignoreUseSubMenusSingleFrame && mbi.Parent != null) {
+				return false;
+			}
 			isMenuClosing = true;
 			this.reopen = reopen;
-			var args = OnMenuClosing (
-				isSubMenu ? openCurrentMenu.barItems : openMenu?.barItems, reopen, isSubMenu);
+			var args = OnMenuClosing (mbi, reopen, isSubMenu);
 			if (args.Cancel) {
 				isMenuClosing = false;
 				if (args.CurrentMenu.Parent != null)
@@ -1327,9 +1389,9 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		void RemoveSubMenu (int index)
+		void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
 		{
-			if (openSubMenu == null)
+			if (openSubMenu == null || (UseSubMenusSingleFrame && !ignoreUseSubMenusSingleFrame && openSubMenu.Count > 0))
 				return;
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
 				isMenuClosing = true;
@@ -1338,6 +1400,8 @@ namespace Terminal.Gui {
 					menu = openSubMenu [i - 1];
 				else
 					menu = openMenu;
+				if (!menu.Visible)
+					menu.Visible = true;
 				openCurrentMenu = menu;
 				openCurrentMenu.SetFocus ();
 				if (openSubMenu != null) {
@@ -1350,7 +1414,7 @@ namespace Terminal.Gui {
 					openSubMenu.Remove (menu);
 					menu.Dispose ();
 				}
-				RemoveSubMenu (i);
+				RemoveSubMenu (i, ignoreUseSubMenusSingleFrame);
 			}
 			if (openSubMenu.Count > 0)
 				openCurrentMenu = openSubMenu.Last ();
@@ -1397,7 +1461,7 @@ namespace Terminal.Gui {
 			if (!isMenuOpening && !isMenuClosing) {
 				if (openSubMenu != null && !CloseMenu (false, true))
 					return;
-				if (!CloseMenu ())
+				if (!CloseMenu (false))
 					return;
 				if (LastFocused != null && LastFocused != this)
 					selected = -1;
@@ -1420,7 +1484,7 @@ namespace Terminal.Gui {
 			return view;
 		}
 
-		internal void PreviousMenu (bool isSubMenu = false)
+		internal void PreviousMenu (bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
 		{
 			switch (isSubMenu) {
 			case false:
@@ -1429,20 +1493,20 @@ namespace Terminal.Gui {
 				else
 					selected--;
 
-				if (selected > -1 && !CloseMenu (true, false))
+				if (selected > -1 && !CloseMenu (true, false, ignoreUseSubMenusSingleFrame))
 					return;
 				OpenMenu (selected);
 				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
 					openCurrentMenu.current = 0;
 					if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-						CloseMenu ();
+						CloseMenu (ignoreUseSubMenusSingleFrame);
 					}
 				}
 				break;
 			case true:
 				if (selectedSub > -1) {
 					selectedSub--;
-					RemoveSubMenu (selectedSub);
+					RemoveSubMenu (selectedSub, ignoreUseSubMenusSingleFrame);
 					SetNeedsDisplay ();
 				} else
 					PreviousMenu ();
@@ -1451,7 +1515,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal void NextMenu (bool isSubMenu = false)
+		internal void NextMenu (bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
 		{
 			switch (isSubMenu) {
 			case false:
@@ -1462,22 +1526,22 @@ namespace Terminal.Gui {
 				else
 					selected++;
 
-				if (selected > -1 && !CloseMenu (true))
+				if (selected > -1 && !CloseMenu (true, ignoreUseSubMenusSingleFrame))
 					return;
 				OpenMenu (selected);
 				SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current);
 				break;
 			case true:
 				if (UseKeysUpDownAsKeysLeftRight) {
-					if (CloseMenu (false, true)) {
-						NextMenu ();
+					if (CloseMenu (false, true, ignoreUseSubMenusSingleFrame)) {
+						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					}
 				} else {
 					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
 						if (openSubMenu != null && !CloseMenu (false, true))
 							return;
-						NextMenu ();
+						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					} else if (subMenu != null ||
 						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
 						selectedSub++;
@@ -1498,7 +1562,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Menus.Length; i++) {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
 				var mi = Menus [i];
-				int p = mi.Title.IndexOf ('_');
+				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
 				if (p != -1 && p + 1 < mi.Title.RuneCount) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
@@ -1543,7 +1607,7 @@ namespace Terminal.Gui {
 
 		private void ProcessMenu (int i, MenuBarItem mi)
 		{
-			if (selected < 0) {
+			if (selected < 0 && IsMenuOpen) {
 				return;
 			}
 
@@ -1556,7 +1620,7 @@ namespace Terminal.Gui {
 				Application.GrabMouse (this);
 				selected = i;
 				OpenMenu (i);
-				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu ()) {
+				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current) && !CloseMenu (false)) {
 					return;
 				}
 				if (!openCurrentMenu.CheckSubMenu ())
@@ -1577,7 +1641,7 @@ namespace Terminal.Gui {
 			}
 
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can�t detect an alone special key down was pressed.
+			// it can't detect an alone special key down was pressed.
 			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
 				OnKeyDown (kb);
 				OnKeyUp (kb);
@@ -1606,7 +1670,7 @@ namespace Terminal.Gui {
 				foreach (var mi in Menus [selected].Children) {
 					if (mi == null)
 						continue;
-					int p = mi.Title.IndexOf ('_');
+					int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
 					if (p != -1 && p + 1 < mi.Title.RuneCount) {
 						if (mi.Title [p + 1] == c) {
 							Selected (mi);
@@ -1621,7 +1685,7 @@ namespace Terminal.Gui {
 
 		void CloseMenuBar ()
 		{
-			if (!CloseMenu ())
+			if (!CloseMenu (false))
 				return;
 			if (openedByAltKey) {
 				openedByAltKey = false;
@@ -1758,7 +1822,9 @@ namespace Terminal.Gui {
 					isContextMenuLoading = false;
 					return false;
 				}
-			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked
+				|| me.Flags == MouseFlags.Button1TripleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+
 				Application.GrabMouse (current);
 			} else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu)) {
 				Application.GrabMouse (me.View);
