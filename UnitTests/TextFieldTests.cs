@@ -1191,17 +1191,17 @@ namespace Terminal.Gui.Views {
 			Application.Begin (Application.Top);
 			
 			Application.Driver.SendKeys('a',ConsoleKey.A,false,false,false);
-			Assert.Equal(tf.Text.ToString(),"a");
+			Assert.Equal("a", tf.Text.ToString ());
 
 			// SuppressKey suppresses the 'j' key
 			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
-			Assert.Equal(tf.Text.ToString(),"a");
+			Assert.Equal("a", tf.Text.ToString ());
 
 			Application.RootKeyEvent -= SuppressKey;
 
 			// Now that the delegate has been removed we can type j again
 			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
-			Assert.Equal(tf.Text.ToString(),"aj");
+			Assert.Equal("aj", tf.Text.ToString ());
 		}
 
 		private bool SuppressKey (KeyEvent arg)
