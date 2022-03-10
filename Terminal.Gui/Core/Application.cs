@@ -403,6 +403,9 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
+			if(RootKeyEvent?.Invoke(ke) ?? false) {
+				return;
+			}
 
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
@@ -587,6 +590,15 @@ namespace Terminal.Gui {
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
 		public static Action<MouseEvent> RootMouseEvent;
+
+		/// <summary>
+		/// <para>
+		/// Called for new KeyPress events before any processing is performed or
+		/// views evaluate.  Use for global key handling and/or debugging.
+		/// </para>
+		/// <para>Return true to suppress the KeyPress event</para>
+		/// </summary>
+		public static Func<KeyEvent,bool> RootKeyEvent;
 
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
@@ -872,6 +884,7 @@ namespace Terminal.Gui {
 			Driver = null;
 			Iteration = null;
 			RootMouseEvent = null;
+			RootKeyEvent = null;
 			Resized = null;
 			_initialized = false;
 			mouseGrabView = null;
