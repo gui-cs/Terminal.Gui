@@ -105,7 +105,7 @@ namespace Terminal.Gui.Views {
 				expectedLook = trailingWhitespace.Replace (expectedLook, "").Trim ();
 				actualLook = trailingWhitespace.Replace (actualLook, "").Trim ();
 
-				// standardise line endings for the comparison
+				// standardize line endings for the comparison
 				expectedLook = expectedLook.Replace ("\r\n", "\n");
 				actualLook = actualLook.Replace ("\r\n", "\n");
 
@@ -168,9 +168,6 @@ namespace Terminal.Gui.Views {
 					}
 					row.RemoveAt (c);
 				}
-				if (row.Count == 0) {
-					lines.Remove (row);
-				}
 			}
 
 			// Convert char list to string
@@ -187,15 +184,17 @@ namespace Terminal.Gui.Views {
 
 			if (!string.Equals (expectedLook, actualLook)) {
 
-				// Remove the first empty line from the expectedLook
-				expectedLook = string.Join (Environment.NewLine, expectedLook
-					.Split (Environment.NewLine.ToCharArray ())
-					.Skip (1)
-					.ToArray ()).TrimEnd ();
-
-				// standardise line endings for the comparison
+				// standardize line endings for the comparison
 				expectedLook = expectedLook.Replace ("\r\n", "\n");
 				actualLook = actualLook.Replace ("\r\n", "\n");
+
+				// Remove the first and the last line ending from the expectedLook
+				if (expectedLook.StartsWith ("\n")) {
+					expectedLook = expectedLook [1..];
+				}
+				if (expectedLook.EndsWith ("\n")) {
+					expectedLook = expectedLook [..^1];
+				}
 
 				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
 				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
