@@ -757,8 +757,10 @@ namespace Terminal.Gui {
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
-				if (host.UseSubMenusSingleFrame || !CheckSubMenu ())
+				if (host.UseSubMenusSingleFrame || !CheckSubMenu ()) {
+					SetNeedsDisplay ();
 					return true;
+				}
 				host.OnMenuOpened ();
 				return true;
 			}

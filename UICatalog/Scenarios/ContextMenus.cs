@@ -12,11 +12,18 @@ namespace UICatalog.Scenarios {
 		private MenuItem miForceMinimumPosToZero;
 		private bool forceMinimumPosToZero = true;
 		private TextField tfTopLeft, tfTopRight, tfMiddle, tfBottomLeft, tfBottomRight;
+		private MenuItem miUseSubMenusSingleFrame;
+		private bool useSubMenusSingleFrame;
 
 		public override void Setup ()
 		{
 			var text = "Context Menu";
 			var width = 20;
+
+			Win.Add (new Label ("Press 'Ctrl + Space' to open the Window context menu.") {
+				X = Pos.Center (),
+				Y = 1
+			});
 
 			tfTopLeft = new TextField (text) {
 				Width = width
@@ -89,10 +96,14 @@ namespace UICatalog.Scenarios {
 						tfBottomLeft.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 						tfBottomRight.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
+						() => contextMenu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
+							CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
+						},
 					null,
 					new MenuItem ("_Quit", "", () => Application.RequestStop ())
 				})
-			) { ForceMinimumPosToZero = forceMinimumPosToZero };
+			) { ForceMinimumPosToZero = forceMinimumPosToZero, UseSubMenusSingleFrame = useSubMenusSingleFrame };
 
 			tfTopLeft.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 			tfTopRight.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;

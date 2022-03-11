@@ -106,7 +106,8 @@ namespace Terminal.Gui {
 				X = position.X,
 				Y = position.Y,
 				Width = 0,
-				Height = 0
+				Height = 0,
+				UseSubMenusSingleFrame = UseSubMenusSingleFrame
 			};
 
 			menuBar.isContextMenuLoading = true;
@@ -201,5 +202,10 @@ namespace Terminal.Gui {
 		/// Gets the <see cref="Gui.MenuBar"/> that is hosting this context menu.
 		/// </summary>
 		public MenuBar MenuBar { get => menuBar; }
+
+		/// <summary>
+		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
+		/// </summary>
+		public bool UseSubMenusSingleFrame { get; set; }
 	}
 }
