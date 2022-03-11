@@ -269,8 +269,8 @@ namespace Terminal.Gui.Core {
                                                                         └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (72, 21), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (72, 21, 80, 4), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (80, 25), cm.Position);
@@ -299,8 +299,8 @@ namespace Terminal.Gui.Core {
                                                                       └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (70, 21), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (70, 21, 78, 4), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (70, 25), cm.Position);
@@ -332,8 +332,8 @@ namespace Terminal.Gui.Core {
       └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (6, 12), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (6, 12, 14, 4), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (6, 11), cm.Position);
@@ -363,8 +363,8 @@ namespace Terminal.Gui.Core {
 └────
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 1), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 1, 5, 4), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (0, 0), cm.Position);
@@ -393,8 +393,8 @@ namespace Terminal.Gui.Core {
 │ Two  │
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 1), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 1, 8, 3), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (0, 0), cm.Position);
@@ -446,8 +446,8 @@ namespace Terminal.Gui.Core {
 └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 1), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 1, 8, 4), pos);
 
 			cm.ForceMinimumPosToZero = false;
 			cm.Show ();
@@ -460,8 +460,8 @@ namespace Terminal.Gui.Core {
 ──────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (1, 0), pos);
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 0, 7, 3), pos);
 		}
 
 		[Fact, AutoInitShutdown]
