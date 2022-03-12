@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 		/// <param name="host">The host view.</param>
 		/// <param name="menuItems">The menu items.</param>
 		public ContextMenu (View host, MenuBarItem menuItems) :
-			this (host.Frame.X + 1, host.Frame.Bottom, menuItems)
+			this (host.Frame.X, host.Frame.Y, menuItems)
 		{
 			Host = host;
 		}
@@ -75,8 +75,13 @@ namespace Terminal.Gui {
 			container.Resized += Container_Resized;
 			var frame = container.Frame;
 			var position = Position;
-			if (Host != null && position != new Point (Host.Frame.X + 1, Host.Frame.Bottom)) {
-				Position = position = new Point (Host.Frame.X + 1, Host.Frame.Bottom);
+			if (Host != null) {
+				Host.ViewToScreen (container.Frame.X, container.Frame.Y, out int x, out int y);
+				var pos = new Point (x, y);
+				pos.Y += Host.Frame.Height - 1;
+				if (position != pos) {
+					Position = position = pos;
+				}
 			}
 			var rect = Menu.MakeFrame (position.X, position.Y, MenuItens.Children);
 			if (rect.Right >= frame.Right) {
@@ -93,7 +98,9 @@ namespace Terminal.Gui {
 					if (Host == null) {
 						position.Y = frame.Bottom - rect.Height - 1;
 					} else {
-						position.Y = Host.Frame.Y - rect.Height;
+						Host.ViewToScreen (container.Frame.X, container.Frame.Y, out int x, out int y);
+						var pos = new Point (x, y);
+						position.Y = pos.Y - rect.Height - 1;
 					}
 				} else if (ForceMinimumPosToZero) {
 					position.Y = 0;

@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 			Point mousePos = default;
 
 			Win.KeyPress += (e) => {
-				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask) && !ContextMenu.IsShow) {
+				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask)) {
 					ShowContextMenu (mousePos.X, mousePos.Y);
 					e.Handled = true;
 				}
@@ -70,12 +70,21 @@ namespace UICatalog.Scenarios {
 					ShowContextMenu (e.MouseEvent.X, e.MouseEvent.Y);
 					e.Handled = true;
 				}
-				mousePos = new Point (e.MouseEvent.X, e.MouseEvent.Y);
 			};
+
+			Application.RootMouseEvent += Application_RootMouseEvent;
+
+			void Application_RootMouseEvent (MouseEvent me)
+			{
+				mousePos = new Point (me.X, me.Y);
+			}
 
 			Win.WantMousePositionReports = true;
 
-			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Top.Closed += (_) => {
+				Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+				Application.RootMouseEvent -= Application_RootMouseEvent;
+			};
 		}
 
 		private void ShowContextMenu (int x, int y)
