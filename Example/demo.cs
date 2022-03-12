@@ -239,6 +239,7 @@ static class Demo {
 	static void Editor ()
 	{
 		Application.Init ();
+		Application.HeightAsBuffer = heightAsBuffer;
 
 		var ntop = Application.Top;
 
@@ -582,13 +583,14 @@ static class Demo {
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
 	public static CheckBox menuAutoMouseNav;
+	private static bool heightAsBuffer = false;
 	static void MainApp ()
 	{
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 		Application.Init ();
-		Application.HeightAsBuffer = true;
+		Application.HeightAsBuffer = heightAsBuffer;
 		//ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 		var top = Application.Top;
@@ -623,6 +625,8 @@ static class Demo {
 		MenuItem miUseSubMenusSingleFrame = null;
 		var useSubMenusSingleFrame = false;
 
+		MenuItem miHeightAsBuffer = null;
+
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.D),
@@ -644,7 +648,11 @@ static class Demo {
 				miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
 				() => menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
 					CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
-				}
+				},
+				miHeightAsBuffer = new MenuItem ("_Height As Buffer", "", () => {
+					miHeightAsBuffer.Checked = heightAsBuffer = !heightAsBuffer;
+					Application.HeightAsBuffer = heightAsBuffer;
+				}) { CheckType = MenuItemCheckStyle.Checked, Checked = heightAsBuffer }
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true), null, null, Key.AltMask + 0.ToString () [0]),
