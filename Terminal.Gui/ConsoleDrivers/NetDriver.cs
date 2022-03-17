@@ -1214,6 +1214,7 @@ namespace Terminal.Gui {
 				} else {
 					Clipboard = new CursesClipboard ();
 				}
+				supportsTrueColorOutput = CursesDriver.CanColorTermTrueColor ();
 			}
 			UseTrueColor = true;
 		}
@@ -1503,7 +1504,7 @@ namespace Terminal.Gui {
 		{
 			System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
-			if (attr is TrueColorAttribute tca) {
+			if ((UseTrueColor) && (attr is TrueColorAttribute tca)) {
 				sb.Append (new [] { '\x1b', '[', '3', '8', ';', '2', ';' });
 				sb.Append (tca.TrueColorForeground.Red);
 				sb.Append (';');
