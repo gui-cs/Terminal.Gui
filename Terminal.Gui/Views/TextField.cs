@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using NStack;
 using Terminal.Gui.Resources;
 using Rune = System.Rune;
@@ -25,6 +27,7 @@ namespace Terminal.Gui {
 		int selectedStart = -1; // -1 represents there is no text selection.
 		ustring selectedText;
 		HistoryText historyText = new HistoryText ();
+		CultureInfo currentCulture;
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
@@ -202,20 +205,25 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
-			ContextMenu = new ContextMenu (this,
-				new MenuBarItem (new MenuItem [] {
-								new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-								new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-								new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-								new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-								new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-								new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-								new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
-				})
-			);
+			currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+			ContextMenu = new ContextMenu (this, BuildContextMenuBarItem ());
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
 			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private MenuBarItem BuildContextMenuBarItem ()
+		{
+			return new MenuBarItem (new MenuItem [] {
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				});
 		}
 
 		private void ContextMenu_KeyChanged (Key obj)
@@ -921,6 +929,12 @@ namespace Terminal.Gui {
 
 		void ShowContextMenu ()
 		{
+			if (currentCulture != Thread.CurrentThread.CurrentUICulture) {
+
+				currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+				ContextMenu.MenuItens = BuildContextMenuBarItem ();
+			}
 			ContextMenu.Show ();
 		}
 
