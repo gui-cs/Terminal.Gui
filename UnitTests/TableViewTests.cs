@@ -75,6 +75,23 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
+		public void Redraw_EmptyTable ()
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = new ColorScheme();
+			tableView.Bounds = new Rect (0, 0, 25, 10);
+
+			// Set a table with 1 column
+			tableView.Table = BuildTable (1, 50);
+			tableView.Redraw(tableView.Bounds);
+
+			tableView.Table.Columns.Remove(tableView.Table.Columns[0]);
+			tableView.Redraw(tableView.Bounds);
+		}
+
+
+		[Fact]
 		public void SelectedCellChanged_NotFiredForSameValue ()
 		{
 			var tableView = new TableView () {

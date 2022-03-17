@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Table == null) {
+			if (Table == null || Table.Columns.Count <= 0) {
 				PositionCursor ();
 				return false;
 			}
@@ -865,7 +865,7 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 
-			if (Table == null) {
+			if (Table == null || Table.Columns.Count <= 0) {
 				return false;
 			}
 
@@ -925,7 +925,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -956,7 +956,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1137,7 +1137,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				yield break;
 
 			int usedSpace = 0;
