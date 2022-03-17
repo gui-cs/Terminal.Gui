@@ -4,6 +4,8 @@ using System.Text;
 using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Globalization;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
@@ -24,6 +26,9 @@ namespace UICatalog.Scenarios {
 		private bool _matchWholeWord;
 		private Window winDialog;
 		private TabView _tabView;
+		private MenuItem miForceMinimumPosToZero;
+		private bool forceMinimumPosToZero = true;
+		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -94,6 +99,13 @@ namespace UICatalog.Scenarios {
 					CreateEnabledChecked (),
 					CreateVisibleChecked ()
 				}),
+				new MenuBarItem ("Conte_xtMenu", new MenuItem [] {
+					miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
+						miForceMinimumPosToZero.Checked = forceMinimumPosToZero = !forceMinimumPosToZero;
+						_textView.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
+					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					new MenuBarItem ("_Languages", GetSupportedCultures ())
+				})
 			});
 			Top.Add (menu);
 
@@ -175,6 +187,8 @@ namespace UICatalog.Scenarios {
 					e.Handled = true;
 				}
 			};
+
+			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()
@@ -444,6 +458,46 @@ namespace UICatalog.Scenarios {
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
+		}
+
+		private MenuItem [] GetSupportedCultures ()
+		{
+			List<MenuItem> supportedCultures = new List<MenuItem> ();
+			var index = -1;
+
+			foreach (var c in cultureInfos) {
+				var culture = new MenuItem {
+					CheckType = MenuItemCheckStyle.Checked
+				};
+				if (index == -1) {
+					culture.Title = "_English";
+					culture.Help = "en-US";
+					culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == "en-US";
+					CreateAction (supportedCultures, culture);
+					supportedCultures.Add (culture);
+					index++;
+					culture = new MenuItem {
+						CheckType = MenuItemCheckStyle.Checked
+					};
+				}
+				culture.Title = $"_{c.Parent.EnglishName}";
+				culture.Help = c.Name;
+				culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
+				CreateAction (supportedCultures, culture);
+				supportedCultures.Add (culture);
+			}
+			return supportedCultures.ToArray ();
+
+			void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
+			{
+				culture.Action += () => {
+					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help.ToString ());
+					culture.Checked = true;
+					foreach (var item in supportedCultures) {
+						item.Checked = item.Help.ToString () == Thread.CurrentThread.CurrentUICulture.Name;
+					}
+				};
+			}
 		}
 
 		private MenuItem [] CreateKeepChecked ()

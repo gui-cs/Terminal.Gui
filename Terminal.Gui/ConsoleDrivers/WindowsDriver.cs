@@ -881,17 +881,15 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
-				if (HeightAsBuffer) {
-					var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
-					left = pos.X;
-					top = pos.Y;
-					cols = inputEvent.WindowBufferSizeEvent.size.X;
-					rows = inputEvent.WindowBufferSizeEvent.size.Y;
-					//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
-					ResizeScreen ();
-					UpdateOffScreen ();
-					TerminalResized?.Invoke ();
-				}
+				var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
+				left = pos.X;
+				top = pos.Y;
+				cols = inputEvent.WindowBufferSizeEvent.size.X;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
+				ResizeScreen ();
+				UpdateOffScreen ();
+				TerminalResized?.Invoke ();
 				break;
 
 			case WindowsConsole.EventType.Focus:
@@ -1566,7 +1564,10 @@ namespace Terminal.Gui {
 			//};
 
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
-			UpdateCursor ();
+
+			// The views that wants to display the cursor must call UpdateCursor explicitly.
+			//UpdateCursor ();
+
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
@@ -1868,7 +1869,7 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.MainIteration ()
 		{
 			while (resultQueue.Count > 0) {
-				var inputEvent = resultQueue.Dequeue()[0];
+				var inputEvent = resultQueue.Dequeue () [0];
 				ProcessInput?.Invoke (inputEvent);
 			}
 			if (winChanged) {
