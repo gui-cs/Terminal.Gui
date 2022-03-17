@@ -1080,12 +1080,31 @@ namespace Terminal.Gui {
 
 			//if we have scrolled too far to the right
 			if (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
-				ColumnOffset = SelectedColumn;
+
+				if(Style.SmoothHorizontalScrolling) {
+
+					// Scroll right 1 column at a time until the users selected column is visible
+					while(SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+
+						ColumnOffset++;
+						columnsToRender = CalculateViewport (Bounds).ToArray ();
+
+						// if we are already scrolled to the last column then break
+						// this will prevent any theoretical infinite loop
+						if (ColumnOffset >= Table.Columns.Count - 1)
+							break;
+
+					}
+				}
+				else {
+					ColumnOffset = SelectedColumn;
+				}
+				
 			}
 
 			//if we have scrolled too far down
 			if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight)) {
-				RowOffset = SelectedRow;
+				RowOffset = SelectedRow - (Bounds.Height - headerHeight) + 1;
 			}
 			//if we have scrolled too far up
 			if (SelectedRow < RowOffset) {
@@ -1377,6 +1396,22 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <value></value>
 			public bool ExpandLastColumn {get;set;} = true;
+
+			/// <summary>
+			/// <para>
+			/// Determines how <see cref="TableView.ColumnOffset"/> is updated when scrolling
+			/// right off the end of the currently visible area.
+			/// </para>
+			/// <para>
+			/// If true then when scrolling right the scroll offset is increased the minimum required to show
+			/// the new column.  This may be slow if you have an incredibly large number of columns in
+			/// your table and/or slow <see cref="ColumnStyle.RepresentationGetter"/> implementations
+			/// </para>
+			/// <para>
+			/// If false then scroll offset is set to the currently selected column (i.e. PageRight).
+			/// </para>
+			/// </summary>
+			public bool SmoothHorizontalScrolling { get; set; } = true;
 			
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
