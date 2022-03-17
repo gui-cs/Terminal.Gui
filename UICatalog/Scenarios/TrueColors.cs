@@ -14,6 +14,13 @@ namespace UICatalog.Scenarios {
 
 			var canTrueColor = Application.Driver.SupportsTrueColorOutput;
 
+			var lblDriverName = new Label($"Current driver is {Application.Driver.GetType().Name}") {
+				X = x,
+				Y = y++
+			};
+			Win.Add(lblDriverName);
+			y++;
+
 			var cbSupportsTrueColor = new CheckBox ("Driver supports true color ") {
 				X = x,
 				Y = y++,
