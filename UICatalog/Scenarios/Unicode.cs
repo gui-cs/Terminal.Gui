@@ -6,7 +6,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Unicode", Description: "Tries to test Unicode in all controls (#204)")]
 	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Unicode")]
 	public class UnicodeInMenu : Scenario {
 		public override void Setup ()
 		{

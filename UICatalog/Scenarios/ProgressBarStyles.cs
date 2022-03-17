@@ -6,7 +6,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ProgressBar Styles", Description: "Shows the ProgressBar Styles")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("MainLoop")]
+	[ScenarioCategory ("MainLoop"), ScenarioCategory ("ProgressBar")]
 	public class ProgressBarStyles : Scenario {
 		private Timer _fractionTimer;
 		private Timer _pulseTimer;

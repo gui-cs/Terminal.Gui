@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ComboBoxIteration", Description: "ComboBox iteration.")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("ComboBox")]
 	public class ComboBoxIteration : Scenario {
 		public override void Setup ()
 		{

@@ -10,7 +10,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dynamic MenuBar", Description: "Demonstrates how to add and remove a MenuBar, Menus and change titles dynamically.")]
-	[ScenarioCategory ("Dynamic")]
+	[ScenarioCategory ("Menu")]
 	public class DynamicMenuBar : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
