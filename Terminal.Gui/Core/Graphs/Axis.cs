@@ -45,7 +45,7 @@ namespace Terminal.Gui.Graphs {
 		/// Displayed below/to left of labels (see <see cref="Orientation"/>).
 		/// If text is not visible, check <see cref="GraphView.MarginBottom"/> / <see cref="GraphView.MarginLeft"/>
 		/// </summary>
-		public string Text;
+		public string Text { get; set; }
 
 		/// <summary>
 		/// The minimum axis point to show.  Defaults to null (no minimum)
