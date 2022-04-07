@@ -51,6 +51,10 @@ namespace Terminal.Gui {
 			bool valid = false;
 			try {
 				dirInfo = new DirectoryInfo (value == null ? directory.ToString () : value.ToString ());
+
+				// Dispose of the old watcher
+				watcher?.Dispose ();
+
 				watcher = new FileSystemWatcher (dirInfo.FullName);
 				watcher.NotifyFilter = NotifyFilters.Attributes
 				 | NotifyFilters.CreationTime
