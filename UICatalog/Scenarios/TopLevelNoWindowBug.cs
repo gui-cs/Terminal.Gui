@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes MenuBar to misbehave. #437")]
-	[ScenarioCategory ("Bug Repro")]
+	[ScenarioCategory ("Bug Repro"), ScenarioCategory ("TopLevel")]
 
 	public class TopLevelNoWindowBug : Scenario {
 

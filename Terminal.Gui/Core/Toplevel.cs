@@ -347,10 +347,8 @@ namespace Terminal.Gui {
 			case Key.AltMask:
 			case Key.AltMask | Key.Space:
 			case Key.CtrlMask | Key.Space:
-				if (MenuBar != null && MenuBar.OnKeyDown (keyEvent)) {
-					return true;
-				}
-				break;
+			case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
+				return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
 			}
 
 			return false;

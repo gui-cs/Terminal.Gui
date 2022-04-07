@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("MainLoop")]
-	[ScenarioCategory ("Threading")]
+	[ScenarioCategory ("Threading"), ScenarioCategory ("ProgressBar")]
 	public class Progress : Scenario {
 
 		class ProgressDemo : FrameView {

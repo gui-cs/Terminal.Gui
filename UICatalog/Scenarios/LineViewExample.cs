@@ -10,7 +10,7 @@ using static UICatalog.Scenario;
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line View", Description: "Demonstrates the LineView control")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Lines")]
 	public class LineViewExample : Scenario {
 
 		public override void Setup ()

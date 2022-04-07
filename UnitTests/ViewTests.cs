@@ -1876,8 +1876,8 @@ namespace Terminal.Gui.Core {
 └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 0), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 8, 4), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1900,8 +1900,8 @@ namespace Terminal.Gui.Core {
 ──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 0), pos);
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 4), pos);
 
 			view.Frame = new Rect (-1, -1, 8, 4);
 			Application.Refresh ();
@@ -1912,33 +1912,33 @@ namespace Terminal.Gui.Core {
 ──────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (6, 0), pos);
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (6, 0, 7, 3), pos);
 
 			view.Frame = new Rect (0, 0, 8, 4);
 			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
 
 			expected = @"
 ┌──────
-│      
-│      
+│
+│
 └──────
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 0), pos);
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 4), pos);
 
 			view.Frame = new Rect (0, 0, 8, 4);
 			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
 
 			expected = @"
 ┌──────
-│      
-│      
+│
+│
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithPosAre (expected, output);
-			Assert.Equal (new Point (0, 0), pos);
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 3), pos);
 		}
 	}
 }

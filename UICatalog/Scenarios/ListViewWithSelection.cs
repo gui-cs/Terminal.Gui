@@ -8,7 +8,7 @@ using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("ListView")]
 	public class ListViewWithSelection : Scenario {
 
 		public CheckBox _customRenderCB;

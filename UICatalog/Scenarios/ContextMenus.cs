@@ -5,18 +5,25 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Menu"), ScenarioCategory ("ContextMenu")]
 	public class ContextMenus : Scenario {
 		private ContextMenu contextMenu = new ContextMenu ();
 		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;
 		private MenuItem miForceMinimumPosToZero;
 		private bool forceMinimumPosToZero = true;
 		private TextField tfTopLeft, tfTopRight, tfMiddle, tfBottomLeft, tfBottomRight;
+		private MenuItem miUseSubMenusSingleFrame;
+		private bool useSubMenusSingleFrame;
 
 		public override void Setup ()
 		{
 			var text = "Context Menu";
 			var width = 20;
+
+			Win.Add (new Label ("Press 'Ctrl + Space' to open the Window context menu.") {
+				X = Pos.Center (),
+				Y = 1
+			});
 
 			tfTopLeft = new TextField (text) {
 				Width = width
@@ -52,7 +59,7 @@ namespace UICatalog.Scenarios {
 			Point mousePos = default;
 
 			Win.KeyPress += (e) => {
-				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask) && !ContextMenu.IsShow) {
+				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask)) {
 					ShowContextMenu (mousePos.X, mousePos.Y);
 					e.Handled = true;
 				}
@@ -63,12 +70,21 @@ namespace UICatalog.Scenarios {
 					ShowContextMenu (e.MouseEvent.X, e.MouseEvent.Y);
 					e.Handled = true;
 				}
-				mousePos = new Point (e.MouseEvent.X, e.MouseEvent.Y);
 			};
+
+			Application.RootMouseEvent += Application_RootMouseEvent;
+
+			void Application_RootMouseEvent (MouseEvent me)
+			{
+				mousePos = new Point (me.X, me.Y);
+			}
 
 			Win.WantMousePositionReports = true;
 
-			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Top.Closed += (_) => {
+				Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+				Application.RootMouseEvent -= Application_RootMouseEvent;
+			};
 		}
 
 		private void ShowContextMenu (int x, int y)
@@ -89,10 +105,14 @@ namespace UICatalog.Scenarios {
 						tfBottomLeft.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 						tfBottomRight.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
+						() => contextMenu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
+							CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
+						},
 					null,
 					new MenuItem ("_Quit", "", () => Application.RequestStop ())
 				})
-			) { ForceMinimumPosToZero = forceMinimumPosToZero };
+			) { ForceMinimumPosToZero = forceMinimumPosToZero, UseSubMenusSingleFrame = useSubMenusSingleFrame };
 
 			tfTopLeft.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 			tfTopRight.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;

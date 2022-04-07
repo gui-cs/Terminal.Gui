@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("TopLevel"), ScenarioCategory ("IO.Stream")]
 	public class HexEditor : Scenario {
 		private string _fileName = "demo.bin";
 		private HexView _hexView;

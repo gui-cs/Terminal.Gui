@@ -10,7 +10,7 @@ using static UICatalog.Scenario;
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Notepad", Description: "Multi tab text editor")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView")]
 	public class Notepad : Scenario {
 
 		TabView tabView;
