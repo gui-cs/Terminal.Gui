@@ -1451,13 +1451,13 @@ namespace Terminal.Gui {
 				dirtyLine [row] = false;
 				System.Text.StringBuilder output = new System.Text.StringBuilder ();
 				for (int col = 0; col < cols; col++) {
-					if (contents [row, col, 2] != 1) {
-						continue;
-					}
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
 					for (; col < cols; col++) {
+						if (contents [row, col, 2] != 1) {
+							continue;
+						}
 						var attr = contents [row, col, 1];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
