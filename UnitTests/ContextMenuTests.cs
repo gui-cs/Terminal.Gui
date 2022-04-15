@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using System.Globalization;
+using System.Threading;
+using Xunit;
 using Xunit.Abstractions;
 using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
@@ -555,6 +557,8 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void ContextMenu_On_Toplevel_With_A_MenuBar_TextField_StatusBar ()
 		{
+			Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("File", "", null),
 				new MenuBarItem ("Edit", "", null)
@@ -614,6 +618,8 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void ContextMenu_On_Toplevel_With_A_MenuBar_Window_TextField_StatusBar ()
 		{
+			Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("File", "", null),
 				new MenuBarItem ("Edit", "", null)
