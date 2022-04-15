@@ -1528,6 +1528,8 @@ namespace Terminal.Gui {
 			UpdateScreen ();
 
 			WinConsole.SetInitialCursorVisibility ();
+
+			UpdateCursor ();
 #if false
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
@@ -1564,9 +1566,6 @@ namespace Terminal.Gui {
 			//};
 
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
-
-			// The views that wants to display the cursor must call UpdateCursor explicitly.
-			//UpdateCursor ();
 
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
@@ -1611,6 +1610,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
+			savedCursorVisibility = visibility;
 			return WinConsole.SetCursorVisibility (visibility);
 		}
 
