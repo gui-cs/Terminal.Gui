@@ -952,51 +952,62 @@ namespace Terminal.Gui {
 
 			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
-				if (MainLoop.EventsPending (wait)) {
-					// Notify Toplevel it's ready
-					if (firstIteration) {
-						state.Toplevel.OnReady ();
-					}
-					firstIteration = false;
+				RunIteration (ref state, wait, ref firstIteration);
+			}
+		}
 
-					MainLoop.MainIteration ();
-					Iteration?.Invoke ();
+		/// <summary>
+		/// Run the <see cref="RunLoop(RunState, bool)"/> iteration.
+		/// </summary>
+		/// <param name="state">The state returned by the Begin method.</param>
+		/// <param name="wait">If will execute the runloop waiting for events.</param>
+		/// <param name="firstIteration">If it's the first run loop iteration.</param>
+		public static void RunIteration (ref RunState state, bool wait, ref bool firstIteration)
+		{
+			if (MainLoop.EventsPending (wait)) {
+				// Notify Toplevel it's ready
+				if (firstIteration) {
+					state.Toplevel.OnReady ();
+				}
+				firstIteration = false;
 
-					EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-					if ((state.Toplevel != Current && Current?.Modal == true)
-						|| (state.Toplevel != Current && Current?.Modal == false)) {
-						MdiTop?.OnDeactivate (state.Toplevel);
-						state.Toplevel = Current;
-						MdiTop?.OnActivate (state.Toplevel);
-						Top.SetChildNeedsDisplay ();
-						Refresh ();
-					}
-					if (Driver.EnsureCursorVisibility ()) {
-						state.Toplevel.SetNeedsDisplay ();
-					}
-				} else if (!wait) {
-					return;
+				MainLoop.MainIteration ();
+				Iteration?.Invoke ();
+
+				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
+				if ((state.Toplevel != Current && Current?.Modal == true)
+					|| (state.Toplevel != Current && Current?.Modal == false)) {
+					MdiTop?.OnDeactivate (state.Toplevel);
+					state.Toplevel = Current;
+					MdiTop?.OnActivate (state.Toplevel);
+					Top.SetChildNeedsDisplay ();
+					Refresh ();
 				}
-				if (state.Toplevel != Top
-					&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
-					Top.Redraw (Top.Bounds);
-					state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+				if (Driver.EnsureCursorVisibility ()) {
+					state.Toplevel.SetNeedsDisplay ();
 				}
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
-					|| MdiChildNeedsDisplay ()) {
-					state.Toplevel.Redraw (state.Toplevel.Bounds);
-					if (DebugDrawBounds) {
-						DrawBounds (state.Toplevel);
-					}
-					state.Toplevel.PositionCursor ();
-					Driver.Refresh ();
-				} else {
-					Driver.UpdateCursor ();
+			} else if (!wait) {
+				return;
+			}
+			if (state.Toplevel != Top
+				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				Top.Redraw (Top.Bounds);
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+			}
+			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
+				|| MdiChildNeedsDisplay ()) {
+				state.Toplevel.Redraw (state.Toplevel.Bounds);
+				if (DebugDrawBounds) {
+					DrawBounds (state.Toplevel);
 				}
-				if (state.Toplevel != Top && !state.Toplevel.Modal
-					&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
-					Top.Redraw (Top.Bounds);
-				}
+				state.Toplevel.PositionCursor ();
+				Driver.Refresh ();
+			} else {
+				Driver.UpdateCursor ();
+			}
+			if (state.Toplevel != Top && !state.Toplevel.Modal
+				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				Top.Redraw (Top.Bounds);
 			}
 		}
 
