@@ -154,7 +154,7 @@
     <value>開く</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
-    <value>フォルダーを保存</value>
+    <value>フォルダーを選択</value>
   </data>
   <data name="fdSelectMixed" xml:space="preserve">
     <value>混在選択</value>
