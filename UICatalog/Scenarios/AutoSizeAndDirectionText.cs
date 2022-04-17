@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "AutoSize and Direction Text", Description: "Demonstrates the text auto-size and direction manipulation.")]
-	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Text"), ScenarioCategory ("AutoSize"), ScenarioCategory ("Direction")]
 	public class AutoSizeAndDirectionText : Scenario {
 		public override void Setup ()
 		{

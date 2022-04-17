@@ -9,7 +9,7 @@ using Rune = System.Rune;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TextFormatter Demo", Description: "Demos and tests the TextFormatter class.")]
 	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("POC")]
+	[ScenarioCategory ("POC"), ScenarioCategory ("TextFormat")]
 	public class TextFormatterDemo : Scenario {
 		public override void Setup ()
 		{

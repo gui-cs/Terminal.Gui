@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("TopLevel"), ScenarioCategory ("TableView")]
 	public class TableEditor : Scenario 
 	{
 		TableView tableView;
