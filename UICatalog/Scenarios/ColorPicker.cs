@@ -57,6 +57,10 @@ namespace UICatalog.Scenarios {
 			// Demo Label.
 			demoLabel = new Label (50, 10, "Lorem Ipsum");
 			Win.Add (demoLabel);
+
+			// Set default colors.
+			backgroundColorPicker.SelectedColor = demoLabel.SuperView.ColorScheme.Normal.Background;
+			foregroundColorPicker.SelectedColor = demoLabel.SuperView.ColorScheme.Normal.Foreground;
 		}
 
 		/// <summary>
