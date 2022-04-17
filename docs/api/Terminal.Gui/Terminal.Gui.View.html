@@ -557,7 +557,7 @@ color scheme.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ColorScheme ColorScheme { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual ColorScheme ColorScheme { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -770,7 +770,7 @@ Gets or sets the HotKey defined for this view. A user pressing HotKey on the key
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Key HotKey { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual Key HotKey { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -795,7 +795,7 @@ Gets or sets the specifier character for the hotkey (e.g. &apos;_&apos;). Set to
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune HotKeySpecifier { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual Rune HotKeySpecifier { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1484,6 +1484,78 @@ Adds the specified views (children) to the view.
   <div class="markdown level1 remarks">
 The Views that have been added to this view can be retrieved via the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> property. See also <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">RemoveAll()</a> 
 </div>
+  <a id="Terminal_Gui_View_AddCommand_" data-uid="Terminal.Gui.View.AddCommand*"></a>
+  <h4 id="Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___" data-uid="Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}})">AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</h4>
+  <div class="markdown level1 summary">
+<p>States that the given <a class="xref" href="Terminal.Gui.View.html">View</a> supports a given <code data-dev-comment-type="paramref" class="paramref">command</code>
+and what <code data-dev-comment-type="paramref" class="paramref">f</code> to perform to make that command happen
+</p>
+<p>If the <code data-dev-comment-type="paramref" class="paramref">command</code> already has an implementation the <code data-dev-comment-type="paramref" class="paramref">f</code>
+will replace the old one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void AddCommand(Command command, Func&lt;bool?&gt; f)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td><span class="parametername">command</span></td>
+        <td>The command.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Nullable</span>&lt;<span class="xref">System.Boolean</span>&gt;&gt;</td>
+        <td><span class="parametername">f</span></td>
+        <td>The function.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_AddKeyBinding_" data-uid="Terminal.Gui.View.AddKeyBinding*"></a>
+  <h4 id="Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_" data-uid="Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.Command)">AddKeyBinding(Key, Command)</h4>
+  <div class="markdown level1 summary">
+<p>Adds a new key combination that will trigger the given <code data-dev-comment-type="paramref" class="paramref">command</code>
+(if supported by the View - see <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">GetSupportedCommands()</a>)
+</p>
+<p>If the key is already bound to a different <a class="xref" href="Terminal.Gui.Command.html">Command</a> it will be
+rebound to this one</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddKeyBinding(Key key, Command command)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td><span class="parametername">command</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_AddRune_" data-uid="Terminal.Gui.View.AddRune*"></a>
   <h4 id="Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_" data-uid="Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)">AddRune(Int32, Int32, Rune)</h4>
   <div class="markdown level1 summary">
@@ -1639,6 +1711,72 @@ Clears the specified region with the current color.
   <h5 id="Terminal_Gui_View_Clear_Terminal_Gui_Rect__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 </div>
+  <a id="Terminal_Gui_View_ClearKeybinding_" data-uid="Terminal.Gui.View.ClearKeybinding*"></a>
+  <h4 id="Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_" data-uid="Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command)">ClearKeybinding(Command)</h4>
+  <div class="markdown level1 summary">
+Removes all key bindings that trigger the given command.  Views can have multiple different
+keys bound to the same command and this method will clear all of them.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearKeybinding(Command command)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td><span class="parametername">command</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_ClearKeybinding_" data-uid="Terminal.Gui.View.ClearKeybinding*"></a>
+  <h4 id="Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_" data-uid="Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Key)">ClearKeybinding(Key)</h4>
+  <div class="markdown level1 summary">
+Clears the existing keybinding (if any) for the given <code data-dev-comment-type="paramref" class="paramref">key</code>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearKeybinding(Key key)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_ClearKeybindings_" data-uid="Terminal.Gui.View.ClearKeybindings*"></a>
+  <h4 id="Terminal_Gui_View_ClearKeybindings" data-uid="Terminal.Gui.View.ClearKeybindings">ClearKeybindings()</h4>
+  <div class="markdown level1 summary">
+Removes all bound keys from the View making including the default
+key combinations such as cursor navigation, scrolling etc
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearKeybindings()</code></pre>
+  </div>
   <a id="Terminal_Gui_View_ClearLayoutNeeded_" data-uid="Terminal.Gui.View.ClearLayoutNeeded*"></a>
   <h4 id="Terminal_Gui_View_ClearLayoutNeeded" data-uid="Terminal.Gui.View.ClearLayoutNeeded">ClearLayoutNeeded()</h4>
   <div class="markdown level1 summary">
@@ -1688,6 +1826,48 @@ Sets the <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a
   <div class="markdown level1 remarks">
 <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> is View-relative.
 </div>
+  <a id="Terminal_Gui_View_ContainsKeyBinding_" data-uid="Terminal.Gui.View.ContainsKeyBinding*"></a>
+  <h4 id="Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_" data-uid="Terminal.Gui.View.ContainsKeyBinding(Terminal.Gui.Key)">ContainsKeyBinding(Key)</h4>
+  <div class="markdown level1 summary">
+Checks if key combination already exist.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ContainsKeyBinding(Key key)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">key</span></td>
+        <td>The key to check.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> If the key already exist, <code>false</code>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_Dispose_" data-uid="Terminal.Gui.View.Dispose*"></a>
   <h4 id="Terminal_Gui_View_Dispose_System_Boolean_" data-uid="Terminal.Gui.View.Dispose(System.Boolean)">Dispose(Boolean)</h4>
   <div class="markdown level1 summary"></div>
@@ -2005,6 +2185,48 @@ Gets the current width based on the <a class="xref" href="Terminal.Gui.View.html
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_GetKeyFromCommand_" data-uid="Terminal.Gui.View.GetKeyFromCommand*"></a>
+  <h4 id="Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_" data-uid="Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)">GetKeyFromCommand(Command)</h4>
+  <div class="markdown level1 summary">
+Gets the key used by a command.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Key GetKeyFromCommand(Command command)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td><span class="parametername">command</span></td>
+        <td>The command to search.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Key.html">Key</a> used by a <a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_GetNormalColor_" data-uid="Terminal.Gui.View.GetNormalColor*"></a>
   <h4 id="Terminal_Gui_View_GetNormalColor" data-uid="Terminal.Gui.View.GetNormalColor">GetNormalColor()</h4>
   <div class="markdown level1 summary">
@@ -2031,6 +2253,99 @@ Determines the current <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_GetSupportedCommands_" data-uid="Terminal.Gui.View.GetSupportedCommands*"></a>
+  <h4 id="Terminal_Gui_View_GetSupportedCommands" data-uid="Terminal.Gui.View.GetSupportedCommands">GetSupportedCommands()</h4>
+  <div class="markdown level1 summary">
+Returns all commands that are supported by this <a class="xref" href="Terminal.Gui.View.html">View</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Command&gt; GetSupportedCommands()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Terminal.Gui.Command.html">Command</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_GetTopSuperView_" data-uid="Terminal.Gui.View.GetTopSuperView*"></a>
+  <h4 id="Terminal_Gui_View_GetTopSuperView" data-uid="Terminal.Gui.View.GetTopSuperView">GetTopSuperView()</h4>
+  <div class="markdown level1 summary">
+Get the top superview of a given <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public View GetTopSuperView()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td>The superview view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_InvokeKeybindings_" data-uid="Terminal.Gui.View.InvokeKeybindings*"></a>
+  <h4 id="Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.InvokeKeybindings(Terminal.Gui.KeyEvent)">InvokeKeybindings(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+Invokes any binding that is registered on this <a class="xref" href="Terminal.Gui.View.html">View</a>
+and matches the <code data-dev-comment-type="paramref" class="paramref">keyEvent</code>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool? InvokeKeybindings(KeyEvent keyEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td>The key event passed.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_LayoutSubviews_" data-uid="Terminal.Gui.View.LayoutSubviews*"></a>
   <h4 id="Terminal_Gui_View_LayoutSubviews" data-uid="Terminal.Gui.View.LayoutSubviews">LayoutSubviews()</h4>
   <div class="markdown level1 summary">
@@ -2047,14 +2362,14 @@ response to the container view or terminal resizing.
 Calls <span class="xref">Terminal.Gui.View.OnLayoutComplete(Terminal.Gui.View.LayoutEventArgs)</span> (which raises the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">LayoutComplete</a> event) before it returns.
 </div>
   <a id="Terminal_Gui_View_Move_" data-uid="Terminal.Gui.View.Move*"></a>
-  <h4 id="Terminal_Gui_View_Move_System_Int32_System_Int32_" data-uid="Terminal.Gui.View.Move(System.Int32,System.Int32)">Move(Int32, Int32)</h4>
+  <h4 id="Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_" data-uid="Terminal.Gui.View.Move(System.Int32,System.Int32,System.Boolean)">Move(Int32, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
 This moves the cursor to the specified column and row in the view.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Move(int col, int row)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Move(int col, int row, bool clipped = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2075,6 +2390,12 @@ This moves the cursor to the specified column and row in the view.
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">row</span></td>
         <td>Row.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">clipped</span></td>
+        <td>Whether to clip the result of the ViewToScreen method,
+ if set to <code>true</code>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</td>
       </tr>
     </tbody>
   </table>
@@ -2145,6 +2466,37 @@ Enables overrides to draw infinitely scrolled content and/or a background behind
   <h5 id="Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 This method will be called before any subviews added with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> have been drawn. 
+</div>
+  <a id="Terminal_Gui_View_OnDrawContentComplete_" data-uid="Terminal.Gui.View.OnDrawContentComplete*"></a>
+  <h4 id="Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.OnDrawContentComplete(Terminal.Gui.Rect)">OnDrawContentComplete(Rect)</h4>
+  <div class="markdown level1 summary">
+Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnDrawContentComplete(Rect viewport)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">viewport</span></td>
+        <td>The view-relative rectangle describing the currently visible viewport into the <a class="xref" href="Terminal.Gui.View.html">View</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This method will be called after any subviews removed with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> have been completed drawing.
 </div>
   <a id="Terminal_Gui_View_OnEnabledChanged_" data-uid="Terminal.Gui.View.OnEnabledChanged*"></a>
   <h4 id="Terminal_Gui_View_OnEnabledChanged" data-uid="Terminal.Gui.View.OnEnabledChanged">OnEnabledChanged()</h4>
@@ -2746,6 +3098,38 @@ Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.Vie
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void RemoveAll()</code></pre>
   </div>
+  <a id="Terminal_Gui_View_ReplaceKeyBinding_" data-uid="Terminal.Gui.View.ReplaceKeyBinding*"></a>
+  <h4 id="Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_" data-uid="Terminal.Gui.View.ReplaceKeyBinding(Terminal.Gui.Key,Terminal.Gui.Key)">ReplaceKeyBinding(Key, Key)</h4>
+  <div class="markdown level1 summary">
+Replaces a key combination already bound to <a class="xref" href="Terminal.Gui.Command.html">Command</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void ReplaceKeyBinding(Key fromKey, Key toKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">fromKey</span></td>
+        <td>The key to be replaced.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">toKey</span></td>
+        <td>The new key to be used.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_ScreenToView_" data-uid="Terminal.Gui.View.ScreenToView*"></a>
   <h4 id="Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_" data-uid="Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)">ScreenToView(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -3158,6 +3542,39 @@ Will be invoked before any subviews added with <a class="xref" href="Terminal.Gu
 Rect provides the view-relative rectangle describing the currently visible viewport into the <a class="xref" href="Terminal.Gui.View.html">View</a>.
 </p>
 </div>
+  <h4 id="Terminal_Gui_View_DrawContentComplete" data-uid="Terminal.Gui.View.DrawContentComplete">DrawContentComplete</h4>
+  <div class="markdown level1 summary">
+Event invoked when the content area of the View is completed drawing.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Rect&gt; DrawContentComplete</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Rect.html">Rect</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_View_DrawContentComplete_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+Will be invoked after any subviews removed with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> have been completed drawing.
+</p>
+<p>
+Rect provides the view-relative rectangle describing the currently visible viewport into the <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</p>
+</div>
   <h4 id="Terminal_Gui_View_EnabledChanged" data-uid="Terminal.Gui.View.EnabledChanged">EnabledChanged</h4>
   <div class="markdown level1 summary">
 Event fired when the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">Enabled</a> value is being changed.
@@ -3202,6 +3619,30 @@ Event fired when the view gets focus.
     <tbody>
       <tr>
         <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.View.FocusEventArgs.html">View.FocusEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_View_HotKeyChanged" data-uid="Terminal.Gui.View.HotKeyChanged">HotKeyChanged</h4>
+  <div class="markdown level1 summary">
+Event invoked when the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">HotKey</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Key&gt; HotKeyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Key.html">Key</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

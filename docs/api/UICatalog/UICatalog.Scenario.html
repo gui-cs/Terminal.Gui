@@ -86,7 +86,7 @@
   <div class="markdown level0 summary"><p>Base class for each demo/scenario.</p>
 <p>
  To define a new scenario:
-<ol><li>Create a new <code>.cs</code> file in the <cs>Scenarios</cs> directory that derives from <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</li><li>Annotate the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> derived class with a <a class="xref" href="UICatalog.Scenario.ScenarioMetadata.html">Scenario.ScenarioMetadata</a> attribute specifying the scenario&apos;s name and description.</li><li>Add one or more <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a> attributes to the class specifying which categories the scenario belongs to. If you don&apos;t specify a category the scenario will show up in &quot;All&quot;.</li><li>Implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Setup()</a> override which will be called when a user selects the scenario to run.</li><li>Optionally, implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_">Init(Toplevel, ColorScheme)</a> and/or <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a> overrides to provide a custom implementation.</li></ol>
+<ol><li>Create a new <code>.cs</code> file in the <cs>Scenarios</cs> directory that derives from <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</li><li>Annotate the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> derived class with a <a class="xref" href="UICatalog.Scenario.ScenarioMetadata.html">Scenario.ScenarioMetadata</a> attribute specifying the scenario&apos;s name and description.</li><li>Add one or more <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a> attributes to the class specifying which categories the scenario belongs to. If you don&apos;t specify a category the scenario will show up in &quot;_All&quot;.</li><li>Implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Setup()</a> override which will be called when a user selects the scenario to run.</li><li>Optionally, implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_">Init(Toplevel, ColorScheme)</a> and/or <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a> overrides to provide a custom implementation.</li></ol>
 </p>
 <p>
 The UI Catalog program uses reflection to find all scenarios and adds them to the
@@ -111,7 +111,9 @@ ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.   
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.CharacterMap.html">CharacterMap</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.ClassExplorer.html">ClassExplorer</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.Clipping.html">Clipping</a></div>
+      <div class="level2"><a class="xref" href="UICatalog.Scenarios.ComboBoxIteration.html">ComboBoxIteration</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.ComputedLayout.html">ComputedLayout</a></div>
+      <div class="level2"><a class="xref" href="UICatalog.Scenarios.ContextMenus.html">ContextMenus</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.CsvEditor.html">CsvEditor</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.Dialogs.html">Dialogs</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.DynamicMenuBar.html">DynamicMenuBar</a></div>
@@ -143,13 +145,12 @@ ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.   
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TextAlignments.html">TextAlignments</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TextAlignmentsAndDirections.html">TextAlignmentsAndDirections</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TextFormatterDemo.html">TextFormatterDemo</a></div>
+      <div class="level2"><a class="xref" href="UICatalog.Scenarios.TextViewAutocompletePopup.html">TextViewAutocompletePopup</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.Threading.html">Threading</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TimeAndDate.html">TimeAndDate</a></div>
-      <div class="level2"><a class="xref" href="UICatalog.Scenarios.TopLevelNoWindowBug.html">TopLevelNoWindowBug</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TreeUseCases.html">TreeUseCases</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.TreeViewFileSystem.html">TreeViewFileSystem</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.UnicodeInMenu.html">UnicodeInMenu</a></div>
-      <div class="level2"><a class="xref" href="UICatalog.Scenarios.UseSystemConsole.html">UseSystemConsole</a></div>
       <div class="level2"><a class="xref" href="UICatalog.Scenarios.WindowsAndFrameViews.html">WindowsAndFrameViews</a></div>
   </div>
   <div classs="implements">

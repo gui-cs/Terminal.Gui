@@ -138,6 +138,9 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
     </div>
     <div>
@@ -270,7 +273,7 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -280,9 +283,6 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
@@ -309,10 +309,46 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -433,6 +469,9 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -622,6 +661,31 @@ The current number of rows in the tree (ignoring the controls bounds)
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_DesiredCursorVisibility_" data-uid="Terminal.Gui.TreeView`1.DesiredCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_DesiredCursorVisibility" data-uid="Terminal.Gui.TreeView`1.DesiredCursorVisibility">DesiredCursorVisibility</h4>
+  <div class="markdown level1 summary">
+Get / Set the wished cursor when the tree is focused
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CursorVisibility DesiredCursorVisibility { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -865,6 +929,18 @@ expands root nodes
   </table>
   <h3 id="methods">Methods
   </h3>
+  <a id="Terminal_Gui_TreeView_1_ActivateSelectedObjectIfAny_" data-uid="Terminal.Gui.TreeView`1.ActivateSelectedObjectIfAny*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ActivateSelectedObjectIfAny" data-uid="Terminal.Gui.TreeView`1.ActivateSelectedObjectIfAny">ActivateSelectedObjectIfAny()</h4>
+  <div class="markdown level1 summary">
+<p>Triggers the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event with the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject">SelectedObject</a>.</p>
+
+<p>This method also ensures that the selected object is visible</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ActivateSelectedObjectIfAny()</code></pre>
+  </div>
   <a id="Terminal_Gui_TreeView_1_AddObject_" data-uid="Terminal.Gui.TreeView`1.AddObject*"></a>
   <h4 id="Terminal_Gui_TreeView_1_AddObject__0_" data-uid="Terminal.Gui.TreeView`1.AddObject(`0)">AddObject(T)</h4>
   <div class="markdown level1 summary">
@@ -976,6 +1052,39 @@ Moves the selection to the first child in the currently selected level
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void AdjustSelectionToBranchStart()</code></pre>
   </div>
+  <a id="Terminal_Gui_TreeView_1_AdjustSelectionToNextItemBeginningWith_" data-uid="Terminal.Gui.TreeView`1.AdjustSelectionToNextItemBeginningWith*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_AdjustSelectionToNextItemBeginningWith_System_Char_System_StringComparison_" data-uid="Terminal.Gui.TreeView`1.AdjustSelectionToNextItemBeginningWith(System.Char,System.StringComparison)">AdjustSelectionToNextItemBeginningWith(Char, StringComparison)</h4>
+  <div class="markdown level1 summary">
+<p>Moves the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject">SelectedObject</a> to the next item that begins with <code data-dev-comment-type="paramref" class="paramref">character</code></p>
+<p>This method will loop back to the start of the tree if reaching the end without finding a match</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AdjustSelectionToNextItemBeginningWith(char character, StringComparison caseSensitivity = StringComparison.CurrentCultureIgnoreCase)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Char</span></td>
+        <td><span class="parametername">character</span></td>
+        <td>The first character of the next item you want selected</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.StringComparison</span></td>
+        <td><span class="parametername">caseSensitivity</span></td>
+        <td>Case sensitivity of the search</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TreeView_1_CanExpand_" data-uid="Terminal.Gui.TreeView`1.CanExpand*"></a>
   <h4 id="Terminal_Gui_TreeView_1_CanExpand__0_" data-uid="Terminal.Gui.TreeView`1.CanExpand(`0)">CanExpand(T)</h4>
   <div class="markdown level1 summary">
@@ -1028,6 +1137,16 @@ Removes all objects from the tree and clears <a class="xref" href="Terminal.Gui.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void ClearObjects()</code></pre>
+  </div>
+  <a id="Terminal_Gui_TreeView_1_Collapse_" data-uid="Terminal.Gui.TreeView`1.Collapse*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_Collapse" data-uid="Terminal.Gui.TreeView`1.Collapse">Collapse()</h4>
+  <div class="markdown level1 summary">
+Collapses the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject">SelectedObject</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Collapse()</code></pre>
   </div>
   <a id="Terminal_Gui_TreeView_1_Collapse_" data-uid="Terminal.Gui.TreeView`1.Collapse*"></a>
   <h4 id="Terminal_Gui_TreeView_1_Collapse__0_" data-uid="Terminal.Gui.TreeView`1.Collapse(`0)">Collapse(T)</h4>
@@ -1184,6 +1303,16 @@ Adjusts the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_Tree
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_TreeView_1_Expand_" data-uid="Terminal.Gui.TreeView`1.Expand*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_Expand" data-uid="Terminal.Gui.TreeView`1.Expand">Expand()</h4>
+  <div class="markdown level1 summary">
+Expands the currently <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject">SelectedObject</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Expand()</code></pre>
+  </div>
   <a id="Terminal_Gui_TreeView_1_Expand_" data-uid="Terminal.Gui.TreeView`1.Expand*"></a>
   <h4 id="Terminal_Gui_TreeView_1_Expand__0_" data-uid="Terminal.Gui.TreeView`1.Expand(`0)">Expand(T)</h4>
   <div class="markdown level1 summary">
@@ -1643,6 +1772,132 @@ Returns true if the <code data-dev-comment-type="paramref" class="paramref">mode
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
+  <a id="Terminal_Gui_TreeView_1_MovePageDown_" data-uid="Terminal.Gui.TreeView`1.MovePageDown*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_MovePageDown_System_Boolean_" data-uid="Terminal.Gui.TreeView`1.MovePageDown(System.Boolean)">MovePageDown(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves the selection down by the height of the control (1 page).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void MovePageDown(bool expandSelection = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">expandSelection</span></td>
+        <td>True if the navigation should add the covered nodes to the selected current selection</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.NotImplementedException</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_MovePageUp_" data-uid="Terminal.Gui.TreeView`1.MovePageUp*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_MovePageUp_System_Boolean_" data-uid="Terminal.Gui.TreeView`1.MovePageUp(System.Boolean)">MovePageUp(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves the selection up by the height of the control (1 page).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void MovePageUp(bool expandSelection = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">expandSelection</span></td>
+        <td>True if the navigation should add the covered nodes to the selected current selection</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.NotImplementedException</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_OnEnter_" data-uid="Terminal.Gui.TreeView`1.OnEnter*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.TreeView`1.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool OnEnter(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
   <a id="Terminal_Gui_TreeView_1_OnObjectActivated_" data-uid="Terminal.Gui.TreeView`1.OnObjectActivated*"></a>
   <h4 id="Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_Trees_ObjectActivatedEventArgs__0__" data-uid="Terminal.Gui.TreeView`1.OnObjectActivated(Terminal.Gui.Trees.ObjectActivatedEventArgs{`0})">OnObjectActivated(ObjectActivatedEventArgs&lt;T&gt;)</h4>
   <div class="markdown level1 summary">
@@ -1856,6 +2111,26 @@ Removes the given root object from the tree
   <h5 id="Terminal_Gui_TreeView_1_Remove__0__remarks">Remarks</h5>
   <div class="markdown level1 remarks">If <code data-dev-comment-type="paramref" class="paramref">o</code> is the currently <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject">SelectedObject</a> then the
 selection is cleared</div>
+  <a id="Terminal_Gui_TreeView_1_ScrollDown_" data-uid="Terminal.Gui.TreeView`1.ScrollDown*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ScrollDown" data-uid="Terminal.Gui.TreeView`1.ScrollDown">ScrollDown()</h4>
+  <div class="markdown level1 summary">
+Scrolls the view area down a single line without changing the current selection
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ScrollDown()</code></pre>
+  </div>
+  <a id="Terminal_Gui_TreeView_1_ScrollUp_" data-uid="Terminal.Gui.TreeView`1.ScrollUp*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ScrollUp" data-uid="Terminal.Gui.TreeView`1.ScrollUp">ScrollUp()</h4>
+  <div class="markdown level1 summary">
+Scrolls the view area up a single line without changing the current selection
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ScrollUp()</code></pre>
+  </div>
   <a id="Terminal_Gui_TreeView_1_SelectAll_" data-uid="Terminal.Gui.TreeView`1.SelectAll*"></a>
   <h4 id="Terminal_Gui_TreeView_1_SelectAll" data-uid="Terminal.Gui.TreeView`1.SelectAll">SelectAll()</h4>
   <div class="markdown level1 summary">

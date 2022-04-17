@@ -133,6 +133,9 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
     </div>
     <div>
@@ -265,7 +268,7 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -298,10 +301,46 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -422,6 +461,9 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -1153,6 +1195,33 @@ Invokes the OnOpenSelectedItem event if it is defined.
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_ListView_OnRowRender_" data-uid="Terminal.Gui.ListView.OnRowRender*"></a>
+  <h4 id="Terminal_Gui_ListView_OnRowRender_Terminal_Gui_ListViewRowEventArgs_" data-uid="Terminal.Gui.ListView.OnRowRender(Terminal.Gui.ListViewRowEventArgs)">OnRowRender(ListViewRowEventArgs)</h4>
+  <div class="markdown level1 summary">
+Virtual method that will invoke the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_RowRender">RowRender</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnRowRender(ListViewRowEventArgs rowEventArgs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ListViewRowEventArgs.html">ListViewRowEventArgs</a></td>
+        <td><span class="parametername">rowEventArgs</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_ListView_OnSelectedChanged_" data-uid="Terminal.Gui.ListView.OnSelectedChanged*"></a>
   <h4 id="Terminal_Gui_ListView_OnSelectedChanged" data-uid="Terminal.Gui.ListView.OnSelectedChanged">OnSelectedChanged()</h4>
   <div class="markdown level1 summary">
@@ -1265,7 +1334,7 @@ Scrolls the view down.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void ScrollDown(int lines)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool ScrollDown(int lines)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1284,6 +1353,21 @@ Scrolls the view down.
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_ListView_ScrollLeft_" data-uid="Terminal.Gui.ListView.ScrollLeft*"></a>
   <h4 id="Terminal_Gui_ListView_ScrollLeft_System_Int32_" data-uid="Terminal.Gui.ListView.ScrollLeft(System.Int32)">ScrollLeft(Int32)</h4>
   <div class="markdown level1 summary">
@@ -1292,7 +1376,7 @@ Scrolls the view left.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void ScrollLeft(int cols)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool ScrollLeft(int cols)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1311,6 +1395,21 @@ Scrolls the view left.
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_ListView_ScrollRight_" data-uid="Terminal.Gui.ListView.ScrollRight*"></a>
   <h4 id="Terminal_Gui_ListView_ScrollRight_System_Int32_" data-uid="Terminal.Gui.ListView.ScrollRight(System.Int32)">ScrollRight(Int32)</h4>
   <div class="markdown level1 summary">
@@ -1319,7 +1418,7 @@ Scrolls the view right.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void ScrollRight(int cols)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool ScrollRight(int cols)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1338,6 +1437,21 @@ Scrolls the view right.
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_ListView_ScrollUp_" data-uid="Terminal.Gui.ListView.ScrollUp*"></a>
   <h4 id="Terminal_Gui_ListView_ScrollUp_System_Int32_" data-uid="Terminal.Gui.ListView.ScrollUp(System.Int32)">ScrollUp(Int32)</h4>
   <div class="markdown level1 summary">
@@ -1346,7 +1460,7 @@ Scrolls the view up.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void ScrollUp(int lines)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool ScrollUp(int lines)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1362,6 +1476,21 @@ Scrolls the view up.
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">lines</span></td>
         <td>Number of lines to scroll up.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1464,6 +1593,30 @@ This event is raised when the user Double Clicks on an item or presses ENTER to 
     <tbody>
       <tr>
         <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_ListView_RowRender" data-uid="Terminal.Gui.ListView.RowRender">RowRender</h4>
+  <div class="markdown level1 summary">
+This event is invoked when this <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> is being drawn before rendering.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;ListViewRowEventArgs&gt; RowRender</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewRowEventArgs.html">ListViewRowEventArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

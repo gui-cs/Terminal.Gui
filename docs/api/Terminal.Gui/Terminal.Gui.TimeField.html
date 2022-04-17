@@ -119,6 +119,9 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave_Terminal_Gui_View_">TextField.OnLeave(View)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Autocomplete">TextField.Autocomplete</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Frame">TextField.Frame</a>
     </div>
     <div>
@@ -128,7 +131,16 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Secret">TextField.Secret</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_CursorPosition">TextField.CursorPosition</a>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ScrollOffset">TextField.ScrollOffset</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_IsDirty">TextField.IsDirty</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_HasHistoryChanges">TextField.HasHistoryChanges</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ContextMenu">TextField.ContextMenu</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_PositionCursor">TextField.PositionCursor()</a>
@@ -138,6 +150,18 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_CanFocus">TextField.CanFocus</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_KillWordBackwards">TextField.KillWordBackwards()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_KillWordForwards">TextField.KillWordForwards()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_SelectAll">TextField.SelectAll()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_DeleteAll">TextField.DeleteAll()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_SelectedStart">TextField.SelectedStart</a>
@@ -170,6 +194,12 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnEnter_Terminal_Gui_View_">TextField.OnEnter(View)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_InsertText_System_String_System_Boolean_">TextField.InsertText(String, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ClearHistoryChanges">TextField.ClearHistoryChanges()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
     </div>
     <div>
@@ -198,6 +228,9 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -326,7 +359,7 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -359,10 +392,46 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -482,6 +551,9 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -596,6 +668,31 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html"
   </table>
   <h3 id="properties">Properties
   </h3>
+  <a id="Terminal_Gui_TimeField_CursorPosition_" data-uid="Terminal.Gui.TimeField.CursorPosition*"></a>
+  <h4 id="Terminal_Gui_TimeField_CursorPosition" data-uid="Terminal.Gui.TimeField.CursorPosition">CursorPosition</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int CursorPosition { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_CursorPosition">TextField.CursorPosition</a></div>
   <a id="Terminal_Gui_TimeField_IsShortFormat_" data-uid="Terminal.Gui.TimeField.IsShortFormat*"></a>
   <h4 id="Terminal_Gui_TimeField_IsShortFormat" data-uid="Terminal.Gui.TimeField.IsShortFormat">IsShortFormat</h4>
   <div class="markdown level1 summary">
@@ -651,6 +748,43 @@ Gets or sets the time of the <a class="xref" href="Terminal.Gui.TimeField.html">
 </div>
   <h3 id="methods">Methods
   </h3>
+  <a id="Terminal_Gui_TimeField_DeleteCharLeft_" data-uid="Terminal.Gui.TimeField.DeleteCharLeft*"></a>
+  <h4 id="Terminal_Gui_TimeField_DeleteCharLeft_System_Boolean_" data-uid="Terminal.Gui.TimeField.DeleteCharLeft(System.Boolean)">DeleteCharLeft(Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void DeleteCharLeft(bool useOldCursorPos = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">useOldCursorPos</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_DeleteCharLeft_System_Boolean_">TextField.DeleteCharLeft(Boolean)</a></div>
+  <a id="Terminal_Gui_TimeField_DeleteCharRight_" data-uid="Terminal.Gui.TimeField.DeleteCharRight*"></a>
+  <h4 id="Terminal_Gui_TimeField_DeleteCharRight" data-uid="Terminal.Gui.TimeField.DeleteCharRight">DeleteCharRight()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void DeleteCharRight()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_DeleteCharRight">TextField.DeleteCharRight()</a></div>
   <a id="Terminal_Gui_TimeField_MouseEvent_" data-uid="Terminal.Gui.TimeField.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TimeField_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TimeField.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>

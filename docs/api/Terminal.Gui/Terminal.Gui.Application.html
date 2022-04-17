@@ -229,6 +229,34 @@ Invoked when the terminal was resized. The new size of the terminal is provided.
       </tr>
     </tbody>
   </table>
+  <h4 id="Terminal_Gui_Application_RootKeyEvent" data-uid="Terminal.Gui.Application.RootKeyEvent">RootKeyEvent</h4>
+  <div class="markdown level1 summary">
+<p>
+Called for new KeyPress events before any processing is performed or
+views evaluate.  Use for global key handling and/or debugging.
+</p>
+<p>Return true to suppress the KeyPress event</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Func&lt;KeyEvent, bool&gt; RootKeyEvent</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a>, <span class="xref">System.Boolean</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h4 id="Terminal_Gui_Application_RootMouseEvent" data-uid="Terminal.Gui.Application.RootMouseEvent">RootMouseEvent</h4>
   <div class="markdown level1 summary">
 Merely a debugging aid to see the raw mouse events
@@ -525,6 +553,31 @@ Gets or sets the key to quit the application.
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Application_SupportedCultures_" data-uid="Terminal.Gui.Application.SupportedCultures*"></a>
+  <h4 id="Terminal_Gui_Application_SupportedCultures" data-uid="Terminal.Gui.Application.SupportedCultures">SupportedCultures</h4>
+  <div class="markdown level1 summary">
+Gets all supported cultures by the application without the invariant language.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;CultureInfo&gt; SupportedCultures { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Globalization.CultureInfo</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>

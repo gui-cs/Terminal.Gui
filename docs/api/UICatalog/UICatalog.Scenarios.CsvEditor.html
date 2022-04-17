@@ -156,12 +156,14 @@
   <h6><strong>Assembly</strong>: UICatalog.dll</h6>
   <h5 id="UICatalog_Scenarios_CsvEditor_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Scenario.ScenarioMetadata(&quot;Csv Editor&quot;, &quot;Open and edit simple CSV files&quot;)]
+    <pre><code class="lang-csharp hljs">[Scenario.ScenarioMetadata(&quot;Csv Editor&quot;, &quot;Open and edit simple CSV files using the TableView class.&quot;)]
+[Scenario.ScenarioCategory(&quot;TableView&quot;)]
 [Scenario.ScenarioCategory(&quot;Controls&quot;)]
 [Scenario.ScenarioCategory(&quot;Dialogs&quot;)]
-[Scenario.ScenarioCategory(&quot;Text&quot;)]
+[Scenario.ScenarioCategory(&quot;Text and Formatting&quot;)]
 [Scenario.ScenarioCategory(&quot;Dialogs&quot;)]
-[Scenario.ScenarioCategory(&quot;TopLevel&quot;)]
+[Scenario.ScenarioCategory(&quot;Top Level Windows&quot;)]
+[Scenario.ScenarioCategory(&quot;Files and IO&quot;)]
 public class CsvEditor : Scenario, IDisposable</code></pre>
   </div>
   <h3 id="methods">Methods
