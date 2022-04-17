@@ -213,12 +213,18 @@ namespace UICatalog {
 		/// </summary>
 		internal static List<string> GetAllCategories ()
 		{
-			List<string> categories = new List<string> () { "_All" };
+			List<string> categories = new List<string> ();
 			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
 			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
 				List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();
 				categories = categories.Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name)).ToList ();
 			}
+
+			// Sort
+			categories = categories.OrderBy (c => c).ToList ();
+
+			// Put "All" at the top
+			categories.Insert (0, "All Scenarios");
 			return categories;
 		}
 

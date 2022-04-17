@@ -2,7 +2,8 @@
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders Comparisons", Description: "Compares Window, Toplevel and FrameView borders.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class BordersComparisons : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{

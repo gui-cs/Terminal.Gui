@@ -7,12 +7,12 @@ using System.Globalization;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "TableEditor", Description: "A Terminal.Gui DataTable editor via TableView")]
+	[ScenarioMetadata (Name: "TableEditor", Description: "Implements data table editor using the TableView control.")]
+	[ScenarioCategory ("TableView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel"), ScenarioCategory ("TableView")]
+	[ScenarioCategory ("Text and Formatting")]
+	[ScenarioCategory ("Top Level Windows")]
 	public class TableEditor : Scenario 
 	{
 		TableView tableView;

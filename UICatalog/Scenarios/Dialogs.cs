@@ -7,7 +7,6 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
-	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	public class Dialogs : Scenario {
 		public override void Setup ()

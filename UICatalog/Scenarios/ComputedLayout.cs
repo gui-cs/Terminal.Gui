@@ -13,7 +13,7 @@ namespace UICatalog.Scenarios {
 	/// [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
 	/// [ ] - ...
 	/// </summary>
-	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates using the Computed (Dim and Pos) Layout System")]
+	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates the Computed (Dim and Pos) Layout System.")]
 	[ScenarioCategory ("Layout")]
 	public class ComputedLayout : Scenario {
 

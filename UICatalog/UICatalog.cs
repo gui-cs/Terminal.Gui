@@ -194,7 +194,7 @@ namespace UICatalog {
 			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
 			_leftPane.ShortcutAction = () => _leftPane.SetFocus ();
 
-			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
+			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
 				X = 0,
 				Y = 0,
@@ -679,9 +679,10 @@ namespace UICatalog {
 				_scenarioListViewItem = 0;
 			}
 			_categoryListViewItem = _categoryListView.SelectedItem;
-			var item = _categories [_categoryListView.SelectedItem];
+			var item = _categories [_categoryListViewItem];
 			List<Type> newlist;
-			if (item.Equals ("_All")) {
+			if (_categoryListViewItem == 0) {
+				// First category is "All"
 				newlist = _scenarios;
 
 			} else {

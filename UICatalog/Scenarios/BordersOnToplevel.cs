@@ -4,8 +4,9 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Borders on Toplevel", Description: "Demonstrate Toplevel borders manipulation.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioMetadata (Name: "Borders on Toplevel", Description: "Demonstrates Toplevel borders manipulation.")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class BordersOnToplevel : Scenario {
 		public override void Setup ()
 		{

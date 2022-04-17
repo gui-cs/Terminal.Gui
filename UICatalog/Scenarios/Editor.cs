@@ -8,12 +8,14 @@ using System.Threading;
 using System.Globalization;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
+	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Text and Formatting")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Files and IO")]
+	[ScenarioCategory ("TextView")]
+
 	public class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;

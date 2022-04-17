@@ -8,7 +8,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Labels As Buttons", Description: "Illustrates that Button is really just a Label++")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("POC")]
+	[ScenarioCategory ("Proof of Concept")]
 	public class LabelsAsLabels : Scenario {
 		public override void Setup ()
 		{

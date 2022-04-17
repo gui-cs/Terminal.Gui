@@ -4,8 +4,8 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demonstrates text alignment")]
-	[ScenarioCategory ("Text"), ScenarioCategory ("Alignment"), ScenarioCategory ("Direction")]
+	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demos horiztonal and vertical text alignment and text direction.")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class TextAlignmentsAndDirections : Scenario {
 
 		public override void Setup ()

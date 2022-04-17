@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Clipping", Description: "Used to test that things clip correctly")]
-	[ScenarioCategory ("Bug Repro")]
+	[ScenarioCategory ("Tests")]
 
 	public class Clipping : Scenario {
 

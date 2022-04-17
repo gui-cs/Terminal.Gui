@@ -6,6 +6,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Invert Colors", Description: "Invert the foreground and the background colors.")]
 	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class InvertColors : Scenario {
 		public override void Setup ()
 		{

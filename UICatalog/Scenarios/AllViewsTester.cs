@@ -9,8 +9,10 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View")]
-	[ScenarioCategory ("Layout"), ScenarioCategory ("StatusBar")]
+	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View.")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Tests")]
+	[ScenarioCategory ("Top Level Windows")]
 	public class AllViewsTester : Scenario {
 		Window _leftPane;
 		ListView _classListView;

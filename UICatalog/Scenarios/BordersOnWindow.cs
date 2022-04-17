@@ -4,8 +4,9 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Borders on Window", Description: "Demonstrate Window borders manipulation.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioMetadata (Name: "Borders on Window", Description: "Demonstrates Window borders manipulation.")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class BordersOnWindow : Scenario {
 		public override void Setup ()
 		{

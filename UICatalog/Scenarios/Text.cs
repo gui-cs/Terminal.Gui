@@ -11,7 +11,8 @@ using Terminal.Gui.TextValidateProviders;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
+	[ScenarioCategory ("Mouse and Keyboard")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class Text : Scenario {
 		public override void Setup ()
 		{
