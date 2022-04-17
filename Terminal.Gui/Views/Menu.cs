@@ -135,7 +135,7 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
-		internal int Width => Title.RuneCount + Help.RuneCount + 1 + 2 +
+		internal int Width => Title.Sum (x => Rune.ColumnWidth (x)) + Help.Sum (x => Rune.ColumnWidth (x)) + 1 + 2 +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
 			(ShortcutTag.RuneCount > 0 ? ShortcutTag.RuneCount + 2 : 0);
 
