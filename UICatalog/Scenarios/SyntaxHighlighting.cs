@@ -8,7 +8,7 @@ using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Syntax Highlighting", Description: "Text editor with keyword highlighting")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("AutoComplete")]
+	[ScenarioCategory ("Controls")]
 	public class SyntaxHighlighting : Scenario {
 
 		SqlTextView textView;

@@ -12,7 +12,7 @@ namespace UICatalog {
 	///  <list type="number">
 	///  <item><description>Create a new <c>.cs</c> file in the <cs>Scenarios</cs> directory that derives from <see cref="Scenario"/>.</description></item>
 	///  <item><description>Annotate the <see cref="Scenario"/> derived class with a <see cref="Scenario.ScenarioMetadata"/> attribute specifying the scenario's name and description.</description></item>
-	///  <item><description>Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "_All".</description></item>
+	///  <item><description>Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "All".</description></item>
 	///  <item><description>Implement the <see cref="Setup"/> override which will be called when a user selects the scenario to run.</description></item>
 	///  <item><description>Optionally, implement the <see cref="Init(Toplevel, ColorScheme)"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description></item>
 	///  </list>
@@ -213,7 +213,7 @@ namespace UICatalog {
 		/// </summary>
 		internal static List<string> GetAllCategories ()
 		{
-			List<string> categories = new List<string> () { "_All" };
+			List<string> categories = new List<string> () { "All" };
 			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
 			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
 				List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();

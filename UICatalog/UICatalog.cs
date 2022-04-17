@@ -681,7 +681,7 @@ namespace UICatalog {
 			_categoryListViewItem = _categoryListView.SelectedItem;
 			var item = _categories [_categoryListView.SelectedItem];
 			List<Type> newlist;
-			if (item.Equals ("_All")) {
+			if (item.Equals ("All")) {
 				newlist = _scenarios;
 
 			} else {

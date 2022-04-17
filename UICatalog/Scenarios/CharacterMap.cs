@@ -17,7 +17,7 @@ namespace UICatalog.Scenarios {
 	/// </summary>
 	[ScenarioMetadata (Name: "Character Map", Description: "Illustrates a custom control and Unicode")]
 	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView")]
+	[ScenarioCategory ("Controls")]
 	public class CharacterMap : Scenario {
 		CharMap _charMap;
 		public override void Setup ()

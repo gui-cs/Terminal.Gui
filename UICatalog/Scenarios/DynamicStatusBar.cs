@@ -10,7 +10,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
-	[ScenarioCategory ("StatusBar")]
+	[ScenarioCategory ("Dynamic")]
 	public class DynamicStatusBar : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{

@@ -4,7 +4,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Show five TextView Autocomplete Popup effects")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("AutoComplete")]
+	[ScenarioCategory ("Controls")]
 	public class TextViewAutocompletePopup : Scenario {
 
 		TextView textViewTopLeft;
