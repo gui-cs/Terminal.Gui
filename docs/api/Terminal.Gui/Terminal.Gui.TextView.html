@@ -133,6 +133,9 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
     </div>
     <div>
@@ -259,7 +262,7 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -292,10 +295,46 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -410,6 +449,9 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -590,7 +632,7 @@ position.  Populate <a class="xref" href="Terminal.Gui.Autocomplete.html#Termina
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Autocomplete Autocomplete { get; protected set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IAutocomplete Autocomplete { get; protected set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -602,7 +644,7 @@ position.  Populate <a class="xref" href="Terminal.Gui.Autocomplete.html#Termina
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Autocomplete.html">Autocomplete</a></td>
+        <td><a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -658,6 +700,31 @@ This is only needed with the keyboard navigation.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocus">View.CanFocus</a></div>
+  <a id="Terminal_Gui_TextView_ContextMenu_" data-uid="Terminal.Gui.TextView.ContextMenu*"></a>
+  <h4 id="Terminal_Gui_TextView_ContextMenu" data-uid="Terminal.Gui.TextView.ContextMenu">ContextMenu</h4>
+  <div class="markdown level1 summary">
+Get the <a class="xref" href="Terminal.Gui.TextView.html#Terminal_Gui_TextView_ContextMenu">ContextMenu</a> for this view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ContextMenu ContextMenu { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ContextMenu.html">ContextMenu</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TextView_CurrentColumn_" data-uid="Terminal.Gui.TextView.CurrentColumn*"></a>
   <h4 id="Terminal_Gui_TextView_CurrentColumn" data-uid="Terminal.Gui.TextView.CurrentColumn">CurrentColumn</h4>
   <div class="markdown level1 summary">
@@ -783,6 +850,58 @@ Get / Set the wished cursor when the field is focused
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a></div>
+  <a id="Terminal_Gui_TextView_HasHistoryChanges_" data-uid="Terminal.Gui.TextView.HasHistoryChanges*"></a>
+  <h4 id="Terminal_Gui_TextView_HasHistoryChanges" data-uid="Terminal.Gui.TextView.HasHistoryChanges">HasHistoryChanges</h4>
+  <div class="markdown level1 summary">
+Indicates whatever the text has history changes or not.
+<span class="xref">true</span> if the text has history changes <span class="xref">false</span> otherwise.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasHistoryChanges { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TextView_IsDirty_" data-uid="Terminal.Gui.TextView.IsDirty*"></a>
+  <h4 id="Terminal_Gui_TextView_IsDirty" data-uid="Terminal.Gui.TextView.IsDirty">IsDirty</h4>
+  <div class="markdown level1 summary">
+Indicates whatever the text was changed or not.
+<span class="xref">true</span> if the text was changed <span class="xref">false</span> otherwise.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDirty { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TextView_LeftColumn_" data-uid="Terminal.Gui.TextView.LeftColumn*"></a>
   <h4 id="Terminal_Gui_TextView_LeftColumn" data-uid="Terminal.Gui.TextView.LeftColumn">LeftColumn</h4>
   <div class="markdown level1 summary">
@@ -1192,6 +1311,16 @@ Allows word wrap the to fit the available container width.
   </table>
   <h3 id="methods">Methods
   </h3>
+  <a id="Terminal_Gui_TextView_ClearHistoryChanges_" data-uid="Terminal.Gui.TextView.ClearHistoryChanges*"></a>
+  <h4 id="Terminal_Gui_TextView_ClearHistoryChanges" data-uid="Terminal.Gui.TextView.ClearHistoryChanges">ClearHistoryChanges()</h4>
+  <div class="markdown level1 summary">
+Allows clearing the <span class="xref">Terminal.Gui.HistoryText.HistoryTextItem</span> items updating the original text.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearHistoryChanges()</code></pre>
+  </div>
   <a id="Terminal_Gui_TextView_CloseFile_" data-uid="Terminal.Gui.TextView.CloseFile*"></a>
   <h4 id="Terminal_Gui_TextView_CloseFile" data-uid="Terminal.Gui.TextView.CloseFile">CloseFile()</h4>
   <div class="markdown level1 summary">
@@ -1349,31 +1478,36 @@ Cut the selected text to the clipboard contents.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Cut()</code></pre>
   </div>
-  <a id="Terminal_Gui_TextView_DeleteTextBackwards_" data-uid="Terminal.Gui.TextView.DeleteTextBackwards*"></a>
-  <h4 id="Terminal_Gui_TextView_DeleteTextBackwards" data-uid="Terminal.Gui.TextView.DeleteTextBackwards">DeleteTextBackwards()</h4>
+  <a id="Terminal_Gui_TextView_DeleteAll_" data-uid="Terminal.Gui.TextView.DeleteAll*"></a>
+  <h4 id="Terminal_Gui_TextView_DeleteAll" data-uid="Terminal.Gui.TextView.DeleteAll">DeleteAll()</h4>
   <div class="markdown level1 summary">
-Deletes a single character from the position of the cursor
+Deletes all text.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool DeleteTextBackwards()</code></pre>
+    <pre><code class="lang-csharp hljs">public void DeleteAll()</code></pre>
   </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+  <a id="Terminal_Gui_TextView_DeleteCharLeft_" data-uid="Terminal.Gui.TextView.DeleteCharLeft*"></a>
+  <h4 id="Terminal_Gui_TextView_DeleteCharLeft" data-uid="Terminal.Gui.TextView.DeleteCharLeft">DeleteCharLeft()</h4>
+  <div class="markdown level1 summary">
+Deletes all the selected or a single character at left from the position of the cursor.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DeleteCharLeft()</code></pre>
+  </div>
+  <a id="Terminal_Gui_TextView_DeleteCharRight_" data-uid="Terminal.Gui.TextView.DeleteCharRight*"></a>
+  <h4 id="Terminal_Gui_TextView_DeleteCharRight" data-uid="Terminal.Gui.TextView.DeleteCharRight">DeleteCharRight()</h4>
+  <div class="markdown level1 summary">
+Deletes all the selected or a single character at right from the position of the cursor.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DeleteCharRight()</code></pre>
+  </div>
   <a id="Terminal_Gui_TextView_FindNextText_" data-uid="Terminal.Gui.TextView.FindNextText*"></a>
   <h4 id="Terminal_Gui_TextView_FindNextText_NStack_ustring_System_Boolean__System_Boolean_System_Boolean_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.TextView.FindNextText(NStack.ustring,System.Boolean@,System.Boolean,System.Boolean,NStack.ustring,System.Boolean)">FindNextText(ustring, out Boolean, Boolean, Boolean, ustring, Boolean)</h4>
   <div class="markdown level1 summary">

@@ -153,6 +153,12 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AspectGetter">TreeView&lt;ITreeNode&gt;.AspectGetter</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_DesiredCursorVisibility">TreeView&lt;ITreeNode&gt;.DesiredCursorVisibility</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnEnter_Terminal_Gui_View_">TreeView&lt;ITreeNode&gt;.OnEnter(View)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObject__0_">TreeView&lt;ITreeNode&gt;.AddObject(ITreeNode)</a>
     </div>
     <div>
@@ -189,6 +195,24 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent_">TreeView&lt;ITreeNode&gt;.ProcessKey(KeyEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ActivateSelectedObjectIfAny">TreeView&lt;ITreeNode&gt;.ActivateSelectedObjectIfAny()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelectionToNextItemBeginningWith_System_Char_System_StringComparison_">TreeView&lt;ITreeNode&gt;.AdjustSelectionToNextItemBeginningWith(Char, StringComparison)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MovePageUp_System_Boolean_">TreeView&lt;ITreeNode&gt;.MovePageUp(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MovePageDown_System_Boolean_">TreeView&lt;ITreeNode&gt;.MovePageDown(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollDown">TreeView&lt;ITreeNode&gt;.ScrollDown()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollUp">TreeView&lt;ITreeNode&gt;.ScrollUp()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_Trees_ObjectActivatedEventArgs__0__">TreeView&lt;ITreeNode&gt;.OnObjectActivated(ObjectActivatedEventArgs&lt;ITreeNode&gt;)</a>
     </div>
     <div>
@@ -222,6 +246,9 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_EnsureVisible__0_">TreeView&lt;ITreeNode&gt;.EnsureVisible(ITreeNode)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Expand">TreeView&lt;ITreeNode&gt;.Expand()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Expand__0_">TreeView&lt;ITreeNode&gt;.Expand(ITreeNode)</a>
     </div>
     <div>
@@ -235,6 +262,9 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_IsExpanded__0_">TreeView&lt;ITreeNode&gt;.IsExpanded(ITreeNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Collapse">TreeView&lt;ITreeNode&gt;.Collapse()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Collapse__0_">TreeView&lt;ITreeNode&gt;.Collapse(ITreeNode)</a>
@@ -292,6 +322,9 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -426,7 +459,7 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -436,9 +469,6 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
@@ -465,10 +495,46 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -589,6 +655,9 @@ implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>

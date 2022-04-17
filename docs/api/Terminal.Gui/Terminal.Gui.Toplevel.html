@@ -135,6 +135,9 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
     </div>
     <div>
@@ -255,7 +258,7 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -294,10 +297,46 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -409,6 +448,9 @@ Toplevel views can be modally executed.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -852,6 +894,60 @@ Move to the previous Mdi child from the <a class="xref" href="Terminal.Gui.Appli
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void MovePrevious()</code></pre>
   </div>
+  <a id="Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnAlternateBackwardKeyChanged*"></a>
+  <h4 id="Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnAlternateBackwardKeyChanged(Terminal.Gui.Key)">OnAlternateBackwardKeyChanged(Key)</h4>
+  <div class="markdown level1 summary">
+Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateBackwardKeyChanged">AlternateBackwardKeyChanged</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnAlternateBackwardKeyChanged(Key oldKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">oldKey</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnAlternateForwardKeyChanged*"></a>
+  <h4 id="Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnAlternateForwardKeyChanged(Terminal.Gui.Key)">OnAlternateForwardKeyChanged(Key)</h4>
+  <div class="markdown level1 summary">
+Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateForwardKeyChanged">AlternateForwardKeyChanged</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnAlternateForwardKeyChanged(Key oldKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">oldKey</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Toplevel_OnKeyDown_" data-uid="Terminal.Gui.Toplevel.OnKeyDown*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)">OnKeyDown(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -936,6 +1032,33 @@ Move to the previous Mdi child from the <a class="xref" href="Terminal.Gui.Appli
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
+  <a id="Terminal_Gui_Toplevel_OnQuitKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged*"></a>
+  <h4 id="Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged(Terminal.Gui.Key)">OnQuitKeyChanged(Key)</h4>
+  <div class="markdown level1 summary">
+Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_QuitKeyChanged">QuitKeyChanged</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnQuitKeyChanged(Key oldKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">oldKey</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Toplevel_PositionCursor_" data-uid="Terminal.Gui.Toplevel.PositionCursor*"></a>
   <h4 id="Terminal_Gui_Toplevel_PositionCursor" data-uid="Terminal.Gui.Toplevel.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -1261,6 +1384,54 @@ Invoked once the last child Toplevel&apos;s <a class="xref" href="Terminal.Gui.A
       </tr>
     </tbody>
   </table>
+  <h4 id="Terminal_Gui_Toplevel_AlternateBackwardKeyChanged" data-uid="Terminal.Gui.Toplevel.AlternateBackwardKeyChanged">AlternateBackwardKeyChanged</h4>
+  <div class="markdown level1 summary">
+Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_AlternateBackwardKey">AlternateBackwardKey</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Key&gt; AlternateBackwardKeyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Key.html">Key</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Toplevel_AlternateForwardKeyChanged" data-uid="Terminal.Gui.Toplevel.AlternateForwardKeyChanged">AlternateForwardKeyChanged</h4>
+  <div class="markdown level1 summary">
+Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_AlternateForwardKey">AlternateForwardKey</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Key&gt; AlternateForwardKeyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Key.html">Key</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h4 id="Terminal_Gui_Toplevel_ChildClosed" data-uid="Terminal.Gui.Toplevel.ChildClosed">ChildClosed</h4>
   <div class="markdown level1 summary">
 Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from the <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>
@@ -1430,6 +1601,30 @@ A Loaded event handler is a good place to finalize initialization before calling
       </tr>
     </tbody>
   </table>
+  <h4 id="Terminal_Gui_Toplevel_QuitKeyChanged" data-uid="Terminal.Gui.Toplevel.QuitKeyChanged">QuitKeyChanged</h4>
+  <div class="markdown level1 summary">
+Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_QuitKey">QuitKey</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Key&gt; QuitKeyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Key.html">Key</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
   <div class="markdown level1 summary">
 Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
@@ -1452,6 +1647,30 @@ changes. A Ready event handler is a good place to finalize initialization after 
     <tbody>
       <tr>
         <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Toplevel_Resized" data-uid="Terminal.Gui.Toplevel.Resized">Resized</h4>
+  <div class="markdown level1 summary">
+Invoked when the terminal was resized. The new <a class="xref" href="Terminal.Gui.Size.html">Size</a> of the terminal is provided.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Size&gt; Resized</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Size.html">Size</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

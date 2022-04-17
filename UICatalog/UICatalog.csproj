@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
