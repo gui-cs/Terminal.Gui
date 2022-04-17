@@ -3,8 +3,10 @@ using System.Text.RegularExpressions;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Show five TextView Autocomplete Popup effects")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("AutoComplete")]
+	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Shows five TextView Autocomplete Popup effects")]
+	[ScenarioCategory ("TextView")]
+	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Mouse and Keyboard")]
 	public class TextViewAutocompletePopup : Scenario {
 
 		TextView textViewTopLeft;

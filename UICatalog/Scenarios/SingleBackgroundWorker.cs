@@ -7,9 +7,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Single BackgroundWorker", Description: "A single BackgroundWorker threading opening another Toplevel")]
 	[ScenarioCategory ("Threading")]
-	[ScenarioCategory ("TopLevel")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Top Level Windows")]
 	public class SingleBackgroundWorker : Scenario {
 		public override void Run ()
 		{

@@ -9,7 +9,7 @@ using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView")]
+	[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView.")]
 	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
 	public class ClassExplorer : Scenario {
 		private TreeView<object> treeView;

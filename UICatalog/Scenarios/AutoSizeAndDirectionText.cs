@@ -1,8 +1,8 @@
 ﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "AutoSize and Direction Text", Description: "Demonstrates the text auto-size and direction manipulation.")]
-	[ScenarioCategory ("Text"), ScenarioCategory ("AutoSize"), ScenarioCategory ("Direction")]
+	[ScenarioMetadata (Name: "Text Direction and AutoSize", Description: "Demos TextFormatter Direction and View AutoSize.")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class AutoSizeAndDirectionText : Scenario {
 		public override void Setup ()
 		{

@@ -3,6 +3,7 @@
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Basic Colors", Description: "Show all basic colors.")]
 	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class BasicColors : Scenario {
 		public override void Setup ()
 		{

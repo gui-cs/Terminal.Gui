@@ -3,10 +3,8 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, FrameViews, and how TAB doesn't work right (#434, #522)")]
-	[ScenarioCategory ("Views")]
+	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, and FrameViews.")]
 	[ScenarioCategory ("Layout")]
-	[ScenarioCategory ("Bug Repro")]
 	public class WindowsAndFrameViews : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{

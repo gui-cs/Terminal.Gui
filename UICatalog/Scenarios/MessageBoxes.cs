@@ -5,7 +5,7 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use MessageBoxes")]
+	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use the MessageBox class.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	public class MessageBoxes : Scenario {

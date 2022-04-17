@@ -6,7 +6,7 @@ using System.Reflection;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
+	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Layout")]
 	public class Buttons : Scenario {

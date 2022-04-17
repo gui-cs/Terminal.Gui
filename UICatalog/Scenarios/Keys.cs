@@ -4,7 +4,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
-	[ScenarioCategory ("Input")]
+	[ScenarioCategory ("Mouse and Keyboard")]
 	public class Keys : Scenario {
 
 		class TestWindow : Window {

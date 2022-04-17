@@ -4,8 +4,8 @@ using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample")]
-	[ScenarioCategory ("Menu"), ScenarioCategory ("ContextMenu")]
+	[ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample.")]
+	[ScenarioCategory ("Menus")]
 	public class ContextMenus : Scenario {
 		private ContextMenu contextMenu = new ContextMenu ();
 		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;

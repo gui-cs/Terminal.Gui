@@ -8,7 +8,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "BackgroundWorker Collection", Description: "A persisting multi Toplevel BackgroundWorker threading")]
 	[ScenarioCategory ("Threading")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Top Level Windows")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
 	public class BackgroundWorkerCollection : Scenario {
