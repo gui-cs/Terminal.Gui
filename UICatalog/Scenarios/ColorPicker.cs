@@ -2,7 +2,7 @@
 using System;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Color Pickers", Description: "ColorPicker demo.")]
+	[ScenarioMetadata (Name: "Color Picker Demo", Description: "Color Picker Demo.")]
 	[ScenarioCategory ("Colors")]
 	public class ColorPickers : Scenario {
 		/// <summary>
