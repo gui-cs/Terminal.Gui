@@ -1,10 +1,4 @@
-﻿//
-// ColorPicker.cs: ColorPicker control
-//
-// Authors:
-//   Jocelyn NATALI (jocelyn.natali@hotmail.fr)
-//
-using System;
+﻿using System;
 using NStack;
 
 namespace Terminal.Gui {
