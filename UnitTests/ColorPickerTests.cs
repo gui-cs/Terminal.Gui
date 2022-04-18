@@ -8,11 +8,11 @@ using Xunit;
 namespace Terminal.Gui.Views {
 	public class ColorPickerTests {
 		[Fact]
-		public void Constructors()
+		public void Constructors ()
 		{
 			var colorPicker = new ColorPicker ();
-			Assert.Equal(Color.Black, colorPicker.SelectedColor);
-			Assert.Equal (new Point(0, 0), colorPicker.Cursor);
+			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (new Point (0, 0), colorPicker.Cursor);
 			Assert.True (colorPicker.CanFocus);
 			Assert.Equal (new Rect (0, 0, 32, 5), colorPicker.Frame);
 
@@ -22,7 +22,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (colorPicker.CanFocus);
 			Assert.Equal (new Rect (5, 10, 32, 5), colorPicker.Frame);
 
-			colorPicker = new ColorPicker (new Point(10, 15), "Title");
+			colorPicker = new ColorPicker (new Point (10, 15), "Title");
 			Assert.Equal (Color.Black, colorPicker.SelectedColor);
 			Assert.Equal (new Point (0, 0), colorPicker.Cursor);
 			Assert.True (colorPicker.CanFocus);
@@ -57,14 +57,14 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MouseEvents()
+		public void MouseEvents ()
 		{
 			var colorPicker = new ColorPicker ();
 			Assert.Equal (Color.Black, colorPicker.SelectedColor);
-			
+
 			Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
 
-			Assert.True (colorPicker.MouseEvent (new MouseEvent () {Flags = MouseFlags.Button1Clicked, X = 4, Y = 0 }));
+			Assert.True (colorPicker.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked, X = 4, Y = 0 }));
 			Assert.Equal (Color.Blue, colorPicker.SelectedColor);
 		}
 
@@ -81,7 +81,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, colorPicker.Cursor.X);
 			Assert.Equal (0, colorPicker.Cursor.Y);
 
-			colorPicker.Cursor = new Point(7, 1);
+			colorPicker.Cursor = new Point (7, 1);
 			Assert.Equal (Color.White, colorPicker.SelectedColor);
 
 			colorPicker.Cursor = new Point (0, 0);

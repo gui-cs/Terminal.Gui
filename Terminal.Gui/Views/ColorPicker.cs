@@ -38,7 +38,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cursor for the selected color.
 		/// </summary>
-		public Point Cursor { get {
+		public Point Cursor {
+			get {
 				return new Point (selectColorIndex % colorsPerLine, selectColorIndex / colorsPerLine);
 			}
 
@@ -180,7 +181,7 @@ namespace Terminal.Gui {
 				return false;
 
 			SetFocus ();
-			Cursor = new Point(me.X / horizontalZoom, (me.Y - 1) / verticalZoom);
+			Cursor = new Point (me.X / horizontalZoom, (me.Y - 1) / verticalZoom);
 
 			return true;
 		}
