@@ -90,6 +90,31 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Width = colorsPerLine * horizontalZoom;
 			Height = lineCount * verticalZoom + 1;
+
+			AddCommands ();
+			AddKeyBindings ();
+		}
+
+		/// <summary>
+		/// Add the commands.
+		/// </summary>
+		private void AddCommands ()
+		{
+			AddCommand (Command.Left, () => MoveLeft ());
+			AddCommand (Command.Right, () => MoveRight ());
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+		}
+
+		/// <summary>
+		/// Add the KeyBindinds.
+		/// </summary>
+		private void AddKeyBindings ()
+		{
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
 		}
 
 		/// <summary>
@@ -148,30 +173,54 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Moves the selected item index to the previous row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveLeft ()
+		{
+			if (Cursor.X > 0) SelectedColor--;
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the last row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveRight ()
+		{
+			if (Cursor.X < colorsPerLine - 1) SelectedColor++;
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the previous row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveUp ()
+		{
+			if (Cursor.Y > 0) SelectedColor -= colorsPerLine;
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the last row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveDown ()
+		{
+			if (Cursor.Y < lineCount - 1) SelectedColor += colorsPerLine;
+			return true;
+		}
+
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (kb.Key == Key.CursorLeft) {
-				if (Cursor.X > 0) SelectedColor--;
-				return true;
-			}
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			if (kb.Key == Key.CursorRight) {
-				if (Cursor.X < colorsPerLine - 1) SelectedColor++;
-				return true;
-			}
-
-			if (kb.Key == Key.CursorUp) {
-				if (Cursor.Y > 0) SelectedColor -= colorsPerLine;
-				return true;
-			}
-
-			if (kb.Key == Key.CursorDown) {
-				if (Cursor.Y < lineCount - 1) SelectedColor += colorsPerLine;
-				return true;
-			}
-
-			return base.ProcessKey (kb);
+			return false;
 		}
 
 		///<inheritdoc/>
