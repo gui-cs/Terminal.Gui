@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 			if (IsShow) {
 				Hide ();
 			}
-			MenuItens = menuItems;
+			MenuItems = menuItems;
 			Position = new Point (x, y);
 		}
 
@@ -63,7 +63,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Open the <see cref="MenuItens"/> menu items.
+		/// Open the <see cref="MenuItems"/> menu items.
 		/// </summary>
 		public void Show ()
 		{
@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 					Position = position = pos;
 				}
 			}
-			var rect = Menu.MakeFrame (position.X, position.Y, MenuItens.Children);
+			var rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
 			if (rect.Right >= frame.Right) {
 				if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero) {
 					position.X = frame.Right - rect.Width;
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 				position.Y = 0;
 			}
 
-			menuBar = new MenuBar (new [] { MenuItens }) {
+			menuBar = new MenuBar (new [] { MenuItems }) {
 				X = position.X,
 				Y = position.Y,
 				Width = 0,
@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Close the <see cref="MenuItens"/> menu items.
+		/// Close the <see cref="MenuItems"/> menu items.
 		/// </summary>
 		public void Hide ()
 		{
@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the menu items for this context menu.
 		/// </summary>
-		public MenuBarItem MenuItens { get; set; }
+		public MenuBarItem MenuItems { get; set; }
 
 		/// <summary>
 		/// The <see cref="Gui.Key"/> used to activate the context menu by keyboard.

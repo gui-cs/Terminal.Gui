@@ -19,14 +19,14 @@ namespace Terminal.Gui.Core {
 		{
 			var cm = new ContextMenu ();
 			Assert.Equal (new Point (0, 0), cm.Position);
-			Assert.Empty (cm.MenuItens.Children);
+			Assert.Empty (cm.MenuItems.Children);
 			Assert.Null (cm.Host);
 			cm.Position = new Point (20, 10);
-			cm.MenuItens = new MenuBarItem (new MenuItem [] {
+			cm.MenuItems = new MenuBarItem (new MenuItem [] {
 				new MenuItem ("First", "", null)
 			});
 			Assert.Equal (new Point (20, 10), cm.Position);
-			Assert.Single (cm.MenuItens.Children);
+			Assert.Single (cm.MenuItems.Children);
 
 			cm = new ContextMenu (5, 10,
 				new MenuBarItem (new MenuItem [] {
@@ -35,7 +35,7 @@ namespace Terminal.Gui.Core {
 				})
 			);
 			Assert.Equal (new Point (5, 10), cm.Position);
-			Assert.Equal (2, cm.MenuItens.Children.Length);
+			Assert.Equal (2, cm.MenuItems.Children.Length);
 			Assert.Null (cm.Host);
 
 			cm = new ContextMenu (new View () { X = 5, Y = 10 },
@@ -45,7 +45,7 @@ namespace Terminal.Gui.Core {
 				})
 			);
 			Assert.Equal (new Point (5, 10), cm.Position);
-			Assert.Equal (2, cm.MenuItens.Children.Length);
+			Assert.Equal (2, cm.MenuItems.Children.Length);
 			Assert.NotNull (cm.Host);
 		}
 
@@ -146,7 +146,7 @@ namespace Terminal.Gui.Core {
 
 			GraphViewTests.AssertDriverContentsAre (expected, output);
 
-			cm.MenuItens = new MenuBarItem (new MenuItem [] {
+			cm.MenuItems = new MenuBarItem (new MenuItem [] {
 				new MenuItem ("First", "", null),
 				new MenuItem ("Second", "", null),
 				new MenuItem ("Third", "", null)

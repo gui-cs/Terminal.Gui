@@ -1340,7 +1340,7 @@ namespace Terminal.Gui {
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-			ContextMenu = new ContextMenu () { MenuItens = BuildContextMenuBarItem () };
+			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
 			AddKeyBinding (ContextMenu.Key, Command.Accept);
@@ -3474,7 +3474,7 @@ namespace Terminal.Gui {
 
 				currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-				ContextMenu.MenuItens = BuildContextMenuBarItem ();
+				ContextMenu.MenuItems = BuildContextMenuBarItem ();
 			}
 			ContextMenu.Show ();
 		}
