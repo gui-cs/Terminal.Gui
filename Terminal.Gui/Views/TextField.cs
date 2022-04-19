@@ -933,7 +933,7 @@ namespace Terminal.Gui {
 
 				currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-				ContextMenu.MenuItens = BuildContextMenuBarItem ();
+				ContextMenu.MenuItems = BuildContextMenuBarItem ();
 			}
 			ContextMenu.Show ();
 		}
