@@ -110,6 +110,19 @@ namespace Terminal.Gui {
 
 			base.Add (tabsBar);
 			base.Add (contentView);
+
+			// Things this view knows how to do
+			AddCommand (Command.Left, () => { SwitchTabBy (-1); return true; });
+			AddCommand (Command.Right, () => { SwitchTabBy (1); return true; });
+			AddCommand (Command.LeftHome, () => { SelectedTab = Tabs.FirstOrDefault (); return true; });
+			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
+
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.End, Command.RightEnd);
 		}
 
 		/// <summary>
@@ -174,12 +187,12 @@ namespace Terminal.Gui {
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, bounds.Width,
-			       bounds.Height - spaceAtBottom - startAtY), 0, true);
+			       Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
 			}
 
 			if (Tabs.Any ()) {
 				tabsBar.Redraw (tabsBar.Bounds);
-				contentView.SetNeedsDisplay();
+				contentView.SetNeedsDisplay ();
 				contentView.Redraw (contentView.Bounds);
 			}
 		}
@@ -216,21 +229,9 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (HasFocus && CanFocus && Focused == tabsBar) {
-				switch (keyEvent.Key) {
-
-				case Key.CursorLeft:
-					SwitchTabBy (-1);
-					return true;
-				case Key.CursorRight:
-					SwitchTabBy (1);
-					return true;
-				case Key.Home:
-					SelectedTab = Tabs.FirstOrDefault ();
-					return true;
-				case Key.End:
-					SelectedTab = Tabs.LastOrDefault ();
-					return true;
-				}
+				var result = InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
 			}
 
 			return base.ProcessKey (keyEvent);
@@ -673,7 +674,7 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
-				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && 
+				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 					return false;

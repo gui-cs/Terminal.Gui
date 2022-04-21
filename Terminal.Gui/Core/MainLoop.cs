@@ -117,8 +117,8 @@ namespace Terminal.Gui {
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			var k = (DateTime.UtcNow + time).Ticks;
 			lock (timeouts) {
+				var k = (DateTime.UtcNow + time).Ticks;
 				while (timeouts.ContainsKey (k)) {
 					k = (DateTime.UtcNow + time).Ticks;
 				}
@@ -159,10 +159,12 @@ namespace Terminal.Gui {
 		/// This method also returns <c>false</c> if the timeout is not found.
 		public bool RemoveTimeout (object token)
 		{
-			var idx = timeouts.IndexOfValue (token as Timeout);
-			if (idx == -1)
-				return false;
-			timeouts.RemoveAt (idx);
+			lock (timeouts) {
+				var idx = timeouts.IndexOfValue (token as Timeout);
+				if (idx == -1)
+					return false;
+				timeouts.RemoveAt (idx);
+			}
 			return true;
 		}
 
@@ -177,8 +179,11 @@ namespace Terminal.Gui {
 				if (k < now) {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);
-				} else
-					timeouts.Add (k, timeout);
+				} else {
+					lock (timeouts) {
+						timeouts.Add (k, timeout);
+					}
+				}
 			}
 		}
 

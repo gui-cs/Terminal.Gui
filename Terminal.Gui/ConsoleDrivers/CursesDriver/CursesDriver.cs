@@ -84,6 +84,8 @@ namespace Terminal.Gui {
 
 		public override void Refresh ()
 		{
+			Curses.raw ();
+			Curses.noecho ();
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
 				Clip = new Rect (0, 0, Cols, Rows);
@@ -1479,7 +1481,10 @@ namespace Terminal.Gui {
 					Curses.raw ();
 					Curses.noecho ();
 				}
-				return result.TrimEnd ();
+				if (result.EndsWith ("\r\n")) {
+					result = result.Substring (0, result.Length - 2);
+				}
+				return result;
 			}
 		}
 

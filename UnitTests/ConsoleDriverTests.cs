@@ -430,7 +430,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var okClicked = false;
 			var closing = false;
 			var cursorRight = false;
-			var cancelHasFocus = false;
+			var endingKeyPress = false;
 			var closed = false;
 
 			var top = Application.Top;
@@ -464,9 +464,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 					if (!cursorRight) {
 						cursorRight = true;
 					} else if (ok.HasFocus) {
-						e.Handled = true;
-					} else {
-						cancelHasFocus = true;
+						e.Handled = endingKeyPress = true;
 					}
 				}
 			};
@@ -497,7 +495,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.True (okClicked);
 			Assert.True (closing);
 			Assert.True (cursorRight);
-			Assert.True (cancelHasFocus);
+			Assert.True (endingKeyPress);
 			Assert.True (closed);
 			Assert.Empty (FakeConsole.MockKeyPresses);
 		}

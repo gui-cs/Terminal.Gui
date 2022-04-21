@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MessageBox
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -132,8 +132,6 @@ else
 
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
   <h4 id="Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,NStack.ustring[])">ErrorQuery(ustring, ustring, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -191,8 +189,6 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
 The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 from the size of the title, message. and buttons.
 </div>
-  
-  
   <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
   <h4 id="Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])">ErrorQuery(ustring, ustring, Int32, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -255,8 +251,73 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
 The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 from the size of the title, message. and buttons.
 </div>
-  
-  
+  <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
+  <h4 id="Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])">ErrorQuery(ustring, ustring, Int32, Border, ustring[])</h4>
+  <div class="markdown level1 summary">
+Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a> with the specified title and message and a list of buttons to show to the user.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int ErrorQuery(ustring title, ustring message, int defaultButton = 0, Border border = null, params ustring[] buttons)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the query.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>Message to display, might contain multiple lines.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">defaultButton</span></td>
+        <td>Index of the default button.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The border settings.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td>Array of buttons to add.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+from the size of the title, message. and buttons.
+</div>
   <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
   <h4 id="Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])">ErrorQuery(Int32, Int32, ustring, ustring, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -323,8 +384,6 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
   <div class="markdown level1 remarks">
 Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_NStack_ustring___">ErrorQuery(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
 </div>
-  
-  
   <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
   <h4 id="Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])">ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -396,8 +455,82 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
   <div class="markdown level1 remarks">
 Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_NStack_ustring___">ErrorQuery(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
 </div>
-  
-  
+  <a id="Terminal_Gui_MessageBox_ErrorQuery_" data-uid="Terminal.Gui.MessageBox.ErrorQuery*"></a>
+  <h4 id="Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])">ErrorQuery(Int32, Int32, ustring, ustring, Int32, Border, ustring[])</h4>
+  <div class="markdown level1 summary">
+Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a> with the specified title and message and a list of buttons to show to the user.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int ErrorQuery(int width, int height, ustring title, ustring message, int defaultButton = 0, Border border = null, params ustring[] buttons)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td>Width for the window.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">height</span></td>
+        <td>Height for the window.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the query.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>Message to display, might contain multiple lines.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">defaultButton</span></td>
+        <td>Index of the default button.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The border settings.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td>Array of buttons to add.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_NStack_ustring___">ErrorQuery(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
+</div>
   <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
   <h4 id="Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,NStack.ustring[])">Query(ustring, ustring, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -455,8 +588,6 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
 The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 from the size of the message and buttons.
 </div>
-  
-  
   <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
   <h4 id="Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])">Query(ustring, ustring, Int32, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -519,8 +650,73 @@ Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
 The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 from the size of the message and buttons.
 </div>
-  
-  
+  <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
+  <h4 id="Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])">Query(ustring, ustring, Int32, Border, ustring[])</h4>
+  <div class="markdown level1 summary">
+Presents an error <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a> with the specified title and message and a list of buttons to show to the user.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Query(ustring title, ustring message, int defaultButton = 0, Border border = null, params ustring[] buttons)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the query.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>Message to display, might contain multiple lines.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">defaultButton</span></td>
+        <td>Index of the default button.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The border settings.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td>Array of buttons to add.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+from the size of the message and buttons.
+</div>
   <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
   <h4 id="Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])">Query(Int32, Int32, ustring, ustring, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -587,8 +783,6 @@ Presents a normal <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
   <div class="markdown level1 remarks">
 Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_NStack_ustring___">Query(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
 </div>
-  
-  
   <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
   <h4 id="Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])">Query(Int32, Int32, ustring, ustring, Int32, ustring[])</h4>
   <div class="markdown level1 summary">
@@ -660,15 +854,87 @@ Presents a normal <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox
   <div class="markdown level1 remarks">
 Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_NStack_ustring___">Query(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
 </div>
+  <a id="Terminal_Gui_MessageBox_Query_" data-uid="Terminal.Gui.MessageBox.Query*"></a>
+  <h4 id="Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring___" data-uid="Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,Terminal.Gui.Border,NStack.ustring[])">Query(Int32, Int32, ustring, ustring, Int32, Border, ustring[])</h4>
+  <div class="markdown level1 summary">
+Presents a normal <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a> with the specified title and message and a list of buttons to show to the user.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int Query(int width, int height, ustring title, ustring message, int defaultButton = 0, Border border = null, params ustring[] buttons)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td>Width for the window.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">height</span></td>
+        <td>Height for the window.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the query.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>Message to display, might contain multiple lines.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">defaultButton</span></td>
+        <td>Index of the default button.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">border</span></td>
+        <td>The border settings.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td>Array of buttons to add.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_Terminal_Gui_Border_NStack_ustring____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Use <a class="xref" href="Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_NStack_ustring___">Query(ustring, ustring, ustring[])</a> instead; it automatically sizes the MessageBox based on the contents.
+</div>
 </article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

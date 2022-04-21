@@ -3,10 +3,10 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Terminal.Gui" Version="0.81.0" />
+    <PackageReference Include="Terminal.Gui" Version="1.4.0" />
   </ItemGroup>
 </Project>

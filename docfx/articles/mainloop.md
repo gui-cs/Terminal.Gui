@@ -25,12 +25,12 @@ This class provides the following capabilities:
 * On Unix systems, it can monitor file descriptors for readability or writability.
 
 The `MainLoop` property in the the
-[`Application`](../api/Terminal.Gui/Terminal.Gui.Application.html)
+[`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml)
 provides access to these functions.
 
 When your code invokes `Application.Run (Toplevel)`, the application
 will prepare the current
-[`Toplevel`](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) instance by
+[`Toplevel`](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) instance by
 redrawing the screen appropriately and then calling the mainloop to
 run.    
 
@@ -39,7 +39,7 @@ can configure the MainLoop in response to events during the execution.
 
 The keyboard inputs is dispatched by the application class to the
 current TopLevel window this is covered in more detail in the
-[Keyboard Event Processing](keyboard.html) document.
+[Keyboard Event Processing](keyboard.md) document.
 
 
 Async Execution

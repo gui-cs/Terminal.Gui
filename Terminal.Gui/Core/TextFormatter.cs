@@ -124,6 +124,11 @@ namespace Terminal.Gui {
 		Size size;
 
 		/// <summary>
+		/// Event invoked when the <see cref="HotKey"/> is changed.
+		/// </summary>
+		public event Action<Key> HotKeyChanged;
+
+		/// <summary>
 		///   The text to be displayed. This text is never modified.
 		/// </summary>
 		public virtual ustring Text {
@@ -270,7 +275,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the hotkey. Will be an upper case letter or digit.
 		/// </summary>
-		public Key HotKey { get => hotKey; internal set => hotKey = value; }
+		public Key HotKey {
+			get => hotKey;
+			internal set {
+				if (hotKey != value) {
+					var oldKey = hotKey;
+					hotKey = value;
+					HotKeyChanged?.Invoke (oldKey);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Specifies the mask to apply to the hotkey to tag it as the hotkey. The default value of <c>0x100000</c> causes
@@ -304,7 +318,8 @@ namespace Terminal.Gui {
 
 				if (NeedsFormat) {
 					var shown_text = text;
-					if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out hotKey)) {
+					if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out Key newHotKey)) {
+						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
 					}

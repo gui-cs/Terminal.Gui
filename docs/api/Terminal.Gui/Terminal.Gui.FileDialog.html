@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FileDialog
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -177,6 +177,27 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ChildUnloaded">Toplevel.ChildUnloaded</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Resized">Toplevel.Resized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateForwardKeyChanged">Toplevel.AlternateForwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateForwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateBackwardKeyChanged">Toplevel.AlternateBackwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateBackwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_QuitKeyChanged">Toplevel.QuitKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_">Toplevel.OnQuitKeyChanged(Key)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Create">Toplevel.Create()</a>
     </div>
     <div>
@@ -262,6 +283,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -384,7 +408,7 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -423,10 +447,46 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -528,6 +588,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -557,8 +620,6 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
   <h4 id="Terminal_Gui_FileDialog__ctor" data-uid="Terminal.Gui.FileDialog.#ctor">FileDialog()</h4>
   <div class="markdown level1 summary">
@@ -569,8 +630,6 @@ Initializes a new <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public FileDialog()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
   <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_System_Collections_Generic_List_System_String__" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,System.Collections.Generic.List{System.String})">FileDialog(ustring, ustring, ustring, ustring, ustring, List&lt;String&gt;)</h4>
   <div class="markdown level1 summary">
@@ -623,8 +682,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
   <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_System_Collections_Generic_List_System_String__" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,System.Collections.Generic.List{System.String})">FileDialog(ustring, ustring, ustring, ustring, List&lt;String&gt;)</h4>
   <div class="markdown level1 summary">
@@ -672,8 +729,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
   <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_System_Collections_Generic_List_System_String__" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,System.Collections.Generic.List{System.String})">FileDialog(ustring, ustring, ustring, List&lt;String&gt;)</h4>
   <div class="markdown level1 summary">
@@ -718,8 +773,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_FileDialog_AllowedFileTypes_" data-uid="Terminal.Gui.FileDialog.AllowedFileTypes*"></a>
   <h4 id="Terminal_Gui_FileDialog_AllowedFileTypes" data-uid="Terminal.Gui.FileDialog.AllowedFileTypes">AllowedFileTypes</h4>
   <div class="markdown level1 summary">
@@ -745,8 +798,6 @@ The array of filename extensions allowed, or null if all file extensions are all
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_AllowsOtherFileTypes_" data-uid="Terminal.Gui.FileDialog.AllowsOtherFileTypes*"></a>
   <h4 id="Terminal_Gui_FileDialog_AllowsOtherFileTypes" data-uid="Terminal.Gui.FileDialog.AllowsOtherFileTypes">AllowsOtherFileTypes</h4>
   <div class="markdown level1 summary">
@@ -772,8 +823,6 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_Canceled_" data-uid="Terminal.Gui.FileDialog.Canceled*"></a>
   <h4 id="Terminal_Gui_FileDialog_Canceled" data-uid="Terminal.Gui.FileDialog.Canceled">Canceled</h4>
   <div class="markdown level1 summary">
@@ -799,8 +848,6 @@ Check if the dialog was or not canceled.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_CanCreateDirectories_" data-uid="Terminal.Gui.FileDialog.CanCreateDirectories*"></a>
   <h4 id="Terminal_Gui_FileDialog_CanCreateDirectories" data-uid="Terminal.Gui.FileDialog.CanCreateDirectories">CanCreateDirectories</h4>
   <div class="markdown level1 summary">
@@ -826,8 +873,6 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_DirectoryPath_" data-uid="Terminal.Gui.FileDialog.DirectoryPath*"></a>
   <h4 id="Terminal_Gui_FileDialog_DirectoryPath" data-uid="Terminal.Gui.FileDialog.DirectoryPath">DirectoryPath</h4>
   <div class="markdown level1 summary">
@@ -853,8 +898,6 @@ Gets or sets the directory path for this panel
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_FilePath_" data-uid="Terminal.Gui.FileDialog.FilePath*"></a>
   <h4 id="Terminal_Gui_FileDialog_FilePath" data-uid="Terminal.Gui.FileDialog.FilePath">FilePath</h4>
   <div class="markdown level1 summary">
@@ -880,8 +923,6 @@ The File path that is currently shown on the panel
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_IsExtensionHidden_" data-uid="Terminal.Gui.FileDialog.IsExtensionHidden*"></a>
   <h4 id="Terminal_Gui_FileDialog_IsExtensionHidden" data-uid="Terminal.Gui.FileDialog.IsExtensionHidden">IsExtensionHidden</h4>
   <div class="markdown level1 summary">
@@ -907,8 +948,6 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_Message_" data-uid="Terminal.Gui.FileDialog.Message*"></a>
   <h4 id="Terminal_Gui_FileDialog_Message" data-uid="Terminal.Gui.FileDialog.Message">Message</h4>
   <div class="markdown level1 summary">
@@ -934,8 +973,6 @@ Gets or sets the message displayed to the user, defaults to nothing
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_NameDirLabel_" data-uid="Terminal.Gui.FileDialog.NameDirLabel*"></a>
   <h4 id="Terminal_Gui_FileDialog_NameDirLabel" data-uid="Terminal.Gui.FileDialog.NameDirLabel">NameDirLabel</h4>
   <div class="markdown level1 summary">
@@ -961,8 +998,6 @@ Gets or sets the name of the directory field label.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_NameFieldLabel_" data-uid="Terminal.Gui.FileDialog.NameFieldLabel*"></a>
   <h4 id="Terminal_Gui_FileDialog_NameFieldLabel" data-uid="Terminal.Gui.FileDialog.NameFieldLabel">NameFieldLabel</h4>
   <div class="markdown level1 summary">
@@ -988,8 +1023,6 @@ Gets or sets the name field label.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FileDialog_Prompt_" data-uid="Terminal.Gui.FileDialog.Prompt*"></a>
   <h4 id="Terminal_Gui_FileDialog_Prompt" data-uid="Terminal.Gui.FileDialog.Prompt">Prompt</h4>
   <div class="markdown level1 summary">
@@ -1017,8 +1050,6 @@ Gets or sets the prompt label for the <a class="xref" href="Terminal.Gui.Button.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_FileDialog_WillPresent_" data-uid="Terminal.Gui.FileDialog.WillPresent*"></a>
   <h4 id="Terminal_Gui_FileDialog_WillPresent" data-uid="Terminal.Gui.FileDialog.WillPresent">WillPresent()</h4>
   <div class="markdown level1 summary"></div>
@@ -1044,10 +1075,6 @@ Gets or sets the prompt label for the <a class="xref" href="Terminal.Gui.Button.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

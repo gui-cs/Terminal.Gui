@@ -119,10 +119,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today?";
 		container.Add (
-				new Label ($"{i+1}-{txt}") { TextAlignment = TextAlignment.Left,      Y = 3, Width = Dim.Fill () },
-				new Label ($"{i+2}-{txt}") { TextAlignment = TextAlignment.Right,     Y = 5, Width = Dim.Fill () },
-				new Label ($"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered,  Y = 7, Width = Dim.Fill () },
-				new Label ($"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
+				new Label ($"{i + 1}-{txt}") { TextAlignment = TextAlignment.Left, Y = 3, Width = Dim.Fill () },
+				new Label ($"{i + 2}-{txt}") { TextAlignment = TextAlignment.Right, Y = 5, Width = Dim.Fill () },
+				new Label ($"{i + 3}-{txt}") { TextAlignment = TextAlignment.Centered, Y = 7, Width = Dim.Fill () },
+				new Label ($"{i + 4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
 			);
 
 		Application.Run (container);
@@ -239,6 +239,7 @@ static class Demo {
 	static void Editor ()
 	{
 		Application.Init ();
+		Application.HeightAsBuffer = heightAsBuffer;
 
 		var ntop = Application.Top;
 
@@ -487,15 +488,15 @@ static class Demo {
 					.OrderBy (x => x).Select (x => ustring.Make (x)).ToList ();
 			}
 		}
-		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
-		list.SetSource(items);
+		var list = new ComboBox () { Width = Dim.Fill (), Height = Dim.Fill () };
+		list.SetSource (items);
 		list.OpenSelectedItem += (ListViewItemEventArgs text) => { Application.RequestStop (); };
 
 		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
 		d.Add (list);
 		Application.Run (d);
 
-		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
+		MessageBox.Query (60, 10, "Selected file", list.Text.ToString () == "" ? "Nothing selected" : list.Text.ToString (), "Ok");
 	}
 	#endregion
 
@@ -564,8 +565,12 @@ static class Demo {
 	#endregion
 
 	public static Action running = MainApp;
-	static void Main ()
+	static void Main (string [] args)
 	{
+		if (args.Length > 0 && args.Contains ("-usc")) {
+			Application.UseSystemConsole = true;
+		}
+
 		Console.OutputEncoding = System.Text.Encoding.Default;
 
 		while (running != null) {
@@ -578,15 +583,14 @@ static class Demo {
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
 	public static CheckBox menuAutoMouseNav;
+	private static bool heightAsBuffer = false;
 	static void MainApp ()
 	{
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-		Application.UseSystemConsole = true;
-
-		Application.Init();
-		Application.HeightAsBuffer = true;
+		Application.Init ();
+		Application.HeightAsBuffer = heightAsBuffer;
 		//ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 		var top = Application.Top;
@@ -618,6 +622,11 @@ static class Demo {
 		menuItems [2].Action = () => ShowMenuItem (menuItems [2]);
 		menuItems [3].Action = () => ShowMenuItem (menuItems [3]);
 
+		MenuItem miUseSubMenusSingleFrame = null;
+		var useSubMenusSingleFrame = false;
+
+		MenuItem miHeightAsBuffer = null;
+
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.D),
@@ -635,7 +644,15 @@ static class Demo {
 				new MenuItem ("_Paste", "", Paste, null, null, Key.AltMask | Key.CtrlMask| Key.V),
 				new MenuBarItem ("_Find and Replace",
 					new MenuItem [] { menuItems [0], menuItems [1] }),
-				menuItems[3]
+				menuItems[3],
+				miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
+				() => menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
+					CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
+				},
+				miHeightAsBuffer = new MenuItem ("_Height As Buffer", "", () => {
+					miHeightAsBuffer.Checked = heightAsBuffer = !heightAsBuffer;
+					Application.HeightAsBuffer = heightAsBuffer;
+				}) { CheckType = MenuItemCheckStyle.Checked, Checked = heightAsBuffer }
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true), null, null, Key.AltMask + 0.ToString () [0]),
@@ -685,7 +702,8 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", Load),
 			new StatusItem(Key.F3, "~F3~ Save", Save),
-			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
+			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } }),
+			new StatusItem(Key.Null, Application.Driver.GetType().Name, null)
 		});
 
 		win.Add (drag, dragText);

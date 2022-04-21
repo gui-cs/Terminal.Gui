@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Window
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -141,6 +141,27 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ChildUnloaded">Toplevel.ChildUnloaded</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Resized">Toplevel.Resized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateForwardKeyChanged">Toplevel.AlternateForwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateForwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateBackwardKeyChanged">Toplevel.AlternateBackwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateBackwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_QuitKeyChanged">Toplevel.QuitKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_">Toplevel.OnQuitKeyChanged(Key)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Create">Toplevel.Create()</a>
     </div>
     <div>
@@ -232,6 +253,9 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -354,7 +378,7 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -393,10 +417,46 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -498,6 +558,9 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -532,8 +595,6 @@ API to determine this rectangle.
 </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor" data-uid="Terminal.Gui.Window.#ctor">Window()</h4>
   <div class="markdown level1 summary">
@@ -544,8 +605,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Window()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring)">Window(ustring)</h4>
   <div class="markdown level1 summary">
@@ -578,8 +637,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
 This constructor initializes a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
 Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
 </div>
-  
-  
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_Terminal_Gui_Border_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring,System.Int32,Terminal.Gui.Border)">Window(ustring, Int32, Border)</h4>
   <div class="markdown level1 summary">
@@ -623,8 +680,6 @@ and an optional title.
 This constructor initializes a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
 Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
 </div>
-  
-  
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)">Window(Rect, ustring)</h4>
   <div class="markdown level1 summary">
@@ -662,8 +717,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
 This constructor initializes a Window with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use constructors
 that do not take <code>Rect</code> parameters to initialize a Window with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
 </div>
-  
-  
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_Terminal_Gui_Border_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Int32,Terminal.Gui.Border)">Window(Rect, ustring, Int32, Border)</h4>
   <div class="markdown level1 summary">
@@ -714,8 +767,6 @@ that do not take <code>Rect</code> parameters to initialize a Window with  <a cl
 </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_Window_Border_" data-uid="Terminal.Gui.Window.Border*"></a>
   <h4 id="Terminal_Gui_Window_Border" data-uid="Terminal.Gui.Window.Border">Border</h4>
   <div class="markdown level1 summary"></div>
@@ -741,8 +792,6 @@ that do not take <code>Rect</code> parameters to initialize a Window with  <a cl
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a></div>
-  
-  
   <a id="Terminal_Gui_Window_Text_" data-uid="Terminal.Gui.Window.Text*"></a>
   <h4 id="Terminal_Gui_Window_Text" data-uid="Terminal.Gui.Window.Text">Text</h4>
   <div class="markdown level1 summary">
@@ -770,8 +819,6 @@ The text displayed by the <a class="xref" href="Terminal.Gui.Label.html">Label</
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a></div>
-  
-  
   <a id="Terminal_Gui_Window_TextAlignment_" data-uid="Terminal.Gui.Window.TextAlignment*"></a>
   <h4 id="Terminal_Gui_Window_TextAlignment" data-uid="Terminal.Gui.Window.TextAlignment">TextAlignment</h4>
   <div class="markdown level1 summary">
@@ -799,8 +846,6 @@ Controls the text-alignment property of the label, changing it will redisplay th
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a></div>
-  
-  
   <a id="Terminal_Gui_Window_Title_" data-uid="Terminal.Gui.Window.Title*"></a>
   <h4 id="Terminal_Gui_Window_Title" data-uid="Terminal.Gui.Window.Title">Title</h4>
   <div class="markdown level1 summary">
@@ -828,8 +873,6 @@ The title to be displayed for this window.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_Window_Add_" data-uid="Terminal.Gui.Window.Add*"></a>
   <h4 id="Terminal_Gui_Window_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.Window.Add(Terminal.Gui.View)">Add(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -857,8 +900,6 @@ The title to be displayed for this window.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Add_Terminal_Gui_View_">Toplevel.Add(View)</a></div>
-  
-  
   <a id="Terminal_Gui_Window_OnCanFocusChanged_" data-uid="Terminal.Gui.Window.OnCanFocusChanged*"></a>
   <h4 id="Terminal_Gui_Window_OnCanFocusChanged" data-uid="Terminal.Gui.Window.OnCanFocusChanged">OnCanFocusChanged()</h4>
   <div class="markdown level1 summary"></div>
@@ -869,8 +910,6 @@ The title to be displayed for this window.
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a></div>
-  
-  
   <a id="Terminal_Gui_Window_Redraw_" data-uid="Terminal.Gui.Window.Redraw*"></a>
   <h4 id="Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -898,8 +937,6 @@ The title to be displayed for this window.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_">Toplevel.Redraw(Rect)</a></div>
-  
-  
   <a id="Terminal_Gui_Window_Remove_" data-uid="Terminal.Gui.Window.Remove*"></a>
   <h4 id="Terminal_Gui_Window_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Window.Remove(Terminal.Gui.View)">Remove(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -927,8 +964,6 @@ The title to be displayed for this window.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_">Toplevel.Remove(View)</a></div>
-  
-  
   <a id="Terminal_Gui_Window_RemoveAll_" data-uid="Terminal.Gui.Window.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Window_RemoveAll" data-uid="Terminal.Gui.Window.RemoveAll">RemoveAll()</h4>
   <div class="markdown level1 summary"></div>
@@ -954,10 +989,6 @@ The title to be displayed for this window.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

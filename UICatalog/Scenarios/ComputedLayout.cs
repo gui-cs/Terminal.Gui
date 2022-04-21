@@ -6,16 +6,16 @@ using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	/// <summary>
 	/// This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. 
 	/// [x] - Using Dim.Fill to fill a window
 	/// [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
 	/// [ ] - ...
 	/// </summary>
-	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates using the Computed (Dim and Pos) Layout System")]
+	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates the Computed (Dim and Pos) Layout System.")]
 	[ScenarioCategory ("Layout")]
-	class ComputedLayout : Scenario {
+	public class ComputedLayout : Scenario {
 
 		public override void Setup ()
 		{

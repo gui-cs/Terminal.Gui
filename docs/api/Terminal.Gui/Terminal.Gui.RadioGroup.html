@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class RadioGroup
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -131,6 +131,9 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -265,7 +268,7 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -301,10 +304,46 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -424,6 +463,9 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -453,8 +495,6 @@
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_RadioGroup__ctor_" data-uid="Terminal.Gui.RadioGroup.#ctor*"></a>
   <h4 id="Terminal_Gui_RadioGroup__ctor" data-uid="Terminal.Gui.RadioGroup.#ctor">RadioGroup()</h4>
   <div class="markdown level1 summary">
@@ -465,8 +505,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.RadioGroup.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public RadioGroup()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_RadioGroup__ctor_" data-uid="Terminal.Gui.RadioGroup.#ctor*"></a>
   <h4 id="Terminal_Gui_RadioGroup__ctor_NStack_ustring___System_Int32_" data-uid="Terminal.Gui.RadioGroup.#ctor(NStack.ustring[],System.Int32)">RadioGroup(ustring[], Int32)</h4>
   <div class="markdown level1 summary">
@@ -499,8 +537,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.RadioGroup.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup__ctor_" data-uid="Terminal.Gui.RadioGroup.#ctor*"></a>
   <h4 id="Terminal_Gui_RadioGroup__ctor_System_Int32_System_Int32_NStack_ustring___System_Int32_" data-uid="Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,NStack.ustring[],System.Int32)">RadioGroup(Int32, Int32, ustring[], Int32)</h4>
   <div class="markdown level1 summary">
@@ -544,8 +580,6 @@ The <a class="xref" href="Terminal.Gui.View.html">View</a> frame is computed fro
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup__ctor_" data-uid="Terminal.Gui.RadioGroup.#ctor*"></a>
   <h4 id="Terminal_Gui_RadioGroup__ctor_Terminal_Gui_Rect_NStack_ustring___System_Int32_" data-uid="Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,NStack.ustring[],System.Int32)">RadioGroup(Rect, ustring[], Int32)</h4>
   <div class="markdown level1 summary">
@@ -585,8 +619,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.RadioGroup.
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_RadioGroup_DisplayMode_" data-uid="Terminal.Gui.RadioGroup.DisplayMode*"></a>
   <h4 id="Terminal_Gui_RadioGroup_DisplayMode" data-uid="Terminal.Gui.RadioGroup.DisplayMode">DisplayMode</h4>
   <div class="markdown level1 summary">
@@ -612,8 +644,6 @@ Gets or sets the <a class="xref" href="Terminal.Gui.DisplayModeLayout.html">Disp
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup_HorizontalSpace_" data-uid="Terminal.Gui.RadioGroup.HorizontalSpace*"></a>
   <h4 id="Terminal_Gui_RadioGroup_HorizontalSpace" data-uid="Terminal.Gui.RadioGroup.HorizontalSpace">HorizontalSpace</h4>
   <div class="markdown level1 summary">
@@ -639,8 +669,6 @@ Gets or sets the horizontal space for this <a class="xref" href="Terminal.Gui.Ra
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup_RadioLabels_" data-uid="Terminal.Gui.RadioGroup.RadioLabels*"></a>
   <h4 id="Terminal_Gui_RadioGroup_RadioLabels" data-uid="Terminal.Gui.RadioGroup.RadioLabels">RadioLabels</h4>
   <div class="markdown level1 summary">
@@ -666,8 +694,6 @@ The radio labels to display
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup_SelectedItem_" data-uid="Terminal.Gui.RadioGroup.SelectedItem*"></a>
   <h4 id="Terminal_Gui_RadioGroup_SelectedItem" data-uid="Terminal.Gui.RadioGroup.SelectedItem">SelectedItem</h4>
   <div class="markdown level1 summary">
@@ -695,8 +721,6 @@ The currently selected item from the list of radio labels
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_RadioGroup_MouseEvent_" data-uid="Terminal.Gui.RadioGroup.MouseEvent*"></a>
   <h4 id="Terminal_Gui_RadioGroup_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -739,8 +763,6 @@ The currently selected item from the list of radio labels
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_OnEnter_" data-uid="Terminal.Gui.RadioGroup.OnEnter*"></a>
   <h4 id="Terminal_Gui_RadioGroup_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.RadioGroup.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -783,8 +805,6 @@ The currently selected item from the list of radio labels
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_OnSelectedItemChanged_" data-uid="Terminal.Gui.RadioGroup.OnSelectedItemChanged*"></a>
   <h4 id="Terminal_Gui_RadioGroup_OnSelectedItemChanged_System_Int32_System_Int32_" data-uid="Terminal.Gui.RadioGroup.OnSelectedItemChanged(System.Int32,System.Int32)">OnSelectedItemChanged(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -817,8 +837,6 @@ Called whenever the current selected item changes. Invokes the <a class="xref" h
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_RadioGroup_PositionCursor_" data-uid="Terminal.Gui.RadioGroup.PositionCursor*"></a>
   <h4 id="Terminal_Gui_RadioGroup_PositionCursor" data-uid="Terminal.Gui.RadioGroup.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -829,8 +847,6 @@ Called whenever the current selected item changes. Invokes the <a class="xref" h
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_ProcessColdKey_" data-uid="Terminal.Gui.RadioGroup.ProcessColdKey*"></a>
   <h4 id="Terminal_Gui_RadioGroup_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -873,8 +889,6 @@ Called whenever the current selected item changes. Invokes the <a class="xref" h
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_ProcessKey_" data-uid="Terminal.Gui.RadioGroup.ProcessKey*"></a>
   <h4 id="Terminal_Gui_RadioGroup_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -917,8 +931,6 @@ Called whenever the current selected item changes. Invokes the <a class="xref" h
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_Redraw_" data-uid="Terminal.Gui.RadioGroup.Redraw*"></a>
   <h4 id="Terminal_Gui_RadioGroup_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.RadioGroup.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -946,8 +958,6 @@ Called whenever the current selected item changes. Invokes the <a class="xref" h
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  
-  
   <a id="Terminal_Gui_RadioGroup_Refresh_" data-uid="Terminal.Gui.RadioGroup.Refresh*"></a>
   <h4 id="Terminal_Gui_RadioGroup_Refresh" data-uid="Terminal.Gui.RadioGroup.Refresh">Refresh()</h4>
   <div class="markdown level1 summary">
@@ -960,8 +970,6 @@ Allow to invoke the <a class="xref" href="Terminal.Gui.RadioGroup.html#Terminal_
   </div>
   <h3 id="events">Events
   </h3>
-  
-  
   <h4 id="Terminal_Gui_RadioGroup_SelectedItemChanged" data-uid="Terminal.Gui.RadioGroup.SelectedItemChanged">SelectedItemChanged</h4>
   <div class="markdown level1 summary">
 Invoked when the selected radio label has changed.
@@ -969,7 +977,7 @@ Invoked when the selected radio label has changed.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event Action&lt;RadioGroup.SelectedItemChangedArgs&gt; SelectedItemChanged</code></pre>
+    <pre><code class="lang-csharp hljs">public event Action&lt;SelectedItemChangedArgs&gt; SelectedItemChanged</code></pre>
   </div>
   <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -981,7 +989,7 @@ Invoked when the selected radio label has changed.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html">RadioGroup.SelectedItemChangedArgs</a>&gt;</td>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.SelectedItemChangedArgs.html">SelectedItemChangedArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1001,10 +1009,6 @@ Invoked when the selected radio label has changed.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

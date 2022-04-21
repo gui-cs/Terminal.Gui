@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Button
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -133,10 +133,7 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">View.Shortcut</a>
@@ -265,7 +262,7 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -295,19 +292,52 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
@@ -347,9 +377,6 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
@@ -421,6 +448,9 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -469,8 +499,6 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
 </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor" data-uid="Terminal.Gui.Button.#ctor">Button()</h4>
   <div class="markdown level1 summary">
@@ -486,8 +514,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.Button.html">Bu
 The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
 text length. The height will always be 1.
 </div>
-  
-  
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)">Button(ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -528,8 +554,6 @@ in a <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> will implicitly 
 The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
 text length. The height will always be 1.
 </div>
-  
-  
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)">Button(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
@@ -572,8 +596,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.Button.html">Bu
 The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
 text length. The height will always be 1.
 </div>
-  
-  
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">Button(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -626,8 +648,81 @@ text length. The height will always be 1.
 </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
+  <a id="Terminal_Gui_Button_AutoSize_" data-uid="Terminal.Gui.Button.AutoSize*"></a>
+  <h4 id="Terminal_Gui_Button_AutoSize" data-uid="Terminal.Gui.Button.AutoSize">AutoSize</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool AutoSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a></div>
+  <a id="Terminal_Gui_Button_HotKey_" data-uid="Terminal.Gui.Button.HotKey*"></a>
+  <h4 id="Terminal_Gui_Button_HotKey" data-uid="Terminal.Gui.Button.HotKey">HotKey</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override Key HotKey { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a></div>
+  <a id="Terminal_Gui_Button_HotKeySpecifier_" data-uid="Terminal.Gui.Button.HotKeySpecifier*"></a>
+  <h4 id="Terminal_Gui_Button_HotKeySpecifier" data-uid="Terminal.Gui.Button.HotKeySpecifier">HotKeySpecifier</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override Rune HotKeySpecifier { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a></div>
   <a id="Terminal_Gui_Button_IsDefault_" data-uid="Terminal.Gui.Button.IsDefault*"></a>
   <h4 id="Terminal_Gui_Button_IsDefault" data-uid="Terminal.Gui.Button.IsDefault">IsDefault</h4>
   <div class="markdown level1 summary">
@@ -653,17 +748,13 @@ Gets or sets whether the <a class="xref" href="Terminal.Gui.Button.html">Button<
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Button_Text_" data-uid="Terminal.Gui.Button.Text*"></a>
   <h4 id="Terminal_Gui_Button_Text" data-uid="Terminal.Gui.Button.Text">Text</h4>
-  <div class="markdown level1 summary">
-The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Button</a>.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ustring Text { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public override ustring Text { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -680,10 +771,10 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a></div>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_Button_MouseEvent_" data-uid="Terminal.Gui.Button.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Button_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -726,8 +817,16 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
+  <a id="Terminal_Gui_Button_OnClicked_" data-uid="Terminal.Gui.Button.OnClicked*"></a>
+  <h4 id="Terminal_Gui_Button_OnClicked" data-uid="Terminal.Gui.Button.OnClicked">OnClicked()</h4>
+  <div class="markdown level1 summary">
+Virtual method to invoke the <a class="xref" href="Terminal.Gui.Button.html#Terminal_Gui_Button_Clicked">Clicked</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnClicked()</code></pre>
+  </div>
   <a id="Terminal_Gui_Button_OnEnter_" data-uid="Terminal.Gui.Button.OnEnter*"></a>
   <h4 id="Terminal_Gui_Button_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.Button.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -770,8 +869,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_Button_PositionCursor_" data-uid="Terminal.Gui.Button.PositionCursor*"></a>
   <h4 id="Terminal_Gui_Button_PositionCursor" data-uid="Terminal.Gui.Button.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -782,8 +879,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
   <a id="Terminal_Gui_Button_ProcessColdKey_" data-uid="Terminal.Gui.Button.ProcessColdKey*"></a>
   <h4 id="Terminal_Gui_Button_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -826,8 +921,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_Button_ProcessHotKey_" data-uid="Terminal.Gui.Button.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_Button_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Button.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -870,8 +963,6 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_Button_ProcessKey_" data-uid="Terminal.Gui.Button.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Button_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Button.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -914,10 +1005,35 @@ The text displayed by this <a class="xref" href="Terminal.Gui.Button.html">Butto
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <a id="Terminal_Gui_Button_Redraw_" data-uid="Terminal.Gui.Button.Redraw*"></a>
+  <h4 id="Terminal_Gui_Button_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Redraw(Rect bounds)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">bounds</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
   <h3 id="events">Events
   </h3>
-  
-  
   <h4 id="Terminal_Gui_Button_Clicked" data-uid="Terminal.Gui.Button.Clicked">Clicked</h4>
   <div class="markdown level1 summary">
 Clicked <span class="xref">System.Action</span>, raised when the user clicks the primary mouse button within the Bounds of this <a class="xref" href="Terminal.Gui.View.html">View</a>
@@ -964,10 +1080,6 @@ the mouse or the keyboard.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

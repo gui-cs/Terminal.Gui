@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 			}
 			set {
 				try {
-					if (IsSupported) {
+					if (IsSupported && value != null) {
 						Application.Driver.Clipboard.SetClipboardData (value.ToString ());
 					}
 					contents = value;

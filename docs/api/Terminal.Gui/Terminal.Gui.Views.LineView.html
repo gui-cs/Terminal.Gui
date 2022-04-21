@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class LineView
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -131,6 +131,9 @@ A straight line control either horizontal or vertical
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -265,7 +268,7 @@ A straight line control either horizontal or vertical
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a>
@@ -307,6 +310,12 @@ A straight line control either horizontal or vertical
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
@@ -314,6 +323,36 @@ A straight line control either horizontal or vertical
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -436,6 +475,9 @@ A straight line control either horizontal or vertical
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
     </div>
     <div>
@@ -468,8 +510,6 @@ A straight line control either horizontal or vertical
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_Views_LineView__ctor_" data-uid="Terminal.Gui.Views.LineView.#ctor*"></a>
   <h4 id="Terminal_Gui_Views_LineView__ctor" data-uid="Terminal.Gui.Views.LineView.#ctor">LineView()</h4>
   <div class="markdown level1 summary">
@@ -480,8 +520,6 @@ Creates a horizontal line
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public LineView()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_Views_LineView__ctor_" data-uid="Terminal.Gui.Views.LineView.#ctor*"></a>
   <h4 id="Terminal_Gui_Views_LineView__ctor_Terminal_Gui_Graphs_Orientation_" data-uid="Terminal.Gui.Views.LineView.#ctor(Terminal.Gui.Graphs.Orientation)">LineView(Orientation)</h4>
   <div class="markdown level1 summary">
@@ -511,8 +549,6 @@ Creates a horizontal or vertical line based on <code data-dev-comment-type="para
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_Views_LineView_EndingAnchor_" data-uid="Terminal.Gui.Views.LineView.EndingAnchor*"></a>
   <h4 id="Terminal_Gui_Views_LineView_EndingAnchor" data-uid="Terminal.Gui.Views.LineView.EndingAnchor">EndingAnchor</h4>
   <div class="markdown level1 summary">
@@ -539,8 +575,6 @@ If not specified then <a class="xref" href="Terminal.Gui.Views.LineView.html#Ter
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Views_LineView_LineRune_" data-uid="Terminal.Gui.Views.LineView.LineRune*"></a>
   <h4 id="Terminal_Gui_Views_LineView_LineRune" data-uid="Terminal.Gui.Views.LineView.LineRune">LineRune</h4>
   <div class="markdown level1 summary">
@@ -566,8 +600,6 @@ The symbol to use for drawing the line
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Views_LineView_Orientation_" data-uid="Terminal.Gui.Views.LineView.Orientation*"></a>
   <h4 id="Terminal_Gui_Views_LineView_Orientation" data-uid="Terminal.Gui.Views.LineView.Orientation">Orientation</h4>
   <div class="markdown level1 summary">
@@ -594,8 +626,6 @@ of the control to cover a relevant area based on the new direction.
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_Views_LineView_StartingAnchor_" data-uid="Terminal.Gui.Views.LineView.StartingAnchor*"></a>
   <h4 id="Terminal_Gui_Views_LineView_StartingAnchor" data-uid="Terminal.Gui.Views.LineView.StartingAnchor">StartingAnchor</h4>
   <div class="markdown level1 summary">
@@ -624,8 +654,6 @@ If not specified then <a class="xref" href="Terminal.Gui.Views.LineView.html#Ter
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_Views_LineView_Redraw_" data-uid="Terminal.Gui.Views.LineView.Redraw*"></a>
   <h4 id="Terminal_Gui_Views_LineView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Views.LineView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -670,10 +698,6 @@ Draws the line including any starting/ending anchors
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

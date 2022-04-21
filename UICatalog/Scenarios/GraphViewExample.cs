@@ -8,9 +8,9 @@ using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Graph View", Description: "Demos GraphView control")]
+	[ScenarioMetadata (Name: "Graph View", Description: "Demos the GraphView control.")]
 	[ScenarioCategory ("Controls")]
-	class GraphViewExample : Scenario {
+	public class GraphViewExample : Scenario {
 
 		GraphView graphView;
 		private TextView about;

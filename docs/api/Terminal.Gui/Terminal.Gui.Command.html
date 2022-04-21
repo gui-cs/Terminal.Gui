@@ -1,0 +1,593 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Enum Command
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Enum Command
+   ">
+    <meta name="generator" content="docfx 2.59.0.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Command">
+  
+  
+  <h1 id="Terminal_Gui_Command" data-uid="Terminal.Gui.Command" class="text-break">Enum Command
+  </h1>
+  <div class="markdown level0 summary">
+Actions which can be performed by the application or bound to keys in a <a class="xref" href="Terminal.Gui.View.html">View</a> control.
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Command_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public enum Command</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    <thead>
+    <tbody>
+      <tr>
+        <td id="Terminal_Gui_Command_Accept">Accept</td>
+        <td>
+Accepts the current state (e.g. selection, button press etc)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_BackTab">BackTab</td>
+        <td>
+Inserts a shift tab.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_BottomEnd">BottomEnd</td>
+        <td>
+Moves to bottom end.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_BottomEndExtend">BottomEndExtend</td>
+        <td>
+Extends the selection to the bottom end.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Cancel">Cancel</td>
+        <td>
+Cancels any current temporary states on the control e.g. expanding
+a combo list
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Collapse">Collapse</td>
+        <td>
+Collapses a list or item (with subitems)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_CollapseAll">CollapseAll</td>
+        <td>
+Recursively collapses a list items of their children (if any)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Copy">Copy</td>
+        <td>
+Copies the current selection.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Cut">Cut</td>
+        <td>
+Cuts the current selection.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_CutToEndLine">CutToEndLine</td>
+        <td>
+Deletes and copies to the clipboard the characters from the current position to the end of the line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_CutToStartLine">CutToStartLine</td>
+        <td>
+Deletes and copies to the clipboard the characters from the current position to the start of the line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_DeleteAll">DeleteAll</td>
+        <td>
+Deletes all objects in the control.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_DeleteCharLeft">DeleteCharLeft</td>
+        <td>
+Deletes the character on the left.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_DeleteCharRight">DeleteCharRight</td>
+        <td>
+Deletes the character on the right.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_DisableOverwrite">DisableOverwrite</td>
+        <td>
+Disables overwrite mode (<a class="xref" href="Terminal.Gui.Command.html#Terminal_Gui_Command_EnableOverwrite">EnableOverwrite</a>)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_EnableOverwrite">EnableOverwrite</td>
+        <td>
+Enables overwrite mode such that newly typed text overwrites the text that is
+already there (typically associated with the Insert key).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_EndOfLine">EndOfLine</td>
+        <td>
+Moves the cursor to the end of line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_EndOfLineExtend">EndOfLineExtend</td>
+        <td>
+Extends the selection to the end of line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_EndOfPage">EndOfPage</td>
+        <td>
+Moves the cursor to the bottom of page.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Expand">Expand</td>
+        <td>
+Expands a list or item (with subitems)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ExpandAll">ExpandAll</td>
+        <td>
+Recursively Expands all child items and their child items (if any)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_KillWordBackwards">KillWordBackwards</td>
+        <td>
+Deletes the characters backwards.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_KillWordForwards">KillWordForwards</td>
+        <td>
+Deletes the characters forwards.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Left">Left</td>
+        <td>
+Moves the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LeftExtend">LeftExtend</td>
+        <td>
+Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LeftHome">LeftHome</td>
+        <td>
+Moves to the left begin.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LeftHomeExtend">LeftHomeExtend</td>
+        <td>
+Extends the selection to the left begin.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineDown">LineDown</td>
+        <td>
+Moves the caret down one line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineDownExtend">LineDownExtend</td>
+        <td>
+Extends the selection down one line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineDownToLastBranch">LineDownToLastBranch</td>
+        <td>
+Moves the caret down to the last child node of the branch that holds the current selection
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineUp">LineUp</td>
+        <td>
+Moves the caret up one line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineUpExtend">LineUpExtend</td>
+        <td>
+Extends the selection up one line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_LineUpToFirstBranch">LineUpToFirstBranch</td>
+        <td>
+Moves the caret up to the first child node of the branch that holds the current selection
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_NewLine">NewLine</td>
+        <td>
+Inserts a new line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_NextView">NextView</td>
+        <td>
+Moves focus to the next view.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_NextViewOrTop">NextViewOrTop</td>
+        <td>
+Moves focus to the next view or toplevel (case of Mdi).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_OpenSelectedItem">OpenSelectedItem</td>
+        <td>
+Open selected item.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageDown">PageDown</td>
+        <td>
+Move the page down.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageDownExtend">PageDownExtend</td>
+        <td>
+Move the page down increase selection area to cover revealed objects/characters.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageLeft">PageLeft</td>
+        <td>
+Moves to the left page.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageRight">PageRight</td>
+        <td>
+Moves to the right page.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageUp">PageUp</td>
+        <td>
+Move the page up.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PageUpExtend">PageUpExtend</td>
+        <td>
+Move the page up increase selection area to cover revealed objects/characters.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Paste">Paste</td>
+        <td>
+Pastes the current selection.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PreviousView">PreviousView</td>
+        <td>
+Moves focuss to the previous view.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_PreviousViewOrTop">PreviousViewOrTop</td>
+        <td>
+Moves focus to the next previous or toplevel (case of Mdi).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_QuitToplevel">QuitToplevel</td>
+        <td>
+Quit a toplevel.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Redo">Redo</td>
+        <td>
+Redo changes.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Refresh">Refresh</td>
+        <td>
+Refresh the application.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Right">Right</td>
+        <td>
+Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_RightEnd">RightEnd</td>
+        <td>
+Moves to the right end.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_RightEndExtend">RightEndExtend</td>
+        <td>
+Extends the selection to the right end.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_RightExtend">RightExtend</td>
+        <td>
+Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ScrollDown">ScrollDown</td>
+        <td>
+Scrolls down one line (without changing the selection).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ScrollLeft">ScrollLeft</td>
+        <td>
+Scrolls one character to the left
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ScrollRight">ScrollRight</td>
+        <td>
+Scrolls one character to the right.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ScrollUp">ScrollUp</td>
+        <td>
+Scrolls up one line (without changing the selection).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_SelectAll">SelectAll</td>
+        <td>
+Selects all objects in the control.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_StartOfLine">StartOfLine</td>
+        <td>
+Moves the cursor to the start of line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_StartOfLineExtend">StartOfLineExtend</td>
+        <td>
+Extends the selection to the start of line.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_StartOfPage">StartOfPage</td>
+        <td>
+Moves the cursor to the top of page.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Suspend">Suspend</td>
+        <td>
+Suspend a application (used on Linux).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Tab">Tab</td>
+        <td>
+Inserts a tab.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ToggleChecked">ToggleChecked</td>
+        <td>
+Toggle the checked state.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ToggleExpandCollapse">ToggleExpandCollapse</td>
+        <td>
+Toggles the Expanded or collapsed state of a a list or item (with subitems)
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ToggleExtend">ToggleExtend</td>
+        <td>
+Toggles the extended selection.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_ToggleOverwrite">ToggleOverwrite</td>
+        <td>
+Toggles overwrite mode such that newly typed text overwrites the text that is
+already there (typically associated with the Insert key).
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_TopHome">TopHome</td>
+        <td>
+Moves to top begin.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_TopHomeExtend">TopHomeExtend</td>
+        <td>
+Extends the selection to the top begin.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_Undo">Undo</td>
+        <td>
+Undo changes.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_UnixEmulation">UnixEmulation</td>
+        <td>
+Unix emulation
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_WordLeft">WordLeft</td>
+        <td>
+Moves the caret to the start of the previous word.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_WordLeftExtend">WordLeftExtend</td>
+        <td>
+Extends the selection to the start of the previous word.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_WordRight">WordRight</td>
+        <td>
+Moves the caret to the start of the next word.
+</td>
+      </tr>
+      <tr>
+        <td id="Terminal_Gui_Command_WordRightExtend">WordRightExtend</td>
+        <td>
+Extends the selection to the start of the next word.
+</td>
+      </tr>
+    </tbody>
+  </thead></thead></table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

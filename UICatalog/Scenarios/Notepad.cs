@@ -9,9 +9,9 @@ using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Notepad", Description: "Multi tab text editor")]
-	[ScenarioCategory ("Controls")]
-	class Notepad : Scenario {
+	[ScenarioMetadata (Name: "Notepad", Description: "Multi tab text editor uising the TabView control.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView")]
+	public class Notepad : Scenario {
 
 		TabView tabView;
 		Label lblStatus;

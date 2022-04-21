@@ -369,6 +369,15 @@ namespace Terminal.Gui.Core {
 
 			Application.Run (top);
 
+			// Replacing the defaults keys to avoid errors on others unit tests that are using it.
+			Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
+			Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
+			Application.QuitKey = Key.Q | Key.CtrlMask;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
@@ -1269,6 +1278,13 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
 			Assert.Null (Toplevel.dragPosition);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetSupportedCultures_Method ()
+		{
+			var cultures = Application.GetSupportedCultures ();
+			Assert.Equal (cultures.Count, Application.SupportedCultures.Count);
 		}
 	}
 }

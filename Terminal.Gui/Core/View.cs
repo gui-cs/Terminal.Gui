@@ -179,14 +179,19 @@ namespace Terminal.Gui {
 		public event Action VisibleChanged;
 
 		/// <summary>
+		/// Event invoked when the <see cref="HotKey"/> is changed.
+		/// </summary>
+		public event Action<Key> HotKeyChanged;
+
+		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
-		public Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
+		public virtual Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
 
 		/// <summary>
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
-		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
+		public virtual Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
 
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
@@ -249,6 +254,12 @@ namespace Terminal.Gui {
 
 		// This is null, and allocated on demand.
 		List<View> tabIndexes;
+
+		/// <summary>
+		/// Configurable keybindings supported by the control
+		/// </summary>
+		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
+		private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
@@ -345,18 +356,16 @@ namespace Terminal.Gui {
 					}
 					TabStop = value;
 
-					if (!value && Application.Top?.Focused == this) {
-						Application.Top.focused = null;
+					if (!value && SuperView?.Focused == this) {
+						SuperView.focused = null;
 					}
 					if (!value && HasFocus) {
 						SetHasFocus (false, this);
-						EnsureFocus ();
-						if (Focused == null) {
-							if (Application.Top.Focused == null) {
-								Application.Top.FocusNext ();
-							} else {
-								var v = Application.Top.GetMostFocused (Application.Top.Focused);
-								v.SetHasFocus (true, null, true);
+						SuperView?.EnsureFocus ();
+						if (SuperView != null && SuperView?.Focused == null) {
+							SuperView.FocusNext ();
+							if (SuperView.Focused == null) {
+								Application.Current.FocusNext ();
 							}
 							Application.EnsuresTopOnFront ();
 						}
@@ -709,6 +718,7 @@ namespace Terminal.Gui {
 			TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
 			textFormatter = new TextFormatter ();
+			textFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
 			if (Border != null) {
@@ -736,6 +746,11 @@ namespace Terminal.Gui {
 			Text = text;
 		}
 
+		private void TextFormatter_HotKeyChanged (Key obj)
+		{
+			HotKeyChanged?.Invoke (obj);
+		}
+
 		/// <summary>
 		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
 		/// </summary>
@@ -754,6 +769,9 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
+			foreach (var view in Subviews) {
+				view.SetNeedsLayout ();
+			}
 			textFormatter.NeedsFormat = true;
 		}
 
@@ -1161,13 +1179,15 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
-		public void Move (int col, int row)
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
+		///  if set to <c>true</c>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		public void Move (int col, int row, bool clipped = true)
 		{
 			if (Driver.Rows == 0) {
 				return;
 			}
 
-			ViewToScreen (col, row, out var rcol, out var rrow);
+			ViewToScreen (col, row, out var rcol, out var rrow, clipped);
 			Driver.Move (rcol, rrow);
 		}
 
@@ -1315,7 +1335,7 @@ namespace Terminal.Gui {
 		/// The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s
 		/// color scheme.
 		/// </summary>
-		public ColorScheme ColorScheme {
+		public virtual ColorScheme ColorScheme {
 			get {
 				if (colorScheme == null)
 					return SuperView?.ColorScheme;
@@ -1385,7 +1405,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Border != null) {
-				Border.DrawContent ();
+				Border.DrawContent (this);
 			}
 
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
@@ -1411,8 +1431,14 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								view.OnDrawContent (view.Bounds);
-								view.Redraw (view.Bounds);
+								var rect = new Rect () {
+									X = Math.Min (view.Bounds.X, view.NeedDisplay.X),
+									Y = Math.Min (view.Bounds.Y, view.NeedDisplay.Y),
+									Width = Math.Max (view.Bounds.Width, view.NeedDisplay.Width),
+									Height = Math.Max (view.Bounds.Height, view.NeedDisplay.Height)
+								};
+								view.OnDrawContent (rect);
+								view.Redraw (rect);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -1420,6 +1446,10 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+
+			// Invoke DrawContentCompleteEvent
+			OnDrawContentComplete (bounds);
+
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
@@ -1447,6 +1477,31 @@ namespace Terminal.Gui {
 		public virtual void OnDrawContent (Rect viewport)
 		{
 			DrawContent?.Invoke (viewport);
+		}
+
+		/// <summary>
+		/// Event invoked when the content area of the View is completed drawing.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Will be invoked after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.
+		/// </para>
+		/// <para>
+		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
+		/// </para>
+		/// </remarks>
+		public event Action<Rect> DrawContentComplete;
+
+		/// <summary>
+		/// Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
+		/// </summary>
+		/// <param name="viewport">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
+		/// <remarks>
+		/// This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.
+		/// </remarks>
+		public virtual void OnDrawContentComplete (Rect viewport)
+		{
+			DrawContentComplete?.Invoke (viewport);
 		}
 
 		/// <summary>
@@ -1545,6 +1600,139 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Invokes any binding that is registered on this <see cref="View"/>
+		/// and matches the <paramref name="keyEvent"/>
+		/// </summary>
+		/// <param name="keyEvent">The key event passed.</param>
+		protected bool? InvokeKeybindings (KeyEvent keyEvent)
+		{
+			if (KeyBindings.ContainsKey (keyEvent.Key)) {
+				var command = KeyBindings [keyEvent.Key];
+
+				if (!CommandImplementations.ContainsKey (command)) {
+					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+				}
+
+				return CommandImplementations [command] ();
+			}
+
+			return null;
+		}
+
+
+		/// <summary>
+		/// <para>Adds a new key combination that will trigger the given <paramref name="command"/>
+		/// (if supported by the View - see <see cref="GetSupportedCommands"/>)
+		/// </para>
+		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
+		/// rebound to this one</para>
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="command"></param>
+		public void AddKeyBinding (Key key, Command command)
+		{
+			if (KeyBindings.ContainsKey (key)) {
+				KeyBindings [key] = command;
+			} else {
+				KeyBindings.Add (key, command);
+			}
+		}
+
+		/// <summary>
+		/// Replaces a key combination already bound to <see cref="Command"/>.
+		/// </summary>
+		/// <param name="fromKey">The key to be replaced.</param>
+		/// <param name="toKey">The new key to be used.</param>
+		protected void ReplaceKeyBinding (Key fromKey, Key toKey)
+		{
+			if (KeyBindings.ContainsKey (fromKey)) {
+				Command value = KeyBindings [fromKey];
+				KeyBindings.Remove (fromKey);
+				KeyBindings [toKey] = value;
+			}
+		}
+
+		/// <summary>
+		/// Checks if key combination already exist.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <returns><c>true</c> If the key already exist, <c>false</c>otherwise.</returns>
+		public bool ContainsKeyBinding (Key key)
+		{
+			return KeyBindings.ContainsKey (key);
+		}
+
+		/// <summary>
+		/// Removes all bound keys from the View making including the default
+		/// key combinations such as cursor navigation, scrolling etc
+		/// </summary>
+		public void ClearKeybindings ()
+		{
+			KeyBindings.Clear ();
+		}
+
+		/// <summary>
+		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>
+		/// </summary>
+		/// <param name="key"></param>
+		public void ClearKeybinding (Key key)
+		{
+			KeyBindings.Remove (key);
+		}
+
+		/// <summary>
+		/// Removes all key bindings that trigger the given command.  Views can have multiple different
+		/// keys bound to the same command and this method will clear all of them.
+		/// </summary>
+		/// <param name="command"></param>
+		public void ClearKeybinding (Command command)
+		{
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
+				KeyBindings.Remove (kvp.Key);
+			}
+		}
+
+		/// <summary>
+		/// <para>States that the given <see cref="View"/> supports a given <paramref name="command"/>
+		/// and what <paramref name="f"/> to perform to make that command happen
+		/// </para>
+		/// <para>If the <paramref name="command"/> already has an implementation the <paramref name="f"/>
+		/// will replace the old one</para>
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="f">The function.</param>
+		protected void AddCommand (Command command, Func<bool?> f)
+		{
+			// if there is already an implementation of this command
+			if (CommandImplementations.ContainsKey (command)) {
+				// replace that implementation
+				CommandImplementations [command] = f;
+			} else {
+				// else record how to perform the action (this should be the normal case)
+				CommandImplementations.Add (command, f);
+			}
+		}
+
+		/// <summary>
+		/// Returns all commands that are supported by this <see cref="View"/>
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<Command> GetSupportedCommands ()
+		{
+			return CommandImplementations.Keys;
+		}
+
+		/// <summary>
+		/// Gets the key used by a command.
+		/// </summary>
+		/// <param name="command">The command to search.</param>
+		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
+		public Key GetKeyFromCommand(Command command)
+		{
+			return KeyBindings.First (x => x.Value == command).Key;
+		}
+
 		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
@@ -1553,15 +1741,12 @@ namespace Terminal.Gui {
 			}
 
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (args);
+			if (MostFocused?.Enabled == true) {
+				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
@@ -1582,12 +1767,12 @@ namespace Terminal.Gui {
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
-			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (args);
+			if (MostFocused?.Enabled == true) {
+				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
 					return true;
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
@@ -2081,6 +2266,7 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
+				var prevSize = frame.Size;
 				var canResize = ResizeView (autoSize);
 				if (canResize && textFormatter.Size != Bounds.Size) {
 					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
@@ -2088,7 +2274,8 @@ namespace Terminal.Gui {
 					textFormatter.Size = Bounds.Size;
 				}
 				SetNeedsLayout ();
-				SetNeedsDisplay ();
+				SetNeedsDisplay (new Rect (new Point (0, 0),
+					new Size (Math.Max (frame.Width, prevSize.Width), Math.Max (frame.Height, prevSize.Height))));
 			}
 		}
 
@@ -2550,6 +2737,22 @@ namespace Terminal.Gui {
 		public Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+		}
+
+		/// <summary>
+		/// Get the top superview of a given <see cref="View"/>.
+		/// </summary>
+		/// <returns>The superview view.</returns>
+		public View GetTopSuperView ()
+		{
+			View top = Application.Top;
+			for (var v = this?.SuperView; v != null; v = v.SuperView) {
+				if (v != null) {
+					top = v;
+				}
+			}
+
+			return top;
 		}
 	}
 }

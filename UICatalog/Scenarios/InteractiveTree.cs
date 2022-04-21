@@ -9,9 +9,9 @@ using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Interactive Tree", Description: "Create nodes and child nodes in TreeView")]
-	[ScenarioCategory ("Controls")]
-	class InteractiveTree : Scenario {
+	[ScenarioMetadata (Name: "Interactive Tree", Description: "Create nodes and child nodes in TreeView.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
+	public class InteractiveTree : Scenario {
 
 		TreeView treeView;
 

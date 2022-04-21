@@ -13,12 +13,13 @@
 // Optimizations
 //   - Add rendering limitation to the exposed area
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using NStack;
 using System.ComponentModel;
+using System.Globalization;
+using System.Reflection;
+using System.IO;
 
 namespace Terminal.Gui {
 
@@ -118,9 +119,9 @@ namespace Terminal.Gui {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-					Driver.HeightAsBuffer = value;
-				}
+				Driver.HeightAsBuffer = value;
 			}
+		}
 
 		/// <summary>
 		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
@@ -140,24 +141,92 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateForwardKey { get; set; } = Key.PageDown | Key.CtrlMask;
+		public static Key AlternateForwardKey {
+			get => alternateForwardKey;
+			set {
+				if (alternateForwardKey != value) {
+					var oldKey = alternateForwardKey;
+					alternateForwardKey = value;
+					OnAlternateForwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		static void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnAlternateForwardKeyChanged (oldKey);
+			}
+		}
+
+		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
+
 		/// <summary>
 		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
 		/// </summary>
-		public static Key AlternateBackwardKey { get; set; } = Key.PageUp | Key.CtrlMask;
+		public static Key AlternateBackwardKey {
+			get => alternateBackwardKey;
+			set {
+				if (alternateBackwardKey != value) {
+					var oldKey = alternateBackwardKey;
+					alternateBackwardKey = value;
+					OnAlternateBackwardKeyChanged (oldKey);
+				}
+			}
+		}
+
+		static void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnAlternateBackwardKeyChanged (oldKey);
+			}
+		}
+
+		static Key quitKey = Key.Q | Key.CtrlMask;
+
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		public static Key QuitKey { get; set; } = Key.Q | Key.CtrlMask;
+		public static Key QuitKey {
+			get => quitKey;
+			set {
+				if (quitKey != value) {
+					var oldKey = quitKey;
+					quitKey = value;
+					OnQuitKeyChanged (oldKey);
+				}
+			}
+		}
+
+		private static List<CultureInfo> supportedCultures;
+
+		/// <summary>
+		/// Gets all supported cultures by the application without the invariant language.
+		/// </summary>
+		public static List<CultureInfo> SupportedCultures => supportedCultures;
+
+		static void OnQuitKeyChanged (Key oldKey)
+		{
+			foreach (var top in toplevels) {
+				top.OnQuitKeyChanged (oldKey);
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
 		/// </summary>
 		/// <value>The main loop.</value>
 		public static MainLoop MainLoop { get; private set; }
+
+		/// <summary>
+		/// Disable or enable the mouse in this <see cref="Application"/>
+		/// </summary>
+		public static bool IsMouseDisabled { get; set; }
 
 		/// <summary>
 		///   This event is raised on each iteration of the <see cref="MainLoop"/> 
@@ -285,6 +354,7 @@ namespace Terminal.Gui {
 			}
 			Top = topLevelFactory ();
 			Current = Top;
+			supportedCultures = GetSupportedCultures ();
 			_initialized = true;
 		}
 
@@ -333,6 +403,9 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
+			if(RootKeyEvent?.Invoke(ke) ?? false) {
+				return;
+			}
 
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
@@ -518,11 +591,24 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Action<MouseEvent> RootMouseEvent;
 
+		/// <summary>
+		/// <para>
+		/// Called for new KeyPress events before any processing is performed or
+		/// views evaluate.  Use for global key handling and/or debugging.
+		/// </para>
+		/// <para>Return true to suppress the KeyPress event</para>
+		/// </summary>
+		public static Func<KeyEvent,bool> RootKeyEvent;
+
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			if (IsMouseDisabled) {
+				return;
+			}
+
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed)
@@ -798,6 +884,7 @@ namespace Terminal.Gui {
 			Driver = null;
 			Iteration = null;
 			RootMouseEvent = null;
+			RootKeyEvent = null;
 			Resized = null;
 			_initialized = false;
 			mouseGrabView = null;
@@ -893,7 +980,7 @@ namespace Terminal.Gui {
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
 
-					EnsureModalAlwaysOnTop (state.Toplevel);
+					EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 					if ((state.Toplevel != Current && Current?.Modal == true)
 						|| (state.Toplevel != Current && Current?.Modal == false)) {
 						MdiTop?.OnDeactivate (state.Toplevel);
@@ -931,9 +1018,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static void EnsureModalAlwaysOnTop (Toplevel toplevel)
+		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel toplevel)
 		{
-			if (!toplevel.Running || toplevel == Current || MdiTop == null || toplevels.Peek ().Modal) {
+			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || toplevels.Peek ().Modal) {
 				return;
 			}
 
@@ -942,6 +1029,9 @@ namespace Terminal.Gui {
 					MoveCurrent (top);
 					return;
 				}
+			}
+			if (!toplevel.Visible && toplevel == Current) {
+				MoveNext ();
 			}
 		}
 
@@ -1150,6 +1240,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
+				t.OnResized (full.Size);
 			}
 			Refresh ();
 		}
@@ -1191,7 +1282,14 @@ namespace Terminal.Gui {
 			if (MdiTop != null && !Current.Modal) {
 				lock (toplevels) {
 					toplevels.MoveNext ();
+					var isMdi = false;
 					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
+						if (!isMdi && toplevels.Peek () == MdiTop) {
+							isMdi = true;
+						} else if (isMdi && toplevels.Peek () == MdiTop) {
+							MoveCurrent (Top);
+							break;
+						}
 						toplevels.MoveNext ();
 					}
 					Current = toplevels.Peek ();
@@ -1207,10 +1305,15 @@ namespace Terminal.Gui {
 			if (MdiTop != null && !Current.Modal) {
 				lock (toplevels) {
 					toplevels.MovePrevious ();
+					var isMdi = false;
 					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
-						lock (toplevels) {
-							toplevels.MovePrevious ();
+						if (!isMdi && toplevels.Peek () == MdiTop) {
+							isMdi = true;
+						} else if (isMdi && toplevels.Peek () == MdiTop) {
+							MoveCurrent (Top);
+							break;
 						}
+						toplevels.MovePrevious ();
 					}
 					Current = toplevels.Peek ();
 				}
@@ -1249,6 +1352,27 @@ namespace Terminal.Gui {
 			if (top != null && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top) {
 				Top.BringSubviewToFront (top);
 			}
+		}
+
+		internal static List<CultureInfo> GetSupportedCultures ()
+		{
+			CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+			// Get the assembly
+			Assembly assembly = Assembly.GetExecutingAssembly ();
+
+			//Find the location of the assembly
+			string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
+
+			// Find the resource file name of the assembly
+			string resourceFilename = $"{Path.GetFileNameWithoutExtension (assembly.Location)}.resources.dll";
+
+			// Return all culture for which satellite folder found with culture code.
+			return culture.Where (cultureInfo =>
+			     assemblyLocation != null &&
+			     Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
+			     File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+			).ToList ();
 		}
 	}
 }

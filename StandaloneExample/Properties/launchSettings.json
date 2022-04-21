@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "StandaloneExample": {
+      "commandName": "Project"
+    },
+    "StandaloneExample-usc": {
+      "commandName": "Project",
+      "commandLineArgs": "-usc"
+    }
+  }
+}

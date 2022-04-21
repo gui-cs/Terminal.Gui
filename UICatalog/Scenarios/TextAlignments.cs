@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Text Alignment", Description: "Demonstrates text alignment")]
-	[ScenarioCategory ("Text")]
-	class TextAlignments : Scenario {
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Simple Text Alignment", Description: "Demonstrates horizontal text alignment")]
+	[ScenarioCategory ("Text and Formatting")]
+	public class TextAlignments : Scenario {
 		public override void Setup ()
 		{
 			Win.X = 10;

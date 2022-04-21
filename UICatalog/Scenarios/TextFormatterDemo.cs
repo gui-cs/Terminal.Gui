@@ -6,11 +6,10 @@ using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TextFormatter Demo", Description: "Demos and tests the TextFormatter class.")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("POC")]
-	class TextFormatterDemo : Scenario {
+	[ScenarioCategory ("Text and Formatting")]
+	public class TextFormatterDemo : Scenario {
 		public override void Setup ()
 		{
 			// TODO: Move this to another Scenario that specifically tests `Views` that have no subviews.

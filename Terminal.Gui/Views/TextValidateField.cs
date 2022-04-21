@@ -391,6 +391,25 @@ namespace Terminal.Gui {
 		{
 			Height = 1;
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.LeftHome, () => { HomeKeyHandler (); return true; });
+			AddCommand (Command.RightEnd, () => { EndKeyHandler (); return true; });
+			AddCommand (Command.DeleteCharRight, () => { DeleteKeyHandler (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { BackspaceKeyHandler (); return true; });
+			AddCommand (Command.Left, () => { CursorLeft (); return true; });
+			AddCommand (Command.Right, () => { CursorRight (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.End, Command.RightEnd);
+
+			AddKeyBinding (Key.Delete, Command.DeleteCharRight);
+			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
+
+			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
 		}
 
 		/// <summary>
@@ -446,7 +465,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///inheritdoc/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			var (left, _) = GetMargins (Frame.Width);
@@ -454,7 +473,7 @@ namespace Terminal.Gui {
 			// Fixed = true, is for inputs thar have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
-			if (provider.Fixed == false && TextAlignment == TextAlignment.Right) {
+			if (provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
 				Move (cursorPosition + left - 1, 0);
 			} else {
 				Move (cursorPosition + left, 0);
@@ -526,6 +545,7 @@ namespace Terminal.Gui {
 		{
 			var current = cursorPosition;
 			cursorPosition = provider.CursorLeft (cursorPosition);
+			SetNeedsDisplay ();
 			return current != cursorPosition;
 		}
 
@@ -537,6 +557,7 @@ namespace Terminal.Gui {
 		{
 			var current = cursorPosition;
 			cursorPosition = provider.CursorRight (cursorPosition);
+			SetNeedsDisplay ();
 			return current != cursorPosition;
 		}
 
@@ -551,6 +572,7 @@ namespace Terminal.Gui {
 			}
 			cursorPosition = provider.CursorLeft (cursorPosition);
 			provider.Delete (cursorPosition);
+			SetNeedsDisplay ();
 			return true;
 		}
 
@@ -564,6 +586,7 @@ namespace Terminal.Gui {
 				cursorPosition = provider.CursorLeft (cursorPosition);
 			}
 			provider.Delete (cursorPosition);
+			SetNeedsDisplay ();
 			return true;
 		}
 
@@ -574,6 +597,7 @@ namespace Terminal.Gui {
 		bool HomeKeyHandler ()
 		{
 			cursorPosition = provider.CursorStart ();
+			SetNeedsDisplay ();
 			return true;
 		}
 
@@ -584,6 +608,7 @@ namespace Terminal.Gui {
 		bool EndKeyHandler ()
 		{
 			cursorPosition = provider.CursorEnd ();
+			SetNeedsDisplay ();
 			return true;
 		}
 
@@ -591,33 +616,24 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (provider == null) {
-				return true;
+				return false;
 			}
 
-			switch (kb.Key) {
-			case Key.Home: HomeKeyHandler (); break;
-			case Key.End: EndKeyHandler (); break;
-			case Key.Delete:
-			case Key.DeleteChar: DeleteKeyHandler (); break;
-			case Key.Backspace: BackspaceKeyHandler (); break;
-			case Key.CursorLeft: CursorLeft (); break;
-			case Key.CursorRight: CursorRight (); break;
-			default:
-				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
-					return false;
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-				var key = new Rune ((uint)kb.KeyValue);
+			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+				return false;
 
-				var inserted = provider.InsertAt ((char)key, cursorPosition);
+			var key = new Rune ((uint)kb.KeyValue);
 
-				if (inserted) {
-					CursorRight ();
-				}
+			var inserted = provider.InsertAt ((char)key, cursorPosition);
 
-				break;
+			if (inserted) {
+				CursorRight ();
 			}
 
-			SetNeedsDisplay ();
 			return true;
 		}
 

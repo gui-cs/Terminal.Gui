@@ -6,9 +6,9 @@ using Terminal.Gui;
 using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "TreeViewFileSystem", Description: "Hierarchical file system explorer based on TreeView")]
-	[ScenarioCategory ("Controls")]
-	class TreeViewFileSystem : Scenario {
+	[ScenarioMetadata (Name: "TreeViewFileSystem", Description: "Hierarchical file system explorer based on TreeView.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView"), ScenarioCategory ("Files and IO")]
+	public class TreeViewFileSystem : Scenario {
 
 		/// <summary>
 		/// A tree view where nodes are files and folders
