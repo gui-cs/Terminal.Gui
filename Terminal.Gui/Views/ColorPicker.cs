@@ -4,8 +4,7 @@ using NStack;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// The <see cref="ColorPicker"/> <see cref="View"/> C
-	/// olor picker.
+	/// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.
 	/// </summary>
 	public class ColorPicker : View {
 		/// <summary>
@@ -72,19 +71,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a new instance of <see cref="ColorPicker"/>.
 		/// </summary>
 		public ColorPicker () : this (0, 0, "Color Picker")
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		/// Initializes a new instance of <see cref="ColorPicker"/>.
 		/// </summary>
-		/// <remarks>
-		///   The size of <see cref="CheckBox"/> is computed based on the
-		///   text length. 
-		/// </remarks>
+		/// <param name="point">Location point.</param>
+		/// <param name="title">Title.</param>
+		public ColorPicker (Point point, ustring title) : this (point.X, point.Y, title)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ColorPicker"/>.
+		/// </summary>
+		/// <param name="x">X location.</param>
+		/// <param name="y">Y location.</param>
+		/// <param name="title">Title</param>
 		public ColorPicker (int x, int y, ustring title) : base (new Rect (x, y, 0, 0), title, new Border () { BorderStyle = BorderStyle.Single })
 		{
 			CanFocus = true;
@@ -115,17 +122,6 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.CursorUp, Command.LineUp);
 			AddKeyBinding (Key.CursorDown, Command.LineDown);
-		}
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
-		/// </summary>
-		/// <remarks>
-		///   The size of <see cref="CheckBox"/> is computed based on the
-		///   text length. 
-		/// </remarks>
-		public ColorPicker (Point point, ustring title) : this (point.X, point.Y, title)
-		{
 		}
 
 		///<inheritdoc/>
@@ -174,7 +170,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the previous row.
+		/// Moves the selected item index to the previous column.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MoveLeft ()
@@ -184,7 +180,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the last row.
+		/// Moves the selected item index to the next column.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MoveRight ()
@@ -204,7 +200,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the last row.
+		/// Moves the selected item index to the next row.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MoveDown ()
