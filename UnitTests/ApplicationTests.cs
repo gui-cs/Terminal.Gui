@@ -1333,7 +1333,7 @@ namespace Terminal.Gui.Core {
 			// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
 			// so the final number of delegatesRun might vary by computer.  So for this assert we say
 			// that it should have run at least 2 seconds worth of delegates
-			Assert.True (delegatesRun >= 100 * 100 * 2);
+			Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 		}
 	}
 }
