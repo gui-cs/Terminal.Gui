@@ -51,6 +51,7 @@ namespace Terminal.Gui {
 		}
 
 		internal SortedList<long, Timeout> timeouts = new SortedList<long, Timeout> ();
+		object timeoutsLockToken = new object ();
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		/// <summary>
@@ -117,7 +118,7 @@ namespace Terminal.Gui {
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			lock (timeouts) {
+			lock (timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
 				while (timeouts.ContainsKey (k)) {
 					k = (DateTime.UtcNow + time).Ticks;
@@ -159,7 +160,7 @@ namespace Terminal.Gui {
 		/// This method also returns <c>false</c> if the timeout is not found.
 		public bool RemoveTimeout (object token)
 		{
-			lock (timeouts) {
+			lock (timeoutsLockToken) {
 				var idx = timeouts.IndexOfValue (token as Timeout);
 				if (idx == -1)
 					return false;
@@ -170,18 +171,20 @@ namespace Terminal.Gui {
 
 		void RunTimers ()
 		{
-			long now = DateTime.UtcNow.Ticks;
-			var copy = timeouts;
-			timeouts = new SortedList<long, Timeout> ();
-			foreach (var t in copy) {
-				var k = t.Key;
-				var timeout = t.Value;
-				if (k < now) {
-					if (timeout.Callback (this))
-						AddTimeout (timeout.Span, timeout);
-				} else {
-					lock (timeouts) {
-						timeouts.Add (k, timeout);
+			lock (timeoutsLockToken) {
+				long now = DateTime.UtcNow.Ticks;
+
+				var copy = timeouts;
+				timeouts = new SortedList<long, Timeout> ();
+				foreach (var t in copy) {
+					var k = t.Key;
+					var timeout = t.Value;
+					if (k < now) {
+						if (timeout.Callback (this))
+							AddTimeout (timeout.Span, timeout);
+					} else {
+							timeouts.Add (k, timeout);
+					
 					}
 				}
 			}
