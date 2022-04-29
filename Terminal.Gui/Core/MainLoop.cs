@@ -171,23 +171,31 @@ namespace Terminal.Gui {
 
 		void RunTimers ()
 		{
-			lock (timeoutsLockToken) {
-				long now = DateTime.UtcNow.Ticks;
+			long now = DateTime.UtcNow.Ticks;
+			SortedList<long, Timeout> copy;
 
-				var copy = timeouts;
+			// lock prevents new timeouts being added
+			// after we have taken the copy but before
+			// we have allocated a new list (which would
+			// result in lost timeouts or errors during enumeration)
+			lock (timeoutsLockToken) {
+				copy = timeouts;
 				timeouts = new SortedList<long, Timeout> ();
-				foreach (var t in copy) {
-					var k = t.Key;
-					var timeout = t.Value;
-					if (k < now) {
-						if (timeout.Callback (this))
-							AddTimeout (timeout.Span, timeout);
-					} else {
-							timeouts.Add (k, timeout);
-					
+			}
+
+			foreach (var t in copy) {
+				var k = t.Key;
+				var timeout = t.Value;
+				if (k < now) {
+					if (timeout.Callback (this))
+						AddTimeout (timeout.Span, timeout);
+				} else {
+					lock (timeoutsLockToken) {
+						timeouts.Add (k, timeout);
 					}
 				}
 			}
+			
 		}
 
 		void RunIdle ()
