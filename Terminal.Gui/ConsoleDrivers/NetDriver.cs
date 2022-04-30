@@ -1216,6 +1216,7 @@ namespace Terminal.Gui {
 
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
+
 		public override void Move (int col, int row)
 		{
 			ccol = col;
@@ -1229,26 +1230,23 @@ namespace Terminal.Gui {
 			}
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			if (Clip.Contains (ccol, crow) && ccol + Math.Max (runeWidth, 1) <= Cols) {
+			var validClip = IsValidContent (ccol, crow, Clip);
+
+			if (validClip) {
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
-				dirtyLine [crow] = true;
 
-				ccol++;
-				if (runeWidth > 1) {
-					for (int i = 1; i < runeWidth; i++) {
-						if (ccol < cols) {
-							contents [crow, ccol, 2] = 0;
-						} else {
-							break;
-						}
-						ccol++;
-					}
-				}
-			} else if (ccol > -1 && crow > -1 && ccol < cols && crow < rows) {
-				contents [crow, ccol, 2] = 1;
 				dirtyLine [crow] = true;
+			}
+
+			ccol++;
+			if (runeWidth > 1) {
+				if (validClip) {
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
+				}
+				ccol++;
 			}
 
 			//if (ccol == Cols) {
@@ -1306,7 +1304,6 @@ namespace Terminal.Gui {
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
-			Clear ();
 			ResizeScreen ();
 			UpdateOffScreen ();
 
@@ -1352,6 +1349,8 @@ namespace Terminal.Gui {
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
 			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
+
+			Clear ();
 		}
 
 		void ResizeScreen ()
@@ -1395,28 +1394,29 @@ namespace Terminal.Gui {
 						$";{Rows};{Cols}w");
 				}
 			}
-
 			Clip = new Rect (0, 0, Cols, Rows);
-
-			contents = new int [Rows, Cols, 3];
-			dirtyLine = new bool [Rows];
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
-			// Can raise an exception while is still resizing.
-			try {
-				for (int row = 0; row < rows; row++) {
-					for (int c = 0; c < cols; c++) {
-						contents [row, c, 0] = ' ';
-						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-						contents [row, c, 2] = 0;
-						dirtyLine [row] = true;
-					}
-				}
-			} catch (IndexOutOfRangeException) { }
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
 
-			winChanging = false;
+			lock (contents) {
+				// Can raise an exception while is still resizing.
+				try {
+					for (int row = 0; row < rows; row++) {
+						for (int c = 0; c < cols; c++) {
+							contents [row, c, 0] = ' ';
+							contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+							contents [row, c, 2] = 0;
+							dirtyLine [row] = true;
+						}
+					}
+				} catch (IndexOutOfRangeException) { }
+
+				winChanging = false;
+			}
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -1427,6 +1427,7 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			UpdateScreen ();
+			UpdateCursor ();
 		}
 
 		int redrawAttr = -1;
@@ -1443,7 +1444,7 @@ namespace Terminal.Gui {
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
 
-			Console.CursorVisible = false;
+			var savedCursorVisible = Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
 				if (!dirtyLine [row]) {
 					continue;
@@ -1454,13 +1455,29 @@ namespace Terminal.Gui {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
+					var lastCol = -1;
 					for (; col < cols; col++) {
-						if (contents [row, col, 2] != 1) {
+						if (col > 0 && contents [row, col, 2] == 0
+							&& Rune.ColumnWidth ((char)contents [row, col - 1, 0]) > 1) {
+
+							if (col == cols - 1 && output.Length > 0) {
+								Console.CursorLeft = lastCol;
+								Console.Write (output);
+							}
 							continue;
 						}
+
+						if (col < cols - 1 && Rune.ColumnWidth ((char)contents [row, col, 0]) > 1
+							&& (contents [row, col + 1, 2] == 1 || col == cols - 1)) {
+
+							contents [row, col, 0] = ' ';
+						}
+
 						var attr = contents [row, col, 1];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
+							if (lastCol == -1)
+								lastCol = col;
 						}
 						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
 							return;
@@ -1469,6 +1486,8 @@ namespace Terminal.Gui {
 							Console.Write ($"{output}{(char)contents [row, col, 0]}");
 						} else {
 							output.Append ((char)contents [row, col, 0]);
+							if (lastCol == -1)
+								lastCol = col;
 						}
 						contents [row, col, 2] = 0;
 						if (!AlwaysSetPosition && col == cols - 1) {
@@ -1477,8 +1496,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			Console.CursorVisible = true;
-			UpdateCursor ();
+			Console.CursorVisible = savedCursorVisible;
 		}
 
 		System.Text.StringBuilder WriteAttributes (int attr)
@@ -1553,11 +1571,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private CursorVisibility? savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (!EnsureCursorVisibility ())
+				return;
+
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (ccol >= 0 && ccol <= cols && crow >= 0 && crow <= rows) {
+				if (ccol >= 0 && ccol < Console.BufferWidth && crow >= 0 && crow < Console.BufferHeight) {
 					Console.SetCursorPosition (ccol, crow);
 				}
 			} catch (System.IO.IOException) {
@@ -1885,21 +1908,30 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Default;
-
-			return false;
+			visibility = savedCursorVisibility ?? CursorVisibility.Default;
+			return visibility == CursorVisibility.Default;
 		}
+
 
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return false;
+			savedCursorVisibility = visibility;
+			return Console.CursorVisible = visibility == CursorVisibility.Default;
 		}
 
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			return false;
+			if (!(ccol >= 0 && crow >= 0 && ccol < Cols && crow < Rows)) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return false;
+			}
+
+			SetCursorVisibility (savedCursorVisibility ?? CursorVisibility.Default);
+			return savedCursorVisibility == CursorVisibility.Default;
 		}
 
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)

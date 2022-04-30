@@ -52,27 +52,47 @@ namespace Terminal.Gui {
 		static bool sync = false;
 		public override void AddRune (Rune rune)
 		{
-			if (Clip.Contains (ccol, crow)) {
+			rune = MakePrintable (rune);
+			var runeWidth = Rune.ColumnWidth (rune);
+			var validClip = IsValidContent (ccol, crow, Clip);
+
+			if (validClip) {
 				if (needMove) {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				rune = MakePrintable (rune);
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					Curses.move (crow, ccol - 1);
+					Curses.addch ((int)(uint)' ');
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+					Curses.move (crow, ccol);
+				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					Curses.move (crow, ccol + 1);
+					Curses.addch ((int)(uint)' ');
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+					Curses.move (crow, ccol);
+				}
 				Curses.addch ((int)(uint)rune);
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 			} else
 				needMove = true;
-			if (sync)
-				Application.Driver.Refresh ();
+
 			ccol++;
-			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
-				for (int i = 1; i < runeWidth; i++) {
-					ccol++;
+				if (validClip) {
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
 				}
+				ccol++;
 			}
+
+			if (sync)
+				UpdateScreen ();
 		}
 
 		public override void AddStr (ustring str)
@@ -933,7 +953,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
 			contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {

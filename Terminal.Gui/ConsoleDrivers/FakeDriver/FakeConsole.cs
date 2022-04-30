@@ -922,6 +922,7 @@ namespace Terminal.Gui {
 		{
 			BufferWidth = width;
 			BufferHeight = height;
+			_buffer = new char [BufferWidth, BufferHeight];
 		}
 
 		//
@@ -1060,7 +1061,8 @@ namespace Terminal.Gui {
 		/// <param name="top"></param>
 		public static void SetWindowPosition (int left, int top)
 		{
-			throw new NotImplementedException ();
+			WindowLeft = left;
+			WindowTop = top;
 		}
 
 		//
@@ -1094,7 +1096,8 @@ namespace Terminal.Gui {
 		/// <param name="height"></param>
 		public static void SetWindowSize (int width, int height)
 		{
-			throw new NotImplementedException ();
+			WindowWidth = width;
+			WindowHeight = height;
 		}
 
 		//
