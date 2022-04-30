@@ -335,7 +335,8 @@ namespace Terminal.Gui {
 					? 2 : 1);
 				Move (padding, row);
 				var rect = new Rect (padding, row, fWidth, Frame.Height);
-				tf?.Draw (ViewToScreen (rect), ColorScheme.HotNormal, ColorScheme.HotNormal);
+				tf?.Draw (ViewToScreen (rect), ColorScheme.HotNormal, ColorScheme.HotNormal,
+					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
 				break;
 			}
 		}

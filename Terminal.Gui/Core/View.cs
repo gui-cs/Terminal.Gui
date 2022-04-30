@@ -124,8 +124,6 @@ namespace Terminal.Gui {
 		Direction focusDirection;
 		bool autoSize;
 
-		TextFormatter textFormatter;
-
 		ShortcutHelper shortcutHelper;
 
 		/// <summary>
@@ -186,12 +184,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
-		public virtual Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
+		public virtual Key HotKey { get => TextFormatter.HotKey; set => TextFormatter.HotKey = value; }
 
 		/// <summary>
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
-		public virtual Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
+		public virtual Rune HotKeySpecifier { get => TextFormatter.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = value; }
 
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
@@ -524,7 +522,7 @@ namespace Terminal.Gui {
 				if (x is Pos.PosAbsolute) {
 					frame = new Rect (x.Anchor (0), frame.Y, frame.Width, frame.Height);
 				}
-				textFormatter.Size = frame.Size;
+				TextFormatter.Size = frame.Size;
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -548,7 +546,7 @@ namespace Terminal.Gui {
 				if (y is Pos.PosAbsolute) {
 					frame = new Rect (frame.X, y.Anchor (0), frame.Width, frame.Height);
 				}
-				textFormatter.Size = frame.Size;
+				TextFormatter.Size = frame.Size;
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -570,11 +568,14 @@ namespace Terminal.Gui {
 				}
 
 				width = value;
+				if (autoSize && value.Anchor (0) != TextFormatter.Size.Width) {
+					autoSize = false;
+				}
 				SetNeedsLayout ();
 				if (width is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, width.Anchor (0), frame.Height);
 				}
-				textFormatter.Size = frame.Size;
+				TextFormatter.Size = frame.Size;
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -592,11 +593,14 @@ namespace Terminal.Gui {
 				}
 
 				height = value;
+				if (autoSize && value.Anchor (0) != TextFormatter.Size.Height) {
+					autoSize = false;
+				}
 				SetNeedsLayout ();
 				if (height is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, frame.Width, height.Anchor (0));
 				}
-				textFormatter.Size = frame.Size;
+				TextFormatter.Size = frame.Size;
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -613,6 +617,11 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
+		/// </summary>
+		public TextFormatter TextFormatter { get; set; }
 
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
@@ -717,8 +726,8 @@ namespace Terminal.Gui {
 		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
 			TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-			textFormatter = new TextFormatter ();
-			textFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
+			TextFormatter = new TextFormatter ();
+			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
 			if (Border != null) {
@@ -772,7 +781,7 @@ namespace Terminal.Gui {
 			foreach (var view in Subviews) {
 				view.SetNeedsLayout ();
 			}
-			textFormatter.NeedsFormat = true;
+			TextFormatter.NeedsFormat = true;
 		}
 
 		/// <summary>
@@ -1013,7 +1022,7 @@ namespace Terminal.Gui {
 			for (int line = 0; line < h; line++) {
 				Move (0, line);
 				for (int col = 0; col < w; col++)
-					Driver.AddRune (' ');
+					Driver.AddStr (" ");
 			}
 		}
 
@@ -1209,7 +1218,7 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			} else {
 				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
-					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.CursorPosition, 0);
+					Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
 				} else {
 					Move (frame.X, frame.Y);
 				}
@@ -1411,11 +1420,12 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
 				Clear ();
 				// Draw any Text
-				if (textFormatter != null) {
-					textFormatter.NeedsFormat = true;
+				if (TextFormatter != null) {
+					TextFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
 			}
 
 			// Invoke DrawContentEvent
@@ -1728,7 +1738,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="command">The command to search.</param>
 		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
-		public Key GetKeyFromCommand(Command command)
+		public Key GetKeyFromCommand (Command command)
 		{
 			return KeyBindings.First (x => x.Value == command).Key;
 		}
@@ -2162,7 +2172,7 @@ namespace Terminal.Gui {
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			textFormatter.Size = Bounds.Size;
+			TextFormatter.Size = Bounds.Size;
 
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -2263,15 +2273,15 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual ustring Text {
-			get => textFormatter.Text;
+			get => TextFormatter.Text;
 			set {
-				textFormatter.Text = value;
+				TextFormatter.Text = value;
 				var prevSize = frame.Size;
 				var canResize = ResizeView (autoSize);
-				if (canResize && textFormatter.Size != Bounds.Size) {
-					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
-				} else if (!canResize && textFormatter.Size != Bounds.Size) {
-					textFormatter.Size = Bounds.Size;
+				if (canResize && TextFormatter.Size != Bounds.Size) {
+					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), TextFormatter.Size);
+				} else if (!canResize && TextFormatter.Size != Bounds.Size) {
+					TextFormatter.Size = Bounds.Size;
 				}
 				SetNeedsLayout ();
 				SetNeedsDisplay (new Rect (new Point (0, 0),
@@ -2289,10 +2299,10 @@ namespace Terminal.Gui {
 			get => autoSize;
 			set {
 				var v = ResizeView (value);
-				textFormatter.AutoSize = v;
+				TextFormatter.AutoSize = v;
 				if (autoSize != v) {
 					autoSize = v;
-					textFormatter.NeedsFormat = true;
+					TextFormatter.NeedsFormat = true;
 					SetNeedsLayout ();
 					SetNeedsDisplay ();
 				}
@@ -2304,9 +2314,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextAlignment TextAlignment {
-			get => textFormatter.Alignment;
+			get => TextFormatter.Alignment;
 			set {
-				textFormatter.Alignment = value;
+				TextFormatter.Alignment = value;
 				SetNeedsDisplay ();
 			}
 		}
@@ -2316,9 +2326,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual VerticalTextAlignment VerticalTextAlignment {
-			get => textFormatter.VerticalAlignment;
+			get => TextFormatter.VerticalAlignment;
 			set {
-				textFormatter.VerticalAlignment = value;
+				TextFormatter.VerticalAlignment = value;
 				SetNeedsDisplay ();
 			}
 		}
@@ -2328,17 +2338,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextDirection TextDirection {
-			get => textFormatter.Direction;
+			get => TextFormatter.Direction;
 			set {
-				if (textFormatter.Direction != value) {
-					textFormatter.Direction = value;
-					if (IsInitialized && AutoSize) {
+				if (TextFormatter.Direction != value) {
+					TextFormatter.Direction = value;
+					if (AutoSize) {
 						ResizeView (true);
 					} else if (IsInitialized) {
 						var b = new Rect (Bounds.X, Bounds.Y, Bounds.Height, Bounds.Width);
 						SetWidthHeight (b);
 					}
-					textFormatter.Size = Bounds.Size;
+					TextFormatter.Size = Bounds.Size;
 					SetNeedsDisplay ();
 				}
 			}
@@ -2423,11 +2433,11 @@ namespace Terminal.Gui {
 			}
 
 			var aSize = autoSize;
-			Rect nBounds = TextFormatter.CalcRect (Bounds.X, Bounds.Y, Text, textFormatter.Direction);
-			if (textFormatter.Size != nBounds.Size) {
-				textFormatter.Size = nBounds.Size;
+			Rect nBounds = TextFormatter.CalcRect (Bounds.X, Bounds.Y, Text, TextFormatter.Direction);
+			if (TextFormatter.Size != nBounds.Size) {
+				TextFormatter.Size = nBounds.Size;
 			}
-			if ((textFormatter.Size != Bounds.Size || textFormatter.Size != nBounds.Size)
+			if ((TextFormatter.Size != Bounds.Size || TextFormatter.Size != nBounds.Size)
 				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != nBounds.Width))
 				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
@@ -2452,7 +2462,7 @@ namespace Terminal.Gui {
 			}
 			if (aSize) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
-				textFormatter.Size = Bounds.Size;
+				TextFormatter.Size = Bounds.Size;
 			}
 
 			return aSize;

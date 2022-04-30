@@ -514,7 +514,8 @@ namespace Terminal.Gui {
 						};
 						tf.Draw (ViewToScreen (new Rect (2, i + 1, Frame.Width - 3, 1)),
 							i == current ? ColorScheme.Focus : GetNormalColor (),
-							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+							SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
 					} else {
 						DrawHotString (textToDraw,
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
