@@ -346,7 +346,6 @@ var entry = new TextField () {
 };
 dialog.Add (entry);
 Application.Run (dialog);
-Application.Shutdown ();
 if (okpressed)
     Console.WriteLine ("The user entered: " + entry.Text);
 ```
