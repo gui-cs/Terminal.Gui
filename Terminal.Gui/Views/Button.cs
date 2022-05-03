@@ -328,6 +328,7 @@ namespace Terminal.Gui {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
 					OnClicked ();
 				}
