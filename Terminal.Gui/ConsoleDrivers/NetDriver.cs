@@ -471,10 +471,12 @@ namespace Terminal.Gui {
 				var c = kChar [i];
 				if (c == '[') {
 					foundPoint++;
-				} else if (foundPoint == 1 && c != ';') {
+				} else if (foundPoint == 1 && c != ';' && c != '?') {
 					value += c.ToString ();
+				} else if (c == '?') {
+					foundPoint++;
 				} else if (c == ';') {
-					if (foundPoint == 1) {
+					if (foundPoint >= 1) {
 						point.Y = int.Parse (value) - 1;
 					}
 					value = "";
@@ -499,6 +501,8 @@ namespace Terminal.Gui {
 						} else {
 							return;
 						}
+						break;
+					case 'c': // CSI?1;0c ("VT101 with No Options")
 						break;
 					default:
 						throw new NotImplementedException ();
