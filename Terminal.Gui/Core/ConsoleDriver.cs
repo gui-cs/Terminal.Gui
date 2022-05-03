@@ -692,13 +692,21 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			if (c <= 0x1F || (c >= 0x80 && c <= 0x9F)) {
+			var controlChars = gethexaformat (c, 4);
+			if (controlChars <= 0x1F || (controlChars >= 0X7F && controlChars <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (c + 0x2400);
+				return new Rune (controlChars + 0x2400);
 			} else {
 				return c;
 			}
+		}
+
+		static uint gethexaformat (uint rune, int length)
+		{
+			var hex = rune.ToString ($"x{length}");
+			var hexstr = hex.Substring (hex.Length - length, length);
+			return (uint)int.Parse (hexstr, System.Globalization.NumberStyles.HexNumber);
 		}
 
 		/// <summary>

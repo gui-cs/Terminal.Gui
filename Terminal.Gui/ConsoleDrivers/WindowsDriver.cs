@@ -1485,8 +1485,6 @@ namespace Terminal.Gui {
 					var prevPosition = crow * Cols + ccol + 1;
 					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-				} else if (rune != ' ') {
-
 				}
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
@@ -1501,8 +1499,8 @@ namespace Terminal.Gui {
 				if (validClip) {
 					position = crow * Cols + ccol;
 					OutputBuffer [position].Attributes = (ushort)currentAttribute;
-					OutputBuffer [position].Char.UnicodeChar = '\0';
-					contents [crow, ccol, 0] = (int)(uint)'\0';
+					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
+					contents [crow, ccol, 0] = (int)(uint)0x00;
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}

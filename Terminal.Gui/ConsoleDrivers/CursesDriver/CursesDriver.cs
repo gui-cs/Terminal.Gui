@@ -64,16 +64,20 @@ namespace Terminal.Gui {
 				if (runeWidth < 2 && ccol > 0
 					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-					Curses.move (crow, ccol - 1);
-					Curses.addch ((int)(uint)' ');
+					var curAtttib = currentAttribute;
+					Curses.attrset (contents [crow, ccol - 1, 1]);
+					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 					Curses.move (crow, ccol);
+					Curses.attrset (curAtttib);
 				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
-					Curses.move (crow, ccol + 1);
-					Curses.addch ((int)(uint)' ');
+					var curAtttib = currentAttribute;
+					Curses.attrset (contents [crow, ccol + 1, 1]);
+					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 					Curses.move (crow, ccol);
+					Curses.attrset (curAtttib);
 				}
 				Curses.addch ((int)(uint)rune);
 				contents [crow, ccol, 0] = (int)(uint)rune;
