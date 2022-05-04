@@ -94,6 +94,7 @@ namespace Terminal.Gui {
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
@@ -102,6 +103,17 @@ namespace Terminal.Gui {
 					//MockConsole.CursorTop = crow;
 					needMove = false;
 				}
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol < Cols - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+				}
+
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
@@ -110,7 +122,6 @@ namespace Terminal.Gui {
 				needMove = true;
 
 			ccol++;
-			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
 				for (int i = 1; i < runeWidth; i++) {
 					if (validClip) {
@@ -249,12 +260,6 @@ namespace Terminal.Gui {
 							&& Rune.ColumnWidth ((char)contents [row, col - 1, 0]) > 1) {
 							FakeConsole.CursorLeft = col + 1;
 							continue;
-						}
-
-						if (col < cols - 1 && Rune.ColumnWidth ((char)contents [row, col, 0]) > 1
-							&& (contents [row, col + 1, 2] == 1 || col == cols - 1)) {
-
-							contents [row, col, 0] = ' ';
 						}
 
 						var color = contents [row, col, 1];
