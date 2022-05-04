@@ -374,7 +374,10 @@ namespace Terminal.Gui {
 			}
 			var pos = point - first + Math.Min (Frame.X, 0);
 			var offB = OffSetBackground ();
-			if (pos > -1 && col >= pos && pos < Frame.Width + offB) {
+			var containerFrame = SuperView?.ViewToScreen (SuperView.Bounds) ?? default;
+			var thisFrame = ViewToScreen (Bounds);
+			if (pos > -1 && col >= pos && pos < Frame.Width + offB
+				&& containerFrame.IntersectsWith (thisFrame)) {
 				RestoreCursorVisibility ();
 				Move (col, 0);
 			} else {

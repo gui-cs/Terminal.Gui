@@ -1443,7 +1443,7 @@ namespace Terminal.Gui {
 			WinConsole.ForceRefreshCursorVisibility ();
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
 			contents = new int [rows, cols, 3];
 			for (int row = 0; row < rows; row++) {
@@ -1468,9 +1468,24 @@ namespace Terminal.Gui {
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			var position = crow * Cols + ccol;
+			var validClip = IsValidContent (ccol, crow, Clip);
 
-			if (Clip.Contains (ccol, crow)) {
+			if (validClip) {
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					var prevPosition = crow * Cols + (ccol - 1);
+					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					var prevPosition = crow * Cols + ccol + 1;
+					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+				}
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
 				contents [crow, ccol, 0] = (int)(uint)rune;
@@ -1480,17 +1495,18 @@ namespace Terminal.Gui {
 			}
 
 			ccol++;
-			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
-				for (int i = 1; i < runeWidth; i++) {
-					AddStr (" ");
+				if (validClip) {
+					position = crow * Cols + ccol;
+					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
+					contents [crow, ccol, 0] = (int)(uint)0x00;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
 				}
+				ccol++;
 			}
-			//if (ccol == Cols) {
-			//	ccol = 0;
-			//	if (crow + 1 < Rows)
-			//		crow++;
-			//}
+
 			if (sync)
 				UpdateScreen ();
 		}

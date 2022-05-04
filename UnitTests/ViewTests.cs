@@ -1338,6 +1338,60 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
 		}
 
+		[Fact, AutoInitShutdown]
+		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Horizontal ()
+		{
+			var label = new Label ("Hello") { Width = 10, Height = 2 };
+			var viewX = new View ("X") { X = Pos.Right (label) };
+			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+
+			Application.Top.Add (label, viewX, viewY);
+			Application.Begin (Application.Top);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
+
+			var expected = @"
+Hello     X
+
+Y
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 11, 3), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Vertical ()
+		{
+			var label = new Label ("Hello") { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight };
+			var viewX = new View ("X") { X = Pos.Right (label) };
+			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+
+			Application.Top.Add (label, viewX, viewY);
+			Application.Begin (Application.Top);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
+
+			var expected = @"
+H X
+e
+l
+l
+o
+
+
+
+
+
+Y
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 3, 11), pos);
+		}
+
 		[Theory]
 		[InlineData (1)]
 		[InlineData (2)]

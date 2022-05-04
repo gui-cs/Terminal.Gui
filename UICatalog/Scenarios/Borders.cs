@@ -36,8 +36,8 @@ namespace UICatalog.Scenarios {
 			smartPanel.Add (new Label () { // Or smartPanel.Child = 
 				X = 0,
 				Y = 0,
-				Width = 24,
-				Height = 13,
+				//Width = 24, commenting because now setting the size disable auto-size
+				//Height = 13,
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwith a \nPanelView",
 				TextAlignment = TextAlignment.Centered

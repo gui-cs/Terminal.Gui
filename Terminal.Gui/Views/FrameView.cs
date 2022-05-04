@@ -216,17 +216,18 @@ namespace Terminal.Gui {
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (GetNormalColor ());
 				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
-				Border.DrawContent ();
+				Clear ();
 			}
 
 			var savedClip = contentView.ClipToBounds ();
-			contentView.Redraw (contentView.Bounds);
+			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearNeedsDisplay ();
 			if (Border.BorderStyle != BorderStyle.None) {
 				Driver.SetAttribute (GetNormalColor ());
 				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
+				Border.DrawContent (this, false);
 				if (HasFocus)
 					Driver.SetAttribute (ColorScheme.HotNormal);
 				//Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);

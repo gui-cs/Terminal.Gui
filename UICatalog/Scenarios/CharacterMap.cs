@@ -144,11 +144,8 @@ namespace UICatalog.Scenarios {
 				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y+= V_SPACE) {
+			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += V_SPACE) {
 				int val = (-viewport.Y + row) * 16;
-				if (val >= 0x00D800 && val <= 0x00DFFF) {
-					continue;
-				}
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
 					Move (0, y + 1);
@@ -157,6 +154,12 @@ namespace UICatalog.Scenarios {
 					for (int col = 0; col < 16; col++) {
 						var rune = new Rune ((uint)((uint)(-viewport.Y + row) * 16 + col));
 						Move (viewport.X + RowHeaderWidth + (col * H_SPACE) + (prevColWasWide ? 0 : 1), y + 1);
+						if (rune >= 0x00D800 && rune <= 0x00DFFF) {
+							if (col == 0) {
+								Driver.AddStr ("Reserved to surrogate pairs.");
+							}
+							continue;
+						}
 						Driver.AddRune (rune);
 						//prevColWasWide = Rune.ColumnWidth (rune) > 1;
 					}

@@ -269,18 +269,16 @@ namespace Terminal.Gui {
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 			//var borderLength = Border.DrawMarginFrame ? 1 : 0;
 
-			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
+			// FIXED: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-				//	Border.BorderStyle != BorderStyle.None, fill: true, Border);
-				Border.DrawContent ();
+				Clear ();
 			}
 			var savedClip = contentView.ClipToBounds ();
 
 			// Redraw our contentView
-			// TODO: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
-			contentView.Redraw (contentView.Bounds);
+			// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
+			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearLayoutNeeded ();
@@ -289,6 +287,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (GetNormalColor ());
 				//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
 				//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
+				Border.DrawContent (this, false);
 				if (HasFocus)
 					Driver.SetAttribute (ColorScheme.HotNormal);
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);

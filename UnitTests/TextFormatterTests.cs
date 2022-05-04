@@ -1,17 +1,22 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.Gui.Views;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
 	public class TextFormatterTests {
+		readonly ITestOutputHelper output;
+
+		public TextFormatterTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void Basic_Usage ()
@@ -1932,6 +1937,240 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void WordWrap_preserveTrailingSpaces_Wide_Runes ()
+		{
+			var text = ustring.Empty;
+			int maxWidth = 1;
+			int expectedClippedWidth = 1;
+
+			List<ustring> wrappedLines;
+
+			text = "文に は言葉 があり ます。";
+			maxWidth = 14;
+			expectedClippedWidth = 14;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("文に は言葉 ", wrappedLines [0].ToString ());
+			Assert.Equal ("があり ます。", wrappedLines [1].ToString ());
+			Assert.True (wrappedLines.Count == 2);
+
+			maxWidth = 3;
+			expectedClippedWidth = 3;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("文に", wrappedLines [0].ToString ());
+			Assert.Equal (" ", wrappedLines [1].ToString ());
+			Assert.Equal ("は言", wrappedLines [2].ToString ());
+			Assert.Equal ("葉 ", wrappedLines [3].ToString ());
+			Assert.Equal ("があ", wrappedLines [4].ToString ());
+			Assert.Equal ("り ", wrappedLines [5].ToString ());
+			Assert.Equal ("ます", wrappedLines [6].ToString ());
+			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 8);
+
+			maxWidth = 2;
+			expectedClippedWidth = 2;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("文", wrappedLines [0].ToString ());
+			Assert.Equal ("に", wrappedLines [1].ToString ());
+			Assert.Equal (" ", wrappedLines [2].ToString ());
+			Assert.Equal ("は", wrappedLines [3].ToString ());
+			Assert.Equal ("言", wrappedLines [4].ToString ());
+			Assert.Equal ("葉", wrappedLines [5].ToString ());
+			Assert.Equal (" ", wrappedLines [6].ToString ());
+			Assert.Equal ("が", wrappedLines [7].ToString ());
+			Assert.Equal ("あ", wrappedLines [8].ToString ());
+			Assert.Equal ("り", wrappedLines [9].ToString ());
+			Assert.Equal (" ", wrappedLines [10].ToString ());
+			Assert.Equal ("ま", wrappedLines [11].ToString ());
+			Assert.Equal ("す", wrappedLines [12].ToString ());
+			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 14);
+
+			maxWidth = 1;
+			expectedClippedWidth = 1;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("文", wrappedLines [0].ToString ());
+			Assert.Equal ("に", wrappedLines [1].ToString ());
+			Assert.Equal (" ", wrappedLines [2].ToString ());
+			Assert.Equal ("は", wrappedLines [3].ToString ());
+			Assert.Equal ("言", wrappedLines [4].ToString ());
+			Assert.Equal ("葉", wrappedLines [5].ToString ());
+			Assert.Equal (" ", wrappedLines [6].ToString ());
+			Assert.Equal ("が", wrappedLines [7].ToString ());
+			Assert.Equal ("あ", wrappedLines [8].ToString ());
+			Assert.Equal ("り", wrappedLines [9].ToString ());
+			Assert.Equal (" ", wrappedLines [10].ToString ());
+			Assert.Equal ("ま", wrappedLines [11].ToString ());
+			Assert.Equal ("す", wrappedLines [12].ToString ());
+			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.False (wrappedLines.Count == text.Length);
+			Assert.True (wrappedLines.Count == text.RuneCount);
+			Assert.Equal (25, text.ConsoleWidth);
+			Assert.Equal (25, TextFormatter.GetTextWidth (text));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void WordWrap_preserveTrailingSpaces_Horizontal_With_Simple_Runes ()
+		{
+			var text = "A sentence has words.";
+			var width = 3;
+			var height = 8;
+			var wrappedLines = TextFormatter.WordWrap (text, width, true);
+			var breakLines = "";
+			foreach (var line in wrappedLines) {
+				breakLines += $"{line}{Environment.NewLine}";
+			}
+			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (label);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
+
+			var expected = @"
+┌───┐
+│A  │
+│sen│
+│ten│
+│ce │
+│has│
+│   │
+│wor│
+│ds.│
+└───┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void WordWrap_preserveTrailingSpaces_Vertical_With_Simple_Runes ()
+		{
+			var text = "A sentence has words.";
+			var width = 8;
+			var height = 3;
+			var wrappedLines = TextFormatter.WordWrap (text, width, true);
+			var breakLines = "";
+			foreach (var line in wrappedLines) {
+				breakLines += $"{line}{Environment.NewLine}";
+			}
+			var label = new Label (breakLines) {
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Width = Dim.Fill (), Height = Dim.Fill () 
+			};
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (label);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
+
+			var expected = @"
+┌────────┐
+│Astc swd│
+│ eeeh os│
+│ nn a r.│
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void WordWrap_preserveTrailingSpaces_Horizontal_With_Wide_Runes ()
+		{
+			var text = "文に は言葉 があり ます。";
+			var width = 6;
+			var height = 8;
+			var wrappedLines = TextFormatter.WordWrap (text, width, true);
+			var breakLines = "";
+			foreach (var line in wrappedLines) {
+				breakLines += $"{line}{Environment.NewLine}";
+			}
+			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (label);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
+
+			var expected = @"
+┌──────┐
+│文に  │
+│は言葉│
+│ があ │
+│り    │
+│ ます │
+│。    │
+│      │
+│      │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void WordWrap_preserveTrailingSpaces_Vertical_With_Wide_Runes ()
+		{
+			var text = "文に は言葉 があり ます。";
+			var width = 8;
+			var height = 4;
+			var wrappedLines = TextFormatter.WordWrap (text, width, true);
+			var breakLines = "";
+			foreach (var line in wrappedLines) {
+				breakLines += $"{line}{Environment.NewLine}";
+			}
+			var label = new Label (breakLines) {
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (label);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
+
+			var expected = @"
+┌────────┐
+│文はがま│
+│に言あす│
+│  葉り。│
+│        │
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
+		}
+
+		[Fact]
 		public void WordWrap_preserveTrailingSpaces_With_Tab ()
 		{
 			var text = ustring.Empty;
@@ -2009,6 +2248,18 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (" ", wrappedLines [13].ToString ());
 			Assert.Equal (".", wrappedLines [^1].ToString ());
 			Assert.True (wrappedLines.Count == text.Length);
+		}
+
+		[Fact]
+		public void WordWrap_Unicode_Wide_Runes ()
+		{
+			ustring text = "これが最初の行です。 こんにちは世界。 これが2行目です。";
+			var width = text.RuneCount;
+			var wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (3, wrappedLines.Count);
+			Assert.Equal ("これが最初の行です。", wrappedLines [0].ToString ());
+			Assert.Equal ("こんにちは世界。", wrappedLines [1].ToString ());
+			Assert.Equal ("これが2行目です。", wrappedLines [^1].ToString ());
 		}
 
 		[Fact]
@@ -2539,7 +2790,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void TestClipOrPad_ShortWord()
+		public void TestClipOrPad_ShortWord ()
 		{
 			// word is short but we want it to fill 6 so it should be padded
 			Assert.Equal ("fff   ", TextFormatter.ClipOrPad ("fff", 6));
@@ -2589,7 +2840,355 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (Key.Null, tf.HotKey);
 			tf.HotKey = Key.CtrlMask | Key.Q;
 			Assert.Equal (Key.CtrlMask | Key.Q, tf.HotKey);
+		}
 
+		[Fact, AutoInitShutdown]
+		public void Draw_Horizontal_Simple_Runes ()
+		{
+			var label = new Label ("Demo Simple Rune");
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 16, 1), label.Frame);
+
+			var expected = @"
+Demo Simple Rune
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 16, 1), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Vertical_Simple_Runes ()
+		{
+			var label = new Label ("Demo Simple Rune") {
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 1, 16), label.Frame);
+
+			var expected = @"
+D
+e
+m
+o
+
+S
+i
+m
+p
+l
+e
+
+R
+u
+n
+e
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 1, 16), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Horizontal_Wide_Runes ()
+		{
+			var label = new Label ("デモエムポンズ");
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 14, 1), label.Frame);
+
+			var expected = @"
+デモエムポンズ
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 14, 1), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Vertical_Wide_Runes ()
+		{
+			var label = new Label ("デモエムポンズ") {
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 7), label.Frame);
+
+			var expected = @"
+デ
+モ
+エ
+ム
+ポ
+ン
+ズ
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 2, 7), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Horizontal_Simple_TextAlignments ()
+		{
+			var text = "Hello World";
+			var width = 20;
+			var lblLeft = new Label (text) { Width = width };
+			var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered };
+			var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right };
+			var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+
+			Assert.False (lblLeft.AutoSize);
+			Assert.False (lblCenter.AutoSize);
+			Assert.False (lblRight.AutoSize);
+			Assert.False (lblJust.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
+
+			var expected = @"
+┌────────────────────┐
+│Hello World         │
+│    Hello World     │
+│         Hello World│
+│Hello          World│
+└────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Vertical_Simple_TextAlignments ()
+		{
+			var text = "Hello World";
+			var height = 20;
+			var lblLeft = new Label (text, direction: TextDirection.TopBottom_LeftRight) { Height = height };
+			var lblCenter = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle };
+			var lblRight = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom };
+			var lblJust = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
+
+			Assert.False (lblLeft.AutoSize);
+			Assert.False (lblCenter.AutoSize);
+			Assert.False (lblRight.AutoSize);
+			Assert.False (lblJust.AutoSize);
+			Assert.Equal (new Rect (0, 0, 1, height), lblLeft.Frame);
+			Assert.Equal (new Rect (2, 0, 1, height), lblCenter.Frame);
+			Assert.Equal (new Rect (4, 0, 1, height), lblRight.Frame);
+			Assert.Equal (new Rect (6, 0, 1, height), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);
+
+			var expected = @"
+┌───────┐
+│H     H│
+│e     e│
+│l     l│
+│l     l│
+│o H   o│
+│  e    │
+│W l    │
+│o l    │
+│r o    │
+│l   H  │
+│d W e  │
+│  o l  │
+│  r l  │
+│  l o  │
+│  d    │
+│    W W│
+│    o o│
+│    r r│
+│    l l│
+│    d d│
+└───────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Horizontal_Wide_TextAlignments ()
+		{
+			var text = "こんにちは 世界";
+			var width = 25;
+			var lblLeft = new Label (text) { Width = width };
+			var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered };
+			var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right };
+			var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+
+			Assert.False (lblLeft.AutoSize);
+			Assert.False (lblCenter.AutoSize);
+			Assert.False (lblRight.AutoSize);
+			Assert.False (lblJust.AutoSize);
+			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
+
+			var expected = @"
+┌─────────────────────────┐
+│こんにちは 世界          │
+│     こんにちは 世界     │
+│          こんにちは 世界│
+│こんにちは           世界│
+└─────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Vertical_Wide_TextAlignments ()
+		{
+			var text = "こんにちは 世界";
+			var height = 23;
+			var lblLeft = new Label (text) { Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight };
+			var lblCenter = new Label (text) { X = 3, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Middle };
+			var lblRight = new Label (text) { X = 6, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Bottom };
+			var lblJust = new Label (text) { X = 9, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Justified };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (13, height + 2);
+
+			Assert.False (lblLeft.AutoSize);
+			Assert.False (lblCenter.AutoSize);
+			Assert.False (lblRight.AutoSize);
+			Assert.False (lblJust.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, height), lblLeft.Frame);
+			Assert.Equal (new Rect (3, 0, 2, height), lblCenter.Frame);
+			Assert.Equal (new Rect (6, 0, 2, height), lblRight.Frame);
+			Assert.Equal (new Rect (9, 0, 2, height), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, 13, height + 2), frame.Frame);
+
+			var expected = @"
+┌───────────┐
+│こ       こ│
+│ん       ん│
+│に       に│
+│ち       ち│
+│は       は│
+│           │
+│世         │
+│界 こ      │
+│   ん      │
+│   に      │
+│   ち      │
+│   は      │
+│           │
+│   世      │
+│   界      │
+│      こ   │
+│      ん   │
+│      に   │
+│      ち   │
+│      は   │
+│           │
+│      世 世│
+│      界 界│
+└───────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
+		}
+
+		[Fact]
+		public void GetTextWidth_Simple_And_Wide_Runes ()
+		{
+			ustring text = "Hello World";
+			Assert.Equal (11, TextFormatter.GetTextWidth (text));
+			text = "こんにちは世界";
+			Assert.Equal (14, TextFormatter.GetTextWidth (text));
+		}
+
+		[Fact]
+		public void GetSumMaxCharWidth_Simple_And_Wide_Runes ()
+		{
+			ustring text = "Hello World";
+			Assert.Equal (11, TextFormatter.GetSumMaxCharWidth (text));
+			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 6, 1));
+			text = "こんにちは 世界";
+			Assert.Equal (15, TextFormatter.GetSumMaxCharWidth (text));
+			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text, 6, 1));
+		}
+
+		[Fact]
+		public void GetSumMaxCharWidth_List_Simple_And_Wide_Runes ()
+		{
+			List<ustring> text =new List<ustring>() { "Hello", "World" };
+			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text));
+			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+			text = new List<ustring> () { "こんにちは", "世界" };
+			Assert.Equal (4, TextFormatter.GetSumMaxCharWidth (text));
+			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+		}
+
+		[Fact]
+		public void GetMaxLengthForWidth_Simple_And_Wide_Runes ()
+		{
+			ustring text = "Hello World";
+			Assert.Equal (6, TextFormatter.GetMaxLengthForWidth (text, 6));
+			text = "こんにちは 世界";
+			Assert.Equal (3, TextFormatter.GetMaxLengthForWidth (text, 6));
+		}
+
+		[Fact]
+		public void GetMaxLengthForWidth_List_Simple_And_Wide_Runes ()
+		{
+			var runes = ustring.Make ("Hello World").ToRuneList ();
+			Assert.Equal (6, TextFormatter.GetMaxLengthForWidth (runes, 6));
+			runes = ustring.Make ("こんにちは 世界").ToRuneList ();
+			Assert.Equal (3, TextFormatter.GetMaxLengthForWidth (runes, 6));
+		}
+
+		[Fact]
+		public void Format_Truncate_Simple_And_Wide_Runes ()
+		{
+			var text = "Truncate";
+			var list = TextFormatter.Format (text, 3, false, false);
+			Assert.Equal ("Tru", list [^1].ToString ());
+
+			text = "デモエムポンズ";
+			list = TextFormatter.Format (text, 3, false, false);
+			Assert.Equal ("デ", list [^1].ToString ());
 		}
 	}
 }

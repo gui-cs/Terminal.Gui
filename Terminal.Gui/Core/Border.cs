@@ -460,15 +460,17 @@ namespace Terminal.Gui {
 		/// Drawn the <see cref="BorderThickness"/> more the <see cref="Padding"/>
 		///  more the <see cref="Border.BorderStyle"/> and the <see cref="Effect3D"/>.
 		/// </summary>
-		public void DrawContent (View view = null)
+		/// <param name="view">The view to draw.</param>
+		/// <param name="fill">If it will clear or not the content area.</param>
+		public void DrawContent (View view = null, bool fill = true)
 		{
 			if (Child == null) {
 				Child = view;
 			}
 			if (Parent?.Border != null) {
-				DrawParentBorder (Parent.ViewToScreen (Parent.Bounds));
+				DrawParentBorder (Parent.ViewToScreen (Parent.Bounds), fill);
 			} else {
-				DrawChildBorder (Child.ViewToScreen (Child.Bounds));
+				DrawChildBorder (Child.ViewToScreen (Child.Bounds), fill);
 			}
 		}
 
@@ -559,7 +561,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void DrawChildBorder (Rect frame)
+		private void DrawChildBorder (Rect frame, bool fill = true)
 		{
 			var drawMarginFrame = DrawMarginFrame ? 1 : 0;
 			var sumThickness = GetSumThickness ();
@@ -663,7 +665,7 @@ namespace Terminal.Gui {
 				Height = frame.Height + (2 * drawMarginFrame)
 			};
 			if (rect.Width > 0 && rect.Height > 0) {
-				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
+				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
 			}
 
 			if (Effect3D) {
@@ -712,7 +714,7 @@ namespace Terminal.Gui {
 			driver.SetAttribute (savedAttribute);
 		}
 
-		private void DrawParentBorder (Rect frame)
+		private void DrawParentBorder (Rect frame, bool fill = true)
 		{
 			var sumThickness = GetSumThickness ();
 			var borderThickness = BorderThickness;
@@ -815,7 +817,7 @@ namespace Terminal.Gui {
 				Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
 			};
 			if (rect.Width > 0 && rect.Height > 0) {
-				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
+				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
 			}
 
 			if (Effect3D) {
@@ -873,6 +875,12 @@ namespace Terminal.Gui {
 
 		private void AddRuneAt (ConsoleDriver driver, int col, int row, Rune ch)
 		{
+			if (col < driver.Cols && row < driver.Rows && col > 0 && driver.Contents [row, col, 2] == 0
+				&& Rune.ColumnWidth ((char)driver.Contents [row, col - 1, 0]) > 1) {
+
+				driver.Contents [row, col, 1] = driver.GetAttribute ();
+				return;
+			}
 			driver.Move (col, row);
 			driver.AddRune (ch);
 		}
