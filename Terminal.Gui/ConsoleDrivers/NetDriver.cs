@@ -1237,6 +1237,16 @@ namespace Terminal.Gui {
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol < Cols - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+				}
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
@@ -1469,12 +1479,6 @@ namespace Terminal.Gui {
 								Console.Write (output);
 							}
 							continue;
-						}
-
-						if (col < cols - 1 && Rune.ColumnWidth ((char)contents [row, col, 0]) > 1
-							&& (contents [row, col + 1, 2] == 1 || col == cols - 1)) {
-
-							contents [row, col, 0] = ' ';
 						}
 
 						var attr = contents [row, col, 1];
