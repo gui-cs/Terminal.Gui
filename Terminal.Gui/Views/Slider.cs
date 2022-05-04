@@ -16,32 +16,19 @@ namespace Terminal.Gui {
 	namespace Sliders {
 
 		/// <summary>
-		/// Layout
-		/// </summary>
-		public enum SliderLayout {
-			/// <summary>
-			///	Auto calculates the values <see cref="SliderStyle.StartSpacing"/>, <see cref="SliderStyle.InnerSpacing"/> and <see cref="SliderStyle.EndSpacing"/>.
-			/// </summary>
-			Auto,
-			/// <summary>
-			///	Auto calculates the values <see cref="SliderStyle.StartSpacing"/>, <see cref="SliderStyle.InnerSpacing"/> and <see cref="SliderStyle.EndSpacing"/> to match the layout values.
-			/// </summary>
-			Layout,
-			/// <summary>
-			///	Use the values <see cref="SliderStyle.StartSpacing"/>, <see cref="SliderStyle.InnerSpacing"/> and <see cref="SliderStyle.EndSpacing"/>.
-			/// </summary>
-			Custom
-		}
-
-		/// <summary>
 		/// Represents an option in the slider.
 		/// </summary>
-		/// <typeparam name="T">Data of the option.</typeparam>
+		/// <typeparam name="T">Datatype of the option.</typeparam>
 		public class SliderOption<T> {
 			/// <summary>
-			/// Display legend of the option.
+			/// Legend of the option.
 			/// </summary>
-			public string Legend { get; set; }
+			public ustring Legend { get; set; }
+
+			/// <summary>
+			/// Abbreviation of the Legend. When the slider is 1 char width.
+			/// </summary>
+			public Rune? LegendAbbr { get; set; }
 
 			/// <summary>
 			/// Custom data of the option.
@@ -81,7 +68,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public event Action<SliderOption<T>> UnSet;
 			/// <summary>
-			/// Event Raised when this option change with the current state.
+			/// Event Raised when this option change containing the CURRENT state.
 			/// </summary>
 			public event Action<SliderOption<T>, bool> Changed;
 		}
@@ -130,12 +117,14 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Slider Char
+		/// Each distinct character of the slider is a SliderChar.
 		/// </summary>
 		public class SliderChar {
 			/// <summary>
-			/// Rune
+			/// Rune to show
 			/// </summary>
 			public Rune Rune { get; set; }
+
 			/// <summary>
 			/// Attribute
 			/// </summary>
@@ -174,29 +163,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Slider Style
-		/// </summary>
-		public class SliderStyle {
-			public SliderHeaderStyle HeaderStyle { get; set; }
-			public SliderLegendStyle LegendStyle { get; set; }
-
-			public SliderLayout Layout { get; set; }
-			public SliderChar EmptyChar { get; set; }
-			public SliderChar OptionChar { get; set; }
-			public SliderChar SetChar { get; set; }
-			public SliderChar SpaceChar { get; set; }
-			public SliderChar RangeChar { get; set; }
-			public SliderChar StartRangeChar { get; set; }
-			public SliderChar EndRangeChar { get; set; }
-
-			public SliderStyle ()
-			{
-				HeaderStyle = new SliderHeaderStyle { };
-				LegendStyle = new SliderLegendStyle { };
-			}
-		}
-
-		/// <summary>
 		/// Legend Style
 		/// </summary>
 		public class SliderLegendStyle {
@@ -214,10 +180,69 @@ namespace Terminal.Gui {
 			public Attribute? EmptyAttribute { get; set; }
 		}
 
+		/// <summary>
+		/// Slider Style
+		/// </summary>
+		public class SliderStyle {
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderHeaderStyle HeaderStyle { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderLegendStyle LegendStyle { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar EmptyChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar OptionChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar SetChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar SpaceChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar RangeChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar StartRangeChar { get; set; }
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderChar EndRangeChar { get; set; }
+
+			/// <summary>
+			/// Slider Style
+			/// </summary>
+			public SliderStyle ()
+			{
+				HeaderStyle = new SliderHeaderStyle { };
+				LegendStyle = new SliderLegendStyle { };
+			}
+		}
+
+		/// <summary>
+		/// All Slider Configuration are grouped in this class.
+		/// </summary>
 		internal class SliderConfiguration {
 			internal bool RangeAllowSingle;
+			internal bool AllowEmpty;
 
 			internal int MouseClickXOptionThreshold;
+
+			internal bool AutoSize;
+
+
 
 			internal int StartMargin;
 			internal int EndMargin;
@@ -226,9 +251,9 @@ namespace Terminal.Gui {
 			internal int InnerSpacing;
 
 			internal bool ShowSpacing;
-			internal bool ShowBorders;
 			internal bool ShowHeader;
 			internal bool ShowLegends;
+			internal bool ShowLegendsAbbr;
 
 			internal SliderType Type = SliderType.Single;
 			internal Orientation SliderOrientation = Orientation.Horizontal;
@@ -250,6 +275,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider options.</param>
 		public Slider (List<object> options, Orientation orientation = Orientation.Horizontal) : base (options, orientation) { }
 
 		/// <summary>
@@ -257,12 +283,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="header">Header text of the slider.</param>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider options.</param>
 		public Slider (ustring header, List<object> options, Orientation orientation = Orientation.Horizontal) : base (header, options, orientation) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider options.</param>
 		public Slider (List<SliderOption<object>> options, Orientation orientation = Orientation.Horizontal) : base (options, orientation) { }
 
 		/// <summary>
@@ -270,6 +298,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="header">Header text of the slider.</param>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider options.</param>
 		public Slider (ustring header, List<SliderOption<object>> options, Orientation orientation = Orientation.Horizontal) : base (header, options, orientation) { }
 	}
 
@@ -278,6 +307,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	public class Slider<T> : View {
+
 		ustring header;
 		bool settingRange;
 
@@ -288,7 +318,6 @@ namespace Terminal.Gui {
 		List<SliderOption<T>> options;
 		List<int> currentOptions = new List<int> ();
 		int currentOption = 0;
-
 
 
 		#region CUSTOM CURSOR
@@ -312,7 +341,7 @@ namespace Terminal.Gui {
 
 		#endregion
 
-		#region Constructors & Init()
+		#region Constructors
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Slider"/> class.
@@ -325,6 +354,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider orientation.</param>
 		public Slider (List<T> options, Orientation orientation = Orientation.Horizontal) : this (ustring.Empty, options, orientation) { }
 
 		/// <summary>
@@ -332,13 +362,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="header">Header text of the slider.</param>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider orientation.</param>
 		public Slider (ustring header, List<T> options, Orientation orientation = Orientation.Horizontal)
 		{
 
 			if (options == null) {
-				Init (header, null, orientation);
+				Initialize (header, null, orientation);
 			} else {
-				Init (header, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList (), orientation);
+				Initialize (header, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList (), orientation);
 			}
 		}
 
@@ -346,6 +377,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Slider"/> class.
 		/// </summary>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider orientation.</param>
 		public Slider (List<SliderOption<T>> options, Orientation orientation = Orientation.Horizontal) : this (ustring.Empty, options, orientation) { }
 
 		/// <summary>
@@ -353,12 +385,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="header">Header text of the slider.</param>
 		/// <param name="options">Initial slider options.</param>
+		/// <param name="orientation">Initial slider orientation.</param>
 		public Slider (ustring header, List<SliderOption<T>> options, Orientation orientation = Orientation.Horizontal)
 		{
-			Init (header, options, orientation);
+			Initialize (header, options, orientation);
 		}
 
-		void Init (ustring header, List<SliderOption<T>> options, Orientation orientation = Orientation.Horizontal)
+		#endregion
+
+		#region Initialize
+		void Initialize (ustring header, List<SliderOption<T>> options, Orientation orientation = Orientation.Horizontal)
 		{
 			CanFocus = true;
 
@@ -375,32 +411,41 @@ namespace Terminal.Gui {
 
 			SetDefaultStyle ();
 
-			// When we lose focus of the View(Slider), if we are range selecting we finish.
+			// When we lose focus of the View(Slider), if we are range selecting we stop it.
 			Leave += (FocusEventArgs e) => {
 				if (settingRange == true) {
 					settingRange = false;
 				}
-				//Application.MainLoop.RemoveTimeout (blink_token);
+				Application.MainLoop.RemoveTimeout (blink_token);
 			};
 
-			Adjust ();
-			CalcBounds ();
+			AdjustBestHeight ();
+			AdjustBestWidth ();
 
-			// Enter += (FocusEventArgs e) => {
-			// 	blink_token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (ee) => {
-			// 		if (cursorPosition != null) {
-			// 			Move (cursorPosition.Value.Item1, cursorPosition.Value.Item2);
-			// 			if (blink) {
-			// 				Driver.SetAttribute (new Attribute (Color.Red, Color.Blue));
-			// 			} else {
-			// 				Driver.SetAttribute (new Attribute (Color.Blue, Color.Red));
-			// 			}
-			// 			Driver.AddRune ('█');
-			// 			blink = !blink;
-			// 		}
-			// 		return true;
-			// 	});
-			// };
+			// Custom cursor
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			// CUSTOM CURSOR
+			Action f = () => {
+				if (cursorPosition != null) {
+					Move (cursorPosition.Value.Item1, cursorPosition.Value.Item2);
+					if (blink) {
+						Driver.SetAttribute (new Attribute (Color.Red, Color.Blue));
+					} else {
+						Driver.SetAttribute (new Attribute (Color.Blue, Color.Red));
+					}
+					Driver.AddRune (GetSetOptions ().Contains (currentOption) ? style.SetChar.Rune : style.OptionChar.Rune);
+					blink = !blink;
+				}
+			};
+
+			Enter += (FocusEventArgs e) => {
+				f ();
+				blink_token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (ee) => {
+					f ();
+					return true;
+				});
+			};
 		}
 
 		#endregion
@@ -408,16 +453,37 @@ namespace Terminal.Gui {
 		#region Properties
 
 		/// <summary>
+		/// Allow no selection.
+		/// </summary>
+		public bool AllowEmpty {
+			get => config.AllowEmpty;
+			set {
+				config.AllowEmpty = value;
+			}
+		}
+
+		/// <summary>
+		/// Autosize
+		/// </summary>
+		public override bool AutoSize {
+			get => config.AutoSize;
+			set {
+				config.AutoSize = value;
+				//SetNeedsLayout ();
+				//SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
 		/// Slider InnerSpecing.
-		/// Changing this value will set the layout to Custom.  <see cref="SliderLayout"></see>.
+		/// Changing this value will set the layout to Custom.
 		/// </summary>
 		public int InnerSpacing {
+
 			get { return config.InnerSpacing; }
 			set {
 				config.InnerSpacing = value;
-				style.Layout = SliderLayout.Custom;
 				Adjust ();
-				CalcBounds ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -430,7 +496,7 @@ namespace Terminal.Gui {
 			set {
 				config.Type = value;
 
-				//Note(jmperricone): Custom logic to preserve options ???
+				// Todo: Custom logic to preserve options.
 				currentOptions.Clear ();
 
 				SetNeedsDisplay ();
@@ -446,7 +512,7 @@ namespace Terminal.Gui {
 			set {
 				config.SliderOrientation = value;
 				Adjust ();
-				CalcBounds ();
+				CalculateSliderDimensions ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -459,7 +525,7 @@ namespace Terminal.Gui {
 			set {
 				config.LegendsOrientation = value;
 				Adjust ();
-				CalcBounds ();
+				CalculateSliderDimensions ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -472,7 +538,6 @@ namespace Terminal.Gui {
 			get { return header; }
 			set {
 				header = value;
-				CalcBounds ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -483,12 +548,12 @@ namespace Terminal.Gui {
 		public SliderStyle Style {
 			get {
 				// Note(jmperricone): Maybe SliderStyle should be a struct so we return a copy ???
+				// Or SetStyle() and ( GetStyle() || Style getter copy )
 				return style;
 			}
 			set {
 				// Note(jmperricone): If the user change a style, he/she must call SetNeedsDisplay(). OK ???
 				style = Style;
-				CalcBounds ();
 			}
 		}
 
@@ -499,6 +564,7 @@ namespace Terminal.Gui {
 			get {
 				// Note(jmperricone): Maybe SliderOption should be a struct so we return a copy ???
 				//                    Events will be preserved ? Need a test.
+				// Or SetOptions() and ( GetOptions() || Options getter copy )
 				return options;
 			}
 			set {
@@ -507,18 +573,6 @@ namespace Terminal.Gui {
 				if (options == null || options.Count == 0)
 					return;
 
-				Adjust ();
-				CalcBounds ();
-			}
-		}
-
-		/// <summary>
-		/// Allow range start and end be in the same option, as a single option.
-		/// </summary>
-		public SliderLayout AdjustLayout {
-			get { return style.Layout; }
-			set {
-				style.Layout = value;
 				Adjust ();
 			}
 		}
@@ -534,24 +588,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Show <see cref="SliderStyle.LeftBorder"/> character and <see cref="SliderStyle.RightBorder"/> character at the beginning and at the end of the slider respectively.
-		/// </summary>
-		public bool ShowBorders {
-			get { return config.ShowBorders; }
-			set {
-				config.ShowBorders = value;
-				CalcBounds ();
-			}
-		}
-
-		/// <summary>
 		/// Show/Hide the slider Header.
 		/// </summary>
 		public bool ShowHeader {
 			get { return config.ShowHeader; }
 			set {
 				config.ShowHeader = value;
-				CalcBounds ();
+				Adjust ();
 			}
 		}
 
@@ -573,7 +616,7 @@ namespace Terminal.Gui {
 			get { return config.ShowLegends; }
 			set {
 				config.ShowLegends = value;
-				CalcBounds ();
+				Adjust ();
 			}
 		}
 
@@ -582,6 +625,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool SetOption (int optionIndex)
 		{
+			// TODO: Handle range type.			
+			// Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
+
 			if (!currentOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < options.Count) {
 				currentOption = optionIndex;
 				SetCurrentOption ();
@@ -595,6 +641,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UnSetOption (int optionIndex)
 		{
+			// TODO: Handle range type.			
+			// Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
+
 			if (currentOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < options.Count) {
 				currentOption = optionIndex;
 				SetCurrentOption ();
@@ -613,7 +662,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the current setted options indexes in the user set order.
+		/// Get the current set options indexes in the user set order.
 		/// </summary>
 		public List<int> GetSetOptionsUnOrdered ()
 		{
@@ -623,10 +672,17 @@ namespace Terminal.Gui {
 
 		#endregion
 
-
 		#region Helpers
 		void MoveAndAdd (int x, int y, Rune rune)
 		{
+			/*
+			// This debug test fails.
+			#if (DEBUG)
+						if (Bounds.Contains (x, y) == false) {
+							header = $"w={Bounds.Width}h={Bounds.Height} x={x}y={y} out of Bounds";
+						}
+			#endif
+			*/
 			Move (x, y);
 			Driver.AddRune (rune);
 		}
@@ -639,11 +695,10 @@ namespace Terminal.Gui {
 
 		void SetDefaultStyle ()
 		{
-			// Note(jmperricone):
 			switch (config.SliderOrientation) {
 			case Orientation.Horizontal:
 				style.SpaceChar = new SliderChar ('─'); // '─'
-				style.OptionChar = new SliderChar ('□'); // '┼' '●🗹□⏹'
+				style.OptionChar = new SliderChar ('●'); // '┼●🗹□⏹'
 				break;
 			case Orientation.Vertical:
 				style.SpaceChar = new SliderChar ('│');
@@ -672,8 +727,8 @@ namespace Terminal.Gui {
 
 			config.LegendsOrientation = config.SliderOrientation;
 			style.EmptyChar = new SliderChar (' ');
-			style.SetChar = new SliderChar ('■');
-			style.RangeChar = new SliderChar ('▓'); // ░ ▒ ▓   // Medium shade not blinking on curses.
+			style.SetChar = new SliderChar ('▓'); // ■
+			style.RangeChar = new SliderChar ('░'); // ░ ▒ ▓   // Medium shade not blinking on curses.
 			style.StartRangeChar = new SliderChar ('█');
 			style.EndRangeChar = new SliderChar ('█');
 
@@ -681,56 +736,152 @@ namespace Terminal.Gui {
 			// RightBorder = '▏',
 			// First = '├',
 			// Last = '┤',
-			//style.SetAllAttributes (new Attribute (Color.White, Color.Red));
+			// style.SetAllAttributes (new Attribute (Color.White, Color.Red));
+		}
+
+		Rect prev_bounds;
+		Rect prev_redraw_bounds;
+		private bool BoundsChanged (Rect redraw_bounds)
+		{
+			if (prev_bounds != Bounds) {
+				prev_bounds = Bounds;
+				// header = "Bounds Changed " + Bounds.Width;
+				return true;
+			}
+			if (prev_redraw_bounds != redraw_bounds) {
+				prev_redraw_bounds = redraw_bounds;
+				// header = "Redraw Bounds Changed";
+				return true;
+			}
+			// header = "Equal " + Bounds.Width;
+			return false;
+		}
+
+		void CalculateBestSliderDimensions ()
+		{
+			if (options.Count == 0) return;
+
+			if (config.SliderOrientation == config.LegendsOrientation) {
+				var max = options.Max (e => e.Legend.ToString ().Length);
+				config.StartSpacing = max / 2;
+				config.InnerSpacing = max + (max % 2 == 0 ? 1 : 0);
+				config.EndSpacing = max / 2 + (max % 2);
+			} else {
+				// H Slider with V Legends || V Slider with H Legends.
+				config.StartSpacing = 1;
+				config.InnerSpacing = 1;
+				config.EndSpacing = 1;
+			}
+		}
+
+		void CalculateSliderDimensions ()
+		{
+			int size;
+			if (config.SliderOrientation == Orientation.Horizontal) {
+				size = Bounds.Width;
+			} else {
+				size = Bounds.Height;
+			}
+
+			// bounds = Bounds;
+			header = Bounds.Width.ToString () + "-" + Bounds.Height.ToString ();
+
+			if (options.Count == 0) return;
+
+			if (config.AutoSize) {
+				// Best values and change width and height.
+				// TODO.
+			} else {
+				// Fit Slider to the actual width and height.
+
+				int max_legend;
+				if (config.SliderOrientation == config.LegendsOrientation) {
+					max_legend = options.Max (e => e.Legend.ToString ().Length);
+				} else {
+					max_legend = 1;
+				}
+
+				var min = (size - max_legend) / (options.Count - 1);
+
+				ustring first;
+				ustring last;
+
+				if (max_legend >= min) {
+					if (config.SliderOrientation == config.LegendsOrientation) {
+						config.ShowLegendsAbbr = true;
+					}
+					first = "x";
+					last = "x";
+				} else {
+					config.ShowLegendsAbbr = false;
+					first = options.First ().Legend;
+					last = options.Last ().Legend;
+				}
+
+				// --o--
+				// Hello
+				// Left = He
+				// Right = lo
+				var first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
+				var last_right = (last.Length) / 2;      // Chars count of the last option to the right.
+
+				if (config.SliderOrientation != config.LegendsOrientation) {
+					first_left = 0;
+					last_right = 0;
+				}
+
+				var width = size - first_left - last_right - 1;
+
+				var b = width / (options.Count - 1);
+				var c = width % (options.Count - 1);
+
+				config.StartSpacing = (c / 2) + first_left;
+				config.InnerSpacing = b - 1;
+				config.EndSpacing = (c / 2) + (c % 2) + last_right;
+			}
+		}
+
+		/// <summary>
+		/// Adjust the height of the Slider to the best value.
+		///</summary>
+		public void AdjustBestHeight ()
+		{
+			// Hack???  Otherwise we can't go back to Dim.Absolute.
+			LayoutStyle = LayoutStyle.Absolute;
+
+			if (config.SliderOrientation == Orientation.Horizontal) {
+				Height = CalcSliderHeight ();
+			} else {
+				Height = CalcSliderWidth ();
+			}
+
+			LayoutStyle = LayoutStyle.Computed;
+		}
+
+		/// <summary>
+		/// Adjust the height of the Slider to the best value. (Only works if height is DimAbsolute).
+		///</summary>
+		public void AdjustBestWidth ()
+		{
+			LayoutStyle = LayoutStyle.Absolute;
+
+			if (config.SliderOrientation == Orientation.Horizontal) {
+				Width = CalcSliderWidth ();
+			} else {
+				Width = CalcSliderHeight ();
+			}
+
+			LayoutStyle = LayoutStyle.Computed;
 		}
 
 		void Adjust ()
 		{
-			if (options.Count == 0) return;
-			// Layout cases:
-			// 1) Find "Best" values.
-			// 1) Using Computed/Absolute Layout.
-			// 3) Values set by the user.
-
-			// TODO(jmperricone): Start and end spacing == 0 with legend inside or centered.
-
-			switch (style.Layout) {
-			case SliderLayout.Auto:
-				// Case 1
-				if (config.SliderOrientation == config.LegendsOrientation) {
-					// Note(jmperricone): This are not the best values, but they are good enough.
-					var max = options.Max (e => e.Legend.ToString ().Length);
-					config.StartSpacing = max / 2;
-					config.InnerSpacing = max + (max % 2 == 0 ? 1 : 0);
-					config.EndSpacing = max / 2;
-				} else {
-					// Horizontal slider with vertical legends OR vertical slider with horizontal legends.
-					config.StartSpacing = 1;
-					config.InnerSpacing = 1;
-					config.EndSpacing = 1;
-				}
-				break;
-			case SliderLayout.Layout:
-				// TODO:
-				break;
-			case SliderLayout.Custom:
-				// We use the values set by the user.
-				break;
+			if (Width is Dim.DimAbsolute) {
+				AdjustBestWidth ();
 			}
-		}
 
-		void CalcBounds ()
-		{
-			// Note(jmperricone): There may be better names for these functions, CalcSliderWidth() and CalcSliderHeight(), because they are confusing.
-
-			//Here we swap the width and height calculations based on the Slider Orientation.
-			if (config.SliderOrientation == Orientation.Horizontal) {
-				Width = CalcSliderWidth ();
-				Height = CalcSliderHeight ();
-			} else {
-				// Swap
-				Width = CalcSliderHeight ();
-				Height = CalcSliderWidth ();
+			if (Height is Dim.DimAbsolute) {
+				AdjustBestHeight ();
 			}
 		}
 
@@ -740,40 +891,49 @@ namespace Terminal.Gui {
 				return 0;
 
 			var width = 0;
-			width += config.ShowBorders ? 2 : 0;
 			width += config.StartSpacing + config.EndSpacing;
 			width += options.Count;
 			width += (options.Count - 1) * config.InnerSpacing;
 
 			// If header is bigger than the slider, add margin to the slider and return header's width.
-			if (config.ShowHeader && header != null && header != ustring.Empty && header.Length > width) {
-				var diff = header.Length - width;
-				config.StartMargin = diff / 2;
-				config.EndMargin = diff / 2 + diff % 2;
-				return header.Length;
-			}
+			// if (config.ShowHeader && header != null && header != ustring.Empty && header.Length > width) {
+			// 	var diff = header.Length - width;
+			// 	config.StartMargin = diff / 2;
+			// 	config.EndMargin = diff / 2 + diff % 2;
+			// 	return header.Length;
+			// }
 
 			return width;
 		}
 
 		int CalcSliderHeight ()
 		{
-			var height = 1; // Always shows the slider.
+			var height = 1; // Always show the slider.
 
-			height += config.ShowHeader ? 1 : 0;
-
-			// If vertical we leave a space between header and slider, and between slider and legends.
-			if (config.SliderOrientation == Orientation.Vertical && config.ShowHeader) {
-				height += config.ShowHeader ? 1 : 0;
-				height += config.ShowLegends ? 1 : 0;
+			if (config.ShowHeader) {
+				switch (config.SliderOrientation) {
+				case Orientation.Horizontal: {
+						height += 1;
+						break;
+					}
+				case Orientation.Vertical: {
+						height += 2;
+						break;
+					}
+				default:
+					throw new ArgumentOutOfRangeException (config.SliderOrientation.ToString ());
+				}
 			}
 
 			if (config.ShowLegends) {
+				// Space between the slider and the legends.
+				if (config.SliderOrientation == Orientation.Vertical) {
+					height += 1;
+				}
+
 				if (config.LegendsOrientation != config.SliderOrientation) {
-					// If the legends Orientation is opposite to the Slider Orientation, we add the max legend length.
-					height += options.OrderByDescending (s => s.Legend.Length).First ().Legend.Length;
+					height += options.Max (s => s.Legend.Length);
 				} else {
-					// Otherwise just 1.
 					height += 1;
 				}
 			}
@@ -789,7 +949,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var offset = config.ShowBorders ? 1 : 0;
+			var offset = 0;
 			offset += config.StartMargin;
 			offset += config.StartSpacing;
 			offset += option * (config.InnerSpacing + 1);
@@ -813,7 +973,6 @@ namespace Terminal.Gui {
 
 			for (int xx = (x - x_threshold); xx < (x + x_threshold + 1); xx++) {
 				var cx = xx;
-				cx -= config.ShowBorders ? 1 : 0;
 				cx -= config.StartMargin;
 				cx -= config.StartSpacing;
 
@@ -837,17 +996,25 @@ namespace Terminal.Gui {
 			case SliderType.Single:
 			case SliderType.LeftRange:
 			case SliderType.RightRange:
-				// Raise unset event.
+
 				if (currentOptions.Count == 1) {
-					options [currentOptions [0]].OnUnSet ();
+					var prev = currentOptions [0];
+
+					if (!config.AllowEmpty && prev == currentOption) {
+						break;
+					}
+
+					currentOptions.Clear ();
+					options [currentOption].OnUnSet ();
+
+					if (currentOption != prev) {
+						currentOptions.Add (currentOption);
+						options [currentOption].OnSet ();
+					}
+				} else {
+					currentOptions.Add (currentOption);
+					options [currentOption].OnSet ();
 				}
-
-				// Set the option.
-				currentOptions.Clear ();
-				currentOptions.Add (currentOption);
-
-				// Raise set event.
-				options [currentOption].OnSet ();
 
 				// Raise slider changed event.
 				OptionsChanged?.Invoke (currentOptions.ToDictionary (e => e, e => options [e]));
@@ -855,6 +1022,9 @@ namespace Terminal.Gui {
 				break;
 			case SliderType.Multiple:
 				if (currentOptions.Contains (currentOption)) {
+					if (!config.AllowEmpty && currentOptions.Count () == 1) {
+						break;
+					}
 					currentOptions.Remove (currentOption);
 					options [currentOption].OnUnSet ();
 				} else {
@@ -930,15 +1100,27 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (TryGetPositionByOption (currentOption, out (int x, int y) position)) {
-				Move (position.x, position.y);
-				//cursorPosition = (position.x, position.y);
+				if (Bounds.Contains (position.x, position.y)) {
+					Move (position.x, position.y);
+					cursorPosition = (position.x, position.y);
+				}
 			}
 		}
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetCursorVisibility (CursorVisibility.Box);
+			// Note(jmperricone): If there is a way to know when the bounds change, this code should go there without the check.
+			//       I tested LayoutComplete event, but it's always called. Maybe I'm doing something wrong.
+			if (BoundsChanged (bounds)) {
+				if (AutoSize == true) {
+					// unreachable
+				} else {
+					CalculateSliderDimensions ();
+				}
+			}
+
+			//Driver.SetCursorVisibility (CursorVisibility.Box);
 
 			var normalScheme = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
 
@@ -947,24 +1129,18 @@ namespace Terminal.Gui {
 			}
 
 			// Debug
+#if (DEBUG)
 			Driver.SetAttribute (new Attribute (Color.White, Color.Red));
-			for (int y = 0; y < bounds.Height; y++) {
-				for (int x = 0; x < bounds.Width; x++) {
-					MoveAndAdd (x, y, 'X');
+			for (int y = 0; y < Bounds.Height; y++) {
+				for (int x = 0; x < Bounds.Width; x++) {
+					// MoveAndAdd (x, y, '·');
 				}
 			}
+#endif
 
 			// Draw Header
 			if (config.ShowHeader) {
 				DrawHeader ();
-
-				// If vertical we leave a space between header and slider.
-				if (config.SliderOrientation == Orientation.Vertical) {
-					Driver.SetAttribute (normalScheme);
-					for (int y = 0; y < bounds.Height; y++) {
-						MoveAndAdd (1, y, ' ');
-					}
-				}
 			}
 
 			// Draw Slider
@@ -972,15 +1148,6 @@ namespace Terminal.Gui {
 
 			// Draw Legends.
 			if (config.ShowLegends) {
-
-				// If vertical we leave a space between slider and legends.
-				if (config.SliderOrientation == Orientation.Vertical) {
-					Driver.SetAttribute (normalScheme);
-					for (int y = 0; y < bounds.Height; y++) {
-						MoveAndAdd (config.ShowHeader ? 3 : 2, y, ' ');
-					}
-				}
-
 				DrawLegends ();
 			}
 		}
@@ -999,13 +1166,19 @@ namespace Terminal.Gui {
 			var s1 = new string (' ', w / 2);
 			var s2 = new string (' ', w % 2);
 
+			// Note: The formatter doesn't handle all of this ???
 			switch (textAlignment) {
 			case TextAlignment.Justified:
+
 				return TextFormatter.Justify (text, width);
 			case TextAlignment.Left:
 				return text + s1 + s1 + s2;
 			case TextAlignment.Centered:
-				return s1 + s2 + text + s1;
+				if (text.Length % 2 != 0) {
+					return s1 + text + s1 + s2;
+				} else {
+					return s1 + s2 + text + s1;
+				}
 			case TextAlignment.Right:
 				return s1 + s1 + s2 + text;
 			default:
@@ -1030,9 +1203,9 @@ namespace Terminal.Gui {
 				MoveAndAdd (0, 0, text);
 				break;
 			case Orientation.Vertical:
-				var i = 0;
+				var y = 0;
 				foreach (var c in text) {
-					MoveAndAdd (0, i++, c);
+					MoveAndAdd (0, y++, c);
 				}
 				break;
 			default:
@@ -1044,6 +1217,8 @@ namespace Terminal.Gui {
 		{
 			// Attributes
 			var normalScheme = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
+			//var normalScheme = style.LegendStyle.NormalAttribute ?? ColorScheme.Disabled;
+			var setScheme = style.SetChar.Attribute ?? ColorScheme.HotNormal;//  ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
 
 			var isVertical = config.SliderOrientation == Orientation.Vertical;
 			var isLegendsVertical = config.LegendsOrientation == Orientation.Vertical;
@@ -1051,31 +1226,23 @@ namespace Terminal.Gui {
 
 			var x = 0;
 			var y = 0;
-			var offset = config.ShowHeader ? 1 : 0;
 
 			if (config.SliderOrientation == Orientation.Vertical) {
-				x = offset + 1;
+				x = config.ShowHeader ? 2 : 0;
 				//y = config.StartMargin;
 			} else {
-				y = offset;
+				y = config.ShowHeader ? 1 : 0;
 				//x = config.StartMargin;
 			}
 
 			var isSet = currentOptions.Count > 0;
 
 			// Left Margin
-			Driver.SetAttribute (normalScheme);
-			for (int i = 0; i < this.config.StartMargin; i++) {
-				MoveAndAdd (x, y, ' ');
-				if (isVertical) y++; else x++;
-			}
-
-			// Left Border
-			if (config.ShowBorders) {
-				Driver.SetAttribute (normalScheme);
-				MoveAndAdd (x, y, '@');
-				if (isVertical) y++; else x++;
-			}
+			// Driver.SetAttribute (normalScheme);
+			// for (int i = 0; i < this.config.StartMargin; i++) {
+			// 	MoveAndAdd (x, y, ' ');
+			// 	if (isVertical) y++; else x++;
+			// }
 
 			// Left Spacing
 			if (config.ShowSpacing && config.StartSpacing > 0) {
@@ -1089,6 +1256,7 @@ namespace Terminal.Gui {
 				}
 			} else {
 				Driver.SetAttribute (style.EmptyChar.Attribute ?? normalScheme);
+				// for (int i = 0; i < this.config.StartSpacing + ((this.config.StartSpacing + this.config.EndSpacing) % 2 == 0 ? 1 : 2); i++) {
 				for (int i = 0; i < this.config.StartSpacing; i++) {
 					MoveAndAdd (x, y, style.EmptyChar.Rune);
 					if (isVertical) y++; else x++;
@@ -1112,7 +1280,7 @@ namespace Terminal.Gui {
 					}
 
 					// Draw Option
-					Driver.SetAttribute (isSet && currentOptions.Contains (i) ? style.SetChar.Attribute ?? normalScheme : drawRange ? style.RangeChar.Attribute ?? normalScheme : style.OptionChar.Attribute ?? normalScheme);
+					Driver.SetAttribute (isSet && currentOptions.Contains (i) ? style.SetChar.Attribute ?? setScheme : drawRange ? style.RangeChar.Attribute ?? setScheme : style.OptionChar.Attribute ?? normalScheme);
 
 					// Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
 					if (Application.Driver is CursesDriver) {
@@ -1127,7 +1295,7 @@ namespace Terminal.Gui {
 
 					// Draw Spacing
 					if (i < options.Count - 1) { // Skip if is the Last Spacing.
-						Driver.SetAttribute (drawRange && isSet ? style.RangeChar.Attribute ?? normalScheme : style.SpaceChar.Attribute ?? normalScheme);
+						Driver.SetAttribute (drawRange && isSet ? style.RangeChar.Attribute ?? setScheme : style.SpaceChar.Attribute ?? normalScheme);
 						for (int s = 0; s < config.InnerSpacing; s++) {
 							MoveAndAdd (x, y, drawRange && isSet ? style.RangeChar.Rune : style.SpaceChar.Rune);
 							if (isVertical) y++; else x++;
@@ -1152,251 +1320,41 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Right Border
-			if (config.ShowBorders) {
-				Driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
-				MoveAndAdd (x, y, '@');
-				if (isVertical) y++; else x++;
-			}
-
 			// Right Margin
-			Driver.SetAttribute (normalScheme);
-			for (int i = 0; i < this.config.EndMargin; i++) {
-				MoveAndAdd (x, y, ' ');
-				if (isVertical) y++; else x++;
-			}
+			// Driver.SetAttribute (normalScheme);
+			// for (int i = 0; i < this.config.EndMargin; i++) {
+			// 	MoveAndAdd (x, y, ' ');
+			// 	if (isVertical) y++; else x++;
+			// }
 		}
 
 		void DrawLegends ()
 		{
 			// Attributes
-			var normalScheme = style.LegendStyle.NormalAttribute ?? ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
-			var setScheme = style.LegendStyle.SetAttribute ?? ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
-			var spaceScheme = style.LegendStyle.EmptyAttribute ?? normalScheme;
+			var normalScheme = style.LegendStyle.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
+			var setScheme = style.LegendStyle.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+			var spaceScheme = normalScheme;// style.LegendStyle.EmptyAttribute ?? normalScheme;
 
-			var isVertical = config.SliderOrientation == Orientation.Vertical;
-			var isLegendsVertical = config.LegendsOrientation == Orientation.Vertical;
-
-			// Todo(jmperricone): Change name
-			var isReverse = config.SliderOrientation != config.LegendsOrientation;
-
-			// TODO: Is this ok ??? for range maybe ? Who programmed this ? ;)
-			var isSet = currentOptions.Count > 0;
+			var isTextVertical = config.LegendsOrientation == Orientation.Vertical;
+			var isSet = config.Type == SliderType.Range ? currentOptions.Count == 2 : currentOptions.Count > 0;
 
 			var x = 0;
 			var y = 0;
-
-			var offset = config.ShowHeader ? 2 : 1;
-			var max_legends_length = isLegendsVertical ? Bounds.Height - offset : Bounds.Width - offset;
-
-			var verticalSeparator = 0;
-			if (config.SliderOrientation == Orientation.Vertical) {
-				verticalSeparator += config.ShowHeader ? 1 : 0;
-				verticalSeparator += config.ShowLegends ? 1 : 0;
-
-				max_legends_length -= verticalSeparator;
-			}
-
-			if (isVertical) {
-				x = offset + verticalSeparator;
-				y = 0;
-			} else {
-				y = offset;
-				x = 0;
-			}
-
-			// Start Margin
-			Driver.SetAttribute (normalScheme);
-			if (isReverse) {
-				for (int i = 0; i < this.config.StartMargin; i++) {
-					for (int j = 0; j < max_legends_length; j++) {
-						MoveAndAdd (x, y, ' ');
-						if (isLegendsVertical) y++; else x++;
-					}
-					if (isLegendsVertical) {
-						x++;
-						y = offset;
-					} else {
-						y++;
-						x = offset + verticalSeparator;
-					}
-				}
-			} else {
-				for (int i = 0; i < this.config.StartMargin; i++) {
-					MoveAndAdd (x, y, ' ');
-					if (isLegendsVertical) y++; else x++;
-				}
-			}
-
-			// Start Spacing (only when is reverse)
-			if (isReverse) {
-				for (int i = 0; i < this.config.StartSpacing; i++) {
-					for (int j = 0; j < max_legends_length; j++) {
-						MoveAndAdd (x, y, ' ');
-						if (isLegendsVertical) y++; else x++;
-					}
-					if (isLegendsVertical) {
-						x++;
-						y = offset;
-					} else {
-						y++;
-						x = offset + verticalSeparator;
-					}
-				}
-			}
-
-			// Legends
-			for (int idx = 0; idx < options.Count; idx++) {
-
-				var text = (ustring)options [idx].Legend;
-
-				if (isReverse) {
-					text = AlignText (options [idx].Legend.ToString (), max_legends_length, TextAlignment.Left);
-				} else {
-					text = AlignText (options [idx].Legend.ToString (), config.InnerSpacing, TextAlignment.Centered);
-				};
-
-				// Check if the Option is Set.
-				bool isOptionSet = false;
-
-				switch (config.Type) {
-				case SliderType.Single:
-				case SliderType.Multiple:
-					if (isSet && currentOptions.Contains (idx))
-						isOptionSet = true;
-					break;
-				case SliderType.LeftRange:
-					if (isSet && idx <= currentOptions [0])
-						isOptionSet = true;
-					break;
-				case SliderType.RightRange:
-					if (isSet && idx >= currentOptions [0])
-						isOptionSet = true;
-					break;
-				case SliderType.Range:
-					if (isSet && ((idx >= currentOptions [0] && idx <= currentOptions [1]) || (idx >= currentOptions [1] && idx <= currentOptions [0])))
-						isOptionSet = true;
-					break;
-				}
-
-				// Draw Text
-				Driver.SetAttribute (isOptionSet ? setScheme : normalScheme);
-				foreach (var c in text) {
-					MoveAndAdd (x, y, c);
-					if (isLegendsVertical) y++; else x++;
-				}
-				Driver.SetAttribute (normalScheme);
-
-				if (isReverse) {
-					if (isLegendsVertical) {
-						x++;
-						y = offset;
-					} else {
-						y++;
-						x = offset + verticalSeparator;
-					}
-				}
-
-				// Draw InnerSpacing if it is not the last option.
-				if (idx != options.Count - 1) {
-					if (isReverse) {
-						for (int i = 0; i < this.config.InnerSpacing; i++) {
-							for (int j = 0; j < max_legends_length; j++) {
-								MoveAndAdd (x, y, ' ');
-								if (isLegendsVertical) y++; else x++;
-							}
-							if (isLegendsVertical) {
-								x++;
-								y = offset;
-							} else {
-								y++;
-								x = offset + verticalSeparator;
-							}
-						}
-					} else {
-						MoveAndAdd (x, y, ' ');
-						if (isLegendsVertical) y++; else x++;
-					}
-				}
-
-				// Reset cursor
-				if (isReverse) {
-					if (config.SliderOrientation == Orientation.Vertical) {
-						x = offset + verticalSeparator;
-					} else {
-						y = offset;
-					}
-				}
-			}
-
-			// End Spacing ( only when is reverse )
-			if (isReverse) {
-				for (int i = 0; i < this.config.EndSpacing; i++) {
-					for (int j = 0; j < max_legends_length; j++) {
-						MoveAndAdd (x, y, ' ');
-						if (isLegendsVertical) y++; else x++;
-					}
-					if (isLegendsVertical) {
-						x++;
-						y = offset;
-					} else {
-						y++;
-						x = offset + verticalSeparator;
-					}
-				}
-			}
-
-			// End Margin
-			if (isReverse) {
-				for (int i = 0; i < this.config.EndMargin; i++) {
-					for (int j = 0; j < max_legends_length; j++) {
-						MoveAndAdd (x, y, ' ');
-						if (isLegendsVertical) y++; else x++;
-					}
-					if (isLegendsVertical) {
-						x++;
-						y = offset;
-					} else {
-						y++;
-						x = offset + verticalSeparator;
-					}
-				}
-			} else {
-				for (int i = 0; i < this.config.EndMargin; i++) {
-					MoveAndAdd (x, y, ' ');
-					if (isLegendsVertical) y++; else x++;
-				}
-			}
-		}
-
-		void DrawLegends2 ()
-		{
-			// Attributes
-			var normalScheme = style.LegendStyle.NormalAttribute ?? ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
-			var setScheme = ColorScheme.Focus; //style.LegendStyle.SetAttribute ?? new Attribute (normalScheme.Background, normalScheme.Foreground);
-			var spaceScheme = style.LegendStyle.EmptyAttribute ?? normalScheme;
-
-			var x = 0;
-			var y = config.ShowHeader ? 2 : 1;
 
 			Move (x, y);
 
 			if (config.SliderOrientation == Orientation.Horizontal && config.LegendsOrientation == Orientation.Vertical) {
 				x += config.StartSpacing;
 			}
-
-			if (config.LegendsOrientation == Orientation.Horizontal) {
-
-			} else if (config.LegendsOrientation == Orientation.Vertical) {
-
+			if (config.SliderOrientation == Orientation.Vertical && config.LegendsOrientation == Orientation.Horizontal) {
+				y += config.StartSpacing;
 			}
 
-			// TODO: CHECK
-			// Move (style.StartMargin + (style.ShowBorders ? 1 : 0), 2);
-			var isTextVertical = config.LegendsOrientation == Orientation.Vertical;
-
-			// TODO: Is this ok ??? for range maybe ? Who programmed this ? ;)
-			var isSet = currentOptions.Count > 0;
+			if (config.SliderOrientation == Orientation.Horizontal) {
+				y += config.ShowHeader ? 2 : 1;
+			} else { // Vertical
+				x += config.ShowHeader ? 4 : 2;
+			}
 
 			for (int i = 0; i < options.Count; i++) {
 
@@ -1423,67 +1381,87 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				ustring text = "";
+				// Text || Abbrevaiation
+				ustring text = config.ShowLegendsAbbr ? options [i].LegendAbbr?.ToString () ?? new Rune (options [i].Legend.First ()).ToString () : options [i].Legend.ToString ();
+
 				switch (config.SliderOrientation) {
 				case Orientation.Horizontal:
 					switch (config.LegendsOrientation) {
 					case Orientation.Horizontal:
-						text = AlignText (options [i].Legend.ToString (), config.InnerSpacing, TextAlignment.Centered);
+						text = AlignText (text, config.InnerSpacing + 1, TextAlignment.Centered);
 						break;
 					case Orientation.Vertical:
 						y = config.ShowHeader ? 2 : 1;
-						text = options [i].Legend.ToString ();
 						break;
 					}
 					break;
 				case Orientation.Vertical:
 					switch (config.LegendsOrientation) {
 					case Orientation.Horizontal:
-						text = options [i].Legend.ToString ();
+						x = config.ShowHeader ? 4 : 2;
 						break;
 					case Orientation.Vertical:
-						text = AlignText (options [i].Legend.ToString (), config.InnerSpacing, TextAlignment.Centered);
+						text = AlignText (text, config.InnerSpacing + 1, TextAlignment.Centered);
 						break;
 					}
 					break;
 				}
 
 				// Text
-				//var text = AlignText (options [i].Legend.ToString (), style.InnerSpacing, TextAlignment.Centered);
-				var left_spaces_count = text.TakeWhile (e => e == ' ').Count ();
-				var right_spaces_count = text.Reverse ().TakeWhile (e => e == ' ').Count ();
+				var legend_left_spaces_count = text.TakeWhile (e => e == ' ').Count ();
+				var legend_right_spaces_count = text.Reverse ().TakeWhile (e => e == ' ').Count ();
 				text = text.TrimSpace ();
 
 				// TODO(jmperricone): Improve the Orientation check.
 
-				// Start Spacing
-				Driver.SetAttribute (spaceScheme);
-				for (int j = 0; j < left_spaces_count; j++) {
-					if (isTextVertical) Move (x, y++);
-					Driver.AddRune (' ');
+				// Calculate Start Spacing
+				if (config.SliderOrientation == config.LegendsOrientation) {
+					if (i == 0) {
+						// The spacing for the slider use the StartSpacing but...
+						// The spacing for the legends is the StartSpacing MINUS the total chars to the left of the first options.
+						//    ●────●────●
+						//  Hello Bye World
+						//
+						// chars_left is 2 for Hello => (5 - 1) / 2
+						//
+						// then the spacing is 2 for the slider but 0 for the legends.
+
+						var chars_left = (text.Length - 1) / 2;
+						legend_left_spaces_count = config.StartSpacing - chars_left;
+					}
+
+					// Option Left Spacing
+					if (isTextVertical) y += legend_left_spaces_count;
+					else x += legend_left_spaces_count;
+					//Move (x, y);
 				}
 
 				// Legend
 				Driver.SetAttribute (isOptionSet ? setScheme : normalScheme);
 				foreach (var c in text) {
-					if (isTextVertical) Move (x, y++);
-					Driver.AddRune (c);
+					MoveAndAdd (x, y, c);
+					//Driver.AddRune (c);
+					if (isTextVertical) y += 1;
+					else x += 1;
 				}
 
-				// End Spacing
+				// Calculate End Spacing
+				if (i == options.Count () - 1) {
+					// See Start Spacing explanation.
+					var chars_right = text.Length / 2;
+					legend_right_spaces_count = config.EndSpacing - chars_right;
+				}
+
+				// Option Right Spacing of Option
 				Driver.SetAttribute (spaceScheme);
-				for (int j = 0; j < right_spaces_count; j++) {
-					if (isTextVertical) Move (x, y++);
-					Driver.AddRune (' ');
-				}
-				//// Separator
-				if (i != options.Count - 1) {
-					if (isTextVertical) Move (x, y++);
-					Driver.AddRune (' ');
-				}
+				if (isTextVertical) y += legend_right_spaces_count;
+				else x += legend_right_spaces_count;
+				//Move (x, y);
 
 				if (config.SliderOrientation == Orientation.Horizontal && config.LegendsOrientation == Orientation.Vertical) {
 					x += config.InnerSpacing + 1;
+				} else if (config.SliderOrientation == Orientation.Vertical && config.LegendsOrientation == Orientation.Horizontal) {
+					y += config.InnerSpacing + 1;
 				}
 			}
 		}
@@ -1517,6 +1495,7 @@ namespace Terminal.Gui {
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorLeft | Key.CtrlMask:
+				header = "SIP SIP";
 				if (currentOptions.Contains (currentOption)) {
 					var prev = currentOption > 0 ? currentOption - 1 : currentOption;
 					if (!currentOptions.Contains (prev) || (config.Type == SliderType.Range && config.RangeAllowSingle)) {
@@ -1547,6 +1526,8 @@ namespace Terminal.Gui {
 			case Key.Home:
 				currentOption = 0;
 				OptionFocused?.Invoke (currentOption, options [currentOption]);
+
+				//Console.WriteLine (LayoutStyle.ToString ());
 				break;
 			case Key.End:
 				currentOption = options.Count - 1;
@@ -1583,6 +1564,10 @@ namespace Terminal.Gui {
 				if (settingRange == true) {
 					settingRange = false;
 				} else {
+					if (Width is Dim.DimAbsolute) {
+						//		Console.WriteLine ("ABSOLUTE");
+					}
+
 					SetCurrentOption ();
 				}
 				break;
@@ -1590,6 +1575,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			ClearLayoutNeeded ();
 			SetNeedsDisplay ();
 			return true;
 		}

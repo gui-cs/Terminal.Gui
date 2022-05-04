@@ -17,14 +17,19 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			var leftView = new FrameView {
+				Title = "Slider Types",
 				X = 0,
 				Y = 0,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
-				ColorScheme = new ColorScheme { Normal = new Terminal.Gui.Attribute (Color.White, Color.Black) }
+				ColorScheme = new ColorScheme {
+					Normal = new Terminal.Gui.Attribute (Color.White, Color.Black),
+					Focus = new Terminal.Gui.Attribute (Color.Black, Color.White),
+				}
 			};
 
 			var rightView = new FrameView {
+				Title = "Configuration",
 				X = Pos.Right (leftView),
 				Y = 0,
 				Width = Dim.Fill (),
@@ -43,15 +48,14 @@ namespace UICatalog {
 
 			#region RightView
 			{
-				var label = new Label ("Sliders Options") { X = 0, Y = 0, Width = Dim.Fill (), TextAlignment = TextAlignment.Centered };
-				rightView.Add (label);
-
 				#region Config Slider
 
 				var slider = new Slider<string> () {
 					X = Pos.Center (),
-					Y = Pos.Bottom (label) + 1,
+					Y = 0,
 					Type = S.SliderType.Multiple,
+					Width = Dim.Fill (),
+					AllowEmpty = true
 				};
 
 				slider.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
@@ -106,33 +110,32 @@ namespace UICatalog {
 				#endregion
 
 				#region InnerSpacing Input
+				// var innerspacing_slider = new Slider<string> ("Innerspacing", new List<string> { "Auto", "0", "1", "2", "3", "4", "5" }) {
+				// 	X = Pos.Center (),
+				// 	Y = Pos.Bottom (slider) + 1
+				// };
 
-				var innerspacing_slider = new Slider<string> ("Innerspacing", new List<string> { "Auto", "0", "1", "2", "3", "4", "5" }) {
-					X = Pos.Center (),
-					Y = Pos.Bottom (slider) + 1
-				};
+				// innerspacing_slider.SetOption (0);
 
-				innerspacing_slider.SetOption (0);
+				// rightView.Add (innerspacing_slider);
 
-				rightView.Add (innerspacing_slider);
-
-				innerspacing_slider.OptionsChanged += (options) => {
-					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
-						if (options.ContainsKey (0))
-						{}
-							//s.la = S.SliderLayout.Auto;
-						else{
-							s.InnerSpacing = options.Keys.First() - 1;
-						}
-					}
-				};
+				// innerspacing_slider.OptionsChanged += (options) => {
+				// 	foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+				// 		if (options.ContainsKey (0)) { }
+				// 		//s.la = S.SliderLayout.Auto;
+				// 		else {
+				// 			s.InnerSpacing = options.Keys.First () - 1;
+				// 		}
+				// 	}
+				// };
 				#endregion
 
 				#region Slider Orientation Slider
 
 				var slider_orientation_slider = new Slider<string> ("Slider Orientation", new List<string> { "Horizontal", "Vertical" }) {
 					X = Pos.Center (),
-					Y = Pos.Bottom (innerspacing_slider) + 1
+					Y = Pos.Bottom (slider) + 1,
+					Width = Dim.Fill (),
 				};
 
 				slider_orientation_slider.SetOption (0);
@@ -144,13 +147,18 @@ namespace UICatalog {
 					View prev = null;
 					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
 
-
 						if (options.ContainsKey (0)) {
 							s.SliderOrientation = S.Orientation.Horizontal;
+
+							s.AdjustBestHeight ();
+							s.Width = Dim.Fill ();
+
 							s.Style.SpaceChar.Rune = '─';
 
 							if (prev == null) {
-								s.Y = Pos.Bottom (label) + 1;
+								s.LayoutStyle = LayoutStyle.Absolute;
+								s.Y = 0;
+								s.LayoutStyle = LayoutStyle.Computed;
 							} else {
 								s.Y = Pos.Bottom (prev) + 1;
 							}
@@ -159,10 +167,16 @@ namespace UICatalog {
 
 						} else if (options.ContainsKey (1)) {
 							s.SliderOrientation = S.Orientation.Vertical;
+
+							s.AdjustBestWidth ();
+							s.Height = Dim.Fill ();
+
 							s.Style.SpaceChar.Rune = '│';
 
 							if (prev == null) {
-								s.X = Pos.Left (label);
+								s.LayoutStyle = LayoutStyle.Absolute;
+								s.X = 0;
+								s.LayoutStyle = LayoutStyle.Computed;
 							} else {
 								s.X = Pos.Right (prev) + 2;
 							}
@@ -178,7 +192,8 @@ namespace UICatalog {
 
 				var legends_orientation_slider = new Slider<string> ("Legends Orientation", new List<string> { "Horizontal", "Vertical" }) {
 					X = Pos.Center (),
-					Y = Pos.Bottom (slider_orientation_slider) + 1
+					Y = Pos.Bottom (slider_orientation_slider) + 1,
+					Width = Dim.Fill (),
 				};
 
 				legends_orientation_slider.SetOption (0);
@@ -202,6 +217,8 @@ namespace UICatalog {
 					X = Pos.Center (),
 					Y = Pos.Bottom (legends_orientation_slider) + 1,
 					Type = S.SliderType.Single,
+					Width = Dim.Fill (),
+					AllowEmpty = true
 				};
 
 				sliderColor.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
@@ -235,19 +252,27 @@ namespace UICatalog {
 				rightView.Add (sliderColor);
 
 				sliderColor.OptionsChanged += (options) => {
-					var data = options.First ().Value.Data;
+					if (options.Count != 0) {
+						var data = options.First ().Value.Data;
 
-					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
-						s.Style.SetChar.Attribute = new Terminal.Gui.Attribute (data.Item1, data.Item2);
-						s.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (data.Item1, Color.Black);
-						s.Style.RangeChar.Attribute = new Terminal.Gui.Attribute (data.Item2, Color.Black);
+						foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+							s.Style.SetChar.Attribute = new Terminal.Gui.Attribute (data.Item1, data.Item2);
+							s.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (data.Item1, Color.Black);
+							s.Style.RangeChar.Attribute = new Terminal.Gui.Attribute (data.Item2, Color.Black);
 
-						// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing, that internaly calls SetNeedDisplay.
+							// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing, that internaly calls SetNeedDisplay.
+						}
+					} else {
+						foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+							s.Style.SetChar.Attribute = null;
+							s.Style.LegendStyle.SetAttribute = null;
+							s.Style.RangeChar.Attribute = null;
+						}
 					}
 				};
 
 				// Set option after Eventhandler def, so it updates the sliders color.
-				sliderColor.SetOption (2);
+				// sliderColor.SetOption (2);
 
 				#endregion
 			}
@@ -258,21 +283,24 @@ namespace UICatalog {
 		{
 			var types = Enum.GetValues (typeof (Terminal.Gui.Sliders.SliderType)).Cast<Terminal.Gui.Sliders.SliderType> ().ToList ();
 
-			View view = new Label ("Slider Types") { X = 0, Y = 0, Width = Dim.Fill (), TextAlignment = TextAlignment.Centered };
-
-			v.Add (view);
+			Slider prev = null;
 
 			foreach (var type in types) {
-				view = new Slider (type.ToString (), options, S.Orientation.Horizontal) {
+				var view = new Slider (type.ToString (), options, S.Orientation.Horizontal) {
 					X = Pos.Center (),
 					//X = Pos.Right (view) + 1,
-					Y = Pos.Bottom (view) + 1,
+					Y = prev == null ? 0 : Pos.Bottom (prev) + 1,
 					//Y = Pos.Center (),
 					Type = type,
 					LegendsOrientation = S.Orientation.Horizontal,
+					Width = Dim.Fill (),
+					AllowEmpty = true
 				};
 				v.Add (view);
+				prev = view;
 			};
+
+			//view.AutoSize = true;
 		}
 	}
 }
