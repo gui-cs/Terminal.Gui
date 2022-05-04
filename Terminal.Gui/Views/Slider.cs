@@ -783,8 +783,8 @@ namespace Terminal.Gui {
 				size = Bounds.Height;
 			}
 
-			// bounds = Bounds;
-			header = Bounds.Width.ToString () + "-" + Bounds.Height.ToString ();
+			// Debug
+			// header = Bounds.Width.ToString () + "-" + Bounds.Height.ToString ();
 
 			if (options.Count == 0) return;
 
