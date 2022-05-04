@@ -120,10 +120,7 @@ namespace Terminal.Gui {
 		{
 			lock (timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
-				while (timeouts.ContainsKey (k)) {
-					k = (DateTime.UtcNow + time).Ticks;
-				}
-				timeouts.Add (k, timeout);
+				timeouts.Add (NudgeToUniqueKey(k), timeout);
 			}
 		}
 
@@ -191,11 +188,28 @@ namespace Terminal.Gui {
 						AddTimeout (timeout.Span, timeout);
 				} else {
 					lock (timeoutsLockToken) {
-						timeouts.Add (k, timeout);
+						timeouts.Add (NudgeToUniqueKey(k), timeout);
 					}
 				}
 			}
 			
+		}
+
+		/// <summary>
+		/// Finds the closest number to <paramref name="k"/> that is not
+		/// present in <see cref="timeouts"/> (incrementally).
+		/// </summary>
+		/// <param name="k"></param>
+		/// <returns></returns>
+		private long NudgeToUniqueKey (long k)
+		{
+			lock(timeoutsLockToken) {
+				while (timeouts.ContainsKey (k)) {
+					k++;
+				}
+			}
+
+			return k;
 		}
 
 		void RunIdle ()
