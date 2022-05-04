@@ -692,14 +692,32 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			if (c <= 0x1F || (c >= 0x80 && c <= 0x9F)) {
+			var controlChars = gethexaformat (c, 4);
+			if (controlChars <= 0x1F || (controlChars >= 0X7F && controlChars <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (c + 0x2400);
+				return new Rune (controlChars + 0x2400);
 			} else {
 				return c;
 			}
 		}
+
+		static uint gethexaformat (uint rune, int length)
+		{
+			var hex = rune.ToString ($"x{length}");
+			var hexstr = hex.Substring (hex.Length - length, length);
+			return (uint)int.Parse (hexstr, System.Globalization.NumberStyles.HexNumber);
+		}
+
+		/// <summary>
+		/// Ensures that the column and line are in a valid range from the size of the driver.
+		/// </summary>
+		/// <param name="col">The column.</param>
+		/// <param name="row">The row.</param>
+		/// <param name="clip">The clip.</param>
+		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
+		public bool IsValidContent (int col, int row, Rect clip) =>
+			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
 
 		/// <summary>
 		/// Adds the specified
@@ -750,6 +768,11 @@ namespace Terminal.Gui {
 		/// Ends the execution of the console driver.
 		/// </summary>
 		public abstract void End ();
+
+		/// <summary>
+		/// Reset and recreate the contents and the driver buffer.
+		/// </summary>
+		public abstract void UpdateOffScreen ();
 
 		/// <summary>
 		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
@@ -824,7 +847,8 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
 				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
 				AddRune (' ');
-				var str = title.RuneCount >= width ? title [0, width - 2] : title;
+				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
+					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
 				AddStr (str);
 				AddRune (' ');
 			}

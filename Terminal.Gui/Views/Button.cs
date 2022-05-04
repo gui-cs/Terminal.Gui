@@ -33,7 +33,6 @@ namespace Terminal.Gui {
 	public class Button : View {
 		ustring text;
 		bool is_default;
-		TextFormatter textFormatter = new TextFormatter ();
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -178,7 +177,7 @@ namespace Terminal.Gui {
 		public override Rune HotKeySpecifier {
 			get => hotKeySpecifier;
 			set {
-				hotKeySpecifier = textFormatter.HotKeySpecifier = value;
+				hotKeySpecifier = TextFormatter.HotKeySpecifier = value;
 			}
 		}
 
@@ -194,11 +193,11 @@ namespace Terminal.Gui {
 		internal void Update ()
 		{
 			if (IsDefault)
-				textFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				textFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			int w = textFormatter.Text.RuneCount - (textFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
 			GetCurrentWidth (out int cWidth);
 			var canSetWidth = SetWidth (w, out int rWidth);
 			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
@@ -233,11 +232,12 @@ namespace Terminal.Gui {
 				Border.DrawContent (this);
 			}
 
-			if (!ustring.IsNullOrEmpty (textFormatter.Text)) {
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear ();
-				textFormatter.NeedsFormat = true;
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
+				TextFormatter.NeedsFormat = true;
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
 			}
 		}
 
@@ -328,6 +328,7 @@ namespace Terminal.Gui {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
 					OnClicked ();
 				}
@@ -341,8 +342,8 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (HotKey == Key.Unknown && text != "") {
-				for (int i = 0; i < textFormatter.Text.RuneCount; i++) {
-					if (textFormatter.Text [i] == text [0]) {
+				for (int i = 0; i < TextFormatter.Text.RuneCount; i++) {
+					if (TextFormatter.Text [i] == text [0]) {
 						Move (i, 0);
 						return;
 					}

@@ -9,6 +9,7 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
+using Rune = System.Rune;
 
 namespace Terminal.Gui.Views {
 
@@ -140,10 +141,13 @@ namespace Terminal.Gui.Views {
 								runes.InsertRange (i, new List<char> () { ' ' });
 							}
 						}
-						if (c > w) {
-							w = c;
+						if (Rune.ColumnWidth (rune) > 1) {
+							c++;
 						}
-						h = r - y;
+						if (c + 1 > w) {
+							w = c + 1;
+						}
+						h = r - y + 1;
 					}
 					if (x > -1) {
 						runes.Add (rune);
@@ -155,7 +159,7 @@ namespace Terminal.Gui.Views {
 			}
 
 			// Remove unnecessary empty lines
-			for (int r = lines.Count - 1; r > h; r--) {
+			for (int r = lines.Count - 1; r > h - 1; r--) {
 				lines.RemoveAt (r);
 			}
 
@@ -201,7 +205,7 @@ namespace Terminal.Gui.Views {
 
 				Assert.Equal (expectedLook, actualLook);
 			}
-			return new Rect (x, y, w > -1 ? w + 1 : 0, h > -1 ? h + 1 : 0);
+			return new Rect (x, y, w > -1 ? w : 0, h > -1 ? h : 0);
 		}
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
@@ -1686,6 +1690,11 @@ namespace Terminal.Gui.Views {
 
 				//put label into view
 				mount.Add (lbl1);
+
+				//putting mount into toplevel since changing size
+				//also change AutoSize to false
+				Application.Top.Add (mount);
+				Application.Begin (Application.Top);
 
 				// render view
 				lbl1.ColorScheme = new ColorScheme ();

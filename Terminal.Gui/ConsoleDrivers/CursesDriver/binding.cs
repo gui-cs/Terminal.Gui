@@ -177,6 +177,14 @@ namespace Unix.Terminal {
 			return addwstr (new String (c, 1));
 		}
 
+		public static int mvaddch (int y, int x, int ch)
+		{
+			if (ch < 127 || ch > 0xffff)
+				return methods.mvaddch (y, x, ch);
+			char c = (char)ch;
+			return mvaddwstr (y, x, new String (c, 1));
+		}
+
 		static IntPtr stdscr;
 
 		static IntPtr get_ptr (string key)
@@ -293,6 +301,7 @@ namespace Unix.Terminal {
 		static public int curs_set (int visibility) => methods.curs_set (visibility);
 		//static public int addch (int ch) => methods.addch (ch);
 		static public int addwstr (string s) => methods.addwstr (s);
+		static public int mvaddwstr (int y, int x, string s) => methods.mvaddwstr (y, x, s);
 		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
 		static public int waddch (IntPtr win, int ch) => methods.waddch (win, ch);
 		static public int attron (int attrs) => methods.attron (attrs);
@@ -364,7 +373,9 @@ namespace Unix.Terminal {
 		public delegate int move (int line, int col);
 		public delegate int curs_set (int visibility);
 		public delegate int addch (int ch);
+		public delegate int mvaddch (int y, int x, int ch);
 		public delegate int addwstr ([MarshalAs (UnmanagedType.LPWStr)] string s);
+		public delegate int mvaddwstr (int y, int x, [MarshalAs (UnmanagedType.LPWStr)] string s);
 		public delegate int wmove (IntPtr win, int line, int col);
 		public delegate int waddch (IntPtr win, int ch);
 		public delegate int attron (int attrs);
@@ -435,7 +446,9 @@ namespace Unix.Terminal {
 		public readonly Delegates.move move;
 		public readonly Delegates.curs_set curs_set;
 		public readonly Delegates.addch addch;
+		public readonly Delegates.mvaddch mvaddch;
 		public readonly Delegates.addwstr addwstr;
+		public readonly Delegates.mvaddwstr mvaddwstr;
 		public readonly Delegates.wmove wmove;
 		public readonly Delegates.waddch waddch;
 		public readonly Delegates.attron attron;
@@ -508,7 +521,9 @@ namespace Unix.Terminal {
 			move = lib.GetNativeMethodDelegate<Delegates.move> ("move");
 			curs_set = lib.GetNativeMethodDelegate<Delegates.curs_set> ("curs_set");
 			addch = lib.GetNativeMethodDelegate<Delegates.addch> ("addch");
+			mvaddch = lib.GetNativeMethodDelegate<Delegates.mvaddch> ("mvaddch");
 			addwstr = lib.GetNativeMethodDelegate<Delegates.addwstr> ("addwstr");
+			mvaddwstr = lib.GetNativeMethodDelegate<Delegates.mvaddwstr> ("mvaddwstr");
 			wmove = lib.GetNativeMethodDelegate<Delegates.wmove> ("wmove");
 			waddch = lib.GetNativeMethodDelegate<Delegates.waddch> ("waddch");
 			attron = lib.GetNativeMethodDelegate<Delegates.attron> ("attron");

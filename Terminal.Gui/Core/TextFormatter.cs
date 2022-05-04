@@ -303,7 +303,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
-		/// <see cref="Format(ustring, int, bool, bool, bool, int)"/> will be called internally. 
+		/// <see cref="Format(ustring, int, bool, bool, bool, int, TextDirection)"/> will be called internally. 
 		/// </para>
 		/// </remarks>
 		public List<ustring> Lines {
@@ -328,12 +328,14 @@ namespace Terminal.Gui {
 					}
 
 					if (IsVerticalDirection (textDirection)) {
-						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1);
+						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1,
+							false, 0, textDirection);
 						if (!AutoSize && lines.Count > Size.Width) {
 							lines.RemoveRange (Size.Width, lines.Count - Size.Width);
 						}
 					} else {
-						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1);
+						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1,
+							false, 0, textDirection);
 						if (!AutoSize && lines.Count > Size.Height) {
 							lines.RemoveRange (Size.Height, lines.Count - Size.Height);
 						}
@@ -346,7 +348,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute)"/> is called.
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect)"/> is called.
 		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
 		/// </summary>
 		/// <remarks>
@@ -436,6 +438,7 @@ namespace Terminal.Gui {
 		/// <param name="preserveTrailingSpaces">If <c>true</c>, the wrapped text will keep the trailing spaces.
 		///  If <c>false</c>, the trailing spaces will be trimmed.</param>
 		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>Returns a list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -445,7 +448,8 @@ namespace Terminal.Gui {
 		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
 		/// </para>
 		/// </remarks>
-		public static List<ustring> WordWrap (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0)
+		public static List<ustring> WordWrap (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0,
+			TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
@@ -460,15 +464,29 @@ namespace Terminal.Gui {
 
 			var runes = StripCRLF (text).ToRuneList ();
 			if (!preserveTrailingSpaces) {
-				while ((end = start + width) < runes.Count) {
-					while (runes [end] != ' ' && end > start)
-						end--;
-					if (end == start)
-						end = start + width;
-					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-					start = end;
-					if (runes [end] == ' ') {
-						start++;
+				if (IsHorizontalDirection (textDirection)) {
+					while ((end = start + GetMaxLengthForWidth (runes.GetRange (start, runes.Count - start), width)) < runes.Count) {
+						while (runes [end] != ' ' && end > start)
+							end--;
+						if (end == start)
+							end = start + GetMaxLengthForWidth (runes.GetRange (end, runes.Count - end), width);
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						start = end;
+						if (runes [end] == ' ') {
+							start++;
+						}
+					}
+				} else {
+					while ((end = start + width) < runes.Count) {
+						while (runes [end] != ' ' && end > start)
+							end--;
+						if (end == start)
+							end = start + width;
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						start = end;
+						if (runes [end] == ' ') {
+							start++;
+						}
 					}
 				}
 			} else {
@@ -486,7 +504,11 @@ namespace Terminal.Gui {
 
 				while (length < cWidth && to < runes.Count) {
 					var rune = runes [to];
-					length += Rune.ColumnWidth (rune);
+					if (IsHorizontalDirection (textDirection)) {
+						length += Rune.ColumnWidth (rune);
+					} else {
+						length++;
+					}
 					if (rune == ' ') {
 						if (length == cWidth) {
 							return to + 1;
@@ -527,10 +549,11 @@ namespace Terminal.Gui {
 		/// <param name="text">The text to justify.</param>
 		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
 		/// <param name="talign">Alignment.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>Justified and clipped text.</returns>
-		public static ustring ClipAndJustify (ustring text, int width, TextAlignment talign)
+		public static ustring ClipAndJustify (ustring text, int width, TextAlignment talign, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
-			return ClipAndJustify (text, width, talign == TextAlignment.Justified);
+			return ClipAndJustify (text, width, talign == TextAlignment.Justified, textDirection);
 		}
 
 		/// <summary>
@@ -539,8 +562,9 @@ namespace Terminal.Gui {
 		/// <param name="text">The text to justify.</param>
 		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
 		/// <param name="justify">Justify.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>Justified and clipped text.</returns>
-		public static ustring ClipAndJustify (ustring text, int width, bool justify)
+		public static ustring ClipAndJustify (ustring text, int width, bool justify, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
@@ -552,10 +576,12 @@ namespace Terminal.Gui {
 			var runes = text.ToRuneList ();
 			int slen = runes.Count;
 			if (slen > width) {
-				return ustring.Make (runes.GetRange (0, width));
+				return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
 			} else {
 				if (justify) {
-					return Justify (text, width);
+					return Justify (text, width, ' ', textDirection);
+				} else if (GetTextWidth (text) > width && IsHorizontalDirection (textDirection)) {
+					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
 				}
 				return text;
 			}
@@ -568,8 +594,9 @@ namespace Terminal.Gui {
 		/// <param name="text"></param>
 		/// <param name="width"></param>
 		/// <param name="spaceChar">Character to replace whitespace and pad with. For debugging purposes.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>The justified text.</returns>
-		public static ustring Justify (ustring text, int width, char spaceChar = ' ')
+		public static ustring Justify (ustring text, int width, char spaceChar = ' ', TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
@@ -579,8 +606,12 @@ namespace Terminal.Gui {
 			}
 
 			var words = text.Split (ustring.Make (' '));
-			int textCount = words.Sum (arg => arg.RuneCount);
-
+			int textCount;
+			if (IsHorizontalDirection (textDirection)) {
+				textCount = words.Sum (arg => GetTextWidth (arg));
+			} else {
+				textCount = words.Sum (arg => arg.RuneCount);
+			}
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
 			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
 
@@ -610,6 +641,7 @@ namespace Terminal.Gui {
 		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
 		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
 		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -622,9 +654,9 @@ namespace Terminal.Gui {
 		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
 		/// </para>
 		/// </remarks>
-		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0)
+		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
-			return Format (text, width, talign == TextAlignment.Justified, wordWrap, preserveTrailingSpaces, tabWidth);
+			return Format (text, width, talign == TextAlignment.Justified, wordWrap, preserveTrailingSpaces, tabWidth, textDirection);
 		}
 
 		/// <summary>
@@ -636,6 +668,7 @@ namespace Terminal.Gui {
 		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
 		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
 		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="textDirection">The text direction.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
@@ -649,7 +682,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public static List<ustring> Format (ustring text, int width, bool justify, bool wordWrap,
-			bool preserveTrailingSpaces = false, int tabWidth = 0)
+			bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("width cannot be negative");
@@ -666,7 +699,7 @@ namespace Terminal.Gui {
 
 			if (wordWrap == false) {
 				text = ReplaceCRLFWithSpace (text);
-				lineResult.Add (ClipAndJustify (text, width, justify));
+				lineResult.Add (ClipAndJustify (text, width, justify, textDirection));
 				return lineResult;
 			}
 
@@ -676,9 +709,9 @@ namespace Terminal.Gui {
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = runes [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth);
+					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth, textDirection);
 					foreach (var line in wrappedLines) {
-						lineResult.Add (ClipAndJustify (line, width, justify));
+						lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 					}
 					if (wrappedLines.Count == 0) {
 						lineResult.Add (ustring.Empty);
@@ -686,8 +719,8 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth)) {
-				lineResult.Add (ClipAndJustify (line, width, justify));
+			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
+				lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 			}
 
 			return lineResult;
@@ -717,12 +750,100 @@ namespace Terminal.Gui {
 			var max = 0;
 			result.ForEach (s => {
 				var m = 0;
-				s.ToRuneList ().ForEach (r => m += Rune.ColumnWidth (r));
+				s.ToRuneList ().ForEach (r => m += Math.Max (Rune.ColumnWidth (r), 1));
 				if (m > max) {
 					max = m;
 				}
 			});
 			return max;
+		}
+
+		/// <summary>
+		/// Gets the total width of the passed text.
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns>The text width.</returns>
+		public static int GetTextWidth (ustring text)
+		{
+			return text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1));
+		}
+
+		/// <summary>
+		/// Gets the maximum characters width from the list based on the <paramref name="startIndex"/>
+		/// and the <paramref name="length"/>.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
+		/// <param name="startIndex">The start index.</param>
+		/// <param name="length">The length.</param>
+		/// <returns>The maximum characters width.</returns>
+		public static int GetSumMaxCharWidth (List<ustring> lines, int startIndex = -1, int length = -1)
+		{
+			var max = 0;
+			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? lines.Count : startIndex + length); i++) {
+				var runes = lines [i];
+				if (runes.Length > 0)
+					max += runes.Max (r => Math.Max (Rune.ColumnWidth (r), 1));
+			}
+			return max;
+		}
+
+		/// <summary>
+		/// Gets the maximum characters width from the text based on the <paramref name="startIndex"/>
+		/// and the <paramref name="length"/>.
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <param name="startIndex">The start index.</param>
+		/// <param name="length">The length.</param>
+		/// <returns>The maximum characters width.</returns>
+		public static int GetSumMaxCharWidth (ustring text, int startIndex = -1, int length = -1)
+		{
+			var max = 0;
+			var runes = text.ToRunes ();
+			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? runes.Length : startIndex + length); i++) {
+				max += Math.Max (Rune.ColumnWidth (runes [i]), 1);
+			}
+			return max;
+		}
+
+		/// <summary>
+		/// Gets the index position from the text based on the <paramref name="width"/>.
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <param name="width">The width.</param>
+		/// <returns>The index of the text that fit the width.</returns>
+		public static int GetMaxLengthForWidth (ustring text, int width)
+		{
+			var runes = text.ToRuneList ();
+			var runesLength = 0;
+			var runeIdx = 0;
+			for (; runeIdx < runes.Count; runeIdx++) {
+				var runeWidth = Math.Max (Rune.ColumnWidth (runes [runeIdx]), 1);
+				if (runesLength + runeWidth > width) {
+					break;
+				}
+				runesLength += runeWidth;
+			}
+			return runeIdx;
+		}
+
+		/// <summary>
+		/// Gets the index position from the list based on the <paramref name="width"/>.
+		/// </summary>
+		/// <param name="runes">The runes.</param>
+		/// <param name="width">The width.</param>
+		/// <returns>The index of the list that fit the width.</returns>
+		public static int GetMaxLengthForWidth (List<Rune> runes, int width)
+		{
+			var runesLength = 0;
+			var runeIdx = 0;
+			for (; runeIdx < runes.Count; runeIdx++) {
+				var runeWidth = Math.Max (Rune.ColumnWidth (runes [runeIdx]), 1);
+				if (runesLength + runeWidth > width) {
+					break;
+				}
+				runesLength += runeWidth;
+			}
+			return runeIdx;
 		}
 
 		/// <summary>
@@ -753,15 +874,13 @@ namespace Terminal.Gui {
 							mw = cols;
 						}
 						cols = 0;
-					} else {
-						if (rune != '\r') {
-							cols++;
-							var rw = Rune.ColumnWidth (rune);
-							if (rw > 0) {
-								rw--;
-							}
-							cols += rw;
+					} else if (rune != '\r') {
+						cols++;
+						var rw = Rune.ColumnWidth (rune);
+						if (rw > 0) {
+							rw--;
 						}
+						cols += rw;
 					}
 				}
 				if (cols > mw) {
@@ -781,16 +900,14 @@ namespace Terminal.Gui {
 							vh = rows;
 						}
 						rows = 0;
-					} else {
-						if (rune != '\r') {
-							rows++;
-							var rw = Rune.ColumnWidth (rune);
-							if (rw < 0) {
-								rw++;
-							}
-							if (rw > vw) {
-								vw = rw;
-							}
+					} else if (rune != '\r') {
+						rows++;
+						var rw = Rune.ColumnWidth (rune);
+						if (rw < 0) {
+							rw++;
+						}
+						if (rw > vw) {
+							vw = rw;
 						}
 					}
 				}
@@ -925,7 +1042,8 @@ namespace Terminal.Gui {
 		/// <param name="bounds">Specifies the screen-relative location and maximum size for drawing the text.</param>
 		/// <param name="normalColor">The color to use for all text except the hotkey</param>
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
-		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor)
+		/// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
+		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (ustring.IsNullOrEmpty (text)) {
@@ -969,26 +1087,31 @@ namespace Terminal.Gui {
 				// Horizontal Alignment
 				if (textAlignment == TextAlignment.Right || (textAlignment == TextAlignment.Justified && !IsLeftToRight (textDirection))) {
 					if (isVertical) {
-						x = bounds.Right - Lines.Count + line;
-						CursorPosition = bounds.Width - Lines.Count + hotKeyPos;
+						var runesWidth = GetSumMaxCharWidth (Lines, line);
+						x = bounds.Right - runesWidth;
+						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
 					} else {
-						x = bounds.Right - runes.Length;
-						CursorPosition = bounds.Width - runes.Length + hotKeyPos;
+						var runesWidth = GetTextWidth (ustring.Make (runes));
+						x = bounds.Right - runesWidth;
+						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
 					}
 				} else if (textAlignment == TextAlignment.Left || textAlignment == TextAlignment.Justified) {
 					if (isVertical) {
-						x = bounds.Left + line;
+						var runesWidth = line > 0 ? GetSumMaxCharWidth (Lines, 0, line) : 0;
+						x = bounds.Left + runesWidth;
 					} else {
 						x = bounds.Left;
 					}
 					CursorPosition = hotKeyPos;
 				} else if (textAlignment == TextAlignment.Centered) {
 					if (isVertical) {
-						x = bounds.Left + line + ((bounds.Width - Lines.Count) / 2);
-						CursorPosition = (bounds.Width - Lines.Count) / 2 + hotKeyPos;
+						var runesWidth = GetSumMaxCharWidth (Lines, line);
+						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
+						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
 					} else {
-						x = bounds.Left + (bounds.Width - runes.Length) / 2;
-						CursorPosition = (bounds.Width - runes.Length) / 2 + hotKeyPos;
+						var runesWidth = GetTextWidth (ustring.Make (runes));
+						x = bounds.Left + (bounds.Width - runesWidth) / 2;
+						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
 					}
 				} else {
 					throw new ArgumentOutOfRangeException ();
@@ -1021,9 +1144,21 @@ namespace Terminal.Gui {
 
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
-
 				var current = start;
-				for (var idx = start; idx < start + size; idx++) {
+				var startX = start < 0
+					? start
+					: isVertical ? start - y : start - x;
+				var savedClip = Application.Driver?.Clip;
+				if (Application.Driver != null && containerBounds != default) {
+					Application.Driver.Clip = containerBounds == default
+						? bounds
+						: new Rect (Math.Max (containerBounds.X, bounds.X),
+						Math.Max (containerBounds.Y, bounds.Y),
+						Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
+						Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top));
+				}
+
+				for (var idx = startX; current < start + size; idx++) {
 					if (idx < 0) {
 						current++;
 						continue;
@@ -1031,13 +1166,13 @@ namespace Terminal.Gui {
 					var rune = (Rune)' ';
 					if (isVertical) {
 						Application.Driver?.Move (x, current);
-						if (idx >= y && idx < (y + runes.Length)) {
-							rune = runes [idx - y];
+						if (idx >= 0 && idx < runes.Length) {
+							rune = runes [idx];
 						}
 					} else {
 						Application.Driver?.Move (current, y);
-						if (idx >= x && idx < (x + runes.Length)) {
-							rune = runes [idx - x];
+						if (idx >= 0 && idx < runes.Length) {
+							rune = runes [idx];
 						}
 					}
 					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
@@ -1051,11 +1186,18 @@ namespace Terminal.Gui {
 					} else {
 						Application.Driver?.AddRune (rune);
 					}
-					current += Rune.ColumnWidth (rune);
-					if (idx + 1 < runes.Length && current + Rune.ColumnWidth (runes [idx + 1]) > size) {
+					var runeWidth = Math.Max (Rune.ColumnWidth (rune), 1);
+					if (isVertical) {
+						current++;
+					} else {
+						current += runeWidth;
+					}
+					if (!isVertical && idx + 1 < runes.Length && current + Rune.ColumnWidth (runes [idx + 1]) > start + size) {
 						break;
 					}
 				}
+				if (Application.Driver != null)
+					Application.Driver.Clip = (Rect)savedClip;
 			}
 		}
 	}

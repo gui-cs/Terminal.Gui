@@ -187,6 +187,7 @@ win.Add(
 );
 
 Application.Run();
+Application.Shutdown();
 ```
 
 Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
@@ -198,6 +199,7 @@ class Demo {
 	static void Main ()
 	{
 		Application.Run<App> ();
+		Application.Shutdown ();
 	}
 }
 ```

@@ -26,7 +26,8 @@ class Demo {
 
         var n = MessageBox.Query (50, 7, 
             "Question", "Do you like console apps?", "Yes", "No");
-
+            
+		Application.Shutdown ();
         return n;
     }
 }
@@ -62,6 +63,7 @@ class Demo {
         };
         Application.Top.Add (label);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 ```
@@ -95,6 +97,7 @@ class Demo {
         // Add both menu and win in a single call
         Application.Top.Add (menu, win);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 ```
@@ -277,6 +280,7 @@ class Demo {
         // Add both menu and win in a single call
         top.Add (win, menu);
         Application.Run (top);
+        Application.Shutdown ();
     }
 }
 ```
