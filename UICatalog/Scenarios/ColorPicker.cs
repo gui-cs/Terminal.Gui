@@ -39,23 +39,35 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 
 			// Forground ColorPicker.
-			foregroundColorPicker = new ColorPicker (1, 1, "Foreground color");
+			foregroundColorPicker = new ColorPicker ();
+			foregroundColorPicker.Text = "Foreground Color";
+			foregroundColorPicker.X = 0;
+			foregroundColorPicker.Y = 0;
 			foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
 			Win.Add (foregroundColorPicker);
 
-			foregroundColorLabel = new Label (1, 10, string.Empty);
+			foregroundColorLabel = new Label ();
+			foregroundColorLabel.X = Pos.Left(foregroundColorPicker);
+			foregroundColorLabel.Y = Pos.Bottom (foregroundColorPicker) + 1;
 			Win.Add (foregroundColorLabel);
 
 			// Background ColorPicker.
-			backgroundColorPicker = new ColorPicker (85, 1, "Background color");
+			backgroundColorPicker = new ColorPicker ();
+			backgroundColorPicker.Text = "Background Color";
+			backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
+			backgroundColorPicker.Y = 0;
 			backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
 			Win.Add (backgroundColorPicker);
 
-			backgroundColorLabel = new Label (85, 10, string.Empty);
+			backgroundColorLabel = new Label ();
+			backgroundColorLabel.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorLabel) - Pos.Left (backgroundColorLabel));
+			backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
 			Win.Add (backgroundColorLabel);
 
 			// Demo Label.
-			demoLabel = new Label (50, 10, "Lorem Ipsum");
+			demoLabel = new Label ("Lorem Ipsum");
+			demoLabel.X = Pos.Center ();
+			demoLabel.Y = 1;
 			Win.Add (demoLabel);
 
 			// Set default colors.

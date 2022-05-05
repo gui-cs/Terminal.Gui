@@ -73,8 +73,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of <see cref="ColorPicker"/>.
 		/// </summary>
-		public ColorPicker () : this (0, 0, "Color Picker")
+		public ColorPicker () : base ("Color Picker")
 		{
+			Initialize ();
 		}
 
 		/// <summary>
@@ -92,11 +93,17 @@ namespace Terminal.Gui {
 		/// <param name="x">X location.</param>
 		/// <param name="y">Y location.</param>
 		/// <param name="title">Title</param>
-		public ColorPicker (int x, int y, ustring title) : base (new Rect (x, y, 0, 0), title, new Border () { BorderStyle = BorderStyle.Single })
+		public ColorPicker (int x, int y, ustring title) : base (x, y, title)
+		{
+			Initialize ();
+		}
+
+		private void Initialize()
 		{
 			CanFocus = true;
 			Width = colorsPerLine * horizontalZoom;
 			Height = lineCount * verticalZoom + 1;
+			Border = new Border () { BorderStyle = BorderStyle.None };
 
 			AddCommands ();
 			AddKeyBindings ();
