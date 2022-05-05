@@ -81,6 +81,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of <see cref="ColorPicker"/>.
 		/// </summary>
+		/// <param name="title">Title.</param>
+		public ColorPicker (ustring title) : base (title)
+		{
+			Initialize ();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ColorPicker"/>.
+		/// </summary>
 		/// <param name="point">Location point.</param>
 		/// <param name="title">Title.</param>
 		public ColorPicker (Point point, ustring title) : this (point.X, point.Y, title)

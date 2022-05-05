@@ -39,8 +39,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 
 			// Forground ColorPicker.
-			foregroundColorPicker = new ColorPicker ();
-			foregroundColorPicker.Text = "Foreground Color";
+			foregroundColorPicker = new ColorPicker ("Foreground Color");
 			foregroundColorPicker.X = 0;
 			foregroundColorPicker.Y = 0;
 			foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;

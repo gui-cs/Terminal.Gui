@@ -206,6 +206,9 @@ Multi-line Labels support word wrap.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
     </div>
     <div>
@@ -521,12 +524,12 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
     <pre><code class="lang-csharp hljs">public Label()</code></pre>
   </div>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring)">Label(ustring)</h4>
+  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring,System.Boolean)">Label(ustring, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label(ustring text)</code></pre>
+    <pre><code class="lang-csharp hljs">public Label(ustring text, bool autosize = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -543,15 +546,20 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
         <td><span class="parametername">text</span></td>
         <td></td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">autosize</span></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring,Terminal.Gui.TextDirection)">Label(ustring, TextDirection)</h4>
+  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_Terminal_Gui_TextDirection_System_Boolean_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring,Terminal.Gui.TextDirection,System.Boolean)">Label(ustring, TextDirection, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label(ustring text, TextDirection direction)</code></pre>
+    <pre><code class="lang-csharp hljs">public Label(ustring text, TextDirection direction, bool autosize = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -573,15 +581,20 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
         <td><span class="parametername">direction</span></td>
         <td></td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">autosize</span></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)">Label(Int32, Int32, ustring)</h4>
+  <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">Label(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label(int x, int y, ustring text)</code></pre>
+    <pre><code class="lang-csharp hljs">public Label(int x, int y, ustring text, bool autosize = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -608,40 +621,20 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
         <td><span class="parametername">text</span></td>
         <td></td>
       </tr>
-    </tbody>
-  </table>
-  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect)">Label(Rect)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label(Rect frame)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
       <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">frame</span></td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">autosize</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)">Label(Rect, ustring)</h4>
+  <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Boolean)">Label(Rect, ustring, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label(Rect rect, ustring text)</code></pre>
+    <pre><code class="lang-csharp hljs">public Label(Rect rect, ustring text, bool autosize = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -661,6 +654,41 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">autosize</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
+  <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_System_Boolean_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.Boolean)">Label(Rect, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Label(Rect frame, bool autosize = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">frame</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">autosize</span></td>
         <td></td>
       </tr>
     </tbody>
