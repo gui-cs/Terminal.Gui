@@ -596,15 +596,15 @@ namespace Terminal.Gui.Core {
 
 
   Label: TextField
-         ┌────────────────────────────┐
-         │ Select All          Ctrl+T │
-         │ Delete All    Ctrl+Shift+D │
-         │ Copy                Ctrl+C │
-         │ Cut                 Ctrl+X │
-         │ Paste               Ctrl+V │
-         │ Undo                Ctrl+Z │
-         │ Redo                Ctrl+Y │
-         └────────────────────────────┘
+         ┌───────────────────────────┐
+         │ Select All         Ctrl+T │
+         │ Delete All   Ctrl+Shift+D │
+         │ Copy               Ctrl+C │
+         │ Cut                Ctrl+X │
+         │ Paste              Ctrl+V │
+         │ Undo               Ctrl+Z │
+         │ Redo               Ctrl+Y │
+         └───────────────────────────┘
 
 
 
@@ -612,7 +612,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 39, 17), pos);
+			Assert.Equal (new Rect (2, 0, 38, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -646,7 +646,7 @@ namespace Terminal.Gui.Core {
 
 			Application.Top.Add (menu, win, statusBar);
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (45, 17);
+			((FakeDriver)Application.Driver).SetBufferSize (44, 17);
 
 
 			Assert.Equal (new Rect (9, 3, 20, 1), tf.Frame);
@@ -658,26 +658,26 @@ namespace Terminal.Gui.Core {
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit
-┌ Window ───────────────────────────────────┐
-│                                           │
-│                                           │
-│                                           │
-│  Label: TextField                         │
-│         ┌────────────────────────────┐    │
-│         │ Select All          Ctrl+T │    │
-│         │ Delete All    Ctrl+Shift+D │    │
-│         │ Copy                Ctrl+C │    │
-│         │ Cut                 Ctrl+X │    │
-│         │ Paste               Ctrl+V │    │
-│         │ Undo                Ctrl+Z │    │
-│         │ Redo                Ctrl+Y │    │
-│         └────────────────────────────┘    │
-└───────────────────────────────────────────┘
+┌ Window ──────────────────────────────────┐
+│                                          │
+│                                          │
+│                                          │
+│  Label: TextField                        │
+│         ┌───────────────────────────┐    │
+│         │ Select All         Ctrl+T │    │
+│         │ Delete All   Ctrl+Shift+D │    │
+│         │ Copy               Ctrl+C │    │
+│         │ Cut                Ctrl+X │    │
+│         │ Paste              Ctrl+V │    │
+│         │ Undo               Ctrl+Z │    │
+│         │ Redo               Ctrl+Y │    │
+│         └───────────────────────────┘    │
+└──────────────────────────────────────────┘
  F1 Help │ ^Q Quit
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 45, 17), pos);
+			Assert.Equal (new Rect (2, 0, 44, 17), pos);
 		}
 	}
 }
