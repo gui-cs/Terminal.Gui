@@ -9,42 +9,43 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
+using Rune = System.Rune;
 
 namespace Terminal.Gui.Views {
-		
+
 	#region Helper Classes
 	class FakeHAxis : HorizontalAxis {
 
 		public List<Point> DrawAxisLinePoints = new List<Point> ();
-		public List<int> LabelPoints = new List<int>();
+		public List<int> LabelPoints = new List<int> ();
 
 		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			base.DrawAxisLine (graph, x, y);
-			DrawAxisLinePoints.Add (new Point(x, y));
+			DrawAxisLinePoints.Add (new Point (x, y));
 		}
 
 		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 		{
 			base.DrawAxisLabel (graph, screenPosition, text);
-			LabelPoints.Add(screenPosition);
+			LabelPoints.Add (screenPosition);
 		}
 	}
 
 	class FakeVAxis : VerticalAxis {
 
 		public List<Point> DrawAxisLinePoints = new List<Point> ();
-		public List<int> LabelPoints = new List<int>();
+		public List<int> LabelPoints = new List<int> ();
 
 		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			base.DrawAxisLine (graph, x, y);
-			DrawAxisLinePoints.Add (new Point(x, y));
+			DrawAxisLinePoints.Add (new Point (x, y));
 		}
 		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 		{
 			base.DrawAxisLabel (graph, screenPosition, text);
-			LabelPoints.Add(screenPosition);
+			LabelPoints.Add (screenPosition);
 		}
 	}
 	#endregion
@@ -99,13 +100,13 @@ namespace Terminal.Gui.Views {
 			if (!string.Equals (expectedLook, actualLook)) {
 
 				// ignore trailing whitespace on each line
-				var trailingWhitespace = new Regex (@"\s+$",RegexOptions.Multiline);
-				
+				var trailingWhitespace = new Regex (@"\s+$", RegexOptions.Multiline);
+
 				// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
-				expectedLook =  trailingWhitespace.Replace(expectedLook,"").Trim();
+				expectedLook = trailingWhitespace.Replace (expectedLook, "").Trim ();
 				actualLook = trailingWhitespace.Replace (actualLook, "").Trim ();
 
-				// standardise line endings for the comparison
+				// standardize line endings for the comparison
 				expectedLook = expectedLook.Replace ("\r\n", "\n");
 				actualLook = actualLook.Replace ("\r\n", "\n");
 
@@ -116,6 +117,97 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		public static Rect AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output)
+		{
+			var lines = new List<List<char>> ();
+			var sb = new StringBuilder ();
+			var driver = ((FakeDriver)Application.Driver);
+			var x = -1;
+			var y = -1;
+			int w = -1;
+			int h = -1;
+
+			var contents = driver.Contents;
+
+			for (int r = 0; r < driver.Rows; r++) {
+				var runes = new List<char> ();
+				for (int c = 0; c < driver.Cols; c++) {
+					var rune = (char)contents [r, c, 0];
+					if (rune != ' ') {
+						if (x == -1) {
+							x = c;
+							y = r;
+							for (int i = 0; i < c; i++) {
+								runes.InsertRange (i, new List<char> () { ' ' });
+							}
+						}
+						if (Rune.ColumnWidth (rune) > 1) {
+							c++;
+						}
+						if (c + 1 > w) {
+							w = c + 1;
+						}
+						h = r - y + 1;
+					}
+					if (x > -1) {
+						runes.Add (rune);
+					}
+				}
+				if (runes.Count > 0) {
+					lines.Add (runes);
+				}
+			}
+
+			// Remove unnecessary empty lines
+			for (int r = lines.Count - 1; r > h - 1; r--) {
+				lines.RemoveAt (r);
+			}
+
+			// Remove trailing whitespace on each line
+			for (int r = 0; r < lines.Count; r++) {
+				List<char> row = lines [r];
+				for (int c = row.Count - 1; c >= 0; c--) {
+					if (row [c] != ' ') {
+						break;
+					}
+					row.RemoveAt (c);
+				}
+			}
+
+			// Convert char list to string
+			for (int r = 0; r < lines.Count; r++) {
+				var line = new string (lines [r].ToArray ());
+				if (r == lines.Count - 1) {
+					sb.Append (line);
+				} else {
+					sb.AppendLine (line);
+				}
+			}
+
+			var actualLook = sb.ToString ();
+
+			if (!string.Equals (expectedLook, actualLook)) {
+
+				// standardize line endings for the comparison
+				expectedLook = expectedLook.Replace ("\r\n", "\n");
+				actualLook = actualLook.Replace ("\r\n", "\n");
+
+				// Remove the first and the last line ending from the expectedLook
+				if (expectedLook.StartsWith ("\n")) {
+					expectedLook = expectedLook [1..];
+				}
+				if (expectedLook.EndsWith ("\n")) {
+					expectedLook = expectedLook [..^1];
+				}
+
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+
+				Assert.Equal (expectedLook, actualLook);
+			}
+			return new Rect (x, y, w > -1 ? w : 0, h > -1 ? h : 0);
+		}
+
 #pragma warning disable xUnit1013 // Public method should be marked as test
 		/// <summary>
 		/// Verifies the console was rendered using the given <paramref name="expectedColors"/> at the given locations.
@@ -124,11 +216,11 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		/// <param name="expectedLook">Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes of <paramref name="expectedColors"/></param>
 		/// <param name="expectedColors"></param>
-		public static void AssertDriverColorsAre (string expectedLook, Attribute[] expectedColors)
+		public static void AssertDriverColorsAre (string expectedLook, Attribute [] expectedColors)
 		{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
-			if(expectedColors.Length > 10) {
+			if (expectedColors.Length > 10) {
 				throw new ArgumentException ("This method only works for UIs that use at most 10 colors");
 			}
 
@@ -138,7 +230,7 @@ namespace Terminal.Gui.Views {
 			var contents = driver.Contents;
 
 			int r = 0;
-			foreach(var line in expectedLook.Split ('\n').Select(l=>l.Trim())) {
+			foreach (var line in expectedLook.Split ('\n').Select (l => l.Trim ())) {
 
 				for (int c = 0; c < line.Length; c++) {
 
@@ -151,10 +243,10 @@ namespace Terminal.Gui.Views {
 						throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 					}
 
-					var colorUsed = Array.IndexOf(expectedColors,match[0]).ToString()[0];
+					var colorUsed = Array.IndexOf (expectedColors, match [0]).ToString () [0];
 					var userExpected = line [c];
 
-					if( colorUsed != userExpected) {
+					if (colorUsed != userExpected) {
 						throw new Exception ($"Colors used did not match expected at row {r} and col {c}.  Color index used was {colorUsed} but test expected {userExpected} (these are indexes into the expectedColors array)");
 					}
 				}
@@ -390,7 +482,7 @@ namespace Terminal.Gui.Views {
 		/// is mutable a sensible place to check this is in redraw.
 		/// </summary>
 		[Fact]
-		public void CellSizeZero()
+		public void CellSizeZero ()
 		{
 			InitFakeDriver ();
 
@@ -398,8 +490,8 @@ namespace Terminal.Gui.Views {
 			gv.ColorScheme = new ColorScheme ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
 			gv.Series.Add (new ScatterSeries () { Points = new List<PointF> { new PointF (1, 1) } });
-			gv.CellSize= new PointF(0,5);
-			var ex = Assert.Throws<Exception>(()=>gv.Redraw (gv.Bounds));
+			gv.CellSize = new PointF (0, 5);
+			var ex = Assert.Throws<Exception> (() => gv.Redraw (gv.Bounds));
 
 			Assert.Equal ("CellSize cannot be 0", ex.Message);
 
@@ -407,7 +499,7 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
-		
+
 
 		/// <summary>
 		/// Tests that each point in the screen space maps to a rectangle of
@@ -444,7 +536,7 @@ namespace Terminal.Gui.Views {
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon , graphSpace.Top + epsilon));
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Top + epsilon));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
@@ -569,33 +661,35 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
-	public class MultiBarSeriesTests{
+	public class MultiBarSeriesTests {
 
 		readonly ITestOutputHelper output;
 
-		public MultiBarSeriesTests(ITestOutputHelper output)
+		public MultiBarSeriesTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
 
 		[Fact]
-		public void MultiBarSeries_BarSpacing(){
-			
+		public void MultiBarSeries_BarSpacing ()
+		{
+
 			// Creates clusters of 5 adjacent bars with 2 spaces between clusters
-			var series = new MultiBarSeries(5,7,1);
+			var series = new MultiBarSeries (5, 7, 1);
 
-			Assert.Equal(5,series.SubSeries.Count);
+			Assert.Equal (5, series.SubSeries.Count);
 
-			Assert.Equal(0,series.SubSeries.ElementAt(0).Offset);
-			Assert.Equal(1,series.SubSeries.ElementAt(1).Offset);
-			Assert.Equal(2,series.SubSeries.ElementAt(2).Offset);
-			Assert.Equal(3,series.SubSeries.ElementAt(3).Offset);
-			Assert.Equal(4,series.SubSeries.ElementAt(4).Offset);
+			Assert.Equal (0, series.SubSeries.ElementAt (0).Offset);
+			Assert.Equal (1, series.SubSeries.ElementAt (1).Offset);
+			Assert.Equal (2, series.SubSeries.ElementAt (2).Offset);
+			Assert.Equal (3, series.SubSeries.ElementAt (3).Offset);
+			Assert.Equal (4, series.SubSeries.ElementAt (4).Offset);
 		}
 
 
 		[Fact]
-		public void MultiBarSeriesColors_WrongNumber(){
+		public void MultiBarSeriesColors_WrongNumber ()
+		{
 
 			var fake = new FakeDriver ();
 
@@ -604,8 +698,8 @@ namespace Terminal.Gui.Views {
 			};
 
 			// user passes 1 color only but asks for 5 bars
-			var ex = Assert.Throws<ArgumentException>(()=>new MultiBarSeries(5,7,1,colors));
-			Assert.Equal("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",ex.Message);
+			var ex = Assert.Throws<ArgumentException> (() => new MultiBarSeries (5, 7, 1, colors));
+			Assert.Equal ("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')", ex.Message);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -613,7 +707,8 @@ namespace Terminal.Gui.Views {
 
 
 		[Fact]
-		public void MultiBarSeriesColors_RightNumber(){
+		public void MultiBarSeriesColors_RightNumber ()
+		{
 
 			var fake = new FakeDriver ();
 
@@ -624,11 +719,11 @@ namespace Terminal.Gui.Views {
 			};
 
 			// user passes 3 colors and asks for 3 bars
-			var series = new MultiBarSeries(3,7,1,colors);
+			var series = new MultiBarSeries (3, 7, 1, colors);
 
-			Assert.Equal(series.SubSeries.ElementAt(0).OverrideBarColor,colors[0]);
-			Assert.Equal(series.SubSeries.ElementAt(1).OverrideBarColor,colors[1]);
-			Assert.Equal(series.SubSeries.ElementAt(2).OverrideBarColor,colors[2]);
+			Assert.Equal (series.SubSeries.ElementAt (0).OverrideBarColor, colors [0]);
+			Assert.Equal (series.SubSeries.ElementAt (1).OverrideBarColor, colors [1]);
+			Assert.Equal (series.SubSeries.ElementAt (2).OverrideBarColor, colors [2]);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -636,20 +731,22 @@ namespace Terminal.Gui.Views {
 
 
 		[Fact]
-		public void MultiBarSeriesAddValues_WrongNumber(){
-			
+		public void MultiBarSeriesAddValues_WrongNumber ()
+		{
+
 			// user asks for 3 bars per category
-			var series = new MultiBarSeries(3,7,1);
+			var series = new MultiBarSeries (3, 7, 1);
 
-			var ex = Assert.Throws<ArgumentException>(()=>series.AddBars("Cars",'#',1));
+			var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", '#', 1));
 
-			Assert.Equal("Number of values must match the number of bars per category (Parameter 'values')",ex.Message);
+			Assert.Equal ("Number of values must match the number of bars per category (Parameter 'values')", ex.Message);
 		}
 
 
 
 		[Fact]
-		public void TestRendering_MultibarSeries(){
+		public void TestRendering_MultibarSeries ()
+		{
 
 			GraphViewTests.InitFakeDriver ();
 
@@ -659,14 +756,14 @@ namespace Terminal.Gui.Views {
 			// y axis goes from 0.1 to 1 across 10 console rows
 			// x axis goes from 0 to 20 across 20 console columns
 			gv.Bounds = new Rect (0, 0, 20, 10);
-			gv.CellSize = new PointF(1f,0.1f);
+			gv.CellSize = new PointF (1f, 0.1f);
 			gv.MarginBottom = 1;
 			gv.MarginLeft = 1;
 
-			var multibarSeries = new MultiBarSeries (2,4,1);
-			
+			var multibarSeries = new MultiBarSeries (2, 4, 1);
+
 			//nudge them left to avoid float rounding errors at the boundaries of cells
-			foreach(var sub in multibarSeries.SubSeries) {
+			foreach (var sub in multibarSeries.SubSeries) {
 				sub.Offset -= 0.001f;
 			}
 
@@ -676,28 +773,28 @@ namespace Terminal.Gui.Views {
 
 			// don't show axis labels that means any labels
 			// that appaer are explicitly from the bars
-			gv.AxisX = fakeXAxis = new FakeHAxis(){Increment=0};
-			gv.AxisY = new FakeVAxis(){Increment=0};
+			gv.AxisX = fakeXAxis = new FakeHAxis () { Increment = 0 };
+			gv.AxisY = new FakeVAxis () { Increment = 0 };
 
-			gv.Redraw(gv.Bounds);
+			gv.Redraw (gv.Bounds);
 
 			// Since bar series has no bars yet no labels should be displayed
-			Assert.Empty(fakeXAxis.LabelPoints);
+			Assert.Empty (fakeXAxis.LabelPoints);
 
-			multibarSeries.AddBars("hey",'M',0.5001f, 0.5001f);
-			fakeXAxis.LabelPoints.Clear();
-			gv.Redraw(gv.Bounds);
-	
-			Assert.Equal(4,fakeXAxis.LabelPoints.Single());
+			multibarSeries.AddBars ("hey", 'M', 0.5001f, 0.5001f);
+			fakeXAxis.LabelPoints.Clear ();
+			gv.Redraw (gv.Bounds);
 
-			multibarSeries.AddBars("there",'M',0.24999f,0.74999f);
-			multibarSeries.AddBars("bob",'M',1,2);
-			fakeXAxis.LabelPoints.Clear();
-			gv.Redraw(gv.Bounds);
+			Assert.Equal (4, fakeXAxis.LabelPoints.Single ());
 
-			Assert.Equal(3,fakeXAxis.LabelPoints.Count);
-			Assert.Equal(4,fakeXAxis.LabelPoints[0]);
-			Assert.Equal(8,fakeXAxis.LabelPoints[1]);
+			multibarSeries.AddBars ("there", 'M', 0.24999f, 0.74999f);
+			multibarSeries.AddBars ("bob", 'M', 1, 2);
+			fakeXAxis.LabelPoints.Clear ();
+			gv.Redraw (gv.Bounds);
+
+			Assert.Equal (3, fakeXAxis.LabelPoints.Count);
+			Assert.Equal (4, fakeXAxis.LabelPoints [0]);
+			Assert.Equal (8, fakeXAxis.LabelPoints [1]);
 			Assert.Equal (12, fakeXAxis.LabelPoints [2]);
 
 			string looksLike =
@@ -719,7 +816,7 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
-	public class BarSeriesTests{
+	public class BarSeriesTests {
 
 
 		private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
@@ -732,46 +829,47 @@ namespace Terminal.Gui.Views {
 			// y axis goes from 0.1 to 1 across 10 console rows
 			// x axis goes from 0 to 10 across 20 console columns
 			gv.Bounds = new Rect (0, 0, 20, 10);
-			gv.CellSize = new PointF(0.5f,0.1f);
+			gv.CellSize = new PointF (0.5f, 0.1f);
 
 			gv.Series.Add (series = new FakeBarSeries ());
 
 			// don't show axis labels that means any labels
 			// that appaer are explicitly from the bars
-			gv.AxisX = axisX = new FakeHAxis(){Increment=0};
-			gv.AxisY = axisY = new FakeVAxis(){Increment=0};
+			gv.AxisX = axisX = new FakeHAxis () { Increment = 0 };
+			gv.AxisY = axisY = new FakeVAxis () { Increment = 0 };
 
 			return gv;
 		}
 
 		[Fact]
-		public void TestZeroHeightBar_WithName(){
+		public void TestZeroHeightBar_WithName ()
+		{
 
-			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw(graph.Bounds);
+			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw (graph.Bounds);
 
 			// no bars
-			Assert.Empty(barSeries.BarScreenStarts);
-			Assert.Empty(axisX.LabelPoints);
-			Assert.Empty(axisY.LabelPoints);
+			Assert.Empty (barSeries.BarScreenStarts);
+			Assert.Empty (axisX.LabelPoints);
+			Assert.Empty (axisY.LabelPoints);
 
 			// bar of height 0
-			barSeries.Bars.Add(new BarSeries.Bar("hi",new GraphCellToRender('.'),0));
+			barSeries.Bars.Add (new BarSeries.Bar ("hi", new GraphCellToRender ('.'), 0));
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
-			graph.Redraw(graph.Bounds);
+			graph.Redraw (graph.Bounds);
 
 			// bar should not be drawn
-			Assert.Empty(barSeries.BarScreenStarts);
+			Assert.Empty (barSeries.BarScreenStarts);
 
-			Assert.NotEmpty(axisX.LabelPoints);
-			Assert.Empty(axisY.LabelPoints);
+			Assert.NotEmpty (axisX.LabelPoints);
+			Assert.Empty (axisY.LabelPoints);
 
 			// but bar name should be
 			// Screen position x=2 because bars are drawn every 1f of
 			// graph space and CellSize.X is 0.5f
-			Assert.Contains(2, axisX.LabelPoints);
+			Assert.Contains (2, axisX.LabelPoints);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -779,71 +877,73 @@ namespace Terminal.Gui.Views {
 
 
 		[Fact]
-		public void TestTwoTallBars_WithOffset(){
+		public void TestTwoTallBars_WithOffset ()
+		{
 
-			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw(graph.Bounds);
+			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw (graph.Bounds);
 
 			// no bars
-			Assert.Empty(barSeries.BarScreenStarts);
-			Assert.Empty(axisX.LabelPoints);
-			Assert.Empty(axisY.LabelPoints);
+			Assert.Empty (barSeries.BarScreenStarts);
+			Assert.Empty (axisX.LabelPoints);
+			Assert.Empty (axisY.LabelPoints);
 
 			// 0.5 units of graph fit every screen cell
 			// so 1 unit of graph space is 2 screen columns
-			graph.CellSize = new PointF(0.5f,0.1f);
+			graph.CellSize = new PointF (0.5f, 0.1f);
 
 			// Start bar 1 screen unit along
 			barSeries.Offset = 0.5f;
 			barSeries.BarEvery = 1f;
 
-			barSeries.Bars.Add(
-				new BarSeries.Bar("hi1",new GraphCellToRender('.'),100));
-			barSeries.Bars.Add(
-				new BarSeries.Bar("hi2",new GraphCellToRender('.'),100));
+			barSeries.Bars.Add (
+				new BarSeries.Bar ("hi1", new GraphCellToRender ('.'), 100));
+			barSeries.Bars.Add (
+				new BarSeries.Bar ("hi2", new GraphCellToRender ('.'), 100));
 
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
-			graph.Redraw(graph.Bounds);
+			graph.Redraw (graph.Bounds);
 
 			// bar should be drawn at BarEvery 1f + offset 0.5f = 3 screen units
-			Assert.Equal(3,barSeries.BarScreenStarts[0].X);
-			Assert.Equal(3,barSeries.BarScreenEnds[0].X);
+			Assert.Equal (3, barSeries.BarScreenStarts [0].X);
+			Assert.Equal (3, barSeries.BarScreenEnds [0].X);
 
 			// second bar should be BarEveryx2 = 2f + offset 0.5f = 5 screen units
-			Assert.Equal(5,barSeries.BarScreenStarts[1].X);
-			Assert.Equal(5,barSeries.BarScreenEnds[1].X);
+			Assert.Equal (5, barSeries.BarScreenStarts [1].X);
+			Assert.Equal (5, barSeries.BarScreenEnds [1].X);
 
 			// both bars should have labels
-			Assert.Equal(2,axisX.LabelPoints.Count);
-			Assert.Contains(3, axisX.LabelPoints);
-			Assert.Contains(5, axisX.LabelPoints);
+			Assert.Equal (2, axisX.LabelPoints.Count);
+			Assert.Contains (3, axisX.LabelPoints);
+			Assert.Contains (5, axisX.LabelPoints);
 
 			// bars are very tall but should not draw up off top of screen
-			Assert.Equal(9,barSeries.BarScreenStarts[0].Y);
-			Assert.Equal(0,barSeries.BarScreenEnds[0].Y);
-			Assert.Equal(9,barSeries.BarScreenStarts[1].Y);
-			Assert.Equal(0,barSeries.BarScreenEnds[1].Y);
+			Assert.Equal (9, barSeries.BarScreenStarts [0].Y);
+			Assert.Equal (0, barSeries.BarScreenEnds [0].Y);
+			Assert.Equal (9, barSeries.BarScreenStarts [1].Y);
+			Assert.Equal (0, barSeries.BarScreenEnds [1].Y);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
 
 		[Fact]
-		public void TestOneLongOneShortHorizontalBars_WithOffset(){
+		public void TestOneLongOneShortHorizontalBars_WithOffset ()
+		{
 
-			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw(graph.Bounds);
+			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw (graph.Bounds);
 
 			// no bars
-			Assert.Empty(barSeries.BarScreenStarts);
-			Assert.Empty(axisX.LabelPoints);
-			Assert.Empty(axisY.LabelPoints);
+			Assert.Empty (barSeries.BarScreenStarts);
+			Assert.Empty (axisX.LabelPoints);
+			Assert.Empty (axisY.LabelPoints);
 
 			// 0.1 units of graph y fit every screen row
 			// so 1 unit of graph y space is 10 screen rows
-			graph.CellSize = new PointF(0.5f,0.1f);
+			graph.CellSize = new PointF (0.5f, 0.1f);
 
 			// Start bar 3 screen units up (y = height-3)
 			barSeries.Offset = 0.25f;
@@ -852,64 +952,64 @@ namespace Terminal.Gui.Views {
 			barSeries.Orientation = Orientation.Horizontal;
 
 			// 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
-			barSeries.Bars.Add(
-				new BarSeries.Bar("hi1",new GraphCellToRender('.'),100));
+			barSeries.Bars.Add (
+				new BarSeries.Bar ("hi1", new GraphCellToRender ('.'), 100));
 
 			// 1 bar that is shorter
-			barSeries.Bars.Add(
-				new BarSeries.Bar("hi2",new GraphCellToRender('.'),5));
+			barSeries.Bars.Add (
+				new BarSeries.Bar ("hi2", new GraphCellToRender ('.'), 5));
 
 			// redraw graph
-			graph.Redraw(graph.Bounds);
+			graph.Redraw (graph.Bounds);
 
 			// since bars are horizontal all have the same X start cordinates
-			Assert.Equal(0,barSeries.BarScreenStarts[0].X);
-			Assert.Equal(0,barSeries.BarScreenStarts[1].X);
+			Assert.Equal (0, barSeries.BarScreenStarts [0].X);
+			Assert.Equal (0, barSeries.BarScreenStarts [1].X);
 
 			// bar goes all the way to the end so bumps up against right screen boundary
 			// width of graph is 20
-			Assert.Equal(19,barSeries.BarScreenEnds[0].X);
+			Assert.Equal (19, barSeries.BarScreenEnds [0].X);
 
 			// shorter bar is 5 graph units wide which is 10 screen units
-			Assert.Equal(10,barSeries.BarScreenEnds[1].X);
+			Assert.Equal (10, barSeries.BarScreenEnds [1].X);
 
 			// first  bar should be offset 6 screen units (0.25f + 0.3f graph units)
 			// since height of control is 10 then first bar should be at screen row 4 (10-6)
-			Assert.Equal(4,barSeries.BarScreenStarts[0].Y);
+			Assert.Equal (4, barSeries.BarScreenStarts [0].Y);
 
 			// second  bar should be offset 9 screen units (0.25f + 0.6f graph units)
 			// since height of control is 10 then second bar should be at screen row 1 (10-9)
-			Assert.Equal(1,barSeries.BarScreenStarts[1].Y);
+			Assert.Equal (1, barSeries.BarScreenStarts [1].Y);
 
 			// both bars should have labels but on the y axis
-			Assert.Equal(2,axisY.LabelPoints.Count);
-			Assert.Empty(axisX.LabelPoints);
+			Assert.Equal (2, axisY.LabelPoints.Count);
+			Assert.Empty (axisX.LabelPoints);
 
 			// labels should align with the bars (same screen y axis point)
-			Assert.Contains(4, axisY.LabelPoints);
-			Assert.Contains(1, axisY.LabelPoints);
+			Assert.Contains (4, axisY.LabelPoints);
+			Assert.Contains (1, axisY.LabelPoints);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
 
-		private class FakeBarSeries : BarSeries{
+		private class FakeBarSeries : BarSeries {
 			public GraphCellToRender FinalColor { get; private set; }
 
-			public List<Point> BarScreenStarts { get; private set; } = new List<Point>();
-			public List<Point> BarScreenEnds { get; private set; } = new List<Point>();
-			
+			public List<Point> BarScreenStarts { get; private set; } = new List<Point> ();
+			public List<Point> BarScreenEnds { get; private set; } = new List<Point> ();
+
 			protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender)
 			{
-				return FinalColor = base.AdjustColor (graphCellToRender);	
+				return FinalColor = base.AdjustColor (graphCellToRender);
 			}
 
 			protected override void DrawBarLine (GraphView graph, Point start, Point end, Bar beingDrawn)
 			{
 				base.DrawBarLine (graph, start, end, beingDrawn);
-				
-				BarScreenStarts.Add(start);
-				BarScreenEnds.Add(end);
+
+				BarScreenStarts.Add (start);
+				BarScreenEnds.Add (end);
 			}
 
 		}
@@ -921,11 +1021,11 @@ namespace Terminal.Gui.Views {
 
 		private GraphView GetGraph (out FakeHAxis axis)
 		{
-			return GetGraph(out axis, out _);
+			return GetGraph (out axis, out _);
 		}
 		private GraphView GetGraph (out FakeVAxis axis)
 		{
-			return GetGraph(out _, out axis);
+			return GetGraph (out _, out axis);
 		}
 		private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
 		{
@@ -959,15 +1059,15 @@ namespace Terminal.Gui.Views {
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (-1, 29), axis.DrawAxisLinePoints);
-			Assert.Contains (new Point (0, 29),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (1, 29), axis.DrawAxisLinePoints);
-						
+
 			Assert.Contains (new Point (48, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (49, 29), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
 
-			Assert.InRange(axis.LabelPoints.Max(),0,49);
-			Assert.InRange(axis.LabelPoints.Min(),0,49);
+			Assert.InRange (axis.LabelPoints.Max (), 0, 49);
+			Assert.InRange (axis.LabelPoints.Min (), 0, 49);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -989,8 +1089,8 @@ namespace Terminal.Gui.Views {
 			Assert.Contains (new Point (49, 19), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (50, 19), axis.DrawAxisLinePoints);
 
-			Assert.InRange(axis.LabelPoints.Max(),0,49);
-			Assert.InRange(axis.LabelPoints.Min(),0,49);
+			Assert.InRange (axis.LabelPoints.Max (), 0, 49);
+			Assert.InRange (axis.LabelPoints.Min (), 0, 49);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1013,8 +1113,8 @@ namespace Terminal.Gui.Views {
 			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
 
 			// Axis lables should not be drawn in the margin
-			Assert.InRange(axis.LabelPoints.Max(),5,49);
-			Assert.InRange(axis.LabelPoints.Min(),5,49);
+			Assert.InRange (axis.LabelPoints.Max (), 5, 49);
+			Assert.InRange (axis.LabelPoints.Min (), 5, 49);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1037,15 +1137,15 @@ namespace Terminal.Gui.Views {
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
-			Assert.Contains (new Point (0, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 2), axis.DrawAxisLinePoints);
-						
+
 			Assert.Contains (new Point (0, 28), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 29), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (0, 30), axis.DrawAxisLinePoints);
 
-			Assert.InRange(axis.LabelPoints.Max(),0,29);
-			Assert.InRange(axis.LabelPoints.Min(),0,29);
+			Assert.InRange (axis.LabelPoints.Max (), 0, 29);
+			Assert.InRange (axis.LabelPoints.Min (), 0, 29);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1060,16 +1160,16 @@ namespace Terminal.Gui.Views {
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
-			Assert.Contains (new Point (0, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 2), axis.DrawAxisLinePoints);
-						
+
 			Assert.Contains (new Point (0, 18), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 19), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (0, 20), axis.DrawAxisLinePoints);
 
 			// Labels should not be drawn into the axis
-			Assert.InRange(axis.LabelPoints.Max(),0,19);
-			Assert.InRange(axis.LabelPoints.Min(),0,19);
+			Assert.InRange (axis.LabelPoints.Max (), 0, 19);
+			Assert.InRange (axis.LabelPoints.Min (), 0, 19);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1084,15 +1184,15 @@ namespace Terminal.Gui.Views {
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (5, -1), axis.DrawAxisLinePoints);
-			Assert.Contains (new Point (5, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (5, 1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (5, 2), axis.DrawAxisLinePoints);
-						
+
 			Assert.Contains (new Point (5, 28), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (5, 29), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (5, 30), axis.DrawAxisLinePoints);
 
-			Assert.InRange(axis.LabelPoints.Max(),0,29);
-			Assert.InRange(axis.LabelPoints.Min(),0,29);
+			Assert.InRange (axis.LabelPoints.Max (), 0, 29);
+			Assert.InRange (axis.LabelPoints.Min (), 0, 29);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1104,13 +1204,13 @@ namespace Terminal.Gui.Views {
 	public class TextAnnotationTests {
 		readonly ITestOutputHelper output;
 
-		public TextAnnotationTests(ITestOutputHelper output)
+		public TextAnnotationTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
 
 		[Fact]
-		public void TestTextAnnotation_ScreenUnits()
+		public void TestTextAnnotation_ScreenUnits ()
 		{
 			var gv = GraphViewTests.GetGraph ();
 
@@ -1133,8 +1233,8 @@ namespace Terminal.Gui.Views {
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
-			gv.Redraw (gv.Bounds); 
-			
+			gv.Redraw (gv.Bounds);
+
 			// we expect no change in the location of the annotation (only the axis label changes)
 			// this is because screen units are constant and do not change as the viewport into
 			// graph space scrolls to different areas of the graph
@@ -1257,7 +1357,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Theory]
-		[InlineData(null)]
+		[InlineData (null)]
 		[InlineData ("  ")]
 		[InlineData ("\t\t")]
 		public void TestTextAnnotation_EmptyText (string whitespace)
@@ -1272,7 +1372,7 @@ namespace Terminal.Gui.Views {
 			// add a point a bit further along the graph so if the whitespace were rendered
 			// the test would pick it up (AssertDriverContentsAre ignores trailing whitespace on lines)
 			var points = new ScatterSeries ();
-			points.Points.Add(new PointF(7, 2));
+			points.Points.Add (new PointF (7, 2));
 			gv.Series.Add (points);
 
 			gv.Redraw (gv.Bounds);
@@ -1296,7 +1396,7 @@ namespace Terminal.Gui.Views {
 	public class LegendTests {
 		readonly ITestOutputHelper output;
 
-		public LegendTests(ITestOutputHelper output)
+		public LegendTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
@@ -1305,7 +1405,7 @@ namespace Terminal.Gui.Views {
 		public void LegendNormalUsage_WithBorder ()
 		{
 			var gv = GraphViewTests.GetGraph ();
-			var legend = new LegendAnnotation(new Rect(2,0,5,3));
+			var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
 			legend.AddEntry (new GraphCellToRender ('A'), "Ant");
 			legend.AddEntry (new GraphCellToRender ('B'), "Bat");
 
@@ -1360,13 +1460,13 @@ namespace Terminal.Gui.Views {
 	public class PathAnnotationTests {
 		readonly ITestOutputHelper output;
 
-		public PathAnnotationTests( ITestOutputHelper output)
+		public PathAnnotationTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
 
 		[Fact]
-		public void PathAnnotation_Box()
+		public void PathAnnotation_Box ()
 		{
 			var gv = GraphViewTests.GetGraph ();
 
@@ -1436,9 +1536,9 @@ namespace Terminal.Gui.Views {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
-			
+
 		[Fact]
-		public void XAxisLabels_With_MarginLeft()
+		public void XAxisLabels_With_MarginLeft ()
 		{
 			GraphViewTests.InitFakeDriver ();
 			var gv = new GraphView {
@@ -1455,7 +1555,7 @@ namespace Terminal.Gui.Views {
 			});
 
 			// reserve 3 cells of the left for the margin
-			gv.MarginLeft = 3; 
+			gv.MarginLeft = 3;
 			gv.MarginBottom = 1;
 
 			gv.Redraw (gv.Bounds);
@@ -1471,7 +1571,7 @@ namespace Terminal.Gui.Views {
    0    5
          
           ";
-				GraphViewTests.AssertDriverContentsAre (expected, output);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 
 			// Shutdown must be called to safely clean up Application if Init has been called
@@ -1555,7 +1655,7 @@ namespace Terminal.Gui.Views {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-			GraphViewTests.AssertDriverContentsAre (expected,output);
+			GraphViewTests.AssertDriverContentsAre (expected, output);
 
 
 			// Shutdown must be called to safely clean up Application if Init has been called
@@ -1591,6 +1691,11 @@ namespace Terminal.Gui.Views {
 				//put label into view
 				mount.Add (lbl1);
 
+				//putting mount into toplevel since changing size
+				//also change AutoSize to false
+				Application.Top.Add (mount);
+				Application.Begin (Application.Top);
+
 				// render view
 				lbl1.ColorScheme = new ColorScheme ();
 				Assert.Equal (1, lbl1.Height);
@@ -1613,11 +1718,11 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
-		public class AxisIncrementToRenderTests {
+	public class AxisIncrementToRenderTests {
 		[Fact]
 		public void AxisIncrementToRenderTests_Constructor ()
 		{
-			var render = new AxisIncrementToRender (Orientation.Horizontal,1,6.6f);
+			var render = new AxisIncrementToRender (Orientation.Horizontal, 1, 6.6f);
 
 			Assert.Equal (Orientation.Horizontal, render.Orientation);
 			Assert.Equal (1, render.ScreenLocation);

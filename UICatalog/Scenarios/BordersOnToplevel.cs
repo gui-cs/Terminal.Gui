@@ -3,10 +3,11 @@ using System.Globalization;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Borders on Toplevel", Description: "Demonstrate Toplevel borders manipulation.")]
-	[ScenarioCategory ("Border")]
-	class BordersOnToplevel : Scenario {
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Borders on Toplevel", Description: "Demonstrates Toplevel borders manipulation.")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
+	public class BordersOnToplevel : Scenario {
 		public override void Setup ()
 		{
 			var borderStyle = BorderStyle.Double;

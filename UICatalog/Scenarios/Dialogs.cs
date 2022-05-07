@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
-	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	class Dialogs : Scenario {
+	public class Dialogs : Scenario {
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {

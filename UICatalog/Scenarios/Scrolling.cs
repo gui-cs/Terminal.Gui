@@ -1,12 +1,11 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
-
-	class Scrolling : Scenario {
+	[ScenarioCategory ("ScrollView")]
+	public class Scrolling : Scenario {
 
 		class Box10x : View {
 			int w = 40;

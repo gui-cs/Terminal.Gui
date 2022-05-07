@@ -11,6 +11,9 @@ using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
+/// <summary>
+/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+/// </summary>
 /// <remarks>
 /// <para>
 ///	UI Catalog attempts to satisfy the following goals:
@@ -38,7 +41,6 @@ using Rune = System.Rune;
 ///	See the project README for more details (https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog/README.md).
 /// </para>	
 /// </remarks>
-
 namespace UICatalog {
 	/// <summary>
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
@@ -192,7 +194,7 @@ namespace UICatalog {
 			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
 			_leftPane.ShortcutAction = () => _leftPane.SetFocus ();
 
-			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
+			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
 				X = 0,
 				Y = 0,
@@ -310,7 +312,41 @@ namespace UICatalog {
 			menuItems.Add (new MenuItem [] { null });
 			menuItems.Add (CreateSizeStyle ());
 			menuItems.Add (CreateAlwaysSetPosition ());
+			menuItems.Add (CreateDisabledEnabledMouse ());
+			menuItems.Add (CreateKeybindings ());
 			return menuItems;
+		}
+
+		private static MenuItem [] CreateDisabledEnabledMouse ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Disable/Enable Mouse";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.IsMouseDisabled;
+			item.Action += () => {
+				item.Checked = Application.IsMouseDisabled = !item.Checked;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+		private static MenuItem[] CreateKeybindings()
+		{
+
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "Keybindings";
+			item.Action += () => {
+				var dlg = new KeyBindingsDialog ();
+				Application.Run (dlg);
+			};
+
+			menuItems.Add (null);
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
 		}
 
 		static MenuItem [] CreateAlwaysSetPosition ()
@@ -643,9 +679,10 @@ namespace UICatalog {
 				_scenarioListViewItem = 0;
 			}
 			_categoryListViewItem = _categoryListView.SelectedItem;
-			var item = _categories [_categoryListView.SelectedItem];
+			var item = _categories [_categoryListViewItem];
 			List<Type> newlist;
-			if (item.Equals ("All")) {
+			if (_categoryListViewItem == 0) {
+				// First category is "All"
 				newlist = _scenarios;
 
 			} else {

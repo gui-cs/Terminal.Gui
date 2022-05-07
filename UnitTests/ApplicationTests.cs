@@ -369,6 +369,15 @@ namespace Terminal.Gui.Core {
 
 			Application.Run (top);
 
+			// Replacing the defaults keys to avoid errors on others unit tests that are using it.
+			Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
+			Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
+			Application.QuitKey = Key.Q | Key.CtrlMask;
+
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
@@ -1269,6 +1278,62 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
 			Assert.Null (Toplevel.dragPosition);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetSupportedCultures_Method ()
+		{
+			var cultures = Application.GetSupportedCultures ();
+			Assert.Equal (cultures.Count, Application.SupportedCultures.Count);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestAddManyTimeouts ()
+		{
+			int delegatesRun = 0;
+			int numberOfThreads = 100;
+			int numberOfTimeoutsPerThread = 100;
+
+
+			// start lots of threads
+			for (int i = 0; i < numberOfThreads; i++) {
+				
+				var myi = i;
+
+				Task.Run (() => {
+					Task.Delay (100).Wait ();
+
+					// each thread registers lots of 1s timeouts
+					for(int j=0;j< numberOfTimeoutsPerThread; j++) {
+
+						Application.MainLoop.AddTimeout (TimeSpan.FromSeconds(1), (s) => {
+
+							// each timeout delegate increments delegatesRun count by 1 every second
+							Interlocked.Increment (ref delegatesRun);
+							return true; 
+						});
+					}
+					 
+					// if this is the first Thread created
+					if (myi == 0) {
+
+						// let the timeouts run for a bit
+						Task.Delay (5000).Wait ();
+
+						// then tell the application to quuit
+						Application.MainLoop.Invoke (() => Application.RequestStop ());
+					}
+				});
+			}
+
+			// blocks here until the RequestStop is processed at the end of the test
+			Application.Run ();
+
+			// undershoot a bit to be on the safe side.  The 5000 ms wait allows the timeouts to run
+			// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
+			// so the final number of delegatesRun might vary by computer.  So for this assert we say
+			// that it should have run at least 2 seconds worth of delegates
+			Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 		}
 	}
 }

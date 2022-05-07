@@ -9,9 +9,9 @@ using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Tab View", Description: "Demos TabView control with limited screen space in Absolute layout")]
-	[ScenarioCategory ("Controls")]
-	class TabViewExample : Scenario {
+	[ScenarioMetadata (Name: "Tab View", Description: "Demos TabView control with limited screen space in Absolute layout.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView")]
+	public class TabViewExample : Scenario {
 
 		TabView tabView;
 

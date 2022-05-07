@@ -77,24 +77,42 @@ namespace Terminal.Gui {
 					Visible = false;
 					return;
 				}
-				child.X = 0;
-				child.Y = 0;
-				AdjustContainer ();
 				if (child?.Border != null) {
-					child.Border.BorderChanged += Border_BorderChanged;
 					Border = child.Border;
-					Border.Child = childContentView;
 				} else {
 					if (Border == null) {
 						Border = new Border ();
 					}
-					Border.BorderChanged += Border_BorderChanged;
-					Border.Child = childContentView;
+					Child.Border = Border;
 				}
+				Border.Child = childContentView;
 				if (!child.IsInitialized) {
 					child.Initialized += Child_Initialized;
 				}
 				childContentView.Add (Child);
+			}
+		}
+
+		/// <inheritdoc />
+		public override Border Border {
+			get => base.Border;
+			set {
+				if (base.Border?.Child != null && value.Child == null) {
+					value.Child = base.Border.Child;
+				}
+				base.Border = value;
+				if (value == null) {
+					return;
+				}
+				Border.BorderChanged += Border_BorderChanged;
+				if (Child != null && (Child?.Border == null || Child?.Border != value)) {
+					if (Child?.Border == null) {
+						Child.Border = new Border ();
+					}
+					Child.Border = Border;
+					Child.Border.BorderChanged += Border_BorderChanged;
+				}
+				AdjustContainer ();
 			}
 		}
 
@@ -118,23 +136,26 @@ namespace Terminal.Gui {
 		private void AdjustContainer ()
 		{
 			if (Child?.IsInitialized == true) {
-				var borderLength = Child.Border != null
-					? Child.Border.DrawMarginFrame ? 1 : 0
-					: 0;
-				var sumPadding = Child.Border != null
-					? Child.Border.GetSumThickness ()
-					: new Thickness ();
+				if (Child?.Border != null && Child.Border != Border) {
+					Border = Child.Border;
+				}
+				var borderLength = Child.Border.DrawMarginFrame ? 1 : 0;
+				var sumPadding = Child.Border.GetSumThickness ();
+				var effect3DOffset = Child.Border.Effect3D ? Child.Border.Effect3DOffset : new Point ();
 				if (!UsePanelFrame) {
-					X = savedChild.X;
+					X = savedPanel.X;
 					childContentView.X = borderLength + sumPadding.Left;
-					Y = savedChild.Y;
+					Y = savedPanel.Y;
 					childContentView.Y = borderLength + sumPadding.Top;
 					if (savedChild.Width is Dim.DimFill) {
 						var margin = -savedChild.Width.Anchor (0);
 						Width = Dim.Fill (margin);
 						childContentView.Width = Dim.Fill (margin + borderLength + sumPadding.Right);
 					} else {
-						Width = savedChild.Width + (2 * borderLength) + sumPadding.Right + sumPadding.Left;
+						var savedLayout = LayoutStyle;
+						LayoutStyle = LayoutStyle.Absolute;
+						Width = savedChild.X.Anchor (0) + savedChild.Width + (2 * borderLength) + sumPadding.Right + sumPadding.Left;
+						LayoutStyle = savedLayout;
 						childContentView.Width = Dim.Fill (borderLength + sumPadding.Right);
 					}
 					if (savedChild.Height is Dim.DimFill) {
@@ -142,25 +163,34 @@ namespace Terminal.Gui {
 						Height = Dim.Fill (margin);
 						childContentView.Height = Dim.Fill (margin + borderLength + sumPadding.Bottom);
 					} else {
-						Height = savedChild.Height + (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
+						var savedLayout = LayoutStyle;
+						LayoutStyle = LayoutStyle.Absolute;
+						Height = savedChild.Y.Anchor (0) + savedChild.Height + (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
+						LayoutStyle = savedLayout;
 						childContentView.Height = Dim.Fill (borderLength + sumPadding.Bottom);
 					}
 				} else {
-					X = savedPanel.X;
+					X = savedPanel.X - (effect3DOffset.X < 0 ? effect3DOffset.X : 0);
 					childContentView.X = borderLength + sumPadding.Left;
-					Y = savedPanel.Y;
+					Y = savedPanel.Y - (effect3DOffset.Y < 0 ? effect3DOffset.Y : 0);
 					childContentView.Y = borderLength + sumPadding.Top;
 					Width = savedPanel.Width;
 					Height = savedPanel.Height;
 					if (Width is Dim.DimFill) {
-						var margin = -savedPanel.Width.Anchor (0);
-						childContentView.Width = Dim.Fill (margin + borderLength + sumPadding.Right);
+						var margin = -savedPanel.Width.Anchor (0) +
+							(effect3DOffset.X > 0 ? effect3DOffset.X : 0);
+						Width = Dim.Fill (margin);
+						childContentView.Width = Dim.Fill (margin + borderLength + sumPadding.Right +
+							(effect3DOffset.X > 0 ? effect3DOffset.X : 0));
 					} else {
 						childContentView.Width = Dim.Fill (borderLength + sumPadding.Right);
 					}
 					if (Height is Dim.DimFill) {
-						var margin = -savedPanel.Height.Anchor (0);
-						childContentView.Height = Dim.Fill (margin + borderLength + sumPadding.Bottom);
+						var margin = -savedPanel.Height.Anchor (0) +
+							(effect3DOffset.Y > 0 ? effect3DOffset.Y : 0);
+						Height = Dim.Fill (margin);
+						childContentView.Height = Dim.Fill (margin + borderLength + sumPadding.Bottom +
+							(effect3DOffset.Y > 0 ? effect3DOffset.Y : 0));
 					} else {
 						childContentView.Height = Dim.Fill (borderLength + sumPadding.Bottom);
 					}
@@ -206,7 +236,7 @@ namespace Terminal.Gui {
 		{
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (Child.GetNormalColor ());
-				Border.DrawContent ();
+				Child.Border.DrawContent (Border.Child);
 			}
 			var savedClip = childContentView.ClipToBounds ();
 			childContentView.Redraw (childContentView.Bounds);

@@ -27,37 +27,39 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect frame) : base (frame)
+		public Label (Rect frame, bool autosize = false) : base (frame)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (ustring text) : base (text)
+		public Label (ustring text, bool autosize = true) : base (text)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect rect, ustring text) : base (rect, text)
+		public Label (Rect rect, ustring text, bool autosize = false) : base (rect, text)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (int x, int y, ustring text) : base (x, y, text)
+		public Label (int x, int y, ustring text, bool autosize = true) : base (x, y, text)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (ustring text, TextDirection direction)
+		public Label (ustring text, TextDirection direction, bool autosize = true)
 			: base (text, direction)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
-		void Initialize ()
+		void Initialize (bool autosize = true)
 		{
-			AutoSize = true;
+			AutoSize = autosize;
 		}
 
 		/// <summary>

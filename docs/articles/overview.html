@@ -8,7 +8,7 @@
     <title>Terminal.Gui API Overview </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Terminal.Gui API Overview ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -104,7 +104,7 @@ not to make a decision and instead pressed the ESC key).</p>
 the various views that are included.   In the following sections, you
 will see how applications are put together.</p>
 <p>In the example above, you can see that we have initialized the runtime by calling the 
-<a href="../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
+<a href="../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
 schemes available for your application and clears the screen to start your application.</p>
 <p>The <a href="../api/Terminal.Gui/Terminal.Gui.Application.html"><code>Application</code></a> class, additionally creates an instance of the <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html"><code>Toplevel</code></a> class that is ready to be consumed, 
 this instance is available in the <code>Application.Top</code> property, and can be used like this:</p>
@@ -305,7 +305,7 @@ class Demo {
 to be used modally - that is, they run, and they are expected to return a result 
 before resuming execution of your application.</p>
 <p>Dialogs are a subclass of <code>Window</code> and additionally expose the 
-<a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_"><code>AddButton</code></a> API which manages the layout
+<a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.yml#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_"><code>AddButton</code></a> API which manages the layout
 of any button passed to it, ensuring that the buttons are at the bottom of the dialog.</p>
 <p>Example:</p>
 <pre><code class="lang-csharp">bool okpressed = false;
@@ -376,8 +376,9 @@ to background views when a modal view is running.   </p>
 <p>All views have been configured with a color scheme that will work both in color
 terminals as well as the more limited black and white terminals.   </p>
 <p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html"><code>Colors</code></a> class which defined color schemes for
-the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:</p>
+the toplevel, the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:</p>
 <ul>
+<li><code>Colors.Toplevel</code></li>
 <li><code>Colors.Base</code></li>
 <li><code>Colors.Menu</code></li>
 <li><code>Colors.Dialog</code></li>
@@ -403,10 +404,6 @@ label.TextColor = myColor
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TableView
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -133,6 +133,9 @@ View for tabular data based on a <span class="xref">System.Data.DataTable</span>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -267,7 +270,7 @@ View for tabular data based on a <span class="xref">System.Data.DataTable</span>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
@@ -306,10 +309,46 @@ View for tabular data based on a <span class="xref">System.Data.DataTable</span>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -432,6 +471,9 @@ View for tabular data based on a <span class="xref">System.Data.DataTable</span>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -461,8 +503,6 @@ View for tabular data based on a <span class="xref">System.Data.DataTable</span>
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_TableView__ctor_" data-uid="Terminal.Gui.TableView.#ctor*"></a>
   <h4 id="Terminal_Gui_TableView__ctor" data-uid="Terminal.Gui.TableView.#ctor">TableView()</h4>
   <div class="markdown level1 summary">
@@ -473,8 +513,6 @@ Initialzies a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> c
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public TableView()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_TableView__ctor_" data-uid="Terminal.Gui.TableView.#ctor*"></a>
   <h4 id="Terminal_Gui_TableView__ctor_System_Data_DataTable_" data-uid="Terminal.Gui.TableView.#ctor(System.Data.DataTable)">TableView(DataTable)</h4>
   <div class="markdown level1 summary">
@@ -504,8 +542,6 @@ Initialzies a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> c
   </table>
   <h3 id="fields">Fields
   </h3>
-  
-  
   <h4 id="Terminal_Gui_TableView_DefaultMaxCellWidth" data-uid="Terminal.Gui.TableView.DefaultMaxCellWidth">DefaultMaxCellWidth</h4>
   <div class="markdown level1 summary">
 The default maximum cell width for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> and <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
@@ -532,8 +568,6 @@ The default maximum cell width for <a class="xref" href="Terminal.Gui.TableView.
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_TableView_CellActivationKey_" data-uid="Terminal.Gui.TableView.CellActivationKey*"></a>
   <h4 id="Terminal_Gui_TableView_CellActivationKey" data-uid="Terminal.Gui.TableView.CellActivationKey">CellActivationKey</h4>
   <div class="markdown level1 summary">
@@ -559,8 +593,6 @@ The key which when pressed should trigger <a class="xref" href="Terminal.Gui.Tab
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_ColumnOffset_" data-uid="Terminal.Gui.TableView.ColumnOffset*"></a>
   <h4 id="Terminal_Gui_TableView_ColumnOffset" data-uid="Terminal.Gui.TableView.ColumnOffset">ColumnOffset</h4>
   <div class="markdown level1 summary">
@@ -588,8 +620,6 @@ Horizontal scroll offset.  The index of the first column in <a class="xref" href
   </table>
   <h5 id="Terminal_Gui_TableView_ColumnOffset_remarks">Remarks</h5>
   <div class="markdown level1 remarks">This property allows very wide tables to be rendered with horizontal scrolling</div>
-  
-  
   <a id="Terminal_Gui_TableView_FullRowSelect_" data-uid="Terminal.Gui.TableView.FullRowSelect*"></a>
   <h4 id="Terminal_Gui_TableView_FullRowSelect" data-uid="Terminal.Gui.TableView.FullRowSelect">FullRowSelect</h4>
   <div class="markdown level1 summary">
@@ -615,8 +645,6 @@ True to select the entire row at once.  False to select individual cells.  Defau
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_MaxCellWidth_" data-uid="Terminal.Gui.TableView.MaxCellWidth*"></a>
   <h4 id="Terminal_Gui_TableView_MaxCellWidth" data-uid="Terminal.Gui.TableView.MaxCellWidth">MaxCellWidth</h4>
   <div class="markdown level1 summary">
@@ -642,8 +670,6 @@ The maximum number of characters to render in any given column.  This prevents o
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_MultiSelect_" data-uid="Terminal.Gui.TableView.MultiSelect*"></a>
   <h4 id="Terminal_Gui_TableView_MultiSelect" data-uid="Terminal.Gui.TableView.MultiSelect">MultiSelect</h4>
   <div class="markdown level1 summary">
@@ -669,8 +695,6 @@ True to allow regions to be selected
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_MultiSelectedRegions_" data-uid="Terminal.Gui.TableView.MultiSelectedRegions*"></a>
   <h4 id="Terminal_Gui_TableView_MultiSelectedRegions" data-uid="Terminal.Gui.TableView.MultiSelectedRegions">MultiSelectedRegions</h4>
   <div class="markdown level1 summary">
@@ -696,8 +720,6 @@ When <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_Mu
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_NullSymbol_" data-uid="Terminal.Gui.TableView.NullSymbol*"></a>
   <h4 id="Terminal_Gui_TableView_NullSymbol" data-uid="Terminal.Gui.TableView.NullSymbol">NullSymbol</h4>
   <div class="markdown level1 summary">
@@ -723,8 +745,6 @@ The text representation that should be rendered for cells with the value <span c
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_RowOffset_" data-uid="Terminal.Gui.TableView.RowOffset*"></a>
   <h4 id="Terminal_Gui_TableView_RowOffset" data-uid="Terminal.Gui.TableView.RowOffset">RowOffset</h4>
   <div class="markdown level1 summary">
@@ -750,8 +770,6 @@ Vertical scroll offset.  The index of the first row in <a class="xref" href="Ter
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_SelectedColumn_" data-uid="Terminal.Gui.TableView.SelectedColumn*"></a>
   <h4 id="Terminal_Gui_TableView_SelectedColumn" data-uid="Terminal.Gui.TableView.SelectedColumn">SelectedColumn</h4>
   <div class="markdown level1 summary">
@@ -777,8 +795,6 @@ The index of <span class="xref">System.Data.DataTable.Columns</span> in <a class
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_SelectedRow_" data-uid="Terminal.Gui.TableView.SelectedRow*"></a>
   <h4 id="Terminal_Gui_TableView_SelectedRow" data-uid="Terminal.Gui.TableView.SelectedRow">SelectedRow</h4>
   <div class="markdown level1 summary">
@@ -804,8 +820,6 @@ The index of <span class="xref">System.Data.DataTable.Rows</span> in <a class="x
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_SeparatorSymbol_" data-uid="Terminal.Gui.TableView.SeparatorSymbol*"></a>
   <h4 id="Terminal_Gui_TableView_SeparatorSymbol" data-uid="Terminal.Gui.TableView.SeparatorSymbol">SeparatorSymbol</h4>
   <div class="markdown level1 summary">
@@ -831,8 +845,6 @@ The symbol to add after each cell value and header value to visually seperate va
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_Style_" data-uid="Terminal.Gui.TableView.Style*"></a>
   <h4 id="Terminal_Gui_TableView_Style" data-uid="Terminal.Gui.TableView.Style">Style</h4>
   <div class="markdown level1 summary">
@@ -858,8 +870,6 @@ Contains options for changing how the table is rendered
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_Table_" data-uid="Terminal.Gui.TableView.Table*"></a>
   <h4 id="Terminal_Gui_TableView_Table" data-uid="Terminal.Gui.TableView.Table">Table</h4>
   <div class="markdown level1 summary">
@@ -887,8 +897,6 @@ The data table to render in the view.  Setting this property automatically updat
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_TableView_CellToScreen_" data-uid="Terminal.Gui.TableView.CellToScreen*"></a>
   <h4 id="Terminal_Gui_TableView_CellToScreen_System_Int32_System_Int32_" data-uid="Terminal.Gui.TableView.CellToScreen(System.Int32,System.Int32)">CellToScreen(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -936,8 +944,6 @@ Returns the screen position (relative to the control client area) that the given
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_ChangeSelectionByOffset_" data-uid="Terminal.Gui.TableView.ChangeSelectionByOffset*"></a>
   <h4 id="Terminal_Gui_TableView_ChangeSelectionByOffset_System_Int32_System_Int32_System_Boolean_" data-uid="Terminal.Gui.TableView.ChangeSelectionByOffset(System.Int32,System.Int32,System.Boolean)">ChangeSelectionByOffset(Int32, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -975,8 +981,114 @@ Moves the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableVi
       </tr>
     </tbody>
   </table>
-  
-  
+  <a id="Terminal_Gui_TableView_ChangeSelectionToEndOfRow_" data-uid="Terminal.Gui.TableView.ChangeSelectionToEndOfRow*"></a>
+  <h4 id="Terminal_Gui_TableView_ChangeSelectionToEndOfRow_System_Boolean_" data-uid="Terminal.Gui.TableView.ChangeSelectionToEndOfRow(System.Boolean)">ChangeSelectionToEndOfRow(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves or extends the selection to the last cell in the current row
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ChangeSelectionToEndOfRow(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_ChangeSelectionToEndOfTable_" data-uid="Terminal.Gui.TableView.ChangeSelectionToEndOfTable*"></a>
+  <h4 id="Terminal_Gui_TableView_ChangeSelectionToEndOfTable_System_Boolean_" data-uid="Terminal.Gui.TableView.ChangeSelectionToEndOfTable(System.Boolean)">ChangeSelectionToEndOfTable(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves or extends the selection to the final cell in the table
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ChangeSelectionToEndOfTable(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_ChangeSelectionToStartOfRow_" data-uid="Terminal.Gui.TableView.ChangeSelectionToStartOfRow*"></a>
+  <h4 id="Terminal_Gui_TableView_ChangeSelectionToStartOfRow_System_Boolean_" data-uid="Terminal.Gui.TableView.ChangeSelectionToStartOfRow(System.Boolean)">ChangeSelectionToStartOfRow(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves or extends the selection to the first cell in the current row
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ChangeSelectionToStartOfRow(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_ChangeSelectionToStartOfTable_" data-uid="Terminal.Gui.TableView.ChangeSelectionToStartOfTable*"></a>
+  <h4 id="Terminal_Gui_TableView_ChangeSelectionToStartOfTable_System_Boolean_" data-uid="Terminal.Gui.TableView.ChangeSelectionToStartOfTable(System.Boolean)">ChangeSelectionToStartOfTable(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves or extends the selection to the first cell in the table (0,0)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ChangeSelectionToStartOfTable(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TableView_EnsureSelectedCellIsVisible_" data-uid="Terminal.Gui.TableView.EnsureSelectedCellIsVisible*"></a>
   <h4 id="Terminal_Gui_TableView_EnsureSelectedCellIsVisible" data-uid="Terminal.Gui.TableView.EnsureSelectedCellIsVisible">EnsureSelectedCellIsVisible()</h4>
   <div class="markdown level1 summary">
@@ -989,8 +1101,6 @@ Updates scroll offsets to ensure that the selected cell is visible.  Has no effe
   </div>
   <h5 id="Terminal_Gui_TableView_EnsureSelectedCellIsVisible_remarks">Remarks</h5>
   <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_EnsureValidScrollOffsets_" data-uid="Terminal.Gui.TableView.EnsureValidScrollOffsets*"></a>
   <h4 id="Terminal_Gui_TableView_EnsureValidScrollOffsets" data-uid="Terminal.Gui.TableView.EnsureValidScrollOffsets">EnsureValidScrollOffsets()</h4>
   <div class="markdown level1 summary">
@@ -1003,8 +1113,6 @@ Updates <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView
   </div>
   <h5 id="Terminal_Gui_TableView_EnsureValidScrollOffsets_remarks">Remarks</h5>
   <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_EnsureValidSelection_" data-uid="Terminal.Gui.TableView.EnsureValidSelection*"></a>
   <h4 id="Terminal_Gui_TableView_EnsureValidSelection" data-uid="Terminal.Gui.TableView.EnsureValidSelection">EnsureValidSelection()</h4>
   <div class="markdown level1 summary">
@@ -1017,8 +1125,6 @@ Updates <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView
   </div>
   <h5 id="Terminal_Gui_TableView_EnsureValidSelection_remarks">Remarks</h5>
   <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_GetAllSelectedCells_" data-uid="Terminal.Gui.TableView.GetAllSelectedCells*"></a>
   <h4 id="Terminal_Gui_TableView_GetAllSelectedCells" data-uid="Terminal.Gui.TableView.GetAllSelectedCells">GetAllSelectedCells()</h4>
   <div class="markdown level1 summary">
@@ -1044,8 +1150,6 @@ Returns all cells in any <a class="xref" href="Terminal.Gui.TableView.html#Termi
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_IsSelected_" data-uid="Terminal.Gui.TableView.IsSelected*"></a>
   <h4 id="Terminal_Gui_TableView_IsSelected_System_Int32_System_Int32_" data-uid="Terminal.Gui.TableView.IsSelected(System.Int32,System.Int32)">IsSelected(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -1093,8 +1197,6 @@ Returns true if the given cell is selected either because it is the active cell 
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_MouseEvent_" data-uid="Terminal.Gui.TableView.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TableView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TableView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -1137,8 +1239,6 @@ Returns true if the given cell is selected either because it is the active cell 
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_OnCellActivated_" data-uid="Terminal.Gui.TableView.OnCellActivated*"></a>
   <h4 id="Terminal_Gui_TableView_OnCellActivated_Terminal_Gui_TableView_CellActivatedEventArgs_" data-uid="Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.TableView.CellActivatedEventArgs)">OnCellActivated(TableView.CellActivatedEventArgs)</h4>
   <div class="markdown level1 summary">
@@ -1166,8 +1266,6 @@ Invokes the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_Table
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_OnSelectedCellChanged_" data-uid="Terminal.Gui.TableView.OnSelectedCellChanged*"></a>
   <h4 id="Terminal_Gui_TableView_OnSelectedCellChanged_Terminal_Gui_TableView_SelectedCellChangedEventArgs_" data-uid="Terminal.Gui.TableView.OnSelectedCellChanged(Terminal.Gui.TableView.SelectedCellChangedEventArgs)">OnSelectedCellChanged(TableView.SelectedCellChangedEventArgs)</h4>
   <div class="markdown level1 summary">
@@ -1195,8 +1293,60 @@ Invokes the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_Table
       </tr>
     </tbody>
   </table>
-  
-  
+  <a id="Terminal_Gui_TableView_PageDown_" data-uid="Terminal.Gui.TableView.PageDown*"></a>
+  <h4 id="Terminal_Gui_TableView_PageDown_System_Boolean_" data-uid="Terminal.Gui.TableView.PageDown(System.Boolean)">PageDown(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves the selection down by one page
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PageDown(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_PageUp_" data-uid="Terminal.Gui.TableView.PageUp*"></a>
+  <h4 id="Terminal_Gui_TableView_PageUp_System_Boolean_" data-uid="Terminal.Gui.TableView.PageUp(System.Boolean)">PageUp(Boolean)</h4>
+  <div class="markdown level1 summary">
+Moves the selection up by one page
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PageUp(bool extend)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">extend</span></td>
+        <td>true to extend the current selection (if any) instead of replacing</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TableView_PositionCursor_" data-uid="Terminal.Gui.TableView.PositionCursor*"></a>
   <h4 id="Terminal_Gui_TableView_PositionCursor" data-uid="Terminal.Gui.TableView.PositionCursor">PositionCursor()</h4>
   <div class="markdown level1 summary">
@@ -1209,8 +1359,6 @@ Positions the cursor in the area of the screen in which the start of the active 
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_ProcessKey_" data-uid="Terminal.Gui.TableView.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TableView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TableView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary"></div>
@@ -1253,8 +1401,6 @@ Positions the cursor in the area of the screen in which the start of the active 
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_Redraw_" data-uid="Terminal.Gui.TableView.Redraw*"></a>
   <h4 id="Terminal_Gui_TableView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TableView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -1282,8 +1428,6 @@ Positions the cursor in the area of the screen in which the start of the active 
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  
-  
   <a id="Terminal_Gui_TableView_RenderCell_" data-uid="Terminal.Gui.TableView.RenderCell*"></a>
   <h4 id="Terminal_Gui_TableView_RenderCell_Terminal_Gui_Attribute_System_String_System_Boolean_" data-uid="Terminal.Gui.TableView.RenderCell(Terminal.Gui.Attribute,System.String,System.Boolean)">RenderCell(Attribute, String, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -1325,8 +1469,6 @@ For changing the content that is rendered use <a class="xref" href="Terminal.Gui
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_ScreenToCell_" data-uid="Terminal.Gui.TableView.ScreenToCell*"></a>
   <h4 id="Terminal_Gui_TableView_ScreenToCell_System_Int32_System_Int32_" data-uid="Terminal.Gui.TableView.ScreenToCell(System.Int32,System.Int32)">ScreenToCell(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -1374,8 +1516,6 @@ Returns the column and row of <a class="xref" href="Terminal.Gui.TableView.html#
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_SelectAll_" data-uid="Terminal.Gui.TableView.SelectAll*"></a>
   <h4 id="Terminal_Gui_TableView_SelectAll" data-uid="Terminal.Gui.TableView.SelectAll">SelectAll()</h4>
   <div class="markdown level1 summary">
@@ -1386,8 +1526,6 @@ When <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_Mu
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void SelectAll()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_TableView_SetSelection_" data-uid="Terminal.Gui.TableView.SetSelection*"></a>
   <h4 id="Terminal_Gui_TableView_SetSelection_System_Int32_System_Int32_System_Boolean_" data-uid="Terminal.Gui.TableView.SetSelection(System.Int32,System.Int32,System.Boolean)">SetSelection(Int32, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -1425,8 +1563,6 @@ Moves the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableVi
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_TableView_Update_" data-uid="Terminal.Gui.TableView.Update*"></a>
   <h4 id="Terminal_Gui_TableView_Update" data-uid="Terminal.Gui.TableView.Update">Update()</h4>
   <div class="markdown level1 summary">
@@ -1441,8 +1577,6 @@ Updates the view to reflect changes to <a class="xref" href="Terminal.Gui.TableV
   <div class="markdown level1 remarks">This always calls <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
   <h3 id="events">Events
   </h3>
-  
-  
   <h4 id="Terminal_Gui_TableView_CellActivated" data-uid="Terminal.Gui.TableView.CellActivated">CellActivated</h4>
   <div class="markdown level1 summary">
 This event is raised when a cell is activated e.g. by double clicking or pressing <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_CellActivationKey">CellActivationKey</a>
@@ -1467,8 +1601,6 @@ This event is raised when a cell is activated e.g. by double clicking or pressin
       </tr>
     </tbody>
   </table>
-  
-  
   <h4 id="Terminal_Gui_TableView_SelectedCellChanged" data-uid="Terminal.Gui.TableView.SelectedCellChanged">SelectedCellChanged</h4>
   <div class="markdown level1 summary">
 This event is raised when the selected cell in the table changes.
@@ -1508,10 +1640,6 @@ This event is raised when the selected cell in the table changes.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

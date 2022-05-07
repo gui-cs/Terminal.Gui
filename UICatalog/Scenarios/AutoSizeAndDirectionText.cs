@@ -1,9 +1,9 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "AutoSize and Direction Text", Description: "Demonstrates the text auto-size and direction manipulation.")]
-	[ScenarioCategory ("Text")]
-	class AutoSizeAndDirectionText : Scenario {
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Text Direction and AutoSize", Description: "Demos TextFormatter Direction and View AutoSize.")]
+	[ScenarioCategory ("Text and Formatting")]
+	public class AutoSizeAndDirectionText : Scenario {
 		public override void Setup ()
 		{
 			var text = "Hello World";

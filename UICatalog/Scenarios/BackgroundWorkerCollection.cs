@@ -5,13 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "BackgroundWorker Collection", Description: "A persisting multi Toplevel BackgroundWorker threading")]
 	[ScenarioCategory ("Threading")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Top Level Windows")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
-	class BackgroundWorkerCollection : Scenario {
+	public class BackgroundWorkerCollection : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Top.Dispose ();
@@ -367,7 +367,7 @@ namespace UICatalog {
 
 			private void OnReportClosed ()
 			{
-				if (Staging.StartStaging != null) {
+				if (Staging?.StartStaging != null) {
 					ReportClosed?.Invoke (this);
 				}
 				RequestStop ();

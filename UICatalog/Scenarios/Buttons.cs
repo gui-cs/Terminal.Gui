@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Layout")]
-	class Buttons : Scenario {
+	public class Buttons : Scenario {
 		public override void Setup ()
 		{
 			// Add a label & text field so we can demo IsDefault

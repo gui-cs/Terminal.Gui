@@ -1,10 +1,10 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "SendKeys", Description: "SendKeys sample - Send key combinations.")]
-	[ScenarioCategory ("Input")]
-	class SendKeys : Scenario {
+	[ScenarioCategory ("Mouse and Keyboard")]
+	public class SendKeys : Scenario {
 		public override void Setup ()
 		{
 			var label = new Label ("Insert the text to send:") {

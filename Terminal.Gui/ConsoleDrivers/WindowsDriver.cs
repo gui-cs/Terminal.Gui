@@ -881,17 +881,15 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
-				if (HeightAsBuffer) {
-					var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
-					left = pos.X;
-					top = pos.Y;
-					cols = inputEvent.WindowBufferSizeEvent.size.X;
-					rows = inputEvent.WindowBufferSizeEvent.size.Y;
-					//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
-					ResizeScreen ();
-					UpdateOffScreen ();
-					TerminalResized?.Invoke ();
-				}
+				var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
+				left = pos.X;
+				top = pos.Y;
+				cols = inputEvent.WindowBufferSizeEvent.size.X;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
+				ResizeScreen ();
+				UpdateOffScreen ();
+				TerminalResized?.Invoke ();
 				break;
 
 			case WindowsConsole.EventType.Focus:
@@ -1445,7 +1443,7 @@ namespace Terminal.Gui {
 			WinConsole.ForceRefreshCursorVisibility ();
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
 			contents = new int [rows, cols, 3];
 			for (int row = 0; row < rows; row++) {
@@ -1470,9 +1468,24 @@ namespace Terminal.Gui {
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			var position = crow * Cols + ccol;
+			var validClip = IsValidContent (ccol, crow, Clip);
 
-			if (Clip.Contains (ccol, crow)) {
+			if (validClip) {
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					var prevPosition = crow * Cols + (ccol - 1);
+					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					var prevPosition = crow * Cols + ccol + 1;
+					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+				}
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
 				OutputBuffer [position].Char.UnicodeChar = (char)rune;
 				contents [crow, ccol, 0] = (int)(uint)rune;
@@ -1482,17 +1495,18 @@ namespace Terminal.Gui {
 			}
 
 			ccol++;
-			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
-				for (int i = 1; i < runeWidth; i++) {
-					AddStr (" ");
+				if (validClip) {
+					position = crow * Cols + ccol;
+					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
+					contents [crow, ccol, 0] = (int)(uint)0x00;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
 				}
+				ccol++;
 			}
-			//if (ccol == Cols) {
-			//	ccol = 0;
-			//	if (crow + 1 < Rows)
-			//		crow++;
-			//}
+
 			if (sync)
 				UpdateScreen ();
 		}
@@ -1530,6 +1544,8 @@ namespace Terminal.Gui {
 			UpdateScreen ();
 
 			WinConsole.SetInitialCursorVisibility ();
+
+			UpdateCursor ();
 #if false
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
@@ -1565,14 +1581,24 @@ namespace Terminal.Gui {
 			//	Bottom = (short)Clip.Bottom
 			//};
 
-			UpdateCursor ();
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
+		CursorVisibility savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (ccol < 0 || crow < 0 || ccol > Cols || crow > Rows) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return;
+			}
+
+			SetCursorVisibility (savedCursorVisibility);
 			var position = new WindowsConsole.Coord () {
 				X = (short)ccol,
 				Y = (short)crow
@@ -1600,6 +1626,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
+			savedCursorVisibility = visibility;
 			return WinConsole.SetCursorVisibility (visibility);
 		}
 
@@ -1858,7 +1885,7 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.MainIteration ()
 		{
 			while (resultQueue.Count > 0) {
-				var inputEvent = resultQueue.Dequeue()[0];
+				var inputEvent = resultQueue.Dequeue () [0];
 				ProcessInput?.Invoke (inputEvent);
 			}
 			if (winChanged) {
@@ -1902,8 +1929,7 @@ namespace Terminal.Gui {
 					Marshal.Copy (pointer, buff, 0, size);
 
 					return System.Text.Encoding.Unicode.GetString (buff)
-						.TrimEnd ('\0')
-						.Replace ("\r\n", "\n");
+						.TrimEnd ('\0');
 				} finally {
 					if (pointer != IntPtr.Zero)
 						GlobalUnlock (handle);

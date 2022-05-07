@@ -4,7 +4,7 @@ This control supports viewing and editing tabular data. It provides a view of a 
 
 System.DataTable is a core class of .net standard and can be created very easily
 
-[TableView API Reference](api/Terminal.Gui/Terminal.Gui.TableView.html)
+[TableView API Reference](~/api/Terminal.Gui/Terminal.Gui.TableView.yml)
 
 ## Csv Example
 

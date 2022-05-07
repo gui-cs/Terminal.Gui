@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 		/// </param>
 		public Button (ustring text, bool is_default = false) : base (text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
 		/// <summary>
@@ -89,15 +89,17 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1), text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
 		Rune _leftBracket;
 		Rune _rightBracket;
 		Rune _leftDefault;
 		Rune _rightDefault;
+		private Key hotKey = Key.Null;
+		private Rune hotKeySpecifier;
 
-		void Init (ustring text, bool is_default)
+		void Initialize (ustring text, bool is_default)
 		{
 			TextAlignment = TextAlignment.Centered;
 
@@ -112,18 +114,29 @@ namespace Terminal.Gui {
 			this.is_default = is_default;
 			this.text = text ?? string.Empty;
 			Update ();
+
+			// Things this view knows how to do
+			AddCommand (Command.Accept, () => AcceptKey ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.Space, Command.Accept);
+			if (HotKey != Key.Null) {
+				AddKeyBinding (Key.Space | HotKey, Command.Accept);
+			}
 		}
 
-		/// <summary>
-		///   The text displayed by this <see cref="Button"/>.
-		/// </summary>
-		public new ustring Text {
+		/// <inheritdoc/>>
+		public override ustring Text {
 			get {
 				return text;
 			}
-
 			set {
 				text = value;
+				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
+				if (hotKey != hk) {
+					HotKey = hk;
+				}
 				Update ();
 			}
 		}
@@ -140,14 +153,51 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => hotKey;
+			set {
+				if (hotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					if (ContainsKeyBinding (Key.Space | hotKey)) {
+						if (v == Key.Null) {
+							ClearKeybinding (Key.Space | hotKey);
+						} else {
+							ReplaceKeyBinding (Key.Space | hotKey, Key.Space | v);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v, Command.Accept);
+					}
+					hotKey = v;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Rune HotKeySpecifier {
+			get => hotKeySpecifier;
+			set {
+				hotKeySpecifier = TextFormatter.HotKeySpecifier = value;
+			}
+		}
+
+		/// <inheritdoc/>
+		public override bool AutoSize {
+			get => base.AutoSize;
+			set {
+				base.AutoSize = value;
+				Update ();
+			}
+		}
+
 		internal void Update ()
 		{
 			if (IsDefault)
-				base.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
 			GetCurrentWidth (out int cWidth);
 			var canSetWidth = SetWidth (w, out int rWidth);
 			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
@@ -171,14 +221,24 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		bool CheckKey (KeyEvent key)
+		/// <inheritdoc/>
+		public override void Redraw (Rect bounds)
 		{
-			if (key.Key == (Key.AltMask | HotKey)) {
-				SetFocus ();
-				Clicked?.Invoke ();
-				return true;
+			if (ColorScheme != null) {
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
-			return false;
+
+			if (Border != null) {
+				Border.DrawContent (this);
+			}
+
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				Clear ();
+				TextFormatter.NeedsFormat = true;
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
+			}
 		}
 
 		///<inheritdoc/>
@@ -188,10 +248,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (kb.IsAlt)
-				return CheckKey (kb);
-
-			return false;
+			return ExecuteHotKey (kb);
 		}
 
 		///<inheritdoc/>
@@ -201,11 +258,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (IsDefault && kb.KeyValue == '\n') {
-				Clicked?.Invoke ();
-				return true;
-			}
-			return CheckKey (kb);
+			return ExecuteColdKey (kb);
 		}
 
 		///<inheritdoc/>
@@ -215,14 +268,45 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || kb.Key == HotKey) {
-				Clicked?.Invoke ();
-				return true;
-			}
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
+
 			return base.ProcessKey (kb);
 		}
 
+		bool ExecuteHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				return AcceptKey ();
+			}
+			return false;
+		}
+
+		bool ExecuteColdKey (KeyEvent ke)
+		{
+			if (IsDefault && ke.KeyValue == '\n') {
+				return AcceptKey ();
+			}
+			return ExecuteHotKey (ke);
+		}
+
+		bool AcceptKey ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			OnClicked ();
+			return true;
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
+		}
 
 		/// <summary>
 		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
@@ -244,8 +328,9 @@ namespace Terminal.Gui {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
-					Clicked?.Invoke ();
+					OnClicked ();
 				}
 
 				return true;
@@ -257,8 +342,8 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (HotKey == Key.Unknown && text != "") {
-				for (int i = 0; i < base.Text.RuneCount; i++) {
-					if (base.Text [i] == text [0]) {
+				for (int i = 0; i < TextFormatter.Text.RuneCount; i++) {
+					if (TextFormatter.Text [i] == text [0]) {
 						Move (i, 0);
 						return;
 					}

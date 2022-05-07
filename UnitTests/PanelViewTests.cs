@@ -4,9 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class PanelViewTests {
+		readonly ITestOutputHelper output;
+
+		public PanelViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructor_Defaults ()
 		{
@@ -24,7 +32,7 @@ namespace Terminal.Gui.Views {
 			Assert.False (pv.UsePanelFrame);
 			Assert.NotNull (pv.Child);
 			Assert.NotNull (pv.Border);
-			Assert.Null (pv.Child.Border);
+			Assert.NotNull (pv.Child.Border);
 		}
 
 		[Fact]
@@ -32,7 +40,7 @@ namespace Terminal.Gui.Views {
 		{
 			var pv = new PanelView (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews[0].Subviews.Count);
+			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
 
 			pv.Child = null;
 			Assert.Null (pv.Child);
@@ -120,6 +128,19 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
+			Assert.False (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+
+			pv.Child.Border.Effect3D = true;
+
+			Assert.True (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+
+			pv.Child.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Point (-1, -1), pv.Child.Border.Effect3DOffset);
 			Assert.Equal (new Rect (0, 0, 25, 15), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
 		}
@@ -171,11 +192,31 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
 			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
 			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
+
+			pv.Child.Border.Effect3D = pv1.Child.Border.Effect3D = pv2.Child.Border.Effect3D = true;
+
+			Assert.True (pv.Child.Border.Effect3D);
+			Assert.Equal (new Rect (0, 0, 78, 23), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 68, 9), pv.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 77, 22), pv1.Frame);
+			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
+			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
+
+			pv.Child.Border.Effect3DOffset = pv1.Child.Border.Effect3DOffset = pv2.Child.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Point (-1, -1), pv.Child.Border.Effect3DOffset);
+			Assert.Equal (new Rect (0, 0, 78, 23), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 68, 9), pv.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 77, 22), pv1.Frame);
+			Assert.Equal (new Rect (0, 0, 65, 6), pv1.Child.Frame);
+			Assert.Equal (new Rect (0, 0, 76, 21), pv2.Frame);
+			Assert.Equal (new Rect (0, 0, 62, 3), pv2.Child.Frame);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void UsePanelFrame_False_PanelView_Always_Respect_The_Child_Upper_Left_Corner_Position_And_Size ()
+		public void UsePanelFrame_False_PanelView_Always_Respect_The_PanelView_Upper_Left_Corner_Position_And_The_Child_Size ()
 		{
 			var top = Application.Top;
 			var win = new Window ();
@@ -208,17 +249,44 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
-			Assert.Equal (new Rect (0, 0, 15, 1), pv.Frame);
+			Assert.False (pv.UsePanelFrame);
+			Assert.False (pv.Border.Effect3D);
+			Assert.Equal (pv.Child.Border, pv.Border);
+			Assert.False (pv1.UsePanelFrame);
+			Assert.False (pv1.Border.Effect3D);
+			Assert.Equal (pv1.Child.Border, pv1.Border);
+			Assert.False (pv2.UsePanelFrame);
+			Assert.False (pv2.Border.Effect3D);
+			Assert.Equal (pv2.Child.Border, pv2.Border);
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
-			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Frame);
-			Assert.Equal (new Rect (0, 0, 15, 1), pv1.Child.Frame);
-			Assert.Equal (new Rect (5, 6, 73, 17), pv2.Frame);
-			Assert.Equal (new Rect (0, 0, 73, 17), pv2.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
+
+			pv.Border.Effect3D = pv1.Border.Effect3D = pv2.Border.Effect3D = true;
+
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
+
+			pv.Border.Effect3DOffset = pv1.Border.Effect3DOffset = pv2.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Rect (2, 4, 15, 1), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 15, 1), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 18, 5), pv1.Frame);
+			Assert.Equal (new Rect (3, 4, 15, 1), pv1.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 76, 19), pv2.Frame);
+			Assert.Equal (new Rect (5, 6, 71, 13), pv2.Child.Frame);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void UsePanelFrame_True_PanelView_Position_And_Size_Are_Used ()
+		public void UsePanelFrame_True_PanelView_Position_And_Size_Are_Used_Depending_On_Effect3DOffset ()
 		{
 			var top = Application.Top;
 			var win = new Window ();
@@ -253,9 +321,155 @@ namespace Terminal.Gui.Views {
 			Application.Begin (top);
 
 			Assert.Equal (new Rect (5, 6, 73, 17), pv.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
 			Assert.Equal (new Rect (2, 4, 20, 10), pv1.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), pv1.Child.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
+
+			pv.Border.Effect3D = pv1.Border.Effect3D = true;
+
+			Assert.Equal (new Rect (5, 6, 73, 17), pv.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv1.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
+
+			pv.Border.Effect3DOffset = pv1.Border.Effect3DOffset = new Point (-1, -1);
+
+			Assert.Equal (new Rect (6, 7, 73, 17), pv.Frame);
+			Assert.Equal (new Rect (2, 4, 20, 10), pv.Child.Frame);
+			Assert.Equal (new Rect (3, 5, 20, 10), pv1.Frame);
+			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Setting_Child_Size_Disable_AutoSize ()
+		{
+			var top = Application.Top;
+			var win = new Window ();
+			var label = new Label ("Hello World") {
+				Width = 24,
+				Height = 13,
+				ColorScheme = Colors.TopLevel,
+				Text = "This is a test\nwith a \nPanelView",
+				TextAlignment = TextAlignment.Centered
+			};
+			var pv = new PanelView (label) {
+				Width = 24,
+				Height = 13,
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
+					DrawMarginFrame = true,
+					BorderThickness = new Thickness (2),
+					BorderBrush = Color.Red,
+					Padding = new Thickness (2),
+					Background = Color.BrightGreen,
+					Effect3D = true
+				},
+			};
+			win.Add (pv);
+			top.Add (win);
+
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 24, 13), label.Frame);
+			Assert.Equal (new Rect (0, 0, 34, 23), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+
+			var expected = @"
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│    ┌────────────────────────┐                                                │
+│    │     This is a test     │                                                │
+│    │        with a          │                                                │
+│    │       PanelView        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    │                        │                                                │
+│    └────────────────────────┘                                                │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 80, 25), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Not_Setting_Child_Size_Default_AutoSize_True ()
+		{
+			var top = Application.Top;
+			var win = new Window ();
+			var label = new Label ("Hello World") {
+				ColorScheme = Colors.TopLevel,
+				Text = "This is a test\nwith a \nPanelView",
+				TextAlignment = TextAlignment.Centered
+			};
+			var pv = new PanelView (label) {
+				Width = 24,
+				Height = 13,
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
+					DrawMarginFrame = true,
+					BorderThickness = new Thickness (2),
+					BorderBrush = Color.Red,
+					Padding = new Thickness (2),
+					Background = Color.BrightGreen,
+					Effect3D = true
+				},
+			};
+			win.Add (pv);
+			top.Add (win);
+
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 14, 3), label.Frame);
+			Assert.Equal (new Rect (0, 0, 24, 13), pv.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+
+			var expected = @"
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│    ┌──────────────┐                                                          │
+│    │This is a test│                                                          │
+│    │   with a     │                                                          │
+│    │  PanelView   │                                                          │
+│    └──────────────┘                                                          │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 80, 25), pos);
 		}
 	}
 }

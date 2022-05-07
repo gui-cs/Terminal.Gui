@@ -1,16 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using Terminal.Gui;
+﻿using System;
 using Xunit;
+using Xunit.Abstractions;
+using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.Views {
+namespace Terminal.Gui.Core {
 	public class ViewTests {
+		readonly ITestOutputHelper output;
+
+		public ViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void New_Initializes ()
 		{
@@ -747,6 +751,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
+		[AutoInitShutdown]
 		public void CanFocus_Faced_With_Container ()
 		{
 			var t = new Toplevel ();
@@ -1333,6 +1338,60 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
 		}
 
+		[Fact, AutoInitShutdown]
+		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Horizontal ()
+		{
+			var label = new Label ("Hello") { Width = 10, Height = 2 };
+			var viewX = new View ("X") { X = Pos.Right (label) };
+			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+
+			Application.Top.Add (label, viewX, viewY);
+			Application.Begin (Application.Top);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
+
+			var expected = @"
+Hello     X
+
+Y
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 11, 3), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Vertical ()
+		{
+			var label = new Label ("Hello") { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight };
+			var viewX = new View ("X") { X = Pos.Right (label) };
+			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+
+			Application.Top.Add (label, viewX, viewY);
+			Application.Begin (Application.Top);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
+
+			var expected = @"
+H X
+e
+l
+l
+o
+
+
+
+
+
+Y
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 3, 11), pos);
+		}
+
 		[Theory]
 		[InlineData (1)]
 		[InlineData (2)]
@@ -1573,6 +1632,367 @@ namespace Terminal.Gui.Views {
 				}
 				return runesCount;
 			}
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void GetTopSuperView_Test ()
+		{
+			var v1 = new View ();
+			var fv1 = new FrameView ();
+			fv1.Add (v1);
+			var tf1 = new TextField ();
+			var w1 = new Window ();
+			w1.Add (fv1, tf1);
+			var top1 = new Toplevel ();
+			top1.Add (w1);
+
+			var v2 = new View ();
+			var fv2 = new FrameView ();
+			fv2.Add (v2);
+			var tf2 = new TextField ();
+			var w2 = new Window ();
+			w2.Add (fv2, tf2);
+			var top2 = new Toplevel ();
+			top2.Add (w2);
+
+			Assert.Equal (top1, v1.GetTopSuperView ());
+			Assert.Equal (top2, v2.GetTopSuperView ());
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Excess_Text_Is_Erased_When_The_Width_Is_Reduced ()
+		{
+			var lbl = new Label ("123");
+			Application.Top.Add (lbl);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("123 ", GetContents ());
+
+			lbl.Text = "12";
+
+			if (!lbl.SuperView.NeedDisplay.IsEmpty) {
+				lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
+			}
+
+			Assert.Equal ("12  ", GetContents ());
+
+			string GetContents ()
+			{
+				var text = "";
+				for (int i = 0; i < 4; i++) {
+					text += (char)Application.Driver.Contents [0, i, 0];
+				}
+				return text;
+			}
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_Does_Not_Sets_HasFocus_To_True ()
+		{
+			var view = new View () { CanFocus = true };
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+
+			Assert.True (view.CanFocus);
+			Assert.True (view.HasFocus);
+
+			view.CanFocus = false;
+			Assert.False (view.CanFocus);
+			Assert.False (view.HasFocus);
+			Assert.Null (Application.Current.Focused);
+			Assert.Null (Application.Current.MostFocused);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_On_Single_View_Focus_View_On_Another_Toplevel ()
+		{
+			var view1 = new View () { Width = 10, Height = 1, CanFocus = true };
+			var win1 = new Window () { Width = Dim.Percent (50), Height = Dim.Fill () };
+			win1.Add (view1);
+			var view2 = new View () { Width = 20, Height = 2, CanFocus = true };
+			var win2 = new Window () { X = Pos.Right (win1), Width = Dim.Fill (), Height = Dim.Fill () };
+			win2.Add (view2);
+			Application.Top.Add (win1, win2);
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			view1.CanFocus = false;
+			Assert.False (view1.CanFocus);
+			Assert.False (view1.HasFocus);
+			Assert.Equal (win2, Application.Current.Focused);
+			Assert.Equal (view2, Application.Current.MostFocused);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_With_Two_Views_Focus_Another_View_On_The_Same_Toplevel ()
+		{
+			var view1 = new View () { Width = 10, Height = 1, CanFocus = true };
+			var view12 = new View () { Y = 5, Width = 10, Height = 1, CanFocus = true };
+			var win1 = new Window () { Width = Dim.Percent (50), Height = Dim.Fill () };
+			win1.Add (view1, view12);
+			var view2 = new View () { Width = 20, Height = 2, CanFocus = true };
+			var win2 = new Window () { X = Pos.Right (win1), Width = Dim.Fill (), Height = Dim.Fill () };
+			win2.Add (view2);
+			Application.Top.Add (win1, win2);
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			view1.CanFocus = false;
+			Assert.False (view1.CanFocus);
+			Assert.False (view1.HasFocus);
+			Assert.Equal (win1, Application.Current.Focused);
+			Assert.Equal (view12, Application.Current.MostFocused);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void CanFocus_Sets_To_False_On_Toplevel_Focus_View_On_Another_Toplevel ()
+		{
+			var view1 = new View () { Width = 10, Height = 1, CanFocus = true };
+			var win1 = new Window () { Width = Dim.Percent (50), Height = Dim.Fill () };
+			win1.Add (view1);
+			var view2 = new View () { Width = 20, Height = 2, CanFocus = true };
+			var win2 = new Window () { X = Pos.Right (win1), Width = Dim.Fill (), Height = Dim.Fill () };
+			win2.Add (view2);
+			Application.Top.Add (win1, win2);
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			win1.CanFocus = false;
+			Assert.False (view1.CanFocus);
+			Assert.False (view1.HasFocus);
+			Assert.False (win1.CanFocus);
+			Assert.False (win1.HasFocus);
+			Assert.Equal (win2, Application.Current.Focused);
+			Assert.Equal (view2, Application.Current.MostFocused);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+		{
+			var sbQuiting = false;
+			var tfQuiting = false;
+			var topQuiting = false;
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+			});
+			var tf = new TextField ();
+			tf.KeyPress += Tf_KeyPress;
+
+			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = tfQuiting = true;
+				}
+			}
+
+			var win = new Window ();
+			win.Add (sb, tf);
+			var top = Application.Top;
+			top.KeyPress += Top_KeyPress;
+
+			void Top_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = topQuiting = true;
+				}
+			}
+
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.False (topQuiting);
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (sbQuiting);
+			Assert.True (tfQuiting);
+			Assert.False (topQuiting);
+
+			tf.KeyPress -= Tf_KeyPress;
+			tfQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.True (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.False (topQuiting);
+
+			sb.RemoveItem (0);
+			sbQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+			Assert.True (topQuiting);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+		{
+			var sbQuiting = false;
+			var tfQuiting = false;
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+			});
+			var tf = new TextField ();
+			tf.KeyPress += Tf_KeyPress;
+
+			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			{
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					obj.Handled = tfQuiting = true;
+				}
+			}
+
+			var win = new Window ();
+			win.Add (sb, tf);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.False (sbQuiting);
+			Assert.False (tfQuiting);
+
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Assert.False (sbQuiting);
+			Assert.True (tfQuiting);
+
+			tf.KeyPress -= Tf_KeyPress;
+			tfQuiting = false;
+			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.MainLoop.MainIteration ();
+			Assert.True (sbQuiting);
+			Assert.False (tfQuiting);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void WindowDispose_CanFocusProblem ()
+		{
+			// Arrange
+			Application.Init ();
+			using var top = Toplevel.Create ();
+			using var view = new View (
+				x: 0,
+				y: 1,
+				text: nameof (WindowDispose_CanFocusProblem));
+			using var window = new Window ();
+			top.Add (window);
+			window.Add (view);
+
+			// Act
+			Application.Begin (top);
+			Application.Shutdown ();
+
+			// Assert does Not throw NullReferenceException
+			top.SetFocus ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Positive_Positions ()
+		{
+			var view = new View (new Rect (0, 0, 8, 4));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌──────┐
+│      │
+│      │
+└──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 8, 4), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Negative_Positions ()
+		{
+			var view = new View (new Rect (-1, 0, 8, 4));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+──────┐
+      │
+      │
+──────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 4), pos);
+
+			view.Frame = new Rect (-1, -1, 8, 4);
+			Application.Refresh ();
+
+			expected = @"
+      │
+      │
+──────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (6, 0, 7, 3), pos);
+
+			view.Frame = new Rect (0, 0, 8, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
+
+			expected = @"
+┌──────
+│
+│
+└──────
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 4), pos);
+
+			view.Frame = new Rect (0, 0, 8, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
+
+			expected = @"
+┌──────
+│
+│
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 3), pos);
 		}
 	}
 }

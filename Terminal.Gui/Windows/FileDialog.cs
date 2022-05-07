@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using NStack;
 using System.IO;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 	internal class DirListView : View {
@@ -50,6 +51,10 @@ namespace Terminal.Gui {
 			bool valid = false;
 			try {
 				dirInfo = new DirectoryInfo (value == null ? directory.ToString () : value.ToString ());
+
+				// Dispose of the old watcher
+				watcher?.Dispose ();
+
 				watcher = new FileSystemWatcher (dirInfo.FullName);
 				watcher.NotifyFilter = NotifyFilters.Attributes
 				 | NotifyFilters.CreationTime
@@ -92,6 +97,21 @@ namespace Terminal.Gui {
 				}
 			}
 			return valid;
+		}
+
+		private bool _disposedValue;
+		protected override void Dispose (bool disposing)
+		{
+			if (!_disposedValue) {
+				if (disposing) {
+					watcher?.Dispose ();
+				}
+
+				_disposedValue = true;
+			}
+
+			// Call base class implementation.
+			base.Dispose (disposing);
 		}
 
 		void Watcher_Error (object sender, ErrorEventArgs e)
@@ -603,7 +623,7 @@ namespace Terminal.Gui {
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
+			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? $"{Strings.fdDirectory}: " : $"{nameDirLabel}: ") {
 				X = 1,
 				Y = 1 + msgLines,
 				AutoSize = true
@@ -620,7 +640,7 @@ namespace Terminal.Gui {
 			};
 			Add (this.nameDirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? "File: " : $"{nameFieldLabel}: ") {
+			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? $"{Strings.fdFile}: " : $"{nameFieldLabel}: ") {
 				X = 1,
 				Y = 3 + msgLines,
 				AutoSize = true
@@ -858,7 +878,7 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
-			: base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message, allowedTypes) { }
+			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -926,8 +946,8 @@ namespace Terminal.Gui {
 		/// <param name="allowedTypes">The allowed types.</param>
 		/// <param name="openMode">The open mode.</param>
 		public OpenDialog (ustring title, ustring message, List<string> allowedTypes = null, OpenMode openMode = OpenMode.File) : base (title,
-			prompt: openMode == OpenMode.File ? "Open" : openMode == OpenMode.Directory ? "Select folder" : "Select Mixed",
-			nameFieldLabel: "Open", message: message, allowedTypes)
+			prompt: openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed,
+			nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
 		{
 			this.openMode = openMode;
 			switch (openMode) {

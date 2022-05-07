@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MainLoop
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -130,8 +130,6 @@ does not seem to be a way of supporting this on Windows.
 </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_MainLoop__ctor_" data-uid="Terminal.Gui.MainLoop.#ctor*"></a>
   <h4 id="Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_" data-uid="Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)">MainLoop(IMainLoopDriver)</h4>
   <div class="markdown level1 summary">
@@ -161,8 +159,6 @@ Creates a new Mainloop.
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_MainLoop_Driver_" data-uid="Terminal.Gui.MainLoop.Driver*"></a>
   <h4 id="Terminal_Gui_MainLoop_Driver" data-uid="Terminal.Gui.MainLoop.Driver">Driver</h4>
   <div class="markdown level1 summary">
@@ -190,8 +186,6 @@ The current IMainLoopDriver in use.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_MainLoop_AddIdle_" data-uid="Terminal.Gui.MainLoop.AddIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})">AddIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -243,8 +237,6 @@ Adds specified idle handler function to mainloop processing. The handler functio
   If the <code>idleHandler</code> returns <code>false</code> it will be removed and not called subsequently.
 </p>
 </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_AddTimeout_" data-uid="Terminal.Gui.MainLoop.AddTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan,System.Func{Terminal.Gui.MainLoop,System.Boolean})">AddTimeout(TimeSpan, Func&lt;MainLoop, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -301,8 +293,6 @@ the invocation. If it returns false, the timeout will stop and be removed.
 The returned value is a token that can be used to stop the timeout
 by calling <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveTimeout_System_Object_">RemoveTimeout(Object)</a>.
 </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_EventsPending_" data-uid="Terminal.Gui.MainLoop.EventsPending*"></a>
   <h4 id="Terminal_Gui_MainLoop_EventsPending_System_Boolean_" data-uid="Terminal.Gui.MainLoop.EventsPending(System.Boolean)">EventsPending(Boolean)</h4>
   <div class="markdown level1 summary">
@@ -351,8 +341,6 @@ You can use this method if you want to probe if events are pending.
 Typically used if you need to flush the input queue while still
 running some of your own code in your main thread.
 </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_Invoke_" data-uid="Terminal.Gui.MainLoop.Invoke*"></a>
   <h4 id="Terminal_Gui_MainLoop_Invoke_System_Action_" data-uid="Terminal.Gui.MainLoop.Invoke(System.Action)">Invoke(Action)</h4>
   <div class="markdown level1 summary">
@@ -380,8 +368,6 @@ Runs <code>action</code> on the thread that is processing events
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_MainLoop_MainIteration_" data-uid="Terminal.Gui.MainLoop.MainIteration*"></a>
   <h4 id="Terminal_Gui_MainLoop_MainIteration" data-uid="Terminal.Gui.MainLoop.MainIteration">MainIteration()</h4>
   <div class="markdown level1 summary">
@@ -399,8 +385,6 @@ You use this to process all pending events (timers, idle handlers and file watch
 You can use it like this:
 while (main.EvensPending ()) MainIteration ();
 </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_RemoveIdle_" data-uid="Terminal.Gui.MainLoop.RemoveIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})">RemoveIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -443,8 +427,6 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_MainLoop_RemoveTimeout_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveTimeout_System_Object_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout(System.Object)">RemoveTimeout(Object)</h4>
   <div class="markdown level1 summary">
@@ -491,8 +473,6 @@ Removes a previously scheduled timeout
   <div class="markdown level1 remarks">
 The token parameter is the value returned by AddTimeout.
 </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_Run_" data-uid="Terminal.Gui.MainLoop.Run*"></a>
   <h4 id="Terminal_Gui_MainLoop_Run" data-uid="Terminal.Gui.MainLoop.Run">Run()</h4>
   <div class="markdown level1 summary">
@@ -503,8 +483,6 @@ Runs the mainloop.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Run()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_MainLoop_Stop_" data-uid="Terminal.Gui.MainLoop.Stop*"></a>
   <h4 id="Terminal_Gui_MainLoop_Stop" data-uid="Terminal.Gui.MainLoop.Stop">Stop()</h4>
   <div class="markdown level1 summary">
@@ -520,10 +498,6 @@ Stops the mainloop.
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

@@ -6,16 +6,16 @@ using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	/// <summary>
 	/// This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. 
 	/// [x] - Using Dim.Fill to fill a window
 	/// [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
 	/// [ ] - ...
 	/// </summary>
-	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates using the Computed (Dim and Pos) Layout System")]
+	[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates the Computed (Dim and Pos) Layout System.")]
 	[ScenarioCategory ("Layout")]
-	class ComputedLayout : Scenario {
+	public class ComputedLayout : Scenario {
 
 		public override void Setup ()
 		{
@@ -39,7 +39,7 @@ namespace UICatalog {
 			var horizontalRuler = new Label ("") {
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
 
@@ -143,14 +143,14 @@ namespace UICatalog {
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
-				Y = Pos.Bottom (Win) - 4  // BUGBUG: -2 should be two lines above border; but it has to be -4
+				Y = Pos.AnchorEnd () - 2 // FIXED: -2 should be two lines above border; but it has to be -4
 			};
 			Win.Add (bottomLabel);
 
 			// Show positioning vertically using Pos.Bottom 
 			// BUGBUG: -1 should be just above border; but it has to be -3
 			var leftButton = new Button ("Left") {
-				Y = Pos.Bottom (Win) - 3
+				Y = Pos.AnchorEnd () - 1
 			};
 			leftButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button

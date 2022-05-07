@@ -4,15 +4,19 @@ using System.Text;
 using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Globalization;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
-	class Editor : Scenario {
+	[ScenarioCategory ("Text and Formatting")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Files and IO")]
+	[ScenarioCategory ("TextView")]
+
+	public class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
@@ -24,6 +28,9 @@ namespace UICatalog {
 		private bool _matchWholeWord;
 		private Window winDialog;
 		private TabView _tabView;
+		private MenuItem miForceMinimumPosToZero;
+		private bool forceMinimumPosToZero = true;
+		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -94,6 +101,13 @@ namespace UICatalog {
 					CreateEnabledChecked (),
 					CreateVisibleChecked ()
 				}),
+				new MenuBarItem ("Conte_xtMenu", new MenuItem [] {
+					miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
+						miForceMinimumPosToZero.Checked = forceMinimumPosToZero = !forceMinimumPosToZero;
+						_textView.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
+					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					new MenuBarItem ("_Languages", GetSupportedCultures ())
+				})
 			});
 			Top.Add (menu);
 
@@ -175,6 +189,8 @@ namespace UICatalog {
 					e.Handled = true;
 				}
 			};
+
+			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()
@@ -321,8 +337,11 @@ namespace UICatalog {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
+				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
+
+			System.Diagnostics.Debug.Assert (_textView.IsDirty);
 
 			var r = MessageBox.ErrorQuery ("Save File",
 				$"Do you want save changes in {Win.Title}?", "Yes", "No", "Cancel");
@@ -394,6 +413,7 @@ namespace UICatalog {
 				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
 				_originalText = _textView.Text.ToByteArray ();
 				_saved = true;
+				_textView.ClearHistoryChanges ();
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
 
 			} catch (Exception ex) {
@@ -440,6 +460,46 @@ namespace UICatalog {
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
+		}
+
+		private MenuItem [] GetSupportedCultures ()
+		{
+			List<MenuItem> supportedCultures = new List<MenuItem> ();
+			var index = -1;
+
+			foreach (var c in cultureInfos) {
+				var culture = new MenuItem {
+					CheckType = MenuItemCheckStyle.Checked
+				};
+				if (index == -1) {
+					culture.Title = "_English";
+					culture.Help = "en-US";
+					culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == "en-US";
+					CreateAction (supportedCultures, culture);
+					supportedCultures.Add (culture);
+					index++;
+					culture = new MenuItem {
+						CheckType = MenuItemCheckStyle.Checked
+					};
+				}
+				culture.Title = $"_{c.Parent.EnglishName}";
+				culture.Help = c.Name;
+				culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
+				CreateAction (supportedCultures, culture);
+				supportedCultures.Add (culture);
+			}
+			return supportedCultures.ToArray ();
+
+			void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
+			{
+				culture.Action += () => {
+					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help.ToString ());
+					culture.Checked = true;
+					foreach (var item in supportedCultures) {
+						item.Checked = item.Help.ToString () == Thread.CurrentThread.CurrentUICulture.Name;
+					}
+				};
+			}
 		}
 
 		private MenuItem [] CreateKeepChecked ()

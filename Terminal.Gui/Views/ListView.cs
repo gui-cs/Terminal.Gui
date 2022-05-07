@@ -323,6 +323,38 @@ namespace Terminal.Gui {
 		{
 			Source = source;
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
+			AddCommand (Command.PageUp, () => MovePageUp ());
+			AddCommand (Command.PageDown, () => MovePageDown ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
+
+			// Default keybindings for all ListViews
+			AddKeyBinding (Key.CursorUp,Command.LineUp);
+			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
+
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+
+			AddKeyBinding(Key.PageUp,Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.Home, Command.TopHome);
+
+			AddKeyBinding (Key.End, Command.BottomEnd);
+
+			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		///<inheritdoc/>
@@ -353,6 +385,12 @@ namespace Terminal.Gui {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
+					var rowEventArgs = new ListViewRowEventArgs (item);
+					OnRowRender (rowEventArgs);
+					if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+						current = (Attribute)rowEventArgs.RowAttribute;
+						Driver.SetAttribute (current);
+					}
 					if (allowsMarking) {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
@@ -396,48 +434,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
+		/// <summary>
+		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
+		/// </summary>
+		public event Action<ListViewRowEventArgs> RowRender;
+
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (source == null)
 				return base.ProcessKey (kb);
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-			case Key.P | Key.CtrlMask:
-				return MoveUp ();
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			case Key.CursorDown:
-			case Key.N | Key.CtrlMask:
-				return MoveDown ();
-
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return MovePageDown ();
-
-			case Key.PageUp:
-				return MovePageUp ();
-
-			case Key.Space:
-				if (MarkUnmarkRow ())
-					return true;
-				else
-					break;
-
-			case Key.Enter:
-				return OnOpenSelectedItem ();
-
-			case Key.End:
-				return MoveEnd ();
-
-			case Key.Home:
-				return MoveHome ();
-
-			default:
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
 		/// <summary>
@@ -620,41 +632,45 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view down.
 		/// </summary>
-		/// <param name="lines">Number of items to scroll down.</param>
-		public virtual void ScrollDown (int items)
+		/// <param name="items">Number of items to scroll down.</param>
+		public virtual bool ScrollDown (int items)
 		{
 			top = Math.Max (Math.Min (top + items*itemHeight, source.Count - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
-		/// <param name="lines">Number of items to scroll up.</param>
-		public virtual void ScrollUp (int items)
+		/// <param name="items">Number of items to scroll up.</param>
+		public virtual bool ScrollUp (int items)
 		{
 			top = Math.Max (top - items*itemHeight, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view right.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll right.</param>
-		public virtual void ScrollRight (int cols)
+		public virtual bool ScrollRight (int cols)
 		{
 			left = Math.Max (Math.Min (left + cols, Maxlength - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view left.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll left.</param>
-		public virtual void ScrollLeft (int cols)
+		public virtual bool ScrollLeft (int cols)
 		{
 			left = Math.Max (left - cols, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		int lastSelectedItem = -1;
@@ -695,6 +711,15 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="RowRender"/>.
+		/// </summary>
+		/// <param name="rowEventArgs"></param>
+		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
+		{
+			RowRender?.Invoke (rowEventArgs);
+		}
+
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
@@ -724,7 +749,7 @@ namespace Terminal.Gui {
 			if (selected < top) {
 				top = selected;
 			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
-				top = Math.Max (selected - Frame.Height + 2, 0);
+				top = Math.Max (selected - Frame.Height + 1, 0);
 			}
 		}
 
@@ -953,6 +978,30 @@ namespace Terminal.Gui {
 		{
 			Item = item;
 			Value = value;
+		}
+	}
+
+	/// <summary>
+	/// <see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.
+	/// </summary>
+	public class ListViewRowEventArgs : EventArgs {
+		/// <summary>
+		/// The current row being rendered.
+		/// </summary>
+		public int Row { get; }
+		/// <summary>
+		/// The <see cref="Attribute"/> used by current row or
+		/// null to maintain the current attribute.
+		/// </summary>
+		public Attribute? RowAttribute { get; set; }
+
+		/// <summary>
+		/// Initializes with the current row.
+		/// </summary>
+		/// <param name="row"></param>
+		public ListViewRowEventArgs (int row)
+		{
+			Row = row;
 		}
 	}
 }

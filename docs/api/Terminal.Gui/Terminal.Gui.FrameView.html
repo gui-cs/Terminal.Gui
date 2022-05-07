@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FrameView
    ">
-    <meta name="generator" content="docfx 2.58.5.0">
+    <meta name="generator" content="docfx 2.59.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -132,6 +132,9 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -257,7 +260,7 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a>
@@ -296,6 +299,12 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
@@ -303,6 +312,36 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -413,6 +452,9 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
     </div>
     <div>
@@ -445,8 +487,6 @@ a GroupBox in Windows.
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
   <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
   <h4 id="Terminal_Gui_FrameView__ctor" data-uid="Terminal.Gui.FrameView.#ctor">FrameView()</h4>
   <div class="markdown level1 summary">
@@ -457,8 +497,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public FrameView()</code></pre>
   </div>
-  
-  
   <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
   <h4 id="Terminal_Gui_FrameView__ctor_NStack_ustring_Terminal_Gui_Border_" data-uid="Terminal.Gui.FrameView.#ctor(NStack.ustring,Terminal.Gui.Border)">FrameView(ustring, Border)</h4>
   <div class="markdown level1 summary">
@@ -491,8 +529,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
       </tr>
     </tbody>
   </table>
-  
-  
   <a id="Terminal_Gui_FrameView__ctor_" data-uid="Terminal.Gui.FrameView.#ctor*"></a>
   <h4 id="Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_Terminal_Gui_View___Terminal_Gui_Border_" data-uid="Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring,Terminal.Gui.View[],Terminal.Gui.Border)">FrameView(Rect, ustring, View[], Border)</h4>
   <div class="markdown level1 summary">
@@ -537,8 +573,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
   <a id="Terminal_Gui_FrameView_Border_" data-uid="Terminal.Gui.FrameView.Border*"></a>
   <h4 id="Terminal_Gui_FrameView_Border" data-uid="Terminal.Gui.FrameView.Border">Border</h4>
   <div class="markdown level1 summary"></div>
@@ -564,8 +598,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.FrameView.h
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_Text_" data-uid="Terminal.Gui.FrameView.Text*"></a>
   <h4 id="Terminal_Gui_FrameView_Text" data-uid="Terminal.Gui.FrameView.Text">Text</h4>
   <div class="markdown level1 summary">
@@ -593,8 +625,6 @@ The text displayed by the <a class="xref" href="Terminal.Gui.Label.html">Label</
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_TextAlignment_" data-uid="Terminal.Gui.FrameView.TextAlignment*"></a>
   <h4 id="Terminal_Gui_FrameView_TextAlignment" data-uid="Terminal.Gui.FrameView.TextAlignment">TextAlignment</h4>
   <div class="markdown level1 summary">
@@ -622,8 +652,6 @@ Controls the text-alignment property of the label, changing it will redisplay th
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_Title_" data-uid="Terminal.Gui.FrameView.Title*"></a>
   <h4 id="Terminal_Gui_FrameView_Title" data-uid="Terminal.Gui.FrameView.Title">Title</h4>
   <div class="markdown level1 summary">
@@ -651,8 +679,6 @@ The title to be displayed for this <a class="xref" href="Terminal.Gui.FrameView.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
   <a id="Terminal_Gui_FrameView_Add_" data-uid="Terminal.Gui.FrameView.Add*"></a>
   <h4 id="Terminal_Gui_FrameView_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.FrameView.Add(Terminal.Gui.View)">Add(View)</h4>
   <div class="markdown level1 summary">
@@ -682,8 +708,6 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_OnCanFocusChanged_" data-uid="Terminal.Gui.FrameView.OnCanFocusChanged*"></a>
   <h4 id="Terminal_Gui_FrameView_OnCanFocusChanged" data-uid="Terminal.Gui.FrameView.OnCanFocusChanged">OnCanFocusChanged()</h4>
   <div class="markdown level1 summary"></div>
@@ -694,8 +718,6 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_OnEnter_" data-uid="Terminal.Gui.FrameView.OnEnter*"></a>
   <h4 id="Terminal_Gui_FrameView_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.FrameView.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary"></div>
@@ -738,8 +760,6 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_Redraw_" data-uid="Terminal.Gui.FrameView.Redraw*"></a>
   <h4 id="Terminal_Gui_FrameView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary"></div>
@@ -767,8 +787,6 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  
-  
   <a id="Terminal_Gui_FrameView_Remove_" data-uid="Terminal.Gui.FrameView.Remove*"></a>
   <h4 id="Terminal_Gui_FrameView_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.FrameView.Remove(Terminal.Gui.View)">Remove(View)</h4>
   <div class="markdown level1 summary">
@@ -801,8 +819,6 @@ Removes a <a class="xref" href="Terminal.Gui.View.html">View</a> from this conta
   <h5 id="Terminal_Gui_FrameView_Remove_Terminal_Gui_View__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 </div>
-  
-  
   <a id="Terminal_Gui_FrameView_RemoveAll_" data-uid="Terminal.Gui.FrameView.RemoveAll*"></a>
   <h4 id="Terminal_Gui_FrameView_RemoveAll" data-uid="Terminal.Gui.FrameView.RemoveAll">RemoveAll()</h4>
   <div class="markdown level1 summary">
@@ -833,10 +849,6 @@ Removes all <a class="xref" href="Terminal.Gui.View.html">View</a>s from this co
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

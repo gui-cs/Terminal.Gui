@@ -10,12 +10,24 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="0.16.0" />
-    <PackageReference Include="MinVer" Version="2.5.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="MinVer" Version="3.1.0" PrivateAssets="all" />
     <InternalsVisibleTo Include="UnitTests" />
     <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Strings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
       <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
@@ -25,7 +37,7 @@
     <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
 
-    <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
@@ -43,6 +55,55 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.5.0
+      * Localization support added. en-US, Japanese, fr-FR, and pt-PT
+      * Adds Key Binding support. Also refactors Autocomplete.
+      * Adds a popup ContextMenu feature. Implements ContextMenu for TextField.
+      * Adds HistoryText class for undo and redo text.
+      * Adds mouse support and more features to the HexView.
+      * Adds feature to display the sub-menus on a single frame instead multiple frames.
+      * Adds Support for Colored ListView Items
+      * Adds context menu and localization on TextView.
+      * Cleanup of UI Catalog scenarios
+      * #1666  Fixes the MenuIem Width for wider runes
+      * #1658  Fixes wide runes not render well on NetDriver.
+      * #1656  Cursor visibility fix.
+      * #1652  Fixed Axis.Text being a field while every other class member is a property
+      * #1651  Dispose `FileSystemWatcher` instance before creating another in `FileDialog`
+      * #1639  Fixed TableView when redrawing a System.DataTable that has no columns
+      * #1633  Fixes the WindowsDriver dirty redrawn on resizing if HeightAsBuffer is true.
+      * #1630  Fixes TextField context menu not showing with the current localization.
+      * #1629  Bump actions/checkout from 2 to 3
+      * #1627  Table scroll fix
+      * #1622  Changed Button Text property to use override instead of new.
+      * #1614  Fixes the ProcessHotKey event.
+      * #1612  Fixes the CanFocus equal to false from setting HasFocus to true again.
+      * #1608  Implementing undo/redo to back tab key.
+      * #1606  Fixes ComboBox text and list if the height is equal to one.
+      * #1603  Fixes the auto-size text bug.
+      * #1600  Fixes FileSystemWatcher exception on Linux.
+      * #1599  Adding unit test for the ListView RowRender event.
+      * #1596  Standalone update fix
+      * #1595  Fixes #1588 - Documentation for keybinding
+      * #1593  Fixes TableView not activating after keybinding refactor
+      * #1586  fixing #1560 - Fix docfx errors and warnings
+      * #1585  Fixes #1584 - ComboBox is hiding elements below from being clicked/focused
+      * #1574  Use custom resolver for libcoreclr.so also for .NET 6.0
+      * #1572  Added MenuOpened event and others bug fixes.
+      * #1564  Fixes #1525 - Gives TextField the same backspace behavior as TextView
+      * #1563  Fixes #1557 - Border and PanelView fixes
+      * #1562  Fixes #1560. Documentation link broken.
+      * #1561  Fixes #1559 - Added DesiredCursorVisibility to TreeView
+      * #1550  Adding Application.Shutdown and updating ReactiveUI.Fody.
+
+      v1.4.0
+      * #1546  Fixes #1535. Added IsMouseDisabled prop to Application
+      * #1515  Upgrading to Net6.0
+      * #1508  Allows ListView trigger the Enter and Leave events.
+      * #1506  Prevents a Process breaks rendering on Linux.
+      * #1505  Fixes #1499. Allowing border settings for the MessageBox.
+      * #1504  Fixes #1502. Prevents high CPU usage.
+
       v1.3.0
       * #1491  Fix link to MainLoop docs in README.md
       * #1489  Dynamic menu/statusbar and Enable property fix.

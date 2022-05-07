@@ -59,7 +59,7 @@ descriptors.
 
 The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
 
-The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key.  So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
+The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key. So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
 
 To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or you can press `ESC` twice.
 
@@ -68,6 +68,20 @@ To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or
 **Terminal.Gui** respects common Mac and Windows keyboard idoms as well. For example, clipboard operations use the familiar `Control/Command-C, X, V` model.
 
 `CTRL-Q` is used for exiting views (and apps).
+
+**Terminal.Gui** supports rebinding keys. For example the default key for activating a button is Enter. You can change this using the `ClearKeybinding` and `AddKeybinding` methods:
+
+```csharp
+var btn = new Button ("Press Me");
+btn.ClearKeybinding (Command.Accept);
+btn.AddKeyBinding (Key.b, Command.Accept);
+```
+
+The `Command` enum lists generic operations that are implemented by views. For example `Command.Accept` in a Button results in the `Clicked` event firing while in `TableView` it is bound to `CellActivated`. Not all commands are implemented by all views (e.g. you cannot scroll in a Button). To see which commands are implemented by a View you can use the `GetSupportedCommands()` method.
+
+Not all controls have the same key bound for a given command, for example `Command.Accept` defaults to `Key.Enter` in a `Button` but defaults to `Key.Space` in `RadioGroup`.
+
+Keybindings only operate while a view has focus. To register global hotkeys you can override a view's `bool ProcessHotKey (KeyEvent kb)` method.
 
 ### Driver model
 
@@ -88,7 +102,6 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 * **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui.
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
 
-
 ## Documentation
 
 * [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
@@ -98,7 +111,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
 
 ### Sample Usage
-The code below is done with the new [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements) in C# 9.0.  
+The code below is done with the new [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements) in C# 9.0. 
 ```csharp
 using Terminal.Gui;
 using NStack;
@@ -174,6 +187,7 @@ win.Add(
 );
 
 Application.Run();
+Application.Shutdown();
 ```
 
 Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
@@ -185,6 +199,7 @@ class Demo {
 	static void Main ()
 	{
 		Application.Run<App> ();
+		Application.Shutdown ();
 	}
 }
 ```

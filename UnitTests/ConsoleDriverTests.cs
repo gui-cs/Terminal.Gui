@@ -339,10 +339,10 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (25, Application.Driver.Rows);
 			Assert.Equal (120, Console.BufferWidth);
 			Assert.Equal (25, Console.BufferHeight);
-			Assert.Equal (120, Console.WindowWidth);
+			Assert.Equal (80, Console.WindowWidth);
 			Assert.Equal (25, Console.WindowHeight);
 			driver.SetWindowPosition (121, 25);
-			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (40, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
 
 			driver.SetWindowSize (90, 25);
@@ -388,17 +388,19 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
 
-			// MockDriver will now be sets to 120x25
+			// MockDriver will now be sets to 80x40
 			driver.SetBufferSize (80, 40);
 			Assert.Equal (80, Application.Driver.Cols);
 			Assert.Equal (40, Application.Driver.Rows);
 			Assert.Equal (80, Console.BufferWidth);
 			Assert.Equal (40, Console.BufferHeight);
 			Assert.Equal (80, Console.WindowWidth);
-			Assert.Equal (40, Console.WindowHeight);
-			driver.SetWindowPosition (80, 40);
+			Assert.Equal (25, Console.WindowHeight);
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
+			driver.SetWindowPosition (80, 40);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (15, Console.WindowTop);
 
 			driver.SetWindowSize (80, 20);
 			Assert.Equal (80, Application.Driver.Cols);
@@ -407,6 +409,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.Equal (40, Console.BufferHeight);
 			Assert.Equal (80, Console.WindowWidth);
 			Assert.Equal (20, Console.WindowHeight);
+			Assert.Equal (0, Console.WindowLeft);
+			Assert.Equal (15, Console.WindowTop);
 			driver.SetWindowPosition (80, 41);
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (20, Console.WindowTop);
@@ -430,7 +434,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var okClicked = false;
 			var closing = false;
 			var cursorRight = false;
-			var cancelHasFocus = false;
+			var endingKeyPress = false;
 			var closed = false;
 
 			var top = Application.Top;
@@ -464,9 +468,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 					if (!cursorRight) {
 						cursorRight = true;
 					} else if (ok.HasFocus) {
-						e.Handled = true;
-					} else {
-						cancelHasFocus = true;
+						e.Handled = endingKeyPress = true;
 					}
 				}
 			};
@@ -497,7 +499,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.True (okClicked);
 			Assert.True (closing);
 			Assert.True (cursorRight);
-			Assert.True (cancelHasFocus);
+			Assert.True (endingKeyPress);
 			Assert.True (closed);
 			Assert.Empty (FakeConsole.MockKeyPresses);
 		}

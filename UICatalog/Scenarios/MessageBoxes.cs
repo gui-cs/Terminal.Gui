@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use MessageBoxes")]
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use the MessageBox class.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	class MessageBoxes : Scenario {
+	public class MessageBoxes : Scenario {
 		public override void Setup ()
 		{
 			var frame = new FrameView ("MessageBox Options") {

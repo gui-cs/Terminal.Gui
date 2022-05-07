@@ -7,9 +7,11 @@ using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Syntax Highlighting", Description: "Text editor with keyword highlighting")]
+	[ScenarioMetadata (Name: "Syntax Highlighting", Description: "Text editor with keyword highlighting using the TextView control.")]
+	[ScenarioCategory ("Text and Formatting")]
 	[ScenarioCategory ("Controls")]
-	class SyntaxHighlighting : Scenario {
+	[ScenarioCategory ("TextView")]
+	public class SyntaxHighlighting : Scenario {
 
 		SqlTextView textView;
 		MenuItem miWrap;

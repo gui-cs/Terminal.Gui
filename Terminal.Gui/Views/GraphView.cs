@@ -74,6 +74,23 @@ namespace Terminal.Gui {
 
 			AxisX = new HorizontalAxis ();
 			AxisY = new VerticalAxis ();
+
+			// Things this view knows how to do
+			AddCommand (Command.ScrollUp, () => { Scroll (0, CellSize.Y); return true; });
+			AddCommand (Command.ScrollDown, () => { Scroll (0, -CellSize.Y); return true; });
+			AddCommand (Command.ScrollRight, () => { Scroll (CellSize.X, 0); return true; });
+			AddCommand (Command.ScrollLeft, () => { Scroll (-CellSize.X, 0); return true; });
+			AddCommand (Command.PageUp, () => { PageUp (); return true; });
+			AddCommand (Command.PageDown, () => { PageDown(); return true; });
+
+			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
+			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
+			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
+			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
+			
+			// Not bound by default (preserves backwards compatibility)
+			//AddKeyBinding (Key.PageUp, Command.PageUp);
+			//AddKeyBinding (Key.PageDown, Command.PageDown);
 		}
 
 		/// <summary>
@@ -228,48 +245,37 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			//&& Focused == tabsBar
-
 			if (HasFocus && CanFocus) {
-				switch (keyEvent.Key) {
-
-				case Key.CursorLeft:
-					Scroll (-CellSize.X, 0);
-					return true;
-				case Key.CursorLeft | Key.CtrlMask:
-					Scroll (-CellSize.X * 5, 0);
-					return true;
-				case Key.CursorRight:
-					Scroll (CellSize.X, 0);
-					return true;
-				case Key.CursorRight | Key.CtrlMask:
-					Scroll (CellSize.X * 5, 0);
-					return true;
-				case Key.CursorDown:
-					Scroll (0, -CellSize.Y);
-					return true;
-				case Key.CursorDown | Key.CtrlMask:
-					Scroll (0, -CellSize.Y * 5);
-					return true;
-				case Key.CursorUp:
-					Scroll (0, CellSize.Y);
-					return true;
-				case Key.CursorUp | Key.CtrlMask:
-					Scroll (0, CellSize.Y * 5);
-					return true;
-				}
+				var result =  InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
 			}
 
 			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>
+		/// Scrolls the graph up 1 page
+		/// </summary>
+		public void PageUp()
+		{
+			Scroll (0, CellSize.Y * Bounds.Height);
+		}
+
+		/// <summary>
+		/// Scrolls the graph down 1 page
+		/// </summary>
+		public void PageDown()
+		{
+			Scroll(0, -1 * CellSize.Y * Bounds.Height);
+		}
+		/// <summary>
 		/// Scrolls the view by a given number of units in graph space.
 		/// See <see cref="CellSize"/> to translate this into rows/cols
 		/// </summary>
 		/// <param name="offsetX"></param>
 		/// <param name="offsetY"></param>
-		private void Scroll (float offsetX, float offsetY)
+		public void Scroll (float offsetX, float offsetY)
 		{
 			ScrollOffset = new PointF (
 				ScrollOffset.X + offsetX,
