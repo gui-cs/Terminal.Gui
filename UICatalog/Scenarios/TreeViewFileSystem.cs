@@ -24,6 +24,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miUnicodeSymbols;
 		private MenuItem miFullPaths;
 		private MenuItem miLeaveLastRow;
+		private MenuItem miCustomColors;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -52,6 +53,7 @@ namespace UICatalog.Scenarios {
 					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miFullPaths = new MenuItem ("_FullPaths", "", () => SetFullName()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miLeaveLastRow = new MenuItem ("_LeaveLastRow", "", () => SetLeaveLastRow()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
+					miCustomColors = new MenuItem ("C_ustomColors", "", () => SetCustomColors()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -208,6 +210,28 @@ namespace UICatalog.Scenarios {
 		{
 			miLeaveLastRow.Checked = !miLeaveLastRow.Checked;
 			treeViewFiles.Style.LeaveLastRow = miLeaveLastRow.Checked;
+		}
+		private void SetCustomColors()
+		{
+			var yellow = new ColorScheme
+			{
+				Focus = new Terminal.Gui.Attribute(Color.BrightYellow,treeViewFiles.ColorScheme.Focus.Background),
+				Normal = new Terminal.Gui.Attribute (Color.BrightYellow,treeViewFiles.ColorScheme.Normal.Background),
+			};
+
+			miCustomColors.Checked = !miCustomColors.Checked;
+
+			if(miCustomColors.Checked)
+			{
+				treeViewFiles.ColorGetter = (m)=>
+				{
+					return m is DirectoryInfo ? yellow : null;
+				};
+			}
+			else
+			{
+				treeViewFiles.ColorGetter = null;
+			}
 		}
 
 
