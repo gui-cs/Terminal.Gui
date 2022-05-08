@@ -140,6 +140,13 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
 
+		
+		/// <summary>
+		/// Delegate for multi colored tree views.  Return the <see cref="ColorScheme"/> to use
+		/// for each passed object or null to use the default.
+		/// </summary>
+		public Func<T,ColorScheme> ColorGetter {get;set;}
+
 		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
 		/// </summary>

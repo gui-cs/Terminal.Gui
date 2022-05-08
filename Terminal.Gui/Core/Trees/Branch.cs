@@ -159,9 +159,27 @@ namespace Terminal.Gui.Trees {
 				availableWidth -= lineBody.Length;
 			}
 
-			//reset the line color if it was changed for rendering expansion symbol
-			driver.SetAttribute (lineColor);
+
+			// default behaviour is for model to use the color scheme
+			// of the tree view
+			var modelColor = lineColor;
+
+			// if custom color delegate invoke it
+			if(tree.ColorGetter != null)
+			{
+				var modelScheme = tree.ColorGetter(Model);
+
+				// if custom color scheme is defined for this Model
+				if(modelScheme != null)
+				{
+					// use it
+					modelColor = isSelected ? modelScheme.Focus : modelScheme.Normal;
+				}
+			}
+
+			driver.SetAttribute (modelColor);
 			driver.AddStr (lineBody);
+			driver.SetAttribute (lineColor);
 
 			if (availableWidth > 0) {
 				driver.AddStr (new string (' ', availableWidth));
