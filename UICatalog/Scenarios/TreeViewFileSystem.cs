@@ -78,6 +78,7 @@ namespace UICatalog.Scenarios {
 
 			treeViewFiles.ObjectActivated += TreeViewFiles_ObjectActivated;
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
+			treeViewFiles.KeyPress += TreeViewFiles_KeyPress;
 
 			SetupFileTree ();
 
@@ -87,6 +88,29 @@ namespace UICatalog.Scenarios {
 
 			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);
 			red = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
+		}
+
+		private void TreeViewFiles_KeyPress (View.KeyEventEventArgs obj)
+		{
+			if(obj.KeyEvent.Key == (Key.R | Key.CtrlMask)) {
+
+				var selected = treeViewFiles.SelectedObject;
+				
+				// nothing is selected
+				if (selected == null)
+					return;
+				
+				var location = treeViewFiles.IndexOf (selected);
+
+				//selected object is offscreen or somehow not found
+				if (location == null || location < 0 || location > treeViewFiles.Frame.Height)
+					return;
+
+				ShowContextMenu (new Point (
+					5 + treeViewFiles.Frame.X,
+					location.Value + treeViewFiles.Frame.Y + 2),
+					selected);
+			}
 		}
 
 		private void TreeViewFiles_MouseClick (View.MouseEventArgs obj)
@@ -100,39 +124,44 @@ namespace UICatalog.Scenarios {
 				if (rightClicked == null)
 					return;
 
-				var menu = new ContextMenu ();
-				menu.Position = new Point(
+				ShowContextMenu (new Point (
 					obj.MouseEvent.X + treeViewFiles.Frame.X,
-					obj.MouseEvent.Y + treeViewFiles.Frame.Y +1);
-
-				menu.MenuItems = new MenuBarItem (new [] { new MenuItem ("Properties",null,()=> {
-					MessageBox.Query($"{rightClicked.Name}({rightClicked.GetType().Name})",Describe(rightClicked),"Ok");
-				}
-					
-				) });
-				menu.Show ();
-
+					obj.MouseEvent.Y + treeViewFiles.Frame.Y + 2),
+					rightClicked);
 			}
 		}
 
-		private string Describe (FileSystemInfo f)
+		private void ShowContextMenu (Point screenPoint, FileSystemInfo forObject)
 		{
-			try {
+			var menu = new ContextMenu ();
+			menu.Position = screenPoint;
 
-				if (f is FileInfo fi) {
-					return "Size:" + fi.Length;
-				}
+			menu.MenuItems = new MenuBarItem (new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
+			
+			Application.MainLoop.Invoke(menu.Show);
+		}
 
-				if (f is DirectoryInfo d) {
-					return $@"Parent:{d.Parent}
-Attributes:{d.Attributes}";
-				}
-			} catch (Exception) {
+		private void ShowPropertiesOf (FileSystemInfo fileSystemInfo)
+		{
+			if (fileSystemInfo is FileInfo f) {
+				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+				sb.AppendLine ($"Path:{f.DirectoryName}");
+				sb.AppendLine ($"Size:{f.Length:N0} bytes");
+				sb.AppendLine ($"Modified:{ f.LastWriteTime}");
+				sb.AppendLine ($"Created:{ f.CreationTime}");
 
-				return "Could not get properties";
+				MessageBox.Query (f.Name, sb.ToString (), "Close");
 			}
 
-			return null;
+			if (fileSystemInfo is DirectoryInfo dir) {
+
+				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+				sb.AppendLine ($"Path:{dir.Parent?.FullName}");
+				sb.AppendLine ($"Modified:{ dir.LastWriteTime}");
+				sb.AppendLine ($"Created:{ dir.CreationTime}");
+
+				MessageBox.Query (dir.Name, sb.ToString (), "Close");
+			}
 		}
 
 		private void SetupScrollBar ()
@@ -187,25 +216,7 @@ Attributes:{d.Attributes}";
 
 		private void TreeViewFiles_ObjectActivated (ObjectActivatedEventArgs<FileSystemInfo> obj)
 		{
-			if (obj.ActivatedObject is FileInfo f) {
-				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-				sb.AppendLine ($"Path:{f.DirectoryName}");
-				sb.AppendLine ($"Size:{f.Length:N0} bytes");
-				sb.AppendLine ($"Modified:{ f.LastWriteTime}");
-				sb.AppendLine ($"Created:{ f.CreationTime}");
-
-				MessageBox.Query (f.Name, sb.ToString (), "Close");
-			}
-
-			if (obj.ActivatedObject is DirectoryInfo dir) {
-
-				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-				sb.AppendLine ($"Path:{dir.Parent?.FullName}");
-				sb.AppendLine ($"Modified:{ dir.LastWriteTime}");
-				sb.AppendLine ($"Created:{ dir.CreationTime}");
-
-				MessageBox.Query (dir.Name, sb.ToString (), "Close");
-			}
+			ShowPropertiesOf (obj.ActivatedObject);
 		}
 
 		private void ShowLines ()

@@ -610,6 +610,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// <para>
+		/// Returns the Y coordinate within the <see cref="View.Bounds"/> of the
+		/// tree at which <paramref name="toFind"/> would be displayed or null if
+		/// it is not currently exposed (e.g. its parent is collapsed).
+		/// </para>
+		/// <para>
+		/// Note that the returned value can be negative if the TreeView is scrolled
+		/// down and the <paramref name="toFind"/> object is off the top of the view.
+		/// </para>
+		/// </summary>
+		/// <param name="toFind"></param>
+		/// <returns></returns>
+		public int? IndexOf(T toFind)
+		{
+			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
+
+			if (idx == -1)
+				return null;
+
+			return idx - ScrollOffsetVertical;
+		}
+
+		/// <summary>
 		/// <para>Moves the <see cref="SelectedObject"/> to the next item that begins with <paramref name="character"/></para>
 		/// <para>This method will loop back to the start of the tree if reaching the end without finding a match</para>
 		/// </summary>

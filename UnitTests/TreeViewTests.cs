@@ -768,7 +768,68 @@ namespace Terminal.Gui.Views {
 			Assert.Null (tv.HitTest (new Point (0, 3)));
 			Assert.Null (tv.HitTest (new Point (0, 4)));
 		}
-			[Fact, AutoInitShutdown]
+
+		[Fact, AutoInitShutdown]
+		public void TestTreeIndexOf ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Equal (0, tv.IndexOf (n1));
+			Assert.Equal (1, tv.IndexOf (n1_1));
+			Assert.Equal (2, tv.IndexOf (n1_2));
+			Assert.Equal (3, tv.IndexOf (n2));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+			Assert.Equal (0, tv.IndexOf (n1));
+			Assert.Null (tv.IndexOf (n1_1));
+			Assert.Null (tv.IndexOf (n1_2));
+			Assert.Equal (1, tv.IndexOf (n2));
+
+
+			// scroll down 1
+			tv.ScrollOffsetVertical = 1;
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"└─pink
+", output);
+			Assert.Equal (-1, tv.IndexOf (n1));
+			Assert.Null (tv.IndexOf (n1_1));
+			Assert.Null (tv.IndexOf (n1_2));
+			Assert.Equal (0, tv.IndexOf (n2));
+		}
+		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor()
 		{
 			var tv = new TreeView{Width = 20,Height = 10};
