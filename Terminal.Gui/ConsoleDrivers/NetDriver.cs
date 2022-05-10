@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 		int lastWindowHeight;
 		int largestWindowHeight;
 #if PROCESS_REQUEST
-		bool neededProcessRequest;
+				bool neededProcessRequest;
 #endif
 		public int NumberOfCSI { get; }
 
@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 					inputReady.Reset ();
 				}
 #if PROCESS_REQUEST
-				neededProcessRequest = false;
+								neededProcessRequest = false;
 #endif
 				if (inputResultQueue.Count > 0) {
 					return inputResultQueue.Dequeue ();
@@ -205,10 +205,10 @@ namespace Terminal.Gui {
 						return;
 					}
 #if PROCESS_REQUEST
-					if (!neededProcessRequest) {
-						Console.Out.Write ("\x1b[6n");
-						neededProcessRequest = true;
-					}
+										if (!neededProcessRequest) {
+											Console.Out.Write ("\x1b[6n");
+											neededProcessRequest = true;
+										}
 #endif
 				}
 			}
@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 			string value = "";
 			for (int i = 0; i < kChar.Length; i++) {
 				var c = kChar [i];
-				if (c == '[') {
+				if (c == '\u001b' || c == '[') {
 					foundPoint++;
 				} else if (foundPoint == 1 && c != ';' && c != '?') {
 					value += c.ToString ();
@@ -1242,12 +1242,18 @@ namespace Terminal.Gui {
 
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-				} else if (runeWidth < 2 && ccol < Cols - 1
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
 					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+					contents [crow, ccol + 1, 2] = 1;
+
 				}
-				contents [crow, ccol, 0] = (int)(uint)rune;
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 
@@ -1256,7 +1262,7 @@ namespace Terminal.Gui {
 
 			ccol++;
 			if (runeWidth > 1) {
-				if (validClip) {
+				if (validClip && ccol < Clip.Right) {
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
@@ -1288,6 +1294,9 @@ namespace Terminal.Gui {
 			StopReportingMouseMoves ();
 			Console.ResetColor ();
 			Clear ();
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?25h");
+			Console.Out.Flush ();
 		}
 
 		void Clear ()
@@ -1312,6 +1321,10 @@ namespace Terminal.Gui {
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
+
+			//Set cursor key to application.
+			Console.Out.Write ("\x1b[?25l");
+			Console.Out.Flush ();
 
 			Console.TreatControlCAsInput = true;
 
@@ -1455,28 +1468,41 @@ namespace Terminal.Gui {
 			}
 
 			int top = Top;
+			int left = Left;
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
+			System.Text.StringBuilder output = new System.Text.StringBuilder ();
+			var lastCol = left;
 
-			var savedCursorVisible = Console.CursorVisible = false;
+			Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
 				if (!dirtyLine [row]) {
 					continue;
 				}
 				dirtyLine [row] = false;
-				System.Text.StringBuilder output = new System.Text.StringBuilder ();
-				for (int col = 0; col < cols; col++) {
+				output.Clear ();
+				for (int col = left; col < cols; col++) {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
-					var lastCol = -1;
+					lastCol = left;
+					var outputWidth = 0;
 					for (; col < cols; col++) {
-						if (col > 0 && contents [row, col, 2] == 0
-							&& Rune.ColumnWidth ((char)contents [row, col - 1, 0]) > 1) {
-
-							if (col == cols - 1 && output.Length > 0) {
-								Console.CursorLeft = lastCol;
-								Console.Write (output);
+						if (contents [row, col, 2] == 0) {
+							if (output.Length > 0) {
+								if (col > 0 && Rune.ColumnWidth ((char)contents [row, col - 1, 0]) < 2) {
+									Console.CursorLeft = lastCol;
+									Console.CursorTop = row;
+									Console.Write (output);
+									output.Clear ();
+									lastCol += outputWidth;
+									outputWidth = 0;
+									if (lastCol + 1 < cols)
+										lastCol++;
+								}
+							} else {
+								if (lastCol + 1 < cols)
+									lastCol++;
 							}
 							continue;
 						}
@@ -1484,27 +1510,27 @@ namespace Terminal.Gui {
 						var attr = contents [row, col, 1];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
-							if (lastCol == -1)
-								lastCol = col;
 						}
 						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
 							return;
 						}
+						var rune = (char)contents [row, col, 0];
+						outputWidth += Math.Max (Rune.ColumnWidth (rune), 1);
 						if (AlwaysSetPosition) {
-							Console.Write ($"{output}{(char)contents [row, col, 0]}");
+							Console.Write ($"{output}{rune}");
+							output.Clear ();
 						} else {
-							output.Append ((char)contents [row, col, 0]);
-							if (lastCol == -1)
-								lastCol = col;
+							output.Append (rune);
 						}
 						contents [row, col, 2] = 0;
-						if (!AlwaysSetPosition && col == cols - 1) {
-							Console.Write (output);
-						}
 					}
 				}
+				if (output.Length > 0) {
+					Console.CursorLeft = lastCol;
+					Console.CursorTop = row;
+					Console.Write (output);
+				}
 			}
-			Console.CursorVisible = savedCursorVisible;
 		}
 
 		System.Text.StringBuilder WriteAttributes (int attr)

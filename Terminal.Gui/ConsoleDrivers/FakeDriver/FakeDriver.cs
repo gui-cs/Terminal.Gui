@@ -108,31 +108,34 @@ namespace Terminal.Gui {
 
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-				} else if (runeWidth < 2 && ccol < Cols - 1
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
 					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-				}
+					contents [crow, ccol + 1, 2] = 1;
 
-				contents [crow, ccol, 0] = (int)(uint)rune;
+				}
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
+
 				dirtyLine [crow] = true;
 			} else
 				needMove = true;
 
 			ccol++;
 			if (runeWidth > 1) {
-				for (int i = 1; i < runeWidth; i++) {
-					if (validClip) {
-						contents [crow, ccol, 1] = currentAttribute;
-						contents [crow, ccol, 2] = 0;
-					} else {
-						break;
-					}
-					ccol++;
+				if (validClip && ccol < Clip.Right) {
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
 				}
+				ccol++;
 			}
+
 			//if (ccol == Cols) {
 			//	ccol = 0;
 			//	if (crow + 1 < Rows)
@@ -248,17 +251,17 @@ namespace Terminal.Gui {
 
 			var savedRow = FakeConsole.CursorTop;
 			var savedCol = FakeConsole.CursorLeft;
-			for (int row = 0; row < rows; row++) {
+			var savedCursorVisible = FakeConsole.CursorVisible;
+			for (int row = top; row < rows; row++) {
 				if (!dirtyLine [row])
 					continue;
 				dirtyLine [row] = false;
-				for (int col = 0; col < cols; col++) {
+				for (int col = left; col < cols; col++) {
 					FakeConsole.CursorTop = row;
 					FakeConsole.CursorLeft = col;
 					for (; col < cols; col++) {
-						if (col > 0 && contents [row, col, 2] == 0
-							&& Rune.ColumnWidth ((char)contents [row, col - 1, 0]) > 1) {
-							FakeConsole.CursorLeft = col + 1;
+						if (contents [row, col, 2] == 0) {
+							FakeConsole.CursorLeft++;
 							continue;
 						}
 
@@ -273,6 +276,7 @@ namespace Terminal.Gui {
 			}
 			FakeConsole.CursorTop = savedRow;
 			FakeConsole.CursorLeft = savedCol;
+			FakeConsole.CursorVisible = savedCursorVisible;
 		}
 
 		public override void Refresh ()
@@ -549,13 +553,13 @@ namespace Terminal.Gui {
 			}
 
 			Clip = new Rect (0, 0, Cols, Rows);
-
-			contents = new int [Rows, Cols, 3];
-			dirtyLine = new bool [Rows];
 		}
 
 		public override void UpdateOffScreen ()
 		{
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
+
 			// Can raise an exception while is still resizing.
 			try {
 				for (int row = 0; row < rows; row++) {

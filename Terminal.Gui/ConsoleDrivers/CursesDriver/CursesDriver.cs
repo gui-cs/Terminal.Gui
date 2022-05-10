@@ -70,7 +70,9 @@ namespace Terminal.Gui {
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 					Curses.move (crow, ccol);
 					Curses.attrset (curAtttib);
-				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					var curAtttib = currentAttribute;
 					Curses.attrset (contents [crow, ccol + 1, 1]);
@@ -78,9 +80,15 @@ namespace Terminal.Gui {
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 					Curses.move (crow, ccol);
 					Curses.attrset (curAtttib);
+
 				}
-				Curses.addch ((int)(uint)rune);
-				contents [crow, ccol, 0] = (int)(uint)rune;
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					Curses.addch ((int)(uint)' ');
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					Curses.addch ((int)(uint)rune);
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 			} else
@@ -88,7 +96,7 @@ namespace Terminal.Gui {
 
 			ccol++;
 			if (runeWidth > 1) {
-				if (validClip) {
+				if (validClip && ccol < Clip.Right) {
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}

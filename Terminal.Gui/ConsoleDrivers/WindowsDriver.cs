@@ -1480,15 +1480,22 @@ namespace Terminal.Gui {
 					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-				} else if (runeWidth < 2 && ccol < Cols - 1 && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					var prevPosition = crow * Cols + ccol + 1;
 					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+
+				}
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					OutputBuffer [position].Char.UnicodeChar = (char)' ';
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					OutputBuffer [position].Char.UnicodeChar = (char)rune;
+					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				OutputBuffer [position].Char.UnicodeChar = (char)rune;
-				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
@@ -1496,7 +1503,7 @@ namespace Terminal.Gui {
 
 			ccol++;
 			if (runeWidth > 1) {
-				if (validClip) {
+				if (validClip && ccol < Clip.Right) {
 					position = crow * Cols + ccol;
 					OutputBuffer [position].Attributes = (ushort)currentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
