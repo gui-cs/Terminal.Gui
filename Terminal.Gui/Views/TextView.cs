@@ -1456,7 +1456,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _, out _, out _);
+					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -1478,7 +1478,7 @@ namespace Terminal.Gui {
 		void WrapTextModel ()
 		{
 			if (wordWrap && wrapManager != null) {
-				model = wrapManager.WrapModel (Frame.Width - 2,
+				model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0),
 					out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,

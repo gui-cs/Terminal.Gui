@@ -5693,5 +5693,19 @@ line.
 			Assert.Equal ($"1{Environment.NewLine}2", tv.Text);
 			Assert.Equal ($"1{Environment.NewLine}2", tv.SelectedText);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void WordWrap_Not_Throw_If_Width_Is_Less_Than_Zero ()
+		{
+			var exception = Record.Exception (() => {
+				var tv = new TextView () {
+					Width = Dim.Fill (),
+					Height = Dim.Fill (),
+					WordWrap = true,
+					Text = "これは、左右のクリップ境界をテストするための非常に長いテキストです。"
+				};
+			});
+			Assert.Null (exception);
+		}
 	}
 }
