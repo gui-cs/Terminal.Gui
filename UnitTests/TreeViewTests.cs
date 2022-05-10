@@ -720,8 +720,55 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
 
 		}
-
 		[Fact, AutoInitShutdown]
+		public void TestTreeHitTest ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.HitTest (new Point (0, 0)));
+			Assert.Same (n1_1, tv.HitTest (new Point (0, 1)));
+			Assert.Same (n1_2, tv.HitTest (new Point (0, 2)));
+			Assert.Same (n2, tv.HitTest (new Point (0, 3)));
+			Assert.Null (tv.HitTest (new Point (0, 4)));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.HitTest (new Point (0, 0)));
+			Assert.Same (n2, tv.HitTest (new Point (0, 1)));
+			Assert.Null (tv.HitTest (new Point (0, 2)));
+			Assert.Null (tv.HitTest (new Point (0, 3)));
+			Assert.Null (tv.HitTest (new Point (0, 4)));
+		}
+			[Fact, AutoInitShutdown]
 		public void TestTreeViewColor()
 		{
 			var tv = new TreeView{Width = 20,Height = 10};

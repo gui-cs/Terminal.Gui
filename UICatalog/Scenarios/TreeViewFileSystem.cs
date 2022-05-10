@@ -77,6 +77,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			treeViewFiles.ObjectActivated += TreeViewFiles_ObjectActivated;
+			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
 
 			SetupFileTree ();
 
@@ -86,6 +87,52 @@ namespace UICatalog.Scenarios {
 
 			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);
 			red = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
+		}
+
+		private void TreeViewFiles_MouseClick (View.MouseEventArgs obj)
+		{
+			// if user right clicks
+			if (obj.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
+
+				var rightClicked = treeViewFiles.HitTest (new Point (obj.MouseEvent.X, obj.MouseEvent.Y));
+
+				// nothing was clicked
+				if (rightClicked == null)
+					return;
+
+				var menu = new ContextMenu ();
+				menu.Position = new Point(
+					obj.MouseEvent.X + treeViewFiles.Frame.X,
+					obj.MouseEvent.Y + treeViewFiles.Frame.Y +1);
+
+				menu.MenuItems = new MenuBarItem (new [] { new MenuItem ("Properties",null,()=> {
+					MessageBox.Query($"{rightClicked.Name}({rightClicked.GetType().Name})",Describe(rightClicked),"Ok");
+				}
+					
+				) });
+				menu.Show ();
+
+			}
+		}
+
+		private string Describe (FileSystemInfo f)
+		{
+			try {
+
+				if (f is FileInfo fi) {
+					return "Size:" + fi.Length;
+				}
+
+				if (f is DirectoryInfo d) {
+					return $@"Parent:{d.Parent}
+Attributes:{d.Attributes}";
+				}
+			} catch (Exception) {
+
+				return "Could not get properties";
+			}
+
+			return null;
 		}
 
 		private void SetupScrollBar ()

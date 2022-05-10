@@ -671,6 +671,21 @@ namespace Terminal.Gui {
 			ObjectActivated?.Invoke (e);
 		}
 
+		/// <summary>
+		/// Returns the object in the tree list that is currently visible
+		/// at the provided point.  Returns null if no object is at that location.
+		/// <remarks>
+		/// </remarks>
+		/// If you have screen cordinates then use <see cref="View.ScreenToView(int, int)"/>
+		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
+		/// </summary>
+		/// <param name="point">Point with the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/></param>
+		/// <returns></returns>
+		public T HitTest (Point point)
+		{
+			return HitTest (point.Y)?.Model;
+		}
+
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
