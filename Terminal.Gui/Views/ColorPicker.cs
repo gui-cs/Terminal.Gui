@@ -112,7 +112,6 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Width = colorsPerLine * horizontalZoom;
 			Height = lineCount * verticalZoom + 1;
-			Border = new Border () { BorderStyle = BorderStyle.None };
 
 			AddCommands ();
 			AddKeyBindings ();
