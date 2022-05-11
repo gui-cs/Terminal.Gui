@@ -21078,6 +21078,23 @@ references:
   fullName.vb: Terminal.Gui.TreeView(Of T).CollapseImpl
   nameWithType: TreeView<T>.CollapseImpl
   nameWithType.vb: TreeView(Of T).CollapseImpl
+- uid: Terminal.Gui.TreeView`1.ColorGetter
+  name: ColorGetter
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ColorGetter
+  commentId: P:Terminal.Gui.TreeView`1.ColorGetter
+  fullName: Terminal.Gui.TreeView<T>.ColorGetter
+  fullName.vb: Terminal.Gui.TreeView(Of T).ColorGetter
+  nameWithType: TreeView<T>.ColorGetter
+  nameWithType.vb: TreeView(Of T).ColorGetter
+- uid: Terminal.Gui.TreeView`1.ColorGetter*
+  name: ColorGetter
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ColorGetter_
+  commentId: Overload:Terminal.Gui.TreeView`1.ColorGetter
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ColorGetter
+  fullName.vb: Terminal.Gui.TreeView(Of T).ColorGetter
+  nameWithType: TreeView<T>.ColorGetter
+  nameWithType.vb: TreeView(Of T).ColorGetter
 - uid: Terminal.Gui.TreeView`1.ContentHeight
   name: ContentHeight
   href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ContentHeight
