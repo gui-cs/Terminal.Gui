@@ -196,7 +196,8 @@ namespace Terminal.Gui {
 					if (Console.WindowTop != consoleDriver.Top) {
 						// Top only working on Windows.
 						var winPositionEv = new WindowPositionEvent () {
-							Top = Console.WindowTop
+							Top = Console.WindowTop,
+							Left = Console.WindowLeft
 						};
 						inputResultQueue.Enqueue (new InputResult () {
 							EventType = EventType.WindowPosition,
@@ -1144,6 +1145,7 @@ namespace Terminal.Gui {
 
 		public struct WindowPositionEvent {
 			public int Top;
+			public int Left;
 			public Point CursorPosition;
 		}
 
@@ -1174,11 +1176,11 @@ namespace Terminal.Gui {
 		const int COLOR_BRIGHT_CYAN = 96;
 		const int COLOR_BRIGHT_WHITE = 97;
 
-		int cols, rows, top;
+		int cols, rows, left, top;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override int Left => 0;
+		public override int Left => left;
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 
@@ -1805,8 +1807,10 @@ namespace Terminal.Gui {
 				break;
 			case NetEvents.EventType.WindowPosition:
 				var newTop = inputEvent.WindowPositionEvent.Top;
-				if (HeightAsBuffer && top != newTop) {
+				var newLeft = inputEvent.WindowPositionEvent.Left;
+				if (HeightAsBuffer && (top != newTop || left != newLeft)) {
 					top = newTop;
+					left = newLeft;
 					Refresh ();
 				}
 				break;
@@ -1824,6 +1828,7 @@ namespace Terminal.Gui {
 				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
 					Console.WindowHeight);
 				top = 0;
+				left = 0;
 			} else {
 				//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 				largestWindowHeight = Console.BufferHeight;
