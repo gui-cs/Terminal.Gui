@@ -66,7 +66,6 @@ namespace UICatalog {
 		private static bool _useSystemConsole = false;
 		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		private static bool _heightAsBuffer = false;
-		private static bool _alwaysSetPosition;
 		private static bool _isFirstRunning = true;
 
 		static void Main (string [] args)
@@ -152,7 +151,6 @@ namespace UICatalog {
 			Application.UseSystemConsole = _useSystemConsole;
 			Application.Init ();
 			Application.HeightAsBuffer = _heightAsBuffer;
-			Application.AlwaysSetPosition = _alwaysSetPosition;
 
 			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
@@ -311,7 +309,6 @@ namespace UICatalog {
 			menuItems.Add (CreateDiagnosticFlagsMenuItems ());
 			menuItems.Add (new MenuItem [] { null });
 			menuItems.Add (CreateSizeStyle ());
-			menuItems.Add (CreateAlwaysSetPosition ());
 			menuItems.Add (CreateDisabledEnabledMouse ());
 			menuItems.Add (CreateKeybindings ());
 			return menuItems;
@@ -344,23 +341,6 @@ namespace UICatalog {
 			};
 
 			menuItems.Add (null);
-			menuItems.Add (item);
-
-			return menuItems.ToArray ();
-		}
-
-		static MenuItem [] CreateAlwaysSetPosition ()
-		{
-			List<MenuItem> menuItems = new List<MenuItem> ();
-			var item = new MenuItem ();
-			item.Title = "_Always set position (NetDriver only)";
-			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
-			item.CheckType |= MenuItemCheckStyle.Checked;
-			item.Checked = Application.AlwaysSetPosition;
-			item.Action += () => {
-				Application.AlwaysSetPosition = !item.Checked;
-				item.Checked = _alwaysSetPosition = Application.AlwaysSetPosition;
-			};
 			menuItems.Add (item);
 
 			return menuItems.ToArray ();

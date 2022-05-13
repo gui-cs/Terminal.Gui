@@ -123,24 +123,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
-		/// </summary>
-		public static bool AlwaysSetPosition {
-			get {
-				if (Driver is NetDriver) {
-					return (Driver as NetDriver).AlwaysSetPosition;
-				}
-				return false;
-			}
-			set {
-				if (Driver is NetDriver) {
-					(Driver as NetDriver).AlwaysSetPosition = value;
-					Driver.Refresh ();
-				}
-			}
-		}
-
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>

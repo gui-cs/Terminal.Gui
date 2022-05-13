@@ -1186,7 +1186,6 @@ namespace Terminal.Gui {
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
-		public bool AlwaysSetPosition { get; set; }
 		public override IClipboard Clipboard { get; }
 		internal override int [,,] Contents => contents;
 
@@ -1474,7 +1473,7 @@ namespace Terminal.Gui {
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
 			System.Text.StringBuilder output = new System.Text.StringBuilder ();
-			var lastCol = left;
+			var lastCol = -1;
 
 			Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
@@ -1487,52 +1486,51 @@ namespace Terminal.Gui {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
-					lastCol = left;
+					lastCol = -1;
 					var outputWidth = 0;
 					for (; col < cols; col++) {
 						if (contents [row, col, 2] == 0) {
 							if (output.Length > 0) {
-								if (col > 0 && Rune.ColumnWidth ((char)contents [row, col - 1, 0]) < 2) {
-									Console.CursorLeft = lastCol;
-									Console.CursorTop = row;
-									Console.Write (output);
-									output.Clear ();
-									lastCol += outputWidth;
-									outputWidth = 0;
-									if (lastCol + 1 < cols)
-										lastCol++;
-								}
-							} else {
-								if (lastCol + 1 < cols)
-									lastCol++;
+								//Console.CursorLeft = lastCol;
+								//Console.CursorTop = row;
+								SetVirtualCursorPosition (lastCol, row);
+								Console.Write (output);
+								output.Clear ();
+								lastCol += outputWidth;
+								outputWidth = 0;
+							} else if (lastCol == -1) {
+								lastCol = col;
 							}
+							if (lastCol + 1 < cols)
+								lastCol++;
 							continue;
 						}
+
+						if (lastCol == -1)
+							lastCol = col;
 
 						var attr = contents [row, col, 1];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
 						}
-						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
-							return;
-						}
-						var rune = (char)contents [row, col, 0];
-						outputWidth += Math.Max (Rune.ColumnWidth (rune), 1);
-						if (AlwaysSetPosition) {
-							Console.Write ($"{output}{rune}");
-							output.Clear ();
-						} else {
-							output.Append (rune);
-						}
+						outputWidth++;
+						output.Append ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
 				}
 				if (output.Length > 0) {
-					Console.CursorLeft = lastCol;
-					Console.CursorTop = row;
+					//Console.CursorLeft = lastCol;
+					//Console.CursorTop = row;
+					SetVirtualCursorPosition (lastCol, row);
 					Console.Write (output);
 				}
 			}
+		}
+
+		void SetVirtualCursorPosition (int lastCol, int row)
+		{
+			Console.Out.Write ($"\x1b[{row + 1};{lastCol + 1}H");
+			Console.Out.Flush ();
 		}
 
 		System.Text.StringBuilder WriteAttributes (int attr)
