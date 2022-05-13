@@ -721,7 +721,7 @@ namespace Terminal.Gui.Views {
 
 		}
 		[Fact, AutoInitShutdown]
-		public void TestGetObjectAtPoint ()
+		public void TestGetObjectOnRow ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -746,11 +746,11 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Same (n1, tv.GetObjectAtPoint (new Point (0, 0)));
-			Assert.Same (n1_1, tv.GetObjectAtPoint (new Point (0, 1)));
-			Assert.Same (n1_2, tv.GetObjectAtPoint (new Point (0, 2)));
-			Assert.Same (n2, tv.GetObjectAtPoint (new Point (0, 3)));
-			Assert.Null (tv.GetObjectAtPoint (new Point (0, 4)));
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n1_1, tv.GetObjectOnRow (1));
+			Assert.Same (n1_2, tv.GetObjectOnRow (2));
+			Assert.Same (n2, tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
 
 			tv.Collapse (n1);
 
@@ -762,11 +762,11 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Same (n1, tv.GetObjectAtPoint (new Point (0, 0)));
-			Assert.Same (n2, tv.GetObjectAtPoint (new Point (0, 1)));
-			Assert.Null (tv.GetObjectAtPoint (new Point (0, 2)));
-			Assert.Null (tv.GetObjectAtPoint (new Point (0, 3)));
-			Assert.Null (tv.GetObjectAtPoint (new Point (0, 4)));
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n2, tv.GetObjectOnRow (1));
+			Assert.Null (tv.GetObjectOnRow (2));
+			Assert.Null (tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
 		}
 
 		[Fact, AutoInitShutdown]

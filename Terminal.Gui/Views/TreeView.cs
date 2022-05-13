@@ -696,17 +696,17 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns the object in the tree list that is currently visible
-		/// at the provided col/row.  Returns null if no object is at that location.
+		/// at the provided row.  Returns null if no object is at that location.
 		/// <remarks>
 		/// </remarks>
 		/// If you have screen coordinates then use <see cref="View.ScreenToView(int, int)"/>
 		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
 		/// </summary>
-		/// <param name="point">Point with the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/></param>
-		/// <returns></returns>
-		public T GetObjectAtPoint (Point point)
+		/// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/></param>
+		/// <returns>The object currently displayed on this row or null</returns>
+		public T GetObjectOnRow (int row)
 		{
-			return HitTest (point.Y)?.Model;
+			return HitTest (row)?.Model;
 		}
 
 		///<inheritdoc/>

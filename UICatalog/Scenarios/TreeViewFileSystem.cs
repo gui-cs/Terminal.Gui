@@ -118,7 +118,7 @@ namespace UICatalog.Scenarios {
 			// if user right clicks
 			if (obj.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
 
-				var rightClicked = treeViewFiles.GetObjectAtPoint (new Point (obj.MouseEvent.X, obj.MouseEvent.Y));
+				var rightClicked = treeViewFiles.GetObjectOnRow ( obj.MouseEvent.Y);
 
 				// nothing was clicked
 				if (rightClicked == null)
