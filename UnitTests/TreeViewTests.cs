@@ -721,7 +721,7 @@ namespace Terminal.Gui.Views {
 
 		}
 		[Fact, AutoInitShutdown]
-		public void TestTreeHitTest ()
+		public void TestGetObjectAtPoint ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -746,11 +746,11 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Same (n1, tv.HitTest (new Point (0, 0)));
-			Assert.Same (n1_1, tv.HitTest (new Point (0, 1)));
-			Assert.Same (n1_2, tv.HitTest (new Point (0, 2)));
-			Assert.Same (n2, tv.HitTest (new Point (0, 3)));
-			Assert.Null (tv.HitTest (new Point (0, 4)));
+			Assert.Same (n1, tv.GetObjectAtPoint (new Point (0, 0)));
+			Assert.Same (n1_1, tv.GetObjectAtPoint (new Point (0, 1)));
+			Assert.Same (n1_2, tv.GetObjectAtPoint (new Point (0, 2)));
+			Assert.Same (n2, tv.GetObjectAtPoint (new Point (0, 3)));
+			Assert.Null (tv.GetObjectAtPoint (new Point (0, 4)));
 
 			tv.Collapse (n1);
 
@@ -762,15 +762,15 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Same (n1, tv.HitTest (new Point (0, 0)));
-			Assert.Same (n2, tv.HitTest (new Point (0, 1)));
-			Assert.Null (tv.HitTest (new Point (0, 2)));
-			Assert.Null (tv.HitTest (new Point (0, 3)));
-			Assert.Null (tv.HitTest (new Point (0, 4)));
+			Assert.Same (n1, tv.GetObjectAtPoint (new Point (0, 0)));
+			Assert.Same (n2, tv.GetObjectAtPoint (new Point (0, 1)));
+			Assert.Null (tv.GetObjectAtPoint (new Point (0, 2)));
+			Assert.Null (tv.GetObjectAtPoint (new Point (0, 3)));
+			Assert.Null (tv.GetObjectAtPoint (new Point (0, 4)));
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestTreeIndexOf ()
+		public void TestGetObjectYPosition ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -795,10 +795,10 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Equal (0, tv.IndexOf (n1));
-			Assert.Equal (1, tv.IndexOf (n1_1));
-			Assert.Equal (2, tv.IndexOf (n1_2));
-			Assert.Equal (3, tv.IndexOf (n2));
+			Assert.Equal (0, tv.GetObjectYPosition (n1));
+			Assert.Equal (1, tv.GetObjectYPosition (n1_1));
+			Assert.Equal (2, tv.GetObjectYPosition (n1_2));
+			Assert.Equal (3, tv.GetObjectYPosition (n2));
 
 			tv.Collapse (n1);
 
@@ -809,10 +809,10 @@ namespace Terminal.Gui.Views {
 @"├+normal
 └─pink
 ", output);
-			Assert.Equal (0, tv.IndexOf (n1));
-			Assert.Null (tv.IndexOf (n1_1));
-			Assert.Null (tv.IndexOf (n1_2));
-			Assert.Equal (1, tv.IndexOf (n2));
+			Assert.Equal (0, tv.GetObjectYPosition (n1));
+			Assert.Null (tv.GetObjectYPosition (n1_1));
+			Assert.Null (tv.GetObjectYPosition (n1_2));
+			Assert.Equal (1, tv.GetObjectYPosition (n2));
 
 
 			// scroll down 1
@@ -824,10 +824,10 @@ namespace Terminal.Gui.Views {
 			GraphViewTests.AssertDriverContentsAre (
 @"└─pink
 ", output);
-			Assert.Equal (-1, tv.IndexOf (n1));
-			Assert.Null (tv.IndexOf (n1_1));
-			Assert.Null (tv.IndexOf (n1_2));
-			Assert.Equal (0, tv.IndexOf (n2));
+			Assert.Equal (-1, tv.GetObjectYPosition (n1));
+			Assert.Null (tv.GetObjectYPosition (n1_1));
+			Assert.Null (tv.GetObjectYPosition (n1_2));
+			Assert.Equal (0, tv.GetObjectYPosition (n2));
 		}
 		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor()

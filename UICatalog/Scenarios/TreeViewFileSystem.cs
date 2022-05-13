@@ -100,7 +100,7 @@ namespace UICatalog.Scenarios {
 				if (selected == null)
 					return;
 				
-				var location = treeViewFiles.IndexOf (selected);
+				var location = treeViewFiles.GetObjectYPosition (selected);
 
 				//selected object is offscreen or somehow not found
 				if (location == null || location < 0 || location > treeViewFiles.Frame.Height)
@@ -118,7 +118,7 @@ namespace UICatalog.Scenarios {
 			// if user right clicks
 			if (obj.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
 
-				var rightClicked = treeViewFiles.HitTest (new Point (obj.MouseEvent.X, obj.MouseEvent.Y));
+				var rightClicked = treeViewFiles.GetObjectAtPoint (new Point (obj.MouseEvent.X, obj.MouseEvent.Y));
 
 				// nothing was clicked
 				if (rightClicked == null)

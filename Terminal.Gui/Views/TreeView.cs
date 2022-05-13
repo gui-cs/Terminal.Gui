@@ -622,7 +622,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="toFind"></param>
 		/// <returns></returns>
-		public int? IndexOf(T toFind)
+		public int? GetObjectYPosition(T toFind)
 		{
 			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
 
@@ -696,15 +696,15 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns the object in the tree list that is currently visible
-		/// at the provided point.  Returns null if no object is at that location.
+		/// at the provided col/row.  Returns null if no object is at that location.
 		/// <remarks>
 		/// </remarks>
-		/// If you have screen cordinates then use <see cref="View.ScreenToView(int, int)"/>
+		/// If you have screen coordinates then use <see cref="View.ScreenToView(int, int)"/>
 		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
 		/// </summary>
 		/// <param name="point">Point with the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/></param>
 		/// <returns></returns>
-		public T HitTest (Point point)
+		public T GetObjectAtPoint (Point point)
 		{
 			return HitTest (point.Y)?.Model;
 		}
