@@ -48,59 +48,61 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
-			foreach (var scenarioClass in scenarioClasses) {
+			lock (Console.MockKeyPresses) {
+				foreach (var scenarioClass in scenarioClasses) {
 
-				// Setup some fake keypresses 
-				// Passing empty string will cause just a ctrl-q to be fired
-				Console.MockKeyPresses.Clear ();
-				int stackSize = CreateInput ("");
+					// Setup some fake keypresses 
+					// Passing empty string will cause just a ctrl-q to be fired
+					Console.MockKeyPresses.Clear ();
+					int stackSize = CreateInput ("");
 
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+					Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-				int iterations = 0;
-				Application.Iteration = () => {
-					iterations++;
-					// Stop if we run out of control...
-					if (iterations > 10) {
-						Application.RequestStop ();
+					int iterations = 0;
+					Application.Iteration = () => {
+						iterations++;
+						// Stop if we run out of control...
+						if (iterations > 10) {
+							Application.RequestStop ();
+						}
+					};
+
+					int ms;
+					if (scenarioClass.Name == "CharacterMap") {
+						ms = 1500;
+					} else {
+						ms = 1000;
 					}
-				};
+					var abortCount = 0;
+					Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
+						abortCount++;
+						Application.RequestStop ();
+						return false;
+					};
+					var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
-				int ms;
-				if (scenarioClass.Name == "CharacterMap") {
-					ms = 1500;
-				}else {
-					ms = 1000;
+					var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
+					scenario.Init (Application.Top, Colors.Base);
+					scenario.Setup ();
+					// There is no need to call Application.Begin because Init already creates the Application.Top
+					// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
+					//var rs = Application.Begin (Application.Top);
+					scenario.Run ();
+
+					//Application.End (rs);
+
+					// Shutdown must be called to safely clean up Application if Init has been called
+					Application.Shutdown ();
+
+					if (abortCount != 0) {
+						output.WriteLine ($"Scenario {scenarioClass} had abort count of {abortCount}");
+					}
+
+					Assert.Equal (0, abortCount);
+					// # of key up events should match # of iterations
+					Assert.Equal (1, iterations);
+					Assert.Equal (stackSize, iterations);
 				}
-				var abortCount = 0;
-				Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
-					abortCount++;
-					Application.RequestStop ();
-					return false;
-				};
-				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
-
-				var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
-				scenario.Init (Application.Top, Colors.Base);
-				scenario.Setup ();
-				// There is no need to call Application.Begin because Init already creates the Application.Top
-				// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
-				//var rs = Application.Begin (Application.Top);
-				scenario.Run ();
-
-				//Application.End (rs);
-
-				// Shutdown must be called to safely clean up Application if Init has been called
-				Application.Shutdown ();
-				
-				if(abortCount != 0) {
-					output.WriteLine ($"Scenario {scenarioClass} had abort count of {abortCount}");
-				}
-
-				Assert.Equal (0, abortCount);
-				// # of key up events should match # of iterations
-				Assert.Equal (1, iterations);
-				Assert.Equal (stackSize, iterations);
 			}
 #if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {
