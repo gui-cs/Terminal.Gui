@@ -1417,15 +1417,20 @@ namespace Terminal.Gui {
 				Border.DrawContent (this);
 			}
 
-			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text) || (this is Label && !AutoSize)) {
 				Clear ();
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
+				var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+				containerBounds.X = Math.Max (containerBounds.X, Driver.Clip.X);
+				containerBounds.Y = Math.Max (containerBounds.Y, Driver.Clip.Y);
+				containerBounds.Width = Math.Min (containerBounds.Width, Driver.Clip.Width);
+				containerBounds.Height = Math.Min (containerBounds.Height, Driver.Clip.Height);
 				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
-					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
+					containerBounds);
 			}
 
 			// Invoke DrawContentEvent

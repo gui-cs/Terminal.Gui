@@ -159,8 +159,10 @@ namespace Terminal.Gui.Views {
 			}
 
 			// Remove unnecessary empty lines
-			for (int r = lines.Count - 1; r > h - 1; r--) {
-				lines.RemoveAt (r);
+			if (lines.Count > 0) {
+				for (int r = lines.Count - 1; r > h - 1; r--) {
+					lines.RemoveAt (r);
+				}
 			}
 
 			// Remove trailing whitespace on each line
