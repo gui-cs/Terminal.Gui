@@ -1145,20 +1145,17 @@ namespace Terminal.Gui {
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start;
-				var startX = start < 0
-					? start
-					: isVertical ? start - y : start - x;
 				var savedClip = Application.Driver?.Clip;
 				if (Application.Driver != null && containerBounds != default) {
 					Application.Driver.Clip = containerBounds == default
 						? bounds
 						: new Rect (Math.Max (containerBounds.X, bounds.X),
 						Math.Max (containerBounds.Y, bounds.Y),
-						Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
-						Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top));
+						Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
+						Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
 				}
 
-				for (var idx = startX; current < start + size; idx++) {
+				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
 					if (idx < 0) {
 						current++;
 						continue;

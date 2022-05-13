@@ -221,26 +221,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			}
-
-			if (Border != null) {
-				Border.DrawContent (this);
-			}
-
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Clear ();
-				TextFormatter.NeedsFormat = true;
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
-					SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
-			}
-		}
-
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
