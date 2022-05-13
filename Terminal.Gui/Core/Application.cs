@@ -315,12 +315,12 @@ namespace Terminal.Gui {
 			}
 
 			// Used only for start debugging on Unix.
-			//#if DEBUG
-			//			while (!System.Diagnostics.Debugger.IsAttached) {
-			//				System.Threading.Thread.Sleep (100);
-			//			}
-			//			System.Diagnostics.Debugger.Break ();
-			//#endif
+//#if DEBUG
+//			while (!System.Diagnostics.Debugger.IsAttached) {
+//				System.Threading.Thread.Sleep (100);
+//			}
+//			System.Diagnostics.Debugger.Break ();
+//#endif
 
 			// Reset all class variables (Application is a singleton).
 			ResetState ();
@@ -914,7 +914,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			Driver.UpdateScreen ();
+			Driver.UpdateOffScreen ();
 			View last = null;
 			foreach (var v in toplevels.Reverse ()) {
 				if (v.Visible) {
