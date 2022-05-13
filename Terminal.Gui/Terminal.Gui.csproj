@@ -55,6 +55,24 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.6.0
+      * Adds ColorPicker control
+      * Adds Context Menu to TreeView
+      * Adds support for custom colors in TreeView
+      * Adds Data field to MenuItem
+      * Adds Timeout thread safety
+      * Adds better docs for Application.Shutdown () 
+      * Fixes #1699 Menu closes on button press and menu hot-key text renders correctly
+      * Fixes #1675 ContextMenu MenuItems typo
+      * Fixes #1715 UI Catalog about box version
+      * Fixes #1712 Intermittent Github Action build failures
+      * Fixes remaining wide runes render issues including #1693 Character Map
+      * Fixes the draw clip bounds issue visible on ScrollView.
+      * Fixes UpdateScreen running twice on Application.Refresh because Driver. Refresh already does.
+      * Fixes TextView throwing when WordWrap is true on constructor initialization.
+      * Fixes RunTimers not checking for key collisions in list when adding to timeouts
+      * Fixes erroneous namespace on LineView to match other views
+
       v1.5.0
       * Localization support added. en-US, Japanese, fr-FR, and pt-PT
       * Adds Key Binding support. Also refactors Autocomplete.
