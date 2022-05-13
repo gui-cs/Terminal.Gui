@@ -622,7 +622,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="toFind"></param>
 		/// <returns></returns>
-		public int? GetObjectYPosition(T toFind)
+		public int? GetObjectRow(T toFind)
 		{
 			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
 

@@ -100,7 +100,7 @@ namespace UICatalog.Scenarios {
 				if (selected == null)
 					return;
 				
-				var location = treeViewFiles.GetObjectYPosition (selected);
+				var location = treeViewFiles.GetObjectRow (selected);
 
 				//selected object is offscreen or somehow not found
 				if (location == null || location < 0 || location > treeViewFiles.Frame.Height)

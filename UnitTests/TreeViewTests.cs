@@ -770,7 +770,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestGetObjectYPosition ()
+		public void TestGetObjectRow ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -795,10 +795,10 @@ namespace Terminal.Gui.Views {
 └─pink
 ", output);
 
-			Assert.Equal (0, tv.GetObjectYPosition (n1));
-			Assert.Equal (1, tv.GetObjectYPosition (n1_1));
-			Assert.Equal (2, tv.GetObjectYPosition (n1_2));
-			Assert.Equal (3, tv.GetObjectYPosition (n2));
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Equal (1, tv.GetObjectRow (n1_1));
+			Assert.Equal (2, tv.GetObjectRow (n1_2));
+			Assert.Equal (3, tv.GetObjectRow (n2));
 
 			tv.Collapse (n1);
 
@@ -809,10 +809,10 @@ namespace Terminal.Gui.Views {
 @"├+normal
 └─pink
 ", output);
-			Assert.Equal (0, tv.GetObjectYPosition (n1));
-			Assert.Null (tv.GetObjectYPosition (n1_1));
-			Assert.Null (tv.GetObjectYPosition (n1_2));
-			Assert.Equal (1, tv.GetObjectYPosition (n2));
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (1, tv.GetObjectRow (n2));
 
 
 			// scroll down 1
@@ -824,10 +824,10 @@ namespace Terminal.Gui.Views {
 			GraphViewTests.AssertDriverContentsAre (
 @"└─pink
 ", output);
-			Assert.Equal (-1, tv.GetObjectYPosition (n1));
-			Assert.Null (tv.GetObjectYPosition (n1_1));
-			Assert.Null (tv.GetObjectYPosition (n1_2));
-			Assert.Equal (0, tv.GetObjectYPosition (n2));
+			Assert.Equal (-1, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (0, tv.GetObjectRow (n2));
 		}
 		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor()
