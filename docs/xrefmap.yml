@@ -39,19 +39,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.AlternateForwardKey
   nameWithType: Application.AlternateForwardKey
-- uid: Terminal.Gui.Application.AlwaysSetPosition
-  name: AlwaysSetPosition
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_AlwaysSetPosition
-  commentId: P:Terminal.Gui.Application.AlwaysSetPosition
-  fullName: Terminal.Gui.Application.AlwaysSetPosition
-  nameWithType: Application.AlwaysSetPosition
-- uid: Terminal.Gui.Application.AlwaysSetPosition*
-  name: AlwaysSetPosition
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_AlwaysSetPosition_
-  commentId: Overload:Terminal.Gui.Application.AlwaysSetPosition
-  isSpec: "True"
-  fullName: Terminal.Gui.Application.AlwaysSetPosition
-  nameWithType: Application.AlwaysSetPosition
 - uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   name: Begin(Toplevel)
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_
@@ -1617,19 +1604,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.ProcessKey
   nameWithType: Button.ProcessKey
-- uid: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  name: Redraw(Rect)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Redraw_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  fullName: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  nameWithType: Button.Redraw(Rect)
-- uid: Terminal.Gui.Button.Redraw*
-  name: Redraw
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Redraw_
-  commentId: Overload:Terminal.Gui.Button.Redraw
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.Redraw
-  nameWithType: Button.Redraw
 - uid: Terminal.Gui.Button.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Text
@@ -21264,6 +21238,40 @@ references:
   fullName.vb: Terminal.Gui.TreeView(Of T).GetContentWidth
   nameWithType: TreeView<T>.GetContentWidth
   nameWithType.vb: TreeView(Of T).GetContentWidth
+- uid: Terminal.Gui.TreeView`1.GetObjectOnRow(System.Int32)
+  name: GetObjectOnRow(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetObjectOnRow_System_Int32_
+  commentId: M:Terminal.Gui.TreeView`1.GetObjectOnRow(System.Int32)
+  fullName: Terminal.Gui.TreeView<T>.GetObjectOnRow(System.Int32)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetObjectOnRow(System.Int32)
+  nameWithType: TreeView<T>.GetObjectOnRow(Int32)
+  nameWithType.vb: TreeView(Of T).GetObjectOnRow(Int32)
+- uid: Terminal.Gui.TreeView`1.GetObjectOnRow*
+  name: GetObjectOnRow
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetObjectOnRow_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetObjectOnRow
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetObjectOnRow
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetObjectOnRow
+  nameWithType: TreeView<T>.GetObjectOnRow
+  nameWithType.vb: TreeView(Of T).GetObjectOnRow
+- uid: Terminal.Gui.TreeView`1.GetObjectRow(`0)
+  name: GetObjectRow(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetObjectRow__0_
+  commentId: M:Terminal.Gui.TreeView`1.GetObjectRow(`0)
+  fullName: Terminal.Gui.TreeView<T>.GetObjectRow(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetObjectRow(T)
+  nameWithType: TreeView<T>.GetObjectRow(T)
+  nameWithType.vb: TreeView(Of T).GetObjectRow(T)
+- uid: Terminal.Gui.TreeView`1.GetObjectRow*
+  name: GetObjectRow
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetObjectRow_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetObjectRow
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetObjectRow
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetObjectRow
+  nameWithType: TreeView<T>.GetObjectRow
+  nameWithType.vb: TreeView(Of T).GetObjectRow
 - uid: Terminal.Gui.TreeView`1.GetParent(`0)
   name: GetParent(T)
   href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetParent__0_
@@ -25914,6 +25922,38 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenarios.ProgressBarStyles.Setup
   nameWithType: ProgressBarStyles.Setup
+- uid: UICatalog.Scenarios.RuneWidthGreaterThanOne
+  name: RuneWidthGreaterThanOne
+  href: api/UICatalog/UICatalog.Scenarios.RuneWidthGreaterThanOne.html
+  commentId: T:UICatalog.Scenarios.RuneWidthGreaterThanOne
+  fullName: UICatalog.Scenarios.RuneWidthGreaterThanOne
+  nameWithType: RuneWidthGreaterThanOne
+- uid: UICatalog.Scenarios.RuneWidthGreaterThanOne.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  name: Init(Toplevel, ColorScheme)
+  href: api/UICatalog/UICatalog.Scenarios.RuneWidthGreaterThanOne.html#UICatalog_Scenarios_RuneWidthGreaterThanOne_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_
+  commentId: M:UICatalog.Scenarios.RuneWidthGreaterThanOne.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  fullName: UICatalog.Scenarios.RuneWidthGreaterThanOne.Init(Terminal.Gui.Toplevel, Terminal.Gui.ColorScheme)
+  nameWithType: RuneWidthGreaterThanOne.Init(Toplevel, ColorScheme)
+- uid: UICatalog.Scenarios.RuneWidthGreaterThanOne.Init*
+  name: Init
+  href: api/UICatalog/UICatalog.Scenarios.RuneWidthGreaterThanOne.html#UICatalog_Scenarios_RuneWidthGreaterThanOne_Init_
+  commentId: Overload:UICatalog.Scenarios.RuneWidthGreaterThanOne.Init
+  isSpec: "True"
+  fullName: UICatalog.Scenarios.RuneWidthGreaterThanOne.Init
+  nameWithType: RuneWidthGreaterThanOne.Init
+- uid: UICatalog.Scenarios.RuneWidthGreaterThanOne.Run
+  name: Run()
+  href: api/UICatalog/UICatalog.Scenarios.RuneWidthGreaterThanOne.html#UICatalog_Scenarios_RuneWidthGreaterThanOne_Run
+  commentId: M:UICatalog.Scenarios.RuneWidthGreaterThanOne.Run
+  fullName: UICatalog.Scenarios.RuneWidthGreaterThanOne.Run()
+  nameWithType: RuneWidthGreaterThanOne.Run()
+- uid: UICatalog.Scenarios.RuneWidthGreaterThanOne.Run*
+  name: Run
+  href: api/UICatalog/UICatalog.Scenarios.RuneWidthGreaterThanOne.html#UICatalog_Scenarios_RuneWidthGreaterThanOne_Run_
+  commentId: Overload:UICatalog.Scenarios.RuneWidthGreaterThanOne.Run
+  isSpec: "True"
+  fullName: UICatalog.Scenarios.RuneWidthGreaterThanOne.Run
+  nameWithType: RuneWidthGreaterThanOne.Run
 - uid: UICatalog.Scenarios.Scrolling
   name: Scrolling
   href: api/UICatalog/UICatalog.Scenarios.Scrolling.html
