@@ -720,7 +720,115 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
 
 		}
+		[Fact, AutoInitShutdown]
+		public void TestGetObjectOnRow ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
 
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n1_1, tv.GetObjectOnRow (1));
+			Assert.Same (n1_2, tv.GetObjectOnRow (2));
+			Assert.Same (n2, tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n2, tv.GetObjectOnRow (1));
+			Assert.Null (tv.GetObjectOnRow (2));
+			Assert.Null (tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestGetObjectRow ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Equal (1, tv.GetObjectRow (n1_1));
+			Assert.Equal (2, tv.GetObjectRow (n1_2));
+			Assert.Equal (3, tv.GetObjectRow (n2));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (1, tv.GetObjectRow (n2));
+
+
+			// scroll down 1
+			tv.ScrollOffsetVertical = 1;
+
+			tv.Redraw (tv.Bounds);
+
+
+			GraphViewTests.AssertDriverContentsAre (
+@"└─pink
+", output);
+			Assert.Equal (-1, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (0, tv.GetObjectRow (n2));
+		}
 		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor()
 		{

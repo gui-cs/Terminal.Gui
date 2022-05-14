@@ -94,11 +94,13 @@ View is the base class for all views on the screen and represents a visible elem
     <div class="level2"><span class="xref">View</span></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Button.html">Button</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.HexView.html">HexView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Label.html">Label</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.LineView.html">LineView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.ListView.html">ListView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.PanelView.html">PanelView</a></div>
@@ -114,7 +116,6 @@ View is the base class for all views on the screen and represents a visible elem
       <div class="level3"><a class="xref" href="Terminal.Gui.TextView.html">TextView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a></div>
-      <div class="level3"><a class="xref" href="Terminal.Gui.Views.LineView.html">LineView</a></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -1230,6 +1231,31 @@ Gets or sets the direction of the View&apos;s <a class="xref" href="Terminal.Gui
       <tr>
         <td><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></td>
         <td>The text alignment.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_TextFormatter_" data-uid="Terminal.Gui.View.TextFormatter*"></a>
+  <h4 id="Terminal_Gui_View_TextFormatter" data-uid="Terminal.Gui.View.TextFormatter">TextFormatter</h4>
+  <div class="markdown level1 summary">
+Gets or sets the <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> which can be handled differently by any derived class.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextFormatter TextFormatter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

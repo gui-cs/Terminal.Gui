@@ -610,6 +610,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// <para>
+		/// Returns the Y coordinate within the <see cref="View.Bounds"/> of the
+		/// tree at which <paramref name="toFind"/> would be displayed or null if
+		/// it is not currently exposed (e.g. its parent is collapsed).
+		/// </para>
+		/// <para>
+		/// Note that the returned value can be negative if the TreeView is scrolled
+		/// down and the <paramref name="toFind"/> object is off the top of the view.
+		/// </para>
+		/// </summary>
+		/// <param name="toFind"></param>
+		/// <returns></returns>
+		public int? GetObjectRow(T toFind)
+		{
+			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
+
+			if (idx == -1)
+				return null;
+
+			return idx - ScrollOffsetVertical;
+		}
+
+		/// <summary>
 		/// <para>Moves the <see cref="SelectedObject"/> to the next item that begins with <paramref name="character"/></para>
 		/// <para>This method will loop back to the start of the tree if reaching the end without finding a match</para>
 		/// </summary>
@@ -669,6 +692,21 @@ namespace Terminal.Gui {
 		protected virtual void OnObjectActivated (ObjectActivatedEventArgs<T> e)
 		{
 			ObjectActivated?.Invoke (e);
+		}
+
+		/// <summary>
+		/// Returns the object in the tree list that is currently visible
+		/// at the provided row.  Returns null if no object is at that location.
+		/// <remarks>
+		/// </remarks>
+		/// If you have screen coordinates then use <see cref="View.ScreenToView(int, int)"/>
+		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
+		/// </summary>
+		/// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/></param>
+		/// <returns>The object currently displayed on this row or null</returns>
+		public T GetObjectOnRow (int row)
+		{
+			return HitTest (row)?.Model;
 		}
 
 		///<inheritdoc/>

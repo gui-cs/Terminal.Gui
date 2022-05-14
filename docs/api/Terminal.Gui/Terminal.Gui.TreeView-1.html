@@ -210,6 +210,9 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
     </div>
     <div>
@@ -636,6 +639,32 @@ implementation is to call <span class="xref">System.Object.ToString()</span>
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Trees.AspectGetterDelegate-1.html">AspectGetterDelegate</a>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_ColorGetter_" data-uid="Terminal.Gui.TreeView`1.ColorGetter*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ColorGetter" data-uid="Terminal.Gui.TreeView`1.ColorGetter">ColorGetter</h4>
+  <div class="markdown level1 summary">
+Delegate for multi colored tree views.  Return the <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> to use
+for each passed object or null to use the default.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;T, ColorScheme&gt; ColorGetter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;T, <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1488,6 +1517,103 @@ every exposed branch in the tree</td>
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_GetObjectOnRow_" data-uid="Terminal.Gui.TreeView`1.GetObjectOnRow*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_GetObjectOnRow_System_Int32_" data-uid="Terminal.Gui.TreeView`1.GetObjectOnRow(System.Int32)">GetObjectOnRow(Int32)</h4>
+  <div class="markdown level1 summary">
+Returns the object in the tree list that is currently visible
+at the provided row.  Returns null if no object is at that location.
+<remarks>
+</remarks>
+If you have screen coordinates then use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">ScreenToView(Int32, Int32)</a>
+to translate these into the client area of the <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T GetObjectOnRow(int row)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">row</span></td>
+        <td>The row of the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> of the <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td>The object currently displayed on this row or null</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_GetObjectRow_" data-uid="Terminal.Gui.TreeView`1.GetObjectRow*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_GetObjectRow__0_" data-uid="Terminal.Gui.TreeView`1.GetObjectRow(`0)">GetObjectRow(T)</h4>
+  <div class="markdown level1 summary">
+<p>
+Returns the Y coordinate within the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> of the
+tree at which <code data-dev-comment-type="paramref" class="paramref">toFind</code> would be displayed or null if
+it is not currently exposed (e.g. its parent is collapsed).
+</p>
+<p>
+Note that the returned value can be negative if the TreeView is scrolled
+down and the <code data-dev-comment-type="paramref" class="paramref">toFind</code> object is off the top of the view.
+</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int? GetObjectRow(T toFind)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">toFind</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
