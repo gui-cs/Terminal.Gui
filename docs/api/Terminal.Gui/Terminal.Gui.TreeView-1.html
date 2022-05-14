@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TreeView&lt;T&gt;
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -208,6 +208,9 @@ when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITre
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
@@ -636,6 +639,32 @@ implementation is to call <span class="xref">System.Object.ToString()</span>
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Trees.AspectGetterDelegate-1.html">AspectGetterDelegate</a>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TreeView_1_ColorGetter_" data-uid="Terminal.Gui.TreeView`1.ColorGetter*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ColorGetter" data-uid="Terminal.Gui.TreeView`1.ColorGetter">ColorGetter</h4>
+  <div class="markdown level1 summary">
+Delegate for multi colored tree views.  Return the <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> to use
+for each passed object or null to use the default.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;T, ColorScheme&gt; ColorGetter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;T, <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

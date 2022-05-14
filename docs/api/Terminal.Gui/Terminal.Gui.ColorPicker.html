@@ -5,12 +5,12 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class LineView
+    <title>Class ColorPicker
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class LineView
+    <meta name="title" content="Class ColorPicker
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -78,13 +78,13 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Views.LineView">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ColorPicker">
   
   
-  <h1 id="Terminal_Gui_Views_LineView" data-uid="Terminal.Gui.Views.LineView" class="text-break">Class LineView
+  <h1 id="Terminal_Gui_ColorPicker" data-uid="Terminal.Gui.ColorPicker" class="text-break">Class ColorPicker
   </h1>
   <div class="markdown level0 summary">
-A straight line control either horizontal or vertical
+The <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a> <a class="xref" href="Terminal.Gui.View.html">View</a> Color picker.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -92,7 +92,7 @@ A straight line control either horizontal or vertical
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></div>
     <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
-    <div class="level3"><span class="xref">LineView</span></div>
+    <div class="level3"><span class="xref">ColorPicker</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -203,6 +203,9 @@ A straight line control either horizontal or vertical
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
@@ -320,9 +323,6 @@ A straight line control either horizontal or vertical
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
@@ -478,9 +478,6 @@ A straight line control either horizontal or vertical
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -502,33 +499,33 @@ A straight line control either horizontal or vertical
       <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Views.html">Terminal.Gui.Views</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_Views_LineView_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_ColorPicker_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class LineView : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class ColorPicker : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  <a id="Terminal_Gui_Views_LineView__ctor_" data-uid="Terminal.Gui.Views.LineView.#ctor*"></a>
-  <h4 id="Terminal_Gui_Views_LineView__ctor" data-uid="Terminal.Gui.Views.LineView.#ctor">LineView()</h4>
+  <a id="Terminal_Gui_ColorPicker__ctor_" data-uid="Terminal.Gui.ColorPicker.#ctor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker__ctor" data-uid="Terminal.Gui.ColorPicker.#ctor">ColorPicker()</h4>
   <div class="markdown level1 summary">
-Creates a horizontal line
+Initializes a new instance of <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public LineView()</code></pre>
+    <pre><code class="lang-csharp hljs">public ColorPicker()</code></pre>
   </div>
-  <a id="Terminal_Gui_Views_LineView__ctor_" data-uid="Terminal.Gui.Views.LineView.#ctor*"></a>
-  <h4 id="Terminal_Gui_Views_LineView__ctor_Terminal_Gui_Graphs_Orientation_" data-uid="Terminal.Gui.Views.LineView.#ctor(Terminal.Gui.Graphs.Orientation)">LineView(Orientation)</h4>
+  <a id="Terminal_Gui_ColorPicker__ctor_" data-uid="Terminal.Gui.ColorPicker.#ctor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker__ctor_NStack_ustring_" data-uid="Terminal.Gui.ColorPicker.#ctor(NStack.ustring)">ColorPicker(ustring)</h4>
   <div class="markdown level1 summary">
-Creates a horizontal or vertical line based on <code data-dev-comment-type="paramref" class="paramref">orientation</code>
+Initializes a new instance of <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public LineView(Orientation orientation)</code></pre>
+    <pre><code class="lang-csharp hljs">public ColorPicker(ustring title)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -541,24 +538,92 @@ Creates a horizontal or vertical line based on <code data-dev-comment-type="para
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Graphs.Orientation.html">Orientation</a></td>
-        <td><span class="parametername">orientation</span></td>
-        <td></td>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker__ctor_" data-uid="Terminal.Gui.ColorPicker.#ctor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.ColorPicker.#ctor(System.Int32,System.Int32,NStack.ustring)">ColorPicker(Int32, Int32, ustring)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ColorPicker(int x, int y, ustring title)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">x</span></td>
+        <td>X location.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">y</span></td>
+        <td>Y location.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker__ctor_" data-uid="Terminal.Gui.ColorPicker.#ctor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker__ctor_Terminal_Gui_Point_NStack_ustring_" data-uid="Terminal.Gui.ColorPicker.#ctor(Terminal.Gui.Point,NStack.ustring)">ColorPicker(Point, ustring)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ColorPicker(Point point, ustring title)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">point</span></td>
+        <td>Location point.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title.</td>
       </tr>
     </tbody>
   </table>
   <h3 id="properties">Properties
   </h3>
-  <a id="Terminal_Gui_Views_LineView_EndingAnchor_" data-uid="Terminal.Gui.Views.LineView.EndingAnchor*"></a>
-  <h4 id="Terminal_Gui_Views_LineView_EndingAnchor" data-uid="Terminal.Gui.Views.LineView.EndingAnchor">EndingAnchor</h4>
+  <a id="Terminal_Gui_ColorPicker_Cursor_" data-uid="Terminal.Gui.ColorPicker.Cursor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_Cursor" data-uid="Terminal.Gui.ColorPicker.Cursor">Cursor</h4>
   <div class="markdown level1 summary">
-The rune to display at the end of the line (right end of horizontal line or bottom end of vertical).
-If not specified then <a class="xref" href="Terminal.Gui.Views.LineView.html#Terminal_Gui_Views_LineView_LineRune">LineRune</a> is used
+Cursor for the selected color.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune? EndingAnchor { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Point Cursor { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -570,20 +635,20 @@ If not specified then <a class="xref" href="Terminal.Gui.Views.LineView.html#Ter
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <a id="Terminal_Gui_Views_LineView_LineRune_" data-uid="Terminal.Gui.Views.LineView.LineRune*"></a>
-  <h4 id="Terminal_Gui_Views_LineView_LineRune" data-uid="Terminal.Gui.Views.LineView.LineRune">LineRune</h4>
+  <a id="Terminal_Gui_ColorPicker_SelectedColor_" data-uid="Terminal.Gui.ColorPicker.SelectedColor*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_SelectedColor" data-uid="Terminal.Gui.ColorPicker.SelectedColor">SelectedColor</h4>
   <div class="markdown level1 summary">
-The symbol to use for drawing the line
+Selected color.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune LineRune { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Color SelectedColor { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -595,70 +660,200 @@ The symbol to use for drawing the line
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Rune</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Terminal_Gui_Views_LineView_Orientation_" data-uid="Terminal.Gui.Views.LineView.Orientation*"></a>
-  <h4 id="Terminal_Gui_Views_LineView_Orientation" data-uid="Terminal.Gui.Views.LineView.Orientation">Orientation</h4>
-  <div class="markdown level1 summary">
-The direction of the line.  If you change this you will need to manually update the Width/Height
-of the control to cover a relevant area based on the new direction.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Orientation Orientation { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Graphs.Orientation.html">Orientation</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Terminal_Gui_Views_LineView_StartingAnchor_" data-uid="Terminal.Gui.Views.LineView.StartingAnchor*"></a>
-  <h4 id="Terminal_Gui_Views_LineView_StartingAnchor" data-uid="Terminal.Gui.Views.LineView.StartingAnchor">StartingAnchor</h4>
-  <div class="markdown level1 summary">
-The rune to display at the start of the line (left end of horizontal line or top end of vertical)
-If not specified then <a class="xref" href="Terminal.Gui.Views.LineView.html#Terminal_Gui_Views_LineView_LineRune">LineRune</a> is used
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune? StartingAnchor { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
   </h3>
-  <a id="Terminal_Gui_Views_LineView_Redraw_" data-uid="Terminal.Gui.Views.LineView.Redraw*"></a>
-  <h4 id="Terminal_Gui_Views_LineView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Views.LineView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
+  <a id="Terminal_Gui_ColorPicker_MouseEvent_" data-uid="Terminal.Gui.ColorPicker.MouseEvent*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ColorPicker.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool MouseEvent(MouseEvent me)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
+  <a id="Terminal_Gui_ColorPicker_MoveDown_" data-uid="Terminal.Gui.ColorPicker.MoveDown*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_MoveDown" data-uid="Terminal.Gui.ColorPicker.MoveDown">MoveDown()</h4>
   <div class="markdown level1 summary">
-Draws the line including any starting/ending anchors
+Moves the selected item index to the next row.
 </div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool MoveDown()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker_MoveLeft_" data-uid="Terminal.Gui.ColorPicker.MoveLeft*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_MoveLeft" data-uid="Terminal.Gui.ColorPicker.MoveLeft">MoveLeft()</h4>
+  <div class="markdown level1 summary">
+Moves the selected item index to the previous column.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool MoveLeft()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker_MoveRight_" data-uid="Terminal.Gui.ColorPicker.MoveRight*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_MoveRight" data-uid="Terminal.Gui.ColorPicker.MoveRight">MoveRight()</h4>
+  <div class="markdown level1 summary">
+Moves the selected item index to the next column.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool MoveRight()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker_MoveUp_" data-uid="Terminal.Gui.ColorPicker.MoveUp*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_MoveUp" data-uid="Terminal.Gui.ColorPicker.MoveUp">MoveUp()</h4>
+  <div class="markdown level1 summary">
+Moves the selected item index to the previous row.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool MoveUp()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ColorPicker_ProcessKey_" data-uid="Terminal.Gui.ColorPicker.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.ColorPicker.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessKey(KeyEvent kb)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">kb</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <a id="Terminal_Gui_ColorPicker_Redraw_" data-uid="Terminal.Gui.ColorPicker.Redraw*"></a>
+  <h4 id="Terminal_Gui_ColorPicker_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ColorPicker.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -683,6 +878,32 @@ Draws the line including any starting/ending anchors
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h3 id="events">Events
+  </h3>
+  <h4 id="Terminal_Gui_ColorPicker_ColorChanged" data-uid="Terminal.Gui.ColorPicker.ColorChanged">ColorChanged</h4>
+  <div class="markdown level1 summary">
+Fired when a color is picked.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action ColorChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
