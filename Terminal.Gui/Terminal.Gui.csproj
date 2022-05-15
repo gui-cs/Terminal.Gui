@@ -73,6 +73,7 @@
       * Fixes RunTimers not checking for key collisions in list when adding to timeouts
       * Fixes erroneous namespace on LineView to match other views
       * Fixes #1723 - ProgressBar with Percentage has extra spaces on the right
+      * Fixes nullref on unclean shutdown
 
       v1.5.0
       * Localization support added. en-US, Japanese, fr-FR, and pt-PT
