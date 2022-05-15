@@ -2,6 +2,7 @@
   "profiles": {
     "UICatalog": {
       "commandName": "Project",
+      "commandLineArgs": "\"ProgressBar Styles\""
     },
     "UICatalog : -usc": {
       "commandName": "Project",

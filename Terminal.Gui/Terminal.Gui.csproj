@@ -61,7 +61,7 @@
       * Adds support for custom colors in TreeView
       * Adds Data field to MenuItem
       * Adds Timeout thread safety
-      * Adds better docs for Application.Shutdown () 
+      * Adds better docs for Application.Shutdown ()
       * Fixes #1699 Menu closes on button press and menu hot-key text renders correctly
       * Fixes #1675 ContextMenu MenuItems typo
       * Fixes #1715 UI Catalog about box version
@@ -72,6 +72,7 @@
       * Fixes TextView throwing when WordWrap is true on constructor initialization.
       * Fixes RunTimers not checking for key collisions in list when adding to timeouts
       * Fixes erroneous namespace on LineView to match other views
+      * Fixes #1723 - ProgressBar with Percentage has extra spaces on the right
 
       v1.5.0
       * Localization support added. en-US, Japanese, fr-FR, and pt-PT
