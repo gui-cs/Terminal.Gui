@@ -1892,8 +1892,11 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.MainIteration ()
 		{
 			while (resultQueue.Count > 0) {
-				var inputEvent = resultQueue.Dequeue () [0];
-				ProcessInput?.Invoke (inputEvent);
+				var inputRecords = resultQueue.Dequeue ();
+				if (inputRecords != null && inputRecords.Length > 0) {
+					var inputEvent = inputRecords [0];
+					ProcessInput?.Invoke (inputEvent);
+				}
 			}
 			if (winChanged) {
 				winChanged = false;
