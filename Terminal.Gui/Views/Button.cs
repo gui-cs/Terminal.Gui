@@ -137,7 +137,8 @@ namespace Terminal.Gui {
 				if (hotKey != hk) {
 					HotKey = hk;
 				}
-				Update ();
+				if (IsInitialized)
+					Update ();
 			}
 		}
 

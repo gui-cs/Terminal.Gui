@@ -2065,7 +2065,8 @@ namespace Terminal.Gui.Core {
 			}
 			var label = new Label (breakLines) {
 				TextDirection = TextDirection.TopBottom_LeftRight,
-				Width = Dim.Fill (), Height = Dim.Fill () 
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
 			};
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -3153,7 +3154,7 @@ e
 		[Fact]
 		public void GetSumMaxCharWidth_List_Simple_And_Wide_Runes ()
 		{
-			List<ustring> text =new List<ustring>() { "Hello", "World" };
+			List<ustring> text = new List<ustring> () { "Hello", "World" };
 			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text));
 			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
 			text = new List<ustring> () { "こんにちは", "世界" };
@@ -3177,6 +3178,38 @@ e
 			Assert.Equal (6, TextFormatter.GetMaxLengthForWidth (runes, 6));
 			runes = ustring.Make ("こんにちは 世界").ToRuneList ();
 			Assert.Equal (3, TextFormatter.GetMaxLengthForWidth (runes, 6));
+			runes = ustring.Make ("[ Say Hello 你 ]").ToRuneList ();
+			Assert.Equal (15, TextFormatter.GetMaxLengthForWidth (runes, 16));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetMaxLengthForWidth_On_Button ()
+		{
+			var btn = new Button ("Say Hello 你") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+			var win = new Window ("Test Demo 你") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
+			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
 		[Fact]
