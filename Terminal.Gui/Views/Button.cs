@@ -150,7 +150,8 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
-				Update ();
+				if (IsInitialized)
+					Update ();
 			}
 		}
 
@@ -187,7 +188,8 @@ namespace Terminal.Gui {
 			get => base.AutoSize;
 			set {
 				base.AutoSize = value;
-				Update ();
+				if (IsInitialized)
+					Update ();
 			}
 		}
 
