@@ -2256,5 +2256,101 @@ Y
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
+		{
+			var view = new View () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			view.LayoutComplete += e => {
+				view.DrawFrame (view.Bounds);
+				var savedClip = Application.Driver.Clip;
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
+				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+					Application.Driver.Move (1, row + 1);
+					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+						Application.Driver.AddStr ($"{col}");
+					}
+				}
+				Application.Driver.Clip = savedClip;
+			};
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			var expected = @"
+┌──────────────────┐
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+└──────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 20, 10), pos);
+
+			view.Clear ();
+
+			expected = @"
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (Rect.Empty, pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
+		{
+			var view = new View () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			view.LayoutComplete += e => {
+				view.DrawFrame (view.Bounds);
+				var savedClip = Application.Driver.Clip;
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
+				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+					Application.Driver.Move (1, row + 1);
+					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+						Application.Driver.AddStr ($"{col}");
+					}
+				}
+				Application.Driver.Clip = savedClip;
+			};
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			var expected = @"
+┌──────────────────┐
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+│012345678910111213│
+└──────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 20, 10), pos);
+
+			view.Clear (view.Bounds);
+
+			expected = @"
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (Rect.Empty, pos);
+		}
 	}
 }
