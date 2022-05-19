@@ -1,12 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ButtonTests {
+		readonly ITestOutputHelper output;
+
+		public ButtonTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact, AutoInitShutdown]
 		public void Constructors_Defaults ()
 		{
@@ -184,6 +188,42 @@ namespace Terminal.Gui.Views {
 			btn.Text = "Te_st";
 			Assert.Equal ("Te_st", btn.Text);
 			Assert.Equal (Key.S, btn.HotKey);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Update_Only_On_Or_After_Initialize ()
+		{
+			var btn = new Button ("Say Hello 你") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+			var win = new Window ("Test Demo 你") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.False (btn.IsInitialized);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
+			Assert.True (btn.IsInitialized);
+			Assert.Equal ("Say Hello 你", btn.Text);
+			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
+			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 	}
 }

@@ -691,7 +691,6 @@ namespace Terminal.Gui {
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 
-				Driver.UpdateOffScreen ();
 				// This is the Application.Top. Clear just the region we're being asked to redraw 
 				// (the bounds passed to us).
 				Clear ();

@@ -80,7 +80,7 @@ namespace UICatalog.Scenarios {
 
 			_leftPane = new Window ("Classes") {
 				X = 0,
-				Y = 0, 
+				Y = 0,
 				Width = 15,
 				Height = Dim.Fill (1), // for status bar
 				CanFocus = false,
@@ -91,7 +91,7 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (0), 
+				Height = Dim.Fill (0),
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};
@@ -188,7 +188,15 @@ namespace UICatalog.Scenarios {
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_wText.TextChanged += (args) => {
 				try {
-					_wVal = int.Parse (_wText.Text.ToString ());
+					switch (_wRadioGroup.SelectedItem) {
+					case 0:
+						_wVal = Math.Min (int.Parse (_wText.Text.ToString ()), 100);
+						break;
+					case 1:
+					case 2:
+						_wVal = int.Parse (_wText.Text.ToString ());
+						break;
+					}
 					DimPosChanged (_curView);
 				} catch {
 
@@ -203,7 +211,15 @@ namespace UICatalog.Scenarios {
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_hText.TextChanged += (args) => {
 				try {
-					_hVal = int.Parse (_hText.Text.ToString ());
+					switch (_hRadioGroup.SelectedItem) {
+					case 0:
+						_hVal = Math.Min (int.Parse (_hText.Text.ToString ()), 100);
+						break;
+					case 1:
+					case 2:
+						_hVal = int.Parse (_hText.Text.ToString ());
+						break;
+					}
 					DimPosChanged (_curView);
 				} catch {
 
@@ -374,7 +390,7 @@ namespace UICatalog.Scenarios {
 
 			//_curView.X = Pos.Center ();
 			//_curView.Y = Pos.Center ();
-			view.Width = Dim.Percent(75);
+			view.Width = Dim.Percent (75);
 			view.Height = Dim.Percent (75);
 
 			// Set the colorscheme to make it stand out if is null by default
@@ -398,7 +414,7 @@ namespace UICatalog.Scenarios {
 			}
 
 			// If the view supports a Source property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType().GetProperty("Source").PropertyType == typeof(Terminal.Gui.IListDataSource)) {
+			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (Terminal.Gui.IListDataSource)) {
 				var source = new ListWrapper (new List<ustring> () { ustring.Make ("Test Text #1"), ustring.Make ("Test Text #2"), ustring.Make ("Test Text #3") });
 				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 			}
@@ -420,7 +436,7 @@ namespace UICatalog.Scenarios {
 			return view;
 		}
 
-		void LayoutCompleteHandler(View.LayoutEventArgs args)
+		void LayoutCompleteHandler (View.LayoutEventArgs args)
 		{
 			UpdateTitle (_curView);
 		}
