@@ -1022,7 +1022,7 @@ namespace Terminal.Gui {
 			for (int line = 0; line < h; line++) {
 				Move (0, line);
 				for (int col = 0; col < w; col++)
-					Driver.AddStr (" ");
+					Driver.AddRune (' ');
 			}
 		}
 

@@ -207,7 +207,7 @@ namespace Terminal.Gui.Views {
 
 				Assert.Equal (expectedLook, actualLook);
 			}
-			return new Rect (x, y, w > -1 ? w : 0, h > -1 ? h : 0);
+			return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
 		}
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
