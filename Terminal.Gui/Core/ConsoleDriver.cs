@@ -665,8 +665,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract bool HeightAsBuffer { get; set; }
 
-		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		internal virtual int [,,] Contents { get; }
+		/// <summary>
+		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public virtual int [,,] Contents { get; }
 
 		/// <summary>
 		/// Initializes the driver

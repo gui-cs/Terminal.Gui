@@ -211,6 +211,24 @@ namespace Terminal.Gui {
 		public static bool IsMouseDisabled { get; set; }
 
 		/// <summary>
+		/// By default this is false which will continue executing the <see cref="RunLoop(RunState, bool)"/> method,
+		/// if you pass true, the method will exit after the first iteration.
+		/// </summary>
+		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
+
+		/// <summary>
+		/// Notify that a new <see cref="RunState"/> token was created,
+		/// used if <see cref="ExitRunLoopAfterFirstIteration"/> is true.
+		/// </summary>
+		public static event Action<RunState> NotifyNewRunState;
+
+		/// <summary>
+		/// Notify that a existent <see cref="RunState"/> token is stopping,
+		/// used if <see cref="ExitRunLoopAfterFirstIteration"/> is true.
+		/// </summary>
+		public static event Action<Toplevel> NotifyStopRunState;
+
+		/// <summary>
 		///   This event is raised on each iteration of the <see cref="MainLoop"/> 
 		/// </summary>
 		/// <remarks>
@@ -297,12 +315,12 @@ namespace Terminal.Gui {
 			}
 
 			// Used only for start debugging on Unix.
-//#if DEBUG
-//			while (!System.Diagnostics.Debugger.IsAttached) {
-//				System.Threading.Thread.Sleep (100);
-//			}
-//			System.Diagnostics.Debugger.Break ();
-//#endif
+			//#if DEBUG
+			//			while (!System.Diagnostics.Debugger.IsAttached) {
+			//				System.Threading.Thread.Sleep (100);
+			//			}
+			//			System.Diagnostics.Debugger.Break ();
+			//#endif
 
 			// Reset all class variables (Application is a singleton).
 			ResetState ();
@@ -352,7 +370,10 @@ namespace Terminal.Gui {
 			{
 				Toplevel = view;
 			}
-			internal Toplevel Toplevel;
+			/// <summary>
+			/// The <see cref="Toplevel"/> belong to this <see cref="RunState"/>.
+			/// </summary>
+			public Toplevel Toplevel { get; internal set; }
 
 			/// <summary>
 			/// Releases alTop = l resource used by the <see cref="Application.RunState"/> object.
@@ -385,7 +406,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			if(RootKeyEvent?.Invoke(ke) ?? false) {
+			if (RootKeyEvent?.Invoke (ke) ?? false) {
 				return;
 			}
 
@@ -580,7 +601,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>Return true to suppress the KeyPress event</para>
 		/// </summary>
-		public static Func<KeyEvent,bool> RootKeyEvent;
+		public static Func<KeyEvent, bool> RootKeyEvent;
 
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
@@ -952,6 +973,8 @@ namespace Terminal.Gui {
 
 			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
+				if (ExitRunLoopAfterFirstIteration && !firstIteration)
+					return;
 				RunIteration (ref state, wait, ref firstIteration);
 			}
 		}
@@ -969,7 +992,6 @@ namespace Terminal.Gui {
 				if (firstIteration) {
 					state.Toplevel.OnReady ();
 				}
-				firstIteration = false;
 
 				MainLoop.MainIteration ();
 				Iteration?.Invoke ();
@@ -989,6 +1011,8 @@ namespace Terminal.Gui {
 			} else if (!wait) {
 				return;
 			}
+			firstIteration = false;
+
 			if (state.Toplevel != Top
 				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
@@ -1118,7 +1142,12 @@ namespace Terminal.Gui {
 				resume = false;
 				var runToken = Begin (view);
 				RunLoop (runToken);
-				End (runToken);
+				if (!ExitRunLoopAfterFirstIteration)
+					End (runToken);
+				else
+					// If ExitRunLoopAfterFirstIteration is true then the user must deal his disposing when it ends
+					// by using NotifyStopRunState event.
+					NotifyNewRunState?.Invoke (runToken);
 #if !DEBUG
 				}
 				catch (Exception error)
@@ -1201,6 +1230,8 @@ namespace Terminal.Gui {
 					return;
 				}
 				currentTop.Running = false;
+				if (ExitRunLoopAfterFirstIteration)
+					NotifyStopRunState?.Invoke (currentTop);
 			}
 		}
 
