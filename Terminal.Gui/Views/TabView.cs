@@ -338,7 +338,11 @@ namespace Terminal.Gui {
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
 
 				string text = tab.Text.ToString ();
-				var maxWidth = MaxTabTextWidth;
+				
+				// The maximum number of characters to use for the tab name as specified
+				// by the user (MaxTabTextWidth).  But not more than the width of the view
+				// or we won't even be able to render a single tab!
+				var maxWidth = Math.Min(bounds.Width-3, MaxTabTextWidth);
 
 				if (tabTextWidth > maxWidth) {
 					text = tab.Text.ToString ().Substring (0, (int)maxWidth);

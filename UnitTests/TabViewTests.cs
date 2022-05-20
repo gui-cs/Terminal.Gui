@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
   
 	public class TabViewTests {
+		readonly ITestOutputHelper output;
+
+		public TabViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		private TabView GetTabView ()
 		{
 			return GetTabView (out _, out _);
@@ -235,6 +243,76 @@ namespace Terminal.Gui.Views {
 
 		}
 
+		[Fact,AutoInitShutdown]
+		public void TestThinTabView_WithLongNames ()
+		{
+			var tv = new TabView { 
+				Width = 10,
+				Height = 5,
+			};
+			tv.ColorScheme = new ColorScheme ();
+			TabView.Tab tab1;
+			TabView.Tab tab2;
+
+			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), true);
+			tv.AddTab (tab2 = new TabView.Tab ("Tab2", new Label ("hi2")), false);
+
+			// Ensures that the tab bar subview gets the bounds of the parent TabView
+			tv.LayoutSubviews ();
+
+			// Test two tab names that fit 
+			tab1.Text = "12";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"
+┌──┐
+│12│13
+│  └─────┐
+│hi      │
+└────────┘", output);
+
+
+			// Test first tab name too long
+			tab1.Text = "12345678910";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"
+┌───────┐
+│1234567│
+│       └►
+│hi      │
+└────────┘", output);
+
+			//switch to tab2
+			tv.SelectedTab = tab2;
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"   
+┌──┐
+│13│
+◄  └─────┐
+│hi2     │
+└────────┘", output);
+
+
+			// now make both tabs too long
+			tab1.Text = "12345678910";
+			tab2.Text = "abcdefghijklmnopq";
+
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"     
+┌───────┐
+│abcdefg│
+◄       └┐
+│hi2     │
+└────────┘", output);
+
+		}
 		private void InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
