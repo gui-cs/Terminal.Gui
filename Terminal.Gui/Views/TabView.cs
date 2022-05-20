@@ -342,7 +342,11 @@ namespace Terminal.Gui {
 				// The maximum number of characters to use for the tab name as specified
 				// by the user (MaxTabTextWidth).  But not more than the width of the view
 				// or we won't even be able to render a single tab!
-				var maxWidth = Math.Min(bounds.Width-3, MaxTabTextWidth);
+				var maxWidth = Math.Max(0,Math.Min(bounds.Width-3, MaxTabTextWidth));
+
+				// if tab view is width <= 3 don't render any tabs
+				if (maxWidth == 0)
+					yield break;
 
 				if (tabTextWidth > maxWidth) {
 					text = tab.Text.ToString ().Substring (0, (int)maxWidth);

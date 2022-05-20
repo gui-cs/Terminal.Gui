@@ -23,11 +23,13 @@ namespace Terminal.Gui.Views {
 			return GetTabView (out _, out _);
 		}
 
-		private TabView GetTabView (out TabView.Tab tab1, out TabView.Tab tab2)
+		private TabView GetTabView (out TabView.Tab tab1, out TabView.Tab tab2, bool initFakeDriver = true)
 		{
-			InitFakeDriver ();
+			if(initFakeDriver)
+				InitFakeDriver ();
 
 			var tv = new TabView ();
+			tv.ColorScheme = new ColorScheme ();
 			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), false);
 			tv.AddTab (tab2 = new TabView.Tab ("Tab2", new Label ("hi2")), false);
 			return tv;
@@ -246,16 +248,9 @@ namespace Terminal.Gui.Views {
 		[Fact,AutoInitShutdown]
 		public void TestThinTabView_WithLongNames ()
 		{
-			var tv = new TabView { 
-				Width = 10,
-				Height = 5,
-			};
-			tv.ColorScheme = new ColorScheme ();
-			TabView.Tab tab1;
-			TabView.Tab tab2;
-
-			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), true);
-			tv.AddTab (tab2 = new TabView.Tab ("Tab2", new Label ("hi2")), false);
+			var tv = GetTabView (out var tab1, out var tab2,false);
+			tv.Width = 10;
+			tv.Height = 5;
 
 			// Ensures that the tab bar subview gets the bounds of the parent TabView
 			tv.LayoutSubviews ();
@@ -312,6 +307,40 @@ namespace Terminal.Gui.Views {
 │hi2     │
 └────────┘", output);
 
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestTabView_Width4 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 4;
+			tv.Height = 5;
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"
+┌─┐
+│T│
+│ └►
+│hi│
+└──┘", output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestTabView_Width3 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 3;
+			tv.Height = 5;
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			GraphViewTests.AssertDriverContentsAre (@"
+┌─┐
+│hi
+└─┘", output);
 		}
 		private void InitFakeDriver ()
 		{
