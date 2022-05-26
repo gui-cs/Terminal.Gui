@@ -1159,6 +1159,8 @@ namespace Terminal.Gui {
 					if (idx < 0) {
 						current++;
 						continue;
+					} else if (idx > runes.Length - 1) {
+						break;
 					}
 					var rune = (Rune)' ';
 					if (isVertical) {

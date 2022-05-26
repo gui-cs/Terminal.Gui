@@ -94,6 +94,7 @@ class Demo {
         var n = MessageBox.Query (50, 7, 
             &quot;Question&quot;, &quot;Do you like console apps?&quot;, &quot;Yes&quot;, &quot;No&quot;);
 
+        Application.Shutdown ();
         return n;
     }
 }
@@ -122,6 +123,7 @@ class Demo {
         };
         Application.Top.Add (label);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 </code></pre><p>Typically, you will want your application to have more than a label, you might
@@ -151,6 +153,7 @@ class Demo {
         // Add both menu and win in a single call
         Application.Top.Add (menu, win);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 </code></pre><h1 id="views">Views</h1>
@@ -294,6 +297,7 @@ class Demo {
         // Add both menu and win in a single call
         top.Add (win, menu);
         Application.Run (top);
+        Application.Shutdown ();
     }
 }
 </code></pre><h2 id="window-views">Window Views</h2>
