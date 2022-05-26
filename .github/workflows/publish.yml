@@ -1,4 +1,4 @@
-name: Publish Terminal.Gui to nuget
+name: Publish Terminal.Gui
 on:
   push:
     tags:
@@ -7,89 +7,72 @@ on:
 jobs:
 
   publish:
-    name: build, pack & publish
+    name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 #fetch-depth is needed for GitVersion
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.100
+    - name: Install and calculate the new version with GitVersion 
+      uses: gittools/actions/gitversion/setup@v0.9.13
+      with:
+        versionSpec: 5.x
 
-      - name: minver-cli
-        run: |
-          dotnet tool install --global minver-cli --version 2.4.0
-          echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.13
+      id: gitversion # step id used as reference for output values
 
-      #- name: Install dependencies
-      #   run: dotnet restore
+    - name: Display GitVersion outputs
+      run: |
+        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
+        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
 
-      #- name: Build
-      #  run: dotnet build --configuration Release --no-restore
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.100
 
-      #- name: Pack nuget package with symbols
-      #  run: dotnet pack --include-symbols
-      
-      - name: Publish Terminal.Gui
-        id: publish_nuget
-        uses: rohith/publish-nuget@v2
-        with:
-          VERSION_STATIC: ${{ env.MINVERVERSIONOVERRIDE }}
-          NUGET_SOURCE: https://api.nuget.org
+    - name: Install dependencies
+      run: dotnet restore
 
-          # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: Terminal.Gui/Terminal.Gui.csproj
-          
-          # NuGet package id, used for version detection & defaults to project name
-          PACKAGE_NAME: Terminal.Gui
-          
-          # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
-          #VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
+    - name: Build Release
+      run: |
+        dotnet-gitversion /updateprojectfiles
+        dotnet build --no-restore -c Release
 
-          # Regex pattern to extract version info in a capturing group
-          #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
-          
-          # Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
-          # VERSION_STATIC: 1.0.0
+    - name: Pack
+      run: dotnet pack -c Release -p:Version='${{ steps.gitversion.outputs.SemVer }}' -v d
 
-          # Flag to toggle git tagging, enabled by default
-          TAG_COMMIT: false
+    - name: Test to generate Code Coverage Report
+      run: |
+        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
+        mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
-          # Format of the git tag, [*] gets replaced with actual version
-          # TAG_FORMAT: v*
+    - name: Create Test Coverage Badge
+      uses: simon-k/dotnet-code-coverage-badge@v1.0.0
+      id: create_coverage_badge
+      with:
+        label: Unit Test Coverage
+        color: brightgreen
+        path: UnitTests/TestResults/coverage.opencover.xml
+        gist-filename: code-coverage.json
+        # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
+        gist-id: 90ef67a684cb71db1817921a970f8d27
+        gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
 
-          # API key to authenticate with NuGet server
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Print Code Coverage
+      run: |
+        echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
+        echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
 
-          # NuGet server uri hosting the packages, defaults to https://api.nuget.org
-          # NUGET_SOURCE: https://api.nuget.org
+        
+    #- name: Prep GitHub Packages
+    #  run: dotnet nuget add source --username tig --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/tig/index.json"
 
-          # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-          # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
-          INCLUDE_SYMBOLS: false
+    #- name: Publish to GitHub packages 
+    #  run: dotnet nuget push NStack/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
 
-      - name: Test to generate Code Coverage Report
-        run: |
-          dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
-          mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
-
-      - name: Create Test Coverage Badge
-        uses: simon-k/dotnet-code-coverage-badge@v1.0.0
-        id: create_coverage_badge
-        with:
-          label: Unit Test Coverage
-          color: brightgreen
-          path: UnitTests/TestResults/coverage.opencover.xml
-          gist-filename: code-coverage.json
-          # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
-          gist-id: 90ef67a684cb71db1817921a970f8d27
-          gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
-
-      - name: Print Code Coverage
-        run: |
-          echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
-          echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
+    - name: Publish to NuGet.org
+      run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

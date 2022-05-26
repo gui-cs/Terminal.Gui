@@ -1,23 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
     <LangVersion>8.0</LangVersion>
+    <FileVersion>1.6.1.0</FileVersion>
+    <InformationalVersion>1.6.1+Branch.fixes-1741-gitversion.Sha.cc04bb37f5c7684d45833dabd3f7e1ca9c53786f</InformationalVersion>
+    <Version>1.6.1</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
-
 </Project>

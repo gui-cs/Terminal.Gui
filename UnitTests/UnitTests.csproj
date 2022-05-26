@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <UseDataCollector />
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
+    <FileVersion>1.6.1.0</FileVersion>
+    <InformationalVersion>1.6.1+Branch.fixes-1741-gitversion.Sha.cc04bb37f5c7684d45833dabd3f7e1ca9c53786f</InformationalVersion>
+    <Version>1.6.1</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="ReportGenerator" Version="5.1.9" />
@@ -28,12 +28,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
     <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
   </ItemGroup>
-
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
       True
@@ -41,8 +39,7 @@
     <Exclude>
       [UICatalog]*
     </Exclude>
-    <Include>
-    </Include>
+    <Include></Include>
     <ExcludeByFile>
       <!--**/Migrations/*
       **/Hacks/*.cs-->
@@ -54,5 +51,4 @@
       False
     </IncludeTestAssembly>
   </PropertyGroup>
-  
 </Project>
