@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-    <PackageReference Include="NStack.Core" Version="0.17" />
+    <PackageReference Include="NStack.Core" Version="0.17.0" />
     <PackageReference Include="MinVer" Version="4.0.0" PrivateAssets="all" />
     <InternalsVisibleTo Include="UnitTests" />
     <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
