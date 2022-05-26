@@ -43,7 +43,7 @@ jobs:
         dotnet build --no-restore -c Release
 
     - name: Pack
-      run: dotnet pack -c Release -p:Version='${{ steps.gitversion.outputs.SemVer }}' -v d
+      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' -v d
 
     - name: Test to generate Code Coverage Report
       run: |
