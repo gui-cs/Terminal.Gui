@@ -2,24 +2,24 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType></DebugType>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
-  
   <PropertyGroup>
-  <!-- Uncomment this to have dotnet restore pull NStack from a local dir for testing -->
-  <!-- See https://stackoverflow.com/a/44463578/297526 -->
+    <!-- Version numbers are automatically updated by gitversion. Do not modify here. -->
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
+    <FileVersion>1.6.1.0</FileVersion>
+    <InformationalVersion>1.6.1+Branch.fixes-1741-gitversion.Sha.cc04bb37f5c7684d45833dabd3f7e1ca9c53786f</InformationalVersion>
+    <Version>1.6.1</Version>
+    <!-- Uncomment this to have dotnet restore pull NStack from a local dir for testing -->
+    <!-- See https://stackoverflow.com/a/44463578/297526 -->
     <!--<RestoreSources>$(RestoreSources);../../local-packages;https://api.nuget.org/v3/index.json</RestoreSources>-->
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-    <PackageReference Include="NStack.Core" Version="0.17.0" />
-    <PackageReference Include="MinVer" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="NStack.Core" Version="0.17.1" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -27,7 +27,6 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -35,12 +34,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
-    <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
-
-    <!-- See Terminal.Gui/README.md for how version numbering works -->
-    <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
-    <MinVerTagPrefix>v</MinVerTagPrefix>
-
     <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
@@ -57,7 +50,6 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
-
     <PackageReleaseNotes>
       v1.6.0
       * Adds ColorPicker control
