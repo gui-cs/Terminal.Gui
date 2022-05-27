@@ -26,7 +26,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
 
-			btn = new Button ("Test", true);
+			btn = new Button ("ARGS", true) {Text="Test"};
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
 			btn.Redraw (btn.Bounds);
@@ -166,12 +166,15 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestAssignTextToButton ()
 		{
-			View b = new Button ();
-			b.Text = "heya";
+			View b = new Button () {Text="heya"};
 			Assert.Equal ("heya", b.Text);
+			Assert.True (b.TextFormatter.Text.Contains ("heya"));
+			b.Text = "heyb";
+			Assert.Equal ("heyb", b.Text);
+			Assert.True (b.TextFormatter.Text.Contains ("heyb"));
 
 			// with cast
-			Assert.Equal ("heya", ((Button)b).Text);
+			Assert.Equal ("heyb", ((Button)b).Text);
 		}
 
 		[Fact]
@@ -210,9 +213,10 @@ namespace Terminal.Gui.Views {
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
 			Assert.True (btn.IsInitialized);
+			btn.Text = btn.Text;
 			Assert.Equal ("Say Hello 你", btn.Text);
 			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
-			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+			Assert.Equal (new Rect (0, 0, 15, 1), btn.Bounds);
 
 			var expected = @"
 ┌ Test Demo 你 ──────────────┐
