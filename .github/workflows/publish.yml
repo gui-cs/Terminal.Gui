@@ -43,7 +43,7 @@ jobs:
         dotnet build --no-restore -c Release
 
     - name: Pack
-      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}'
+      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     - name: Test to generate Code Coverage Report
       run: |
@@ -66,7 +66,6 @@ jobs:
       run: |
         echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
         echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
-
         
     #- name: Prep GitHub Packages
     #  run: dotnet nuget add source --username tig --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/tig/index.json"
