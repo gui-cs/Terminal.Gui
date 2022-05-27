@@ -192,8 +192,6 @@ namespace Terminal.Gui {
 
 		internal void Update ()
 		{
-			// Workaround for TextFormatter erroneously caching width if runecount and width differ
-			TextFormatter.Size = new Size (0, 0);
 			if (IsDefault)
 				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
