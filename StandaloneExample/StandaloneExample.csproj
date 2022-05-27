@@ -3,10 +3,10 @@
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyVersion>1.6.1.0</AssemblyVersion>
-    <FileVersion>1.6.1.0</FileVersion>
-    <InformationalVersion>1.6.1+Branch.fixes-1741-gitversion.Sha.cc04bb37f5c7684d45833dabd3f7e1ca9c53786f</InformationalVersion>
-    <Version>1.6.1</Version>
+    <AssemblyVersion>1.6.2.0</AssemblyVersion>
+    <FileVersion>1.6.2.0</FileVersion>
+    <InformationalVersion>1.6.2+Branch.main.Sha.b6eeb6321685af474ffc17b1390ff1d4894a90c5</InformationalVersion>
+    <Version>1.6.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Terminal.Gui" Version="1.4.0" />
