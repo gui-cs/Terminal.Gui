@@ -26,7 +26,9 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
 
-			btn = new Button ("Test", true);
+			btn = new Button ("PreTestArg", true) {Text="PreTest"};
+			Assert.Equal ("PreTest", btn.Text);
+			btn.Text = "Test"
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
 			btn.Redraw (btn.Bounds);
