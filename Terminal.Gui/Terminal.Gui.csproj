@@ -1,24 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
+  <!-- Version numbers are automatically updated by gitversion. Do not modify here. -->
   <PropertyGroup>
-    <!-- Version numbers are automatically updated by gitversion. Do not modify here. -->
-    <AssemblyVersion>1.6.1.0</AssemblyVersion>
-    <FileVersion>1.6.1.0</FileVersion>
-    <InformationalVersion>1.6.1+Branch.fixes-1741-gitversion.Sha.cc04bb37f5c7684d45833dabd3f7e1ca9c53786f</InformationalVersion>
-    <Version>1.6.1</Version>
-    <!-- Uncomment this to have dotnet restore pull NStack from a local dir for testing -->
-    <!-- See https://stackoverflow.com/a/44463578/297526 -->
-    <!--<RestoreSources>$(RestoreSources);../../local-packages;https://api.nuget.org/v3/index.json</RestoreSources>-->
+    <AssemblyVersion>1.6.2.0</AssemblyVersion>
+    <FileVersion>1.6.2.0</FileVersion>
+    <Version>1.6.2</Version>
+    <InformationalVersion>1.6.2+Branch.main.Sha.b6eeb6321685af474ffc17b1390ff1d4894a90c5</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="0.17.1" />
     <InternalsVisibleTo Include="UnitTests" />
+  </ItemGroup>
+  <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
+  <PropertyGroup>
+    <!-- See https://stackoverflow.com/a/44463578/297526 -->
+    <!--<RestoreSources>$(RestoreSources);../../local-packages;https://api.nuget.org/v3/index.json</RestoreSources>-->
+  </PropertyGroup>
+  <!-- API Documentation -->
+  <ItemGroup>
+    <None Include="..\docfx\images\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
@@ -33,23 +47,35 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <!-- Enable Nuget Source Link for github -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+    <!--<GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>-->
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
+    <!--<RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>-->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
-    <Description>Console user interface toolkit for .NET applications.</Description>
-    <Owners>Miguel de Icaza</Owners>
-    <Summary>Application framework for creating modern console applications using .NET</Summary>
-    <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
+    <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
+    <Description>Cross Platform Terminal UI toolkit for .NET</Description>
+    <Owners>Miguel de Icaza, Charlie Kindel</Owners>
+    <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
+    <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
       v1.6.0
       * Adds ColorPicker control
