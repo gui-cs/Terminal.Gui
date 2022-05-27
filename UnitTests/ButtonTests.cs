@@ -216,7 +216,7 @@ namespace Terminal.Gui.Views {
 			btn.Text = btn.Text;
 			Assert.Equal ("Say Hello 你", btn.Text);
 			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
-			Assert.Equal (new Rect (0, 0, 15, 1), btn.Bounds);
+			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
 
 			var expected = @"
 ┌ Test Demo 你 ──────────────┐
