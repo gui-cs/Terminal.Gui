@@ -213,7 +213,6 @@ namespace Terminal.Gui.Views {
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
 			Assert.True (btn.IsInitialized);
-			btn.Text = btn.Text;
 			Assert.Equal ("Say Hello 你", btn.Text);
 			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
 			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
