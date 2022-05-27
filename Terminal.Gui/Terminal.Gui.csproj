@@ -61,8 +61,8 @@
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
-    <!--<RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>-->
+    <RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
