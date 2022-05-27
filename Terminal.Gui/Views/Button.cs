@@ -137,8 +137,7 @@ namespace Terminal.Gui {
 				if (hotKey != hk) {
 					HotKey = hk;
 				}
-				if (IsInitialized)
-					Update ();
+				Update ();
 			}
 		}
 
@@ -150,8 +149,7 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
-				if (IsInitialized)
-					Update ();
+				Update ();
 			}
 		}
 
