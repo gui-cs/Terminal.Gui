@@ -228,5 +228,43 @@ namespace Terminal.Gui.Views {
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
+		
+		[Fact, AutoInitShutdown]
+		public void Update_Parameterless_Only_On_Or_After_Initialize ()
+		{
+			var btn = new Button () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Text = "Say Hello 你"
+			};
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.False (btn.IsInitialized);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
+			Assert.True (btn.IsInitialized);
+			Assert.Equal ("Say Hello 你", btn.Text);
+			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
+			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+		}
 	}
 }
