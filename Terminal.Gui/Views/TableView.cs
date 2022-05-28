@@ -439,7 +439,7 @@ namespace Terminal.Gui {
 						// unless we have horizontally scrolled along
 						// in which case render an arrow, to indicate user
 						// can scroll left
-						if(ColumnOffset > 0)
+						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
 						{
 							rune = Driver.LeftArrow;
 							scrollLeftPoint = new Point(c,row);
@@ -459,7 +459,8 @@ namespace Terminal.Gui {
 						// unless there is more of the table we could horizontally
 						// scroll along to see. In which case render an arrow,
 						// to indicate user can scroll right
-						if(ColumnOffset  + columnsToRender.Length < Table.Columns.Count)
+						if(Style.ShowHorizontalScrollIndicators &&
+							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
 						{
 							rune = Driver.RightArrow;
 							scrollRightPoint = new Point(c,row);
@@ -1418,6 +1419,14 @@ namespace Terminal.Gui {
 			/// True to render a solid line vertical line between headers
 			/// </summary>
 			public bool ShowVerticalHeaderLines { get; set; } = true;
+
+			/// <summary>
+			/// True to render a arrows on the right/left of the table when 
+			/// there are more column(s) that can be scrolled to.  Requires
+			/// <see cref="ShowHorizontalHeaderUnderline"/> to be true.
+			/// Defaults to true
+			/// </summary>
+			public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
 			/// <summary>
 			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
