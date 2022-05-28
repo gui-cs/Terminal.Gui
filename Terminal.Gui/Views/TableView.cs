@@ -60,6 +60,9 @@ namespace Terminal.Gui {
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
+		Point? scrollLeftPoint;
+		Point? scrollRightPoint;
+
 		/// <summary>
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
 		/// </summary>
@@ -261,6 +264,9 @@ namespace Terminal.Gui {
 				Move (0, 0);
 				var frame = Frame;
 
+				scrollRightPoint = null;
+				scrollLeftPoint = null;
+
 				// What columns to render at what X offset in viewport
 				var columnsToRender = CalculateViewport (bounds).ToArray ();
 
@@ -434,7 +440,11 @@ namespace Terminal.Gui {
 						// in which case render an arrow, to indicate user
 						// can scroll left
 						if(ColumnOffset > 0)
+						{
 							rune = Driver.LeftArrow;
+							scrollLeftPoint = new Point(c,row);
+						}
+							
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
@@ -450,7 +460,10 @@ namespace Terminal.Gui {
 						// scroll along to see. In which case render an arrow,
 						// to indicate user can scroll right
 						if(ColumnOffset  + columnsToRender.Length < Table.Columns.Count)
+						{
 							rune = Driver.RightArrow;
+							scrollRightPoint = new Point(c,row);
+						}
 
 					}
 					  // if the next console column is the lastcolumns end
@@ -916,6 +929,24 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+
+				if (scrollLeftPoint != null 
+					&& scrollLeftPoint.Value.X == me.X
+					&& scrollLeftPoint.Value.Y == me.Y)
+				{
+					ColumnOffset--;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
+				if (scrollRightPoint != null 
+					&& scrollRightPoint.Value.X == me.X
+					&& scrollRightPoint.Value.Y == me.Y)
+				{
+					ColumnOffset++;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
 
 				var hit = ScreenToCell (me.X, me.Y);
 				if (hit != null) {
