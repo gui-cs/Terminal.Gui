@@ -60,6 +60,9 @@ namespace Terminal.Gui {
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
+		Point? scrollLeftPoint;
+		Point? scrollRightPoint;
+
 		/// <summary>
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
 		/// </summary>
@@ -261,6 +264,9 @@ namespace Terminal.Gui {
 				Move (0, 0);
 				var frame = Frame;
 
+				scrollRightPoint = null;
+				scrollLeftPoint = null;
+
 				// What columns to render at what X offset in viewport
 				var columnsToRender = CalculateViewport (bounds).ToArray ();
 
@@ -420,11 +426,25 @@ namespace Terminal.Gui {
 
 			for (int c = 0; c < availableWidth; c++) {
 
+				// Start by assuming we just draw a straight line the
+				// whole way but update to instead draw a header indicator
+				// or scroll arrow etc
 				var rune = Driver.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
+						// for first character render line
 						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
+
+						// unless we have horizontally scrolled along
+						// in which case render an arrow, to indicate user
+						// can scroll left
+						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
+						{
+							rune = Driver.LeftArrow;
+							scrollLeftPoint = new Point(c,row);
+						}
+							
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
@@ -432,7 +452,20 @@ namespace Terminal.Gui {
 						/*TODO: is ┼ symbol in Driver?*/
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
+
+						// for the last character in the table
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
+
+						// unless there is more of the table we could horizontally
+						// scroll along to see. In which case render an arrow,
+						// to indicate user can scroll right
+						if(Style.ShowHorizontalScrollIndicators &&
+							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
+						{
+							rune = Driver.RightArrow;
+							scrollRightPoint = new Point(c,row);
+						}
+
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
@@ -897,6 +930,24 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+
+				if (scrollLeftPoint != null 
+					&& scrollLeftPoint.Value.X == me.X
+					&& scrollLeftPoint.Value.Y == me.Y)
+				{
+					ColumnOffset--;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
+				if (scrollRightPoint != null 
+					&& scrollRightPoint.Value.X == me.X
+					&& scrollRightPoint.Value.Y == me.Y)
+				{
+					ColumnOffset++;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
 
 				var hit = ScreenToCell (me.X, me.Y);
 				if (hit != null) {
@@ -1368,6 +1419,14 @@ namespace Terminal.Gui {
 			/// True to render a solid line vertical line between headers
 			/// </summary>
 			public bool ShowVerticalHeaderLines { get; set; } = true;
+
+			/// <summary>
+			/// True to render a arrows on the right/left of the table when 
+			/// there are more column(s) that can be scrolled to.  Requires
+			/// <see cref="ShowHorizontalHeaderUnderline"/> to be true.
+			/// Defaults to true
+			/// </summary>
+			public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
 			/// <summary>
 			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.

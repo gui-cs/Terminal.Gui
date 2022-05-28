@@ -20,6 +20,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miHeaderOverline;
 		private MenuItem miHeaderMidline;
 		private MenuItem miHeaderUnderline;
+		private MenuItem miShowHorizontalScrollIndicators;
 		private MenuItem miCellLines;
 		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
@@ -55,7 +56,8 @@ namespace UICatalog.Scenarios {
 					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeader()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
-					miHeaderUnderline =new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
 					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
@@ -203,6 +205,12 @@ namespace UICatalog.Scenarios {
 		{
 			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
 			tableView.Style.ShowHorizontalHeaderUnderline = miHeaderUnderline.Checked;
+			tableView.Update();
+		}
+		private void ToggleHorizontalScrollIndicators ()
+		{
+			miShowHorizontalScrollIndicators.Checked = !miShowHorizontalScrollIndicators.Checked;
+			tableView.Style.ShowHorizontalScrollIndicators = miShowHorizontalScrollIndicators.Checked;
 			tableView.Update();
 		}
 		private void ToggleFullRowSelect ()

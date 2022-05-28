@@ -778,6 +778,85 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+
+		[Fact]
+		public void ScrollIndicators ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected = 
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			// since A is now pushed off screen we get indicator showing
+			// that user can scroll left to see first column
+			tableView.Redraw (tableView.Bounds);
+
+			expected =
+				@"
+│B│C│D│
+◄─┼─┼─►
+│2│3│4│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right twice more (to end of columns)
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+			tableView.Redraw (tableView.Bounds);
+
+			expected =
+				@"
+│D│E│F│
+◄─┼─┼─┤
+│4│5│6│";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
 		/// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
 		/// </summary>
