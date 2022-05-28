@@ -420,11 +420,21 @@ namespace Terminal.Gui {
 
 			for (int c = 0; c < availableWidth; c++) {
 
+				// Start by assuming we just draw a straight line the
+				// whole way but update to instead draw a header indicator
+				// or scroll arrow etc
 				var rune = Driver.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
+						// for first character render line
 						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
+
+						// unless we have horizontally scrolled along
+						// in which case render an arrow, to indicate user
+						// can scroll left
+						if(ColumnOffset > 0)
+							rune = Driver.LeftArrow;
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
@@ -432,7 +442,16 @@ namespace Terminal.Gui {
 						/*TODO: is ┼ symbol in Driver?*/
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
+
+						// for the last character in the table
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
+
+						// unless there is more of the table we could horizontally
+						// scroll along to see. In which case render an arrow,
+						// to indicate user can scroll right
+						if(ColumnOffset  + columnsToRender.Length < Table.Columns.Count)
+							rune = Driver.RightArrow;
+
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
