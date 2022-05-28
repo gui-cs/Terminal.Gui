@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 			set {
 				text = value;
 
-				if (text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.RuneCount)) {
+				if (text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.ConsoleWidth)) {
 					// Provide a default size (width = length of longest line, height = 1)
 					// TODO: It might makes more sense for the default to be width = length of first line?
 					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
