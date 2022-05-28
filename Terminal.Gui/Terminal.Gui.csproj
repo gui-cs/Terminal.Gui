@@ -6,12 +6,14 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <!-- Version numbers are automatically updated by gitversion. Do not modify here. -->
   <PropertyGroup>
-    <AssemblyVersion>1.6.2.0</AssemblyVersion>
-    <FileVersion>1.6.2.0</FileVersion>
-    <Version>1.6.2</Version>
-    <InformationalVersion>1.6.2+Branch.main.Sha.b6eeb6321685af474ffc17b1390ff1d4894a90c5</InformationalVersion>
+    <!-- Version numbers are automatically updated by gitversion when a release is released -->
+    <!-- In the source tree the version will always be 1.0 for all projects. -->
+    <!-- Do not modify these. -->
+    <AssemblyVersion>1.0</AssemblyVersion>
+    <FileVersion>1.0</FileVersion>
+    <Version>1.0</Version>
+    <InformationalVersion>1.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
@@ -61,8 +63,8 @@
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
-    <!--<RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>-->
+    <RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
@@ -77,6 +79,13 @@
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
+      v1.6.4
+      * Fixes #1750. Erroneous suppression of Button Text updates.
+      * Fixes #1753. Update all .csproj files with Release version # upon Release
+      * Fixes #1742. Explicitly dispose old TreeView instances in UICatalog scenario
+      * Fixes #1748. Add horizontal scroll idicators to TableView
+      * StandaloneExample: Updated to use latest version and added help menu
+
       v1.6.0
       * Adds ColorPicker control
       * Adds Context Menu to TreeView
