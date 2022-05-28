@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = Table == null ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
+			set => columnOffset = Table == null ? 0 : Math.Max (0, Math.Min (GetVisibleColumns ().Count () - 1, value));
 		}
 
 		/// <summary>
@@ -121,7 +121,7 @@ namespace Terminal.Gui {
 				var oldValue = selectedColumn;
 
 				//try to prevent this being set to an out of bounds column
-				selectedColumn = Table == null ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+				selectedColumn = Table == null ? 0 : Math.Min (GetVisibleColumns ().Count () - 1, Math.Max (0, value));
 
 				if (oldValue != selectedColumn)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, oldValue, SelectedColumn, SelectedRow, SelectedRow));
@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 			set {
 				if (cellActivationKey != value) {
 					ReplaceKeyBinding (cellActivationKey, value);
-					
+
 					// of API user is mixing and matching old and new methods of keybinding then they may have lost
 					// the old binding (e.g. with ClearKeybindings) so ReplaceKeyBinding alone will fail
 					AddKeyBinding (value, Command.Accept);
@@ -209,9 +209,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDown, () => { ChangeSelectionByOffset (0, 1, false); return true; });
 			AddCommand (Command.PageUp, () => { PageUp (false); return true; });
 			AddCommand (Command.PageDown, () => { PageDown (false); return true; });
-			AddCommand (Command.LeftHome, () => { ChangeSelectionToStartOfRow (false);  return true; });
+			AddCommand (Command.LeftHome, () => { ChangeSelectionToStartOfRow (false); return true; });
 			AddCommand (Command.RightEnd, () => { ChangeSelectionToEndOfRow (false); return true; });
-			AddCommand (Command.TopHome, () => { ChangeSelectionToStartOfTable(false); return true; });
+			AddCommand (Command.TopHome, () => { ChangeSelectionToStartOfTable (false); return true; });
 			AddCommand (Command.BottomEnd, () => { ChangeSelectionToEndOfTable (false); return true; });
 
 			AddCommand (Command.RightExtend, () => { ChangeSelectionByOffset (1, 0, true); return true; });
@@ -225,8 +225,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.TopHomeExtend, () => { ChangeSelectionToStartOfTable (true); return true; });
 			AddCommand (Command.BottomEndExtend, () => { ChangeSelectionToEndOfTable (true); return true; });
 
-			AddCommand (Command.SelectAll, () => { SelectAll(); return true; });
-			AddCommand (Command.Accept, () => { OnCellActivated(new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)); return true; });
+			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
+			AddCommand (Command.Accept, () => { OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.CursorLeft, Command.Left);
@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
 			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
 			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
-			AddKeyBinding (Key.CursorDown| Key.ShiftMask, Command.LineDownExtend);
+			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
 			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
 			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
 			AddKeyBinding (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
@@ -257,28 +257,28 @@ namespace Terminal.Gui {
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
-			{
-				Move (0, 0);
-				var frame = Frame;
+		{
+			Move (0, 0);
+			var frame = Frame;
 
-				// What columns to render at what X offset in viewport
-				var columnsToRender = CalculateViewport (bounds).ToArray ();
+			// What columns to render at what X offset in viewport
+			var columnsToRender = CalculateViewport (bounds).ToArray ();
 
-				Driver.SetAttribute (GetNormalColor ());
+			Driver.SetAttribute (GetNormalColor ());
 
-				//invalidate current row (prevents scrolling around leaving old characters in the frame
-				Driver.AddStr (new string (' ', bounds.Width));
+			//invalidate current row (prevents scrolling around leaving old characters in the frame
+			Driver.AddStr (new string (' ', bounds.Width));
 
-				int line = 0;
+			int line = 0;
 
-				if (ShouldRenderHeaders ()) {
-					// Render something like:
-					/*
-						┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-						│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-						└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
-					*/
-			if (Style.ShowHorizontalHeaderOverline) {
+			if (ShouldRenderHeaders ()) {
+				// Render something like:
+				/*
+					┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+					│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+				*/
+				if (Style.ShowHorizontalHeaderOverline) {
 					RenderHeaderOverline (line, bounds.Width, columnsToRender);
 					line++;
 				}
@@ -448,7 +448,7 @@ namespace Terminal.Gui {
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
 			var rowScheme = (Style.RowColorGetter?.Invoke (
-				new RowColorGetterArgs(Table,rowToRender))) ?? ColorScheme;
+				new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
 
 			//render start of line
 			if (style.ShowVerticalCellLines)
@@ -482,17 +482,16 @@ namespace Terminal.Gui {
 				var colorSchemeGetter = colStyle?.ColorGetter;
 
 				ColorScheme scheme;
-				if(colorSchemeGetter != null) {
+				if (colorSchemeGetter != null) {
 					// user has a delegate for defining row color per cell, call it
-					scheme = colorSchemeGetter(
-						new CellColorGetterArgs (Table, rowToRender, current.Column.Ordinal, val, representation,rowScheme));
+					scheme = colorSchemeGetter (
+						new CellColorGetterArgs (Table, rowToRender, current.Column.Ordinal, val, representation, rowScheme));
 
 					// if users custom color getter returned null, use the row scheme
-					if(scheme == null) {
+					if (scheme == null) {
 						scheme = rowScheme;
 					}
-				}
-				else {
+				} else {
 					// There is no custom cell coloring delegate so use the scheme for the row
 					scheme = rowScheme;
 				}
@@ -503,9 +502,9 @@ namespace Terminal.Gui {
 
 				// While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
 				bool isPrimaryCell = current.Column.Ordinal == selectedColumn && rowToRender == selectedRow;
-				
-				RenderCell (cellColor,render,isPrimaryCell);
-								
+
+				RenderCell (cellColor, render, isPrimaryCell);
+
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
 					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
@@ -538,7 +537,7 @@ namespace Terminal.Gui {
 		/// <param name="cellColor"></param>
 		/// <param name="render"></param>
 		/// <param name="isPrimaryCell"></param>
-		protected virtual void RenderCell (Attribute cellColor, string render,bool isPrimaryCell)
+		protected virtual void RenderCell (Attribute cellColor, string render, bool isPrimaryCell)
 		{
 			// If the cell is the selected col/row then draw the first rune in inverted colors
 			// this allows the user to track which cell is the active one during a multi cell
@@ -621,7 +620,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (Table == null || GetVisibleColumns ().Count () <= 0) {
 				PositionCursor ();
 				return false;
 			}
@@ -680,7 +679,7 @@ namespace Terminal.Gui {
 		/// Moves the selection up by one page
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-		public void PageUp(bool extend)
+		public void PageUp (bool extend)
 		{
 			ChangeSelectionByOffset (0, -(Bounds.Height - GetHeaderHeightIfAny ()), extend);
 			Update ();
@@ -690,7 +689,7 @@ namespace Terminal.Gui {
 		/// Moves the selection down by one page
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-		public void PageDown(bool extend)
+		public void PageDown (bool extend)
 		{
 			ChangeSelectionByOffset (0, Bounds.Height - GetHeaderHeightIfAny (), extend);
 			Update ();
@@ -710,9 +709,9 @@ namespace Terminal.Gui {
 		/// Moves or extends the selection to the final cell in the table
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-		public void ChangeSelectionToEndOfTable(bool extend)
+		public void ChangeSelectionToEndOfTable (bool extend)
 		{
-			SetSelection (Table.Columns.Count - 1, Table.Rows.Count - 1, extend);
+			SetSelection (GetVisibleColumns ().Count () - 1, Table.Rows.Count - 1, extend);
 			Update ();
 		}
 
@@ -723,7 +722,7 @@ namespace Terminal.Gui {
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToEndOfRow (bool extend)
 		{
-			SetSelection (Table.Columns.Count - 1, SelectedRow, extend);
+			SetSelection (GetVisibleColumns ().Count () - 1, SelectedRow, extend);
 			Update ();
 		}
 
@@ -771,7 +770,7 @@ namespace Terminal.Gui {
 				var yMax = MultiSelectedRegions.Max (r => r.Rect.Bottom);
 
 				var xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min (r => r.Rect.Left);
-				var xMax = FullRowSelect ? Table.Columns.Count : MultiSelectedRegions.Max (r => r.Rect.Right);
+				var xMax = FullRowSelect ? GetVisibleColumns ().Count () : MultiSelectedRegions.Max (r => r.Rect.Right);
 
 				for (int y = yMin; y < yMax; y++) {
 					for (int x = xMin; x < xMax; x++) {
@@ -787,7 +786,7 @@ namespace Terminal.Gui {
 				// if we are selecting the full row
 				if (FullRowSelect) {
 					// all cells in active row are selected
-					for (int x = 0; x < Table.Columns.Count; x++) {
+					for (int x = 0; x < GetVisibleColumns ().Count (); x++) {
 						yield return new Point (x, SelectedRow);
 					}
 				} else {
@@ -865,7 +864,7 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (Table == null || GetVisibleColumns ().Count () <= 0) {
 				return false;
 			}
 
@@ -925,7 +924,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (Table == null || GetVisibleColumns ().Count () <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -956,7 +955,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (Table == null || GetVisibleColumns ().Count () <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1008,7 +1007,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns.Count - 1), 0);
+			ColumnOffset = Math.Max (Math.Min (ColumnOffset, GetVisibleColumns ().Count () - 1), 0);
 			RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows.Count - 1), 0);
 		}
 
@@ -1026,7 +1025,9 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns.Count - 1), 0);
+			var visibleColumns = GetVisibleColumns ().ToArray ();
+
+			SelectedColumn = Math.Max (Math.Min (SelectedColumn, visibleColumns.Length - 1), 0);
 			SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows.Count - 1), 0);
 
 			var oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
@@ -1040,18 +1041,18 @@ namespace Terminal.Gui {
 					continue;
 
 				// ignore regions entirely too far right of table columns
-				if (region.Rect.Left >= Table.Columns.Count)
+				if (region.Rect.Left >= visibleColumns.Length)
 					continue;
 
 				// ensure region's origin exists
 				region.Origin = new Point (
-					Math.Max (Math.Min (region.Origin.X, Table.Columns.Count - 1), 0),
+					Math.Max (Math.Min (region.Origin.X, visibleColumns.Length - 1), 0),
 					Math.Max (Math.Min (region.Origin.Y, Table.Rows.Count - 1), 0));
 
 				// ensure regions do not go over edge of table bounds
 				region.Rect = Rect.FromLTRB (region.Rect.Left,
 					region.Rect.Top,
-					Math.Max (Math.Min (region.Rect.Right, Table.Columns.Count), 0),
+					Math.Max (Math.Min (region.Rect.Right, visibleColumns.Length), 0),
 					Math.Max (Math.Min (region.Rect.Bottom, Table.Rows.Count), 0)
 					);
 
@@ -1066,7 +1067,9 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureSelectedCellIsVisible ()
 		{
-			if (Table == null || Table.Columns.Count <= 0) {
+			var visibleColumns = GetVisibleColumns ().ToArray ();
+
+			if (Table == null || visibleColumns.Length <= 0) {
 				return;
 			}
 
@@ -1081,25 +1084,24 @@ namespace Terminal.Gui {
 			//if we have scrolled too far to the right
 			if (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
 
-				if(Style.SmoothHorizontalScrolling) {
+				if (Style.SmoothHorizontalScrolling) {
 
 					// Scroll right 1 column at a time until the users selected column is visible
-					while(SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+					while (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
 
 						ColumnOffset++;
 						columnsToRender = CalculateViewport (Bounds).ToArray ();
 
 						// if we are already scrolled to the last column then break
 						// this will prevent any theoretical infinite loop
-						if (ColumnOffset >= Table.Columns.Count - 1)
+						if (ColumnOffset >= visibleColumns.Length - 1)
 							break;
 
 					}
-				}
-				else {
+				} else {
 					ColumnOffset = SelectedColumn;
 				}
-				
+
 			}
 
 			//if we have scrolled too far down
@@ -1137,7 +1139,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			var visibleColumns = GetVisibleColumns ().ToArray ();
+
+			if (visibleColumns.Length == 0)
 				yield break;
 
 			int usedSpace = 0;
@@ -1154,9 +1158,9 @@ namespace Terminal.Gui {
 				rowsToRender -= GetHeaderHeight ();
 
 			bool first = true;
-			var lastColumn = Table.Columns.Cast<DataColumn> ().Last ();
+			var lastColumn = visibleColumns.Last ();
 
-			foreach (var col in Table.Columns.Cast<DataColumn> ().Skip (ColumnOffset)) {
+			foreach (var col in visibleColumns.Skip (ColumnOffset)) {
 
 				int startingIdxForCurrentHeader = usedSpace;
 				var colStyle = Style.GetColumnStyleIfAny (col);
@@ -1178,9 +1182,17 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private IEnumerable<DataColumn> GetVisibleColumns ()
+		{
+			if (Table is null)
+				return Enumerable.Empty<DataColumn> ();
+
+			return Table.Columns.Cast<DataColumn> ().Where (c => c.ColumnMapping != MappingType.Hidden);
+		}
+
 		private bool ShouldRenderHeaders ()
 		{
-			if (Table == null || Table.Columns.Count == 0)
+			if (GetVisibleColumns ().Count () == 0)
 				return false;
 
 			return Style.AlwaysShowHeaders || rowOffset == 0;
@@ -1385,7 +1397,7 @@ namespace Terminal.Gui {
 			/// Delegate for coloring specific rows in a different color.  For cell color <see cref="ColumnStyle.ColorGetter"/>
 			/// </summary>
 			/// <value></value>
-			public RowColorGetterDelegate RowColorGetter {get;set;}
+			public RowColorGetterDelegate RowColorGetter { get; set; }
 
 			/// <summary>
 			/// Determines rendering when the last column in the table is visible but it's
@@ -1395,7 +1407,7 @@ namespace Terminal.Gui {
 			/// and leave a blank column that cannot be selected in the remaining space.  
 			/// </summary>
 			/// <value></value>
-			public bool ExpandLastColumn {get;set;} = true;
+			public bool ExpandLastColumn { get; set; } = true;
 
 			/// <summary>
 			/// <para>
@@ -1412,7 +1424,7 @@ namespace Terminal.Gui {
 			/// </para>
 			/// </summary>
 			public bool SmoothHorizontalScrolling { get; set; } = true;
-			
+
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
 			/// </summary>
