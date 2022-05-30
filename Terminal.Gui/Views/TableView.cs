@@ -68,6 +68,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public const int DefaultMaxCellWidth = 100;
 
+
+		/// <summary>
+		/// The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/>
+		/// </summary>
+		public const int DefaultMinAcceptableWidth = 100;
+
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
 		/// </summary>
@@ -1214,11 +1220,38 @@ namespace Terminal.Gui {
 				int colWidth;
 
 				// is there enough space for this column (and it's data)?
-				usedSpace += colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
 
-				// no (don't render it) unless its the only column we are render (that must be one massively wide column!)
-				if (!first && usedSpace > availableHorizontalSpace)
-					yield break;
+				// there is not enough space for this columns 
+				// visible content
+				if (usedSpace + colWidth > availableHorizontalSpace)
+				{
+					bool showColumn = false;
+
+					// if this column accepts flexible width rendering and
+					// is therefore happy rendering into less space
+					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 && availableHorizontalSpace > colStyle.MinAcceptableWidth)
+					{
+						// show column and use use whatever space is 
+						// left for rendering it
+						showColumn = true;
+						colWidth = availableHorizontalSpace - usedSpace;
+					}
+
+					// If its the only column we are able to render then
+					// accept it anyway (that must be one massively wide column!)
+					if (first)
+					{
+						showColumn = true;
+					}
+
+					// no special exceptions and we are out of space
+					// so stop accepting new columns for the render area
+					if(!showColumn)
+						break;
+				}
+
+				usedSpace += colWidth;
 
 				// there is space
 				yield return new ColumnToRender (col, startingIdxForCurrentHeader,
@@ -1351,9 +1384,24 @@ namespace Terminal.Gui {
 			public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
 			/// <summary>
-			/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// Set the minimum width of the column in characters.  Setting this will ensure that
+			/// even when a column has short content/header it still fills a given width of the control.
+			/// 
+			/// <para>This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> 
+			/// or the <see cref="MaxWidth"/>
+			/// </para>
+			/// <remarks>
+			/// For setting a flexible column width (down to a lower limit) use <see cref="MinAcceptableWidth"/>
+			/// instead
+			/// </remarks>
 			/// </summary>
 			public int MinWidth { get; set; }
+
+			/// <summary>
+			/// Enables flexible sizing of this column based on available screen space to render into.
+			/// When set the S <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// </summary>
+			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
