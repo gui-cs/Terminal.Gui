@@ -1401,7 +1401,6 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// Enables flexible sizing of this column based on available screen space to render into.
-			/// When set the S <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
 			/// </summary>
 			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
 
