@@ -25,6 +25,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miCellLines;
 		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
+		private MenuItem miSmoothScrolling;
 		private MenuItem miAlternatingColors;
 		private MenuItem miCursor;
 
@@ -62,6 +63,7 @@ namespace UICatalog.Scenarios {
 					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
+					miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
 					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
@@ -72,6 +74,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Set Max Width", "", SetMaxWidth),
 					new MenuItem ("_Set Min Width", "", SetMinWidth),
 					new MenuItem ("_Set MinAcceptableWidth", "",SetMinAcceptableWidth),
+					new MenuItem ("_Set All MinAcceptableWidth=1", "",SetMinAcceptableWidthToOne),
 				}),
 			});
 		
@@ -128,6 +131,7 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
+
 		private DataColumn GetColumn ()
 		{
 			if (tableView.Table == null)
@@ -139,6 +143,14 @@ namespace UICatalog.Scenarios {
 			return tableView.Table.Columns [tableView.SelectedColumn];
 		}
 
+		private void SetMinAcceptableWidthToOne ()
+		{
+			foreach (DataColumn c in tableView.Table.Columns) 
+			{
+				var style = tableView.Style.GetOrCreateColumnStyle (c);
+				style.MinAcceptableWidth = 1;
+			}
+		}
 		private void SetMinAcceptableWidth ()
 		{
 			var col = GetColumn ();
@@ -304,6 +316,14 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ExpandLastColumn = miExpandLastColumn.Checked;
 
 			tableView.Update();
+
+		}
+		private void ToggleSmoothScrolling()
+		{
+			miSmoothScrolling.Checked = !miSmoothScrolling.Checked;
+			tableView.Style.SmoothHorizontalScrolling = miSmoothScrolling.Checked;
+
+			tableView.Update ();
 
 		}
 		private void ToggleCellLines()
