@@ -97,6 +97,8 @@ namespace Terminal.Gui {
 
 					if (abortCount != 0) {
 						output.WriteLine ($"Scenario {scenarioClass} had abort count of {abortCount}");
+					} else if (iterations > 1) {
+						output.WriteLine ($"Scenario {scenarioClass} had iterations count of {iterations}");
 					}
 
 					Assert.Equal (0, abortCount);
