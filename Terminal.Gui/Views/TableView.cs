@@ -1230,7 +1230,9 @@ namespace Terminal.Gui {
 
 					// if this column accepts flexible width rendering and
 					// is therefore happy rendering into less space
-					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 && availableHorizontalSpace > colStyle.MinAcceptableWidth)
+					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 &&
+						// is there enough space to meet the MinAcceptableWidth
+						(availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth)
 					{
 						// show column and use use whatever space is 
 						// left for rendering it

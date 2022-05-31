@@ -4,6 +4,7 @@ using System.Data;
 using Terminal.Gui;
 using System.Linq;
 using System.Globalization;
+using static Terminal.Gui.TableView;
 
 namespace UICatalog.Scenarios {
 
@@ -67,8 +68,15 @@ namespace UICatalog.Scenarios {
 					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 				}),
+				new MenuBarItem ("_Column", new MenuItem [] {
+					new MenuItem ("_Set Max Width", "", SetMaxWidth),
+					new MenuItem ("_Set Min Width", "", SetMinWidth),
+					new MenuItem ("_Set MinAcceptableWidth", "",SetMinAcceptableWidth),
+				}),
 			});
-			Top.Add (menu);
+		
+
+		Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
@@ -91,7 +99,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add(selectedCellLabel);
 
-			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
+			tableView.SelectedCellChanged += (e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
 			tableView.KeyPress += TableViewKeyPress;
 
@@ -118,6 +126,76 @@ namespace UICatalog.Scenarios {
 				Focus = Win.ColorScheme.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.Red,Color.BrightBlue)
 			};
+		}
+
+		private DataColumn GetColumn ()
+		{
+			if (tableView.Table == null)
+				return null;
+
+			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns.Count)
+				return null;
+
+			return tableView.Table.Columns [tableView.SelectedColumn];
+		}
+
+		private void SetMinAcceptableWidth ()
+		{
+			var col = GetColumn ();
+			RunColumnWidthDialog (col, "MinAcceptableWidth", (s,v)=>s.MinAcceptableWidth = v,(s)=>s.MinAcceptableWidth);
+		}
+
+		private void SetMinWidth ()
+		{
+			var col = GetColumn ();
+			RunColumnWidthDialog (col, "MinWidth", (s, v) => s.MinWidth = v, (s) => s.MinWidth);
+		}
+
+		private void SetMaxWidth ()
+		{
+			var col = GetColumn ();
+			RunColumnWidthDialog (col, "MaxWidth", (s, v) => s.MaxWidth = v, (s) => s.MaxWidth);
+		}
+
+		private void RunColumnWidthDialog (DataColumn col, string prompt, Action<ColumnStyle,int> setter,Func<ColumnStyle,int> getter)
+		{
+			var accepted = false;
+			var ok = new Button ("Ok", is_default: true);
+			ok.Clicked += () => { accepted = true; Application.RequestStop (); };
+			var cancel = new Button ("Cancel");
+			cancel.Clicked += () => { Application.RequestStop (); };
+			var d = new Dialog (prompt, 60, 20, ok, cancel);
+
+			var style = tableView.Style.GetOrCreateColumnStyle (col);
+
+			var lbl = new Label () {
+				X = 0,
+				Y = 1,
+				Text = col.ColumnName
+			};
+
+			var tf = new TextField () {
+				Text = getter(style).ToString (),
+				X = 0,
+				Y = 2,
+				Width = Dim.Fill ()
+			};
+
+			d.Add (lbl, tf);
+			tf.SetFocus ();
+
+			Application.Run (d);
+
+			if (accepted) {
+
+				try {
+					setter (style, int.Parse (tf.Text.ToString()));
+				} catch (Exception ex) {
+					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
+				}
+
+				tableView.Update ();
+			}
 		}
 
 		private void SetupScrollBar ()

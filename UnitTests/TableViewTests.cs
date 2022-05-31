@@ -879,7 +879,38 @@ namespace Terminal.Gui.Views {
 ";
 			GraphViewTests.AssertDriverContentsAre (expected, output);
 
-			Application.Shutdown();
+			// Now test making the width too small for the MinAcceptableWidth
+			// the Column won't fit so should not be rendered
+			Application.Shutdown ();
+			GraphViewTests.InitFakeDriver ();
+
+			tableView.Bounds = new Rect(0,0,9,5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B    │
+├─┼─────►
+│1│2    │
+│1│2    │
+
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// setting width to 10 leaves just enough space for the column to
+			// meet MinAcceptableWidth of 5.  Column width includes terminator line
+			// symbol (e.g. ┤ or │)
+			tableView.Bounds = new Rect (0, 0, 10, 5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B│Very│
+├─┼─┼────┤
+│1│2│aaaa│
+│1│2│aaa │
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			Application.Shutdown ();
 		}
 
 
