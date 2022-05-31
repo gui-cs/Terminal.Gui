@@ -48,15 +48,16 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
-			lock (FakeConsole.MockKeyPresses) {
-				foreach (var scenarioClass in scenarioClasses) {
+			foreach (var scenarioClass in scenarioClasses) {
 
-					// Setup some fake keypresses 
-					// Passing empty string will cause just a ctrl-q to be fired
-					FakeConsole.MockKeyPresses.Clear ();
-					int stackSize = CreateInput ("");
+				// Setup some fake keypresses 
+				// Passing empty string will cause just a ctrl-q to be fired
+				FakeConsole.MockKeyPresses.Clear ();
+				int stackSize = CreateInput ("");
 
-					Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+				lock (FakeConsole.MockKeyPresses) {
 
 					int iterations = 0;
 					Application.Iteration = () => {
