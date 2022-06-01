@@ -778,6 +778,141 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		[Fact]
+		public void LongColumnTest ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 25 characters can be printed into table
+			tableView.Bounds = new Rect (0, 0, 25, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("Very Long Column");
+
+			dt.Rows.Add (1, 2, new string('a',500));
+			dt.Rows.Add (1, 2, "aaa");
+
+			tableView.Table = dt;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// default behaviour of TableView is not to render
+			// columns unless there is sufficient space
+			string expected = 
+				@"
+│A│B                    │
+├─┼─────────────────────►
+│1│2                    │
+│1│2                    │
+";
+
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// get a style for the long column
+			var style = tableView.Style.GetOrCreateColumnStyle(dt.Columns[2]);
+			
+			// one way the API user can fix this for long columns
+			// is to specify a max width for the column
+			style.MaxWidth = 10;
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long          │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaa         │
+│1│2│aaa                │
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// revert the style change
+			style.MaxWidth = TableView.DefaultMaxCellWidth;
+
+			// another way API user can fix problem is to implement
+			// RepresentationGetter and apply max length there
+
+			style.RepresentationGetter = (s)=>{
+				return s.ToString().Length < 15 ? s.ToString() : s.ToString().Substring(0,13)+"...";
+			};
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long Column   │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaaaaa...   │
+│1│2│aaa                │
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// revert style change
+			style.RepresentationGetter = null;
+
+			// Both of the above methods rely on having a fixed
+			// size limit for the column.  These are awkward if a
+			// table is resizeable e.g. Dim.Fill().  Ideally we want
+			// to render in any space available and truncate the content
+			// of the column dynamically so it fills the free space at
+			// the end of the table.
+
+			// We can now specify that the column can be any length
+			// (Up to MaxWidth) but the renderer can accept using
+			// less space down to this limit
+			style.MinAcceptableWidth = 5;
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long Column   │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaaaaaaaaaaa│
+│1│2│aaa                │
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// Now test making the width too small for the MinAcceptableWidth
+			// the Column won't fit so should not be rendered
+			Application.Shutdown ();
+			GraphViewTests.InitFakeDriver ();
+
+			tableView.Bounds = new Rect(0,0,9,5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B    │
+├─┼─────►
+│1│2    │
+│1│2    │
+
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			// setting width to 10 leaves just enough space for the column to
+			// meet MinAcceptableWidth of 5.  Column width includes terminator line
+			// symbol (e.g. ┤ or │)
+			tableView.Bounds = new Rect (0, 0, 10, 5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B│Very│
+├─┼─┼────┤
+│1│2│aaaa│
+│1│2│aaa │
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+			Application.Shutdown ();
+		}
+
 
 		[Fact]
 		public void ScrollIndicators ()
