@@ -459,6 +459,24 @@ namespace UICatalog.Scenarios {
 		}
 
 		List<UnicodeRange> Ranges = new List<UnicodeRange> {
+			new UnicodeRange (0x0000, 0x001F, "ASCII Control Characters"),
+			new UnicodeRange (0x0080, 0x009F, "C0 Control Characters"),
+			new UnicodeRange(0x1100, 0x11ff,"Hangul Jamo"),	// This is where wide chars tend to start
+			new UnicodeRange(0x20A0, 0x20CF,"Currency Symbols"),
+			new UnicodeRange(0x2100, 0x214F,"Letterlike Symbols"),
+			new UnicodeRange(0x2190, 0x21ff,"Arrows" ),
+			new UnicodeRange(0x2200, 0x22ff,"Mathematical symbols"),
+			new UnicodeRange(0x2300, 0x23ff,"Miscellaneous Technical"),
+			new UnicodeRange(0x2500, 0x25ff,"Box Drawing & Geometric Shapes"),
+			new UnicodeRange(0x2600, 0x26ff,"Miscellaneous Symbols"),
+			new UnicodeRange(0x2700, 0x27ff,"Dingbats"),
+			new UnicodeRange(0x2800, 0x28ff,"Braille"),
+			new UnicodeRange(0x2b00, 0x2bff,"Miscellaneous Symbols and Arrows"),
+			new UnicodeRange(0xFB00, 0xFb4f,"Alphabetic Presentation Forms"),
+			new UnicodeRange(0x12400, 0x1240f,"Cuneiform Numbers and Punctuation"),
+			new UnicodeRange(0x1FA00, 0x1FA0f,"Chess Symbols"),
+			new UnicodeRange((uint)(CharMap.MaxCodePointVal - 16), (uint)CharMap.MaxCodePointVal,"End"),
+
 			new UnicodeRange (0x0020 ,0x007F        ,"Basic Latin"),
 			new UnicodeRange (0x00A0 ,0x00FF        ,"Latin-1 Supplement"),
 			new UnicodeRange (0x0100 ,0x017F        ,"Latin Extended-A"),
@@ -637,7 +655,7 @@ namespace UICatalog.Scenarios {
 				return;
 			var o = e.Table.Rows [e.Row] [e.Col];
 
-			var title = o is uint u ? GetUnicodeCategory(u) + $"({o:X})" : "Enter new value";
+			var title = o is uint u ? GetUnicodeCategory(u) + $"(0x{o:X4})" : "Enter new value";
 
 			var oldValue = e.Table.Rows[e.Row][e.Col].ToString();
 			bool okPressed = false;
