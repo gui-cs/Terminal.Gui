@@ -6,15 +6,15 @@
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
 ![Bugs](https://img.shields.io/github/issues/migueldeicaza/gui.cs/bug)
 
-# Terminal.Gui - Cross Platform Terminal GUI toolkit for .NET
+# Terminal.Gui - Cross Platform Terminal UI toolkit for .NET
 
-A toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-## Controls & Features
+## Controls and Views
 
-*Terminal.Gui* contains various controls for building text user interfaces:
+*Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
 * [Button](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
 * [CheckBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
@@ -43,20 +43,20 @@ A toolkit for building console GUI apps for .NET, .NET Core, and Mono that works
 * [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
 * [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
 
-In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull [`TerminalView.cs`](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) into your project.
-
 ### Features
 
-* **Cross Platform** - Works on Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
-* **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including limited support for drag & drop.
-* **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - **Terminal.Gui** supports both *Absolute layout* and an innovative UI layout system referred to as *Computed Layout*. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic console GUIs.
+* **Cross Platform** - Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean apps will work well on both color and monochrome terminals. 
+* **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including support for drag & drop.
+* **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - Supports both *Absolute layout* and an innovative *Computed Layout* system. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic terminal UIs.
 * **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
 * **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
 * **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
-descriptors.
-* **Reactive Extensions Support** - Use [reactive extensions](https://github.com/dotnet/reactive) and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) of a sample app in order to learn how to achieve this.
+descriptors. Most classes are safe for threading.
+* **Reactive Extensions** - Use [reactive extensions](https://github.com/dotnet/reactive) and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) of a sample app in order to learn how to achieve this.
 
 ### Keyboard Input Handling
+
+**Terminal.Gui** respects common Linux, Mac, and Windows keyboard idioms. For example, clipboard operations use the familiar `Control/Command-C, X, V` model. `CTRL-Q` is used for exiting views (and apps).
 
 The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
 
@@ -66,25 +66,9 @@ To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or
 
 `ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to `F10`, and `F1` to `F9` respectively.
 
-**Terminal.Gui** respects common Mac and Windows keyboard idoms as well. For example, clipboard operations use the familiar `Control/Command-C, X, V` model.
+Apps can change key bindings using the `AddKeyBinding` API. 
 
-`CTRL-Q` is used for exiting views (and apps).
-
-**Terminal.Gui** supports rebinding keys. For example the default key for activating a button is Enter. You can change this using the `ClearKeybinding` and `AddKeybinding` methods:
-
-```csharp
-var btn = new Button ("Press Me");
-btn.ClearKeybinding (Command.Accept);
-btn.AddKeyBinding (Key.b, Command.Accept);
-```
-
-The `Command` enum lists generic operations that are implemented by views. For example `Command.Accept` in a Button results in the `Clicked` event firing while in `TableView` it is bound to `CellActivated`. Not all commands are implemented by all views (e.g. you cannot scroll in a Button). To see which commands are implemented by a View you can use the `GetSupportedCommands()` method.
-
-Not all controls have the same key bound for a given command, for example `Command.Accept` defaults to `Key.Enter` in a `Button` but defaults to `Key.Space` in `RadioGroup`.
-
-Keybindings only operate while a view has focus. To register global hotkeys you can override a view's `bool ProcessHotKey (KeyEvent kb)` method.
-
-### Driver model
+### Driver Model
 
 **Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/CursesDriver/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/ConsoleDrivers/WindowsDriver.cs) front-end.
 
@@ -99,8 +83,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 * **[Example (aka `demo.cs`)](https://github.com/migueldeicaza/gui.cs/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the simple demo.
 * **[Standalone Example](https://github.com/migueldeicaza/gui.cs/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
 * **[F# Example](https://github.com/migueldeicaza/gui.cs/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
-* **[Powershell Sample]()** - (Coming soon! See PR #952. Shows how to build Terminal.Gui apps using Powershell.
-* **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui.
+* **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)** - `OCGV` sends the output from a command to  an interactive table. 
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
 
 ## Documentation
@@ -112,7 +95,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
 
 ### Sample Usage
-The code below is done with the new [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements) in C# 9.0. 
+(This code uses C# 9.0 [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements).) 
 ```csharp
 using Terminal.Gui;
 using NStack;
@@ -191,6 +174,8 @@ Application.Run();
 Application.Shutdown();
 ```
 
+The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)**.
+
 Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
 
 ```csharp
@@ -204,8 +189,6 @@ class Demo {
 	}
 }
 ```
-
-The example above shows how to add views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)**.
 
 ## Installing
 
@@ -221,10 +204,10 @@ dotnet add package Terminal.Gui
 
 ## Running and Building
 
-* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project ./UICatalog` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
-Building in Release requires the [git command line tool](https://git-scm.com/) (a dependency of the [MinVer](https://github.com/adamralph/minver#can-i-disable-minver) build tool)
+Building in `Release` requires the [git command line tool](https://git-scm.com/) (a dependency of the [MinVer](https://github.com/adamralph/minver#can-i-disable-minver) build tool)
 
 ## Contributing
 

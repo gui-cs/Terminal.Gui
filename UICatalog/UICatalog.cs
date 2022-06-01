@@ -166,7 +166,7 @@ namespace UICatalog {
 			aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |");
 			aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|");
 			aboutMessage.AppendLine (@"");
-			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {FileVersionInfo.GetVersionInfo (typeof (Terminal.Gui.Application).Assembly.Location).ProductVersion}");
+			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {FileVersionInfo.GetVersionInfo (typeof (Terminal.Gui.Application).Assembly.Location).FileVersion}");
 			aboutMessage.AppendLine (@"");
 
 			_menu = new MenuBar (new MenuBarItem [] {

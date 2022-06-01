@@ -66,6 +66,15 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void TestSize_TextChange ()
+		{
+			var tf = new TextFormatter () { Text = "你" };
+			Assert.Equal (2,tf.Size.Width);
+			tf.Text = "你你";
+			Assert.Equal (4, tf.Size.Width);
+		}
+
+		[Fact]
 		public void NeedsFormat_Sets ()
 		{
 			var testText = ustring.Make ("test");

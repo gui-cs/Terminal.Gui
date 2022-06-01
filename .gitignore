@@ -17,6 +17,6 @@ UnitTests/TestResults
 
 .vscode/
 
-demo.txt
+demo.*
 
 *.deb

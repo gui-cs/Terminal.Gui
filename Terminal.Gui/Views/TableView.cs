@@ -60,10 +60,19 @@ namespace Terminal.Gui {
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
+		Point? scrollLeftPoint;
+		Point? scrollRightPoint;
+
 		/// <summary>
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
 		/// </summary>
 		public const int DefaultMaxCellWidth = 100;
+
+
+		/// <summary>
+		/// The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/>
+		/// </summary>
+		public const int DefaultMinAcceptableWidth = 100;
 
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
@@ -261,6 +270,9 @@ namespace Terminal.Gui {
 				Move (0, 0);
 				var frame = Frame;
 
+				scrollRightPoint = null;
+				scrollLeftPoint = null;
+
 				// What columns to render at what X offset in viewport
 				var columnsToRender = CalculateViewport (bounds).ToArray ();
 
@@ -420,11 +432,25 @@ namespace Terminal.Gui {
 
 			for (int c = 0; c < availableWidth; c++) {
 
+				// Start by assuming we just draw a straight line the
+				// whole way but update to instead draw a header indicator
+				// or scroll arrow etc
 				var rune = Driver.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
+						// for first character render line
 						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
+
+						// unless we have horizontally scrolled along
+						// in which case render an arrow, to indicate user
+						// can scroll left
+						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
+						{
+							rune = Driver.LeftArrow;
+							scrollLeftPoint = new Point(c,row);
+						}
+							
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
@@ -432,7 +458,20 @@ namespace Terminal.Gui {
 						/*TODO: is ┼ symbol in Driver?*/
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
+
+						// for the last character in the table
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
+
+						// unless there is more of the table we could horizontally
+						// scroll along to see. In which case render an arrow,
+						// to indicate user can scroll right
+						if(Style.ShowHorizontalScrollIndicators &&
+							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
+						{
+							rune = Driver.RightArrow;
+							scrollRightPoint = new Point(c,row);
+						}
+
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
@@ -898,6 +937,24 @@ namespace Terminal.Gui {
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
+				if (scrollLeftPoint != null 
+					&& scrollLeftPoint.Value.X == me.X
+					&& scrollLeftPoint.Value.Y == me.Y)
+				{
+					ColumnOffset--;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
+				if (scrollRightPoint != null 
+					&& scrollRightPoint.Value.X == me.X
+					&& scrollRightPoint.Value.Y == me.Y)
+				{
+					ColumnOffset++;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
 				var hit = ScreenToCell (me.X, me.Y);
 				if (hit != null) {
 
@@ -1163,11 +1220,40 @@ namespace Terminal.Gui {
 				int colWidth;
 
 				// is there enough space for this column (and it's data)?
-				usedSpace += colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
 
-				// no (don't render it) unless its the only column we are render (that must be one massively wide column!)
-				if (!first && usedSpace > availableHorizontalSpace)
-					yield break;
+				// there is not enough space for this columns 
+				// visible content
+				if (usedSpace + colWidth > availableHorizontalSpace)
+				{
+					bool showColumn = false;
+
+					// if this column accepts flexible width rendering and
+					// is therefore happy rendering into less space
+					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 &&
+						// is there enough space to meet the MinAcceptableWidth
+						(availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth)
+					{
+						// show column and use use whatever space is 
+						// left for rendering it
+						showColumn = true;
+						colWidth = availableHorizontalSpace - usedSpace;
+					}
+
+					// If its the only column we are able to render then
+					// accept it anyway (that must be one massively wide column!)
+					if (first)
+					{
+						showColumn = true;
+					}
+
+					// no special exceptions and we are out of space
+					// so stop accepting new columns for the render area
+					if(!showColumn)
+						break;
+				}
+
+				usedSpace += colWidth;
 
 				// there is space
 				yield return new ColumnToRender (col, startingIdxForCurrentHeader,
@@ -1300,9 +1386,23 @@ namespace Terminal.Gui {
 			public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
 			/// <summary>
-			/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// Set the minimum width of the column in characters.  Setting this will ensure that
+			/// even when a column has short content/header it still fills a given width of the control.
+			/// 
+			/// <para>This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> 
+			/// or the <see cref="MaxWidth"/>
+			/// </para>
+			/// <remarks>
+			/// For setting a flexible column width (down to a lower limit) use <see cref="MinAcceptableWidth"/>
+			/// instead
+			/// </remarks>
 			/// </summary>
 			public int MinWidth { get; set; }
+
+			/// <summary>
+			/// Enables flexible sizing of this column based on available screen space to render into.
+			/// </summary>
+			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
@@ -1368,6 +1468,14 @@ namespace Terminal.Gui {
 			/// True to render a solid line vertical line between headers
 			/// </summary>
 			public bool ShowVerticalHeaderLines { get; set; } = true;
+
+			/// <summary>
+			/// True to render a arrows on the right/left of the table when 
+			/// there are more column(s) that can be scrolled to.  Requires
+			/// <see cref="ShowHorizontalHeaderUnderline"/> to be true.
+			/// Defaults to true
+			/// </summary>
+			public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
 			/// <summary>
 			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.

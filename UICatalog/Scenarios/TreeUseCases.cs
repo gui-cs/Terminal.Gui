@@ -75,6 +75,7 @@ namespace UICatalog.Scenarios {
 
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 
@@ -148,6 +149,7 @@ namespace UICatalog.Scenarios {
 
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 
@@ -180,6 +182,7 @@ namespace UICatalog.Scenarios {
 		{
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 

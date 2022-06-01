@@ -1840,12 +1840,12 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
+			waitForProbe.Set ();
+			winChange.Set ();
+
 			if (CheckTimers (wait, out var waitTimeout)) {
 				return true;
 			}
-
-			waitForProbe.Set ();
-			winChange.Set ();
 
 			try {
 				if (!tokenSource.IsCancellationRequested) {
