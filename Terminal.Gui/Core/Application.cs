@@ -106,6 +106,11 @@ namespace Terminal.Gui {
 		public static Toplevel Current { get; private set; }
 
 		/// <summary>
+		/// The current <see cref="View"/> object that wants continuous mouse button pressed events.
+		/// </summary>
+		public static View WantContinuousButtonPressedView { get; private set; }
+
+		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
 		public static bool HeightAsBuffer {
@@ -603,7 +608,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Func<KeyEvent, bool> RootKeyEvent;
 
-		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
 
 		static void ProcessMouseEvent (MouseEvent me)
@@ -615,9 +619,9 @@ namespace Terminal.Gui {
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed)
-				wantContinuousButtonPressedView = view;
+				WantContinuousButtonPressedView = view;
 			else
-				wantContinuousButtonPressedView = null;
+				WantContinuousButtonPressedView = null;
 			if (view != null) {
 				me.View = view;
 			}
@@ -676,9 +680,9 @@ namespace Terminal.Gui {
 					return;
 
 				if (view.WantContinuousButtonPressed)
-					wantContinuousButtonPressedView = view;
+					WantContinuousButtonPressedView = view;
 				else
-					wantContinuousButtonPressedView = null;
+					WantContinuousButtonPressedView = null;
 
 				// Should we bubbled up the event, if it is not handled?
 				view.OnMouseEvent (nme);

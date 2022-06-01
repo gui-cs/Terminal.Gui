@@ -1186,7 +1186,7 @@ namespace Terminal.Gui {
 					Flags = mouseFlag
 				};
 
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null) {
 					break;
 				}
