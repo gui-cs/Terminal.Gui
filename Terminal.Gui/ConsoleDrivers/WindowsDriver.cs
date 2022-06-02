@@ -910,7 +910,8 @@ namespace Terminal.Gui {
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState};EventFlags: {mouseEvent.EventFlags}");
+			//System.Diagnostics.Debug.WriteLine (
+			//	$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
 
 			if (isButtonDoubleClicked || isOneFingerDoubleClicked) {
 				Application.MainLoop.AddIdle (() => {
@@ -1014,21 +1015,16 @@ namespace Terminal.Gui {
 
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
-					point = new Point ();
 					isButtonReleased = false;
 					processButtonClick = false;
-				} else {
-					point = new Point () {
-						X = mouseEvent.MousePosition.X,
-						Y = mouseEvent.MousePosition.Y
-					};
 				}
+				point = p;
 				lastMouseButtonPressed = mouseEvent.ButtonState;
 				isButtonPressed = true;
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseEvent, mouseFlag));
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 						return false;
 					});
 				}
@@ -1175,14 +1171,13 @@ namespace Terminal.Gui {
 			//buttonPressedCount = 0;
 		}
 
-		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
+		async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
 		{
-			await Task.Delay (200);
 			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = mouseEvent.MousePosition.X,
-					Y = mouseEvent.MousePosition.Y,
+					X = point.X,
+					Y = point.Y,
 					Flags = mouseFlag
 				};
 
