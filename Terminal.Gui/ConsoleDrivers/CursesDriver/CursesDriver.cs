@@ -382,18 +382,16 @@ namespace Terminal.Gui {
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 					mouseFlag = MapCursesButton ((Curses.Event)lastMouseButtonPressed) | MouseFlags.ReportMousePosition;
-					point = new Point ();
 					cancelButtonClicked = true;
-				} else {
-					point = new Point () {
-						X = cev.X,
-						Y = cev.Y
-					};
 				}
+				point = new Point () {
+					X = cev.X,
+					Y = cev.Y
+				};
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync (cev, mouseFlag));
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 						return false;
 					});
 				}
@@ -480,14 +478,13 @@ namespace Terminal.Gui {
 			return mf;
 		}
 
-		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
 		{
-			await Task.Delay (200);
-			while (isButtonPressed && lastMouseButtonPressed != null) {
+			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = cev.X,
-					Y = cev.Y,
+					X = point.X,
+					Y = point.Y,
 					Flags = mouseFlag
 				};
 
