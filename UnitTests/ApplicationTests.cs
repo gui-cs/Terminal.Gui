@@ -1144,7 +1144,7 @@ namespace Terminal.Gui.Core {
 			var rs = Application.Begin (Application.Top);
 			Assert.Equal (Application.Top, rs.Toplevel);
 			Assert.Null (Application.mouseGrabView);
-			Assert.Null (Application.wantContinuousButtonPressedView);
+			Assert.Null (Application.WantContinuousButtonPressedView);
 			Assert.False (Application.DebugDrawBounds);
 			Assert.False (Application.ShowChild (Application.Top));
 			Application.End (Application.Top);
