@@ -48,16 +48,16 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
-			foreach (var scenarioClass in scenarioClasses) {
+			lock (FakeConsole.MockKeyPresses) {
 
-				// Setup some fake keypresses 
-				// Passing empty string will cause just a ctrl-q to be fired
-				FakeConsole.MockKeyPresses.Clear ();
-				int stackSize = CreateInput ("");
+				foreach (var scenarioClass in scenarioClasses) {
 
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+					// Setup some fake keypresses 
+					// Passing empty string will cause just a ctrl-q to be fired
+					FakeConsole.MockKeyPresses.Clear ();
+					int stackSize = CreateInput ("");
 
-				lock (FakeConsole.MockKeyPresses) {
+					Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 					int iterations = 0;
 					Application.Iteration = () => {
@@ -97,7 +97,8 @@ namespace Terminal.Gui {
 
 					if (abortCount != 0) {
 						output.WriteLine ($"Scenario {scenarioClass} had abort count of {abortCount}");
-					} else if (iterations > 1) {
+					}
+					if (iterations > 1) {
 						output.WriteLine ($"Scenario {scenarioClass} had iterations count of {iterations}");
 					}
 

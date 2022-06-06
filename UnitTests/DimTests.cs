@@ -610,12 +610,12 @@ namespace Terminal.Gui.Core {
 					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 					view.Add (label);
 					Assert.Equal ($"Label {count}", label.Text);
-					Assert.Equal ($"Pos.Absolute({count})", label.Y.ToString ());
+					Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
 
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 					view.Height += 1;
 					count++;
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
@@ -675,7 +675,10 @@ namespace Terminal.Gui.Core {
 					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
 					view.Height -= 1;
 					count--;
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					if (count == 0)
+						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+					else
+						Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
 				}
 			};
 
