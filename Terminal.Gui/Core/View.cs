@@ -622,7 +622,7 @@ namespace Terminal.Gui {
 
 		void SetMinWidthHeight ()
 		{
-			if (IsInitialized && !AutoSize) {
+			if (IsInitialized && !AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 				case true:
 					var colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
