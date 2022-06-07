@@ -486,6 +486,8 @@ namespace Terminal.Gui {
 		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
+			var focused = HasFocus;
+
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs(Table,rowToRender))) ?? ColorScheme;
 
@@ -495,8 +497,18 @@ namespace Terminal.Gui {
 
 			//start by clearing the entire line
 			Move (0, row);
-			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus
-				: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+			Attribute color;
+
+			if(FullRowSelect && IsSelected (0, rowToRender)) {
+				color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+			}
+			else 
+			{
+				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+			}
+
+			Driver.SetAttribute (color);
 			Driver.AddStr (new string (' ', Bounds.Width));
 
 			// Render cells for each visible header for the current row
@@ -547,8 +559,14 @@ namespace Terminal.Gui {
 								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
-					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
-						: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+					if(isSelectedCell) {
+						color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+					}
+					else {
+						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+					}
+					Driver.SetAttribute (color);
 				}
 
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
