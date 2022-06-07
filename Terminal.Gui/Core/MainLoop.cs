@@ -64,7 +64,9 @@ namespace Terminal.Gui {
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		/// <summary>
-		/// Gets the list of all timeouts.
+		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks./>.
+		/// A shorter limit time can be added at the end, but it will be called before an
+		///  earlier addition that has a longer limit time.
 		/// </summary>
 		public SortedList<long, Timeout> Timeouts => timeouts;
 
@@ -145,7 +147,7 @@ namespace Terminal.Gui {
 		{
 			lock (timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
-				timeouts.Add (NudgeToUniqueKey(k), timeout);
+				timeouts.Add (NudgeToUniqueKey (k), timeout);
 				TimeoutAdded?.Invoke (k);
 			}
 		}
@@ -214,7 +216,7 @@ namespace Terminal.Gui {
 						AddTimeout (timeout.Span, timeout);
 				} else {
 					lock (timeoutsLockToken) {
-						timeouts.Add (NudgeToUniqueKey(k), timeout);
+						timeouts.Add (NudgeToUniqueKey (k), timeout);
 					}
 				}
 			}
@@ -228,7 +230,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private long NudgeToUniqueKey (long k)
 		{
-			lock(timeoutsLockToken) {
+			lock (timeoutsLockToken) {
 				while (timeouts.ContainsKey (k)) {
 					k++;
 				}

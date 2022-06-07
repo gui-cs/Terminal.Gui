@@ -216,8 +216,8 @@ namespace Terminal.Gui {
 		public static bool IsMouseDisabled { get; set; }
 
 		/// <summary>
-		/// By default this is false which will continue executing the <see cref="RunLoop(RunState, bool)"/> method,
-		/// if you pass true, the method will exit after the first iteration.
+		/// Set to true to cause the RunLoop method to exit after the first iterations.
+		/// Set to false (the default) to cause the RunLoop to continue running until Application.RequestStop() is called.
 		/// </summary>
 		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
 
@@ -979,17 +979,17 @@ namespace Terminal.Gui {
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (ExitRunLoopAfterFirstIteration && !firstIteration)
 					return;
-				RunIteration (ref state, wait, ref firstIteration);
+				RunMainLoopIteration (ref state, wait, ref firstIteration);
 			}
 		}
 
 		/// <summary>
-		/// Run the <see cref="RunLoop(RunState, bool)"/> iteration.
+		/// Run one iteration of the MainLoop.
 		/// </summary>
 		/// <param name="state">The state returned by the Begin method.</param>
 		/// <param name="wait">If will execute the runloop waiting for events.</param>
 		/// <param name="firstIteration">If it's the first run loop iteration.</param>
-		public static void RunIteration (ref RunState state, bool wait, ref bool firstIteration)
+		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)
 		{
 			if (MainLoop.EventsPending (wait)) {
 				// Notify Toplevel it's ready
