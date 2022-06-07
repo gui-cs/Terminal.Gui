@@ -548,7 +548,12 @@ namespace Terminal.Gui {
 					scheme = rowScheme;
 				}
 
-				var cellColor = isSelectedCell ? scheme.HotFocus : Enabled ? scheme.Normal : scheme.Disabled;
+				Attribute cellColor;
+				if (isSelectedCell) {
+					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+				} else {
+					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
+				}
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
