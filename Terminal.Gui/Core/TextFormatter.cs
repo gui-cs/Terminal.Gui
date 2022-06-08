@@ -309,7 +309,7 @@ namespace Terminal.Gui {
 		public List<ustring> Lines {
 			get {
 				// With this check, we protect against subclasses with overrides of Text
-				if (ustring.IsNullOrEmpty (Text)) {
+				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
 					lines = new List<ustring> ();
 					lines.Add (ustring.Empty);
 					NeedsFormat = false;
@@ -323,15 +323,18 @@ namespace Terminal.Gui {
 						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
 					}
-					if (Size.IsEmpty) {
-						throw new InvalidOperationException ("Size must be set before accessing Lines");
-					}
 
 					if (IsVerticalDirection (textDirection)) {
-						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1,
+						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1);
+						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth,
 							false, 0, textDirection);
-						if (!AutoSize && lines.Count > Size.Width) {
-							lines.RemoveRange (Size.Width, lines.Count - Size.Width);
+						if (!AutoSize) {
+							colsWidth = GetMaxColsForWidth (lines, Size.Width);
+							if (lines.Count > colsWidth) {
+								for (int i = colsWidth; i < lines.Count; i++) {
+									lines.Remove (lines [i]);
+								}
+							}
 						}
 					} else {
 						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1,
@@ -576,11 +579,15 @@ namespace Terminal.Gui {
 			var runes = text.ToRuneList ();
 			int slen = runes.Count;
 			if (slen > width) {
-				return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+				if (IsHorizontalDirection (textDirection)) {
+					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+				} else {
+					return ustring.Make (runes.GetRange (0, width));
+				}
 			} else {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
-				} else if (GetTextWidth (text) > width && IsHorizontalDirection (textDirection)) {
+				} else if (IsHorizontalDirection (textDirection) && GetTextWidth (text) > width) {
 					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
 				}
 				return text;
@@ -844,6 +851,28 @@ namespace Terminal.Gui {
 				runesLength += runeWidth;
 			}
 			return runeIdx;
+		}
+
+		/// <summary>
+		/// Gets the index position from the list based on the <paramref name="width"/>.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
+		/// <param name="width">The width.</param>
+		/// <returns>The index of the list that fit the width.</returns>
+		public static int GetMaxColsForWidth (List<ustring> lines, int width)
+		{
+			var runesLength = 0;
+			var lineIdx = 0;
+			for (; lineIdx < lines.Count; lineIdx++) {
+				var runes = lines [lineIdx].ToRuneList ();
+				var maxRruneWidth = runes.Count > 0
+					? runes.Max (r => Math.Max (Rune.ColumnWidth (r), 1)) : 1;
+				if (runesLength + maxRruneWidth > width) {
+					break;
+				}
+				runesLength += maxRruneWidth;
+			}
+			return lineIdx;
 		}
 
 		/// <summary>
