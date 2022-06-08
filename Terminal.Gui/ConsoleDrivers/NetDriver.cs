@@ -947,7 +947,7 @@ namespace Terminal.Gui {
 			await Task.Delay (200);
 			while (isButtonPressed) {
 				await Task.Delay (100);
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null) {
 					break;
 				}
@@ -1187,7 +1187,7 @@ namespace Terminal.Gui {
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
 		public override IClipboard Clipboard { get; }
-		internal override int [,,] Contents => contents;
+		public override int [,,] Contents => contents;
 
 		int largestWindowHeight;
 

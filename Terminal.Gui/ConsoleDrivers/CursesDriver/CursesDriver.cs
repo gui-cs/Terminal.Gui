@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 		IClipboard clipboard;
 		int [,,] contents;
 
-		internal override int [,,] Contents => contents;
+		public override int [,,] Contents => contents;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -488,7 +488,7 @@ namespace Terminal.Gui {
 					Flags = mouseFlag
 				};
 
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null)
 					break;
 				if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
