@@ -7,6 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
+using System.Reflection;
 
 namespace Terminal.Gui.Views {
 
@@ -548,24 +549,45 @@ namespace Terminal.Gui.Views {
 			tv.ProcessKey (new KeyEvent (Key.z, new KeyModifiers ()));
 			Assert.Equal ("R0C0", activatedValue);
 		}
+/*
+ * TODO: test this
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorTests_InvertSelectedCellFirstCharacter (bool focused)
+		{
+			var tv = SetUpMiniTable ();
+			tv.Style.InvertSelectedCellFirstCharacter = true;
+		}*/
 
-		[Fact]
-		public void TableView_ColorsTest_ColorGetter ()
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorsTest_ColorGetter (bool focused)
 		{
 			var tv = SetUpMiniTable ();
 
-			tv.Style.ExpandLastColumn = false;
-			tv.Style.InvertSelectedCellFirstCharacter = true;
-
 			// width exactly matches the max col widths
 			tv.Bounds = new Rect (0, 0, 5, 4);
-			
+
 			// Create a style for column B
 			var bStyle = tv.Style.GetOrCreateColumnStyle (tv.Table.Columns ["B"]);
 
 			// when B is 2 use the custom highlight colour
-			ColorScheme cellHighlight = new ColorScheme () { Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray) };
+			var cellHighlight = new ColorScheme () {
+				Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray),
+				HotNormal = Attribute.Make (Color.Green, Color.Blue),
+				HotFocus = Attribute.Make (Color.BrightYellow, Color.White),
+				Focus = Attribute.Make (Color.Cyan, Color.Magenta),
+			};
+
 			bStyle.ColorGetter = (a) => Convert.ToInt32(a.CellValue) == 2 ? cellHighlight : null;
+
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
 			tv.Redraw (tv.Bounds);
 
@@ -577,21 +599,55 @@ namespace Terminal.Gui.Views {
 ";
 			GraphViewTests.AssertDriverContentsAre (expected, output);
 
+
 			string expectedColors = @"
 00000
 00000
 00000
 01020
 ";
-			var invertedNormalColor = Application.Driver.MakeAttribute (tv.ColorScheme.Normal.Background, tv.ColorScheme.Normal.Foreground);
-
+			
 			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				invertedNormalColor,				
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal,
 				// 2
 				cellHighlight.Normal});
+
+
+			// change the value in the table so that
+			// it no longer matches the ColorGetter
+			// delegate conditional ( which checks for
+			// the value 2)
+			tv.Table.Rows[0][1] = 5;
+
+			tv.Redraw (tv.Bounds);
+			expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│5│
+";
+			GraphViewTests.AssertDriverContentsAre (expected, output);
+
+
+			expectedColors = @"
+00000
+00000
+00000
+01000
+";
+
+			// now we only see 2 colors used (the selected cell color and Normal
+			// cellHighlight should no longer be used because the delegate returned null
+			// (now that the cell value is 5 - which does not match the conditional)
+			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
+
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -615,10 +671,7 @@ namespace Terminal.Gui.Views {
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 
 			GraphViewTests.InitFakeDriver ();
-			tv.ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				HotFocus = Application.Driver.MakeAttribute (Color.White, Color.Black)
-			};
+			tv.ColorScheme = Colors.Base;
 			return tv;
 		}
 
