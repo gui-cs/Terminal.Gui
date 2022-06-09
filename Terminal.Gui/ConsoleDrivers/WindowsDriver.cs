@@ -1571,6 +1571,12 @@ namespace Terminal.Gui {
 			if (damageRegion.Left == -1)
 				return;
 
+			if (!HeightAsBuffer) {
+				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
+				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
+					return;
+			}
+
 			var bufferCoords = new WindowsConsole.Coord () {
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
