@@ -140,6 +140,10 @@ namespace Terminal.Gui {
 			/// </summary>
 			Right
 		}
+		/// <summary>
+		/// Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the 
+		/// bottom of the dialog. 
+		/// </summary>
 		public ButtonAlignments ButtonAlignment = Dialog.ButtonAlignments.Center;
 
 		void LayoutStartedHandler ()
