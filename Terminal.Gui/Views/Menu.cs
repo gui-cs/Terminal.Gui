@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDown, () => MoveDown ());
 			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
 			AddCommand (Command.Right, () => {
-				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
+				this.host.NextMenu (!this.barItems.IsTopLevel || (this.barItems.Children != null
 					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
 					current > -1 && host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
 				return true;
@@ -846,7 +846,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Used for change the navigation key style.
 		/// </summary>
-		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
+		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = false;
 
 		static ustring shortcutDelimiter = "+";
 		/// <summary>
@@ -1122,7 +1122,7 @@ namespace Terminal.Gui {
 		public virtual void OnMenuOpened ()
 		{
 			MenuItem mi = null;
-			if (openCurrentMenu.barItems.Children != null) {
+			if (openCurrentMenu.barItems.Children != null && openCurrentMenu?.current > -1) {
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
 			}
 			MenuOpened?.Invoke (mi);
@@ -1548,12 +1548,19 @@ namespace Terminal.Gui {
 							return;
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					} else if (subMenu != null ||
-						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
+						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu) {
 						selectedSub++;
-					else
+						openCurrentMenu.CheckSubMenu ();
+					} else {
+						if (CloseMenu (false, true, ignoreUseSubMenusSingleFrame)) {
+							NextMenu (false, ignoreUseSubMenusSingleFrame);
+						}
 						return;
+					}
+
 					SetNeedsDisplay ();
-					openCurrentMenu.CheckSubMenu ();
+					if (UseKeysUpDownAsKeysLeftRight)
+						openCurrentMenu.CheckSubMenu ();
 				}
 				break;
 			}
