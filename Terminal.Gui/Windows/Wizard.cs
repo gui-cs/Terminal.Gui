@@ -40,8 +40,6 @@ namespace Terminal.Gui {
 
 			private ustring nextButtonText = ustring.Empty;
 
-			private ustring cancelButtonText = ustring.Empty;
-
 			/// <summary>
 			/// Sets or gets the text for the back button.
 			/// </summary>
@@ -52,12 +50,6 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise it is "Finish"</remarks>
 			public ustring NextButtonText { get => nextButtonText; set => nextButtonText = value; }
-
-			/// <summary>
-			/// Sets or gets the text for the cancel button.
-			/// </summary>
-			/// <remarks>The default text is "Cancel"</remarks>
-			public ustring CancelButtonText { get => cancelButtonText; set => cancelButtonText = value; }
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -123,8 +115,6 @@ namespace Terminal.Gui {
 				//separator.X = Pos.Right (ControlPane);
 				//separator.Height = Dim.Fill ();
 				//this.Add (separator);
-
-				CancelButtonText = cancelButtonText;
 			}
 
 			private bool showHelp = true;
@@ -203,12 +193,6 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Button NextFinishButton { get => nextfinishBtn; }
 
-		private Button cancelBtn;
-		/// <summary>
-		/// Cancels the Wizard
-		/// </summary>
-		public Button CancelButton { get => cancelBtn; }
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
@@ -230,7 +214,8 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Wizard (ustring title)
 		{
-			
+			ButtonAlignment = ButtonAlignments.Justify;
+
 			//this.ColorScheme = Colors.TopLevel;
 
 			// Store the passed in title
@@ -249,9 +234,6 @@ namespace Terminal.Gui {
 			nextfinishBtn.IsDefault = true;
 			AddButton (nextfinishBtn);
 
-			cancelBtn = new Button ("_Cancel");
-			AddButton (cancelBtn);
-
 			backBtn.Clicked += () => {
 				var args = new WizardStepEventArgs ();
 				MovingBack?.Invoke (args);
@@ -260,10 +242,6 @@ namespace Terminal.Gui {
 						CurrentStep--;
 					}
 				}
-			};
-
-			cancelBtn.Clicked += () => {
-				Application.RequestStop (this);
 			};
 
 			nextfinishBtn.Clicked += () => {
