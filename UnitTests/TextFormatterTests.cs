@@ -69,7 +69,7 @@ namespace Terminal.Gui.Core {
 		public void TestSize_TextChange ()
 		{
 			var tf = new TextFormatter () { Text = "你" };
-			Assert.Equal (2,tf.Size.Width);
+			Assert.Equal (2, tf.Size.Width);
 			tf.Text = "你你";
 			Assert.Equal (4, tf.Size.Width);
 		}
@@ -3201,6 +3201,356 @@ e
 			text = "デモエムポンズ";
 			list = TextFormatter.Format (text, 3, false, false);
 			Assert.Equal ("デ", list [^1].ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_View_IsEmpty_False_Return_Null_Lines ()
+		{
+			var text = "Views";
+			var view = new View () {
+				Width = Dim.Fill () - text.Length,
+				Height = 1,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
+			Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "Vie" }, view.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+			var expected = @"
+┌ Wind ──┐
+│Vie     │
+│        │
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			view.Width = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
+			Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines);
+			expected = @"
+┌ Wind ──┐
+│        │
+│        │
+└────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_View_IsEmpty_True_Minimum_Height ()
+		{
+			var text = "Views";
+			var view = new View () {
+				Width = Dim.Fill () - text.Length,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
+			Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "Vie" }, view.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+			var expected = @"
+┌ Wind ──┐
+│Vie     │
+│        │
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			view.Width = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
+			Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
+			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines));
+			Assert.Null (exception);
+			expected = @"
+┌ Wind ──┐
+│        │
+│        │
+└────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_Label_IsEmpty_False_Return_Null_Lines ()
+		{
+			var text = "Label";
+			var label = new Label () {
+				Width = Dim.Fill () - text.Length,
+				Height = 1,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (label);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);
+			Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "Lab" }, label.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+			var expected = @"
+┌ Wind ──┐
+│Lab     │
+│        │
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			label.Width = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
+			Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { ustring.Empty }, label.TextFormatter.Lines);
+			expected = @"
+┌ Wind ──┐
+│        │
+│        │
+└────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_Label_IsEmpty_True_Minimum_Height ()
+		{
+			var text = "Label";
+			var label = new Label () {
+				Width = Dim.Fill () - text.Length,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (label);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);
+			Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "Lab" }, label.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+			var expected = @"
+┌ Wind ──┐
+│Lab     │
+│        │
+└────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			label.Width = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
+			Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
+			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, label.TextFormatter.Lines));
+			Assert.Null (exception);
+			expected = @"
+┌ Wind ──┐
+│        │
+│        │
+└────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 4), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_View_IsEmpty_True_Minimum_Width ()
+		{
+			var text = "Views";
+			var view = new View () {
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Height = Dim.Fill () - text.Length,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (4, 10);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 1, 3), view.Frame);
+			Assert.Equal (new Size (1, 3), view.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "Vie" }, view.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 4, 10), win.Frame);
+			Assert.Equal (new Rect (0, 0, 4, 10), Application.Top.Frame);
+			var expected = @"
+┌──┐
+│V │
+│i │
+│e │
+│  │
+│  │
+│  │
+│  │
+│  │
+└──┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 4, 10), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			view.Height = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 1, 0), view.Frame);
+			Assert.Equal (new Size (1, 0), view.TextFormatter.Size);
+			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines));
+			Assert.Null (exception);
+			expected = @"
+┌──┐
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+└──┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 4, 10), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Size_View_IsEmpty_True_Minimum_Width_Wide_Rune ()
+		{
+			var text = "界View";
+			var view = new View () {
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Height = Dim.Fill () - text.Length,
+				Text = text
+			};
+			var win = new Window ("Window") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (view);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (4, 10);
+
+			Assert.Equal (5, text.Length);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 3), view.Frame);
+			Assert.Equal (new Size (2, 3), view.TextFormatter.Size);
+			Assert.Equal (new List<ustring> () { "界Vi" }, view.TextFormatter.Lines);
+			Assert.Equal (new Rect (0, 0, 4, 10), win.Frame);
+			Assert.Equal (new Rect (0, 0, 4, 10), Application.Top.Frame);
+			var expected = @"
+┌──┐
+│界│
+│V │
+│i │
+│  │
+│  │
+│  │
+│  │
+│  │
+└──┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 4, 10), pos);
+
+			text = "0123456789";
+			Assert.Equal (10, text.Length);
+			view.Height = Dim.Fill () - text.Length;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 2, 0), view.Frame);
+			Assert.Equal (new Size (2, 0), view.TextFormatter.Size);
+			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines));
+			Assert.Null (exception);
+			expected = @"
+┌──┐
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+│  │
+└──┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
 	}
 }

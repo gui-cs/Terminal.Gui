@@ -571,6 +571,7 @@ namespace Terminal.Gui {
 				if (autoSize && value.Anchor (0) != TextFormatter.Size.Width) {
 					autoSize = false;
 				}
+				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				if (width is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, width.Anchor (0), frame.Height);
@@ -596,6 +597,7 @@ namespace Terminal.Gui {
 				if (autoSize && value.Anchor (0) != TextFormatter.Size.Height) {
 					autoSize = false;
 				}
+				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				if (height is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, frame.Width, height.Anchor (0));
@@ -616,6 +618,25 @@ namespace Terminal.Gui {
 				}
 			}
 			return false;
+		}
+
+		void SetMinWidthHeight ()
+		{
+			if (IsInitialized && !AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+				case true:
+					var colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
+					if (Width == null || (Width is Dim.DimAbsolute && Width.Anchor (0) < colWidth)) {
+						width = colWidth;
+					}
+					break;
+				default:
+					if (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)) {
+						height = 1;
+					}
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -2288,6 +2309,7 @@ namespace Terminal.Gui {
 				} else if (!canResize && TextFormatter.Size != Bounds.Size) {
 					TextFormatter.Size = Bounds.Size;
 				}
+				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				SetNeedsDisplay (new Rect (new Point (0, 0),
 					new Size (Math.Max (frame.Width, prevSize.Width), Math.Max (frame.Height, prevSize.Height))));
@@ -2359,11 +2381,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool isInitialized;
+
 		/// <summary>
 		/// Get or sets if  the <see cref="View"/> was already initialized.
 		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
 		/// </summary>
-		public virtual bool IsInitialized { get; set; }
+		public virtual bool IsInitialized {
+			get => isInitialized;
+			set {
+				isInitialized = value;
+				SetMinWidthHeight ();
+			}
+		}
 
 		bool oldEnabled;
 

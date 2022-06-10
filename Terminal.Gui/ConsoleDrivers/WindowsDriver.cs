@@ -732,7 +732,7 @@ namespace Terminal.Gui {
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 		public override IClipboard Clipboard => clipboard;
-		internal override int [,,] Contents => contents;
+		public override int [,,] Contents => contents;
 
 		public WindowsConsole WinConsole { get; private set; }
 
@@ -1181,7 +1181,7 @@ namespace Terminal.Gui {
 					Flags = mouseFlag
 				};
 
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null) {
 					break;
 				}
@@ -1570,6 +1570,12 @@ namespace Terminal.Gui {
 		{
 			if (damageRegion.Left == -1)
 				return;
+
+			if (!HeightAsBuffer) {
+				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
+				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
+					return;
+			}
 
 			var bufferCoords = new WindowsConsole.Coord () {
 				X = (short)Clip.Width,

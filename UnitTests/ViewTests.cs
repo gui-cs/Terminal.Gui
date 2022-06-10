@@ -2352,5 +2352,91 @@ Y
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (Rect.Empty, pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
+		{
+			var text = $"First line{Environment.NewLine}Second line";
+			var horizontalView = new View () {
+				Width = 20,
+				Text = text
+			};
+			var verticalView = new View () {
+				Y = 3,
+				Height = 20,
+				Text = text,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = "Window"
+			};
+			win.Add (horizontalView, verticalView);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
+
+			Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
+			Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
+			var expected = @"
+┌────────────────────┐
+│First line Second li│
+│                    │
+│                    │
+│F                   │
+│i                   │
+│r                   │
+│s                   │
+│t                   │
+│                    │
+│l                   │
+│i                   │
+│n                   │
+│e                   │
+│                    │
+│S                   │
+│e                   │
+│c                   │
+│o                   │
+│n                   │
+│d                   │
+└────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			verticalView.Text = $"最初の行{Environment.NewLine}二行目";
+			Application.Top.Redraw (Application.Top.Bounds);
+			Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
+			expected = @"
+┌────────────────────┐
+│First line Second li│
+│                    │
+│                    │
+│最                  │
+│初                  │
+│の                  │
+│行                  │
+│                    │
+│二                  │
+│行                  │
+│目                  │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+		}
 	}
 }

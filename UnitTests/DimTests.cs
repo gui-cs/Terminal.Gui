@@ -642,6 +642,55 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void Dim_Add_Operator_With_Text ()
+		{
+
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("View") { X = 0, Y = 0, Width = 20, Height = 0 };
+			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
+			var count = 0;
+
+			field.KeyDown += (k) => {
+				if (k.KeyEvent.Key == Key.Enter) {
+					field.Text = $"Label {count}";
+					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+					view.Add (label);
+					Assert.Equal ($"Label {count}", label.Text);
+					Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+					view.Height += 1;
+					count++;
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+				}
+			};
+
+			Application.Iteration += () => {
+				while (count < 20) {
+					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				}
+
+				Application.RequestStop ();
+			};
+
+			var win = new Window ();
+			win.Add (view);
+			win.Add (field);
+
+			top.Add (win);
+
+			Application.Run (top);
+
+			Assert.Equal (20, count);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
 		public void Dim_Subtract_Operator ()
 		{
 
@@ -676,6 +725,69 @@ namespace Terminal.Gui.Core {
 					view.Height -= 1;
 					count--;
 					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+				}
+			};
+
+			Application.Iteration += () => {
+				while (count > 0) {
+					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				}
+
+				Application.RequestStop ();
+			};
+
+			var win = new Window ();
+			win.Add (view);
+			win.Add (field);
+
+			top.Add (win);
+
+			Application.Run (top);
+
+			Assert.Equal (0, count);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Dim_Subtract_Operator_With_Text ()
+		{
+
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("View") { X = 0, Y = 0, Width = 20, Height = 0 };
+			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
+			var count = 20;
+			var listLabels = new List<Label> ();
+
+			for (int i = 0; i < count; i++) {
+				field.Text = $"Label {i}";
+				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+				view.Add (label);
+				Assert.Equal ($"Label {i}", label.Text);
+				Assert.Equal ($"Pos.Absolute({i})", label.Y.ToString ());
+				listLabels.Add (label);
+
+				Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
+				view.Height += 1;
+				Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+			}
+
+			field.KeyDown += (k) => {
+				if (k.KeyEvent.Key == Key.Enter) {
+					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
+					view.Remove (listLabels [count - 1]);
+
+					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					view.Height -= 1;
+					count--;
+					if (count == 0)
+						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+					else
+						Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
 				}
 			};
 
