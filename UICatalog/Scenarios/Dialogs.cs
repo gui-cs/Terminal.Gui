@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
-				Height = 10
+				Height = 15
 			};
 			Win.Add (frame);
 
@@ -92,10 +92,25 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (numButtonsEdit);
 
+
+			label = new Label ("Button Style:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+			};
+			frame.Add (styleRadioGroup);
+
 			void Top_Loaded ()
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-					+ Dim.Height (numButtonsEdit) + 2;
+					+ Dim.Height (numButtonsEdit) + Dim.Height(styleRadioGroup) + 2;
 				Top.Loaded -= Top_Loaded;
 			}
 			Top.Loaded += Top_Loaded;
@@ -145,7 +160,10 @@ namespace UICatalog.Scenarios {
 					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 					// the buttons are laid out correctly
 					var dialog = new Dialog (titleEdit.Text, width, height,
-						buttons.ToArray ());
+						buttons.ToArray ()) {
+						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
+					};
+
 					var add = new Button ("Add a button") {
 						X = Pos.Center (),
 						Y = Pos.Center ()
