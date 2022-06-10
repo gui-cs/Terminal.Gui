@@ -119,8 +119,15 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.refresh ();
+			ProcessWinChange ();
+		}
+
+		private void ProcessWinChange ()
+		{
 			if (Curses.CheckWinChange ()) {
 				Clip = new Rect (0, 0, Cols, Rows);
+				Console.Out.Write ("\x1b[3J");
+				Console.Out.Flush ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
 			}
@@ -625,10 +632,7 @@ namespace Terminal.Gui {
 
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
-					if (Curses.CheckWinChange ()) {
-						TerminalResized?.Invoke ();
-						return;
-					}
+					ProcessWinChange ();
 				}
 				if (wch == Curses.KeyMouse) {
 					Curses.getmouse (out Curses.MouseEvent ev);
@@ -802,11 +806,7 @@ namespace Terminal.Gui {
 			});
 
 			mLoop.WinChanged += () => {
-				if (Curses.CheckWinChange ()) {
-					Clip = new Rect (0, 0, Cols, Rows);
-					UpdateOffScreen ();
-					TerminalResized?.Invoke ();
-				}
+				ProcessWinChange ();
 			};
 		}
 

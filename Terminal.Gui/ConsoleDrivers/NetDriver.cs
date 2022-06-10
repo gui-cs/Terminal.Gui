@@ -1423,6 +1423,8 @@ namespace Terminal.Gui {
 				}
 			}
 			Clip = new Rect (0, 0, Cols, Rows);
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
@@ -1442,8 +1444,6 @@ namespace Terminal.Gui {
 						}
 					}
 				} catch (IndexOutOfRangeException) { }
-
-				winChanging = false;
 			}
 		}
 
@@ -1462,7 +1462,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
+			if (Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
 				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
 				|| (HeightAsBuffer && Rows != largestWindowHeight)) {
 				return;
@@ -1815,11 +1815,8 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool winChanging;
-
 		void ChangeWin ()
 		{
-			winChanging = true;
 			const int Min_WindowWidth = 14;
 			Size size = new Size ();
 			if (!HeightAsBuffer) {
@@ -1836,9 +1833,7 @@ namespace Terminal.Gui {
 			rows = size.Height;
 			ResizeScreen ();
 			UpdateOffScreen ();
-			if (!winChanging) {
-				TerminalResized.Invoke ();
-			}
+			TerminalResized?.Invoke ();
 		}
 
 		MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
