@@ -178,7 +178,7 @@ Edit
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MenuOpened_MenuItem_Arg_Is_Null_If_OpenCurrentMenu_Current_Is_Minus_One_Disabled ()
+		public void MenuOpened_On_Disabled_MenuItem ()
 		{
 			MenuItem miCurrent = null;
 			Menu mCurrent = null;
@@ -216,7 +216,18 @@ Edit
 				View = mCurrent
 			}));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Null (miCurrent);
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_New", miCurrent.Title);
+
+			Assert.True (mCurrent.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 2,
+				Flags = MouseFlags.ReportMousePosition,
+				View = mCurrent
+			}));
+			Assert.True (menu.IsMenuOpen);
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_Save", miCurrent.Title);
 
 			// close the menu
 			Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -228,7 +239,7 @@ Edit
 			Assert.False (menu.IsMenuOpen);
 
 			// open the menu
-			Assert.True (menu.ProcessHotKey(new KeyEvent(Key.F9, new KeyModifiers())));
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_New", miCurrent.Parent.Title);
 			Assert.Equal ("_New doc", miCurrent.Title);
@@ -240,7 +251,8 @@ Edit
 
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Null (miCurrent);
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_New", miCurrent.Title);
 
 			// close the menu
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
@@ -375,7 +387,7 @@ Edit
 			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
-			Assert.Equal ("None", GetCurrentMenuTitle ());
+			Assert.Equal ("_About", GetCurrentMenuTitle ());
 
 			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
@@ -434,7 +446,7 @@ Edit
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
-			Assert.Equal ("None", GetCurrentMenuTitle ());
+			Assert.Equal ("_About", GetCurrentMenuTitle ());
 
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
@@ -464,7 +476,7 @@ Edit
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
-			Assert.Equal ("None", GetCurrentMenuTitle ());
+			Assert.Equal ("_About", GetCurrentMenuTitle ());
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());

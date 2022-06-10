@@ -1124,6 +1124,10 @@ namespace Terminal.Gui {
 			MenuItem mi = null;
 			if (openCurrentMenu.barItems.Children != null && openCurrentMenu?.current > -1) {
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
+			} else if (openCurrentMenu.barItems.IsTopLevel) {
+				mi = openCurrentMenu.barItems;
+			} else {
+				mi = openMenu.barItems.Children [openMenu.current];
 			}
 			MenuOpened?.Invoke (mi);
 		}
@@ -1395,7 +1399,9 @@ namespace Terminal.Gui {
 
 		void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
 		{
-			if (openSubMenu == null || (UseSubMenusSingleFrame && !ignoreUseSubMenusSingleFrame && openSubMenu.Count > 0))
+			if (openSubMenu == null || (UseSubMenusSingleFrame
+				&& !ignoreUseSubMenusSingleFrame && openSubMenu.Count == 0))
+
 				return;
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
 				isMenuClosing = true;
@@ -1542,13 +1548,15 @@ namespace Terminal.Gui {
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					}
 				} else {
-					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
+					var subMenu = openCurrentMenu.current > -1
+						? openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current])
+						: null;
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
 						if (openSubMenu != null && !CloseMenu (false, true))
 							return;
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
-					} else if (subMenu != null ||
-						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu) {
+					} else if (subMenu != null || (openCurrentMenu.current > -1
+						&& !openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)) {
 						selectedSub++;
 						openCurrentMenu.CheckSubMenu ();
 					} else {
