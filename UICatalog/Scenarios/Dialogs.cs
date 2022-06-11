@@ -148,9 +148,12 @@ namespace UICatalog.Scenarios {
 			};
 			showDialogButton.Clicked += () => {
 				try {
-					int width = int.Parse (widthEdit.Text.ToString ());
-					int height = int.Parse (heightEdit.Text.ToString ());
-					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
+					int width = 0;
+					int.TryParse (widthEdit.Text.ToString (), out width);
+					int height = 0;
+					int.TryParse (heightEdit.Text.ToString (), out height);
+					int numButtons = 3;
+					int.TryParse (numButtonsEdit.Text.ToString (), out numButtons);
 
 					var buttons = new List<Button> ();
 					var clicked = -1;
