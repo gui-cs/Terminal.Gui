@@ -125,9 +125,7 @@ namespace Terminal.Gui {
 		private void ProcessWinChange ()
 		{
 			if (Curses.CheckWinChange ()) {
-				Clip = new Rect (0, 0, Cols, Rows);
-				Console.Out.Write ("\x1b[3J");
-				Console.Out.Flush ();
+				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
 			}
@@ -871,6 +869,9 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
+			ResizeScreen ();
+			UpdateOffScreen ();
+
 			//HLine = Curses.ACS_HLINE;
 			//VLine = Curses.ACS_VLINE;
 			//Stipple = Curses.ACS_CKBOARD;
@@ -893,8 +894,7 @@ namespace Terminal.Gui {
 			Colors.Dialog = new ColorScheme ();
 			Colors.Menu = new ColorScheme ();
 			Colors.Error = new ColorScheme ();
-			Clip = new Rect (0, 0, Cols, Rows);
-			UpdateOffScreen ();
+
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
@@ -960,6 +960,13 @@ namespace Terminal.Gui {
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
+		}
+
+		void ResizeScreen ()
+		{
+			Clip = new Rect (0, 0, Cols, Rows);
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
