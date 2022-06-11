@@ -82,7 +82,9 @@ namespace Terminal.Gui {
 					};
 					var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
-					var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
+					Scenario scenario = null;
+					var exception = Record.Exception (() => scenario = (Scenario)Activator.CreateInstance (scenarioClass));
+					Assert.Null (exception);
 					scenario.Init (Application.Top, Colors.Base);
 					scenario.Setup ();
 					// There is no need to call Application.Begin because Init already creates the Application.Top
