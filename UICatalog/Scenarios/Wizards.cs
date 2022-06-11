@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var widthEdit = new TextField ("0") {
+			var widthEdit = new TextField ("80") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -45,22 +45,13 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var heightEdit = new TextField ("0") {
+			var heightEdit = new TextField ("20") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
 				Height = 1
 			};
 			frame.Add (heightEdit);
-
-			frame.Add (new Label ("If height & width are both 0,") {
-				X = Pos.Right (widthEdit) + 2,
-				Y = Pos.Top (widthEdit),
-			});
-			frame.Add (new Label ("the Wizard will size to 80% of container.") {
-				X = Pos.Right (heightEdit) + 2,
-				Y = Pos.Top (heightEdit),
-			});
 
 			label = new Label ("Title:") {
 				X = 0,
@@ -109,8 +100,12 @@ namespace UICatalog.Scenarios {
 					int width = int.Parse (widthEdit.Text.ToString ());
 					int height = int.Parse (heightEdit.Text.ToString ());
 
-					var wizard = new Wizard ();
-					wizard.Title = titleEdit.Text;
+					var wizard = new Wizard () {
+						Title = titleEdit.Text,
+						Width = width,
+						Height = height
+					};
+
 					wizard.MovingBack += (args) => {
 						//args.Cancel = true;
 						actionLabel.Text = "Moving Back";
@@ -131,7 +126,7 @@ namespace UICatalog.Scenarios {
 					wizard.AddStep (firstStep);
 					firstStep.ShowControls = false;
 					firstStep.NextButtonText = "Accept";
-					firstStep.HelpText = "This is the End User License Agreement.\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\n\n\n\n\n\n\nTHe end of the EULA.";
+					firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");

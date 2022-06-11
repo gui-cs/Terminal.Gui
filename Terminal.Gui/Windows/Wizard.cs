@@ -6,16 +6,21 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Provides a step-based "wizard" UI. The Wizard supports multiple steps. Each step (<see cref="WizardStep"/>) can host 
 	/// arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step also has a pane for help text. Along the
-	/// bottom of the Wizard view are buttons enabling the user to navigate through the Wizard. 
+	/// bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard. 
 	/// </summary>
 	/// <remarks>
 	/// </remarks>
 	public class Wizard : Dialog {
 
 		/// <summary>
-		/// One step for the Wizard.
+		/// One step for the Wizard. The <see cref="WizardStep"/> view hosts two sub-views: 1) add <see cref="View"/>s to <see cref="WizardStep.Controls"/>, 
+		/// 2) use <see cref="WizardStep.HelpText"/> to set the contents of the <see cref="TextView"/> that shows on the
+		/// right side. Use <see cref="WizardStep.showControls"/> and <see cref="WizardStep.showHelp"/> to 
+		/// control wether the control or help pane are shown. 
 		/// </summary>
 		/// <remarks>
+		/// If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
+		/// with the Next button of the Wizard.
 		/// </remarks>
 		public class WizardStep : View {
 
@@ -25,26 +30,36 @@ namespace Terminal.Gui {
 			public ustring Title;
 
 			private View controlPane = new FrameView ();
+
 			/// <summary>
-			/// THe pane that holds the controls for the <see cref="WizardStep"/>.
+			/// THe pane that holds the controls for the <see cref="WizardStep"/>. Use <see cref="WizardStep.Controls"/> `Add(View`) to add 
+			/// controls. Note that the Controls view is sized to take 70% of the Wizard's width and the <see cref="WizardStep.HelpText"/> 
+			/// takes the other 30%. This can be adjusted by setting `Width` from `Dim.Percent(70)` to 
+			/// another value. If <see cref="WizardStep.ShowHelp"/> is set to `false` the control pane will fill the entire 
+			/// Wizard.
 			/// </summary>
 			public View Controls { get => controlPane; }
 
 			private TextView helpTextView = new TextView ();
+
 			/// <summary>
-			/// The pane that displays help or the <see cref="WizardStep"/>.
+			/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.ShowHelp"/> is set to 
+			/// `false` the control pane will fill the entire wizard.
 			/// </summary>
+			/// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
 			public ustring HelpText { get => helpTextView.Text; set => helpTextView.Text = value; }
 
 			private ustring backButtonText = ustring.Empty;
 
-			private ustring nextButtonText = ustring.Empty;
-
 			/// <summary>
-			/// Sets or gets the text for the back button.
+			/// Sets or gets the text for the back button. The back button will only be visible on 
+			/// steps after the first step.
 			/// </summary>
 			/// <remarks>The default text is "Back"</remarks>
 			public ustring BackButtonText { get => backButtonText; set => backButtonText = value; }
+
+			private ustring nextButtonText = ustring.Empty;
+
 			/// <summary>
 			/// Sets or gets the text for the next/finish button.
 			/// </summary>
@@ -74,7 +89,6 @@ namespace Terminal.Gui {
 				this.Add (Controls);
 
 				helpTextView.ColorScheme = Colors.Menu;
-				//helpTextView.Border.Padding = new Thickness (0, 0, 0, 0);
 				helpTextView.Y = 0;
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
@@ -110,16 +124,11 @@ namespace Terminal.Gui {
 					scrollBar.Refresh ();
 				};
 				this.Add (scrollBar);
-
-				//separator = new LineView (Graphs.Orientation.Vertical);
-				//separator.X = Pos.Right (ControlPane);
-				//separator.Height = Dim.Fill ();
-				//this.Add (separator);
 			}
 
 			private bool showHelp = true;
 			/// <summary>
-			/// If true (the default) the help pane will be visible. If false, the help pane will not be shown and the control pane will
+			/// If true (the default) the help will be visible. If false, the help will not be shown and the control pane will
 			/// fill the wizard step.
 			/// </summary>
 			public bool ShowHelp {
@@ -132,7 +141,7 @@ namespace Terminal.Gui {
 
 			private bool showControls = true;
 			/// <summary>
-			/// If true (the default) the help pane will be visible. If false, the help pane will not be shown and the control pane will
+			/// If true (the default) the <see cref="Controls"/> View will be visible. If false, the controls will not be shown and the help will
 			/// fill the wizard step.
 			/// </summary>
 			public bool ShowControls {
@@ -142,6 +151,7 @@ namespace Terminal.Gui {
 					ShowHide ();
 				}
 			}
+
 			private void ShowHide ()
 			{
 				Controls.Height = Dim.Fill (1);
@@ -197,8 +207,8 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <remarks>
-		/// The Wizard will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// The Wizard will be vertically and horizontally centered in the container.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
 		/// </remarks>
 		public Wizard () : this (ustring.Empty)
 		{
@@ -209,17 +219,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">Title for the Wizard.</param>
 		/// <remarks>
-		/// The Wizard will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// The Wizard will be vertically and horizontally centered in the container.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
 		/// </remarks>
 		public Wizard (ustring title)
 		{
 			ButtonAlignment = ButtonAlignments.Justify;
+			this.Border.BorderStyle = BorderStyle.Double;
 
-			//this.ColorScheme = Colors.TopLevel;
-
-			// Store the passed in title
-			this.title = title;
+			// Store the passed in title in Dialog's Title
+			base.Title = title;
 
 			// Add a horiz separator
 			var separator = new LineView (Graphs.Orientation.Horizontal) {
@@ -276,9 +285,11 @@ namespace Terminal.Gui {
 		private int currentStep = 0;
 
 		/// <summary>
-		/// Adds a step to the wizard.
+		/// Adds a step to the wizard. The Next and Back buttons navigate through the added steps in the
+		/// order they were added.
 		/// </summary>
 		/// <param name="newStep"></param>
+		/// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
 		public void AddStep (WizardStep newStep)
 		{
 			steps.Add (newStep);
@@ -303,7 +314,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public new ustring Title {
 			get {
-				return title;
+				return base.Title;
 			}
 			set {
 				title = value;
