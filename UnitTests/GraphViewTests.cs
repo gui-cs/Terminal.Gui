@@ -240,7 +240,7 @@ namespace Terminal.Gui.Views {
 
 					var match = expectedColors.Where (e => e.Value == val).ToList ();
 					if (match.Count == 0) {
-						throw new Exception ($"Unexpected color {val} was used at row {r} and col {c}.  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value))})");
+						throw new Exception ($"Unexpected color {DescribeColor (val)} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value))})");
 					} else if (match.Count > 1) {
 						throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 					}
@@ -249,12 +249,18 @@ namespace Terminal.Gui.Views {
 					var userExpected = line [c];
 
 					if (colorUsed != userExpected) {
-						throw new Exception ($"Colors used did not match expected at row {r} and col {c}.  Color index used was {colorUsed} but test expected {userExpected} (these are indexes into the expectedColors array)");
+						throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor(colorUsed)} but test expected {DescribeColor(userExpected)} (these are indexes into the expectedColors array)");
 					}
 				}
 
 				r++;
 			}
+		}
+
+		private static object DescribeColor (int userExpected)
+		{
+			var a = new Attribute (userExpected);
+			return $"{a.Foreground},{a.Background}";
 		}
 
 		#region Screen to Graph Tests

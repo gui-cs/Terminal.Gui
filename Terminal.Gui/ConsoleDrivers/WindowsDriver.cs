@@ -1436,6 +1436,8 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
