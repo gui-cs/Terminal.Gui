@@ -64,7 +64,7 @@ namespace Terminal.Gui.Views {
 			var title = "1234";
 			var stepTitle = " - ABCD";
 
-			int width = 30;
+			int width = 40;
 			int height = 4;
 			d.SetBufferSize (width, height);
 
