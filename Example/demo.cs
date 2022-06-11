@@ -651,11 +651,17 @@ static class Demo {
 					new MenuItem [] { menuItems [0], menuItems [1] }),
 				menuItems[3],
 				miUseKeysUpDownAsKeysLeftRight = new MenuItem ("Use_KeysUpDownAsKeysLeftRight", "",
-				() => menu.UseKeysUpDownAsKeysLeftRight = miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = !useKeysUpDownAsKeysLeftRight) {
+				() => {
+				menu.UseKeysUpDownAsKeysLeftRight = miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = !useKeysUpDownAsKeysLeftRight;
+					miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = menu.UseSubMenusSingleFrame;
+					}) {
 					CheckType = MenuItemCheckStyle.Checked, Checked = useKeysUpDownAsKeysLeftRight
 				},
 				miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
-				() => menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
+				() => {
+				menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame;
+					miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = menu.UseKeysUpDownAsKeysLeftRight;
+					}) {
 					CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
 				},
 				miHeightAsBuffer = new MenuItem ("_Height As Buffer", "", () => {
