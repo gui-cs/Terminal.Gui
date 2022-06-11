@@ -654,7 +654,8 @@ namespace Terminal.Gui {
 				if (current >= barItems.Children.Length) {
 					current = 0;
 				}
-				if (this != host.openCurrentMenu && barItems.Children [current].IsFromSubMenu && host.selectedSub > -1) {
+				if (this != host.openCurrentMenu && barItems.Children [current] != null
+					&& barItems.Children [current].IsFromSubMenu && host.selectedSub > -1) {
 					host.PreviousMenu (true);
 					host.SelectEnabledItem (barItems.Children, current, out current);
 					host.openCurrentMenu = this;
