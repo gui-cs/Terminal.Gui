@@ -1319,7 +1319,7 @@ namespace Terminal.Gui.Core {
 							// let the timeouts run for a bit
 							Task.Delay (5000).Wait ();
 
-							// then tell the application to quuit
+							// then tell the application to quit
 							Application.MainLoop.Invoke (() => Application.RequestStop ());
 						}
 					});
