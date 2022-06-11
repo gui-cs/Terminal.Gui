@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using NStack;
+using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios {
 
@@ -26,7 +27,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miLeft;
 		private MenuItem miRight;
 		private MenuItem miCentered;
-		private Label selectedCellLabel;
+		private TextField selectedCellLabel;
 
 		public override void Setup ()
 		{
@@ -78,14 +79,14 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tableView);
 
-			selectedCellLabel = new Label(){
+			selectedCellLabel = new TextField(){
 				X = 0,
 				Y = Pos.Bottom(tableView),
 				Text = "0,0",
 				Width = Dim.Fill(),
-				TextAlignment = TextAlignment.Right
-				
+				TextAlignment = TextAlignment.Right				
 			};
+			selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
 
 			Win.Add(selectedCellLabel);
 
@@ -96,10 +97,26 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar();
 		}
 
+		private void SelectedCellLabel_TextChanged (ustring last)
+		{
+			// if user is in the text control and editing the selected cell
+			if (!selectedCellLabel.HasFocus)
+				return;
+			
+			// change selected cell to the one the user has typed into the box
+			var match = Regex.Match (selectedCellLabel.Text.ToString(), "^(\\d+),(\\d+)$");
+			if(match.Success) {
+
+				tableView.SelectedColumn = int.Parse (match.Groups [1].Value);
+				tableView.SelectedRow = int.Parse (match.Groups [2].Value);
+			}
+		}
 
 		private void OnSelectedCellChanged (TableView.SelectedCellChangedEventArgs e)
 		{
-			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
+			// only update the text box if the user is not manually editing it
+			if (!selectedCellLabel.HasFocus)
+				selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 			
 			if(tableView.Table == null || tableView.SelectedColumn == -1)
 				return;
