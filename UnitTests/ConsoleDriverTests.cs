@@ -576,7 +576,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
-││     [ Ok ]    │ │
+││    [ Ok ]     │ │
 │└───────────────┘ │
 └──────────────────┘
 ";
