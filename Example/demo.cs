@@ -624,6 +624,8 @@ static class Demo {
 
 		MenuItem miUseSubMenusSingleFrame = null;
 		var useSubMenusSingleFrame = false;
+		MenuItem miUseKeysUpDownAsKeysLeftRight = null;
+		var useKeysUpDownAsKeysLeftRight = false;
 
 		MenuItem miHeightAsBuffer = null;
 
@@ -635,6 +637,9 @@ static class Demo {
 				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.H),
 				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.Q),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
+				new MenuBarItem ("_SubMenu Disabled", new MenuItem [] {
+					new MenuItem ("_Disabled", "", () => { }, () => false)
+				}),
 				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.CtrlMask | Key.Q)
 			}),
@@ -645,6 +650,10 @@ static class Demo {
 				new MenuBarItem ("_Find and Replace",
 					new MenuItem [] { menuItems [0], menuItems [1] }),
 				menuItems[3],
+				miUseKeysUpDownAsKeysLeftRight = new MenuItem ("Use_KeysUpDownAsKeysLeftRight", "",
+				() => menu.UseKeysUpDownAsKeysLeftRight = miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = !useKeysUpDownAsKeysLeftRight) {
+					CheckType = MenuItemCheckStyle.Checked, Checked = useKeysUpDownAsKeysLeftRight
+				},
 				miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
 				() => menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
 					CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame

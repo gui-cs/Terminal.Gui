@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDown, () => MoveDown ());
 			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
 			AddCommand (Command.Right, () => {
-				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
+				this.host.NextMenu (!this.barItems.IsTopLevel || (this.barItems.Children != null
 					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
 					current > -1 && host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
 				return true;
@@ -846,7 +846,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Used for change the navigation key style.
 		/// </summary>
-		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
+		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = false;
 
 		static ustring shortcutDelimiter = "+";
 		/// <summary>
@@ -1122,8 +1122,12 @@ namespace Terminal.Gui {
 		public virtual void OnMenuOpened ()
 		{
 			MenuItem mi = null;
-			if (openCurrentMenu.barItems.Children != null) {
+			if (openCurrentMenu.barItems.Children != null && openCurrentMenu?.current > -1) {
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
+			} else if (openCurrentMenu.barItems.IsTopLevel) {
+				mi = openCurrentMenu.barItems;
+			} else {
+				mi = openMenu.barItems.Children [openMenu.current];
 			}
 			MenuOpened?.Invoke (mi);
 		}
@@ -1395,7 +1399,9 @@ namespace Terminal.Gui {
 
 		void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
 		{
-			if (openSubMenu == null || (UseSubMenusSingleFrame && !ignoreUseSubMenusSingleFrame && openSubMenu.Count > 0))
+			if (openSubMenu == null || (UseSubMenusSingleFrame
+				&& !ignoreUseSubMenusSingleFrame && openSubMenu.Count == 0))
+
 				return;
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
 				isMenuClosing = true;
@@ -1542,18 +1548,27 @@ namespace Terminal.Gui {
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					}
 				} else {
-					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
+					var subMenu = openCurrentMenu.current > -1
+						? openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current])
+						: null;
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
 						if (openSubMenu != null && !CloseMenu (false, true))
 							return;
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
-					} else if (subMenu != null ||
-						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
+					} else if (subMenu != null || (openCurrentMenu.current > -1
+						&& !openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)) {
 						selectedSub++;
-					else
+						openCurrentMenu.CheckSubMenu ();
+					} else {
+						if (CloseMenu (false, true, ignoreUseSubMenusSingleFrame)) {
+							NextMenu (false, ignoreUseSubMenusSingleFrame);
+						}
 						return;
+					}
+
 					SetNeedsDisplay ();
-					openCurrentMenu.CheckSubMenu ();
+					if (UseKeysUpDownAsKeysLeftRight)
+						openCurrentMenu.CheckSubMenu ();
 				}
 				break;
 			}
