@@ -9,13 +9,13 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
 	[ScenarioCategory ("Dialogs")]
 	public class Dialogs : Scenario {
+		static int CODE_POINT = '你'; // We know this is a wide char
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {
 				X = Pos.Center (),
-				Y = 1,
-				Width = Dim.Percent (75),
-				Height = 15
+				Y = 0,
+				Width = Dim.Percent (75)
 			};
 			Win.Add (frame);
 
@@ -92,12 +92,18 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (numButtonsEdit);
 
+			var glyphsNotWords = new CheckBox ($"Add {Char.ConvertFromUtf32(CODE_POINT)} to button text to stress wide char support", false) {
+				X = Pos.Left (numButtonsEdit),
+				Y = Pos.Bottom (label),
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (glyphsNotWords);
+
 
 			label = new Label ("Button Style:") {
 				X = 0,
-				Y = Pos.Bottom (label),
-				Width = Dim.Width (label),
-				Height = 1,
+				Y = Pos.Bottom (glyphsNotWords),
+				AutoSize = true,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
@@ -110,7 +116,7 @@ namespace UICatalog.Scenarios {
 			void Top_Loaded ()
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-					+ Dim.Height (numButtonsEdit) + Dim.Height(styleRadioGroup) + 2;
+					+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height(glyphsNotWords) + 2;
 				Top.Loaded -= Top_Loaded;
 			}
 			Top.Loaded += Top_Loaded;
@@ -127,10 +133,14 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
+
 				ColorScheme = Colors.Error,
 			};
+			// glyphsNotWords
+			// false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
+			// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };
+			// \u2781 is ➁ dingbats \ufb70 is	
 
-			//var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 			var showDialogButton = new Button ("Show Dialog") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
@@ -145,11 +155,16 @@ namespace UICatalog.Scenarios {
 					var buttons = new List<Button> ();
 					var clicked = -1;
 					for (int i = 0; i < numButtons; i++) {
-						var buttonId = i;
-						//var button = new Button (btnText [buttonId % 10],
-						//	is_default: buttonId == 0);
-						var button = new Button (NumberToWords.Convert (buttonId),
-							is_default: buttonId == 0);
+						int buttonId = i;
+						Button button = null;
+						if (glyphsNotWords.Checked) {
+							buttonId = i;
+							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+								is_default: buttonId == 0);
+						} else {
+							button = new Button (NumberToWords.Convert (buttonId),
+							       is_default: buttonId == 0);
+						}
 						button.Clicked += () => {
 							clicked = buttonId;
 							Application.RequestStop ();
@@ -170,10 +185,14 @@ namespace UICatalog.Scenarios {
 					};
 					add.Clicked += () => {
 						var buttonId = buttons.Count;
-						//var button = new Button (btnText [buttonId % 10],
-						//	is_default: buttonId == 0);
-						var button = new Button (NumberToWords.Convert (buttonId),
-							is_default: buttonId == 0);
+						Button button;
+						if (glyphsNotWords.Checked) {
+							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+								is_default: buttonId == 0);
+						} else {
+							button = new Button (NumberToWords.Convert (buttonId),
+								is_default: buttonId == 0);
+						}
 						button.Clicked += () => {
 							clicked = buttonId;
 							Application.RequestStop ();

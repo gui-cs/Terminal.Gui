@@ -7,6 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
+using NStack;
 
 namespace Terminal.Gui.Views {
 
@@ -208,18 +209,19 @@ namespace Terminal.Gui.Views {
 			var btn1 = $"{d.LeftBracket} {btn1Text} {d.RightBracket}";
 			var btn2Text = "no";
 			var btn2 = $"{d.LeftBracket} {btn2Text} {d.RightBracket}";
-			var btn3Text = "maybe";
+			var btn3Text = "你你你你你"; // This is a wide char
 			var btn3 = $"{d.LeftBracket} {btn3Text} {d.RightBracket}";
-			var btn4Text = "never";
+			// Requires a Nerd Font
+			var btn4Text = "\uE36E\uE36F\uE370\uE371\uE372\uE373";
 			var btn4 = $"{d.LeftBracket} {btn4Text} {d.RightBracket}";
 
 			// Note extra spaces to make dialog even wider
 			//                         123456                           12345
 			var buttonRow = $"{d.VLine}      {btn1} {btn2} {btn3} {btn4}     {d.VLine}";
-			var width = buttonRow.Length;
+			var width = ustring.Make (buttonRow).ConsoleWidth;
 			var topRow = $"┌ {title} {new String (d.HLine.ToString () [0], width - title.Length - 4)}┐";
 			var bottomRow = $"└{new String (d.HLine.ToString () [0], width - 2)}┘";
-			d.SetBufferSize (buttonRow.Length, 3);
+			d.SetBufferSize (width, 3);
 
 			// Default - Center
 			RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
@@ -227,19 +229,19 @@ namespace Terminal.Gui.Views {
 
 			// Justify
 			buttonRow = $"{d.VLine}{btn1}     {btn2}     {btn3}    {btn4}{d.VLine}";
-			Assert.Equal (width, buttonRow.Length);
+			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
 			RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
 
 			// Right
 			buttonRow = $"{d.VLine}           {btn1} {btn2} {btn3} {btn4}{d.VLine}";
-			Assert.Equal (width, buttonRow.Length);
+			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
 			RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
 
 			// Left
 			buttonRow = $"{d.VLine}{btn1} {btn2} {btn3} {btn4}           {d.VLine}";
-			Assert.Equal (width, buttonRow.Length);
+			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
 			RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
 		}
