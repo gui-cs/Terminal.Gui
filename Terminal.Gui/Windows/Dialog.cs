@@ -109,24 +109,115 @@ namespace Terminal.Gui {
 			LayoutSubviews ();
 		}
 
+		// Get the width of all buttons, not including any spacing
 		internal int GetButtonsWidth ()
 		{
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count - 1;
+			return buttons.Select (b => b.Bounds.Width).Sum ();
 		}
+		/// <summary>
+		/// Determines the horizontal alignment of the Dialog buttons.
+		/// </summary>
+		public enum ButtonAlignments {
+			/// <summary>
+			/// Center-aligns the buttons (the default).
+			/// </summary>
+			Center = 0,
+
+			/// <summary>
+			/// Justifies the buttons
+			/// </summary>
+			Justify,
+
+			/// <summary>
+			/// Left-aligns the buttons
+			/// </summary>
+			Left,
+
+			/// <summary>
+			/// Right-aligns the buttons
+			/// </summary>
+			Right
+		}
+
+		private ButtonAlignments buttonAlignment = Dialog.ButtonAlignments.Center;
+
+		/// <summary>
+		/// Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the 
+		/// bottom of the dialog. 
+		/// </summary>
+		public ButtonAlignments ButtonAlignment { get => buttonAlignment; set => buttonAlignment = value; }
 
 		void LayoutStartedHandler ()
 		{
-			int buttonsWidth = GetButtonsWidth ();
+			if (buttons.Count == 0) return;
 
-			int shiftLeft = Math.Max ((Bounds.Width - buttonsWidth) / 2 - 2, 0);
-			for (int i = buttons.Count - 1; i >= 0; i--) {
-				Button button = buttons [i];
-				shiftLeft += button.Frame.Width + 1;
-				button.X = Pos.AnchorEnd (shiftLeft);
-				button.Y = Pos.AnchorEnd (1);
+			int shiftLeft = 0;
+
+			int buttonsWidth = GetButtonsWidth ();
+			switch (ButtonAlignment) {
+			case ButtonAlignments.Center:
+				// Center Buttons
+				shiftLeft = Math.Max ((Bounds.Width - buttonsWidth - buttons.Count - 2) / 2 + 1, 0);
+				for (int i = buttons.Count - 1; i >= 0; i--) {
+					Button button = buttons [i];
+					shiftLeft += button.Frame.Width + (i == buttons.Count - 1 ? 0 : 1);
+					button.X = Pos.AnchorEnd (shiftLeft);
+					button.Y = Pos.AnchorEnd (1);
+				}
+				break;
+
+			case ButtonAlignments.Justify:
+				// Justify Buttons
+				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
+
+				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - 2) / (buttons.Count - 1));
+				for (int i = buttons.Count - 1; i >= 0; i--) {
+					Button button = buttons [i];
+					if (i == buttons.Count - 1) {
+						shiftLeft += button.Frame.Width;
+						button.X = Pos.AnchorEnd (shiftLeft);
+					} else {
+						if (i == 0) {
+							// first (leftmost) button - always hard flush left
+							var left = Bounds.Width - 2;
+							button.X = Pos.AnchorEnd (left);
+						} else {
+							shiftLeft += button.Frame.Width + (spacing);
+							button.X = Pos.AnchorEnd (shiftLeft);
+						}
+					}
+					button.Y = Pos.AnchorEnd (1);
+				}
+				break;
+
+			case ButtonAlignments.Left:
+				// Left Align Buttons
+				var prevButton = buttons [0];
+				prevButton.X = 0;
+				prevButton.Y = Pos.AnchorEnd (1);
+				for (int i = 1; i < buttons.Count; i++) {
+					Button button = buttons [i];
+					button.X = Pos.Right (prevButton) + 1;
+					button.Y = Pos.AnchorEnd (1);
+					prevButton = button;
+				}
+				break;
+
+			case ButtonAlignments.Right:
+				// Right align buttons
+				shiftLeft = buttons [buttons.Count - 1].Frame.Width;
+				buttons [buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
+				buttons [buttons.Count - 1].Y = Pos.AnchorEnd (1);
+				for (int i = buttons.Count - 2; i >= 0; i--) {
+					Button button = buttons [i];
+					shiftLeft += button.Frame.Width + 1;
+					button.X = Pos.AnchorEnd (shiftLeft);
+					button.Y = Pos.AnchorEnd (1);
+				}
+				break;
 			}
 		}
 
@@ -140,5 +231,6 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
+
 	}
 }
