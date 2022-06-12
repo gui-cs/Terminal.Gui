@@ -411,11 +411,6 @@ namespace Terminal.Gui {
 			} else {
 				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "_Next...";
 			}
-
-			// Work around https://github.com/migueldeicaza/gui.cs/issues/1791
-			SetNeedsLayout ();
-			LayoutSubviews ();
-			backBtn.AutoSize = nextfinishBtn.AutoSize = true;
 		}
 	}
 }
