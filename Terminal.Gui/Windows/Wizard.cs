@@ -222,13 +222,12 @@ namespace Terminal.Gui {
 		/// The Wizard will be vertically and horizontally centered in the container.
 		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
 		/// </remarks>
-		public Wizard (ustring title)
+		public Wizard (ustring title) : base (title)
 		{
+			// Using Justify causes the Back and Next buttons to be hard justified against
+			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
 			this.Border.BorderStyle = BorderStyle.Double;
-
-			// Store the passed in title in Dialog's Title
-			base.Title = title;
 
 			// Add a horiz separator
 			var separator = new LineView (Graphs.Orientation.Horizontal) {
@@ -236,10 +235,10 @@ namespace Terminal.Gui {
 			};
 			Add (separator);
 
-			backBtn = new Button ("_Back");
+			backBtn = new Button ("_Back") { AutoSize = true };
 			AddButton (backBtn);
 
-			nextfinishBtn = new Button ("_Next...");
+			nextfinishBtn = new Button ("_Next...") { AutoSize = true };
 			nextfinishBtn.IsDefault = true;
 			AddButton (nextfinishBtn);
 
@@ -413,6 +412,10 @@ namespace Terminal.Gui {
 				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "_Next...";
 			}
 
+			// Work around https://github.com/migueldeicaza/gui.cs/issues/1791
+			SetNeedsLayout ();
+			LayoutSubviews ();
+			backBtn.AutoSize = nextfinishBtn.AutoSize = true;
 		}
 	}
 }

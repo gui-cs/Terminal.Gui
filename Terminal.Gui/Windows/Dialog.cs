@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 
 		void LayoutStartedHandler ()
 		{
-			if (buttons.Count == 0) return;
+			if (buttons.Count == 0 || !IsInitialized) return;
 
 			int shiftLeft = 0;
 

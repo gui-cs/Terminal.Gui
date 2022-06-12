@@ -125,7 +125,7 @@ namespace UICatalog.Scenarios {
 					var firstStep = new Wizard.WizardStep ("End User License Agreement");
 					wizard.AddStep (firstStep);
 					firstStep.ShowControls = false;
-					firstStep.NextButtonText = "Accept";
+					firstStep.NextButtonText = "Accept!";
 					firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 
 					// Add 2nd step

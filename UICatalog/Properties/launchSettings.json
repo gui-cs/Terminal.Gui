@@ -1,12 +1,23 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "commandLineArgs": "Wizards"
+      "commandName": "Project"
     },
     "UICatalog : -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
+    },
+    "Wizards": {
+      "commandName": "Project",
+      "commandLineArgs": "Wizards"
+    },
+    "Dialogs": {
+      "commandName": "Project",
+      "commandLineArgs": "Dialogs"
+    },
+    "Buttons": {
+      "commandName": "Project",
+      "commandLineArgs": "Buttons"
     }
   }
 }

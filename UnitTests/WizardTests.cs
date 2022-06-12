@@ -27,11 +27,23 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
+		public void DefaultConstructor_SizedProperly ()
+		{
+			var d = ((FakeDriver)Application.Driver);
+
+			var wizard = new Wizard ();
+			Assert.NotEqual (0, wizard.Width);
+			Assert.NotEqual (0, wizard.Height);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
 		public void ZeroStepWizard_Shows ()
 		{
 			var d = ((FakeDriver)Application.Driver);
 
 			var title = "1234";
+			var stepTitle = "";
 
 			int width = 30;
 			int height = 6;
@@ -42,12 +54,12 @@ namespace Terminal.Gui.Views {
 			var btnNextText = "Next...";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"┌ {title} {new String (d.HDLine.ToString () [0], width - title.Length - 4)}┐";
+			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var row2 = $"{d.VDLine}{new String (' ', width - 2)}{d.VDLine}";
 			var row3 = row2;
-			var separatorRow = $"{d.VDLine}{new String (d.HDLine.ToString () [0], width - 2)}{d.VDLine}";
+			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
 			var buttonRow = $"{d.VDLine}{btnBack}{new String (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
-			var bottomRow = $"└{new String (d.HDLine.ToString () [0], width - 2)}┘";
+			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
 			var wizard = new Wizard (title) { Width = width, Height = height };
 			Application.End (Application.Begin (wizard));
@@ -75,7 +87,10 @@ namespace Terminal.Gui.Views {
 
 			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
-			var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
+
+			// Once this is fixed, revert to commented out line: https://github.com/migueldeicaza/gui.cs/issues/1791
+			var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 3)}{btnNext} {d.VDLine}";
+			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
 			var wizard = new Wizard (title) { Width = width, Height = height };
