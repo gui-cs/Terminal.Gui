@@ -23,11 +23,12 @@ namespace Terminal.Gui {
 		/// with the Next button of the Wizard.
 		/// </remarks>
 		public class WizardStep : View {
-
 			/// <summary>
 			/// The title of the <see cref="WizardStep"/>.
 			/// </summary>
-			public ustring Title;
+			public ustring Title { get => title; set => title = value; }
+			// TODO: Update Wizard title when step title is changed if step is current - this will require step to slueth it's parent 
+			private ustring title;
 
 			private View controlPane = new FrameView ();
 
@@ -40,31 +41,28 @@ namespace Terminal.Gui {
 			/// </summary>
 			public View Controls { get => controlPane; }
 
-			private TextView helpTextView = new TextView ();
-
 			/// <summary>
 			/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.ShowHelp"/> is set to 
 			/// `false` the control pane will fill the entire wizard.
 			/// </summary>
 			/// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
 			public ustring HelpText { get => helpTextView.Text; set => helpTextView.Text = value; }
-
-			private ustring backButtonText = ustring.Empty;
+			private TextView helpTextView = new TextView ();
 
 			/// <summary>
 			/// Sets or gets the text for the back button. The back button will only be visible on 
 			/// steps after the first step.
 			/// </summary>
 			/// <remarks>The default text is "Back"</remarks>
-			public ustring BackButtonText { get => backButtonText; set => backButtonText = value; }
-
-			private ustring nextButtonText = ustring.Empty;
+			public ustring BackButtonText { get; set; } = ustring.Empty;
+			// TODO: Update button text of Wizard button when step's button text is changed if step is current - this will require step to slueth it's parent 
 
 			/// <summary>
 			/// Sets or gets the text for the next/finish button.
 			/// </summary>
 			/// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise it is "Finish"</remarks>
-			public ustring NextButtonText { get => nextButtonText; set => nextButtonText = value; }
+			public ustring NextButtonText { get; set; } = ustring.Empty;
+			// TODO: Update button text of Wizard button when step's button text is changed if step is current - this will require step to slueth it's parent 
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -75,7 +73,7 @@ namespace Terminal.Gui {
 			/// </remarks>
 			public WizardStep (ustring title)
 			{
-				Title = title;
+				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
 				this.ColorScheme = Colors.Menu;
 		
 				Y = 0;
@@ -126,7 +124,6 @@ namespace Terminal.Gui {
 				this.Add (scrollBar);
 			}
 
-			private bool showHelp = true;
 			/// <summary>
 			/// If true (the default) the help will be visible. If false, the help will not be shown and the control pane will
 			/// fill the wizard step.
@@ -138,8 +135,8 @@ namespace Terminal.Gui {
 					ShowHide ();
 				}
 			}
+			private bool showHelp = true;
 
-			private bool showControls = true;
 			/// <summary>
 			/// If true (the default) the <see cref="Controls"/> View will be visible. If false, the controls will not be shown and the help will
 			/// fill the wizard step.
@@ -151,7 +148,11 @@ namespace Terminal.Gui {
 					ShowHide ();
 				}
 			}
+			private bool showControls = true;
 
+			/// <summary>
+			/// Does the work to show and hide the controls, help, and buttons as appropriate
+			/// </summary>
 			private void ShowHide ()
 			{
 				Controls.Height = Dim.Fill (1);
@@ -180,7 +181,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Button backBtn;
 		/// <summary>
 		/// If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes
 		/// the <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step. 
@@ -189,8 +189,7 @@ namespace Terminal.Gui {
 		/// Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.
 		/// </remarks>
 		public Button BackButton { get => backBtn; }
-
-		private Button nextfinishBtn;
+		private Button backBtn;
 
 		/// <summary>
 		/// If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes
@@ -202,6 +201,7 @@ namespace Terminal.Gui {
 		/// when the user attempts go to the next step or finish the wizard.
 		/// </remarks>
 		public Button NextFinishButton { get => nextfinishBtn; }
+		private Button nextfinishBtn;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -224,6 +224,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Wizard (ustring title) : base (title)
 		{
+			wizardTitle = title;
 			// Using Justify causes the Back and Next buttons to be hard justified against
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
@@ -296,30 +297,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the currently active <see cref="WizardStep"/>.
-		/// </summary>
-		public int CurrentStep {
-			get => currentStep;
-			set {
-				currentStep = value;
-				OnCurrentStepChanged ();
-			}
-		}
-
-		private ustring title;
-
-		/// <summary>
 		/// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
 		/// </summary>
 		public new ustring Title {
 			get {
+				// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
 				return base.Title;
 			}
 			set {
-				title = value;
-				base.Title = $"{title}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
+				wizardTitle = value;
+				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
 			}
 		}
+		private ustring wizardTitle = ustring.Empty;
 
 		/// <summary>	
 		/// <see cref="EventArgs"/> for <see cref="WizardStep"/> transition events.
@@ -386,6 +376,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the currently active <see cref="WizardStep"/>.
+		/// </summary>
+		public int CurrentStep {
+			get => currentStep;
+			set {
+				currentStep = value;
+				OnCurrentStepChanged ();
+			}
+		}
+
+		/// <summary>
 		/// Called when the current <see cref="WizardStep"/> has changed (<see cref="CurrentStep"/>).
 		/// </summary>
 		public virtual void OnCurrentStepChanged ()
@@ -397,7 +398,7 @@ namespace Terminal.Gui {
 			}
 
 			// TODO: Add support for "Wizard Title - Step Title"
-			base.Title = $"{this.Title}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
+			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
 
 			backBtn.Text = steps [currentStep].BackButtonText != ustring.Empty ? steps [currentStep].BackButtonText : "_Back";
 			if (currentStep == 0) {

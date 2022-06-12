@@ -25,8 +25,29 @@ namespace Terminal.Gui.Views {
 			Application.End (Application.Begin (wizard));
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		// =========== WizardStep Tests
+		[Fact, AutoInitShutdown]
+		public void WizardStep_Title ()
+		{
+			// Verify default title
+
+			// Verify set actually changes property
+
+			// Verify set changes Wizard title (TODO: NOT YET IMPLEMENTED)
+		}
+
+		[Fact, AutoInitShutdown]
+		public void WizardStep_ButtonText ()
+		{
+			// Verify default button text
+
+			// Verify set actually changes property
+
+			// Verify set actually changes buttons for the current step
+		}
+
+		// =========== Wizard Tests
+		[Fact, AutoInitShutdown]
 		public void DefaultConstructor_SizedProperly ()
 		{
 			var d = ((FakeDriver)Application.Driver);
@@ -36,8 +57,9 @@ namespace Terminal.Gui.Views {
 			Assert.NotEqual (0, wizard.Height);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
+		// Verify a zero-step wizard doesn't crash and shows a blank wizard
+		// and that the title is correct
 		public void ZeroStepWizard_Shows ()
 		{
 			var d = ((FakeDriver)Application.Driver);
@@ -66,8 +88,49 @@ namespace Terminal.Gui.Views {
 			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
+		// This test verifies that a single step wizard shows the correct buttons
+		// and that the title is correct
+		public void OneStepWizard_Shows ()
+		{
+		}
+
+		[Fact, AutoInitShutdown]
+		// This test verifies that the 2nd step in a wizard with 2 steps 
+		// shows the correct buttons on both steps
+		// and that the title is correct
+		public void TwoStepWizard_Next_Shows_SecondStep ()
+		{
+			// verify step one
+
+			// Next
+
+			// verify step two
+
+			// Back
+
+			// verify step one again
+		}
+
+		[Fact, AutoInitShutdown]
+		// This test verifies that the 2nd step in a wizard with more than 2 steps 
+		// shows the correct buttons on all steps
+		// and that the title is correct
+		public void ThreeStepWizard_Next_Shows_Steps ()
+		{
+
+			// verify step one
+
+			// Next
+
+			// verify step two
+
+			// Back
+
+			// verify step one again
+		}
+
+		[Fact, AutoInitShutdown]
 		// this test is needed because Wizard overrides Dialog's title behavior ("Title - StepTitle")
 		public void Setting_Title_Works ()
 		{
@@ -80,8 +143,6 @@ namespace Terminal.Gui.Views {
 			int height = 4;
 			d.SetBufferSize (width, height);
 
-			var btnBackText = "Back";
-			var btnBack = $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
 			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 

@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (frame);
 
-			var label = new Label ("width:") {
+			var label = new Label ("Width:") {
 				X = 0,
 				Y = 0,
 				Width = 15,
@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (widthEdit);
 
-			label = new Label ("height:") {
+			label = new Label ("Height:") {
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
@@ -97,11 +97,17 @@ namespace UICatalog.Scenarios {
 			};
 			showWizardButton.Clicked += () => {
 				try {
-					int width = int.Parse (widthEdit.Text.ToString ());
-					int height = int.Parse (heightEdit.Text.ToString ());
+					int width = 0;
+					int.TryParse (widthEdit.Text.ToString (), out width);
+					int height = 0;
+					int.TryParse (heightEdit.Text.ToString (), out height);
 
-					var wizard = new Wizard () {
-						Title = titleEdit.Text,
+					if (width < 1 || height < 1) {
+						MessageBox.ErrorQuery ("Nope", "Height and width must be greater than 0 (much bigger)", "Ok");
+						return;
+					}
+
+					var wizard = new Wizard (titleEdit.Text) {
 						Width = width,
 						Height = height
 					};
@@ -143,7 +149,7 @@ namespace UICatalog.Scenarios {
 					};
 					secondStep.Controls.Add (buttonLbl, button);
 					var lbl = new Label () { Text = "First Name: ", AutoSize = true, X = 1, Y = Pos.Bottom (buttonLbl) };
-					var firstNameField = new TextField () { Width = 30, X = Pos.Right(lbl), Y = Pos.Top (lbl) };
+					var firstNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					secondStep.Controls.Add (lbl, firstNameField);
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
@@ -209,7 +215,7 @@ namespace UICatalog.Scenarios {
 					var lastStep = new Wizard.WizardStep ("The last step");
 					wizard.AddStep (lastStep);
 					lastStep.HelpText = "The wizard is complete! Press the Finish button to continue. Pressing ESC will cancel the wizard.";
-					
+
 
 					// TODO: Demo setting initial Pane
 
