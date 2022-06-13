@@ -36,6 +36,7 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
+		// Helper class to provide dynamic value by the execution of a function that returns an integer.
 		internal class PosFunc : Pos {
 			Func<int> function;
 
@@ -60,7 +61,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Creates an Func <see cref="Pos"/> from the specified function value.
+		/// Creates a "PosFunc" from the specified function.
 		/// </summary>
 		/// <param name="function">The function to be executed.</param>
 		/// <returns>The <see cref="Pos"/> returned from the function.</returns>
@@ -425,6 +426,7 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
+		// Helper class to provide dynamic value by the execution of a function that returns an integer.
 		internal class DimFunc : Dim {
 			Func<int> function;
 
@@ -449,7 +451,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Creates an Func <see cref="Dim"/> from the specified function value.
+		/// Creates a "DimFunc" from the specified function.
 		/// </summary>
 		/// <param name="function">The function to be executed.</param>
 		/// <returns>The <see cref="Dim"/> returned from the function.</returns>
