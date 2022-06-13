@@ -380,7 +380,7 @@ namespace Terminal.Gui {
 		{
 			int barsize = scrollBarView.vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
-			if (barsize == 0 || barsize > scrollBarView.size) {
+			if (barsize == 0 || barsize >= scrollBarView.size) {
 				if (scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = false;
 				}
