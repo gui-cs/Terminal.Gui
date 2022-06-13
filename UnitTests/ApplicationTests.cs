@@ -1293,45 +1293,47 @@ namespace Terminal.Gui.Core {
 			int numberOfTimeoutsPerThread = 100;
 
 
-			// start lots of threads
-			for (int i = 0; i < numberOfThreads; i++) {
-				
-				var myi = i;
+			lock (Application.Top) {
+				// start lots of threads
+				for (int i = 0; i < numberOfThreads; i++) {
 
-				Task.Run (() => {
-					Task.Delay (100).Wait ();
+					var myi = i;
 
-					// each thread registers lots of 1s timeouts
-					for(int j=0;j< numberOfTimeoutsPerThread; j++) {
+					Task.Run (() => {
+						Task.Delay (100).Wait ();
 
-						Application.MainLoop.AddTimeout (TimeSpan.FromSeconds(1), (s) => {
+						// each thread registers lots of 1s timeouts
+						for (int j = 0; j < numberOfTimeoutsPerThread; j++) {
 
-							// each timeout delegate increments delegatesRun count by 1 every second
-							Interlocked.Increment (ref delegatesRun);
-							return true; 
-						});
-					}
-					 
-					// if this is the first Thread created
-					if (myi == 0) {
+							Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1), (s) => {
 
-						// let the timeouts run for a bit
-						Task.Delay (5000).Wait ();
+								// each timeout delegate increments delegatesRun count by 1 every second
+								Interlocked.Increment (ref delegatesRun);
+								return true;
+							});
+						}
 
-						// then tell the application to quuit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-					}
-				});
+						// if this is the first Thread created
+						if (myi == 0) {
+
+							// let the timeouts run for a bit
+							Task.Delay (5000).Wait ();
+
+							// then tell the application to quit
+							Application.MainLoop.Invoke (() => Application.RequestStop ());
+						}
+					});
+				}
+
+				// blocks here until the RequestStop is processed at the end of the test
+				Application.Run ();
+
+				// undershoot a bit to be on the safe side.  The 5000 ms wait allows the timeouts to run
+				// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
+				// so the final number of delegatesRun might vary by computer.  So for this assert we say
+				// that it should have run at least 2 seconds worth of delegates
+				Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 			}
-
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-
-			// undershoot a bit to be on the safe side.  The 5000 ms wait allows the timeouts to run
-			// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
-			// so the final number of delegatesRun might vary by computer.  So for this assert we say
-			// that it should have run at least 2 seconds worth of delegates
-			Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 		}
 	}
 }

@@ -13,7 +13,7 @@ using Xunit;
 // This is necessary because a) Application is a singleton and Init/Shutdown must be called
 // as a pair, and b) all unit test functions should be atomic.
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class AutoInitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 	static bool _init = false;
 	public override void Before (MethodInfo methodUnderTest)

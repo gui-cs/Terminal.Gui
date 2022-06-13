@@ -188,6 +188,7 @@ Edit
 					new MenuBarItem ("_New", new MenuItem [] {
 						new MenuItem ("_New doc", "Creates new doc.", null, () => false)
 					}),
+					null,
 					new MenuItem ("_Save", "Saves the file.", null, null)
 				})
 			});
@@ -222,6 +223,16 @@ Edit
 			Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 				X = 1,
 				Y = 2,
+				Flags = MouseFlags.ReportMousePosition,
+				View = mCurrent
+			}));
+			Assert.True (menu.IsMenuOpen);
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_New", miCurrent.Title);
+
+			Assert.True (mCurrent.MouseEvent (new MouseEvent () {
+				X = 1,
+				Y = 3,
 				Flags = MouseFlags.ReportMousePosition,
 				View = mCurrent
 			}));
@@ -1268,6 +1279,22 @@ Edit
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (2, 0, 13, 1), pos);
+		}
+
+		[Fact]
+		public void UseKeysUpDownAsKeysLeftRight_And_UseSubMenusSingleFrame_Cannot_Be_Both_True ()
+		{
+			var menu = new MenuBar ();
+			Assert.False (menu.UseKeysUpDownAsKeysLeftRight);
+			Assert.False (menu.UseSubMenusSingleFrame);
+
+			menu.UseKeysUpDownAsKeysLeftRight = true;
+			Assert.True (menu.UseKeysUpDownAsKeysLeftRight);
+			Assert.False (menu.UseSubMenusSingleFrame);
+
+			menu.UseSubMenusSingleFrame = true;
+			Assert.False (menu.UseKeysUpDownAsKeysLeftRight);
+			Assert.True (menu.UseSubMenusSingleFrame);
 		}
 	}
 }

@@ -654,7 +654,7 @@ namespace Terminal.Gui {
 				if (current >= barItems.Children.Length) {
 					current = 0;
 				}
-				if (this != host.openCurrentMenu && barItems.Children [current].IsFromSubMenu && host.selectedSub > -1) {
+				if (this != host.openCurrentMenu && barItems.Children [current]?.IsFromSubMenu == true && host.selectedSub > -1) {
 					host.PreviousMenu (true);
 					host.SelectEnabledItem (barItems.Children, current, out current);
 					host.openCurrentMenu = this;
@@ -843,10 +843,21 @@ namespace Terminal.Gui {
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
 
+		private bool useKeysUpDownAsKeysLeftRight = false;
+
 		/// <summary>
 		/// Used for change the navigation key style.
 		/// </summary>
-		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = false;
+		public bool UseKeysUpDownAsKeysLeftRight {
+			get => useKeysUpDownAsKeysLeftRight;
+			set {
+				useKeysUpDownAsKeysLeftRight = value;
+				if (value && UseSubMenusSingleFrame) {
+					UseSubMenusSingleFrame = false;
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		static ustring shortcutDelimiter = "+";
 		/// <summary>
@@ -866,10 +877,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		new public static Rune HotKeySpecifier => '_';
 
+		private bool useSubMenusSingleFrame;
+
 		/// <summary>
 		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
 		/// </summary>
-		public bool UseSubMenusSingleFrame { get; set; }
+		public bool UseSubMenusSingleFrame {
+			get => useSubMenusSingleFrame;
+			set {
+				useSubMenusSingleFrame = value;
+				if (value && UseKeysUpDownAsKeysLeftRight) {
+					useKeysUpDownAsKeysLeftRight = false;
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
