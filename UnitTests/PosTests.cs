@@ -70,11 +70,11 @@ namespace Terminal.Gui.Core {
 
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews[0].Frame);
-			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString());
+			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString ());
 			Assert.Equal (new Rect (1, 1, 79, 24), new Rect (
-				win.Subviews[0].Frame.Left, win.Subviews [0].Frame.Top,
-				win.Subviews [0].Frame.Right, win.Subviews[0].Frame.Bottom));
+				win.Subviews [0].Frame.Left, win.Subviews [0].Frame.Top,
+				win.Subviews [0].Frame.Right, win.Subviews [0].Frame.Bottom));
 			Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
 		}
 
@@ -488,11 +488,37 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Percent_Equal ()
 		{
-			var n1 = 0;
-			var n2 = 0;
+			float n1 = 0;
+			float n2 = 0;
 			var pos1 = Pos.Percent (n1);
 			var pos2 = Pos.Percent (n2);
-			// BUGBUG: Pos.Percent should support equality 
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 0.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 100f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = 0;
+			n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.NotEqual (pos1, pos2);
+
+			n1 = 0.5f;
+			n2 = 1.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
 			Assert.NotEqual (pos1, pos2);
 		}
 
@@ -810,6 +836,35 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (40, posRight.Anchor (0));
 			var posViewBottom = new Pos.PosView (view, 3);
 			Assert.Equal (11, posViewBottom.Anchor (0));
+		}
+
+		[Fact]
+		public void Function_SetsValue ()
+		{
+			var text = "Test";
+			var pos = Pos.Function (() => text.Length);
+			Assert.Equal ("Pos.PosFunc(4)", pos.ToString ());
+
+			text = "New Test";
+			Assert.Equal ("Pos.PosFunc(8)", pos.ToString ());
+
+			text = "";
+			Assert.Equal ("Pos.PosFunc(0)", pos.ToString ());
+		}
+
+		[Fact]
+		public void Function_Equal ()
+		{
+			var f1 = () => 0;
+			var f2 = () => 0;
+
+			var pos1 = Pos.Function (f1);
+			var pos2 = Pos.Function (f2);
+			Assert.Equal (pos1, pos2);
+
+			f2 = () => 1;
+			pos2 = Pos.Function (f2);
+			Assert.NotEqual (pos1, pos2);
 		}
 	}
 }

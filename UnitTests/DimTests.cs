@@ -836,5 +836,34 @@ namespace Terminal.Gui.Core {
 			var dimViewWidth = new Dim.DimView (view, 1);
 			Assert.Equal (20, dimViewWidth.Anchor (0));
 		}
+
+		[Fact]
+		public void Function_SetsValue ()
+		{
+			var text = "Test";
+			var dim = Dim.Function (() => text.Length);
+			Assert.Equal ("Dim.DimFunc(4)", dim.ToString ());
+
+			text = "New Test";
+			Assert.Equal ("Dim.DimFunc(8)", dim.ToString ());
+
+			text = "";
+			Assert.Equal ("Dim.DimFunc(0)", dim.ToString ());
+		}
+
+		[Fact]
+		public void Function_Equal ()
+		{
+			var f1 = () => 0;
+			var f2 = () => 0;
+
+			var dim1 = Dim.Function (f1);
+			var dim2 = Dim.Function (f2);
+			Assert.Equal (dim1, dim2);
+
+			f2 = () => 1;
+			dim2 = Dim.Function (f2);
+			Assert.NotEqual (dim1, dim2);
+		}
 	}
 }
