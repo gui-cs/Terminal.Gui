@@ -4,9 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class CheckboxTests {
+		readonly ITestOutputHelper output;
+
+		public CheckboxTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
@@ -58,6 +66,52 @@ namespace Terminal.Gui.Views {
 			isChecked = false;
 			Assert.True (ckb.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.True (isChecked);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_StaysVisible ()
+		{
+			var checkBox = new CheckBox () {
+				X = 1,
+				Y = Pos.Center (),
+				Text = "Check this out 你"
+			};
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (checkBox);
+			Application.Top.Add (win);
+
+			Assert.False (checkBox.IsInitialized);
+
+			var runstate = Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
+			Assert.True (checkBox.IsInitialized);
+			Assert.Equal ("Check this out 你", checkBox.Text);
+
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│ ╴ Check this out 你        │
+│                            │
+└────────────────────────────┘
+";
+
+			// Positive test
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+
+			// Negative test
+			checkBox.AutoSize = true;
+			bool first = false;
+			Application.RunMainLoopIteration (ref runstate, true, ref first);
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 	}
 }

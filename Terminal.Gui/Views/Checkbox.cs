@@ -78,8 +78,8 @@ namespace Terminal.Gui {
 			Checked = is_checked;
 			Text = s;
 			CanFocus = true;
-			Height = 1;
-			Width = s.RuneCount + 4;
+			AutoSize = true;
+			Update ();
 
 			// Things this view knows how to do
 			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
@@ -87,6 +87,17 @@ namespace Terminal.Gui {
 			// Default keybindings for this view
 			AddKeyBinding ((Key)' ', Command.ToggleChecked);
 			AddKeyBinding (Key.Space, Command.ToggleChecked);
+		}
+
+		private void Update ()
+		{
+			TextFormatter.Text = text;
+			var h = 1;
+			var w = text.ConsoleWidth + 4;
+			TextFormatter.Size = new Size (w, h);
+			Height = h;
+			TextFormatter.Size = new Size (w, h);
+			Width = w;
 		}
 
 		/// <summary>
@@ -118,6 +129,9 @@ namespace Terminal.Gui {
 						break;
 					}
 					i++;
+				}
+				if (AutoSize) {
+					Update ();
 				}
 			}
 		}
