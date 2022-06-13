@@ -90,6 +90,9 @@ namespace Terminal.Gui {
 				helpTextView.Y = 0;
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
+				helpTextView.AllowsTab = false;
+				//helpTextView.AllowsReturn = false; // see #1801
+				helpTextView.CanFocus = true; // See https://github.com/migueldeicaza/gui.cs/issues/1799
 				this.Add (helpTextView);
 				ShowHide ();
 
@@ -108,7 +111,9 @@ namespace Terminal.Gui {
 						helpTextView.RightOffset = 1;
 					} else if (!scrollBar.Visible && helpTextView.RightOffset == 1) {
 						helpTextView.RightOffset = 0;
-					}
+					}	
+
+					//helpTextView.AllowsTab = helpTextView.CanFocus = scrollBar.Visible;
 				};
 
 				helpTextView.DrawContent += (e) => {
@@ -411,6 +416,13 @@ namespace Terminal.Gui {
 				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "Fi_nish";
 			} else {
 				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "_Next...";
+			}
+
+			// Set focus to the nav buttons
+			if (backBtn.HasFocus) {
+				backBtn.SetFocus ();
+			} else {
+				nextfinishBtn.SetFocus ();
 			}
 		}
 	}

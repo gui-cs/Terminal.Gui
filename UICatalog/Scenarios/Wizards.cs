@@ -154,6 +154,8 @@ namespace UICatalog.Scenarios {
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					secondStep.Controls.Add (lbl, lastNameField);
+					var checkBox = new CheckBox () { Text = "Un-check me!", Checked = true, X = Pos.Left(lastNameField), Y = Pos.Bottom(lastNameField) };
+					secondStep.Controls.Add (checkBox);
 
 					// Add 3rd step
 					var thirdStep = new Wizard.WizardStep ("Third Step");
@@ -179,6 +181,7 @@ namespace UICatalog.Scenarios {
 						Width = Dim.Fill (),
 						Height = Dim.Fill (),
 						WordWrap = true,
+						AllowsTab = false
 					};
 					fourthStep.Controls.Add (someText);
 					var scrollBar = new ScrollBarView (someText, true);

@@ -1659,8 +1659,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether pressing the TAB key in a <see cref="TextView"/>
-		/// types a TAB character in the view instead of moving the focus to the next view in the tab order.
+		/// Gets or sets whether the <see cref="TextView"/> inserts a tab character into the text or ignores 
+		/// tab input. If set to `false` and the user presses the tab key (or shift-tab) the focus will move to the
+		/// next view (or previous with shift-tab). The default is `true`; if the user presses the tab key, a tab 
+		/// character will be inserted into the text.
 		/// </summary>
 		public bool AllowsTab {
 			get => allowsTab;
