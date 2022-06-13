@@ -174,13 +174,13 @@ namespace UICatalog.Scenarios {
 						};
 						buttons.Add (button);
 					}
-					if (buttons.Count > 1) {
-						buttons [1].Text = "Accept";
-						buttons [1].IsDefault = true;
-						buttons [0].Visible = false;
-						buttons [0].Text = "_Back";
-						buttons [0].IsDefault = false;
-					}
+					//if (buttons.Count > 1) {
+					//	buttons [1].Text = "Accept";
+					//	buttons [1].IsDefault = true;
+					//	buttons [0].Visible = false;
+					//	buttons [0].Text = "_Back";
+					//	buttons [0].IsDefault = false;
+					//}
 
 					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 					// the buttons are laid out correctly
