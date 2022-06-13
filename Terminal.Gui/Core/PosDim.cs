@@ -167,22 +167,24 @@ namespace Terminal.Gui {
 
 		internal class PosAbsolute : Pos {
 			int n;
+			Func<int> function;
 			public PosAbsolute (int n) { this.n = n; }
+			public PosAbsolute (Func<int> function) { this.function = function; }
 
 			public override string ToString ()
 			{
-				return $"Pos.Absolute({n})";
+				return $"Pos.Absolute({(function == null ? n : function ())})";
 			}
 
 			internal override int Anchor (int width)
 			{
-				return n;
+				return function == null ? n : function ();
 			}
 
-			public override int GetHashCode () => n.GetHashCode ();
+			public override int GetHashCode () => function == null ? n.GetHashCode () : function ().GetHashCode ();
 
-			public override bool Equals (object other) => other is PosAbsolute abs && abs.n == n;
-
+			public override bool Equals (object other) => other is PosAbsolute abs
+				&& (function == null ? abs.n == n : abs.function () == function ());
 		}
 
 		/// <summary>
@@ -203,6 +205,16 @@ namespace Terminal.Gui {
 		public static Pos At (int n)
 		{
 			return new PosAbsolute (n);
+		}
+
+		/// <summary>
+		/// Creates an Absolute <see cref="Pos"/> from the specified function value.
+		/// </summary>
+		/// <param name="function">The function to be executed.</param>
+		/// <returns>The <see cref="Pos"/> returned from the function.</returns>
+		public static Pos Function (Func<int> function)
+		{
+			return new PosAbsolute (function);
 		}
 
 		internal class PosCombine : Pos {
@@ -434,22 +446,24 @@ namespace Terminal.Gui {
 
 		internal class DimAbsolute : Dim {
 			int n;
+			Func<int> function;
 			public DimAbsolute (int n) { this.n = n; }
+			public DimAbsolute (Func<int> function) { this.function = function; }
 
 			public override string ToString ()
 			{
-				return $"Dim.Absolute({n})";
+				return $"Dim.Absolute({(function == null ? n : function ())})";
 			}
 
 			internal override int Anchor (int width)
 			{
-				return n;
+				return function == null ? n : function ();
 			}
 
-			public override int GetHashCode () => n.GetHashCode ();
+			public override int GetHashCode () => function == null ? n.GetHashCode () : function ().GetHashCode ();
 
-			public override bool Equals (object other) => other is DimAbsolute abs && abs.n == n;
-
+			public override bool Equals (object other) => other is DimAbsolute abs
+				&& (function == null ? abs.n == n : abs.function () == function ());
 		}
 
 		internal class DimFill : Dim {
@@ -506,6 +520,16 @@ namespace Terminal.Gui {
 		public static Dim Sized (int n)
 		{
 			return new DimAbsolute (n);
+		}
+
+		/// <summary>
+		/// Creates an Absolute <see cref="Dim"/> from the specified function value.
+		/// </summary>
+		/// <param name="function">The function to be executed.</param>
+		/// <returns>The <see cref="Dim"/> returned from the function.</returns>
+		public static Dim Function (Func<int> function)
+		{
+			return new DimAbsolute (function);
 		}
 
 		internal class DimCombine : Dim {
