@@ -488,11 +488,37 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Percent_Equal ()
 		{
-			var n1 = 0;
-			var n2 = 0;
+			float n1 = 0;
+			float n2 = 0;
 			var pos1 = Pos.Percent (n1);
 			var pos2 = Pos.Percent (n2);
-			// BUGBUG: Pos.Percent should support equality 
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 0.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 100f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = 0;
+			n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.NotEqual (pos1, pos2);
+
+			n1 = 0.5f;
+			n2 = 1.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
 			Assert.NotEqual (pos1, pos2);
 		}
 
@@ -817,13 +843,13 @@ namespace Terminal.Gui.Core {
 		{
 			var text = "Test";
 			var pos = Pos.Function (() => text.Length);
-			Assert.Equal ("Pos.Absolute(4)", pos.ToString ());
+			Assert.Equal ("Pos.PosFunc(4)", pos.ToString ());
 
 			text = "New Test";
-			Assert.Equal ("Pos.Absolute(8)", pos.ToString ());
+			Assert.Equal ("Pos.PosFunc(8)", pos.ToString ());
 
 			text = "";
-			Assert.Equal ("Pos.Absolute(0)", pos.ToString ());
+			Assert.Equal ("Pos.PosFunc(0)", pos.ToString ());
 		}
 
 		[Fact]

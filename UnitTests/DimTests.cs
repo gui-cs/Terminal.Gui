@@ -842,13 +842,13 @@ namespace Terminal.Gui.Core {
 		{
 			var text = "Test";
 			var dim = Dim.Function (() => text.Length);
-			Assert.Equal ("Dim.Absolute(4)", dim.ToString ());
+			Assert.Equal ("Dim.DimFunc(4)", dim.ToString ());
 
 			text = "New Test";
-			Assert.Equal ("Dim.Absolute(8)", dim.ToString ());
+			Assert.Equal ("Dim.DimFunc(8)", dim.ToString ());
 
 			text = "";
-			Assert.Equal ("Dim.Absolute(0)", dim.ToString ());
+			Assert.Equal ("Dim.DimFunc(0)", dim.ToString ());
 		}
 
 		[Fact]
