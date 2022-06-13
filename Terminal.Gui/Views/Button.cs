@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 			set {
 				if (hotKey != value) {
 					var v = value == Key.Unknown ? Key.Null : value;
-					if (ContainsKeyBinding (Key.Space | hotKey)) {
+					if (hotKey != Key.Null && ContainsKeyBinding (Key.Space | hotKey)) {
 						if (v == Key.Null) {
 							ClearKeybinding (Key.Space | hotKey);
 						} else {
