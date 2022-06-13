@@ -26,7 +26,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
 
-			btn = new Button ("ARGS", true) {Text="Test"};
+			btn = new Button ("ARGS", true) { Text = "Test" };
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
 			btn.Redraw (btn.Bounds);
@@ -166,7 +166,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void TestAssignTextToButton ()
 		{
-			View b = new Button () {Text="heya"};
+			View b = new Button () { Text = "heya" };
 			Assert.Equal ("heya", b.Text);
 			Assert.True (b.TextFormatter.Text.Contains ("heya"));
 			b.Text = "heyb";
@@ -228,7 +228,7 @@ namespace Terminal.Gui.Views {
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void Update_Parameterless_Only_On_Or_After_Initialize ()
 		{
@@ -265,6 +265,100 @@ namespace Terminal.Gui.Views {
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_Center ()
+		{
+			var btn = new Button () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Text = "Say Hello 你",
+				AutoSize = true
+			};
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.True (btn.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.True (btn.AutoSize);
+			btn.Text = "Say Hello 你 changed";
+			Assert.True (btn.AutoSize);
+			Application.Refresh ();
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│  [ Say Hello 你 changed ]  │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_AnchorEnd ()
+		{
+			var btn = new Button () {
+				Y = Pos.Center (),
+				Text = "Say Hello 你",
+				AutoSize = true
+			};
+			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth  (btn.TextFormatter.Text));
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.True (btn.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│            [ Say Hello 你 ]│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.True (btn.AutoSize);
+			btn.Text = "Say Hello 你 changed";
+			Assert.True (btn.AutoSize);
+			Application.Refresh ();
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│    [ Say Hello 你 changed ]│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 		}
 	}
 }
