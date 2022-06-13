@@ -106,6 +106,14 @@ namespace Terminal.Gui {
 					helpTextView.SetNeedsDisplay ();
 				};
 
+				scrollBar.OtherScrollBarView.ChangedPosition += () => {
+					helpTextView.LeftColumn = scrollBar.OtherScrollBarView.Position;
+					if (helpTextView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
+						scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
+					}
+					helpTextView.SetNeedsDisplay ();
+				};
+
 				scrollBar.VisibleChanged += () => {
 					if (scrollBar.Visible && helpTextView.RightOffset == 0) {
 						helpTextView.RightOffset = 1;
@@ -114,6 +122,14 @@ namespace Terminal.Gui {
 					}	
 
 					//helpTextView.AllowsTab = helpTextView.CanFocus = scrollBar.Visible;
+				};
+
+				scrollBar.OtherScrollBarView.VisibleChanged += () => {
+					if (scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 0) {
+						helpTextView.BottomOffset = 1;
+					} else if (!scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 1) {
+						helpTextView.BottomOffset = 0;
+					}
 				};
 
 				helpTextView.DrawContent += (e) => {
