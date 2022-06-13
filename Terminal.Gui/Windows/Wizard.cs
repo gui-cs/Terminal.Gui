@@ -429,7 +429,7 @@ namespace Terminal.Gui {
 			}
 
 			if (currentStep == steps.Count - 1) {
-				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "Fi_nish";
+				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "Finish";
 			} else {
 				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "_Next...";
 			}
