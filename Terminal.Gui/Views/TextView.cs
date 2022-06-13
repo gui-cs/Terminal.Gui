@@ -2934,8 +2934,8 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsTab) {
-				return false;
+			if (!AllowsTab || isReadOnly) {
+				return ProcessMovePreviousView ();
 			}
 			if (currentColumn > 0) {
 				var currentLine = GetCurrentLine ();
@@ -2958,8 +2958,8 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsTab) {
-				return false;
+			if (!AllowsTab || isReadOnly) {
+				return ProcessMoveNextView ();
 			}
 			InsertText (new KeyEvent ((Key)'\t', null));
 			DoNeededAction ();
@@ -2977,11 +2977,9 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsReturn) {
+			if (!AllowsReturn || isReadOnly) {
 				return false;
 			}
-			if (isReadOnly)
-				return true;
 
 			var currentLine = GetCurrentLine ();
 
