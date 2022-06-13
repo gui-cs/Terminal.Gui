@@ -2530,5 +2530,52 @@ Y
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_Center_HotKeySpecifier ()
+		{
+			var btn = new Button () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Text = "Say He_llo 你",
+				AutoSize = true
+			};
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.True (btn.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.True (btn.AutoSize);
+			btn.Text = "Say He_llo 你 changed";
+			Assert.True (btn.AutoSize);
+			Application.Refresh ();
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│  [ Say Hello 你 changed ]  │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
 	}
 }

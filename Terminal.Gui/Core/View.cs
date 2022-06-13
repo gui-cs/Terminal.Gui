@@ -569,7 +569,8 @@ namespace Terminal.Gui {
 
 				width = value;
 				if (autoSize && value.Anchor (0) != TextFormatter.Size.Width
-					- (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
+					- (TextFormatter.IsHorizontalDirection (TextDirection)
+					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
 					autoSize = false;
 				}
 				SetMinWidthHeight ();
@@ -596,7 +597,8 @@ namespace Terminal.Gui {
 
 				height = value;
 				if (autoSize && value.Anchor (0) != TextFormatter.Size.Height
-					- (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
+					- (TextFormatter.IsVerticalDirection (TextDirection)
+					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
 					autoSize = false;
 				}
 				SetMinWidthHeight ();
