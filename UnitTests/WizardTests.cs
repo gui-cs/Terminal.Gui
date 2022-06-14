@@ -73,7 +73,7 @@ namespace Terminal.Gui.Views {
 
 			var btnBackText = "Back";
 			var btnBack = $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
-			var btnNextText = "Next...";
+			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
 			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";

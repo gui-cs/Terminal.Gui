@@ -234,10 +234,10 @@ namespace Terminal.Gui {
 			Add (separator);
 
 			// BUGBUG: Space is to work around https://github.com/migueldeicaza/gui.cs/issues/1812
-			backBtn = new Button (" ") { AutoSize = true };
+			backBtn = new Button (Strings.wzBack) { AutoSize = true };
 			AddButton (backBtn);
 
-			nextfinishBtn = new Button (" ") { AutoSize = true };
+			nextfinishBtn = new Button (Strings.wzFinish) { AutoSize = true };
 			nextfinishBtn.IsDefault = true;
 			AddButton (nextfinishBtn);
 
@@ -496,8 +496,6 @@ namespace Terminal.Gui {
 			}
 
 			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + newStep.Title : string.Empty)}";
-
-			// TODO: Move strings to loc
 
 			// Configure the Back button
 			backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : Strings.wzBack; // "_Back";
