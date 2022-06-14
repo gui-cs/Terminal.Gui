@@ -215,6 +215,18 @@ namespace UICatalog.Scenarios {
 					};
 					dialog.Add (add);
 
+					var addChar = new Button ($"Add a {Char.ConvertFromUtf32(CODE_POINT)} to each button") {
+						X = Pos.Center (),
+						Y = Pos.Center () + 1
+					};
+					addChar.Clicked += () => {
+						foreach (var button in buttons) {
+							button.Text += Char.ConvertFromUtf32 (CODE_POINT);
+						}
+						dialog.LayoutSubviews ();
+					};
+					dialog.Add (addChar);
+
 					Application.Run (dialog);
 					buttonPressedLabel.Text = $"{clicked}";
 

@@ -93,6 +93,37 @@ namespace Terminal.Gui.Views {
 		// and that the title is correct
 		public void OneStepWizard_Shows ()
 		{
+			var d = ((FakeDriver)Application.Driver);
+
+			var title = "1234";
+			var stepTitle = "ABCD";
+
+			int width = 30;
+			int height = 7;
+			d.SetBufferSize (width, height);
+
+			var btnBackText = "Back";
+			var btnBack = string.Empty; // $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
+			var btnNextText = "Finish"; // "Next";
+			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
+
+			var topRow = $"{d.ULDCorner} {title} - {stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDCorner}";
+			var row2 = $"{d.VDLine}{new String (' ', width - 2)}{d.VDLine}";
+			var row3 = row2;
+			var row4 = row3;
+			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
+			var buttonRow = $"{d.VDLine}{btnBack}{new String (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
+			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
+
+			var wizard = new Wizard (title) { Width = width, Height = height };
+			wizard.AddStep (new Wizard.WizardStep (stepTitle));
+			//wizard.LayoutSubviews ();
+			var firstIteration = false;
+			var runstate = Application.Begin (wizard);
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+
+			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
 		}
 
 		[Fact, AutoInitShutdown]
