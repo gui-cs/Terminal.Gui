@@ -16,7 +16,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 0,
 				Width = Dim.Percent (75),
-				Height = 10,
 				ColorScheme = Colors.Base,
 			};
 			Win.Add (frame);
@@ -69,9 +68,18 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (titleEdit);
 
+			var useStepView = new CheckBox () {
+				Text = "Add 3rd step controls to WizardStep instead of WizardStep.Controls",
+				Checked = false,
+				X = Pos.Left (titleEdit),
+				Y = Pos.Bottom (titleEdit)
+			};
+			frame.Add (useStepView);
+
+
 			void Top_Loaded ()
 			{
-				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + 2;
+				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (useStepView) + 2;
 				Top.Loaded -= Top_Loaded;
 			}
 			Top.Loaded += Top_Loaded;
@@ -127,6 +135,11 @@ namespace UICatalog.Scenarios {
 						actionLabel.Text = "Finished";
 					};
 
+					wizard.Cancelled += (args) => {
+						//args.Cancel = true;
+						actionLabel.Text = "Cancelled";
+					};
+
 					// Add 1st step
 					var firstStep = new Wizard.WizardStep ("End User License Agreement");
 					wizard.AddStep (firstStep);
@@ -138,6 +151,15 @@ namespace UICatalog.Scenarios {
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
 					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too.";
+
+
+					View viewForControls = secondStep.Controls;
+					ustring frameMsg = "Added to WizardStep.Controls";
+					if (useStepView.Checked) {
+						viewForControls = secondStep;
+						frameMsg = "Added to WizardStep directly";
+					}
+
 					var buttonLbl = new Label () { Text = "Second Step Button: ", AutoSize = true, X = 1, Y = 1 };
 					var button = new Button () {
 						Text = "Press Me",
@@ -147,13 +169,28 @@ namespace UICatalog.Scenarios {
 					button.Clicked += () => {
 						MessageBox.Query ("Wizard Scenario", "The Second Step Button was pressed.");
 					};
-					secondStep.Controls.Add (buttonLbl, button);
+					viewForControls.Add (buttonLbl, button);
 					var lbl = new Label () { Text = "First Name: ", AutoSize = true, X = 1, Y = Pos.Bottom (buttonLbl) };
 					var firstNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-					secondStep.Controls.Add (lbl, firstNameField);
+					viewForControls.Add (lbl, firstNameField);
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-					secondStep.Controls.Add (lbl, lastNameField);
+					viewForControls.Add (lbl, lastNameField);
+					var checkBox = new CheckBox () { Text = "Un-check me!", Checked = true, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
+					viewForControls.Add (checkBox);
+
+					// Add a frame to demonstrate difference between adding controls to
+					// WizardStep.Controls vs. WizardStep directly. This is here to demonstrate why 
+					// adding to .Controls is preferred.
+					var frame = new FrameView ($"A Broken Frame - {frameMsg}") {
+						X = 0,
+						Y = Pos.Bottom (checkBox) + 2,
+						Width = Dim.Fill (),
+						Height = 4,
+						//ColorScheme = Colors.Error,
+					};
+					frame.Add (new TextField ("This is a TextField inside of the frame."));
+					viewForControls.Add (frame);
 
 					// Add 3rd step
 					var thirdStep = new Wizard.WizardStep ("Third Step");
@@ -169,19 +206,34 @@ namespace UICatalog.Scenarios {
 					thirdStep.Controls.Add (progLbl, progressBar);
 
 					// Add 4th step
-					var fourthStep = new Wizard.WizardStep ("Hidden Help pane");
+					var fourthStep = new Wizard.WizardStep ("Step Four");
 					wizard.AddStep (fourthStep);
 					fourthStep.ShowHelp = false;
 					var someText = new TextView () {
-						Text = "This step shows how to hide the Help pane. The control pane contains this TextView.",
+						Text = "This step (Step Four) shows how to hide the Help pane. The control pane contains this TextView (but it's hard to tell it's a TextView because of Issue #1800).",
 						X = 0,
 						Y = 0,
 						Width = Dim.Fill (),
 						Height = Dim.Fill (),
 						WordWrap = true,
+						AllowsTab = false
 					};
 					fourthStep.Controls.Add (someText);
+					//fourthStep.NextButtonText = "4";
 					var scrollBar = new ScrollBarView (someText, true);
+
+					wizard.StepChanging += (args) => {
+						if (args.NewStep == fourthStep) {
+							var btn = MessageBox.ErrorQuery ("Wizards", "Move to Step Four?", "Yes", "No");
+							args.Cancel = btn == 1;
+						}
+					};
+
+					wizard.StepChanged += (args) => {
+						if (args.NewStep == fourthStep) {
+							var btn = MessageBox.ErrorQuery ("Wizards", "Yay. Moved to Step Four", "Ok");
+						}
+					};
 
 					scrollBar.ChangedPosition += () => {
 						someText.TopRow = scrollBar.Position;
@@ -216,12 +268,7 @@ namespace UICatalog.Scenarios {
 					wizard.AddStep (lastStep);
 					lastStep.HelpText = "The wizard is complete! Press the Finish button to continue. Pressing ESC will cancel the wizard.";
 
-
 					// TODO: Demo setting initial Pane
-
-					wizard.Finished += (args) => {
-						Application.RequestStop (wizard);
-					};
 
 					Application.Run (wizard);
 

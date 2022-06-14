@@ -30,6 +30,8 @@ namespace Terminal.Gui {
 			// TODO: Update Wizard title when step title is changed if step is current - this will require step to slueth it's parent 
 			private ustring title;
 
+			// The controlPane is a separate view, so when devs add controls to the Step and help is visible, Y = Pos.AnchorEnd()
+			// will work as expected.
 			private View controlPane = new FrameView ();
 
 			/// <summary>
@@ -74,8 +76,8 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
-				this.ColorScheme = Colors.Menu;
-		
+				this.ColorScheme = Colors.Dialog;
+
 				Y = 0;
 				Height = Dim.Fill (1); // for button frame
 				Width = Dim.Fill ();
@@ -178,7 +180,7 @@ namespace Terminal.Gui {
 				if (showControls) {
 					if (showHelp) {
 						Controls.Width = Dim.Percent (70);
-						helpTextView.X = Pos.Right (Controls) ;
+						helpTextView.X = Pos.Right (Controls);
 						helpTextView.Width = Dim.Fill ();
 
 					} else {
@@ -195,29 +197,7 @@ namespace Terminal.Gui {
 				Controls.Visible = showControls;
 				helpTextView.Visible = showHelp;
 			}
-		}
-
-		/// <summary>
-		/// If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes
-		/// the <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step. 
-		/// </summary>
-		/// <remarks>
-		/// Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.
-		/// </remarks>
-		public Button BackButton { get => backBtn; }
-		private Button backBtn;
-
-		/// <summary>
-		/// If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes
-		/// the <see cref="Finished"/> event to be fired and the wizard to close. If the step is not the last step,
-		/// the <see cref="MovingNext"/> event will be fired and the wizard will move next step. 
-		/// </summary>
-		/// <remarks>
-		/// Use the <see cref="MovingNext"></see> and <see cref="Finished"></see> events to be notified 
-		/// when the user attempts go to the next step or finish the wizard.
-		/// </remarks>
-		public Button NextFinishButton { get => nextfinishBtn; }
-		private Button nextfinishBtn;
+		} // WizardStep
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -259,46 +239,90 @@ namespace Terminal.Gui {
 			nextfinishBtn.IsDefault = true;
 			AddButton (nextfinishBtn);
 
-			backBtn.Clicked += () => {
-				var args = new WizardStepEventArgs ();
-				MovingBack?.Invoke (args);
-				if (!args.Cancel) {
-					if (currentStep > 0) {
-						CurrentStep--;
-					}
-				}
-			};
+			backBtn.Clicked += BackBtn_Clicked;
+			nextfinishBtn.Clicked += NextfinishBtn_Clicked;
 
-			nextfinishBtn.Clicked += () => {
-				if (currentStep == steps.Count - 1) {
-					var args = new WizardStepEventArgs ();
-					Finished?.Invoke (args);
-					if (!args.Cancel) {
-						Application.RequestStop (this);
-					}
-				} else {
-					var args = new WizardStepEventArgs ();
-					MovingNext?.Invoke (args);
-					if (!args.Cancel) {
-						CurrentStep++;
-					}
-				}
-			};
-
-			Loaded += () => {
-				foreach (var step in steps) {
-					step.Y = 0;
-				}
-				if (steps.Count > 0) {
-
-					CurrentStep = 0;
-				}
-			};
-
+			Loaded += Wizard_Loaded;
+			Closing += Wizard_Closing;
 		}
 
-		private List<WizardStep> steps = new List<WizardStep> ();
-		private int currentStep = 0;
+		private bool finishedPressed = false;
+
+		private void Wizard_Closing (ToplevelClosingEventArgs obj)
+		{
+			if (!finishedPressed) {
+				var args = new WizardButtonEventArgs ();
+				Cancelled?.Invoke (args);
+			}
+		}
+
+		private void Wizard_Loaded ()
+		{
+			foreach (var step in steps) {
+				step.Y = 0;
+			}
+			if (steps.Count > 0) {
+				CurrentStep = steps.First.Value;
+			}
+		}
+
+		private void NextfinishBtn_Clicked ()
+		{
+			if (CurrentStep == steps.Last.Value) {
+				var args = new WizardButtonEventArgs ();
+				Finished?.Invoke (args);
+				if (!args.Cancel) {
+					finishedPressed = true;
+					Application.RequestStop (this);
+				}
+			} else {
+				var args = new WizardButtonEventArgs ();
+				MovingNext?.Invoke (args);
+				if (!args.Cancel) {
+					var current = steps.Find (CurrentStep);
+					if (current != null && current.Next != null) {
+						GotoStep (current.Next.Value);
+					}
+				}
+			}
+		}
+
+		private void BackBtn_Clicked ()
+		{
+			var args = new WizardButtonEventArgs ();
+			MovingBack?.Invoke (args);
+			if (!args.Cancel) {
+				var current = steps.Find (CurrentStep);
+				if (current != null && current.Previous != null) {
+					GotoStep (current.Previous.Value);
+				}
+			}
+		}
+
+		private LinkedList<WizardStep> steps = new LinkedList<WizardStep> ();
+		private WizardStep currentStep = null;
+
+		/// <summary>
+		/// If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes
+		/// the <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step. 
+		/// </summary>
+		/// <remarks>
+		/// Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.
+		/// </remarks>
+		public Button BackButton { get => backBtn; }
+		private Button backBtn;
+
+		/// <summary>
+		/// If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes
+		/// the <see cref="Finished"/> event to be fired and the wizard to close. If the step is not the last step,
+		/// the <see cref="MovingNext"/> event will be fired and the wizard will move next step. 
+		/// </summary>
+		/// <remarks>
+		/// Use the <see cref="MovingNext"></see> and <see cref="Finished"></see> events to be notified 
+		/// when the user attempts go to the next step or finish the wizard.
+		/// </remarks>
+		public Button NextFinishButton { get => nextfinishBtn; }
+		private Button nextfinishBtn;
 
 		/// <summary>
 		/// Adds a step to the wizard. The Next and Back buttons navigate through the added steps in the
@@ -308,8 +332,9 @@ namespace Terminal.Gui {
 		/// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
 		public void AddStep (WizardStep newStep)
 		{
-			steps.Add (newStep);
+			steps.AddLast (newStep);
 			this.Add (newStep);
+			SetNeedsLayout ();
 		}
 
 		/// <summary>
@@ -322,7 +347,7 @@ namespace Terminal.Gui {
 			}
 			set {
 				wizardTitle = value;
-				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
+				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + currentStep.Title : string.Empty)}";
 			}
 		}
 		private ustring wizardTitle = ustring.Empty;
@@ -330,16 +355,16 @@ namespace Terminal.Gui {
 		/// <summary>	
 		/// <see cref="EventArgs"/> for <see cref="WizardStep"/> transition events.
 		/// </summary>
-		public class WizardStepEventArgs : EventArgs {
+		public class WizardButtonEventArgs : EventArgs {
 			/// <summary>
 			/// Set to true to cancel the transition to the next step.
 			/// </summary>
 			public bool Cancel { get; set; }
 
 			/// <summary>
-			/// Initializes a new instance of <see cref="WizardStepEventArgs"/>
+			/// Initializes a new instance of <see cref="WizardButtonEventArgs"/>
 			/// </summary>
-			public WizardStepEventArgs ()
+			public WizardButtonEventArgs ()
 			{
 				Cancel = false;
 			}
@@ -349,7 +374,7 @@ namespace Terminal.Gui {
 		/// This event is raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always
 		/// the first button in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any.
 		/// </summary>
-		public event Action<WizardStepEventArgs> MovingBack;
+		public event Action<WizardButtonEventArgs> MovingBack;
 
 		/// <summary>
 		/// This event is raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
@@ -357,7 +382,7 @@ namespace Terminal.Gui {
 		/// raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow 
 		/// (otherwise the <see cref="Finished"/> event is raised).
 		/// </summary>
-		public event Action<WizardStepEventArgs> MovingNext;
+		public event Action<WizardButtonEventArgs> MovingNext;
 
 		/// <summary>
 		/// This event is raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
@@ -365,69 +390,143 @@ namespace Terminal.Gui {
 		/// raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow 
 		/// (otherwise the <see cref="Finished"/> event is raised).
 		/// </summary>
-		public event Action<WizardStepEventArgs> Finished;
+		public event Action<WizardButtonEventArgs> Finished;
+
 
 		/// <summary>
-		/// This event is raised when the current step )<see cref="CurrentStep"/>) in the <see cref="Wizard"/> changes.
+		/// This event is raised when the user has cancelled the <see cref="Wizard"/> (with Ctrl-Q or ESC).
 		/// </summary>
-		public event Action<CurrentStepChangedEventArgs> CurrentStepChanged;
+		public event Action<WizardButtonEventArgs> Cancelled;
 
 		/// <summary>
 		/// <see cref="EventArgs"/> for <see cref="WizardStep"/> events.
 		/// </summary>
-		public class CurrentStepChangedEventArgs : EventArgs {
+		public class StepChangeEventArgs : EventArgs {
 			/// <summary>
-			/// The new current <see cref="WizardStep"/>.
+			/// The current (or previous) <see cref="WizardStep"/>.
 			/// </summary>
-			public int CurrentStepIndex { get; }
+			public WizardStep OldStep { get; }
 
 			/// <summary>
-			/// Initializes a new instance of <see cref="CurrentStepChangedEventArgs"/>
+			/// The <see cref="WizardStep"/> the <see cref="Wizard"/> is changing to or has changed to.
 			/// </summary>
-			/// <param name="currentStepIndex">The new current <see cref="WizardStep"/>.</param>
-			public CurrentStepChangedEventArgs (int currentStepIndex)
+			public WizardStep NewStep { get; }
+
+			/// <summary>
+			/// Event handlers can set to true before returning to cancel the step transition.
+			/// </summary>
+			public bool Cancel { get; set; }
+
+			/// <summary>
+			/// Initializes a new instance of <see cref="StepChangeEventArgs"/>
+			/// </summary>
+			/// <param name="oldStep">The current <see cref="WizardStep"/>.</param>
+			/// <param name="newStep">The new <see cref="WizardStep"/>.</param>
+			public StepChangeEventArgs (WizardStep oldStep, WizardStep newStep)
 			{
-				CurrentStepIndex = currentStepIndex;
+				OldStep = oldStep;
+				NewStep = newStep;
+				Cancel = false;
 			}
 		}
+
+		/// <summary>
+		/// This event is raised when the current <see cref="CurrentStep"/>) is about to change. Use <see cref="StepChangeEventArgs.Cancel"/> 
+		/// to abort the transition.
+		/// </summary>
+		public event Action<StepChangeEventArgs> StepChanging;
+
+		/// <summary>
+		/// This event is raised after the <see cref="Wizard"/> has changed the <see cref="CurrentStep"/>. 
+		/// </summary>
+		public event Action<StepChangeEventArgs> StepChanged;
 
 		/// <summary>
 		/// Gets or sets the currently active <see cref="WizardStep"/>.
 		/// </summary>
-		public int CurrentStep {
+		public WizardStep CurrentStep {
 			get => currentStep;
 			set {
-				currentStep = value;
-				OnCurrentStepChanged ();
+				GotoStep (value);
 			}
 		}
 
 		/// <summary>
-		/// Called when the current <see cref="WizardStep"/> has changed (<see cref="CurrentStep"/>).
+		/// Called when the <see cref="Wizard"/> is about to transition to another <see cref="WizardStep"/>. Fires the <see cref="StepChanging"/> event. 
 		/// </summary>
-		public virtual void OnCurrentStepChanged ()
+		/// <param name="oldStep">The step the Wizard is about to change from</param>
+		/// <param name="newStep">The step the Wizard is about to change to</param>
+		/// <returns>True if the change is to be cancelled.</returns>
+		public virtual bool OnStepChanging (WizardStep oldStep, WizardStep newStep)
 		{
-			CurrentStepChanged?.Invoke (new CurrentStepChangedEventArgs (currentStep));
-			// Hide all but the first step
+			var args = new StepChangeEventArgs (oldStep, newStep);
+			StepChanging?.Invoke (args);
+			return args.Cancel;
+		}
+
+
+		/// <summary>
+		/// Called when the <see cref="Wizard"/> has completed transition to a new <see cref="WizardStep"/>. Fires the <see cref="StepChanged"/> event. 
+		/// </summary>
+		/// <param name="oldStep">The step the Wizard changed from</param>
+		/// <param name="newStep">The step the Wizard has changed to</param>
+		/// <returns>True if the change is to be cancelled.</returns>
+		public virtual bool OnStepChanged (WizardStep oldStep, WizardStep newStep)
+		{
+			var args = new StepChangeEventArgs (oldStep, newStep);
+			StepChanged?.Invoke (args);
+			return args.Cancel;
+		}
+		/// <summary>
+		/// Changes to the specified <see cref="WizardStep"/>.
+		/// </summary>
+		/// <param name="newStep">The step to go to.</param>
+		/// <returns>True if the transition to the step succeeded. False if the step was not found or the operation was cancelled.</returns>
+		public bool GotoStep (WizardStep newStep)
+		{
+			if (OnStepChanging (currentStep, newStep)) {
+				return false;
+			}
+
+			// Hide all but the new step
 			foreach (WizardStep step in steps) {
-				step.Visible = (steps [currentStep] == step);
+				step.Visible = (step == newStep);
 			}
 
-			// TODO: Add support for "Wizard Title - Step Title"
-			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + steps [currentStep].Title : string.Empty)}";
+			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + newStep.Title : string.Empty)}";
 
-			backBtn.Text = steps [currentStep].BackButtonText != ustring.Empty ? steps [currentStep].BackButtonText : "_Back";
-			if (currentStep == 0) {
-				backBtn.Visible = false;
+			// TODO: Move strings to loc
+
+			// Configure the Back button
+			backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : "_Back";
+			backBtn.Visible = (newStep != steps.First.Value);
+
+			// Configure the Next/Finished button
+			if (newStep == steps.Last.Value) {
+				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : "Fi_nish";
 			} else {
-				backBtn.Visible = true;
+				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : "_Next...";
 			}
 
-			if (currentStep == steps.Count - 1) {
-				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "Fi_nish";
+			// Set focus to the nav buttons
+			if (backBtn.HasFocus) {
+				backBtn.SetFocus ();
 			} else {
-				nextfinishBtn.Text = steps [currentStep].NextButtonText != ustring.Empty ? steps [currentStep].NextButtonText : "_Next...";
+				nextfinishBtn.SetFocus ();
 			}
+
+			var oldStep = currentStep; 
+			currentStep = newStep;
+
+			LayoutSubviews ();
+			Redraw (this.Bounds);
+
+			if (OnStepChanged (oldStep, currentStep)) {
+				// For correctness we do this, but it's meaningless because there's nothing to cancel
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
