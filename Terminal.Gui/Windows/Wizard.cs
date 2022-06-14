@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NStack;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -232,10 +233,11 @@ namespace Terminal.Gui {
 			};
 			Add (separator);
 
-			backBtn = new Button ("_Back") { AutoSize = true };
+			// BUGBUG: Space is to work around https://github.com/migueldeicaza/gui.cs/issues/1812
+			backBtn = new Button (" ") { AutoSize = true };
 			AddButton (backBtn);
 
-			nextfinishBtn = new Button ("_Next...") { AutoSize = true };
+			nextfinishBtn = new Button (" ") { AutoSize = true };
 			nextfinishBtn.IsDefault = true;
 			AddButton (nextfinishBtn);
 
@@ -498,14 +500,14 @@ namespace Terminal.Gui {
 			// TODO: Move strings to loc
 
 			// Configure the Back button
-			backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : "_Back";
+			backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : Strings.wzBack; // "_Back";
 			backBtn.Visible = (newStep != steps.First.Value);
 
 			// Configure the Next/Finished button
 			if (newStep == steps.Last.Value) {
-				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : "Fi_nish";
+				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
 			} else {
-				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : "_Next...";
+				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzNext; // "_Next...";
 			}
 
 			// Set focus to the nav buttons

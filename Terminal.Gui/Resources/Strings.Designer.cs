@@ -185,5 +185,32 @@ namespace Terminal.Gui.Resources {
                 return ResourceManager.GetString("fdSelectMixed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Back.
+        /// </summary>
+        internal static string wzBack {
+            get {
+                return ResourceManager.GetString("wzBack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fi_nish.
+        /// </summary>
+        internal static string wzFinish {
+            get {
+                return ResourceManager.GetString("wzFinish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Next....
+        /// </summary>
+        internal static string wzNext {
+            get {
+                return ResourceManager.GetString("wzNext", resourceCulture);
+            }
+        }
     }
 }
