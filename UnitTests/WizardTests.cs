@@ -181,7 +181,7 @@ namespace Terminal.Gui.Views {
 			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
 
 			// Once this is fixed, revert to commented out line: https://github.com/migueldeicaza/gui.cs/issues/1791
-			var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 3)}{btnNext} {d.VDLine}";
+			var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
