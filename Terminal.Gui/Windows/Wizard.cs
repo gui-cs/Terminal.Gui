@@ -90,6 +90,7 @@ namespace Terminal.Gui {
 				helpTextView.Y = 0;
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
+				helpTextView.TabStop = false;
 				this.Add (helpTextView);
 				ShowHide ();
 
