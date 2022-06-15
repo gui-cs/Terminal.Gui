@@ -2399,7 +2399,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool oldEnabled;
+		bool oldEnabled = true;
 
 		/// <inheritdoc/>
 		public override bool Enabled {

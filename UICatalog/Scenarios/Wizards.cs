@@ -176,15 +176,15 @@ namespace UICatalog.Scenarios {
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, lastNameField);
-					var checkBox = new CheckBox () { Text = "Un-check me!", Checked = true, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
-					viewForControls.Add (checkBox);
+					var thirdStepEnabledCeckBox = new CheckBox () { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
+					viewForControls.Add (thirdStepEnabledCeckBox);
 
 					// Add a frame to demonstrate difference between adding controls to
 					// WizardStep.Controls vs. WizardStep directly. This is here to demonstrate why 
 					// adding to .Controls is preferred.
 					var frame = new FrameView ($"A Broken Frame - {frameMsg}") {
 						X = 0,
-						Y = Pos.Bottom (checkBox) + 2,
+						Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
 						Width = Dim.Fill (),
 						Height = 4,
 						//ColorScheme = Colors.Error,
@@ -192,10 +192,23 @@ namespace UICatalog.Scenarios {
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					viewForControls.Add (frame);
 
-					// Add 3rd step
-					var thirdStep = new Wizard.WizardStep ("Third Step");
+					// Add 3rd (optional) step
+					var thirdStep = new Wizard.WizardStep ("Third Step (Optional)");
+
+					thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					thirdStepEnabledCeckBox.Toggled += (args) => {
+						thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					};
+
 					wizard.AddStep (thirdStep);
-					thirdStep.HelpText = "This is the help text for the Third Step.";
+					thirdStep.HelpText = "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
+					var step3Label = new Label () {
+						Text = "This step is optional.",
+						X = 0,
+						Y = 0,
+						AutoSize = true
+					};
+					thirdStep.Controls.Add (step3Label);
 					var progLbl = new Label () { Text = "Third Step ProgressBar: ", AutoSize = true, X = 1, Y = 10 };
 					var progressBar = new ProgressBar () {
 						X = Pos.Right (progLbl),
@@ -222,18 +235,18 @@ namespace UICatalog.Scenarios {
 					//fourthStep.NextButtonText = "4";
 					var scrollBar = new ScrollBarView (someText, true);
 
-					wizard.StepChanging += (args) => {
-						if (args.NewStep == fourthStep) {
-							var btn = MessageBox.ErrorQuery ("Wizards", "Move to Step Four?", "Yes", "No");
-							args.Cancel = btn == 1;
-						}
-					};
+					//wizard.StepChanging += (args) => {
+					//	if (args.NewStep == fourthStep) {
+					//		var btn = MessageBox.ErrorQuery ("Wizards", "Move to Step Four?", "Yes", "No");
+					//		args.Cancel = btn == 1;
+					//	}
+					//};
 
-					wizard.StepChanged += (args) => {
-						if (args.NewStep == fourthStep) {
-							var btn = MessageBox.ErrorQuery ("Wizards", "Yay. Moved to Step Four", "Ok");
-						}
-					};
+					//wizard.StepChanged += (args) => {
+					//	if (args.NewStep == fourthStep) {
+					//		var btn = MessageBox.ErrorQuery ("Wizards", "Yay. Moved to Step Four", "Ok");
+					//	}
+					//};
 
 					scrollBar.ChangedPosition += () => {
 						someText.TopRow = scrollBar.Position;

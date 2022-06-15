@@ -22,6 +22,11 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
 		/// with the Next button of the Wizard.
+		/// 
+		/// Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when the step is active; see also: <see cref="Wizard.StepChanged"/>.
+		/// 
+		/// To enable or disable a step from being shown to the user, set <see cref="View.Enabled"/>.
+		/// 
 		/// </remarks>
 		public class WizardStep : View {
 			/// <summary>
@@ -94,6 +99,7 @@ namespace Terminal.Gui {
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
 				this.Add (helpTextView);
+
 				ShowHide ();
 
 				var scrollBar = new ScrollBarView (helpTextView, true);
@@ -142,6 +148,13 @@ namespace Terminal.Gui {
 				};
 				this.Add (scrollBar);
 			}
+
+			//public override void OnEnabledChanged()
+			//{
+			//	if (Enabled) { }
+			//	base.OnEnabledChanged ();
+			//}
+
 
 			/// <summary>
 			/// If true (the default) the help will be visible. If false, the help will not be shown and the control pane will
@@ -281,12 +294,51 @@ namespace Terminal.Gui {
 				var args = new WizardButtonEventArgs ();
 				MovingNext?.Invoke (args);
 				if (!args.Cancel) {
-					var current = steps.Find (CurrentStep);
-					if (current != null && current.Next != null) {
-						GotoStep (current.Next.Value);
-					}
+					GoNext ();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Causes the wizad to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). 
+		/// If there is no previous step, does nothing.
+		/// </summary>
+		public void GoNext ()
+		{
+			var nextStep = GetNextStep ();
+			if (nextStep != null) {
+				GoToStep (nextStep);
+			}
+		}
+
+		/// <summary>
+		/// Returns the next enabled <see cref="WizardStep"/> after the current step. Takes into account steps which
+		/// are disabled. If <see cref="CurrentStep"/> is `null` returns the first enabled step.
+		/// </summary>
+		/// <returns>The next step after the current step, if there is one; otherwise returns `null`, which 
+		/// indicates either there are no enabled steps or the current step is the last enabled step.</returns>
+		public WizardStep GetNextStep ()
+		{
+			LinkedListNode<WizardStep> step = null;
+			if (CurrentStep == null) {
+				// Get last step, assume it is next
+				step = steps.First;
+			} else {
+				// Get the step after current
+				step = steps.Find (CurrentStep);
+				if (step != null) {
+					step = step.Next;
+				}
+			}
+
+			// step now points to the potential next step
+			while (step != null) {
+				if (step.Value.Enabled) {
+					return step.Value;
+				}
+				step = step.Next;
+			}
+			return null;
 		}
 
 		private void BackBtn_Clicked ()
@@ -294,11 +346,50 @@ namespace Terminal.Gui {
 			var args = new WizardButtonEventArgs ();
 			MovingBack?.Invoke (args);
 			if (!args.Cancel) {
-				var current = steps.Find (CurrentStep);
-				if (current != null && current.Previous != null) {
-					GotoStep (current.Previous.Value);
+				GoBack ();
+			}
+		}
+
+		/// <summary>
+		/// Causes the wizad to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set). 
+		/// If there is no previous step, does nothing.
+		/// </summary>
+		public void GoBack ()
+		{
+			var previous = GetPreviousStep ();
+			if (previous != null) {
+				GoToStep (previous);
+			}
+		}
+
+		/// <summary>
+		/// Returns the first enabled <see cref="WizardStep"/> before the current step. Takes into account steps which
+		/// are disabled. If <see cref="CurrentStep"/> is `null` returns the last enabled step.
+		/// </summary>
+		/// <returns>The first step ahead of the current step, if there is one; otherwise returns `null`, which 
+		/// indicates either there are no enabled steps or the current step is the first enabled step.</returns>
+		public WizardStep GetPreviousStep ()
+		{
+			LinkedListNode<WizardStep> step = null;
+			if (CurrentStep == null) {
+				// Get last step, assume it is previous
+				step = steps.Last;
+			} else {
+				// Get the step before current
+				step = steps.Find (CurrentStep);
+				if (step != null) {
+					step = step.Previous;
 				}
 			}
+
+			// step now points to the potential previous step
+			while (step != null) {
+				if (step.Value.Enabled) {
+					return step.Value;
+				}
+				step = step.Previous;
+			}
+			return null;
 		}
 
 		private LinkedList<WizardStep> steps = new LinkedList<WizardStep> ();
@@ -449,7 +540,7 @@ namespace Terminal.Gui {
 		public WizardStep CurrentStep {
 			get => currentStep;
 			set {
-				GotoStep (value);
+				GoToStep (value);
 			}
 		}
 
@@ -484,9 +575,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="newStep">The step to go to.</param>
 		/// <returns>True if the transition to the step succeeded. False if the step was not found or the operation was cancelled.</returns>
-		public bool GotoStep (WizardStep newStep)
+		public bool GoToStep (WizardStep newStep)
 		{
-			if (OnStepChanging (currentStep, newStep)) {
+			if (OnStepChanging (currentStep, newStep) || (newStep != null && !newStep.Enabled)) {
 				return false;
 			}
 
@@ -495,17 +586,20 @@ namespace Terminal.Gui {
 				step.Visible = (step == newStep);
 			}
 
-			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + newStep.Title : string.Empty)}";
+			if (newStep != null) {
 
-			// Configure the Back button
-			backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : Strings.wzBack; // "_Back";
-			backBtn.Visible = (newStep != steps.First.Value);
+				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + newStep.Title : string.Empty)}";
 
-			// Configure the Next/Finished button
-			if (newStep == steps.Last.Value) {
-				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
-			} else {
-				nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzNext; // "_Next...";
+				// Configure the Back button
+				backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : Strings.wzBack; // "_Back";
+				backBtn.Visible = (newStep != steps.First.Value);
+
+				// Configure the Next/Finished button
+				if (newStep == steps.Last.Value) {
+					nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
+				} else {
+					nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzNext; // "_Next...";
+				}
 			}
 
 			// Set focus to the nav buttons
@@ -515,7 +609,7 @@ namespace Terminal.Gui {
 				nextfinishBtn.SetFocus ();
 			}
 
-			var oldStep = currentStep; 
+			var oldStep = currentStep;
 			currentStep = newStep;
 
 			LayoutSubviews ();
