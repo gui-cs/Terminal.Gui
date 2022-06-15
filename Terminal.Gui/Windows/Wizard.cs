@@ -276,9 +276,7 @@ namespace Terminal.Gui {
 			foreach (var step in steps) {
 				step.Y = 0;
 			}
-			if (steps.Count > 0) {
-				CurrentStep = steps.First.Value;
-			}
+			CurrentStep = GetNextStep (); // gets the first step if CurrentStep == null
 		}
 
 		private void NextfinishBtn_Clicked ()
@@ -440,7 +438,7 @@ namespace Terminal.Gui {
 			}
 			set {
 				wizardTitle = value;
-				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + currentStep.Title : string.Empty)}";
+				base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
 			}
 		}
 		private ustring wizardTitle = ustring.Empty;
