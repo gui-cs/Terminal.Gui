@@ -150,8 +150,7 @@ namespace UICatalog.Scenarios {
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
-					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too.";
-
+					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter First Name too.";
 
 					View viewForControls = secondStep.Controls;
 					ustring frameMsg = "Added to WizardStep.Controls";
@@ -191,15 +190,15 @@ namespace UICatalog.Scenarios {
 					};
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					viewForControls.Add (frame);
+					wizard.StepChanging += (args) => {
+						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty ) {
+							args.Cancel = true;
+							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
+						}
+					};
 
 					// Add 3rd (optional) step
 					var thirdStep = new Wizard.WizardStep ("Third Step (Optional)");
-
-					thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
-					thirdStepEnabledCeckBox.Toggled += (args) => {
-						thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
-					};
-
 					wizard.AddStep (thirdStep);
 					thirdStep.HelpText = "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
 					var step3Label = new Label () {
@@ -217,7 +216,11 @@ namespace UICatalog.Scenarios {
 						Fraction = 0.42F
 					};
 					thirdStep.Controls.Add (progLbl, progressBar);
-
+					thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					thirdStepEnabledCeckBox.Toggled += (args) => {
+						thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					};
+	
 					// Add 4th step
 					var fourthStep = new Wizard.WizardStep ("Step Four");
 					wizard.AddStep (fourthStep);
@@ -232,21 +235,8 @@ namespace UICatalog.Scenarios {
 						AllowsTab = false
 					};
 					fourthStep.Controls.Add (someText);
-					//fourthStep.NextButtonText = "4";
+					fourthStep.NextButtonText = "Go To Last Step";
 					var scrollBar = new ScrollBarView (someText, true);
-
-					//wizard.StepChanging += (args) => {
-					//	if (args.NewStep == fourthStep) {
-					//		var btn = MessageBox.ErrorQuery ("Wizards", "Move to Step Four?", "Yes", "No");
-					//		args.Cancel = btn == 1;
-					//	}
-					//};
-
-					//wizard.StepChanged += (args) => {
-					//	if (args.NewStep == fourthStep) {
-					//		var btn = MessageBox.ErrorQuery ("Wizards", "Yay. Moved to Step Four", "Ok");
-					//	}
-					//};
 
 					scrollBar.ChangedPosition += () => {
 						someText.TopRow = scrollBar.Position;
