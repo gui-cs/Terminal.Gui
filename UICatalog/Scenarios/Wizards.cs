@@ -269,9 +269,18 @@ namespace UICatalog.Scenarios {
 					// Add last step
 					var lastStep = new Wizard.WizardStep ("The last step");
 					wizard.AddStep (lastStep);
-					lastStep.HelpText = "The wizard is complete! Press the Finish button to continue. Pressing ESC will cancel the wizard.";
+					lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
+					var finalFinalStepEnabledCeckBox = new CheckBox () { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
+					lastStep.Add (finalFinalStepEnabledCeckBox);
 
-					// TODO: Demo setting initial Pane
+					// Add an optional FINAL last step
+					var finalFinalStep = new Wizard.WizardStep ("The VERY last step");
+					wizard.AddStep (finalFinalStep);
+					finalFinalStep.HelpText = "This step only shows if it was enabled on the other last step.";
+					finalFinalStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					finalFinalStepEnabledCeckBox.Toggled += (args) => {
+						finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.Checked;
+					};
 
 					Application.Run (wizard);
 
