@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NStack;
 using Terminal.Gui.Resources;
 
@@ -211,6 +212,7 @@ namespace Terminal.Gui {
 				Controls.Visible = showControls;
 				helpTextView.Visible = showHelp;
 			}
+
 		} // WizardStep
 
 		/// <summary>
@@ -390,6 +392,24 @@ namespace Terminal.Gui {
 			return null;
 		}
 
+		/// <summary>
+		/// Returns the first enabled step in the Wizard
+		/// </summary>
+		/// <returns>The last enabled step</returns>
+		public WizardStep GetFirstStep ()
+		{
+			return steps.FirstOrDefault (s => s.Enabled);
+		}
+
+		/// <summary>
+		/// Returns the last enabled step in the Wizard
+		/// </summary>
+		/// <returns>The last enabled step</returns>
+		public WizardStep GetLastStep ()
+		{
+			return steps.LastOrDefault (s => s.Enabled);
+		}
+
 		private LinkedList<WizardStep> steps = new LinkedList<WizardStep> ();
 		private WizardStep currentStep = null;
 
@@ -425,7 +445,9 @@ namespace Terminal.Gui {
 		{
 			steps.AddLast (newStep);
 			this.Add (newStep);
-			SetNeedsLayout ();
+			newStep.EnabledChanged += UpdateButtonsAndTitle;
+			//newStep.TitleChanged += UpdateButtonsAndTitle;
+			UpdateButtonsAndTitle ();
 		}
 
 		/// <summary>
@@ -555,7 +577,6 @@ namespace Terminal.Gui {
 			return args.Cancel;
 		}
 
-
 		/// <summary>
 		/// Called when the <see cref="Wizard"/> has completed transition to a new <see cref="WizardStep"/>. Fires the <see cref="StepChanged"/> event. 
 		/// </summary>
@@ -568,6 +589,7 @@ namespace Terminal.Gui {
 			StepChanged?.Invoke (args);
 			return args.Cancel;
 		}
+
 		/// <summary>
 		/// Changes to the specified <see cref="WizardStep"/>.
 		/// </summary>
@@ -584,21 +606,10 @@ namespace Terminal.Gui {
 				step.Visible = (step == newStep);
 			}
 
-			if (newStep != null) {
+			var oldStep = currentStep;
+			currentStep = newStep;
 
-				base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + newStep.Title : string.Empty)}";
-
-				// Configure the Back button
-				backBtn.Text = newStep.BackButtonText != ustring.Empty ? newStep.BackButtonText : Strings.wzBack; // "_Back";
-				backBtn.Visible = (newStep != steps.First.Value);
-
-				// Configure the Next/Finished button
-				if (newStep == steps.Last.Value) {
-					nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
-				} else {
-					nextfinishBtn.Text = newStep.NextButtonText != ustring.Empty ? newStep.NextButtonText : Strings.wzNext; // "_Next...";
-				}
-			}
+			UpdateButtonsAndTitle ();
 
 			// Set focus to the nav buttons
 			if (backBtn.HasFocus) {
@@ -607,18 +618,33 @@ namespace Terminal.Gui {
 				nextfinishBtn.SetFocus ();
 			}
 
-			var oldStep = currentStep;
-			currentStep = newStep;
-
-			LayoutSubviews ();
-			Redraw (this.Bounds);
-
 			if (OnStepChanged (oldStep, currentStep)) {
 				// For correctness we do this, but it's meaningless because there's nothing to cancel
 				return false;
 			}
 
 			return true;
+		}
+
+		private void UpdateButtonsAndTitle ()
+		{
+			if (CurrentStep == null) return;
+
+			base.Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + CurrentStep.Title : string.Empty)}";
+
+			// Configure the Back button
+			backBtn.Text = CurrentStep.BackButtonText != ustring.Empty ? CurrentStep.BackButtonText : Strings.wzBack; // "_Back";
+			backBtn.Visible = (CurrentStep != GetFirstStep ());
+
+			// Configure the Next/Finished button
+			if (CurrentStep == GetLastStep ()) {
+				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
+			} else {
+				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
+			}
+			SetNeedsLayout ();
+			LayoutSubviews ();
+			Redraw (Bounds);
 		}
 	}
 }
