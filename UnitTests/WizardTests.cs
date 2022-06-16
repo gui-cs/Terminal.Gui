@@ -102,7 +102,7 @@ namespace Terminal.Gui.Views {
 			int height = 7;
 			d.SetBufferSize (width, height);
 
-			var btnBackText = "Back";
+			//	var btnBackText = "Back";
 			var btnBack = string.Empty; // $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
 			var btnNextText = "Finish"; // "Next";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
