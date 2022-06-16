@@ -2755,8 +2755,10 @@ Y
 
 			Assert.True(horizontalView.AutoSize);
 			Assert.True(verticalView.AutoSize);
-			Assert.Equal (new Rect (0, 0, 10, 1), horizontalView.Frame);
-			Assert.Equal (new Rect (0, 3, 2, 9), verticalView.Frame);
+			Assert.Equal (new Size (10, 1), horizontalView.TextFormatter.Size);
+			Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
+			Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
+			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
 			var expected = @"
 ┌────────────────────┐
 │Finish 終           │
