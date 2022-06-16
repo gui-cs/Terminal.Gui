@@ -422,8 +422,11 @@ namespace Terminal.Gui {
 			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
 			AddCommand (Command.Right, () => {
 				this.host.NextMenu (!this.barItems.IsTopLevel || (this.barItems.Children != null
-					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
-					current > -1 && host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
+					&& this.barItems.Children.Length > 0 && current > -1
+					&& current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
+					this.barItems.Children != null && this.barItems.Children.Length > 0 && current > -1
+					&& host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
+
 				return true;
 			});
 			AddCommand (Command.Cancel, () => { CloseAllMenus (); return true; });
@@ -1296,11 +1299,11 @@ namespace Terminal.Gui {
 				previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 
 			OpenMenu (idx, sIdx, subMenu);
-			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
-				&& subMenu == null && !CloseMenu (false)) {
+			//if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
+			//	&& subMenu == null && !CloseMenu (false)) {
 
-				return;
-			}
+			//	return;
+			//}
 			SetNeedsDisplay ();
 		}
 
@@ -1531,9 +1534,9 @@ namespace Terminal.Gui {
 				OpenMenu (selected);
 				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
 					openCurrentMenu.current = 0;
-					if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-						CloseMenu (ignoreUseSubMenusSingleFrame);
-					}
+					//if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
+					//	CloseMenu (ignoreUseSubMenusSingleFrame);
+					//}
 				}
 				break;
 			case true:
@@ -1570,7 +1573,7 @@ namespace Terminal.Gui {
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					}
 				} else {
-					var subMenu = openCurrentMenu.current > -1
+					var subMenu = openCurrentMenu.current > -1 && openCurrentMenu.barItems.Children.Length > 0
 						? openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current])
 						: null;
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
