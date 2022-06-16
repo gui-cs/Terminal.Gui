@@ -320,7 +320,7 @@ namespace Terminal.Gui {
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public override ustring Text {
-			get => contentView.Text;
+			get => contentView?.Text;
 			set {
 				base.Text = value;
 				if (contentView != null) {

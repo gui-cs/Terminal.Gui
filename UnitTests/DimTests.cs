@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,15 +6,20 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
+using Terminal.Gui.Views;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
 	public class DimTests {
-		public DimTests ()
+		readonly ITestOutputHelper output;
+
+		public DimTests (ITestOutputHelper output)
 		{
+			this.output = output;
 			Console.OutputEncoding = System.Text.Encoding.Default;
 			// Change current culture
 			CultureInfo culture = CultureInfo.CreateSpecificCulture ("en-US");
@@ -641,6 +646,303 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 		}
 
+		private string [] expecteds = new string [21] {
+@"
+┌────────────────────┐
+│View                │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View                │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+│Label 19            │
+└────────────────────┘"
+};
+
 		[Fact]
 		public void Dim_Add_Operator_With_Text ()
 		{
@@ -652,25 +954,36 @@ namespace Terminal.Gui.Core {
 			var view = new View ("View") { X = 0, Y = 0, Width = 20, Height = 0 };
 			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
 			var count = 0;
+			var listLabels = new List<Label> ();
 
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
-					field.Text = $"Label {count}";
-					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
-					view.Add (label);
-					Assert.Equal ($"Label {count}", label.Text);
-					Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+					((FakeDriver)Application.Driver).SetBufferSize (22, count + 3);
+					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					Assert.Equal (new Rect (0, 0, 22, count + 3), pos);
 
-					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
-					view.Height += 1;
-					count++;
+					if (count < 20) {
+						field.Text = $"Label {count}";
+						var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+						view.Add (label);
+						Assert.Equal ($"Label {count}", label.Text);
+						Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+						listLabels.Add (label);
+						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+						view.Height += 1;
+						count++;
+					}
 					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
 			Application.Iteration += () => {
-				while (count < 20) {
+				while (count < 21) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					if (count == 20) {
+						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						break;
+					}
 				}
 
 				Application.RequestStop ();
@@ -685,6 +998,7 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (20, count);
+			Assert.Equal (count, listLabels.Count);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -768,32 +1082,39 @@ namespace Terminal.Gui.Core {
 				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
-				Assert.Equal ($"Pos.Absolute({i})", label.Y.ToString ());
+				Assert.Equal ($"Pos.Absolute({i + 1})", label.Y.ToString ());
 				listLabels.Add (label);
 
-				Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
-				view.Height += 1;
 				Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+				view.Height += 1;
+				Assert.Equal ($"Dim.Absolute({i + 2})", view.Height.ToString ());
 			}
 
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
-					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-					view.Remove (listLabels [count - 1]);
+					((FakeDriver)Application.Driver).SetBufferSize (22, count + 3);
+					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					Assert.Equal (new Rect (0, 0, 22, count + 3), pos);
 
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
-					view.Height -= 1;
-					count--;
-					if (count == 0)
+					if (count > 0) {
+						Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
+						view.Remove (listLabels [count - 1]);
+						listLabels.RemoveAt (count - 1);
 						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
-					else
-						Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+						view.Height -= 1;
+						count--;
+					}
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
 			Application.Iteration += () => {
-				while (count > 0) {
+				while (count > -1) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					if (count == 0) {
+						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						break;
+					}
 				}
 
 				Application.RequestStop ();
@@ -808,6 +1129,7 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (0, count);
+			Assert.Equal (count, listLabels.Count);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();

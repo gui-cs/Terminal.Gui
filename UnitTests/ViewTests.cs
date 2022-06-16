@@ -1289,6 +1289,56 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void AutoSize_False_If_Text_Emmpty ()
+		{
+			var view1 = new View ();
+			var view2 = new View ("");
+			var view3 = new View () { Text = "" };
+
+			Assert.False (view1.AutoSize);
+			Assert.False (view2.AutoSize);
+			Assert.False (view3.AutoSize);
+		}
+
+		[Fact]
+		public void AutoSize_False_If_Text_Is_Not_Emmpty ()
+		{
+			var view1 = new View ();
+			view1.Text = "Hello World";
+			var view2 = new View ("Hello World");
+			var view3 = new View () { Text = "Hello World" };
+
+			Assert.False (view1.AutoSize);
+			Assert.False (view2.AutoSize);
+			Assert.False (view3.AutoSize);
+		}
+
+		[Fact]
+		public void AutoSize_True_Label_If_Text_Emmpty ()
+		{
+			var label1 = new Label ();
+			var label2 = new Label ("");
+			var label3 = new Label () { Text = "" };
+
+			Assert.True (label1.AutoSize);
+			Assert.True (label2.AutoSize);
+			Assert.True (label3.AutoSize);
+		}
+
+		[Fact]
+		public void AutoSize_True_Label_If_Text_Is_Not_Emmpty ()
+		{
+			var label1 = new Label ();
+			label1.Text = "Hello World";
+			var label2 = new Label ("Hello World");
+			var label3 = new Label () { Text = "Hello World" };
+
+			Assert.True (label1.AutoSize);
+			Assert.True (label2.AutoSize);
+			Assert.True (label3.AutoSize);
+		}
+
+		[Fact]
 		public void AutoSize_False_ResizeView_Is_Always_False ()
 		{
 			var label = new Label () { AutoSize = false };
@@ -1296,7 +1346,7 @@ namespace Terminal.Gui.Core {
 			label.Text = "New text";
 
 			Assert.False (label.AutoSize);
-			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
+			Assert.Equal ("{X=0,Y=0,Width=0,Height=1}", label.Bounds.ToString ());
 		}
 
 		[Fact]
@@ -1311,7 +1361,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void AutoSize_True_ResizeView_With_Dim_Fill ()
+		public void AutoSize_False_ResizeView_With_Dim_Fill ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
 			var label = new Label () { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -1320,22 +1370,60 @@ namespace Terminal.Gui.Core {
 			label.Text = "New text\nNew line";
 			win.LayoutSubviews ();
 
-			Assert.True (label.AutoSize);
+			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
 		}
 
 		[Fact]
-		public void AutoSize_True_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute ()
+		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 
+			// Text is empty so height=0
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
+
+			// Here the SetMinWidthHeight ensuring the minimum height
 			label.Text = "New text\nNew line";
 			win.LayoutSubviews ();
 
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
+		{
+			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var label = new Label () { Width = Dim.Fill () };
+			win.Add (label);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=0}", label.Bounds.ToString ());
+
+			// Here the SetMinWidthHeight ensuring the minimum height
+			label.Text = "New text\nNew line";
+			Application.Refresh ();
+
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
+
+			label.AutoSize = true;
+			Application.Refresh ();
+
+			// Here the AutoSize ensuring the right height
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+
+			label.Text = "New changed text\nNew changed line\nNew line";
+			Application.Refresh ();
+
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=3}", label.Bounds.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2423,6 +2511,206 @@ Y
 │二                  │
 │行                  │
 │目                  │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TextDirection_Toggle ()
+		{
+			var view = new View ();
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+			win.Add (view);
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
+
+			Assert.False (view.AutoSize);
+			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
+			Assert.Equal (Rect.Empty, view.Frame);
+			var expected = @"
+┌────────────────────┐
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.AutoSize = true;
+			view.Text = "Hello World";
+			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			Application.Refresh ();
+			expected = @"
+┌────────────────────┐
+│Hello World         │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.TextDirection = TextDirection.TopBottom_LeftRight;
+			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
+			Application.Refresh ();
+			expected = @"
+┌────────────────────┐
+│H                   │
+│e                   │
+│l                   │
+│l                   │
+│o                   │
+│                    │
+│W                   │
+│o                   │
+│r                   │
+│l                   │
+│d                   │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.AutoSize = false;
+			view.Text = "Hello Worlds";
+			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
+			Application.Refresh ();
+			expected = @"
+┌────────────────────┐
+│H                   │
+│e                   │
+│l                   │
+│l                   │
+│o                   │
+│                    │
+│W                   │
+│o                   │
+│r                   │
+│l                   │
+│d                   │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.TextDirection = TextDirection.LeftRight_TopBottom;
+			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			Application.Refresh ();
+			expected = @"
+┌────────────────────┐
+│Hello World         │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.AutoSize = true;
+			Assert.Equal (new Rect (0, 0, 12, 1), view.Frame);
+			Application.Refresh ();
+			expected = @"
+┌────────────────────┐
+│Hello Worlds        │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
 │                    │
 │                    │
 │                    │

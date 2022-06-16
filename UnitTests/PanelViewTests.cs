@@ -345,7 +345,7 @@ namespace Terminal.Gui.Views {
 		{
 			var top = Application.Top;
 			var win = new Window ();
-			var label = new Label ("Hello World") {
+			var label = new Label () {
 				Width = 24,
 				Height = 13,
 				ColorScheme = Colors.TopLevel,
@@ -370,6 +370,7 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
+			Assert.False (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 24, 13), label.Frame);
 			Assert.Equal (new Rect (0, 0, 34, 23), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);

@@ -522,7 +522,7 @@ namespace Terminal.Gui {
 				if (x is Pos.PosAbsolute) {
 					frame = new Rect (x.Anchor (0), frame.Y, frame.Width, frame.Height);
 				}
-				TextFormatter.Size = frame.Size;
+				TextFormatter.Size = GetBoundsSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -546,7 +546,7 @@ namespace Terminal.Gui {
 				if (y is Pos.PosAbsolute) {
 					frame = new Rect (frame.X, y.Anchor (0), frame.Width, frame.Height);
 				}
-				TextFormatter.Size = frame.Size;
+				TextFormatter.Size = GetBoundsSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -568,9 +568,11 @@ namespace Terminal.Gui {
 				}
 
 				width = value;
-				if (autoSize && value.Anchor (0) != TextFormatter.Size.Width
-					- (TextFormatter.IsHorizontalDirection (TextDirection)
-					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
+
+				var isValidNewAutSize = autoSize ? IsValidAutoSizeWidth (width) : false;
+
+				if (autoSize && !isValidNewAutSize) {
+					TextFormatter.AutoSize = false;
 					autoSize = false;
 				}
 				SetMinWidthHeight ();
@@ -578,7 +580,7 @@ namespace Terminal.Gui {
 				if (width is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, width.Anchor (0), frame.Height);
 				}
-				TextFormatter.Size = frame.Size;
+				TextFormatter.Size = GetBoundsSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -596,9 +598,11 @@ namespace Terminal.Gui {
 				}
 
 				height = value;
-				if (autoSize && value.Anchor (0) != TextFormatter.Size.Height
-					- (TextFormatter.IsVerticalDirection (TextDirection)
-					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0)) {
+
+				var isValidNewAutSize = autoSize ? IsValidAutoSizeHeight (height) : false;
+
+				if (autoSize && !isValidNewAutSize) {
+					TextFormatter.AutoSize = false;
 					autoSize = false;
 				}
 				SetMinWidthHeight ();
@@ -606,7 +610,7 @@ namespace Terminal.Gui {
 				if (height is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, frame.Width, height.Anchor (0));
 				}
-				TextFormatter.Size = frame.Size;
+				TextFormatter.Size = GetBoundsSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -626,17 +630,21 @@ namespace Terminal.Gui {
 
 		void SetMinWidthHeight ()
 		{
-			if (IsInitialized && !AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
+			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 				case true:
 					var colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
 					if (Width == null || (Width is Dim.DimAbsolute && Width.Anchor (0) < colWidth)) {
 						width = colWidth;
+						Bounds = new Rect (Bounds.X, Bounds.Y, colWidth, Bounds.Height);
+						TextFormatter.Size = GetBoundsSize ();
 					}
 					break;
 				default:
 					if (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)) {
 						height = 1;
+						Bounds = new Rect (Bounds.X, Bounds.Y, Bounds.Width, 1);
+						TextFormatter.Size = GetBoundsSize ();
 					}
 					break;
 				}
@@ -2202,7 +2210,7 @@ namespace Terminal.Gui {
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			TextFormatter.Size = Bounds.Size;
+			TextFormatter.Size = GetBoundsSize ();
 
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -2308,10 +2316,11 @@ namespace Terminal.Gui {
 				TextFormatter.Text = value;
 				var prevSize = frame.Size;
 				var canResize = ResizeView (autoSize);
-				if (canResize && TextFormatter.Size != Bounds.Size) {
-					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), TextFormatter.Size);
-				} else if (!canResize && TextFormatter.Size != Bounds.Size) {
-					TextFormatter.Size = Bounds.Size;
+				var txtFmtSize = GetTextFormatterSize ();
+				if (canResize && txtFmtSize != Bounds.Size) {
+					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), txtFmtSize);
+				} else if (!canResize && txtFmtSize != Bounds.Size) {
+					TextFormatter.Size = GetBoundsSize ();
 				}
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
@@ -2372,14 +2381,23 @@ namespace Terminal.Gui {
 			get => TextFormatter.Direction;
 			set {
 				if (TextFormatter.Direction != value) {
+					var isValidOldAutSize = autoSize ? IsValidAutoSize (out Size autSize) : false;
+					var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
+						!= TextFormatter.IsHorizontalDirection (value);
+
 					TextFormatter.Direction = value;
-					if (AutoSize) {
+
+					if ((IsInitialized && AutoSize) || (directionChanged && AutoSize && isValidOldAutSize)) {
 						ResizeView (true);
+					} else if (directionChanged && AutoSize && !isValidOldAutSize) {
+						TextFormatter.AutoSize = false;
+						autoSize = false;
 					} else if (IsInitialized) {
 						var b = new Rect (Bounds.X, Bounds.Y, Bounds.Height, Bounds.Width);
 						SetWidthHeight (b);
 					}
-					TextFormatter.Size = Bounds.Size;
+
+					TextFormatter.Size = GetBoundsSize ();
 					SetNeedsDisplay ();
 				}
 			}
@@ -2396,6 +2414,10 @@ namespace Terminal.Gui {
 			set {
 				isInitialized = value;
 				SetMinWidthHeight ();
+				if (autoSize && !IsValidAutoSize (out _)) {
+					TextFormatter.AutoSize = false;
+					autoSize = false;
+				}
 			}
 		}
 
@@ -2476,7 +2498,8 @@ namespace Terminal.Gui {
 			if (TextFormatter.Size != nBounds.Size) {
 				TextFormatter.Size = nBounds.Size;
 			}
-			if ((TextFormatter.Size != Bounds.Size || TextFormatter.Size != nBounds.Size)
+			var fmtSize = GetTextFormatterSize ();
+			if ((fmtSize != Bounds.Size || fmtSize != nBounds.Size)
 				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != nBounds.Width))
 				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
@@ -2489,8 +2512,10 @@ namespace Terminal.Gui {
 		bool SetWidthHeight (Rect nBounds)
 		{
 			bool aSize = false;
-			var canSizeW = SetWidth (nBounds.Width, out int rW);
-			var canSizeH = SetHeight (nBounds.Height, out int rH);
+			var canSizeW = SetWidth (nBounds.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0), out int rW);
+			var canSizeH = SetHeight (nBounds.Height - (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0), out int rH);
 			if (canSizeW) {
 				aSize = true;
 				width = rW;
@@ -2501,10 +2526,61 @@ namespace Terminal.Gui {
 			}
 			if (aSize) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
-				TextFormatter.Size = Bounds.Size;
+				TextFormatter.Size = GetBoundsSize ();
 			}
 
 			return aSize;
+		}
+
+		bool IsValidAutoSize (out Size autoSize)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			autoSize = new Size (rect.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0),
+				rect.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+			return !(!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)
+				|| frame.Size.Width != rect.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0)
+				|| frame.Size.Height != rect.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+		}
+
+		bool IsValidAutoSizeWidth (Dim width)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var dimValue = width.Anchor (0);
+			return !(!(width is Dim.DimAbsolute) || dimValue != rect.Size.Width
+				- (TextFormatter.IsHorizontalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+		}
+
+		bool IsValidAutoSizeHeight (Dim height)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var dimValue = height.Anchor (0);
+			return !(!(height is Dim.DimAbsolute) || dimValue != rect.Size.Height
+				- (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+		}
+
+		Size GetTextFormatterSize ()
+		{
+			return new Size (TextFormatter.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0),
+				TextFormatter.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0));
+		}
+
+		Size GetBoundsSize ()
+		{
+			if (TextFormatter.Text == null)
+				return Bounds.Size;
+
+			return new Size (frame.Size.Width + (TextFormatter.IsHorizontalDirection (TextDirection)
+					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0),
+				frame.Size.Height + (TextFormatter.IsVerticalDirection (TextDirection)
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0));
 		}
 
 		/// <summary>
