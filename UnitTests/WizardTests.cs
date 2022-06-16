@@ -26,15 +26,6 @@ namespace Terminal.Gui.Views {
 		}
 
 		// =========== WizardStep Tests
-		[Fact, AutoInitShutdown]
-		public void WizardStep_Title ()
-		{
-			// Verify default title
-
-			// Verify set actually changes property
-
-			// Verify set changes Wizard title (TODO: NOT YET IMPLEMENTED)
-		}
 
 		[Fact, AutoInitShutdown]
 		public void WizardStep_ButtonText ()
@@ -44,6 +35,57 @@ namespace Terminal.Gui.Views {
 			// Verify set actually changes property
 
 			// Verify set actually changes buttons for the current step
+		}
+
+
+		[Fact]
+		public void WizardStep_Set_Title_Fires_TitleChanging ()
+		{
+			var r = new Window ();
+			Assert.Null (r.Title);
+
+			string expectedAfter = null;
+			string expectedDuring = null;
+			bool cancel = false;
+			r.TitleChanging += (args) => {
+				Assert.Equal (expectedDuring, args.NewTitle);
+				args.Cancel = cancel;
+			};
+
+			r.Title = expectedDuring = expectedAfter = "title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+
+			r.Title = expectedDuring = expectedAfter = "a different title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+
+			// Now setup cancelling the change and change it back to "title"
+			cancel = true;
+			r.Title = expectedDuring = "title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+			r.Dispose ();
+
+		}
+
+		[Fact]
+		public void WizardStep_Set_Title_Fires_TitleChanged ()
+		{
+			var r = new Window ();
+			Assert.Null (r.Title);
+
+			string expected = null;
+			r.TitleChanged += (args) => {
+				Assert.Equal (r.Title, args.NewTitle);
+			};
+
+			expected = "title";
+			r.Title = expected;
+			Assert.Equal (expected, r.Title.ToString ());
+
+			expected = "another title";
+			r.Title = expected;
+			Assert.Equal (expected, r.Title.ToString ());
+			r.Dispose ();
+
 		}
 
 		// =========== Wizard Tests

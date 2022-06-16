@@ -150,7 +150,7 @@ namespace UICatalog.Scenarios {
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
-					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter First Name too.";
+					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button demo changing the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 					View viewForControls = secondStep.Controls;
 					ustring frameMsg = "Added to WizardStep.Controls";
@@ -161,19 +161,20 @@ namespace UICatalog.Scenarios {
 
 					var buttonLbl = new Label () { Text = "Second Step Button: ", AutoSize = true, X = 1, Y = 1 };
 					var button = new Button () {
-						Text = "Press Me",
+						Text = "Press Me to Rename Step",
 						X = Pos.Right (buttonLbl),
 						Y = Pos.Top (buttonLbl)
 					};
 					button.Clicked += () => {
-						MessageBox.Query ("Wizard Scenario", "The Second Step Button was pressed.");
+						secondStep.Title = "2nd Step";
+						MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'");
 					};
 					viewForControls.Add (buttonLbl, button);
 					var lbl = new Label () { Text = "First Name: ", AutoSize = true, X = 1, Y = Pos.Bottom (buttonLbl) };
-					var firstNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+					var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, firstNameField);
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
-					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+					var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, lastNameField);
 					var thirdStepEnabledCeckBox = new CheckBox () { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
 					viewForControls.Add (thirdStepEnabledCeckBox);
