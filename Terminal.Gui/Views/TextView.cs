@@ -790,8 +790,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (ustring.Make (line), width,
-					TextAlignment.Left, true, true, tabWidth));
+					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true, false, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
