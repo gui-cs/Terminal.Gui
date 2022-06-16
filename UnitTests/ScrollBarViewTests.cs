@@ -744,7 +744,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (textView.WordWrap);
 			Assert.True (scrollBar.AutoHideScrollBars);
 			Assert.Equal (7, textView.Lines);
-			Assert.Equal (21, textView.Maxlength);
+			Assert.Equal (22, textView.Maxlength);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
