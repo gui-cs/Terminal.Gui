@@ -14,8 +14,11 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class CheckBox : View {
 		ustring text;
-		int hot_pos = -1;
-		Rune hot_key;
+		Key hotKey = Key.Null;
+		Rune hotKeySpecifier;
+		Rune charChecked;
+		Rune charUnChecked;
+		bool @checked;
 
 		/// <summary>
 		///   Toggled event, raised when the <see cref="CheckBox"/>  is toggled.
@@ -75,10 +78,13 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring s, bool is_checked)
 		{
+			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
+			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
 			Checked = is_checked;
-			Text = s;
+			HotKeySpecifier = new Rune ('_');
 			CanFocus = true;
 			AutoSize = true;
+			Text = s;
 			Update ();
 
 			// Things this view knows how to do
@@ -89,21 +95,95 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
-		private void Update ()
+		void Update ()
 		{
-			TextFormatter.Text = text;
-			var h = 1;
-			var w = text.ConsoleWidth + 4;
-			TextFormatter.Size = new Size (w, h);
-			Height = h;
-			TextFormatter.Size = new Size (w, h);
-			Width = w;
+			switch (TextAlignment) {
+			case TextAlignment.Left:
+			case TextAlignment.Centered:
+			case TextAlignment.Justified:
+				if (Checked)
+					TextFormatter.Text = ustring.Make (charChecked) + " " + GetFormatterText ();
+				else
+					TextFormatter.Text = ustring.Make (charUnChecked) + " " + GetFormatterText ();
+				break;
+			case TextAlignment.Right:
+				if (Checked)
+					TextFormatter.Text = GetFormatterText () + " " + ustring.Make (charChecked);
+				else
+					TextFormatter.Text = GetFormatterText () + " " + ustring.Make (charUnChecked);
+				break;
+			}
+
+			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			GetCurrentWidth (out int cWidth);
+			var canSetWidth = SetWidth (w, out int rWidth);
+			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
+				Width = rWidth;
+				w = rWidth;
+			} else if (!canSetWidth || !AutoSize) {
+				w = cWidth;
+			}
+			var layout = LayoutStyle;
+			bool layoutChanged = false;
+			if (!(Height is Dim.DimAbsolute)) {
+				// The height is always equal to 1 and must be Dim.DimAbsolute.
+				layoutChanged = true;
+				LayoutStyle = LayoutStyle.Absolute;
+			}
+			Height = 1;
+			if (layoutChanged) {
+				LayoutStyle = layout;
+			}
+			Frame = new Rect (Frame.Location, new Size (w, 1));
+			SetNeedsDisplay ();
+		}
+
+		ustring GetFormatterText ()
+		{
+			if (AutoSize || ustring.IsNullOrEmpty (text)) {
+				return text;
+			}
+			return text.RuneSubstring (0, Math.Min (Frame.Width - 2, text.RuneCount));
+		}
+
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => hotKey;
+			set {
+				if (hotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					hotKey = v;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Rune HotKeySpecifier {
+			get => hotKeySpecifier;
+			set {
+				hotKeySpecifier = TextFormatter.HotKeySpecifier = value;
+			}
+		}
+
+		/// <inheritdoc/>
+		public override bool AutoSize {
+			get => base.AutoSize;
+			set {
+				base.AutoSize = value;
+				Update ();
+			}
 		}
 
 		/// <summary>
 		///    The state of the <see cref="CheckBox"/>
 		/// </summary>
-		public bool Checked { get; set; }
+		public bool Checked {
+			get => @checked;
+			set {
+				@checked = value;
+				Update ();
+			}
+		}
 
 		/// <summary>
 		///   The text displayed by this <see cref="CheckBox"/>
@@ -115,40 +195,20 @@ namespace Terminal.Gui {
 
 			set {
 				text = value;
-
-				int i = 0;
-				hot_pos = -1;
-				hot_key = (char)0;
-				foreach (Rune c in text) {
-					//if (Rune.IsUpper (c)) {
-					if (c == '_') {
-						hot_key = text [i + 1];
-						HotKey = (Key)(char)hot_key.ToString ().ToUpper () [0];
-						text = text.ToString ().Replace ("_", "");
-						hot_pos = i;
-						break;
-					}
-					i++;
+				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
+				if (hotKey != hk) {
+					HotKey = hk;
 				}
-				if (AutoSize) {
-					Update ();
-				}
+				Update ();
 			}
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
-			Move (0, 0);
-			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
-			Driver.AddRune (' ');
-			Move (2, 0);
-			Driver.AddStr (Text);
-			if (hot_pos != -1) {
-				Move (2 + hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
-				Driver.AddRune (hot_key);
+		public override TextAlignment TextAlignment {
+			get => base.TextAlignment;
+			set {
+				base.TextAlignment = value;
+				Update ();
 			}
 		}
 
