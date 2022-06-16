@@ -2965,6 +2965,7 @@ e
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
+			// All AutoSize are false because the Frame.Width != TextFormatter.Size.Width
 			Assert.False (lblLeft.AutoSize);
 			Assert.False (lblCenter.AutoSize);
 			Assert.False (lblRight.AutoSize);
@@ -3004,6 +3005,7 @@ e
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
 
+			// All AutoSize are false because the Frame.Height != TextFormatter.Size.Height
 			Assert.False (lblLeft.AutoSize);
 			Assert.False (lblCenter.AutoSize);
 			Assert.False (lblRight.AutoSize);
@@ -3098,6 +3100,7 @@ e
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (13, height + 2);
 
+			// All AutoSize are false because the Frame.Height != TextFormatter.Size.Height
 			Assert.False (lblLeft.AutoSize);
 			Assert.False (lblCenter.AutoSize);
 			Assert.False (lblRight.AutoSize);
