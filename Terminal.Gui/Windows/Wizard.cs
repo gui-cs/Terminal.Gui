@@ -33,9 +33,72 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The title of the <see cref="WizardStep"/>.
 			/// </summary>
-			public ustring Title { get => title; set => title = value; }
-			// TODO: Update Wizard title when step title is changed if step is current - this will require step to slueth it's parent 
+			public ustring Title {
+				get => title;
+				set {
+					if (!OnTitleChanging (value)) {
+						title = value;
+						OnTitleChanged (title);
+					}
+					SetNeedsDisplay ();
+				}
+			}
+
 			private ustring title;
+
+			/// <summary>
+			/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
+			/// </summary>
+			public class TitleEventArgs : EventArgs {
+				/// <summary>
+				/// The new Window Title.
+				/// </summary>
+				public ustring NewTitle { get; set; }
+
+				/// <summary>
+				/// Flag which allows cancelling changing to the new TItle value.
+				/// </summary>
+				public bool Cancel { get; set; }
+
+				/// <summary>
+				/// Initializes a new instance of <see cref="TitleEventArgs"/>
+				/// </summary>
+				/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+				public TitleEventArgs (ustring newTitle)
+				{
+					NewTitle = newTitle;
+				}
+			}
+			/// <summary>
+			/// Called before the <see cref="Window.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
+			/// </summary>
+			/// <returns>`true` if an event handler cancelled the Title change.</returns>
+			public virtual bool OnTitleChanging (ustring newTitle)
+			{
+				var args = new TitleEventArgs (newTitle);
+				TitleChanging?.Invoke (args);
+				return args.Cancel;
+			}
+
+			/// <summary>
+			/// Event fired when the <see cref="Window.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
+			/// `true` to cancel the Title change.
+			/// </summary>
+			public event Action<TitleEventArgs> TitleChanging;
+
+			/// <summary>
+			/// Called when the <see cref="Window.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
+			/// </summary>
+			public virtual void OnTitleChanged (ustring newTitle)
+			{
+				var args = new TitleEventArgs (title);
+				TitleChanged?.Invoke (args);
+			}
+
+			/// <summary>
+			/// Event fired after the <see cref="Window.Title"/> has been changed. 
+			/// </summary>
+			public event Action<TitleEventArgs> TitleChanged;
 
 			// The controlPane is a separate view, so when devs add controls to the Step and help is visible, Y = Pos.AnchorEnd()
 			// will work as expected.
@@ -446,7 +509,7 @@ namespace Terminal.Gui {
 			steps.AddLast (newStep);
 			this.Add (newStep);
 			newStep.EnabledChanged += UpdateButtonsAndTitle;
-			//newStep.TitleChanged += UpdateButtonsAndTitle;
+			newStep.TitleChanged += (args) => UpdateButtonsAndTitle();
 			UpdateButtonsAndTitle ();
 		}
 
