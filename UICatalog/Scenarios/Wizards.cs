@@ -150,7 +150,7 @@ namespace UICatalog.Scenarios {
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
-					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button demo changing the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 					View viewForControls = secondStep.Controls;
 					ustring frameMsg = "Added to WizardStep.Controls";
