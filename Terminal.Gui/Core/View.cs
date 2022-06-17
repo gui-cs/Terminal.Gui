@@ -522,7 +522,7 @@ namespace Terminal.Gui {
 				if (x is Pos.PosAbsolute) {
 					frame = new Rect (x.Anchor (0), frame.Y, frame.Width, frame.Height);
 				}
-				TextFormatter.Size = GetBoundsSize ();
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -546,7 +546,7 @@ namespace Terminal.Gui {
 				if (y is Pos.PosAbsolute) {
 					frame = new Rect (frame.X, y.Anchor (0), frame.Width, frame.Height);
 				}
-				TextFormatter.Size = GetBoundsSize ();
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -580,7 +580,7 @@ namespace Terminal.Gui {
 				if (width is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, width.Anchor (0), frame.Height);
 				}
-				TextFormatter.Size = GetBoundsSize ();
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -610,7 +610,7 @@ namespace Terminal.Gui {
 				if (height is Dim.DimAbsolute) {
 					frame = new Rect (frame.X, frame.Y, frame.Width, height.Anchor (0));
 				}
-				TextFormatter.Size = GetBoundsSize ();
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -637,14 +637,14 @@ namespace Terminal.Gui {
 					if (Width == null || (Width is Dim.DimAbsolute && Width.Anchor (0) < colWidth)) {
 						width = colWidth;
 						Bounds = new Rect (Bounds.X, Bounds.Y, colWidth, Bounds.Height);
-						TextFormatter.Size = GetBoundsSize ();
+						TextFormatter.Size = GetBoundsTextFormatterSize ();
 					}
 					break;
 				default:
 					if (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)) {
 						height = 1;
 						Bounds = new Rect (Bounds.X, Bounds.Y, Bounds.Width, 1);
-						TextFormatter.Size = GetBoundsSize ();
+						TextFormatter.Size = GetBoundsTextFormatterSize ();
 					}
 					break;
 				}
@@ -2210,7 +2210,7 @@ namespace Terminal.Gui {
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			TextFormatter.Size = GetBoundsSize ();
+			TextFormatter.Size = GetBoundsTextFormatterSize ();
 
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -2316,11 +2316,11 @@ namespace Terminal.Gui {
 				TextFormatter.Text = value;
 				var prevSize = frame.Size;
 				var canResize = ResizeView (autoSize);
-				var txtFmtSize = GetTextFormatterSize ();
+				var txtFmtSize = GetTextFormatterBoundsSize ();
 				if (canResize && txtFmtSize != Bounds.Size) {
 					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), txtFmtSize);
 				} else if (!canResize && txtFmtSize != Bounds.Size) {
-					TextFormatter.Size = GetBoundsSize ();
+					TextFormatter.Size = GetBoundsTextFormatterSize ();
 				}
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
@@ -2397,7 +2397,7 @@ namespace Terminal.Gui {
 						SetWidthHeight (b);
 					}
 
-					TextFormatter.Size = GetBoundsSize ();
+					TextFormatter.Size = GetBoundsTextFormatterSize ();
 					SetNeedsDisplay ();
 				}
 			}
@@ -2498,7 +2498,7 @@ namespace Terminal.Gui {
 			if (TextFormatter.Size != nBounds.Size) {
 				TextFormatter.Size = nBounds.Size;
 			}
-			var fmtSize = GetTextFormatterSize ();
+			var fmtSize = GetTextFormatterBoundsSize ();
 			if ((fmtSize != Bounds.Size || fmtSize != nBounds.Size)
 				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != nBounds.Width))
@@ -2526,7 +2526,7 @@ namespace Terminal.Gui {
 			}
 			if (aSize) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
-				TextFormatter.Size = GetBoundsSize ();
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
 
 			return aSize;
@@ -2564,23 +2564,31 @@ namespace Terminal.Gui {
 				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
 		}
 
-		Size GetTextFormatterSize ()
+		/// <summary>
+		/// Gets the bounds size from a <see cref="TextFormatter.Size"/>.
+		/// </summary>
+		/// <returns>The bounds size minus the <see cref="TextFormatter.HotKeySpecifier"/> length.</returns>
+		public Size GetTextFormatterBoundsSize ()
 		{
 			return new Size (TextFormatter.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0),
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0),
 				TextFormatter.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0));
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0));
 		}
 
-		Size GetBoundsSize ()
+		/// <summary>
+		/// Gets the text formatter size from a <see cref="Bounds"/> size.
+		/// </summary>
+		/// <returns>The text formatter size more the <see cref="TextFormatter.HotKeySpecifier"/> length.</returns>
+		public Size GetBoundsTextFormatterSize ()
 		{
 			if (TextFormatter.Text == null)
 				return Bounds.Size;
 
 			return new Size (frame.Size.Width + (TextFormatter.IsHorizontalDirection (TextDirection)
-					&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0),
+					&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0),
 				frame.Size.Height + (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0));
+				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0));
 		}
 
 		/// <summary>
