@@ -150,8 +150,7 @@ namespace UICatalog.Scenarios {
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
-					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too.";
-
+					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button demo changing the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 					View viewForControls = secondStep.Controls;
 					ustring frameMsg = "Added to WizardStep.Controls";
@@ -162,40 +161,54 @@ namespace UICatalog.Scenarios {
 
 					var buttonLbl = new Label () { Text = "Second Step Button: ", AutoSize = true, X = 1, Y = 1 };
 					var button = new Button () {
-						Text = "Press Me",
+						Text = "Press Me to Rename Step",
 						X = Pos.Right (buttonLbl),
 						Y = Pos.Top (buttonLbl)
 					};
 					button.Clicked += () => {
-						MessageBox.Query ("Wizard Scenario", "The Second Step Button was pressed.");
+						secondStep.Title = "2nd Step";
+						MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'");
 					};
 					viewForControls.Add (buttonLbl, button);
 					var lbl = new Label () { Text = "First Name: ", AutoSize = true, X = 1, Y = Pos.Bottom (buttonLbl) };
-					var firstNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+					var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, firstNameField);
 					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
-					var lastNameField = new TextField () { Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+					var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, lastNameField);
-					var checkBox = new CheckBox () { Text = "Un-check me!", Checked = true, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
-					viewForControls.Add (checkBox);
+					var thirdStepEnabledCeckBox = new CheckBox () { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
+					viewForControls.Add (thirdStepEnabledCeckBox);
 
 					// Add a frame to demonstrate difference between adding controls to
 					// WizardStep.Controls vs. WizardStep directly. This is here to demonstrate why 
 					// adding to .Controls is preferred.
 					var frame = new FrameView ($"A Broken Frame - {frameMsg}") {
 						X = 0,
-						Y = Pos.Bottom (checkBox) + 2,
+						Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
 						Width = Dim.Fill (),
 						Height = 4,
 						//ColorScheme = Colors.Error,
 					};
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					viewForControls.Add (frame);
+					wizard.StepChanging += (args) => {
+						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty ) {
+							args.Cancel = true;
+							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
+						}
+					};
 
-					// Add 3rd step
-					var thirdStep = new Wizard.WizardStep ("Third Step");
+					// Add 3rd (optional) step
+					var thirdStep = new Wizard.WizardStep ("Third Step (Optional)");
 					wizard.AddStep (thirdStep);
-					thirdStep.HelpText = "This is the help text for the Third Step.";
+					thirdStep.HelpText = "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
+					var step3Label = new Label () {
+						Text = "This step is optional.",
+						X = 0,
+						Y = 0,
+						AutoSize = true
+					};
+					thirdStep.Controls.Add (step3Label);
 					var progLbl = new Label () { Text = "Third Step ProgressBar: ", AutoSize = true, X = 1, Y = 10 };
 					var progressBar = new ProgressBar () {
 						X = Pos.Right (progLbl),
@@ -204,7 +217,11 @@ namespace UICatalog.Scenarios {
 						Fraction = 0.42F
 					};
 					thirdStep.Controls.Add (progLbl, progressBar);
-
+					thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					thirdStepEnabledCeckBox.Toggled += (args) => {
+						thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					};
+	
 					// Add 4th step
 					var fourthStep = new Wizard.WizardStep ("Step Four");
 					wizard.AddStep (fourthStep);
@@ -219,21 +236,8 @@ namespace UICatalog.Scenarios {
 						AllowsTab = false
 					};
 					fourthStep.Controls.Add (someText);
-					//fourthStep.NextButtonText = "4";
+					fourthStep.NextButtonText = "Go To Last Step";
 					var scrollBar = new ScrollBarView (someText, true);
-
-					wizard.StepChanging += (args) => {
-						if (args.NewStep == fourthStep) {
-							var btn = MessageBox.ErrorQuery ("Wizards", "Move to Step Four?", "Yes", "No");
-							args.Cancel = btn == 1;
-						}
-					};
-
-					wizard.StepChanged += (args) => {
-						if (args.NewStep == fourthStep) {
-							var btn = MessageBox.ErrorQuery ("Wizards", "Yay. Moved to Step Four", "Ok");
-						}
-					};
 
 					scrollBar.ChangedPosition += () => {
 						someText.TopRow = scrollBar.Position;
@@ -266,9 +270,18 @@ namespace UICatalog.Scenarios {
 					// Add last step
 					var lastStep = new Wizard.WizardStep ("The last step");
 					wizard.AddStep (lastStep);
-					lastStep.HelpText = "The wizard is complete! Press the Finish button to continue. Pressing ESC will cancel the wizard.";
+					lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
+					var finalFinalStepEnabledCeckBox = new CheckBox () { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
+					lastStep.Add (finalFinalStepEnabledCeckBox);
 
-					// TODO: Demo setting initial Pane
+					// Add an optional FINAL last step
+					var finalFinalStep = new Wizard.WizardStep ("The VERY last step");
+					wizard.AddStep (finalFinalStep);
+					finalFinalStep.HelpText = "This step only shows if it was enabled on the other last step.";
+					finalFinalStep.Enabled = thirdStepEnabledCeckBox.Checked;
+					finalFinalStepEnabledCeckBox.Toggled += (args) => {
+						finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.Checked;
+					};
 
 					Application.Run (wizard);
 

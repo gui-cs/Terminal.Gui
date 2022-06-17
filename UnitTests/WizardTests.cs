@@ -26,15 +26,6 @@ namespace Terminal.Gui.Views {
 		}
 
 		// =========== WizardStep Tests
-		[Fact, AutoInitShutdown]
-		public void WizardStep_Title ()
-		{
-			// Verify default title
-
-			// Verify set actually changes property
-
-			// Verify set changes Wizard title (TODO: NOT YET IMPLEMENTED)
-		}
 
 		[Fact, AutoInitShutdown]
 		public void WizardStep_ButtonText ()
@@ -44,6 +35,57 @@ namespace Terminal.Gui.Views {
 			// Verify set actually changes property
 
 			// Verify set actually changes buttons for the current step
+		}
+
+
+		[Fact]
+		public void WizardStep_Set_Title_Fires_TitleChanging ()
+		{
+			var r = new Window ();
+			Assert.Null (r.Title);
+
+			string expectedAfter = null;
+			string expectedDuring = null;
+			bool cancel = false;
+			r.TitleChanging += (args) => {
+				Assert.Equal (expectedDuring, args.NewTitle);
+				args.Cancel = cancel;
+			};
+
+			r.Title = expectedDuring = expectedAfter = "title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+
+			r.Title = expectedDuring = expectedAfter = "a different title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+
+			// Now setup cancelling the change and change it back to "title"
+			cancel = true;
+			r.Title = expectedDuring = "title";
+			Assert.Equal (expectedAfter, r.Title.ToString ());
+			r.Dispose ();
+
+		}
+
+		[Fact]
+		public void WizardStep_Set_Title_Fires_TitleChanged ()
+		{
+			var r = new Window ();
+			Assert.Null (r.Title);
+
+			string expected = null;
+			r.TitleChanged += (args) => {
+				Assert.Equal (r.Title, args.NewTitle);
+			};
+
+			expected = "title";
+			r.Title = expected;
+			Assert.Equal (expected, r.Title.ToString ());
+
+			expected = "another title";
+			r.Title = expected;
+			Assert.Equal (expected, r.Title.ToString ());
+			r.Dispose ();
+
 		}
 
 		// =========== Wizard Tests
@@ -190,6 +232,281 @@ namespace Terminal.Gui.Views {
 
 			Application.End (Application.Begin (wizard));
 			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GetPreviousStep_Correct ()
+		{
+			var wizard = new Wizard ();
+
+			// If no steps should be null
+			Assert.Null (wizard.GetPreviousStep ());
+
+			var step1 = new Wizard.WizardStep ("step1");
+			wizard.AddStep (step1);
+
+			// If no current step, should be last step
+			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			wizard.CurrentStep = step1;
+			// If there is 1 step it's current step should be null
+			Assert.Null (wizard.GetPreviousStep ());
+
+			// If one disabled step should be null
+			step1.Enabled = false;
+			Assert.Null (wizard.GetPreviousStep ());
+
+			// If two steps and at 2 and step 1 is `Enabled = true`should be step1
+			var step2 = new Wizard.WizardStep ("step2");
+			wizard.AddStep (step2);
+			wizard.CurrentStep = step2;
+			step1.Enabled = true;
+			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			// If two steps and at 2 and step 1 is `Enabled = false` should be null
+			step1.Enabled = false;
+			Assert.Null (wizard.GetPreviousStep ());
+
+			// If three steps with Step2.Enabled = true
+			//   At step 1 should be null
+			//   At step 2 should be step 1
+			//   At step 3 should be step 2
+			var step3 = new Wizard.WizardStep ("step3");
+			wizard.AddStep (step3);
+			step1.Enabled = true;
+			wizard.CurrentStep = step1;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Null (wizard.GetPreviousStep ());
+			wizard.CurrentStep = step2;
+			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			wizard.CurrentStep = step3;
+			Assert.Equal (step2.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			// If three steps with Step2.Enabled = false
+			//   At step 1 should be null
+			//   At step 3 should be step1
+			step1.Enabled = true;
+			step2.Enabled = false;
+			step3.Enabled = true;
+			wizard.CurrentStep = step1;
+			Assert.Null (wizard.GetPreviousStep ());
+			wizard.CurrentStep = step3;
+			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			// If three steps with Step1.Enabled = false & Step2.Enabled = false
+			//   At step 3 should be null
+
+			// If no current step, GetPreviousStep provides equivalent to GetLastStep
+			wizard.CurrentStep = null;
+			step1.Enabled = true;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = false;
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = true;
+			step3.Enabled = false;
+			Assert.Equal (step2.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+
+			step1.Enabled = true;
+			step2.Enabled = false;
+			step3.Enabled = false;
+			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GetNextStep_Correct ()
+		{
+			var wizard = new Wizard ();
+
+			// If no steps should be null
+			Assert.Null (wizard.GetNextStep ());
+
+			var step1 = new Wizard.WizardStep ("step1");
+			wizard.AddStep (step1);
+
+			// If no current step, should be first step
+			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			wizard.CurrentStep = step1;
+			// If there is 1 step it's current step should be null
+			Assert.Null (wizard.GetNextStep ());
+
+			// If one disabled step should be null
+			step1.Enabled = false;
+			Assert.Null (wizard.GetNextStep ());
+
+			// If two steps and at 1 and step 2 is `Enabled = true`should be step 2
+			var step2 = new Wizard.WizardStep ("step2");
+			wizard.AddStep (step2);
+			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			// If two steps and at 1 and step 2 is `Enabled = false` should be null
+			step1.Enabled = true;
+			wizard.CurrentStep = step1;
+			step2.Enabled = false;
+			Assert.Null (wizard.GetNextStep ());
+
+			// If three steps with Step2.Enabled = true
+			//   At step 1 should be step 2
+			//   At step 2 should be step 3
+			//   At step 3 should be null
+			var step3 = new Wizard.WizardStep ("step3");
+			wizard.AddStep (step3);
+			step1.Enabled = true;
+			wizard.CurrentStep = step1;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			wizard.CurrentStep = step2;
+			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			wizard.CurrentStep = step3;
+			Assert.Null (wizard.GetNextStep ());
+
+			// If three steps with Step2.Enabled = false
+			//   At step 1 should be step 3
+			//   At step 3 should be null
+			step1.Enabled = true;
+			wizard.CurrentStep = step1;
+			step2.Enabled = false;
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			wizard.CurrentStep = step3;
+			Assert.Null (wizard.GetNextStep ());
+
+			// If three steps with Step2.Enabled = false & Step3.Enabled = false
+			//   At step 1 should be null
+			step1.Enabled = true;
+			wizard.CurrentStep = step1;
+			step2.Enabled = false;
+			step3.Enabled = false;
+			Assert.Null (wizard.GetNextStep ());
+
+			// If no current step, GetNextStep provides equivalent to GetFirstStep
+			wizard.CurrentStep = null;
+			step1.Enabled = true;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = true;
+			step3.Enabled = true;
+			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = false;
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = true;
+			step3.Enabled = false;
+			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+
+			step1.Enabled = true;
+			step2.Enabled = false;
+			step3.Enabled = false;
+			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GoNext_Works ()
+		{
+			// If zero steps do nothing
+
+			// If one step do nothing (enabled or disabled)
+
+			// If two steps
+			//    If current is 1
+			//        If 2 is enabled 2 becomes current
+			//        If 2 is disabled 1 stays current
+			//    If current is 2 does nothing
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GoBack_Works ()
+		{
+			// If zero steps do nothing
+
+			// If one step do nothing (enabled or disabled)
+
+			// If two steps
+			//    If current is 1 does nothing
+			//    If current is 2 does nothing
+			//        If 1 is enabled 2 becomes current
+			//        If 1 is disabled 1 stays current
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GetFirstStep_Works ()
+		{
+			var wizard = new Wizard ();
+
+			Assert.Null (wizard.GetFirstStep ());
+
+			var step1 = new Wizard.WizardStep ("step1");
+			wizard.AddStep (step1);
+			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+
+			var step2 = new Wizard.WizardStep ("step2");
+			wizard.AddStep (step2);
+			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+
+			var step3 = new Wizard.WizardStep ("step3");
+			wizard.AddStep (step3);
+			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			Assert.Equal (step2.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+
+			step1.Enabled = true;
+			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+
+			step1.Enabled = false;
+			step2.Enabled = false;
+			Assert.Equal (step3.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Navigate_GetLastStep_Works ()
+		{
+			var wizard = new Wizard ();
+
+			Assert.Null (wizard.GetLastStep ());
+
+			var step1 = new Wizard.WizardStep ("step1");
+			wizard.AddStep (step1);
+			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+
+			var step2 = new Wizard.WizardStep ("step2");
+			wizard.AddStep (step2);
+			Assert.Equal (step2.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+
+			var step3 = new Wizard.WizardStep ("step3");
+			wizard.AddStep (step3);
+			Assert.Equal (step3.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+
+			step3.Enabled = false;
+			Assert.Equal (step2.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+
+			step3.Enabled = true;
+			Assert.Equal (step3.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+
+			step3.Enabled = false;
+			step2.Enabled = false;
+			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
 		}
 	}
 }
