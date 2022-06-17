@@ -2753,8 +2753,8 @@ Y
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
-			Assert.True(horizontalView.AutoSize);
-			Assert.True(verticalView.AutoSize);
+			Assert.True (horizontalView.AutoSize);
+			Assert.True (verticalView.AutoSize);
 			Assert.Equal (new Size (10, 1), horizontalView.TextFormatter.Size);
 			Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
 			Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
@@ -2866,6 +2866,51 @@ Y
 ";
 
 			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact]
+		public void GetTextFormatterBoundsSize_GetBoundsTextFormatterSize_HotKeySpecifier ()
+		{
+			var text = "Say Hello 你";
+			var horizontalView = new View () { Text = text, AutoSize = true, HotKeySpecifier = '_' };
+			var verticalView = new View () {
+				Text = text,
+				AutoSize = true,
+				HotKeySpecifier = '_',
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+
+			Assert.True (horizontalView.AutoSize);
+			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
+			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetTextFormatterBoundsSize ());
+
+			Assert.True (verticalView.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (2, 11), verticalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetTextFormatterBoundsSize ());
+
+			text = "Say He_llo 你";
+			horizontalView.Text = text;
+			verticalView.Text = text;
+
+			Assert.True (horizontalView.AutoSize);
+			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
+			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (13, 1), horizontalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetTextFormatterBoundsSize ());
+
+			Assert.True (verticalView.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (2, 12), verticalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetBoundsTextFormatterSize ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetTextFormatterBoundsSize ());
 		}
 	}
 }
