@@ -962,7 +962,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
 			Console.Out.Write ("\x1b[3J");
