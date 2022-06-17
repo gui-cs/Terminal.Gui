@@ -114,7 +114,8 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier)
+				? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0);
 			GetCurrentWidth (out int cWidth);
 			var canSetWidth = SetWidth (w, out int rWidth);
 			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
