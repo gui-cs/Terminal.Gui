@@ -374,5 +374,97 @@ namespace Terminal.Gui.Views {
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_AnchorEnd_Without_HotKeySpecifier ()
+		{
+			var checkBox = new CheckBox () {
+				Y = Pos.Center (),
+				Text = "Check this out 你"
+			};
+			checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetTextFormatterBoundsSize ().Width);
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (checkBox);
+			Application.Top.Add (win);
+
+			Assert.True (checkBox.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│         ╴ Check this out 你│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.True (checkBox.AutoSize);
+			checkBox.Text = "Check this out 你 changed";
+			Assert.True (checkBox.AutoSize);
+			Application.Refresh ();
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│ ╴ Check this out 你 changed│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_AnchorEnd_With_HotKeySpecifier ()
+		{
+			var checkBox = new CheckBox () {
+				Y = Pos.Center (),
+				Text = "C_heck this out 你"
+			};
+			checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetTextFormatterBoundsSize ().Width);
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (checkBox);
+			Application.Top.Add (win);
+
+			Assert.True (checkBox.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│         ╴ Check this out 你│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.True (checkBox.AutoSize);
+			checkBox.Text = "Check this out 你 changed";
+			Assert.True (checkBox.AutoSize);
+			Application.Refresh ();
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│ ╴ Check this out 你 changed│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
 	}
 }
