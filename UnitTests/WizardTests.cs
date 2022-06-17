@@ -42,10 +42,10 @@ namespace Terminal.Gui.Views {
 		public void WizardStep_Set_Title_Fires_TitleChanging ()
 		{
 			var r = new Window ();
-			Assert.Null (r.Title);
+			Assert.Equal (ustring.Empty, r.Title);
 
-			string expectedAfter = null;
-			string expectedDuring = null;
+			string expectedAfter = string.Empty;
+			string expectedDuring = string.Empty;
 			bool cancel = false;
 			r.TitleChanging += (args) => {
 				Assert.Equal (expectedDuring, args.NewTitle);
@@ -70,9 +70,9 @@ namespace Terminal.Gui.Views {
 		public void WizardStep_Set_Title_Fires_TitleChanged ()
 		{
 			var r = new Window ();
-			Assert.Null (r.Title);
+			Assert.Equal (ustring.Empty, r.Title);
 
-			string expected = null;
+			string expected = string.Empty;
 			r.TitleChanged += (args) => {
 				Assert.Equal (r.Title, args.NewTitle);
 			};
