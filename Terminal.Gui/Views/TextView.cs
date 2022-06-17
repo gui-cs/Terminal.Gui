@@ -769,7 +769,7 @@ namespace Terminal.Gui {
 		}
 
 		public TextModel WrapModel (int width, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
-			int row = 0, int col = 0, int startRow = 0, int startCol = 0, int tabWidth = 0)
+			int row = 0, int col = 0, int startRow = 0, int startCol = 0, int tabWidth = 0, bool preserveTrailingSpaces = true)
 		{
 			frameWidth = width;
 
@@ -790,8 +790,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (ustring.Make (line), width,
-					TextAlignment.Left, true, true, tabWidth));
+					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
@@ -996,11 +995,11 @@ namespace Terminal.Gui {
 		}
 
 		public void UpdateModel (TextModel model, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
-			int row, int col, int startRow, int startCol)
+			int row, int col, int startRow, int startCol, bool preserveTrailingSpaces)
 		{
 			isWrapModelRefreshing = true;
 			Model = model;
-			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol);
+			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol, tabWidth: 0, preserveTrailingSpaces);
 			isWrapModelRefreshing = false;
 		}
 	}
@@ -1456,7 +1455,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: !ReadOnly);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -1483,7 +1482,7 @@ namespace Terminal.Gui {
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
 					selectionStartRow, selectionStartColumn,
-					tabWidth);
+					tabWidth, preserveTrailingSpaces: !ReadOnly);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
@@ -1601,7 +1600,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: !ReadOnly);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}
@@ -2234,7 +2233,7 @@ namespace Terminal.Gui {
 				wrapManager.UpdateModel (model, out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
-					selectionStartRow, selectionStartColumn);
+					selectionStartRow, selectionStartColumn, preserveTrailingSpaces: !ReadOnly);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;

@@ -695,7 +695,7 @@ namespace Terminal.Gui {
 				throw new ArgumentOutOfRangeException ("width cannot be negative");
 			}
 			if (preserveTrailingSpaces && !wordWrap) {
-				throw new ArgumentException ("if 'preserveTrailingSpaces' is true, then 'wordWrap' must be true either.");
+				throw new ArgumentException ("if 'preserveTrailingSpaces' is true, then 'wordWrap' must also be true.");
 			}
 			List<ustring> lineResult = new List<ustring> ();
 
