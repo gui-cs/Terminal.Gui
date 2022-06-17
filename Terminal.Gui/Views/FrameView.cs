@@ -108,7 +108,8 @@ namespace Terminal.Gui {
 
 		void Initialize (Rect frame, ustring title, View [] views = null, Border border = null)
 		{
-			this.title = title;
+			if (title == null) title = ustring.Empty;
+			this.Title = title;
 			if (border == null) {
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single

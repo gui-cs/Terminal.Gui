@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Window : Toplevel {
 		View contentView;
-		ustring title;
+		ustring title = ustring.Empty;
 
 		/// <summary>
 		/// The title to be displayed for this window.
@@ -32,9 +32,10 @@ namespace Terminal.Gui {
 		public ustring Title {
 			get => title;
 			set {
-				if (!OnTitleChanging (value)) {
+				if (!OnTitleChanging (title, value)) {
+					var old = title;
 					title = value;
-					OnTitleChanged (title);
+					OnTitleChanged (old, title);
 				}
 				SetNeedsDisplay ();
 			}
@@ -174,6 +175,7 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			ColorScheme = Colors.Base;
+			if (title == null) title = ustring.Empty;
 			Title = title;
 			if (border == null) {
 				Border = new Border () {
@@ -348,26 +350,35 @@ namespace Terminal.Gui {
 			public ustring NewTitle { get; set; }
 
 			/// <summary>
-			/// Flag which allows cancelling changing to the new TItle value.
+			/// The old Window Title.
+			/// </summary>
+			public ustring OldTitle { get; set; }
+
+			/// <summary>
+			/// Flag which allows cancelling the Title change.
 			/// </summary>
 			public bool Cancel { get; set; }
 
 			/// <summary>
 			/// Initializes a new instance of <see cref="TitleEventArgs"/>
 			/// </summary>
+			/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
 			/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
-			public TitleEventArgs (ustring newTitle)
+			public TitleEventArgs (ustring oldTitle, ustring newTitle)
 			{
+				OldTitle = oldTitle;
 				NewTitle = newTitle;
 			}
 		}
 		/// <summary>
 		/// Called before the <see cref="Window.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
 		/// </summary>
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
 		/// <returns>`true` if an event handler cancelled the Title change.</returns>
-		public virtual bool OnTitleChanging (ustring newTitle)
+		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 		{
-			var args = new TitleEventArgs (newTitle);
+			var args = new TitleEventArgs (oldTitle, newTitle);
 			TitleChanging?.Invoke (args);
 			return args.Cancel;
 		}
@@ -381,9 +392,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called when the <see cref="Window.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
 		/// </summary>
-		public virtual void OnTitleChanged (ustring newTitle)
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
 		{
-			var args = new TitleEventArgs (title);
+			var args = new TitleEventArgs (oldTitle, newTitle);
 			TitleChanged?.Invoke (args);
 		}
 

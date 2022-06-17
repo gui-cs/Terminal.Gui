@@ -5,6 +5,7 @@ using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
+using NStack;
 
 namespace Terminal.Gui.Core {
 	public class WindowTests {
@@ -21,7 +22,7 @@ namespace Terminal.Gui.Core {
 			// Parameterless
 			var r = new Window ();
 			Assert.NotNull (r);
-			Assert.Null (r.Title);
+			Assert.Equal(ustring.Empty, r.Title);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 			Assert.Equal ("Window()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
 			Assert.True (r.CanFocus);
@@ -100,24 +101,29 @@ namespace Terminal.Gui.Core {
 		public void Set_Title_Fires_TitleChanging ()
 		{
 			var r = new Window ();
-			Assert.Null (r.Title);
+			Assert.Equal (ustring.Empty, r.Title);
 
-			string expectedAfter = null;
+			string expectedOld = null;
 			string expectedDuring = null;
+			string expectedAfter = null;
 			bool cancel = false;
 			r.TitleChanging += (args) => {
+				Assert.Equal (expectedOld, args.OldTitle);
 				Assert.Equal (expectedDuring, args.NewTitle);
 				args.Cancel = cancel;
 			};
 
+			expectedOld = string.Empty;
 			r.Title = expectedDuring = expectedAfter = "title";
 			Assert.Equal (expectedAfter, r.Title.ToString());
 
+			expectedOld = r.Title.ToString();
 			r.Title = expectedDuring = expectedAfter = "a different title";
 			Assert.Equal (expectedAfter, r.Title.ToString ());
 
 			// Now setup cancelling the change and change it back to "title"
 			cancel = true;
+			expectedOld = r.Title.ToString();
 			r.Title = expectedDuring = "title";
 			Assert.Equal (expectedAfter, r.Title.ToString ());
 			r.Dispose ();
@@ -128,18 +134,22 @@ namespace Terminal.Gui.Core {
 		public void Set_Title_Fires_TitleChanged ()
 		{
 			var r = new Window ();
-			Assert.Null (r.Title);
+			Assert.Equal (ustring.Empty, r.Title);
 
+			string expectedOld = null;
 			string expected = null;
 			r.TitleChanged += (args) => {
+				Assert.Equal (expectedOld, args.OldTitle);
 				Assert.Equal (r.Title, args.NewTitle);
 			};
 
 			expected = "title";
+			expectedOld = r.Title.ToString ();
 			r.Title = expected;
 			Assert.Equal (expected, r.Title.ToString ());
 
 			expected = "another title";
+			expectedOld = r.Title.ToString ();
 			r.Title = expected;
 			Assert.Equal (expected, r.Title.ToString ());
 			r.Dispose ();

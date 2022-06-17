@@ -359,7 +359,7 @@ namespace Terminal.Gui {
 		void SetTitle (ustring title)
 		{
 			if (title == null)
-				title = "";
+				title = ustring.Empty;
 			Title = title;
 		}
 
