@@ -1425,7 +1425,7 @@ namespace Terminal.Gui {
 			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
 			Clip = new Rect (0, 0, Cols, Rows);

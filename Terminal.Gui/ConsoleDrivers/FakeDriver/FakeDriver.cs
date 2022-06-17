@@ -523,7 +523,7 @@ namespace Terminal.Gui {
 			TerminalResized?.Invoke ();
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			if (!HeightAsBuffer) {
 				if (FakeConsole.WindowHeight > 0) {

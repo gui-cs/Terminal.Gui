@@ -772,6 +772,11 @@ namespace Terminal.Gui {
 		public abstract void End ();
 
 		/// <summary>
+		/// Resizes the clip area when the screen is resized.
+		/// </summary>
+		public abstract void ResizeScreen ();
+
+		/// <summary>
 		/// Reset and recreate the contents and the driver buffer.
 		/// </summary>
 		public abstract void UpdateOffScreen ();

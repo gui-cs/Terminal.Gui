@@ -1381,7 +1381,7 @@ namespace Terminal.Gui {
 			Clear ();
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			if (!HeightAsBuffer) {
 				if (Console.WindowHeight > 0) {
