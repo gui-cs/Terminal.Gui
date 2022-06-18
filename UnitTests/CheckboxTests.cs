@@ -175,6 +175,7 @@ namespace Terminal.Gui.Views {
 				X = 1,
 				Y = Pos.Center (),
 				Text = "Check this out 你",
+				AutoSize = false,
 				Width = 25
 			};
 			var win = new Window () {
@@ -226,8 +227,9 @@ namespace Terminal.Gui.Views {
 				X = 1,
 				Y = Pos.Center (),
 				Text = "Check this out 你",
-				Width = 25,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false,
+				Width = 25
 			};
 			var win = new Window () {
 				Width = Dim.Fill (),
@@ -278,8 +280,9 @@ namespace Terminal.Gui.Views {
 				X = 1,
 				Y = Pos.Center (),
 				Text = "Check this out 你",
-				Width = 25,
-				TextAlignment = TextAlignment.Justified
+				TextAlignment = TextAlignment.Justified,
+				AutoSize = false,
+				Width = 25
 			};
 			var win = new Window () {
 				Width = Dim.Fill (),
@@ -330,8 +333,9 @@ namespace Terminal.Gui.Views {
 				X = 1,
 				Y = Pos.Center (),
 				Text = "Check this out 你",
-				Width = 25,
-				TextAlignment = TextAlignment.Right
+				TextAlignment = TextAlignment.Right,
+				AutoSize = false,
+				Width = 25
 			};
 			var win = new Window () {
 				Width = Dim.Fill (),
