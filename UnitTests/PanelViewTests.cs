@@ -346,11 +346,11 @@ namespace Terminal.Gui.Views {
 			var top = Application.Top;
 			var win = new Window ();
 			var label = new Label () {
-				Width = 24,
-				Height = 13,
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwith a \nPanelView",
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				Width = 24,
+				Height = 13
 			};
 			var pv = new PanelView (label) {
 				Width = 24,

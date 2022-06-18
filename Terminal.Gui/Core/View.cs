@@ -571,9 +571,8 @@ namespace Terminal.Gui {
 
 				var isValidNewAutSize = autoSize ? IsValidAutoSizeWidth (width) : false;
 
-				if (autoSize && !isValidNewAutSize) {
-					TextFormatter.AutoSize = false;
-					autoSize = false;
+				if (IsInitialized && autoSize && !isValidNewAutSize) {
+					throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
 				}
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
@@ -601,9 +600,8 @@ namespace Terminal.Gui {
 
 				var isValidNewAutSize = autoSize ? IsValidAutoSizeHeight (height) : false;
 
-				if (autoSize && !isValidNewAutSize) {
-					TextFormatter.AutoSize = false;
-					autoSize = false;
+				if (IsInitialized && autoSize && !isValidNewAutSize) {
+					throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
 				}
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
@@ -633,7 +631,7 @@ namespace Terminal.Gui {
 			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 				case true:
-					var colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
+					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
 					if (Width == null || (Width is Dim.DimAbsolute && Width.Anchor (0) < colWidth)) {
 						width = colWidth;
 						Bounds = new Rect (Bounds.X, Bounds.Y, colWidth, Bounds.Height);
@@ -2389,9 +2387,6 @@ namespace Terminal.Gui {
 
 					if ((IsInitialized && AutoSize) || (directionChanged && AutoSize && isValidOldAutSize)) {
 						ResizeView (true);
-					} else if (directionChanged && AutoSize && !isValidOldAutSize) {
-						TextFormatter.AutoSize = false;
-						autoSize = false;
 					} else if (IsInitialized) {
 						var b = new Rect (Bounds.X, Bounds.Y, Bounds.Height, Bounds.Width);
 						SetWidthHeight (b);
@@ -2411,10 +2406,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual bool IsInitialized {
 			get => isInitialized;
-			set {
+			private set {
 				isInitialized = value;
 				SetMinWidthHeight ();
-				if (autoSize && !IsValidAutoSize (out _)) {
+				if (autoSize && !IsValidAutoSize (out Size autSize)) {
 					TextFormatter.AutoSize = false;
 					autoSize = false;
 				}
@@ -2512,10 +2507,8 @@ namespace Terminal.Gui {
 		bool SetWidthHeight (Rect nBounds)
 		{
 			bool aSize = false;
-			var canSizeW = SetWidth (nBounds.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0), out int rW);
-			var canSizeH = SetHeight (nBounds.Height - (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0), out int rH);
+			var canSizeW = SetWidth (nBounds.Width - GetHotKeySpecifierLength (), out int rW);
+			var canSizeH = SetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out int rH);
 			if (canSizeW) {
 				aSize = true;
 				width = rW;
@@ -2535,15 +2528,11 @@ namespace Terminal.Gui {
 		bool IsValidAutoSize (out Size autoSize)
 		{
 			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
-			autoSize = new Size (rect.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0),
-				rect.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
+				rect.Size.Height - GetHotKeySpecifierLength (false));
 			return !(!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)
-				|| frame.Size.Width != rect.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0)
-				|| frame.Size.Height != rect.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+				|| frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+				|| frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
 		bool IsValidAutoSizeWidth (Dim width)
@@ -2551,8 +2540,7 @@ namespace Terminal.Gui {
 			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = width.Anchor (0);
 			return !(!(width is Dim.DimAbsolute) || dimValue != rect.Size.Width
-				- (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+				- GetHotKeySpecifierLength ());
 		}
 
 		bool IsValidAutoSizeHeight (Dim height)
@@ -2560,8 +2548,25 @@ namespace Terminal.Gui {
 			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = height.Anchor (0);
 			return !(!(height is Dim.DimAbsolute) || dimValue != rect.Size.Height
-				- (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text?.Contains (HotKeySpecifier) == true ? 1 : 0));
+				- GetHotKeySpecifierLength (false));
+		}
+
+		/// <summary>
+		/// Get the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> length.
+		/// </summary>
+		/// <param name="isWidth"><c>true</c>if is the width (default)<c>false</c>if is the height.</param>
+		/// <returns>The length of the <see cref="TextFormatter.HotKeySpecifier"/>.</returns>
+		public int GetHotKeySpecifierLength (bool isWidth = true)
+		{
+			if (isWidth) {
+				return TextFormatter.IsHorizontalDirection (TextDirection) &&
+					TextFormatter.Text?.Contains (HotKeySpecifier) == true
+					? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0;
+			} else {
+				return TextFormatter.IsVerticalDirection (TextDirection) &&
+					TextFormatter.Text?.Contains (HotKeySpecifier) == true
+					? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0;
+			}
 		}
 
 		/// <summary>
@@ -2570,10 +2575,8 @@ namespace Terminal.Gui {
 		/// <returns>The bounds size minus the <see cref="TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetTextFormatterBoundsSize ()
 		{
-			return new Size (TextFormatter.Size.Width - (TextFormatter.IsHorizontalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0),
-				TextFormatter.Size.Height - (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0));
+			return new Size (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+				TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
 		/// <summary>
@@ -2585,10 +2588,8 @@ namespace Terminal.Gui {
 			if (TextFormatter.Text == null)
 				return Bounds.Size;
 
-			return new Size (frame.Size.Width + (TextFormatter.IsHorizontalDirection (TextDirection)
-					&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0),
-				frame.Size.Height + (TextFormatter.IsVerticalDirection (TextDirection)
-				&& TextFormatter.Text.Contains (HotKeySpecifier) ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0));
+			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
+				frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
 
 		/// <summary>

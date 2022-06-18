@@ -1176,7 +1176,7 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 		}
 
-		[Fact]
+		[Fact, AutoInitShutdown]
 		public void SetWidth_CanSetWidth ()
 		{
 			var top = new View () {
@@ -1200,8 +1200,12 @@ namespace Terminal.Gui.Core {
 			v.Width = null;
 			Assert.True (v.SetWidth (70, out rWidth));
 			Assert.Equal (70, rWidth);
+			Assert.False (v.IsInitialized);
 
-			v.IsInitialized = true;
+			Application.Top.Add (top);
+			Application.Begin (Application.Top);
+
+			Assert.True (v.IsInitialized);
 			v.Width = Dim.Fill (1);
 			Assert.Throws<ArgumentException> (() => v.Width = 75);
 			v.LayoutStyle = LayoutStyle.Absolute;
@@ -1210,7 +1214,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (60, rWidth);
 		}
 
-		[Fact]
+		[Fact, AutoInitShutdown]
 		public void SetHeight_CanSetHeight ()
 		{
 			var top = new View () {
@@ -1234,8 +1238,13 @@ namespace Terminal.Gui.Core {
 			v.Height = null;
 			Assert.True (v.SetHeight (10, out rHeight));
 			Assert.Equal (10, rHeight);
+			Assert.False (v.IsInitialized);
 
-			v.IsInitialized = true;
+			Application.Top.Add (top);
+			Application.Begin (Application.Top);
+
+			Assert.True (v.IsInitialized);
+
 			v.Height = Dim.Fill (1);
 			Assert.Throws<ArgumentException> (() => v.Height = 15);
 			v.LayoutStyle = LayoutStyle.Absolute;
@@ -1360,37 +1369,50 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("{X=0,Y=0,Width=8,Height=1}", label.Bounds.ToString ());
 		}
 
-		[Fact]
-		public void AutoSize_False_ResizeView_With_Dim_Fill ()
+		[Fact, AutoInitShutdown]
+		public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
 			var label = new Label () { Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (label);
+			Application.Top.Add (win);
+
+			// Text is empty so height=0
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
 
 			label.Text = "New text\nNew line";
-			win.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
+
+			Application.Begin (Application.Top);
 			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
 		}
 
-		[Fact]
-		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute ()
+		[Fact, AutoInitShutdown]
+		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsInitialized ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
+			Application.Top.Add (win);
 
 			// Text is empty so height=0
-			Assert.False (label.AutoSize);
+			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
 
-			// Here the SetMinWidthHeight ensuring the minimum height
 			label.Text = "New text\nNew line";
-			win.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+
+			Application.Begin (Application.Top);
 			Assert.False (label.AutoSize);
-			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2827,8 +2849,7 @@ Y
 			var btn = new Button () {
 				X = Pos.Center (),
 				Y = Pos.Center (),
-				Text = "Say He_llo 你",
-				AutoSize = true
+				Text = "Say He_llo 你"
 			};
 
 			var win = new Window () {
@@ -2911,6 +2932,68 @@ Y
 			Assert.Equal (new Size (2, 12), verticalView.GetBoundsTextFormatterSize ());
 			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetBoundsTextFormatterSize ());
 			Assert.Equal (verticalView.Frame.Size, verticalView.GetTextFormatterBoundsSize ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Exceptions ()
+		{
+			var exception = Record.Exception (() => new View () { Text = "Say Hello 你", AutoSize = true, Width = 10 });
+			Assert.Null (exception);
+
+			var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10 };
+			var view2 = new View () { Text = "Say Hello view2 你", Height = 10, AutoSize = true };
+			var view3 = new View () { Text = "Say Hello view3 你", Width = 10 };
+			var view4 = new View () {
+				Text = "Say Hello view4 你",
+				Height = 10,
+				AutoSize = true,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			var view5 = new View () {
+				Text = "Say Hello view5 你",
+				Height = 10,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			Application.Top.Add (view1, view2, view3, view4, view5);
+
+			Assert.False (view1.IsInitialized);
+			Assert.False (view2.IsInitialized);
+			Assert.False (view3.IsInitialized);
+			Assert.False (view4.IsInitialized);
+			Assert.False (view5.IsInitialized);
+
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.IsInitialized);
+			Assert.True (view2.IsInitialized);
+			Assert.True (view3.IsInitialized);
+			Assert.True (view4.IsInitialized);
+			Assert.True (view5.IsInitialized);
+
+			Assert.False (view1.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view1.Frame);
+			Assert.True (view2.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 1), view2.Frame);
+			Assert.False (view3.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view3.Frame);
+			Assert.True (view4.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 17), view4.Frame);
+			Assert.False (view5.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 10), view5.Frame);
+
+			exception = Record.Exception (() => view1.Width = 20);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 20, 1), view1.Frame);
+			Assert.Throws<InvalidOperationException> (() => view2.Height = 10);
+			exception = Record.Exception (() => view3.Width = 20);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 20, 1), view3.Frame);
+			exception = Record.Exception (() => view4.TextDirection = TextDirection.LeftRight_TopBottom);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 18, 1), view4.Frame);
+			exception = Record.Exception (() => view5.TextDirection = TextDirection.LeftRight_TopBottom);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 10, 2), view5.Frame);
 		}
 	}
 }
