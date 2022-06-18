@@ -1299,11 +1299,6 @@ namespace Terminal.Gui {
 				previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 
 			OpenMenu (idx, sIdx, subMenu);
-			//if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
-			//	&& subMenu == null && !CloseMenu (false)) {
-
-			//	return;
-			//}
 			SetNeedsDisplay ();
 		}
 
@@ -1534,9 +1529,6 @@ namespace Terminal.Gui {
 				OpenMenu (selected);
 				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
 					openCurrentMenu.current = 0;
-					//if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
-					//	CloseMenu (ignoreUseSubMenusSingleFrame);
-					//}
 				}
 				break;
 			case true:
