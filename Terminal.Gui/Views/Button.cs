@@ -111,6 +111,7 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
+			AutoSize = true;
 			this.is_default = is_default;
 			this.text = text ?? string.Empty;
 			Update ();
@@ -197,7 +198,7 @@ namespace Terminal.Gui {
 			else
 				TextFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			int w = TextFormatter.Size.Width - (TextFormatter.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			int w = TextFormatter.Size.Width - GetHotKeySpecifierLength ();
 			GetCurrentWidth (out int cWidth);
 			var canSetWidth = SetWidth (w, out int rWidth);
 			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
