@@ -117,7 +117,7 @@ namespace Unix.Terminal {
 			}
 
 			if (this.handle == IntPtr.Zero) {
-				throw new IOException (string.Format ("Error loading native library \"{0}\"", this.libraryPath));
+				throw new IOException ($"Error loading native library \"{string.Join (", ", libraryPathAlternatives)}\"");
 			}
 		}
 
