@@ -821,7 +821,7 @@ namespace Terminal.Gui {
 
 				window = Curses.initscr ();
 			} catch (Exception e) {
-				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
+				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
 			}
 
 			// Ensures that all procedures are performed at some previous closing.
@@ -986,6 +986,9 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
+			if (new CursesClipboard ().IsSupported) {
+				return false;
+			}
 			var result = BashRunner.Run ("uname -a", runCurses: false);
 			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
@@ -1361,11 +1364,14 @@ namespace Terminal.Gui {
 						FileName = "bash",
 						Arguments = arguments,
 						RedirectStandardInput = true,
+						RedirectStandardError = true,
 						UseShellExecute = false,
 						CreateNoWindow = false
 					}
 				}) {
 					process.Start ();
+					process.ErrorDataReceived += (sender, args) => { };
+					process.BeginErrorReadLine ();
 					process.StandardInput.Write (inputText);
 					process.StandardInput.Close ();
 					process.WaitForExit ();
@@ -1506,7 +1512,6 @@ namespace Terminal.Gui {
 				powershell.Start ();
 				var result = powershell.StandardOutput.ReadToEnd ();
 				powershell.StandardOutput.Close ();
-				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
@@ -1533,7 +1538,6 @@ namespace Terminal.Gui {
 				}
 			}) {
 				powershell.Start ();
-				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
