@@ -1505,7 +1505,7 @@ namespace Terminal.Gui {
 					RedirectStandardOutput = true,
 					FileName = "powershell.exe",
 					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = Application.Driver is CursesDriver,
+					UseShellExecute = false,
 					CreateNoWindow = true
 				}
 			}) {
