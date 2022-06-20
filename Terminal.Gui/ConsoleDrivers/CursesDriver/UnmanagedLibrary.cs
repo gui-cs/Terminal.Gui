@@ -186,7 +186,12 @@ namespace Unix.Terminal {
 					return Mono.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 				}
 				if (IsNetCore) {
-					return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					try {
+						return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					} catch (Exception) {
+
+						IsNetCore = false;
+					}
 				}
 				return Linux.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 			}
