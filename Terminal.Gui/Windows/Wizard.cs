@@ -358,7 +358,7 @@ namespace Terminal.Gui {
 
 		private void NextfinishBtn_Clicked ()
 		{
-			if (CurrentStep == steps.Last.Value) {
+			if (CurrentStep == GetLastStep()) {
 				var args = new WizardButtonEventArgs ();
 				Finished?.Invoke (args);
 				if (!args.Cancel) {
