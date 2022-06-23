@@ -508,5 +508,103 @@ namespace Terminal.Gui.Views {
 			step2.Enabled = false;
 			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Finish_Button_Closes ()
+		{
+			// https://github.com/migueldeicaza/gui.cs/issues/1833
+			var wizard = new Wizard ();
+			var step1 = new Wizard.WizardStep ("step1") { };
+			wizard.AddStep (step1);
+
+			var finishedFired = false;
+			wizard.Finished += (args) => {
+				finishedFired = true;
+			};
+
+			var closedFired = false;
+			wizard.Closed += (args) => {
+				closedFired = true;
+			};
+
+			var runstate = Application.Begin (wizard);
+			var firstIteration = true;
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+
+			wizard.NextFinishButton.OnClicked ();
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			Application.End (runstate);
+			Assert.True (finishedFired);
+			Assert.True (closedFired);
+			step1.Dispose ();
+			wizard.Dispose ();
+
+			// Same test, but with two steps
+			wizard = new Wizard ();
+			firstIteration = false;
+			step1 = new Wizard.WizardStep ("step1") { };
+			wizard.AddStep (step1);
+			var step2 = new Wizard.WizardStep ("step2") { };
+			wizard.AddStep (step2);
+
+			finishedFired = false;
+			wizard.Finished += (args) => {
+				finishedFired = true;
+			};
+
+			closedFired = false;
+			wizard.Closed += (args) => {
+				closedFired = true;
+			};
+
+			runstate = Application.Begin (wizard);
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+
+			Assert.Equal (step1.Title.ToString(), wizard.CurrentStep.Title.ToString());
+			wizard.NextFinishButton.OnClicked ();
+			Assert.False (finishedFired);
+			Assert.False (closedFired);
+
+			Assert.Equal (step2.Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			Assert.Equal (wizard.GetLastStep().Title.ToString(), wizard.CurrentStep.Title.ToString ());
+			wizard.NextFinishButton.OnClicked ();
+			Application.End (runstate);
+			Assert.True (finishedFired);
+			Assert.True (closedFired);
+
+			step1.Dispose ();
+			step2.Dispose ();
+			wizard.Dispose ();
+
+			// Same test, but with two steps but the 1st one disabled
+			wizard = new Wizard ();
+			firstIteration = false;
+			step1 = new Wizard.WizardStep ("step1") { };
+			wizard.AddStep (step1);
+			step2 = new Wizard.WizardStep ("step2") { };
+			wizard.AddStep (step2);
+			step1.Enabled = false;
+
+			finishedFired = false;
+			wizard.Finished += (args) => {
+				finishedFired = true;
+			};
+
+			closedFired = false;
+			wizard.Closed += (args) => {
+				closedFired = true;
+			};
+
+			runstate = Application.Begin (wizard);
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+
+			Assert.Equal (step2.Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			Assert.Equal (wizard.GetLastStep ().Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			wizard.NextFinishButton.OnClicked ();
+			Application.End (runstate);
+			Assert.True (finishedFired);
+			Assert.True (closedFired);
+
+		}
 	}
 }
