@@ -1452,17 +1452,29 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				ResetPosition ();
-				model.LoadString (value);
-				if (wordWrap) {
-					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
-				}
-				TextChanged?.Invoke ();
-				SetNeedsDisplay ();
-
-				historyText.Clear (Text);
+				SetText(value,true);
 			}
+		}
+
+		/// <summary>
+		/// Updates the text displayed to the provided value.
+		/// </summary>
+		public void SetText(ustring value, bool resetCursorPosition=true)
+		{
+			if (resetCursorPosition)
+			{
+				ResetPosition ();
+			}
+
+			model.LoadString (value);
+			if (wordWrap) {
+				wrapManager = new WordWrapManager (model);
+				model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+			}
+			TextChanged?.Invoke ();
+			SetNeedsDisplay ();
+
+			historyText.Clear (Text);
 		}
 
 		///<inheritdoc/>
@@ -3278,7 +3290,10 @@ namespace Terminal.Gui {
 			DoNeededAction ();
 		}
 
-		void MoveStartOfLine ()
+		/// <summary>
+		/// Moves the cursor to the start of the current line
+		/// </summary>
+		public void MoveStartOfLine ()
 		{
 			currentColumn = 0;
 			leftColumn = 0;
