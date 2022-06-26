@@ -1370,8 +1370,6 @@ namespace Terminal.Gui {
 					}
 				}) {
 					process.Start ();
-					process.ErrorDataReceived += (sender, args) => { };
-					process.BeginErrorReadLine ();
 					process.StandardInput.Write (inputText);
 					process.StandardInput.Close ();
 					process.WaitForExit ();
