@@ -52,12 +52,27 @@ namespace Terminal.Gui.Views {
 
 	public class GraphViewTests {
 
+		static string LastInitFakeDriver;
 
 		public static FakeDriver InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			try {
+				Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			} catch (InvalidOperationException) {
+
+				// close it so that we don't get a thousand of these errors in a row
+				Application.Shutdown ();
+
+				// but still report a failure and name the test that didn't shut down.  Note
+				// that the test that didn't shutdown won't be the one currently running it will
+				// be the last one
+				throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
+			}
+			
 			driver.Init (() => { });
+
+			LastInitFakeDriver = Environment.StackTrace;
 			return driver;
 		}
 

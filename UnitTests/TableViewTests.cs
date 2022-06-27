@@ -570,6 +570,8 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (0, tv.SelectedColumn);
 			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
 		}
 		[Fact]
 		public void TableViewMultiSelect_CannotFallOffRight()
@@ -591,6 +593,8 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (1, tv.SelectedColumn);
 			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
 		}
 		[Fact]
 		public void TableViewMultiSelect_CannotFallOffBottom ()
@@ -613,6 +617,8 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (1, tv.SelectedColumn);
 			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -636,6 +642,8 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (0, tv.SelectedColumn);
 			Assert.Equal (0, tv.SelectedRow);
+
+			Application.Shutdown ();
 		}
 
 		[Theory]
