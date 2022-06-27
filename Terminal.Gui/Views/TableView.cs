@@ -869,11 +869,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y)
 		{
-			var top = Math.Max(Math.Min (pt1Y, pt2Y),0);
-			var bot = Math.Max(Math.Max (pt1Y, pt2Y),0);
+			var top = Math.Max(Math.Min (pt1Y, pt2Y), 0);
+			var bot = Math.Max(Math.Max (pt1Y, pt2Y), 0);
 
-			var left = Math.Max(0,Math.Min (pt1X, pt2X));
-			var right = Math.Max(0,Math.Max (pt1X, pt2X));
+			var left = Math.Max(Math.Min (pt1X, pt2X), 0);
+			var right = Math.Max(Math.Max (pt1X, pt2X), 0);
 
 			// Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
 			return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1));
