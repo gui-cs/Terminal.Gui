@@ -550,6 +550,84 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("R0C0", activatedValue);
 		}
 
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffLeft()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 1;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single().Rect);
+
+			// this next shift left should be ignored because we are already at the bounds
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+		}
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffRight()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 0;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next shift right should be ignored because we are already at the right bounds
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+		}
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffBottom ()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 0;
+			tv.SelectedRow = 0;
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next moves should be ignored because we already selected the whole table
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+		}
+
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffTop()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 1;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next moves should be ignored because we already selected the whole table
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+		}
+
 		[Theory]
 		[InlineData (false)]
 		[InlineData (true)]
