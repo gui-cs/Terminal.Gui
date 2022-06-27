@@ -567,6 +567,9 @@ namespace Terminal.Gui.Views {
 			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
 		}
 		[Fact]
 		public void TableViewMultiSelect_CannotFallOffRight()
@@ -585,6 +588,9 @@ namespace Terminal.Gui.Views {
 			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
 		}
 		[Fact]
 		public void TableViewMultiSelect_CannotFallOffBottom ()
@@ -605,6 +611,8 @@ namespace Terminal.Gui.Views {
 			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
 		}
 
 		[Fact]
@@ -626,6 +634,8 @@ namespace Terminal.Gui.Views {
 			tv.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (0, tv.SelectedRow);
 		}
 
 		[Theory]
