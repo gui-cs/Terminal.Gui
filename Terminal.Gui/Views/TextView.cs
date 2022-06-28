@@ -1458,7 +1458,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Appends <paramref name="toAppend"/> to <see cref="Text"/> optional 
+		/// Appends <paramref name="toAppend"/> to <see cref="Text"/> optionally 
 		/// preserving the current selection
 		/// </summary>
 		/// <param name="resetCursorPosition">true to clear currently selected text (if any) and jump to 0,0.  False to retain current selection</param>
