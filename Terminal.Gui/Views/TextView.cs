@@ -3305,7 +3305,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Moves the cursor to the start of the current line
 		/// </summary>
-		public void MoveStartOfLine ()
+		private void MoveStartOfLine ()
 		{
 			currentColumn = 0;
 			leftColumn = 0;

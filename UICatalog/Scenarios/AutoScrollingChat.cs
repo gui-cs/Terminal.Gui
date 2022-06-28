@@ -107,8 +107,8 @@ namespace UICatalog.Scenarios {
 
 		private void GoToEndOfTextView ()
 		{			
-			textView.MoveEnd();
-			textView.MoveStartOfLine();
+			textView.DoCommand(Command.BottomEnd);
+			textView.DoCommand(Command.StartOfLine);
 		}
 
 		private string GetRandomSentence ()

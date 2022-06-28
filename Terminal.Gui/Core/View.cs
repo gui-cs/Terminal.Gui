@@ -334,6 +334,22 @@ namespace Terminal.Gui {
 		bool oldCanFocus;
 		int oldTabIndex;
 
+
+		/// <summary>
+		/// Performs the requested command.  Returns true if
+		/// the command is of a Type supported by the view
+		/// and the command was successful
+		/// </summary>
+		public bool DoCommand(Command cmd)
+		{
+			if (!CommandImplementations.ContainsKey(cmd))
+			{
+				return false;
+			}
+
+			return CommandImplementations[cmd]() ?? false;
+		}
+
 		/// <inheritdoc/>
 		public override bool CanFocus {
 			get => base.CanFocus;
