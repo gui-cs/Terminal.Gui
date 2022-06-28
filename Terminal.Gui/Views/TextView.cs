@@ -1456,10 +1456,22 @@ namespace Terminal.Gui {
 			}
 		}
 
+
+		/// <summary>
+		/// Appends <paramref name="toAppend"/> to <see cref="Text"/> optional 
+		/// preserving the current selection
+		/// </summary>
+		/// <param name="resetCursorPosition">true to clear currently selected text (if any) and jump to 0,0.  False to retain current selection</param>
+		/// <param name="toAppend">The text to append to the end of <see cref="Text"/></param>
+		public void AppendText(ustring toAppend, bool resetCursorPosition)
+		{
+			SetText(Text + toAppend,resetCursorPosition);
+		}
+
 		/// <summary>
 		/// Updates the text displayed to the provided value.
 		/// </summary>
-		public void SetText(ustring value, bool resetCursorPosition=true)
+		private void SetText(ustring value, bool resetCursorPosition=true)
 		{
 			if (resetCursorPosition)
 			{

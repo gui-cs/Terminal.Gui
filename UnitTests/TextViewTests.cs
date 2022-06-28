@@ -5707,5 +5707,32 @@ line.
 			});
 			Assert.Null (exception);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestAppendText()
+		{
+			var tv = new TextView{
+				Width = 100,
+				Height = 100,
+				Text = "I've got a lovely bunch of coconuts"
+			};
+
+			tv.SelectAll();
+			Assert.Equal(0,tv.SelectionStartColumn);
+			Assert.Equal(0,tv.SelectionStartRow);
+			Assert.Equal(35,tv.SelectedLength);
+			Assert.Equal("I've got a lovely bunch of coconuts",tv.SelectedText.ToString());
+
+			tv.AppendText(". Here they are sitting in a row",false);
+
+			// Text should be appended
+			Assert.Equal("I've got a lovely bunch of coconuts. Here they are sitting in a row",tv.Text.ToString());
+
+			// but selection should be retained
+			Assert.Equal(0,tv.SelectionStartColumn);
+			Assert.Equal(0,tv.SelectionStartRow);
+			Assert.Equal(35,tv.SelectedLength);
+			Assert.Equal("I've got a lovely bunch of coconuts",tv.SelectedText.ToString());
+		}
 	}
 }

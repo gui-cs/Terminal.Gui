@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 					 textView.CurrentRow >= textView.Lines-1;
 
 					// append the chat log
-					textView.SetText(textView.Text + $"\n{user}: {sentence}",false);
+					textView.AppendText($"\n{user}: {sentence}",false);
 										
 					if(autoscroll)
 					{
