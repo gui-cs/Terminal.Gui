@@ -3303,7 +3303,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves the cursor to the start of the current line
+		/// Moves the cursor to the start of the current line.
 		/// </summary>
 		void MoveStartOfLine ()
 		{

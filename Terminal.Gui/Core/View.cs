@@ -336,9 +336,9 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Performs the requested command.  Returns true if
+		/// Performs the requested command. Returns true if
 		/// the command is supported by the view and the 
-		/// command was successful
+		/// command was successful.
 		/// </summary>
 		public bool DoCommand(Command cmd)
 		{
