@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		public void Constructors_Defaults ()
+		public void Constructors_Defaults()
 		{
 			var ckb = new CheckBox ();
 			Assert.True (ckb.AutoSize);
@@ -53,13 +53,13 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void KeyBindings_Command ()
+		public void KeyBindings_Command()
 		{
 			var isChecked = false;
 			CheckBox ckb = new CheckBox ();
 			ckb.Toggled += (e) => isChecked = true;
-			Application.Top.Add (ckb);
-			Application.Begin (Application.Top);
+			Application.Top.Add(ckb);
+			Application.Begin(Application.Top);
 
 			Assert.Equal (Key.Null, ckb.HotKey);
 			ckb.Text = "Test";
@@ -71,8 +71,8 @@ namespace Terminal.Gui.Views {
 			Assert.True (ckb.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (isChecked);
 			isChecked = false;
-			Assert.True (ckb.ProcessKey (new KeyEvent ((Key)' ', new KeyModifiers ())));
-			Assert.True (isChecked);
+			Assert.True(ckb.ProcessKey(new KeyEvent((Key)' ', new KeyModifiers())));
+			Assert.True(isChecked);
 			isChecked = false;
 			Assert.True (ckb.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.True (isChecked);
