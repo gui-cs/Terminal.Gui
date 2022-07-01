@@ -60,7 +60,7 @@ namespace UICatalog.Scenarios {
 
 			// Multi-Line
 
-			var container = new View () { X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (7), ColorScheme = color2 };
+			var container = new View () { X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (6), ColorScheme = color2 };
 
 			var txtLabelTL = new Label (txt) { X = 1 /*                    */, Y = 1, Width = Dim.Percent (100f / 3f), Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Left, VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1 };
 			var txtLabelTC = new Label (txt) { X = Pos.Right (txtLabelTL) + 2, Y = 1, Width = Dim.Percent (100f / 3f), Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Centered, VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1 };

@@ -4,46 +4,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class RadioGroupTests {
+		readonly ITestOutputHelper output;
+
+		public RadioGroupTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
 			var rg = new RadioGroup ();
 			Assert.True (rg.CanFocus);
 			Assert.Empty (rg.RadioLabels);
-			Assert.Equal (0, rg.X);
-			Assert.Equal (0, rg.Y);
-			Assert.Equal (0, rg.Width);
-			Assert.Equal (0, rg.Height);
+			Assert.Null (rg.X);
+			Assert.Null (rg.Y);
+			Assert.Null (rg.Width);
+			Assert.Null (rg.Height);
+			Assert.Equal (Rect.Empty, rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 
 			rg = new RadioGroup (new NStack.ustring [] { "Test" });
 			Assert.True (rg.CanFocus);
 			Assert.Single (rg.RadioLabels);
-			Assert.Equal (0, rg.X);
-			Assert.Equal (0, rg.Y);
-			Assert.Equal (7, rg.Width);
-			Assert.Equal (1, rg.Height);
+			Assert.Null (rg.X);
+			Assert.Null (rg.Y);
+			Assert.Null (rg.Width);
+			Assert.Null (rg.Height);
+			Assert.Equal (new Rect (0, 0, 7, 1), rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 
 			rg = new RadioGroup (new Rect (1, 2, 20, 5), new NStack.ustring [] { "Test" });
 			Assert.True (rg.CanFocus);
 			Assert.Single (rg.RadioLabels);
-			Assert.Equal (1, rg.X);
-			Assert.Equal (2, rg.Y);
-			Assert.Equal (20, rg.Width);
-			Assert.Equal (5, rg.Height);
+			Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
+			Assert.Null (rg.X);
+			Assert.Null (rg.Y);
+			Assert.Null (rg.Width);
+			Assert.Null (rg.Height);
+			Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 
 			rg = new RadioGroup (1, 2, new NStack.ustring [] { "Test" });
 			Assert.True (rg.CanFocus);
 			Assert.Single (rg.RadioLabels);
-			Assert.Equal (1, rg.X);
-			Assert.Equal (2, rg.Y);
-			Assert.Equal (7, rg.Width);
-			Assert.Equal (1, rg.Height);
+			Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
+			Assert.Null (rg.X);
+			Assert.Null (rg.Y);
+			Assert.Null (rg.Width);
+			Assert.Null (rg.Height);
+			Assert.Equal (new Rect (1, 2, 7, 1), rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
@@ -56,32 +70,78 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
-		[Fact]
-		public void DisplayMode_Width_Height_HorizontalSpace ()
+		[Fact, AutoInitShutdown]
+		public void DisplayMode_Width_Height_Vertical_Horizontal_Space ()
 		{
-			var rg = new RadioGroup (new NStack.ustring [] { "Test", "New Test" });
+			var rg = new RadioGroup (new NStack.ustring [] { "Test", "New Test 你" });
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (rg);
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
 			Assert.Equal (DisplayModeLayout.Vertical, rg.DisplayMode);
 			Assert.Equal (2, rg.RadioLabels.Length);
 			Assert.Equal (0, rg.X);
 			Assert.Equal (0, rg.Y);
-			Assert.Equal (11, rg.Width);
+			Assert.Equal (14, rg.Width);
 			Assert.Equal (2, rg.Height);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│● Test                      │
+│◌ New Test 你               │
+│                            │
+└────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			rg.DisplayMode = DisplayModeLayout.Horizontal;
+			Application.Refresh ();
+
 			Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
 			Assert.Equal (2, rg.HorizontalSpace);
 			Assert.Equal (0, rg.X);
 			Assert.Equal (0, rg.Y);
-			Assert.Equal (16, rg.Width);
+			Assert.Equal (21, rg.Width);
 			Assert.Equal (1, rg.Height);
 
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│● Test  ◌ New Test 你       │
+│                            │
+│                            │
+└────────────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+
 			rg.HorizontalSpace = 4;
+			Application.Refresh ();
+
 			Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
 			Assert.Equal (4, rg.HorizontalSpace);
 			Assert.Equal (0, rg.X);
 			Assert.Equal (0, rg.Y);
-			Assert.Equal (20, rg.Width);
+			Assert.Equal (23, rg.Width);
 			Assert.Equal (1, rg.Height);
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│● Test    ◌ New Test 你     │
+│                            │
+│                            │
+└────────────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
 		[Fact]

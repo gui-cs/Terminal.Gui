@@ -22,8 +22,8 @@ namespace UICatalog.Scenarios {
 			var multiLineHeight = 5;
 
 			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog };
-				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog };
+				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog, AutoSize = false };
+				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog, AutoSize = false };
 			}
 
 			// Add a label & text field so we can demo IsDefault

@@ -19,26 +19,34 @@ namespace Terminal.Gui.Views {
 		public void Constructors_Defaults ()
 		{
 			var ckb = new CheckBox ();
+			Assert.True (ckb.AutoSize);
 			Assert.False (ckb.Checked);
 			Assert.Equal (string.Empty, ckb.Text);
+			Assert.Equal ("╴ ", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
 			ckb = new CheckBox ("Test", true);
+			Assert.True (ckb.AutoSize);
 			Assert.True (ckb.Checked);
 			Assert.Equal ("Test", ckb.Text);
+			Assert.Equal ("√ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
 			ckb = new CheckBox (1, 2, "Test");
+			Assert.True (ckb.AutoSize);
 			Assert.False (ckb.Checked);
 			Assert.Equal ("Test", ckb.Text);
+			Assert.Equal ("╴ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
 			ckb = new CheckBox (3, 4, "Test", true);
+			Assert.True (ckb.AutoSize);
 			Assert.True (ckb.Checked);
 			Assert.Equal ("Test", ckb.Text);
+			Assert.Equal ("√ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (3, 4, 6, 1), ckb.Frame);
 		}
@@ -106,7 +114,6 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("Check this out 你", checkBox.Text);
 			Assert.Equal ("╴ Check this out 你", checkBox.TextFormatter.Text);
 			Assert.True (checkBox.AutoSize);
-
 			var expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
@@ -123,12 +130,21 @@ namespace Terminal.Gui.Views {
 			checkBox.AutoSize = true;
 			bool first = false;
 			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│ ╴ Check this out 你        │
+│                            │
+└────────────────────────────┘
+";
 
 			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
 			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
 			expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
@@ -141,8 +157,27 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.AutoSize = false;
+			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
 			checkBox.Text = "Check this out 你 changed";
 			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│ √ Check this out 你        │
+│                            │
+└────────────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+
+			checkBox.Width = 19;
+			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
+			checkBox.Text = "Check this out 你 changed";
+			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Assert.False (checkBox.AutoSize);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
 			expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
@@ -156,6 +191,7 @@ namespace Terminal.Gui.Views {
 
 			checkBox.AutoSize = true;
 			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
 			expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
@@ -191,6 +227,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (TextAlignment.Left, checkBox.TextAlignment);
 			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Assert.Equal ("Check this out 你", checkBox.Text);
 			Assert.Equal ("╴ Check this out 你", checkBox.TextFormatter.Text);
 			Assert.False (checkBox.AutoSize);
@@ -244,6 +281,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (TextAlignment.Centered, checkBox.TextAlignment);
 			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Assert.Equal ("Check this out 你", checkBox.Text);
 			Assert.Equal ("╴ Check this out 你", checkBox.TextFormatter.Text);
 			Assert.False (checkBox.AutoSize);
@@ -297,6 +335,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (TextAlignment.Justified, checkBox.TextAlignment);
 			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Assert.Equal ("Check this out 你", checkBox.Text);
 			Assert.Equal ("╴ Check this out 你", checkBox.TextFormatter.Text);
 			Assert.False (checkBox.AutoSize);
@@ -313,6 +352,8 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
+			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Application.Refresh ();
 			expected = @"
 ┌ Test Demo 你 ──────────────┐
@@ -350,6 +391,7 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (TextAlignment.Right, checkBox.TextAlignment);
 			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Assert.Equal ("Check this out 你", checkBox.Text);
 			Assert.Equal ("Check this out 你 ╴", checkBox.TextFormatter.Text);
 			Assert.False (checkBox.AutoSize);

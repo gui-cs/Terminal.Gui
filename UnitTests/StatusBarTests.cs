@@ -34,7 +34,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (Dim.Fill (), sb.Width);
 			Assert.Equal (1, sb.Height);
 
-			Assert.Equal (0, sb.Y);
+			Assert.Null (sb.Y);
 
 			var driver = new FakeDriver ();
 			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));

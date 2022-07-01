@@ -7,11 +7,14 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			var text = "Hello World";
+			//var text = "Hello World 你";
 			var color = Colors.Dialog;
 
 			var labelH = new Label (text, TextDirection.LeftRight_TopBottom) {
 				X = 1,
 				Y = 1,
+				Width = 11,
+				Height = 1,
 				ColorScheme = color
 			};
 			Win.Add (labelH);
@@ -19,6 +22,8 @@ namespace UICatalog.Scenarios {
 			var labelV = new Label (text, TextDirection.TopBottom_LeftRight) {
 				X = 70,
 				Y = 1,
+				Width = 1,
+				Height = 11,
 				ColorScheme = color
 			};
 			Win.Add (labelV);
@@ -58,6 +63,15 @@ namespace UICatalog.Scenarios {
 			};
 			ckbAutoSize.Toggled += (_) => labelH.AutoSize = labelV.AutoSize = ckbAutoSize.Checked;
 			Win.Add (ckbAutoSize);
+
+			var ckbPreserveTrailingSpaces = new CheckBox ("Preserve Trailing Spaces") {
+				X = Pos.Center (),
+				Y = Pos.Center () + 7,
+				Checked = labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces
+			};
+			ckbPreserveTrailingSpaces.Toggled += (_) =>
+					labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = ckbPreserveTrailingSpaces.Checked;
+			Win.Add (ckbPreserveTrailingSpaces);
 
 			Win.KeyUp += (_) =>
 				labelH.Text = labelV.Text = text = editText.Text.ToString ();
