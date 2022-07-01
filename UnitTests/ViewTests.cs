@@ -29,11 +29,10 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Equal (Dim.Sized (0), r.Width);
-			Assert.Equal (Dim.Sized (0), r.Height);
-			// FIXED: Pos needs equality implemented
-			Assert.Equal (Pos.At (0), r.X);
-			Assert.Equal (Pos.At (0), r.Y);
+			Assert.Null (r.Width);
+			Assert.Null (r.Height);
+			Assert.Null (r.X);
+			Assert.Null (r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -54,10 +53,10 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.NotNull (r.Width);       // All view Dim are initialized now,
-			Assert.NotNull (r.Height);      // avoiding Dim errors.
-			Assert.NotNull (r.X);           // All view Pos are initialized now,
-			Assert.NotNull (r.Y);           // avoiding Pos errors.
+			Assert.Null (r.Width);       // All view Dim are initialized now in the IsAdded setter,
+			Assert.Null (r.Height);      // avoiding Dim errors.
+			Assert.Null (r.X);           // All view Pos are initialized now in the IsAdded setter,
+			Assert.Null (r.Y);           // avoiding Pos errors.
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -78,10 +77,10 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.NotNull (r.Width);
-			Assert.NotNull (r.Height);
-			Assert.NotNull (r.X);
-			Assert.NotNull (r.Y);
+			Assert.Null (r.Width);
+			Assert.Null (r.Height);
+			Assert.Null (r.X);
+			Assert.Null (r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -102,10 +101,10 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Rect (0, 0, 1, 13), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.NotNull (r.Width);       // All view Dim are initialized now,
-			Assert.NotNull (r.Height);      // avoiding Dim errors.
-			Assert.NotNull (r.X);           // All view Pos are initialized now,
-			Assert.NotNull (r.Y);           // avoiding Pos errors.
+			Assert.Null (r.Width);       // All view Dim are initialized now in the IsAdded setter,
+			Assert.Null (r.Height);      // avoiding Dim errors.
+			Assert.Null (r.X);           // All view Pos are initialized now in the IsAdded setter,
+			Assert.Null (r.Y);           // avoiding Pos errors.
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -1082,19 +1081,19 @@ namespace Terminal.Gui.Core {
 
 			// Default Constructor
 			view = new View ();
-			Assert.Equal (0, view.X);
-			Assert.Equal (0, view.Y);
-			Assert.Equal (0, view.Width);
-			Assert.Equal (0, view.Height);
+			Assert.Null (view.X);
+			Assert.Null (view.Y);
+			Assert.Null (view.Width);
+			Assert.Null (view.Height);
 			Assert.True (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
 
 			// Constructor
 			view = new View (1, 2, "");
-			Assert.NotNull (view.X);
-			Assert.NotNull (view.Y);
-			Assert.NotNull (view.Width);
-			Assert.NotNull (view.Height);
+			Assert.Null (view.X);
+			Assert.Null (view.Y);
+			Assert.Null (view.Width);
+			Assert.Null (view.Height);
 			Assert.False (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
 
@@ -1177,7 +1176,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void SetWidth_CanSetWidth ()
+		public void SetWidth_CanSetWidth_ForceValidatePosDim ()
 		{
 			var top = new View () {
 				X = 0,
@@ -1186,7 +1185,8 @@ namespace Terminal.Gui.Core {
 			};
 
 			var v = new View () {
-				Width = Dim.Fill ()
+				Width = Dim.Fill (),
+				ForceValidatePosDim = true
 			};
 			top.Add (v);
 
@@ -1215,7 +1215,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void SetHeight_CanSetHeight ()
+		public void SetHeight_CanSetHeight_ForceValidatePosDim ()
 		{
 			var top = new View () {
 				X = 0,
@@ -1224,7 +1224,8 @@ namespace Terminal.Gui.Core {
 			};
 
 			var v = new View () {
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				ForceValidatePosDim = true
 			};
 			top.Add (v);
 
@@ -1267,11 +1268,17 @@ namespace Terminal.Gui.Core {
 			};
 			top.Add (v);
 
-			Assert.False (v.GetCurrentWidth (out int cWidth));
+			Assert.False (v.AutoSize);
+			Assert.True (v.GetCurrentWidth (out int cWidth));
 			Assert.Equal (80, cWidth);
 
 			v.Width = Dim.Fill (1);
-			Assert.False (v.GetCurrentWidth (out cWidth));
+			Assert.True (v.GetCurrentWidth (out cWidth));
+			Assert.Equal (79, cWidth);
+
+			v.AutoSize = true;
+
+			Assert.True (v.GetCurrentWidth (out cWidth));
 			Assert.Equal (79, cWidth);
 		}
 
@@ -1289,11 +1296,17 @@ namespace Terminal.Gui.Core {
 			};
 			top.Add (v);
 
-			Assert.False (v.GetCurrentHeight (out int cHeight));
+			Assert.False (v.AutoSize);
+			Assert.True (v.GetCurrentHeight (out int cHeight));
 			Assert.Equal (20, cHeight);
 
 			v.Height = Dim.Fill (1);
-			Assert.False (v.GetCurrentHeight (out cHeight));
+			Assert.True (v.GetCurrentHeight (out cHeight));
+			Assert.Equal (19, cHeight);
+
+			v.AutoSize = true;
+
+			Assert.True (v.GetCurrentHeight (out cHeight));
 			Assert.Equal (19, cHeight);
 		}
 
@@ -1373,46 +1386,59 @@ namespace Terminal.Gui.Core {
 		public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
-			var label = new Label () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var label = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
 
 			// Text is empty so height=0
-			Assert.True (label.AutoSize);
+			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
 
 			label.Text = "New text\nNew line";
 			Application.Top.LayoutSubviews ();
 
-			Assert.True (label.AutoSize);
+			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
+			Assert.False (label.IsInitialized);
 
 			Application.Begin (Application.Top);
+			Assert.True (label.IsInitialized);
 			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=78}", label.Bounds.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsInitialized ()
+		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 		{
 			var win = new Window (new Rect (0, 0, 30, 80), "");
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
 
+			Assert.True (label.IsAdded);
+
 			// Text is empty so height=0
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
 
-			label.Text = "New text\nNew line";
+			label.Text = "First line\nSecond line";
 			Application.Top.LayoutSubviews ();
 
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+			Assert.False (label.IsInitialized);
 
 			Application.Begin (Application.Top);
-			Assert.False (label.AutoSize);
+
+			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+			Assert.True (label.IsInitialized);
+
+			label.AutoSize = false;
+			Application.Refresh ();
+
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1422,13 +1448,31 @@ namespace Terminal.Gui.Core {
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
+
+			// Text is empty so height=0
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=0,Height=0}", label.Bounds.ToString ());
+
 			Application.Begin (Application.Top);
 
-			Assert.False (label.AutoSize);
+			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=0}", label.Bounds.ToString ());
 
+			label.Text = "First line\nSecond line";
+			Application.Refresh ();
+
+			// Here the AutoSize ensuring the right size
+			Assert.True (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+
+			label.AutoSize = false;
+			Application.Refresh ();
+
 			// Here the SetMinWidthHeight ensuring the minimum height
-			label.Text = "New text\nNew line";
+			Assert.False (label.AutoSize);
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
+
+			label.Text = "First changed line\nSecond changed line\nNew line";
 			Application.Refresh ();
 
 			Assert.False (label.AutoSize);
@@ -1437,19 +1481,12 @@ namespace Terminal.Gui.Core {
 			label.AutoSize = true;
 			Application.Refresh ();
 
-			// Here the AutoSize ensuring the right height
-			Assert.True (label.AutoSize);
-			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
-
-			label.Text = "New changed text\nNew changed line\nNew line";
-			Application.Refresh ();
-
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=3}", label.Bounds.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Horizontal ()
+		public void AutoSize_True_Setting_With_Height_Horizontal ()
 		{
 			var label = new Label ("Hello") { Width = 10, Height = 2 };
 			var viewX = new View ("X") { X = Pos.Right (label) };
@@ -1458,7 +1495,7 @@ namespace Terminal.Gui.Core {
 			Application.Top.Add (label, viewX, viewY);
 			Application.Begin (Application.Top);
 
-			Assert.False (label.AutoSize);
+			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
 
 			var expected = @"
@@ -1469,10 +1506,25 @@ Y
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 11, 3), pos);
+
+			label.AutoSize = false;
+			Application.Refresh ();
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
+
+			expected = @"
+Hello     X
+
+Y
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 11, 3), pos);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_True_Setting_With_Height_Sets_AutoSize_False_Vertical ()
+		public void AutoSize_True_Setting_With_Height_Vertical ()
 		{
 			var label = new Label ("Hello") { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight };
 			var viewX = new View ("X") { X = Pos.Right (label) };
@@ -1481,7 +1533,7 @@ Y
 			Application.Top.Add (label, viewX, viewY);
 			Application.Begin (Application.Top);
 
-			Assert.False (label.AutoSize);
+			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
 
 			var expected = @"
@@ -1499,6 +1551,29 @@ Y
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 3, 11), pos);
+
+			label.AutoSize = false;
+			Application.Refresh ();
+
+			Assert.False (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
+
+			expected = @"
+H X
+e
+l
+l
+o
+
+
+
+
+
+Y
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 3, 11), pos);
 		}
 
@@ -1573,11 +1648,16 @@ Y
 			view.SetRelativeLayout (top.Bounds);
 			Assert.Equal (79, view.Bounds.Width);
 			Assert.Equal (24, view.Bounds.Height);
+			view.X = 0;
+			view.Y = 0;
+			view.SetRelativeLayout (top.Bounds);
+			Assert.Equal (80, view.Bounds.Width);
+			Assert.Equal (25, view.Bounds.Height);
 			bool layoutStarted = false;
-			view.LayoutStarted += (_) => { layoutStarted = true; };
+			view.LayoutStarted += (_) => layoutStarted = true;
 			view.OnLayoutStarted (null);
 			Assert.True (layoutStarted);
-			view.LayoutComplete += (_) => { layoutStarted = false; };
+			view.LayoutComplete += (_) => layoutStarted = false;
 			view.OnLayoutComplete (null);
 			Assert.False (layoutStarted);
 			view.X = Pos.Center () - 41;
@@ -1778,13 +1858,12 @@ Y
 			Application.Top.Add (lbl);
 			Application.Begin (Application.Top);
 
+			Assert.True (lbl.AutoSize);
 			Assert.Equal ("123 ", GetContents ());
 
 			lbl.Text = "12";
 
-			if (!lbl.SuperView.NeedDisplay.IsEmpty) {
-				lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
-			}
+			lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
 
 			Assert.Equal ("12  ", GetContents ());
 
@@ -2485,68 +2564,90 @@ Y
 			win.Add (horizontalView, verticalView);
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
+			((FakeDriver)Application.Driver).SetBufferSize (32, 32);
 
+			Assert.False (horizontalView.AutoSize);
+			Assert.False (verticalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
 			Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
 			var expected = @"
-┌────────────────────┐
-│First line Second li│
-│                    │
-│                    │
-│F                   │
-│i                   │
-│r                   │
-│s                   │
-│t                   │
-│                    │
-│l                   │
-│i                   │
-│n                   │
-│e                   │
-│                    │
-│S                   │
-│e                   │
-│c                   │
-│o                   │
-│n                   │
-│d                   │
-└────────────────────┘
+┌──────────────────────────────┐
+│First line Second li          │
+│                              │
+│                              │
+│F                             │
+│i                             │
+│r                             │
+│s                             │
+│t                             │
+│                              │
+│l                             │
+│i                             │
+│n                             │
+│e                             │
+│                              │
+│S                             │
+│e                             │
+│c                             │
+│o                             │
+│n                             │
+│d                             │
+│                              │
+│l                             │
+│i                             │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+└──────────────────────────────┘
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+			Assert.Equal (new Rect (0, 0, 32, 32), pos);
 
 			verticalView.Text = $"最初の行{Environment.NewLine}二行目";
 			Application.Top.Redraw (Application.Top.Bounds);
 			Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
 			expected = @"
-┌────────────────────┐
-│First line Second li│
-│                    │
-│                    │
-│最                  │
-│初                  │
-│の                  │
-│行                  │
-│                    │
-│二                  │
-│行                  │
-│目                  │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
+┌──────────────────────────────┐
+│First line Second li          │
+│                              │
+│                              │
+│最                            │
+│初                            │
+│の                            │
+│行                            │
+│                              │
+│二                            │
+│行                            │
+│目                            │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+└──────────────────────────────┘
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+			Assert.Equal (new Rect (0, 0, 32, 32), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2563,6 +2664,10 @@ Y
 			Assert.False (view.AutoSize);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
 			Assert.Equal (Rect.Empty, view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view.Height.ToString ());
 			var expected = @"
 ┌────────────────────┐
 │                    │
@@ -2591,13 +2696,55 @@ Y
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
-			view.AutoSize = true;
 			view.Text = "Hello World";
-			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			view.Width = 11;
 			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Hello World         │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.AutoSize = true;
+			view.Text = "Hello Worlds";
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 12, 1), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view.Height.ToString ());
+			expected = @"
+┌────────────────────┐
+│Hello Worlds        │
 │                    │
 │                    │
 │                    │
@@ -2624,8 +2771,13 @@ Y
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
 			view.TextDirection = TextDirection.TopBottom_LeftRight;
-			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
 			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 11, 12), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │H                   │
@@ -2639,7 +2791,7 @@ Y
 │r                   │
 │l                   │
 │d                   │
-│                    │
+│s                   │
 │                    │
 │                    │
 │                    │
@@ -2655,22 +2807,27 @@ Y
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
 			view.AutoSize = false;
-			view.Text = "Hello Worlds";
-			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
+			view.Height = 1;
 			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
-│H                   │
-│e                   │
-│l                   │
-│l                   │
-│o                   │
+│HelloWorlds         │
 │                    │
-│W                   │
-│o                   │
-│r                   │
-│l                   │
-│d                   │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
+│                    │
 │                    │
 │                    │
 │                    │
@@ -2686,9 +2843,14 @@ Y
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
-			view.TextDirection = TextDirection.LeftRight_TopBottom;
-			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			view.PreserveTrailingSpaces = true;
 			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Hello World         │
@@ -2717,12 +2879,31 @@ Y
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
-			view.AutoSize = true;
-			Assert.Equal (new Rect (0, 0, 12, 1), view.Frame);
+			view.PreserveTrailingSpaces = false;
+			var f = view.Frame;
+			view.Width = f.Height;
+			view.Height = f.Width;
+			view.TextDirection = TextDirection.TopBottom_LeftRight;
 			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
-│Hello Worlds        │
+│H                   │
+│e                   │
+│l                   │
+│l                   │
+│o                   │
+│                    │
+│W                   │
+│o                   │
+│r                   │
+│l                   │
+│d                   │
 │                    │
 │                    │
 │                    │
@@ -2732,8 +2913,34 @@ Y
 │                    │
 │                    │
 │                    │
+└────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+
+			view.AutoSize = true;
+			Application.Refresh ();
+
+			Assert.Equal (new Rect (0, 0, 1, 12), view.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(11)", view.Height.ToString ());
+			expected = @"
+┌────────────────────┐
+│H                   │
+│e                   │
+│l                   │
+│l                   │
+│o                   │
 │                    │
-│                    │
+│W                   │
+│o                   │
+│r                   │
+│l                   │
+│d                   │
+│s                   │
 │                    │
 │                    │
 │                    │
@@ -2780,7 +2987,15 @@ Y
 			Assert.Equal (new Size (10, 1), horizontalView.TextFormatter.Size);
 			Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
 			Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
+			Assert.Equal ("Pos.Absolute(0)", horizontalView.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", horizontalView.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(9)", horizontalView.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", horizontalView.Height.ToString ());
 			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
+			Assert.Equal ("Pos.Absolute(0)", verticalView.X.ToString ());
+			Assert.Equal ("Pos.Absolute(3)", verticalView.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(8)", verticalView.Height.ToString ());
 			var expected = @"
 ┌────────────────────┐
 │Finish 終           │
@@ -2813,7 +3028,12 @@ Y
 			Application.Top.Redraw (Application.Top.Bounds);
 			Assert.True (horizontalView.AutoSize);
 			Assert.True (verticalView.AutoSize);
+			// height was initialized with 8 and is kept as minimum
 			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
+			Assert.Equal ("Pos.Absolute(0)", verticalView.X.ToString ());
+			Assert.Equal ("Pos.Absolute(3)", verticalView.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(8)", verticalView.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Finish 終           │
@@ -2935,32 +3155,63 @@ Y
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_Exceptions ()
+		public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
 		{
-			var exception = Record.Exception (() => new View () { Text = "Say Hello 你", AutoSize = true, Width = 10 });
-			Assert.Null (exception);
-
-			var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10 };
-			var view2 = new View () { Text = "Say Hello view2 你", Height = 10, AutoSize = true };
-			var view3 = new View () { Text = "Say Hello view3 你", Width = 10 };
+			var view1 = new View () { Text = "Say Hello view1 你", AutoSize = false, Width = 10, Height = 5 };
+			var view2 = new View () { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = false };
+			var view3 = new View () { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
 			var view4 = new View () {
 				Text = "Say Hello view4 你",
-				Height = 10,
-				AutoSize = true,
+				AutoSize = false,
+				Width = 10,
+				Height = 5,
 				TextDirection = TextDirection.TopBottom_LeftRight
 			};
 			var view5 = new View () {
 				Text = "Say Hello view5 你",
-				Height = 10,
+				Width = 10,
+				Height = 5,
+				AutoSize = false,
 				TextDirection = TextDirection.TopBottom_LeftRight
 			};
-			Application.Top.Add (view1, view2, view3, view4, view5);
+			var view6 = new View () {
+				AutoSize = false,
+				Width = 10,
+				Height = 5,
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Text = "Say Hello view6 你",
+			};
+			Application.Top.Add (view1, view2, view3, view4, view5, view6);
 
 			Assert.False (view1.IsInitialized);
 			Assert.False (view2.IsInitialized);
 			Assert.False (view3.IsInitialized);
 			Assert.False (view4.IsInitialized);
 			Assert.False (view5.IsInitialized);
+			Assert.False (view1.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view1.Height.ToString ());
+			Assert.False (view2.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view2.Height.ToString ());
+			Assert.False (view3.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view3.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view3.Height.ToString ());
+			Assert.False (view4.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view4.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view4.Height.ToString ());
+			Assert.False (view5.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view5.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view5.Height.ToString ());
+			Assert.False (view6.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view6.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view6.Height.ToString ());
 
 			Application.Begin (Application.Top);
 
@@ -2969,31 +3220,222 @@ Y
 			Assert.True (view3.IsInitialized);
 			Assert.True (view4.IsInitialized);
 			Assert.True (view5.IsInitialized);
-
 			Assert.False (view1.AutoSize);
-			Assert.Equal (new Rect (0, 0, 10, 1), view1.Frame);
-			Assert.True (view2.AutoSize);
-			Assert.Equal (new Rect (0, 0, 18, 1), view2.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view1.Height.ToString ());
+			Assert.False (view2.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view2.Height.ToString ());
 			Assert.False (view3.AutoSize);
-			Assert.Equal (new Rect (0, 0, 10, 1), view3.Frame);
-			Assert.True (view4.AutoSize);
-			Assert.Equal (new Rect (0, 0, 2, 17), view4.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view3.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view3.Height.ToString ());
+			Assert.False (view4.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view4.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view4.Height.ToString ());
 			Assert.False (view5.AutoSize);
-			Assert.Equal (new Rect (0, 0, 2, 10), view5.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view5.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view5.Height.ToString ());
+			Assert.False (view6.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view6.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view6.Height.ToString ());
+		}
 
-			exception = Record.Exception (() => view1.Width = 20);
-			Assert.Null (exception);
-			Assert.Equal (new Rect (0, 0, 20, 1), view1.Frame);
-			Assert.Throws<InvalidOperationException> (() => view2.Height = 10);
-			exception = Record.Exception (() => view3.Width = 20);
-			Assert.Null (exception);
-			Assert.Equal (new Rect (0, 0, 20, 1), view3.Frame);
-			exception = Record.Exception (() => view4.TextDirection = TextDirection.LeftRight_TopBottom);
-			Assert.Null (exception);
-			Assert.Equal (new Rect (0, 0, 18, 1), view4.Frame);
-			exception = Record.Exception (() => view5.TextDirection = TextDirection.LeftRight_TopBottom);
-			Assert.Null (exception);
-			Assert.Equal (new Rect (0, 0, 10, 2), view5.Frame);
+		[Fact, AutoInitShutdown]
+		public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
+		{
+			var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10, Height = 5 };
+			var view2 = new View () { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true };
+			var view3 = new View () { AutoSize = true, Width = 10, Height = 5, Text = "Say Hello view3 你" };
+			var view4 = new View () {
+				Text = "Say Hello view4 你",
+				AutoSize = true,
+				Width = 10,
+				Height = 5,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			var view5 = new View () {
+				Text = "Say Hello view5 你",
+				Width = 10,
+				Height = 5,
+				AutoSize = true,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			var view6 = new View () {
+				AutoSize = true,
+				Width = 10,
+				Height = 5,
+				TextDirection = TextDirection.TopBottom_LeftRight,
+				Text = "Say Hello view6 你",
+			};
+			Application.Top.Add (view1, view2, view3, view4, view5, view6);
+
+			Assert.False (view1.IsInitialized);
+			Assert.False (view2.IsInitialized);
+			Assert.False (view3.IsInitialized);
+			Assert.False (view4.IsInitialized);
+			Assert.False (view5.IsInitialized);
+			Assert.True (view1.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view1.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view1.Height.ToString ());
+			Assert.True (view2.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view2.Height.ToString ());
+			Assert.True (view3.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view3.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view3.Height.ToString ());
+			Assert.True (view4.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view4.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view4.Height.ToString ());
+			Assert.True (view5.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view5.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view5.Height.ToString ());
+			Assert.True (view6.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view6.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view6.Height.ToString ());
+
+			Application.Begin (Application.Top);
+
+			Assert.True (view1.IsInitialized);
+			Assert.True (view2.IsInitialized);
+			Assert.True (view3.IsInitialized);
+			Assert.True (view4.IsInitialized);
+			Assert.True (view5.IsInitialized);
+			Assert.True (view1.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view1.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view1.Height.ToString ());
+			Assert.True (view2.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view2.Height.ToString ());
+			Assert.True (view3.AutoSize);
+			Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view3.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view3.Height.ToString ());
+			Assert.True (view4.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view4.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view4.Height.ToString ());
+			Assert.True (view5.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view5.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view5.Height.ToString ());
+			Assert.True (view6.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
+			Assert.Equal ("Dim.Absolute(10)", view6.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(5)", view6.Height.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Setting_Frame_Dont_Respect_AutoSize_True_On_Layout_Absolute ()
+		{
+			var view1 = new View (new Rect (0, 0, 10, 0)) { Text = "Say Hello view1 你", AutoSize = true };
+			var view2 = new View (new Rect (0, 0, 0, 10)) {
+				Text = "Say Hello view2 你",
+				AutoSize = true,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			Application.Top.Add (view1, view2);
+
+			var rs = Application.Begin (Application.Top);
+
+			Assert.True (view1.AutoSize);
+			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
+			Assert.Equal (new Rect (0, 0, 18, 1), view1.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view1.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view1.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(18)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view1.Height.ToString ());
+			Assert.True (view2.AutoSize);
+			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
+			Assert.Equal (new Rect (0, 0, 2, 17), view2.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view2.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view2.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(2)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(17)", view2.Height.ToString ());
+
+			view1.Frame = new Rect (0, 0, 25, 4);
+			bool firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+
+			Assert.True (view1.AutoSize);
+			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
+			Assert.Equal (new Rect (0, 0, 25, 4), view1.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view1.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view1.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(18)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(1)", view1.Height.ToString ());
+
+			view2.Frame = new Rect (0, 0, 1, 25);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+
+			Assert.True (view2.AutoSize);
+			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
+			Assert.Equal (new Rect (0, 0, 1, 25), view2.Frame);
+			Assert.Equal ("Pos.Absolute(0)", view2.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view2.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(2)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(17)", view2.Height.ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()
+		{
+			var top = Application.Top;
+			var view1 = new View ();
+			Assert.False (view1.IsAdded);
+			Assert.Null (view1.X);
+			Assert.Null (view1.Y);
+			Assert.Null (view1.Width);
+			Assert.Null (view1.Height);
+			top.Add (view1);
+			Assert.True (view1.IsAdded);
+			Assert.Equal ("Pos.Absolute(0)", view1.X.ToString ());
+			Assert.Equal ("Pos.Absolute(0)", view1.Y.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view1.Width.ToString ());
+			Assert.Equal ("Dim.Absolute(0)", view1.Height.ToString ());
+
+			var view2 = new View () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			Assert.False (view2.IsAdded);
+			Assert.Equal ("Pos.Center", view2.X.ToString ());
+			Assert.Equal ("Pos.Center", view2.Y.ToString ());
+			Assert.Equal ("Dim.Fill(margin=0)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Fill(margin=0)", view2.Height.ToString ());
+			top.Add (view2);
+			Assert.True (view2.IsAdded);
+			Assert.Equal ("Pos.Center", view2.X.ToString ());
+			Assert.Equal ("Pos.Center", view2.Y.ToString ());
+			Assert.Equal ("Dim.Fill(margin=0)", view2.Width.ToString ());
+			Assert.Equal ("Dim.Fill(margin=0)", view2.Height.ToString ());
+		}
+
+		[Fact]
+		public void IsAdded_Added_Removed ()
+		{
+			var top = new Toplevel ();
+			var view = new View ();
+			Assert.False (view.IsAdded);
+			top.Add (view);
+			Assert.True (view.IsAdded);
+			top.Remove (view);
+			Assert.False (view.IsAdded);
 		}
 	}
 }

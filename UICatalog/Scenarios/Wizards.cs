@@ -26,6 +26,7 @@ namespace UICatalog.Scenarios {
 				Width = 15,
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				AutoSize = false
 			};
 			frame.Add (label);
 			var widthEdit = new TextField ("80") {
@@ -42,6 +43,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				AutoSize = false
 			};
 			frame.Add (label);
 			var heightEdit = new TextField ("20") {
@@ -58,6 +60,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				AutoSize = false
 			};
 			frame.Add (label);
 			var titleEdit = new TextField ("Title") {
@@ -87,14 +90,12 @@ namespace UICatalog.Scenarios {
 			label = new Label ("Action:") {
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd (1),
-				AutoSize = true,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 			var actionLabel = new Label (" ") {
 				X = Pos.Right (label),
 				Y = Pos.AnchorEnd (1),
-				AutoSize = true,
 				ColorScheme = Colors.Error,
 			};
 
@@ -159,7 +160,7 @@ namespace UICatalog.Scenarios {
 						frameMsg = "Added to WizardStep directly";
 					}
 
-					var buttonLbl = new Label () { Text = "Second Step Button: ", AutoSize = true, X = 1, Y = 1 };
+					var buttonLbl = new Label () { Text = "Second Step Button: ", X = 1, Y = 1 };
 					var button = new Button () {
 						Text = "Press Me to Rename Step",
 						X = Pos.Right (buttonLbl),
@@ -170,10 +171,10 @@ namespace UICatalog.Scenarios {
 						MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'");
 					};
 					viewForControls.Add (buttonLbl, button);
-					var lbl = new Label () { Text = "First Name: ", AutoSize = true, X = 1, Y = Pos.Bottom (buttonLbl) };
+					var lbl = new Label () { Text = "First Name: ", X = 1, Y = Pos.Bottom (buttonLbl) };
 					var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, firstNameField);
-					lbl = new Label () { Text = "Last Name:  ", AutoSize = true, X = 1, Y = Pos.Bottom (lbl) };
+					lbl = new Label () { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					viewForControls.Add (lbl, lastNameField);
 					var thirdStepEnabledCeckBox = new CheckBox () { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
@@ -192,7 +193,7 @@ namespace UICatalog.Scenarios {
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					viewForControls.Add (frame);
 					wizard.StepChanging += (args) => {
-						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty ) {
+						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty) {
 							args.Cancel = true;
 							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
 						}
@@ -205,11 +206,10 @@ namespace UICatalog.Scenarios {
 					var step3Label = new Label () {
 						Text = "This step is optional.",
 						X = 0,
-						Y = 0,
-						AutoSize = true
+						Y = 0
 					};
 					thirdStep.Controls.Add (step3Label);
-					var progLbl = new Label () { Text = "Third Step ProgressBar: ", AutoSize = true, X = 1, Y = 10 };
+					var progLbl = new Label () { Text = "Third Step ProgressBar: ", X = 1, Y = 10 };
 					var progressBar = new ProgressBar () {
 						X = Pos.Right (progLbl),
 						Y = Pos.Top (progLbl),
@@ -221,7 +221,7 @@ namespace UICatalog.Scenarios {
 					thirdStepEnabledCeckBox.Toggled += (args) => {
 						thirdStep.Enabled = thirdStepEnabledCeckBox.Checked;
 					};
-	
+
 					// Add 4th step
 					var fourthStep = new Wizard.WizardStep ("Step Four");
 					wizard.AddStep (fourthStep);

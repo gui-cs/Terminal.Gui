@@ -31,8 +31,13 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Button : View {
-		ustring text;
 		bool is_default;
+		Rune _leftBracket;
+		Rune _rightBracket;
+		Rune _leftDefault;
+		Rune _rightDefault;
+		Key hotKey = Key.Null;
+		Rune hotKeySpecifier;
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -92,16 +97,10 @@ namespace Terminal.Gui {
 			Initialize (text, is_default);
 		}
 
-		Rune _leftBracket;
-		Rune _rightBracket;
-		Rune _leftDefault;
-		Rune _rightDefault;
-		private Key hotKey = Key.Null;
-		private Rune hotKeySpecifier;
-
 		void Initialize (ustring text, bool is_default)
 		{
 			TextAlignment = TextAlignment.Centered;
+			VerticalTextAlignment = VerticalTextAlignment.Middle;
 
 			HotKeySpecifier = new Rune ('_');
 
@@ -113,8 +112,9 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			AutoSize = true;
 			this.is_default = is_default;
-			this.text = text ?? string.Empty;
-			Update ();
+			Text = text ?? string.Empty;
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
@@ -127,21 +127,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <inheritdoc/>>
-		public override ustring Text {
-			get {
-				return text;
-			}
-			set {
-				text = value;
-				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
-				if (hotKey != hk) {
-					HotKey = hk;
-				}
-				Update ();
-			}
-		}
-
 		/// <summary>
 		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 		/// </summary>
@@ -150,7 +135,8 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
-				Update ();
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
@@ -183,43 +169,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool AutoSize {
-			get => base.AutoSize;
-			set {
-				base.AutoSize = value;
-				Update ();
-			}
-		}
-
-		internal void Update ()
+		protected override void UpdateTextFormatterText ()
 		{
 			if (IsDefault)
-				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + Text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				TextFormatter.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			int w = TextFormatter.Size.Width - GetHotKeySpecifierLength ();
-			GetCurrentWidth (out int cWidth);
-			var canSetWidth = SetWidth (w, out int rWidth);
-			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
-				Width = rWidth;
-				w = rWidth;
-			} else if (!canSetWidth || !AutoSize) {
-				w = cWidth;
-			}
-			var layout = LayoutStyle;
-			bool layoutChanged = false;
-			if (!(Height is Dim.DimAbsolute)) {
-				// The height is always equal to 1 and must be Dim.DimAbsolute.
-				layoutChanged = true;
-				LayoutStyle = LayoutStyle.Absolute;
-			}
-			Height = 1;
-			if (layoutChanged) {
-				LayoutStyle = layout;
-			}
-			Frame = new Rect (Frame.Location, new Size (w, 1));
-			SetNeedsDisplay ();
+				TextFormatter.Text = ustring.Make (_leftBracket) + " " + Text + " " + ustring.Make (_rightBracket);
 		}
 
 		///<inheritdoc/>
@@ -322,9 +277,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			if (HotKey == Key.Unknown && text != "") {
+			if (HotKey == Key.Unknown && Text != "") {
 				for (int i = 0; i < TextFormatter.Text.RuneCount; i++) {
-					if (TextFormatter.Text [i] == text [0]) {
+					if (TextFormatter.Text [i] == Text [0]) {
 						Move (i, 0);
 						return;
 					}

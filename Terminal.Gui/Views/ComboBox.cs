@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
-			if (Bounds.Height < minimumHeight && Height is Dim.DimAbsolute) {
+			if (Bounds.Height < minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
 				Height = minimumHeight;
 			}
 

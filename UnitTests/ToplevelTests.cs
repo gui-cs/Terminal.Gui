@@ -37,6 +37,7 @@ namespace Terminal.Gui.Core {
 
 			Application.Iteration += () => {
 				if (iterations == 0) {
+					Assert.False (Application.Top.AutoSize);
 					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
 					Assert.Equal (0, Application.Top.Frame.Y);

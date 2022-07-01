@@ -748,12 +748,7 @@ namespace UICatalog.Scenarios {
 
 		private View FindTab ()
 		{
-			var d = new View () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			var d = new View ();
 			d.DrawContent += (e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
@@ -762,10 +757,11 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label (0, 1, "Find:") {
+			var label = new Label ("Find:") {
+				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				LayoutStyle = LayoutStyle.Computed
+				AutoSize = false
 			};
 			d.Add (label);
 
@@ -784,7 +780,8 @@ namespace UICatalog.Scenarios {
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
-				IsDefault = true
+				IsDefault = true,
+				AutoSize = false
 			};
 			btnFindNext.Clicked += () => FindNext ();
 			d.Add (btnFindNext);
@@ -794,7 +791,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnFindPrevious.Clicked += () => FindPrevious ();
 			d.Add (btnFindPrevious);
@@ -810,7 +808,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
 				Width = 20,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnCancel.Clicked += () => {
 				DisposeWinDialog ();
@@ -841,12 +840,7 @@ namespace UICatalog.Scenarios {
 
 		private View ReplaceTab ()
 		{
-			var d = new View () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			var d = new View ();
 			d.DrawContent += (e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
@@ -855,10 +849,11 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label (0, 1, "Find:") {
+			var label = new Label ("Find:") {
+				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				LayoutStyle = LayoutStyle.Computed
+				AutoSize = false
 			};
 			d.Add (label);
 
@@ -877,7 +872,8 @@ namespace UICatalog.Scenarios {
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
-				IsDefault = true
+				IsDefault = true,
+				AutoSize = false
 			};
 			btnFindNext.Clicked += () => ReplaceNext ();
 			d.Add (btnFindNext);
@@ -904,7 +900,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnFindPrevious.Clicked += () => ReplacePrevious ();
 			d.Add (btnFindPrevious);
@@ -914,7 +911,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnReplaceAll.Clicked += () => ReplaceAll ();
 			d.Add (btnReplaceAll);
@@ -931,7 +929,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
 				Width = 20,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnCancel.Clicked += () => {
 				DisposeWinDialog ();

@@ -103,8 +103,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("Button Style:") {
 				X = 0,
 				Y = Pos.Bottom (glyphsNotWords),
-				AutoSize = true,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right
 			};
 			frame.Add (label);
 			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
@@ -133,7 +132,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
-
 				ColorScheme = Colors.Error,
 			};
 			// glyphsNotWords

@@ -350,7 +350,8 @@ namespace Terminal.Gui.Views {
 				Text = "This is a test\nwith a \nPanelView",
 				TextAlignment = TextAlignment.Centered,
 				Width = 24,
-				Height = 13
+				Height = 13,
+				AutoSize = false
 			};
 			var pv = new PanelView (label) {
 				Width = 24,
@@ -413,7 +414,7 @@ namespace Terminal.Gui.Views {
 		{
 			var top = Application.Top;
 			var win = new Window ();
-			var label = new Label ("Hello World") {
+			var label = new Label () {
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwith a \nPanelView",
 				TextAlignment = TextAlignment.Centered
@@ -436,6 +437,8 @@ namespace Terminal.Gui.Views {
 
 			Application.Begin (top);
 
+			Assert.True (label.AutoSize);
+			Assert.False (pv.UsePanelFrame);
 			Assert.Equal (new Rect (0, 0, 14, 3), label.Frame);
 			Assert.Equal (new Rect (0, 0, 24, 13), pv.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);

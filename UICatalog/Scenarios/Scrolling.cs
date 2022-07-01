@@ -129,7 +129,8 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				Height = 2,
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
 			const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
@@ -139,7 +140,8 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
 

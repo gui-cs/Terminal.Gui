@@ -13,7 +13,6 @@ namespace Terminal.Gui {
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
-		ustring text;
 		Key hotKey = Key.Null;
 		Rune hotKeySpecifier;
 		Rune charChecked;
@@ -71,7 +70,7 @@ namespace Terminal.Gui {
 		///   The size of <see cref="CheckBox"/> is computed based on the
 		///   text length. 
 		/// </remarks>
-		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
+		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
 		{
 			Initialize (s, is_checked);
 		}
@@ -85,7 +84,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			AutoSize = true;
 			Text = s;
-			Update ();
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 
 			// Things this view knows how to do
 			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
@@ -95,55 +95,27 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
-		void Update ()
+		/// <inheritdoc/>
+		protected override void UpdateTextFormatterText ()
 		{
 			switch (TextAlignment) {
 			case TextAlignment.Left:
 			case TextAlignment.Centered:
 			case TextAlignment.Justified:
-				if (Checked)
-					TextFormatter.Text = ustring.Make (charChecked) + " " + GetFormatterText ();
-				else
-					TextFormatter.Text = ustring.Make (charUnChecked) + " " + GetFormatterText ();
+				TextFormatter.Text = ustring.Make (Checked ? charChecked : charUnChecked) + " " + GetFormatterText ();
 				break;
 			case TextAlignment.Right:
-				if (Checked)
-					TextFormatter.Text = GetFormatterText () + " " + ustring.Make (charChecked);
-				else
-					TextFormatter.Text = GetFormatterText () + " " + ustring.Make (charUnChecked);
+				TextFormatter.Text = GetFormatterText () + " " + ustring.Make (Checked ? charChecked : charUnChecked);
 				break;
 			}
-
-			int w = TextFormatter.Size.Width - GetHotKeySpecifierLength ();
-			GetCurrentWidth (out int cWidth);
-			var canSetWidth = SetWidth (w, out int rWidth);
-			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
-				Width = rWidth;
-				w = rWidth;
-			} else if (!canSetWidth || !AutoSize) {
-				w = cWidth;
-			}
-			var layout = LayoutStyle;
-			bool layoutChanged = false;
-			if (!(Height is Dim.DimAbsolute)) {
-				// The height is always equal to 1 and must be Dim.DimAbsolute.
-				layoutChanged = true;
-				LayoutStyle = LayoutStyle.Absolute;
-			}
-			Height = 1;
-			if (layoutChanged) {
-				LayoutStyle = layout;
-			}
-			Frame = new Rect (Frame.Location, new Size (w, 1));
-			SetNeedsDisplay ();
 		}
 
 		ustring GetFormatterText ()
 		{
-			if (AutoSize || ustring.IsNullOrEmpty (text)) {
-				return text;
+			if (AutoSize || ustring.IsNullOrEmpty (Text) || Frame.Width <= 2) {
+				return Text;
 			}
-			return text.RuneSubstring (0, Math.Min (Frame.Width - 2, text.RuneCount));
+			return Text.RuneSubstring (0, Math.Min (Frame.Width - 2, Text.RuneCount));
 		}
 
 		/// <inheritdoc/>
@@ -165,15 +137,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <inheritdoc/>
-		public override bool AutoSize {
-			get => base.AutoSize;
-			set {
-				base.AutoSize = value;
-				Update ();
-			}
-		}
-
 		/// <summary>
 		///    The state of the <see cref="CheckBox"/>
 		/// </summary>
@@ -181,34 +144,8 @@ namespace Terminal.Gui {
 			get => @checked;
 			set {
 				@checked = value;
-				Update ();
-			}
-		}
-
-		/// <summary>
-		///   The text displayed by this <see cref="CheckBox"/>
-		/// </summary>
-		public new ustring Text {
-			get {
-				return text;
-			}
-
-			set {
-				text = value;
-				TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out Key hk);
-				if (hotKey != hk) {
-					HotKey = hk;
-				}
-				Update ();
-			}
-		}
-
-		///<inheritdoc/>
-		public override TextAlignment TextAlignment {
-			get => base.TextAlignment;
-			set {
-				base.TextAlignment = value;
-				Update ();
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 

@@ -165,6 +165,7 @@ namespace Terminal.Gui {
 			{
 				ColorScheme = Colors.TopLevel;
 				Text = title ?? "";
+				Frame = frame;
 				if (border == null) {
 					Border = new Border () {
 						BorderStyle = BorderStyle.Single,

@@ -6,9 +6,6 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using NStack;
 
 namespace Terminal.Gui {
@@ -110,7 +107,7 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				Clicked?.Invoke ();
+				OnClicked ();
 				return true;
 			}
 			return false;
@@ -122,6 +119,27 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			return base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				if (!HasFocus) {
+					SetFocus ();
+				}
+				OnClicked ();
+				return true;
+			}
+			return base.ProcessHotKey (ke);
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
 		}
 	}
 }

@@ -11,25 +11,27 @@ namespace Terminal.Gui.Views {
 		public void Constructors_Defaults ()
 		{
 			var sv = new ScrollView ();
+			Assert.Equal (LayoutStyle.Computed, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
 			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Equal (0, sv.X);
-			Assert.Equal (0, sv.Y);
-			Assert.Equal (0, sv.Width);
-			Assert.Equal (0, sv.Height);
+			Assert.Null (sv.X);
+			Assert.Null (sv.Y);
+			Assert.Null (sv.Width);
+			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.True (sv.KeepContentAlwaysInViewport);
 
 			sv = new ScrollView (new Rect (1, 2, 20, 10));
+			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Equal (1, sv.X);
-			Assert.Equal (2, sv.Y);
-			Assert.Equal (20, sv.Width);
-			Assert.Equal (10, sv.Height);
+			Assert.Null (sv.X);
+			Assert.Null (sv.Y);
+			Assert.Null (sv.Width);
+			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
