@@ -3437,5 +3437,80 @@ Y
 			top.Remove (view);
 			Assert.False (view.IsAdded);
 		}
+
+		[Fact]
+		public void AutoSize_Layout_Absolute_Without_Add ()
+		{
+			var view = new View (new Rect (0, 0, 10, 1)) {
+				Text = "Test"
+			};
+
+			Assert.False (view.IsAdded);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Frame);
+			Assert.Equal ("Test", view.TextFormatter.Text);
+
+			view.Text = "First line\nSecond line";
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+
+			view.AutoSize = true;
+			Assert.True (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 11, 2), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+
+			view.AutoSize = false;
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 11, 2), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_Layout_Absolute_With_Add ()
+		{
+			var view = new View (new Rect (0, 0, 10, 1)) {
+				Text = "Test"
+			};
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			Assert.True (view.IsAdded);
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Frame);
+			Assert.Equal ("Test", view.TextFormatter.Text);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Test
+", output);
+
+
+			view.Text = "First line\nSecond line";
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+First line
+", output);
+
+			view.AutoSize = true;
+			Assert.True (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 11, 2), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+First line
+Second line
+", output);
+
+			view.AutoSize = false;
+			Assert.False (view.AutoSize);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Frame);
+			Assert.Equal ("First line\nSecond line", view.TextFormatter.Text);
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+First line
+", output);
+		}
 	}
 }
