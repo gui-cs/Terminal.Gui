@@ -189,7 +189,9 @@ namespace Terminal.Gui {
 		public virtual Key HotKey {
 			get => hotKey;
 			set {
-				hotKey = TextFormatter.HotKey = value;
+				if (hotKey != value) {
+					hotKey = TextFormatter.HotKey = (value == Key.Unknown ? Key.Null : value);
+				}
 			}
 		}
 
