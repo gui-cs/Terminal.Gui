@@ -36,7 +36,6 @@ namespace Terminal.Gui {
 		Rune _rightBracket;
 		Rune _leftDefault;
 		Rune _rightDefault;
-		Key hotKey = Key.Null;
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -141,20 +140,20 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc/>
 		public override Key HotKey {
-			get => hotKey;
+			get => base.HotKey;
 			set {
-				if (hotKey != value) {
+				if (base.HotKey != value) {
 					var v = value == Key.Unknown ? Key.Null : value;
-					if (hotKey != Key.Null && ContainsKeyBinding (Key.Space | hotKey)) {
+					if (base.HotKey != Key.Null && ContainsKeyBinding (Key.Space | base.HotKey)) {
 						if (v == Key.Null) {
-							ClearKeybinding (Key.Space | hotKey);
+							ClearKeybinding (Key.Space | base.HotKey);
 						} else {
-							ReplaceKeyBinding (Key.Space | hotKey, Key.Space | v);
+							ReplaceKeyBinding (Key.Space | base.HotKey, Key.Space | v);
 						}
 					} else if (v != Key.Null) {
 						AddKeyBinding (Key.Space | v, Command.Accept);
 					}
-					hotKey = TextFormatter.HotKey = v;
+					base.HotKey = TextFormatter.HotKey = v;
 				}
 			}
 		}
