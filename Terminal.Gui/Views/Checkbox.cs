@@ -13,8 +13,6 @@ namespace Terminal.Gui {
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
-		Key hotKey = Key.Null;
-		Rune hotKeySpecifier;
 		Rune charChecked;
 		Rune charUnChecked;
 		bool @checked;
@@ -116,25 +114,6 @@ namespace Terminal.Gui {
 				return Text;
 			}
 			return Text.RuneSubstring (0, Math.Min (Frame.Width - 2, Text.RuneCount));
-		}
-
-		/// <inheritdoc/>
-		public override Key HotKey {
-			get => hotKey;
-			set {
-				if (hotKey != value) {
-					var v = value == Key.Unknown ? Key.Null : value;
-					hotKey = v;
-				}
-			}
-		}
-
-		/// <inheritdoc/>
-		public override Rune HotKeySpecifier {
-			get => hotKeySpecifier;
-			set {
-				hotKeySpecifier = TextFormatter.HotKeySpecifier = value;
-			}
 		}
 
 		/// <summary>
