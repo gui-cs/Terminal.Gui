@@ -247,7 +247,7 @@ namespace Terminal.Gui.Core {
 				win.Frame.Right, win.Frame.Bottom));
 			Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
 			var expected = @"
-  Menu
+  Menu                                                                          
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
 │                                                                              │
@@ -271,7 +271,7 @@ namespace Terminal.Gui.Core {
 │                                                                              │
 │                        This should be the last line.                         │
 └──────────────────────────────────────────────────────────────────────────────┘
- F1 Help
+ F1 Help                                                                        
 ";
 
 			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -310,7 +310,7 @@ namespace Terminal.Gui.Core {
 				win.Frame.Right, win.Frame.Bottom));
 			Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
 			var expected = @"
-  Menu
+  Menu                                                                          
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
 │                                                                              │
@@ -334,7 +334,7 @@ namespace Terminal.Gui.Core {
 │                                                                              │
 │                        This should be the last line.                         │
 └──────────────────────────────────────────────────────────────────────────────┘
- F1 Help
+ F1 Help                                                                        
 ";
 
 			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);

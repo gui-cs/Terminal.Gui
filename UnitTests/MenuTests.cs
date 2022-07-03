@@ -660,8 +660,8 @@ Edit
 
 			expected = @"
 ┌──────
-│ One
-│ Two
+│ One  
+│ Two  
 └──────
 ";
 
@@ -676,8 +676,8 @@ Edit
 
 			expected = @"
 ┌──────
-│ One
-│ Two
+│ One  
+│ Two  
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -714,7 +714,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -728,9 +728,9 @@ Edit
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.CursorDown, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
-┌────────┐
-│ One    │
+  Numbers                
+┌────────┐               
+│ One    │               
 │ Two   ►│┌─────────────┐
 │ Three  ││ Sub-Menu 1  │
 └────────┘│ Sub-Menu 2  │
@@ -743,7 +743,7 @@ Edit
 			Assert.True (Application.Top.Subviews [2].ProcessKey (new KeyEvent (Key.CursorLeft, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -799,7 +799,7 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -818,9 +818,9 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
-┌────────┐
-│ One    │
+  Numbers                
+┌────────┐               
+│ One    │               
 │ Two   ►│┌─────────────┐
 │ Three  ││ Sub-Menu 1  │
 └────────┘│ Sub-Menu 2  │
@@ -838,7 +838,7 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -896,7 +896,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -911,7 +911,7 @@ Edit
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.Enter, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers      
 ┌─────────────┐
 │◄    Two     │
 ├─────────────┤
@@ -926,7 +926,7 @@ Edit
 			Assert.True (Application.Top.Subviews [2].ProcessKey (new KeyEvent (Key.Enter, null)));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -984,7 +984,7 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -1003,7 +1003,7 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers      
 ┌─────────────┐
 │◄    Two     │
 ├─────────────┤
@@ -1023,7 +1023,7 @@ Edit
 			}));
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  Numbers
+  Numbers 
 ┌────────┐
 │ One    │
 │ Two   ►│
@@ -1125,9 +1125,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐     
+│ New  │     
+└──────┘     
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1141,7 +1141,7 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  File   Edit
+  File   Edit   
        ┌───────┐
        │ Copy  │
        └───────┘
@@ -1175,9 +1175,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐     
+│ New  │     
+└──────┘     
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1187,7 +1187,7 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  File   Edit
+  File   Edit   
        ┌───────┐
        │ Copy  │
        └───────┘
@@ -1221,9 +1221,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
   File   Edit
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐     
+│ New  │     
+└──────┘     
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1233,7 +1233,7 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  File   Edit
+  File   Edit   
        ┌───────┐
        │ Copy  │
        └───────┘
@@ -1262,9 +1262,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐     
+│ New  │     
+└──────┘     
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);

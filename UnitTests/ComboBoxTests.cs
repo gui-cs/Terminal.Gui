@@ -122,7 +122,7 @@ namespace Terminal.Gui.Views {
 			Application.Begin (Application.Top);
 			GraphViewTests.AssertDriverContentsWithFrameAre (@"
 One      ▼
-One
+One       
 ", output);
 
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
@@ -132,7 +132,7 @@ One
 			Application.Begin (Application.Top);
 			GraphViewTests.AssertDriverContentsWithFrameAre (@"
 Two      ▼
-Two
+Two       
 ", output);
 
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
@@ -142,7 +142,7 @@ Two
 			Application.Begin (Application.Top);
 			GraphViewTests.AssertDriverContentsWithFrameAre (@"
 Three    ▼
-Three
+Three     
 ", output);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
 			Assert.True (cb.IsShow);
