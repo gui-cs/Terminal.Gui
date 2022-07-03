@@ -1321,9 +1321,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit   Format
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐              
+│ New  │              
+└──────┘              
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1345,7 +1345,7 @@ Edit
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  File   Edit   Format
+  File   Edit   Format 
               ┌───────┐
               │ Wrap  │
               └───────┘
@@ -1371,9 +1371,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
   File   Edit   Format
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐              
+│ New  │              
+└──────┘              
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1415,9 +1415,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
   File   Edit   Format
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐              
+│ New  │              
+└──────┘              
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -1439,7 +1439,7 @@ Edit
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
-  File   Edit   Format
+  File   Edit   Format 
               ┌───────┐
               │ Wrap  │
               └───────┘
@@ -1465,9 +1465,9 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			expected = @"
   File   Edit   Format
-┌──────┐
-│ New  │
-└──────┘
+┌──────┐              
+│ New  │              
+└──────┘              
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
