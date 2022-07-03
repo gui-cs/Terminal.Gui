@@ -184,7 +184,8 @@ namespace Terminal.Gui.Views {
 			for (int r = 0; r < lines.Count; r++) {
 				List<char> row = lines [r];
 				for (int c = row.Count - 1; c >= 0; c--) {
-					if (row [c] != ' ') {
+					var rune = row [c];
+					if (rune != ' ' || (row.Sum (x => Rune.ColumnWidth (x)) == w)) {
 						break;
 					}
 					row.RemoveAt (c);
@@ -264,7 +265,7 @@ namespace Terminal.Gui.Views {
 					var userExpected = line [c];
 
 					if (colorUsed != userExpected) {
-						throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor(colorUsed)} but test expected {DescribeColor(userExpected)} (these are indexes into the expectedColors array)");
+						throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor (colorUsed)} but test expected {DescribeColor (userExpected)} (these are indexes into the expectedColors array)");
 					}
 				}
 
