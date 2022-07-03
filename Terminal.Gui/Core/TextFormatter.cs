@@ -934,7 +934,7 @@ namespace Terminal.Gui {
 				w = mw;
 				h = ml;
 			} else {
-				int vw = 0;
+				int vw = 1, cw = 1;
 				int vh = 0;
 
 				int rows = 0;
@@ -945,14 +945,13 @@ namespace Terminal.Gui {
 							vh = rows;
 						}
 						rows = 0;
+						cw = 1;
 					} else if (rune != '\r') {
 						rows++;
 						var rw = Rune.ColumnWidth (rune);
-						if (rw < 0) {
-							rw++;
-						}
-						if (rw > vw) {
-							vw = rw;
+						if (cw < rw) {
+							cw = rw;
+							vw++;
 						}
 					}
 				}
