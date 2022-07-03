@@ -2260,8 +2260,8 @@ namespace Terminal.Gui.Core {
 			var height = 4;
 			var wrappedLines = TextFormatter.WordWrap (text, width, true);
 			var breakLines = "";
-			foreach (var line in wrappedLines) {
-				breakLines += $"{line}{Environment.NewLine}";
+			for (int i = 0; i < wrappedLines.Count; i++) {
+				breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 			}
 			var label = new Label (breakLines) {
 				TextDirection = TextDirection.TopBottom_LeftRight,
@@ -3016,14 +3016,14 @@ D
 e
 m
 o
-
+ 
 S
 i
 m
 p
 l
 e
-
+ 
 R
 u
 n
