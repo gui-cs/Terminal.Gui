@@ -827,7 +827,7 @@ namespace Terminal.Gui {
 			var _y = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
 
 			if (AutoSize) {
-				var s = CalculateAutoSize ();
+				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
 				frame = new Rect (new Point (_x, _y), new Size (w, h));
@@ -2118,7 +2118,7 @@ namespace Terminal.Gui {
 			var s = Size.Empty;
 
 			if (AutoSize) {
-				s = CalculateAutoSize ();
+				s = GetAutoSize ();
 			}
 
 			if (x is Pos.PosCenter) {
@@ -2401,10 +2401,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Used by <see cref="Text"/> to resize the view's <see cref="Bounds"/> with the <see cref="TextFormatter.Size"/>.
-		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="Width"/> and <see cref="Height"/> are null or
-		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout
-		///   and <see cref="ForceValidatePosDim"/> to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>.
+		/// The default is `false`. Set to `true` to turn on AutoSize. If <see cref="AutoSize"/> is `true` the <see cref="Width"/>
+		/// and <see cref="Height"/> will always be used if the text size is lower. If the text size is higher the bounds will
+		/// be resized to fit it.
+		/// In addition, if <see cref="ForceValidatePosDim"/> is `true` the new values of <see cref="Width"/> and
+		/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
 		/// </summary>
 		public virtual bool AutoSize {
 			get => autoSize;
@@ -2421,8 +2423,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get or sets a flag if the wrapped text will keep the trailing spaces or
-		/// the trailing spaces will be trimmed (default).
+		/// Gets or sets a flag that determines whether <see cref="TextFormatter.Text"/> will have trailing spaces preserved
+		/// or not when <see cref="TextFormatter.WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
+		/// either the <see cref="Text"/> property is changed or when <see cref="TextFormatter.WordWrap"/> is set to `true`.
+		/// The default is `false`.
 		/// </summary>
 		public virtual bool PreserveTrailingSpaces {
 			get => TextFormatter.PreserveTrailingSpaces;
@@ -2496,7 +2500,7 @@ namespace Terminal.Gui {
 		public virtual bool IsInitialized { get; set; }
 
 		/// <summary>
-		/// Gets information if the view was already added to the superview.
+		/// Gets information if the view was already added to the <see cref="SuperView"/>.
 		/// </summary>
 		public bool IsAdded { get; private set; }
 
@@ -2581,7 +2585,7 @@ namespace Terminal.Gui {
 			}
 
 			var aSize = true;
-			var nBoundsSize = CalculateAutoSize ();
+			var nBoundsSize = GetAutoSize ();
 			if (nBoundsSize != Bounds.Size) {
 				if (ForceValidatePosDim) {
 					aSize = SetWidthHeight (nBoundsSize);
@@ -2615,32 +2619,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Calculates the size to fit all text if <see cref="AutoSize"/> is true.
+		/// Gets the size to fit all text if <see cref="AutoSize"/> is true.
 		/// </summary>
 		/// <returns>The <see cref="Size"/></returns>
-		public Size CalculateAutoSize ()
+		public Size GetAutoSize ()
 		{
 			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
 			return new Size (rect.Size.Width - GetHotKeySpecifierLength (),
 			    rect.Size.Height - GetHotKeySpecifierLength (false));
-		}
-
-		/// <summary>
-		/// Calculates the width to fit the text if <see cref="AutoSize"/> is true.
-		/// </summary>
-		/// <returns>The width length.</returns>
-		public int CalculateAutoSizeWidth ()
-		{
-			return CalculateAutoSize ().Width;
-		}
-
-		/// <summary>
-		/// Calculates the height to fit the text if <see cref="AutoSize"/> is true.
-		/// </summary>
-		/// <returns>The height length.</returns>
-		public int CalculateAutoSizeHeight ()
-		{
-			return CalculateAutoSize ().Height;
 		}
 
 		bool IsValidAutoSize (out Size autoSize)

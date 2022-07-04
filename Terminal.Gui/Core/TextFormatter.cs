@@ -155,12 +155,13 @@ namespace Terminal.Gui {
 		public bool AutoSize { get; set; }
 
 		/// <summary>
-		/// Get or sets a flag if the wrapped text will keep the trailing spaces or
-		/// the trailing spaces will be trimmed (default).
+		/// Gets or sets a flag that determines whether <see cref="Text"/> will have trailing spaces preserved
+		/// or not when <see cref="WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
+		/// either the <see cref="Text"/> property is changed or when <see cref="WordWrap"/> is set to `true`.
+		/// The default is `false`.
 		/// </summary>
 		public bool PreserveTrailingSpaces { get; set; }
 
-		// TODO: Add Vertical Text Alignment
 		/// <summary>
 		/// Controls the horizontal text-alignment property.
 		/// </summary>
