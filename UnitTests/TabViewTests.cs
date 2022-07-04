@@ -9,7 +9,7 @@ using System.Globalization;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
-  
+
 	public class TabViewTests {
 		readonly ITestOutputHelper output;
 
@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views {
 
 		private TabView GetTabView (out TabView.Tab tab1, out TabView.Tab tab2, bool initFakeDriver = true)
 		{
-			if(initFakeDriver)
+			if (initFakeDriver)
 				InitFakeDriver ();
 
 			var tv = new TabView ();
@@ -51,7 +51,6 @@ namespace Terminal.Gui.Views {
 
 			Application.Shutdown ();
 		}
-
 
 		[Fact]
 		public void EnsureSelectedTabVisible_NullSelect ()
@@ -92,7 +91,6 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
-
 		[Fact]
 		public void SelectedTabChanged_Called ()
 		{
@@ -119,6 +117,7 @@ namespace Terminal.Gui.Views {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+
 		[Fact]
 		public void RemoveTab_ChangesSelection ()
 		{
@@ -224,8 +223,6 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
-
-
 		[Fact]
 		public void SwitchTabBy_OutOfTabsRange ()
 		{
@@ -242,13 +239,12 @@ namespace Terminal.Gui.Views {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
-
 		}
 
-		[Fact,AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void TestThinTabView_WithLongNames ()
 		{
-			var tv = GetTabView (out var tab1, out var tab2,false);
+			var tv = GetTabView (out var tab1, out var tab2, false);
 			tv.Width = 10;
 			tv.Height = 5;
 
@@ -306,9 +302,7 @@ namespace Terminal.Gui.Views {
 ◄       └┐
 │hi2     │
 └────────┘", output);
-
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void TestTabView_Width4 ()
@@ -327,6 +321,7 @@ namespace Terminal.Gui.Views {
 │hi│
 └──┘", output);
 		}
+
 		[Fact, AutoInitShutdown]
 		public void TestTabView_Width3 ()
 		{
@@ -339,9 +334,10 @@ namespace Terminal.Gui.Views {
 
 			GraphViewTests.AssertDriverContentsAre (@"
 ┌─┐
-│hi
+│h│
 └─┘", output);
 		}
+
 		private void InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
