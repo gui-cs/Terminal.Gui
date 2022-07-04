@@ -7,8 +7,7 @@
 using System;
 using NStack;
 
-namespace Terminal.Gui
-{
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
@@ -31,24 +30,24 @@ namespace Terminal.Gui
 		/// <summary>
 		/// Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.
 		/// </summary>
-		public virtual void OnToggled(bool previousChecked)
+		public virtual void OnToggled (bool previousChecked)
 		{
-			Toggled?.Invoke(previousChecked);
+			Toggled?.Invoke (previousChecked);
 		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		public CheckBox() : this(string.Empty) { }
+		public CheckBox () : this (string.Empty) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="s">S.</param>
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
-		public CheckBox(ustring s, bool is_checked = false) : base()
+		public CheckBox (ustring s, bool is_checked = false) : base ()
 		{
-			Initialize(s, is_checked);
+			Initialize (s, is_checked);
 		}
 
 		/// <summary>
@@ -58,7 +57,7 @@ namespace Terminal.Gui
 		///   The size of <see cref="CheckBox"/> is computed based on the
 		///   text length. This <see cref="CheckBox"/> is not toggled.
 		/// </remarks>
-		public CheckBox(int x, int y, ustring s) : this(x, y, s, false)
+		public CheckBox (int x, int y, ustring s) : this (x, y, s, false)
 		{
 		}
 
@@ -71,10 +70,10 @@ namespace Terminal.Gui
 		/// </remarks>
 		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
 		{
-			Initialize(s, is_checked);
+			Initialize (s, is_checked);
 		}
 
-		void Initialize(ustring s, bool is_checked)
+		void Initialize (ustring s, bool is_checked)
 		{
 			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
 			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
@@ -87,11 +86,11 @@ namespace Terminal.Gui
 			ProcessResizeView ();
 
 			// Things this view knows how to do
-			AddCommand(Command.ToggleChecked, () => ToggleChecked());
+			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
 
 			// Default keybindings for this view
-			AddKeyBinding((Key)' ', Command.ToggleChecked);
-			AddKeyBinding(Key.Space, Command.ToggleChecked);
+			AddKeyBinding ((Key)' ', Command.ToggleChecked);
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		/// <inheritdoc/>
@@ -130,64 +129,63 @@ namespace Terminal.Gui
 		}
 
 		///<inheritdoc/>
-		public override void PositionCursor()
+		public override void PositionCursor ()
 		{
-			Move(0, 0);
+			Move (0, 0);
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey(KeyEvent kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
-			var result = InvokeKeybindings(kb);
+			var result = InvokeKeybindings (kb);
 			if (result != null)
 				return (bool)result;
 
-			return base.ProcessKey(kb);
+			return base.ProcessKey (kb);
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey(KeyEvent kb)
+		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == (Key.AltMask | HotKey))
-				return ToggleChecked();
+				return ToggleChecked ();
 
 			return false;
 		}
 
-		bool ToggleChecked()
+		bool ToggleChecked ()
 		{
-			if (!HasFocus)
-			{
-				SetFocus();
+			if (!HasFocus) {
+				SetFocus ();
 			}
 			var previousChecked = Checked;
 			Checked = !Checked;
-			OnToggled(previousChecked);
-			SetNeedsDisplay();
+			OnToggled (previousChecked);
+			SetNeedsDisplay ();
 			return true;
 		}
 
 		///<inheritdoc/>
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent (MouseEvent me)
 		{
-			if (!me.Flags.HasFlag(MouseFlags.Button1Clicked) || !CanFocus)
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
 				return false;
 
-			SetFocus();
+			SetFocus ();
 			var previousChecked = Checked;
 			Checked = !Checked;
-			OnToggled(previousChecked);
-			SetNeedsDisplay();
+			OnToggled (previousChecked);
+			SetNeedsDisplay ();
 
 			return true;
 		}
 
 		///<inheritdoc/>
-		public override bool OnEnter(View view)
+		public override bool OnEnter (View view)
 		{
-			Application.Driver.SetCursorVisibility(CursorVisibility.Invisible);
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
-			return base.OnEnter(view);
+			return base.OnEnter (view);
 		}
 	}
 }
