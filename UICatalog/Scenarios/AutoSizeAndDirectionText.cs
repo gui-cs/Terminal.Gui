@@ -7,7 +7,7 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			var text = "Hello World";
-			//var text = "Hello World 你";
+			var wideText = "Hello World 你";
 			var color = Colors.Dialog;
 
 			var labelH = new Label (text, TextDirection.LeftRight_TopBottom) {
@@ -72,6 +72,24 @@ namespace UICatalog.Scenarios {
 			ckbPreserveTrailingSpaces.Toggled += (_) =>
 					labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = ckbPreserveTrailingSpaces.Checked;
 			Win.Add (ckbPreserveTrailingSpaces);
+
+			var ckbWideText = new CheckBox ("Use wide runes") {
+				X = Pos.Center (),
+				Y = Pos.Center () + 9
+			};
+			ckbWideText.Toggled += (_) => {
+				if (ckbWideText.Checked) {
+					labelH.Text = labelV.Text = editText.Text = wideText;
+					labelH.Width = 14;
+					labelV.Height = 13;
+				} else {
+					labelH.Text = labelV.Text = editText.Text = text;
+					labelH.Width = 11;
+					labelV.Width = 1;
+					labelV.Height = 11;
+				}
+			};
+			Win.Add (ckbWideText);
 
 			Win.KeyUp += (_) =>
 				labelH.Text = labelV.Text = text = editText.Text.ToString ();
