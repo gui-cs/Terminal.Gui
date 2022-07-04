@@ -869,6 +869,15 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Mouse:
 				var me = ToDriverMouse (inputEvent.MouseEvent);
 				mouseHandler (me);
+				if (processButtonClick) {
+					mouseHandler (
+						new MouseEvent () {
+							X = me.X,
+							Y = me.Y,
+							Flags = ProcessButtonClick (inputEvent.MouseEvent)
+						});
+					processButtonClick = false;
+				}
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
@@ -892,10 +901,10 @@ namespace Terminal.Gui {
 		bool isButtonPressed = false;
 		bool isButtonReleased = false;
 		bool isButtonDoubleClicked = false;
-		Point? point;
-		Point pointMove;
+		Point point;
 		//int buttonPressedCount;
 		bool isOneFingerDoubleClicked = false;
+		bool processButtonClick;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -1004,13 +1013,12 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				if (point == null)
-					point = p;
-
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					isButtonReleased = false;
+					processButtonClick = false;
 				}
+				point = p;
 				lastMouseButtonPressed = mouseEvent.ButtonState;
 				isButtonPressed = true;
 
@@ -1038,28 +1046,13 @@ namespace Terminal.Gui {
 				}
 				isButtonPressed = false;
 				isButtonReleased = true;
-				if (point != null && (((Point)point).X != mouseEvent.MousePosition.X || ((Point)point).Y != mouseEvent.MousePosition.Y))
-					point = null;
-
+				if (point.X == mouseEvent.MousePosition.X && point.Y == mouseEvent.MousePosition.Y) {
+					processButtonClick = true;
+				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
 
-				switch (lastMouseButtonPressed) {
-				case WindowsConsole.ButtonState.Button1Pressed:
-					mouseFlag = MouseFlags.Button1Clicked;
-					break;
-
-				case WindowsConsole.ButtonState.Button2Pressed:
-					mouseFlag = MouseFlags.Button2Clicked;
-					break;
-
-				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button3Clicked;
-					break;
-				}
-				point = null;
-				lastMouseButtonPressed = null;
-				isButtonReleased = false;
+				mouseFlag = ProcessButtonClick (mouseEvent);
 
 			} else if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.DoubleClick)) {
 				switch (mouseEvent.ButtonState) {
@@ -1126,9 +1119,9 @@ namespace Terminal.Gui {
 				}
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
-				if (mouseEvent.MousePosition.X != pointMove.X || mouseEvent.MousePosition.Y != pointMove.Y) {
+				if (mouseEvent.MousePosition.X != point.X || mouseEvent.MousePosition.Y != point.Y) {
 					mouseFlag = MouseFlags.ReportMousePosition;
-					pointMove = new Point ();
+					point = new Point ();
 				} else {
 					mouseFlag = 0;
 				}
@@ -1145,6 +1138,31 @@ namespace Terminal.Gui {
 			};
 		}
 
+		MouseFlags ProcessButtonClick (WindowsConsole.MouseEventRecord mouseEvent)
+		{
+			MouseFlags mouseFlag = 0;
+			switch (lastMouseButtonPressed) {
+			case WindowsConsole.ButtonState.Button1Pressed:
+				mouseFlag = MouseFlags.Button1Clicked;
+				break;
+
+			case WindowsConsole.ButtonState.Button2Pressed:
+				mouseFlag = MouseFlags.Button2Clicked;
+				break;
+
+			case WindowsConsole.ButtonState.RightmostButtonPressed:
+				mouseFlag = MouseFlags.Button3Clicked;
+				break;
+			}
+			point = new Point () {
+				X = mouseEvent.MousePosition.X,
+				Y = mouseEvent.MousePosition.Y
+			};
+			lastMouseButtonPressed = null;
+			isButtonReleased = false;
+			return mouseFlag;
+		}
+
 		async Task ProcessButtonDoubleClickedAsync ()
 		{
 			await Task.Delay (300);
@@ -1158,8 +1176,8 @@ namespace Terminal.Gui {
 			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = pointMove.X,
-					Y = pointMove.Y,
+					X = point.X,
+					Y = point.Y,
 					Flags = mouseFlag
 				};
 
