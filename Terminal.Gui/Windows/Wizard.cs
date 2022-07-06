@@ -11,6 +11,9 @@ namespace Terminal.Gui {
 	/// bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard. 
 	/// </summary>
 	/// <remarks>
+	/// The Wizard can be shown either as a modal pop-up (the default) or embedded in a containing <see cref="View"/>. To use a a <see cref="View"/>, 
+	/// set <see cref="Toplevel.Modal"/> to `false` and <see cref="BorderStyle"/> to <see cref="BorderStyle.None"/> before using <see cref="View.Add(View)"/>
+	/// to add the Wizard to the container.
 	/// </remarks>
 	public class Wizard : Dialog {
 
@@ -225,13 +228,6 @@ namespace Terminal.Gui {
 				this.Add (scrollBar);
 			}
 
-			//public override void OnEnabledChanged()
-			//{
-			//	if (Enabled) { }
-			//	base.OnEnabledChanged ();
-			//}
-
-
 			/// <summary>
 			/// If true (the default) the help will be visible. If false, the help will not be shown and the control pane will
 			/// fill the wizard step.
@@ -335,7 +331,15 @@ namespace Terminal.Gui {
 			nextfinishBtn.Clicked += NextfinishBtn_Clicked;
 
 			Loaded += Wizard_Loaded;
+			Initialized += Wizard_Initialized;
 			Closing += Wizard_Closing;
+		}
+
+		private void Wizard_Initialized (object sender, EventArgs e)
+		{
+			if (!Modal) {
+				Wizard_Loaded ();
+			}
 		}
 
 		private bool finishedPressed = false;
@@ -363,7 +367,12 @@ namespace Terminal.Gui {
 				Finished?.Invoke (args);
 				if (!args.Cancel) {
 					finishedPressed = true;
-					Application.RequestStop (this);
+					if (IsCurrentTop) {
+						Application.RequestStop (this);
+					} else {
+						// Wizard was created as a non-modal (just added to another View). 
+						// Do nothing
+					}
 				}
 			} else {
 				var args = new WizardButtonEventArgs ();
@@ -373,6 +382,19 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		///<inheritdoc/>
+		public override bool ProcessKey (KeyEvent kb)
+		{
+			switch (kb.Key) {
+			case Key.Esc:
+				// Dialog causes ESC to close/cancel; we dont want that with wizard
+				// Use QuitKey instead.
+				return false;
+			}
+			return base.ProcessKey (kb);
+		}
+
 
 		/// <summary>
 		/// Causes the wizad to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). 

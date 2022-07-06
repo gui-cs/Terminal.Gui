@@ -1097,8 +1097,12 @@ namespace Terminal.Gui {
 		{
 			if (_initialized && Driver != null) {
 				var top = new T ();
-				if (top.GetType ().BaseType != typeof (Toplevel)) {
-					throw new ArgumentException (top.GetType ().BaseType.Name);
+				var type = top.GetType ().BaseType;
+				while (type != typeof (Toplevel) && type != typeof (object)) {
+					type = type.BaseType;
+				}
+				if (type != typeof (Toplevel)) {
+					throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
 				}
 				Run (top, errorHandler);
 			} else {

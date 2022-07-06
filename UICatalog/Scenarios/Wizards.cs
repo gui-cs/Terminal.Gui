@@ -99,11 +99,20 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error,
 			};
 
-			var showWizardButton = new Button ("Show Wizard") {
+			var modalCheckBox = new CheckBox ("Modal (pop-up)") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
+				AutoSize = true,
+				Checked = true
+			};
+			Win.Add (modalCheckBox);
+
+			var showWizardButton = new Button ("Show Wizard") {
+				X = Pos.Center (),
+				Y = Pos.Bottom (modalCheckBox) + 1,
 				IsDefault = true,
 			};
+
 			showWizardButton.Clicked += () => {
 				try {
 					int width = 0;
@@ -283,7 +292,18 @@ namespace UICatalog.Scenarios {
 						finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.Checked;
 					};
 
-					Application.Run (wizard);
+					if (modalCheckBox.Checked) {
+						Application.Run (wizard);
+					} else {
+						// Disable the Show button so this only happens once
+						showWizardButton.Visible = false;
+						// To use Wizard as a View, you must set Modal = false
+						wizard.Modal = false;
+						// Turn off borders since it's not a popup
+						wizard.Border.BorderStyle = BorderStyle.None;
+						wizard.ColorScheme = Win.ColorScheme;
+						Win.Add (wizard);
+					}
 
 				} catch (FormatException) {
 					actionLabel.Text = "Invalid Options";
