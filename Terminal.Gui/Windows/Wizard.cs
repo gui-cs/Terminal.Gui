@@ -163,18 +163,18 @@ namespace Terminal.Gui {
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
 				this.ColorScheme = Colors.Dialog;
 
-				Y = 0;
 				Height = Dim.Fill (1); // for button frame
 				Width = Dim.Fill ();
 
-				Controls.ColorScheme = Colors.Dialog;
+				this.ColorScheme = Colors.Dialog;
+
+				Controls.ColorScheme = this.ColorScheme;
 				Controls.Border.BorderStyle = BorderStyle.None;
 				Controls.Border.Padding = new Thickness (0);
 				Controls.Border.BorderThickness = new Thickness (0);
 				this.Add (Controls);
 
-				helpTextView.ColorScheme = Colors.Menu;
-				helpTextView.Y = 0;
+				helpTextView.ColorScheme = Colors.TopLevel;
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
 				this.Add (helpTextView);
@@ -312,6 +312,7 @@ namespace Terminal.Gui {
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
 			this.Border.BorderStyle = BorderStyle.Double;
+			this.Border.Padding = new Thickness (0);
 
 			// Add a horiz separator
 			var separator = new LineView (Graphs.Orientation.Horizontal) {
@@ -331,15 +332,12 @@ namespace Terminal.Gui {
 			nextfinishBtn.Clicked += NextfinishBtn_Clicked;
 
 			Loaded += Wizard_Loaded;
-			Initialized += Wizard_Initialized;
 			Closing += Wizard_Closing;
 		}
 
-		private void Wizard_Initialized (object sender, EventArgs e)
+		private void Wizard_Loaded ()
 		{
-			if (!Modal) {
-				Wizard_Loaded ();
-			}
+			CurrentStep = GetFirstStep (); // gets the first step if CurrentStep == null
 		}
 
 		private bool finishedPressed = false;
@@ -350,14 +348,6 @@ namespace Terminal.Gui {
 				var args = new WizardButtonEventArgs ();
 				Cancelled?.Invoke (args);
 			}
-		}
-
-		private void Wizard_Loaded ()
-		{
-			foreach (var step in steps) {
-				step.Y = 0;
-			}
-			CurrentStep = GetNextStep (); // gets the first step if CurrentStep == null
 		}
 
 		private void NextfinishBtn_Clicked ()
@@ -418,7 +408,7 @@ namespace Terminal.Gui {
 		{
 			LinkedListNode<WizardStep> step = null;
 			if (CurrentStep == null) {
-				// Get last step, assume it is next
+				// Get first step, assume it is next
 				step = steps.First;
 			} else {
 				// Get the step after current
@@ -540,10 +530,11 @@ namespace Terminal.Gui {
 		/// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
 		public void AddStep (WizardStep newStep)
 		{
-			steps.AddLast (newStep);
-			this.Add (newStep);
+			newStep.Y = 0;
 			newStep.EnabledChanged += UpdateButtonsAndTitle;
 			newStep.TitleChanged += (args) => UpdateButtonsAndTitle ();
+			steps.AddLast (newStep);
+			this.Add (newStep);
 			UpdateButtonsAndTitle ();
 		}
 

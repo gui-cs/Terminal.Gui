@@ -12,14 +12,28 @@ namespace UICatalog.Scenarios {
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
-			var wizard = new Wizard ($"{GetName ()} - CTRL-Q to Cancel") {
+			Top = Application.Top;
+
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_Restart Configuration...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to reset the Wizard and start over?", "Ok", "Cancel")),
+					new MenuItem ("Re_boot Server...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to reboot the server start over?", "Ok", "Cancel")),
+					new MenuItem ("_Shutdown Server...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to cancel setup and shutdown?", "Ok", "Cancel")),
+				})
+			});
+			Top.Add (menu);
+
+			// No need for a Title because the border is disabled
+			var wizard = new Wizard () {
 				X = 0,
 				Y = 0,
-				Width = Application.Driver.Cols,
-				Height = Application.Driver.Rows,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
 			};
-			//wizard.Modal = false;
-			wizard.Border.Effect3D = false;
+			wizard.ColorScheme = Colors.Base;
+			wizard.Border.BorderStyle = BorderStyle.None;
+			wizard.Border.BorderThickness = new Thickness (0);
+			wizard.Border.Padding = new Thickness (0);
 
 			wizard.MovingBack += (args) => {
 				//args.Cancel = true;
@@ -33,12 +47,13 @@ namespace UICatalog.Scenarios {
 
 			wizard.Finished += (args) => {
 				//args.Cancel = true;
-				MessageBox.Query ("Step", "Finished", "Ok");
+				MessageBox.Query ("Setup Wizard", "Finished", "Ok");
 				Application.RequestStop ();
 			};
 
 			// Add 1st step
 			var firstStep = new Wizard.WizardStep ("End User License Agreement");
+			firstStep.ColorScheme = firstStep.Controls.ColorScheme = wizard.ColorScheme;
 			wizard.AddStep (firstStep);
 			firstStep.ShowControls = false;
 			firstStep.NextButtonText = "Accept!";
@@ -46,36 +61,42 @@ namespace UICatalog.Scenarios {
 
 			// Add 2nd step
 			var secondStep = new Wizard.WizardStep ("Second Step");
+			secondStep.ColorScheme = secondStep.Controls.ColorScheme = wizard.ColorScheme;
 			wizard.AddStep (secondStep);
-			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button demo changing the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+
+			var buttonLbl = new Label () { Text = "Second Step Button: ", X = 0, Y = 0 };
+			var button = new Button () {
+				Text = "Press Me to Rename Step",
+				X = Pos.Right (buttonLbl),
+				Y = Pos.Top (buttonLbl)
+			};
+			button.Clicked += () => {
+				secondStep.Title = "2nd Step";
+				MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'", "Ok");
+			};
+			secondStep.Controls.Add (buttonLbl, button);
+			var lbl = new Label () { Text = "First Name: ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (buttonLbl) };
+			var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+			secondStep.Controls.Add (lbl, firstNameField);
+			lbl = new Label () { Text = "Last Name:  ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (lbl) };
+			var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+			secondStep.Controls.Add (lbl, lastNameField);
 
 			// Add last step
 			var lastStep = new Wizard.WizardStep ("The last step");
+			lastStep.ColorScheme = lastStep.Controls.ColorScheme = wizard.ColorScheme; 
 			wizard.AddStep (lastStep);
 			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
-			// Normally Modal's like Wizard or Dialog can't take focus
-			//wizard.CanFocus = true;
-			//top.Add (wizard);
+			// When run as a modal, Wizard gets a Loading event where it sets the
+			// Current Step. But when running non-modal it must be done manually.
+			wizard.CurrentStep = wizard.GetNextStep ();
 
-			top.ColorScheme = Colors.Error;
-			top.Ready += () => {
-				// Normally only the view passed to Application.Run gets `OnLoaded` called. 
-				//wizard.OnLoaded ();
-				Application.Run (wizard);
-				Application.RequestStop (top);
-			};
-
-			//Application.Top.Loaded += (args)
-			//Application.Run<Wizard> (null);
-
-			Application.Run (top);
-		   
-		}
-
-		// Override Run to NOT call Application.Run since we call it above
-		public override void Run ()
-		{
+			Top.Add (wizard);
+			wizard.Modal = false;
+			wizard.CanFocus = true;
+			wizard.SetFocus ();
 		}
 	}
 }

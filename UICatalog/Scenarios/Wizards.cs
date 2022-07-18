@@ -72,7 +72,7 @@ namespace UICatalog.Scenarios {
 			frame.Add (titleEdit);
 
 			var useStepView = new CheckBox () {
-				Text = "Add 3rd step controls to WizardStep instead of WizardStep.Controls",
+				Text = "A_dd 3rd step controls to WizardStep instead of WizardStep.Controls",
 				Checked = false,
 				X = Pos.Left (titleEdit),
 				Y = Pos.Bottom (titleEdit)
@@ -125,6 +125,8 @@ namespace UICatalog.Scenarios {
 						return;
 					}
 
+					actionLabel.Text = ustring.Empty;
+
 					var wizard = new Wizard (titleEdit.Text) {
 						Width = width,
 						Height = height
@@ -152,15 +154,15 @@ namespace UICatalog.Scenarios {
 
 					// Add 1st step
 					var firstStep = new Wizard.WizardStep ("End User License Agreement");
-					wizard.AddStep (firstStep);
 					firstStep.ShowControls = false;
 					firstStep.NextButtonText = "Accept!";
 					firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
+					wizard.AddStep (firstStep);
 
 					// Add 2nd step
 					var secondStep = new Wizard.WizardStep ("Second Step");
 					wizard.AddStep (secondStep);
-					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button demo changing the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 					View viewForControls = secondStep.Controls;
 					ustring frameMsg = "Added to WizardStep.Controls";
@@ -302,7 +304,15 @@ namespace UICatalog.Scenarios {
 						// Turn off borders since it's not a popup
 						wizard.Border.BorderStyle = BorderStyle.None;
 						wizard.ColorScheme = Win.ColorScheme;
+						// When run as a modal, Wizard gets a Loading event where it sets the
+						// Current Step. But when running non-modal it must be done manually.
+						wizard.CurrentStep = wizard.GetNextStep ();
+
 						Win.Add (wizard);
+						
+						// Ensure the wizard has focus
+						wizard.SetFocus ();
+						
 					}
 
 				} catch (FormatException) {
