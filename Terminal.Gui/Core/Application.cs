@@ -279,9 +279,22 @@ namespace Terminal.Gui {
 
 			public override void Send (SendOrPostCallback d, object state)
 			{
-				mainLoop.Invoke (() => {
-					d (state);
-				});
+				if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
+					mainLoop.Invoke (() => {
+						d (state);
+					});
+				} 
+				else 
+				{
+					var wasExecuted = false;
+					mainLoop.Invoke (() => {
+						d (state);
+						wasExecuted = true;
+					});
+					while (!wasExecuted) {
+						Thread.Sleep (15);
+					}
+				}
 			}
 		}
 
@@ -307,7 +320,8 @@ namespace Terminal.Gui {
 		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver);
 
 		internal static bool _initialized = false;
-
+		internal static int _mainThreadId = -1;
+		
 		/// <summary>
 		/// Initializes the Terminal.Gui application
 		/// </summary>
@@ -360,6 +374,7 @@ namespace Terminal.Gui {
 			Top = topLevelFactory ();
 			Current = Top;
 			supportedCultures = GetSupportedCultures ();
+			_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 			_initialized = true;
 		}
 
@@ -893,6 +908,7 @@ namespace Terminal.Gui {
 			RootMouseEvent = null;
 			RootKeyEvent = null;
 			Resized = null;
+			_mainThreadId = -1;
 			_initialized = false;
 			mouseGrabView = null;
 
