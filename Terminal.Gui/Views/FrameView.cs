@@ -124,20 +124,23 @@ namespace Terminal.Gui {
 		{
 			var borderLength = Border.DrawMarginFrame ? 1 : 0;
 			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
 			var wb = new Size ();
 			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
 				wb.Width = borderLength + sumPadding.Right;
 				wb.Height = borderLength + sumPadding.Bottom;
 				if (contentView == null) {
 					contentView = new ContentView () {
-						X = borderLength + sumPadding.Left,
-						Y = borderLength + sumPadding.Top,
+						X = wp.X,
+						Y = wp.Y,
 						Width = Dim.Fill (wb.Width),
 						Height = Dim.Fill (wb.Height)
 					};
 				} else {
-					contentView.X = borderLength + sumPadding.Left;
-					contentView.Y = borderLength + sumPadding.Top;
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
 					contentView.Width = Dim.Fill (wb.Width);
 					contentView.Height = Dim.Fill (wb.Height);
 				}
@@ -225,15 +228,14 @@ namespace Terminal.Gui {
 			Driver.Clip = savedClip;
 
 			ClearNeedsDisplay ();
-			if (Border.BorderStyle != BorderStyle.None) {
-				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
-				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				//Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
+
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
+			Border.DrawContent (this, false);
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			if (Border.DrawMarginFrame)
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			}
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
