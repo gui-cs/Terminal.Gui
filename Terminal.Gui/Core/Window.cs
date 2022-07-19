@@ -75,7 +75,6 @@ namespace Terminal.Gui {
 			AdjustContentView (frame);
 		}
 
-
 		/// <summary>
 		/// ContentView is an internal implementation detail of Window. It is used to host Views added with <see cref="Add(View)"/>. 
 		/// Its ONLY reason for being is to provide a simple way for Window to expose to those SubViews that the Window's Bounds 
@@ -186,26 +185,30 @@ namespace Terminal.Gui {
 			} else {
 				Border = border;
 			}
+			AdjustContentView (frame);
 		}
 
 		void AdjustContentView (Rect frame)
 		{
 			var borderLength = Border.DrawMarginFrame ? 1 : 0;
 			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
 			var wb = new Size ();
 			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
 				wb.Width = borderLength + sumPadding.Right;
 				wb.Height = borderLength + sumPadding.Bottom;
 				if (contentView == null) {
 					contentView = new ContentView (this) {
-						X = borderLength + sumPadding.Left,
-						Y = borderLength + sumPadding.Top,
+						X = wp.X,
+						Y = wp.Y,
 						Width = Dim.Fill (wb.Width),
 						Height = Dim.Fill (wb.Height)
 					};
 				} else {
-					contentView.X = borderLength + sumPadding.Left;
-					contentView.Y = borderLength + sumPadding.Top;
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
 					contentView.Width = Dim.Fill (wb.Width);
 					contentView.Height = Dim.Fill (wb.Height);
 				}
@@ -219,7 +222,8 @@ namespace Terminal.Gui {
 					contentView.Frame = cFrame;
 				}
 			}
-			base.Add (contentView);
+			if (Subviews?.Count == 0)
+				base.Add (contentView);
 			Border.Child = contentView;
 		}
 
@@ -289,15 +293,15 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-			if (Border.BorderStyle != BorderStyle.None) {
-				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-				//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
-				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
+
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
+			//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
+			Border.DrawContent (this, false);
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			if (Border.DrawMarginFrame)
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			}
 			Driver.SetAttribute (GetNormalColor ());
 
 			// Checks if there are any SuperView view which intersect with this window.
