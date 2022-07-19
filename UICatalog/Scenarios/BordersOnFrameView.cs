@@ -30,7 +30,8 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Frame"
 				},
 				ColorScheme = Colors.TopLevel
 			};
