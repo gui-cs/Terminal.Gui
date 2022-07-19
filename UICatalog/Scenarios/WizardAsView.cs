@@ -6,7 +6,7 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "WizardAsView", Description: "Demonstrates how to use the Wizard class in an no-modal way")]
+	[ScenarioMetadata (Name: "WizardAsView", Description: "Shows using the Wizard class in an non-modal way")]
 	[ScenarioCategory ("Dialogs")]
 	public class WizardAsView : Scenario {
 
@@ -30,9 +30,10 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-			wizard.Modal = false;
 
-			wizard.Border.DrawMarginFrame = false;
+			// Set Mdoal to false to cause the Wizard class to render without a frame and
+			// behave like an non-modal View (vs. a modal/pop-up Window).
+			wizard.Modal = false;
 
 			wizard.MovingBack += (args) => {
 				//args.Cancel = true;
@@ -52,15 +53,12 @@ namespace UICatalog.Scenarios {
 
 			// Add 1st step
 			var firstStep = new Wizard.WizardStep ("End User License Agreement");
-			firstStep.ColorScheme = firstStep.Controls.ColorScheme = wizard.ColorScheme;
 			wizard.AddStep (firstStep);
-			firstStep.ShowControls = false;
 			firstStep.NextButtonText = "Accept!";
 			firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 
 			// Add 2nd step
 			var secondStep = new Wizard.WizardStep ("Second Step");
-			secondStep.ColorScheme = secondStep.Controls.ColorScheme = firstStep.ColorScheme;
 			wizard.AddStep (secondStep);
 			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
@@ -74,17 +72,16 @@ namespace UICatalog.Scenarios {
 				secondStep.Title = "2nd Step";
 				MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'", "Ok");
 			};
-			secondStep.Controls.Add (buttonLbl, button);
+			secondStep.Add (buttonLbl, button);
 			var lbl = new Label () { Text = "First Name: ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (buttonLbl) };
 			var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-			secondStep.Controls.Add (lbl, firstNameField);
+			secondStep.Add (lbl, firstNameField);
 			lbl = new Label () { Text = "Last Name:  ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (lbl) };
 			var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-			secondStep.Controls.Add (lbl, lastNameField);
+			secondStep.Add (lbl, lastNameField);
 
 			// Add last step
 			var lastStep = new Wizard.WizardStep ("The last step");
-			lastStep.ColorScheme = lastStep.Controls.ColorScheme = firstStep.ColorScheme; 
 			wizard.AddStep (lastStep);
 			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
@@ -93,7 +90,13 @@ namespace UICatalog.Scenarios {
 			wizard.CurrentStep = wizard.GetNextStep ();
 
 			Top.Add (wizard);
-			wizard.SetFocus ();
+			Application.Run (Top);
+		}
+
+		public override void Run ()
+		{
+			// Do nothing in the override because we call Application.Run above
+			// (just to make it clear how the Top is being run and not the Wizard).
 		}
 	}
 }
