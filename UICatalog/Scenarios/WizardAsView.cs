@@ -30,10 +30,13 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-			wizard.ColorScheme = Colors.Base;
+			
+			Top.ColorScheme = wizard.ColorScheme = Colors.Base;
 			wizard.Border.BorderStyle = BorderStyle.None;
 			wizard.Border.BorderThickness = new Thickness (0);
 			wizard.Border.Padding = new Thickness (0);
+
+			wizard.Border.DrawMarginFrame = false;
 
 			wizard.MovingBack += (args) => {
 				//args.Cancel = true;
@@ -61,7 +64,7 @@ namespace UICatalog.Scenarios {
 
 			// Add 2nd step
 			var secondStep = new Wizard.WizardStep ("Second Step");
-			secondStep.ColorScheme = secondStep.Controls.ColorScheme = wizard.ColorScheme;
+			secondStep.ColorScheme = secondStep.Controls.ColorScheme = firstStep.ColorScheme;
 			wizard.AddStep (secondStep);
 			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
@@ -85,7 +88,7 @@ namespace UICatalog.Scenarios {
 
 			// Add last step
 			var lastStep = new Wizard.WizardStep ("The last step");
-			lastStep.ColorScheme = lastStep.Controls.ColorScheme = wizard.ColorScheme; 
+			lastStep.ColorScheme = lastStep.Controls.ColorScheme = firstStep.ColorScheme; 
 			wizard.AddStep (lastStep);
 			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
