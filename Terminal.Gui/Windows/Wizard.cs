@@ -32,11 +32,11 @@ namespace Terminal.Gui {
 		/// To enable or disable a step from being shown to the user, set <see cref="View.Enabled"/>.
 		/// 
 		/// </remarks>
-		public class WizardStep : View {
+		public class WizardStep : FrameView {
 			/// <summary>
 			/// The title of the <see cref="WizardStep"/>.
 			/// </summary>
-			public ustring Title {
+			public new ustring Title {
 				get => title;
 				set {
 					if (!OnTitleChanging (title, value)) {
@@ -161,14 +161,7 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
-				this.ColorScheme = Colors.Dialog;
 
-				Height = Dim.Fill (1); // for button frame
-				Width = Dim.Fill ();
-
-				this.ColorScheme = Colors.Dialog;
-
-				Controls.ColorScheme = this.ColorScheme;
 				Controls.Border.BorderStyle = BorderStyle.None;
 				Controls.Border.Padding = new Thickness (0);
 				Controls.Border.BorderThickness = new Thickness (0);
@@ -259,8 +252,8 @@ namespace Terminal.Gui {
 			/// </summary>
 			private void ShowHide ()
 			{
-				Controls.Height = Dim.Fill (1);
-				helpTextView.Height = Dim.Fill (1);
+				Controls.Height = Dim.Fill ();
+				helpTextView.Height = Dim.Fill ();
 				helpTextView.Width = Dim.Fill ();
 
 				if (showControls) {
@@ -314,11 +307,11 @@ namespace Terminal.Gui {
 			this.Border.BorderStyle = BorderStyle.Double;
 			this.Border.Padding = new Thickness (0);
 
-			// Add a horiz separator
-			var separator = new LineView (Graphs.Orientation.Horizontal) {
-				Y = Pos.AnchorEnd (2)
-			};
-			Add (separator);
+			//// Add a horiz separator
+			//var separator = new LineView (Graphs.Orientation.Horizontal) {
+			//	Y = Pos.AnchorEnd (2)
+			//};
+			//Add (separator);
 
 			// BUGBUG: Space is to work around https://github.com/migueldeicaza/gui.cs/issues/1812
 			backBtn = new Button (Strings.wzBack) { AutoSize = true };
@@ -352,7 +345,7 @@ namespace Terminal.Gui {
 
 		private void NextfinishBtn_Clicked ()
 		{
-			if (CurrentStep == GetLastStep()) {
+			if (CurrentStep == GetLastStep ()) {
 				var args = new WizardButtonEventArgs ();
 				Finished?.Invoke (args);
 				if (!args.Cancel) {
@@ -530,7 +523,8 @@ namespace Terminal.Gui {
 		/// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
 		public void AddStep (WizardStep newStep)
 		{
-			newStep.Y = 0;
+			SizeStep (newStep);
+
 			newStep.EnabledChanged += UpdateButtonsAndTitle;
 			newStep.TitleChanged += (args) => UpdateButtonsAndTitle ();
 			steps.AddLast (newStep);
@@ -730,9 +724,28 @@ namespace Terminal.Gui {
 			} else {
 				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
 			}
+
+			SizeStep (CurrentStep);
+
 			SetNeedsLayout ();
 			LayoutSubviews ();
 			Redraw (Bounds);
+		}
+
+		private void SizeStep (WizardStep step)
+		{
+			if (Modal) {
+				// If we're modal, then we expand the WizardStep so that the top and side 
+				// borders and not visible. The bottom border is the separator above the buttons.
+				step.X = step.Y = -1;
+				step.Height = Dim.Fill (1); // for button frame
+				step.Width = Dim.Fill (-1);
+			} else {
+				// If we're not a modal, then we show the border around the WizardStep
+				step.X = step.Y = 0;
+				step.Height = Dim.Fill (1); // for button frame
+				step.Width = Dim.Fill (0);
+			}
 		}
 	}
 }
