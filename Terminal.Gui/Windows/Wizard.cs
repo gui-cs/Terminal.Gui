@@ -161,6 +161,7 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
+				this.Border.BorderStyle = BorderStyle.Rounded;
 
 				Controls.Border.BorderStyle = BorderStyle.None;
 				Controls.Border.Padding = new Thickness (0);
@@ -745,6 +746,33 @@ namespace Terminal.Gui {
 				step.X = step.Y = 0;
 				step.Height = Dim.Fill (1); // for button frame
 				step.Width = Dim.Fill (0);
+			}
+		}
+
+		/// <inheritdoc/>
+		public new bool Modal {
+			get => base.Modal;
+			set {
+				base.Modal = value;
+				foreach (var step in steps) {
+					SizeStep (step);
+				}
+				if (base.Modal) {
+					ColorScheme = Colors.Dialog;
+					Border.BorderStyle = BorderStyle.Rounded;
+					Border.Effect3D = true;
+					Border.DrawMarginFrame = true;
+				} else {
+					if (SuperView != null) {
+						ColorScheme = SuperView.ColorScheme;
+					} else {
+						ColorScheme = Colors.Base;
+					}
+					CanFocus = true;
+					Border.Effect3D = false;
+					Border.BorderStyle = BorderStyle.None;
+					Border.DrawMarginFrame = false;
+				}
 			}
 		}
 	}

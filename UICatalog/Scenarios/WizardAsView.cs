@@ -30,11 +30,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-			
-			Top.ColorScheme = wizard.ColorScheme = Colors.Base;
-			wizard.Border.BorderStyle = BorderStyle.None;
-			wizard.Border.BorderThickness = new Thickness (0);
-			wizard.Border.Padding = new Thickness (0);
+			wizard.Modal = false;
 
 			wizard.Border.DrawMarginFrame = false;
 
@@ -97,8 +93,6 @@ namespace UICatalog.Scenarios {
 			wizard.CurrentStep = wizard.GetNextStep ();
 
 			Top.Add (wizard);
-			wizard.Modal = false;
-			wizard.CanFocus = true;
 			wizard.SetFocus ();
 		}
 	}

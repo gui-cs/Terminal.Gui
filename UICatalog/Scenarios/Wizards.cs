@@ -301,11 +301,7 @@ namespace UICatalog.Scenarios {
 						showWizardButton.Visible = false;
 						// To use Wizard as a View, you must set Modal = false
 						wizard.Modal = false;
-						// Turn off borders since it's not a popup
-						wizard.Border.BorderStyle = BorderStyle.None;
-						wizard.Border.DrawMarginFrame = false;
-						wizard.Border.Effect3D = false;
-						wizard.ColorScheme = Win.ColorScheme;
+
 						// When run as a modal, Wizard gets a Loading event where it sets the
 						// Current Step. But when running non-modal it must be done manually.
 						wizard.CurrentStep = wizard.GetNextStep ();
