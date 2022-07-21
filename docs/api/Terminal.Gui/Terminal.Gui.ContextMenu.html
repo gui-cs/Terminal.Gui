@@ -1,0 +1,558 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class ContextMenu
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class ContextMenu
+   ">
+    <meta name="generator" content="docfx 2.58.9.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ContextMenu">
+  
+  
+  <h1 id="Terminal_Gui_ContextMenu" data-uid="Terminal.Gui.ContextMenu" class="text-break">Class ContextMenu
+  </h1>
+  <div class="markdown level0 summary">
+A context menu window derived from <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_MenuBar">MenuBar</a> containing menu items
+which can be opened in any position.
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">ContextMenu</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_ContextMenu_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class ContextMenu : IDisposable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="Terminal_Gui_ContextMenu__ctor_" data-uid="Terminal.Gui.ContextMenu.#ctor*"></a>
+  <h4 id="Terminal_Gui_ContextMenu__ctor" data-uid="Terminal.Gui.ContextMenu.#ctor">ContextMenu()</h4>
+  <div class="markdown level1 summary">
+Initialize a context menu with empty menu items.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ContextMenu()</code></pre>
+  </div>
+  <a id="Terminal_Gui_ContextMenu__ctor_" data-uid="Terminal.Gui.ContextMenu.#ctor*"></a>
+  <h4 id="Terminal_Gui_ContextMenu__ctor_System_Int32_System_Int32_Terminal_Gui_MenuBarItem_" data-uid="Terminal.Gui.ContextMenu.#ctor(System.Int32,System.Int32,Terminal.Gui.MenuBarItem)">ContextMenu(Int32, Int32, MenuBarItem)</h4>
+  <div class="markdown level1 summary">
+Initialize a context menu with menu items.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ContextMenu(int x, int y, MenuBarItem menuItems)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">x</span></td>
+        <td>The left position.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">y</span></td>
+        <td>The top position.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
+        <td><span class="parametername">menuItems</span></td>
+        <td>The menu items.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu__ctor_" data-uid="Terminal.Gui.ContextMenu.#ctor*"></a>
+  <h4 id="Terminal_Gui_ContextMenu__ctor_Terminal_Gui_View_Terminal_Gui_MenuBarItem_" data-uid="Terminal.Gui.ContextMenu.#ctor(Terminal.Gui.View,Terminal.Gui.MenuBarItem)">ContextMenu(View, MenuBarItem)</h4>
+  <div class="markdown level1 summary">
+Initialize a context menu with menu items from a host <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ContextMenu(View host, MenuBarItem menuItems)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">host</span></td>
+        <td>The host view.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
+        <td><span class="parametername">menuItems</span></td>
+        <td>The menu items.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Terminal_Gui_ContextMenu_ForceMinimumPosToZero_" data-uid="Terminal.Gui.ContextMenu.ForceMinimumPosToZero*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_ForceMinimumPosToZero" data-uid="Terminal.Gui.ContextMenu.ForceMinimumPosToZero">ForceMinimumPosToZero</h4>
+  <div class="markdown level1 summary">
+Gets or sets whether forces the minimum position to zero
+if the left or right position are negative.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ForceMinimumPosToZero { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_Host_" data-uid="Terminal.Gui.ContextMenu.Host*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Host" data-uid="Terminal.Gui.ContextMenu.Host">Host</h4>
+  <div class="markdown level1 summary">
+The host <a class="xref" href="Terminal.Gui.View.html">View</a> which position will be used,
+otherwise if it&apos;s null the container will be used.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public View Host { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_IsShow_" data-uid="Terminal.Gui.ContextMenu.IsShow*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_IsShow" data-uid="Terminal.Gui.ContextMenu.IsShow">IsShow</h4>
+  <div class="markdown level1 summary">
+Gets information whether menu is showing or not.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsShow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_Key_" data-uid="Terminal.Gui.ContextMenu.Key*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Key" data-uid="Terminal.Gui.ContextMenu.Key">Key</h4>
+  <div class="markdown level1 summary">
+The <a class="xref" href="Terminal.Gui.Key.html">Key</a> used to activate the context menu by keyboard.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Key Key { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_MenuBar_" data-uid="Terminal.Gui.ContextMenu.MenuBar*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_MenuBar" data-uid="Terminal.Gui.ContextMenu.MenuBar">MenuBar</h4>
+  <div class="markdown level1 summary">
+Gets the <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> that is hosting this context menu.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuBar MenuBar { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_MenuItems_" data-uid="Terminal.Gui.ContextMenu.MenuItems*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_MenuItems" data-uid="Terminal.Gui.ContextMenu.MenuItems">MenuItems</h4>
+  <div class="markdown level1 summary">
+Gets or sets the menu items for this context menu.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuBarItem MenuItems { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_MouseFlags_" data-uid="Terminal.Gui.ContextMenu.MouseFlags*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_MouseFlags" data-uid="Terminal.Gui.ContextMenu.MouseFlags">MouseFlags</h4>
+  <div class="markdown level1 summary">
+The <a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a> used to activate the context menu by mouse.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MouseFlags MouseFlags { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_Position_" data-uid="Terminal.Gui.ContextMenu.Position*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Position" data-uid="Terminal.Gui.ContextMenu.Position">Position</h4>
+  <div class="markdown level1 summary">
+Gets or set the menu position.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Point Position { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_ContextMenu_UseSubMenusSingleFrame_" data-uid="Terminal.Gui.ContextMenu.UseSubMenusSingleFrame*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_UseSubMenusSingleFrame" data-uid="Terminal.Gui.ContextMenu.UseSubMenusSingleFrame">UseSubMenusSingleFrame</h4>
+  <div class="markdown level1 summary">
+Gets or sets if the sub-menus must be displayed in a single or multiple frames.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseSubMenusSingleFrame { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Terminal_Gui_ContextMenu_Dispose_" data-uid="Terminal.Gui.ContextMenu.Dispose*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Dispose" data-uid="Terminal.Gui.ContextMenu.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary">
+Disposes the all the context menu objects instances.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  <a id="Terminal_Gui_ContextMenu_Hide_" data-uid="Terminal.Gui.ContextMenu.Hide*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Hide" data-uid="Terminal.Gui.ContextMenu.Hide">Hide()</h4>
+  <div class="markdown level1 summary">
+Close the <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_MenuItems">MenuItems</a> menu items.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Hide()</code></pre>
+  </div>
+  <a id="Terminal_Gui_ContextMenu_Show_" data-uid="Terminal.Gui.ContextMenu.Show*"></a>
+  <h4 id="Terminal_Gui_ContextMenu_Show" data-uid="Terminal.Gui.ContextMenu.Show">Show()</h4>
+  <div class="markdown level1 summary">
+Open the <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_MenuItems">MenuItems</a> menu items.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Show()</code></pre>
+  </div>
+  <h3 id="events">Events
+  </h3>
+  <h4 id="Terminal_Gui_ContextMenu_KeyChanged" data-uid="Terminal.Gui.ContextMenu.KeyChanged">KeyChanged</h4>
+  <div class="markdown level1 summary">
+Event invoked when the <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_Key">Key</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Key&gt; KeyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Key.html">Key</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_ContextMenu_MouseFlagsChanged" data-uid="Terminal.Gui.ContextMenu.MouseFlagsChanged">MouseFlagsChanged</h4>
+  <div class="markdown level1 summary">
+Event invoked when the <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_MouseFlags">MouseFlags</a> is changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;MouseFlags&gt; MouseFlagsChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

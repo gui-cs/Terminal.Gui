@@ -1,0 +1,855 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Pos
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Pos
+   ">
+    <meta name="generator" content="docfx 2.58.9.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Pos">
+  
+  
+  <h1 id="Terminal_Gui_Pos" data-uid="Terminal.Gui.Pos" class="text-break">Class Pos
+  </h1>
+  <div class="markdown level0 summary">
+Describes the position of a <a class="xref" href="Terminal.Gui.View.html">View</a> which can be an absolute value, a percentage, centered, or 
+relative to the ending dimension. Integer values are implicitly convertible to
+an absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>. These objects are created using the static methods Percent,
+AnchorEnd, and Center. The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> objects can be combined with the addition and 
+subtraction operators.
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Pos</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Pos_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class Pos</code></pre>
+  </div>
+  <h5 id="Terminal_Gui_Pos_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  Use the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> objects on the X or Y properties of a view to control the position.
+</p>
+<p>
+  These can be used to set the absolute position, when merely assigning an
+  integer value (via the implicit integer to <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> conversion), and they can be combined
+  to produce more useful layouts, like: Pos.Center - 3, which would shift the position
+  of the <a class="xref" href="Terminal.Gui.View.html">View</a> 3 characters to the left after centering for example.
+</p>
+<p>
+  It is possible to reference coordinates of another view by using the methods
+  Left(View), Right(View), Bottom(View), Top(View). The X(View) and Y(View) are
+  aliases to Left(View) and Top(View) respectively.
+</p>
+</div>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Terminal_Gui_Pos_AnchorEnd_" data-uid="Terminal.Gui.Pos.AnchorEnd*"></a>
+  <h4 id="Terminal_Gui_Pos_AnchorEnd_System_Int32_" data-uid="Terminal.Gui.Pos.AnchorEnd(System.Int32)">AnchorEnd(Int32)</h4>
+  <div class="markdown level1 summary">
+Creates a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object that is anchored to the end (right side or bottom) of the dimension, 
+useful to flush the layout from the right or bottom.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos AnchorEnd(int margin = 0)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">margin</span></td>
+        <td>Optional margin to place to the right or below.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object anchored to the end (the bottom or the right side).</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Pos_AnchorEnd_System_Int32__examples">Examples</h5>
+  
+This sample shows how align a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the bottom-right of a <a class="xref" href="Terminal.Gui.View.html">View</a>.
+<pre><code>// See Issue #502 
+anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+anchorButton.Y = Pos.AnchorEnd (1);</code></pre>
+
+  <a id="Terminal_Gui_Pos_At_" data-uid="Terminal.Gui.Pos.At*"></a>
+  <h4 id="Terminal_Gui_Pos_At_System_Int32_" data-uid="Terminal.Gui.Pos.At(System.Int32)">At(Int32)</h4>
+  <div class="markdown level1 summary">
+Creates an Absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> from the specified integer value.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos At(int n)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">n</span></td>
+        <td>The value to convert to the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The Absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_Bottom_" data-uid="Terminal.Gui.Pos.Bottom*"></a>
+  <h4 id="Terminal_Gui_Pos_Bottom_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Bottom(Terminal.Gui.View)">Bottom(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Bottom (Y+Height) coordinate of the specified <a class="xref" href="Terminal.Gui.View.html">View</a> 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Bottom(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_Center_" data-uid="Terminal.Gui.Pos.Center*"></a>
+  <h4 id="Terminal_Gui_Pos_Center" data-uid="Terminal.Gui.Pos.Center">Center()</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object that can be used to center the <a class="xref" href="Terminal.Gui.View.html">View</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Center()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The center Pos.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Pos_Center_examples">Examples</h5>
+  
+This creates a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>that is centered horizontally, is 50% of the way down, 
+is 30% the height, and is 80% the width of the <a class="xref" href="Terminal.Gui.View.html">View</a> it added to.
+<pre><code>var textView = new TextView () {
+X = Pos.Center (),
+Y = Pos.Percent (50),
+Width = Dim.Percent (80),
+	Height = Dim.Percent (30),
+};</code></pre>
+
+  <a id="Terminal_Gui_Pos_Equals_" data-uid="Terminal.Gui.Pos.Equals*"></a>
+  <h4 id="Terminal_Gui_Pos_Equals_System_Object_" data-uid="Terminal.Gui.Pos.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary">Determines whether the specified object is equal to the current object.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">other</span></td>
+        <td>The object to compare with the current object. </td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>
+<span class="xref">true</span> if the specified object  is equal to the current object; otherwise, <span class="xref">false</span>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.Equals(System.Object)</span></div>
+  <a id="Terminal_Gui_Pos_Function_" data-uid="Terminal.Gui.Pos.Function*"></a>
+  <h4 id="Terminal_Gui_Pos_Function_System_Func_System_Int32__" data-uid="Terminal.Gui.Pos.Function(System.Func{System.Int32})">Function(Func&lt;Int32&gt;)</h4>
+  <div class="markdown level1 summary">
+Creates a &quot;PosFunc&quot; from the specified function.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Function(Func&lt;int&gt; function)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
+        <td><span class="parametername">function</span></td>
+        <td>The function to be executed.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> returned from the function.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_GetHashCode_" data-uid="Terminal.Gui.Pos.GetHashCode*"></a>
+  <h4 id="Terminal_Gui_Pos_GetHashCode" data-uid="Terminal.Gui.Pos.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary">Serves as the default hash function. </div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>A hash code for the current object.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.GetHashCode()</span></div>
+  <a id="Terminal_Gui_Pos_Left_" data-uid="Terminal.Gui.Pos.Left*"></a>
+  <h4 id="Terminal_Gui_Pos_Left_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Left(Terminal.Gui.View)">Left(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Left (X) position of the specified <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Left(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_Percent_" data-uid="Terminal.Gui.Pos.Percent*"></a>
+  <h4 id="Terminal_Gui_Pos_Percent_System_Single_" data-uid="Terminal.Gui.Pos.Percent(System.Single)">Percent(Single)</h4>
+  <div class="markdown level1 summary">
+Creates a percentage <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Percent(float n)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">n</span></td>
+        <td>A value between 0 and 100 representing the percentage.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The percent <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Pos_Percent_System_Single__examples">Examples</h5>
+  
+This creates a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>that is centered horizontally, is 50% of the way down, 
+is 30% the height, and is 80% the width of the <a class="xref" href="Terminal.Gui.View.html">View</a> it added to.
+<pre><code>var textView = new TextView () {
+X = Pos.Center (),
+Y = Pos.Percent (50),
+Width = Dim.Percent (80),
+	Height = Dim.Percent (30),
+};</code></pre>
+
+  <a id="Terminal_Gui_Pos_Right_" data-uid="Terminal.Gui.Pos.Right*"></a>
+  <h4 id="Terminal_Gui_Pos_Right_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Right(Terminal.Gui.View)">Right(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Right (X+Width) coordinate of the specified <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Right(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_Top_" data-uid="Terminal.Gui.Pos.Top*"></a>
+  <h4 id="Terminal_Gui_Pos_Top_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Top(Terminal.Gui.View)">Top(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Top (Y) position of the specified <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Top(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_X_" data-uid="Terminal.Gui.Pos.X*"></a>
+  <h4 id="Terminal_Gui_Pos_X_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.X(Terminal.Gui.View)">X(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Left (X) position of the specified <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos X(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_Y_" data-uid="Terminal.Gui.Pos.Y*"></a>
+  <h4 id="Terminal_Gui_Pos_Y_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Y(Terminal.Gui.View)">Y(View)</h4>
+  <div class="markdown level1 summary">
+Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object tracks the Top (Y) position of the specified <a class="xref" href="Terminal.Gui.View.html">View</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos Y(View view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.View.html">View</a>  that will be tracked.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that depends on the other view.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="operators">Operators
+  </h3>
+  <a id="Terminal_Gui_Pos_op_Addition_" data-uid="Terminal.Gui.Pos.op_Addition*"></a>
+  <h4 id="Terminal_Gui_Pos_op_Addition_Terminal_Gui_Pos_Terminal_Gui_Pos_" data-uid="Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)">Addition(Pos, Pos)</h4>
+  <div class="markdown level1 summary">
+Adds a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> to a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>, yielding a new <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos operator +(Pos left, Pos right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><span class="parametername">left</span></td>
+        <td>The first <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> to add.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><span class="parametername">right</span></td>
+        <td>The second <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> to add.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that is the sum of the values of <code>left</code> and <code>right</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_op_Implicit_" data-uid="Terminal.Gui.Pos.op_Implicit*"></a>
+  <h4 id="Terminal_Gui_Pos_op_Implicit_System_Int32__Terminal_Gui_Pos" data-uid="Terminal.Gui.Pos.op_Implicit(System.Int32)~Terminal.Gui.Pos">Implicit(Int32 to Pos)</h4>
+  <div class="markdown level1 summary">
+Creates an Absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> from the specified integer value.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static implicit operator Pos(int n)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">n</span></td>
+        <td>The value to convert to the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> .</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The Absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Pos_op_Subtraction_" data-uid="Terminal.Gui.Pos.op_Subtraction*"></a>
+  <h4 id="Terminal_Gui_Pos_op_Subtraction_Terminal_Gui_Pos_Terminal_Gui_Pos_" data-uid="Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)">Subtraction(Pos, Pos)</h4>
+  <div class="markdown level1 summary">
+Subtracts a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> from a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>, yielding a new <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Pos operator -(Pos left, Pos right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><span class="parametername">left</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> to subtract from (the minuend).</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><span class="parametername">right</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> to subtract (the subtrahend).</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> that is the <code>left</code> minus <code>right</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
