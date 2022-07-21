@@ -47,7 +47,9 @@ namespace Terminal.Gui {
 			Dispose ();
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Disposes the all the context menu objects instances.
+		/// </summary>
 		public void Dispose ()
 		{
 			if (IsShow) {

@@ -1,0 +1,967 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Autocomplete
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Autocomplete
+   ">
+    <meta name="generator" content="docfx 2.59.3.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Autocomplete">
+  
+  
+  <h1 id="Terminal_Gui_Autocomplete" data-uid="Terminal.Gui.Autocomplete" class="text-break">Class Autocomplete
+  </h1>
+  <div class="markdown level0 summary">
+Renders an overlay on another view at a given point that allows selecting
+from a range of &apos;autocomplete&apos; options.
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Autocomplete</span></div>
+      <div class="level2"><a class="xref" href="Terminal.Gui.TextFieldAutocomplete.html">TextFieldAutocomplete</a></div>
+      <div class="level2"><a class="xref" href="Terminal.Gui.TextViewAutocomplete.html">TextViewAutocomplete</a></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Autocomplete_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class Autocomplete : IAutocomplete</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Terminal_Gui_Autocomplete_AllSuggestions_" data-uid="Terminal.Gui.Autocomplete.AllSuggestions*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_AllSuggestions" data-uid="Terminal.Gui.Autocomplete.AllSuggestions">AllSuggestions</h4>
+  <div class="markdown level1 summary">
+The full set of all strings that can be suggested.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual List&lt;string&gt; AllSuggestions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_CloseKey_" data-uid="Terminal.Gui.Autocomplete.CloseKey*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_CloseKey" data-uid="Terminal.Gui.Autocomplete.CloseKey">CloseKey</h4>
+  <div class="markdown level1 summary">
+The key that the user can press to close the currently popped autocomplete menu
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Key CloseKey { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_ColorScheme_" data-uid="Terminal.Gui.Autocomplete.ColorScheme*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_ColorScheme" data-uid="Terminal.Gui.Autocomplete.ColorScheme">ColorScheme</h4>
+  <div class="markdown level1 summary">
+The colors to use to render the overlay.  Accessing this property before
+the Application has been initialized will cause an error
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual ColorScheme ColorScheme { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_HostControl_" data-uid="Terminal.Gui.Autocomplete.HostControl*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_HostControl" data-uid="Terminal.Gui.Autocomplete.HostControl">HostControl</h4>
+  <div class="markdown level1 summary">
+The host control to handle.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual View HostControl { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_MaxHeight_" data-uid="Terminal.Gui.Autocomplete.MaxHeight*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_MaxHeight" data-uid="Terminal.Gui.Autocomplete.MaxHeight">MaxHeight</h4>
+  <div class="markdown level1 summary">
+The maximum number of visible rows in the autocomplete dropdown to render
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int MaxHeight { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_MaxWidth_" data-uid="Terminal.Gui.Autocomplete.MaxWidth*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_MaxWidth" data-uid="Terminal.Gui.Autocomplete.MaxWidth">MaxWidth</h4>
+  <div class="markdown level1 summary">
+The maximum width of the autocomplete dropdown
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int MaxWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_PopupInsideContainer_" data-uid="Terminal.Gui.Autocomplete.PopupInsideContainer*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_PopupInsideContainer" data-uid="Terminal.Gui.Autocomplete.PopupInsideContainer">PopupInsideContainer</h4>
+  <div class="markdown level1 summary">
+Gets or sets If the popup is displayed inside or outside the host limits.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PopupInsideContainer { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_Reopen_" data-uid="Terminal.Gui.Autocomplete.Reopen*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_Reopen" data-uid="Terminal.Gui.Autocomplete.Reopen">Reopen</h4>
+  <div class="markdown level1 summary">
+The key that the user can press to reopen the currently popped autocomplete menu
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Key Reopen { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_ScrollOffset_" data-uid="Terminal.Gui.Autocomplete.ScrollOffset*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_ScrollOffset" data-uid="Terminal.Gui.Autocomplete.ScrollOffset">ScrollOffset</h4>
+  <div class="markdown level1 summary">
+When more suggestions are available than can be rendered the user
+can scroll down the dropdown list.  This indicates how far down they
+have gone
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int ScrollOffset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_SelectedIdx_" data-uid="Terminal.Gui.Autocomplete.SelectedIdx*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_SelectedIdx" data-uid="Terminal.Gui.Autocomplete.SelectedIdx">SelectedIdx</h4>
+  <div class="markdown level1 summary">
+The currently selected index into <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_Suggestions">Suggestions</a> that the user has highlighted
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int SelectedIdx { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_SelectionKey_" data-uid="Terminal.Gui.Autocomplete.SelectionKey*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_SelectionKey" data-uid="Terminal.Gui.Autocomplete.SelectionKey">SelectionKey</h4>
+  <div class="markdown level1 summary">
+The key that the user must press to accept the currently selected autocomplete suggestion
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Key SelectionKey { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_Suggestions_" data-uid="Terminal.Gui.Autocomplete.Suggestions*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_Suggestions" data-uid="Terminal.Gui.Autocomplete.Suggestions">Suggestions</h4>
+  <div class="markdown level1 summary">
+The strings that form the current list of suggestions to render
+based on what the user has typed so far.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual ReadOnlyCollection&lt;string&gt; Suggestions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.ObjectModel.ReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_Visible_" data-uid="Terminal.Gui.Autocomplete.Visible*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_Visible" data-uid="Terminal.Gui.Autocomplete.Visible">Visible</h4>
+  <div class="markdown level1 summary">
+True if the autocomplete should be considered open and visible
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool Visible { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Terminal_Gui_Autocomplete_ClearSuggestions_" data-uid="Terminal.Gui.Autocomplete.ClearSuggestions*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_ClearSuggestions" data-uid="Terminal.Gui.Autocomplete.ClearSuggestions">ClearSuggestions()</h4>
+  <div class="markdown level1 summary">
+Clears <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_Suggestions">Suggestions</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ClearSuggestions()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_Close_" data-uid="Terminal.Gui.Autocomplete.Close*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_Close" data-uid="Terminal.Gui.Autocomplete.Close">Close()</h4>
+  <div class="markdown level1 summary">
+Closes the Autocomplete context menu if it is showing and <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_ClearSuggestions">ClearSuggestions()</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void Close()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_DeleteTextBackwards_" data-uid="Terminal.Gui.Autocomplete.DeleteTextBackwards*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_DeleteTextBackwards" data-uid="Terminal.Gui.Autocomplete.DeleteTextBackwards">DeleteTextBackwards()</h4>
+  <div class="markdown level1 summary">
+Deletes the text backwards before insert the selected text in the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void DeleteTextBackwards()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_EnsureSelectedIdxIsValid_" data-uid="Terminal.Gui.Autocomplete.EnsureSelectedIdxIsValid*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_EnsureSelectedIdxIsValid" data-uid="Terminal.Gui.Autocomplete.EnsureSelectedIdxIsValid">EnsureSelectedIdxIsValid()</h4>
+  <div class="markdown level1 summary">
+Updates <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_SelectedIdx">SelectedIdx</a> to be a valid index within <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_Suggestions">Suggestions</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void EnsureSelectedIdxIsValid()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_GenerateSuggestions_" data-uid="Terminal.Gui.Autocomplete.GenerateSuggestions*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_GenerateSuggestions" data-uid="Terminal.Gui.Autocomplete.GenerateSuggestions">GenerateSuggestions()</h4>
+  <div class="markdown level1 summary">
+Populates <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_Suggestions">Suggestions</a> with all strings in <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_AllSuggestions">AllSuggestions</a> that
+match with the current cursor position/text in the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void GenerateSuggestions()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_GetCurrentWord_" data-uid="Terminal.Gui.Autocomplete.GetCurrentWord*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_GetCurrentWord" data-uid="Terminal.Gui.Autocomplete.GetCurrentWord">GetCurrentWord()</h4>
+  <div class="markdown level1 summary">
+Returns the currently selected word from the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a>.
+<p>
+When overriding this method views can make use of <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_IdxToWord_System_Collections_Generic_List_System_Rune__System_Int32_">IdxToWord(List&lt;Rune&gt;, Int32)</a>
+</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract string GetCurrentWord()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_IdxToWord_" data-uid="Terminal.Gui.Autocomplete.IdxToWord*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_IdxToWord_System_Collections_Generic_List_System_Rune__System_Int32_" data-uid="Terminal.Gui.Autocomplete.IdxToWord(System.Collections.Generic.List{System.Rune},System.Int32)">IdxToWord(List&lt;Rune&gt;, Int32)</h4>
+  <div class="markdown level1 summary">
+<p>
+Given a <code data-dev-comment-type="paramref" class="paramref">line</code> of characters, returns the word which ends at <code data-dev-comment-type="paramref" class="paramref">idx</code> 
+or null.  Also returns null if the <code data-dev-comment-type="paramref" class="paramref">idx</code> is positioned in the middle of a word.
+</p>
+
+<p>Use this method to determine whether autocomplete should be shown when the cursor is at
+a given point in a line and to get the word from which suggestions should be generated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual string IdxToWord(List&lt;Rune&gt; line, int idx)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
+        <td><span class="parametername">line</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">idx</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_InsertSelection_" data-uid="Terminal.Gui.Autocomplete.InsertSelection*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_InsertSelection_System_String_" data-uid="Terminal.Gui.Autocomplete.InsertSelection(System.String)">InsertSelection(String)</h4>
+  <div class="markdown level1 summary">
+Called when the user confirms a selection at the current cursor location in
+the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a>.  The <code data-dev-comment-type="paramref" class="paramref">accepted</code> string
+is the full autocomplete word to be inserted.  Typically a host will have to
+remove some characters such that the <code data-dev-comment-type="paramref" class="paramref">accepted</code> string 
+completes the word instead of simply being appended.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool InsertSelection(string accepted)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">accepted</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>True if the insertion was possible otherwise false</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_InsertText_" data-uid="Terminal.Gui.Autocomplete.InsertText*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_InsertText_System_String_" data-uid="Terminal.Gui.Autocomplete.InsertText(System.String)">InsertText(String)</h4>
+  <div class="markdown level1 summary">
+Inser the selected text in the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void InsertText(string accepted)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">accepted</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_IsWordChar_" data-uid="Terminal.Gui.Autocomplete.IsWordChar*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_IsWordChar_System_Rune_" data-uid="Terminal.Gui.Autocomplete.IsWordChar(System.Rune)">IsWordChar(Rune)</h4>
+  <div class="markdown level1 summary">
+Return true if the given symbol should be considered part of a word
+and can be contained in matches.  Base behavior is to use <span class="xref">System.Char.IsLetterOrDigit(System.Char)</span>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool IsWordChar(Rune rune)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td><span class="parametername">rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_MouseEvent_" data-uid="Terminal.Gui.Autocomplete.MouseEvent*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_MouseEvent_Terminal_Gui_MouseEvent_System_Boolean_" data-uid="Terminal.Gui.Autocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)">MouseEvent(MouseEvent, Boolean)</h4>
+  <div class="markdown level1 summary">
+Handle mouse events before <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a> e.g. to make mouse events like
+report/click apply to the autocomplete control instead of changing the cursor position in
+the underlying text view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool MouseEvent(MouseEvent me, bool fromHost = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
+        <td>The mouse event.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">fromHost</span></td>
+        <td>If was called from the popup or from the host.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>if the mouse can be handled <code>false</code>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_MoveDown_" data-uid="Terminal.Gui.Autocomplete.MoveDown*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_MoveDown" data-uid="Terminal.Gui.Autocomplete.MoveDown">MoveDown()</h4>
+  <div class="markdown level1 summary">
+Moves the selection in the Autocomplete context menu down one
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void MoveDown()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_MoveUp_" data-uid="Terminal.Gui.Autocomplete.MoveUp*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_MoveUp" data-uid="Terminal.Gui.Autocomplete.MoveUp">MoveUp()</h4>
+  <div class="markdown level1 summary">
+Moves the selection in the Autocomplete context menu up one
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void MoveUp()</code></pre>
+  </div>
+  <a id="Terminal_Gui_Autocomplete_ProcessKey_" data-uid="Terminal.Gui.Autocomplete.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Autocomplete.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+Handle key events before <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a> e.g. to make key events like
+up/down apply to the autocomplete control instead of changing the cursor position in
+the underlying text view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool ProcessKey(KeyEvent kb)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">kb</span></td>
+        <td>The key event.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>if the key can be handled <code>false</code>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_RenderOverlay_" data-uid="Terminal.Gui.Autocomplete.RenderOverlay*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_RenderOverlay_Terminal_Gui_Point_" data-uid="Terminal.Gui.Autocomplete.RenderOverlay(Terminal.Gui.Point)">RenderOverlay(Point)</h4>
+  <div class="markdown level1 summary">
+Renders the autocomplete dialog inside or outside the given <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_HostControl">HostControl</a> at the
+given point.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RenderOverlay(Point renderAt)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">renderAt</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_RenderSelectedIdxByMouse_" data-uid="Terminal.Gui.Autocomplete.RenderSelectedIdxByMouse*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_RenderSelectedIdxByMouse_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Autocomplete.RenderSelectedIdxByMouse(Terminal.Gui.MouseEvent)">RenderSelectedIdxByMouse(MouseEvent)</h4>
+  <div class="markdown level1 summary">
+Render the current selection in the Autocomplete context menu by the mouse reporting.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void RenderSelectedIdxByMouse(MouseEvent me)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_ReopenSuggestions_" data-uid="Terminal.Gui.Autocomplete.ReopenSuggestions*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_ReopenSuggestions" data-uid="Terminal.Gui.Autocomplete.ReopenSuggestions">ReopenSuggestions()</h4>
+  <div class="markdown level1 summary">
+Reopen the popup after it has been closed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool ReopenSuggestions()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Autocomplete_Select_" data-uid="Terminal.Gui.Autocomplete.Select*"></a>
+  <h4 id="Terminal_Gui_Autocomplete_Select" data-uid="Terminal.Gui.Autocomplete.Select">Select()</h4>
+  <div class="markdown level1 summary">
+Completes the autocomplete selection process.  Called when user hits the <a class="xref" href="Terminal.Gui.Autocomplete.html#Terminal_Gui_Autocomplete_SelectionKey">SelectionKey</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool Select()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
