@@ -121,7 +121,7 @@ namespace Terminal.Gui.Views {
 			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var row2 = $"{d.VDLine}{new String (' ', width - 2)}{d.VDLine}";
 			var row3 = row2;
-			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
+			var separatorRow = $"{d.VDLine}{new String (' ', width - 2)}{d.VDLine}";
 			var buttonRow = $"{d.VDLine}{btnBack}{new String (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
