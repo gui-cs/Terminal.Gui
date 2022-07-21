@@ -105,9 +105,9 @@ not to make a decision and instead pressed the ESC key).</p>
 the various views that are included. In the following sections, you
 will see how applications are put together.</p>
 <p>In the example above, you can see that we have initialized the runtime by calling the 
-<a href="../api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
+<a href="../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
 schemes available for your application and clears the screen to start your application.</p>
-<p>The <a href="../api/Terminal.Gui/Terminal.Gui.Application.yml"><code>Application</code></a> class, additionally creates an instance of the <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.yml"><code>Toplevel</code></a> class that is ready to be consumed, 
+<p>The <a href="../api/Terminal.Gui/Terminal.Gui.Application.html"><code>Application</code></a> class, additionally creates an instance of the <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html"><code>Toplevel</code></a> class that is ready to be consumed, 
 this instance is available in the <code>Application.Top</code> property, and can be used like this:</p>
 <pre><code class="lang-csharp">using Terminal.Gui;
 
@@ -218,7 +218,7 @@ View.</p>
 </ul>
 <h2 id="layout">Layout</h2>
 <p><code>Terminal.Gui</code> supports two different layout systems, absolute and computed \
-(controlled by the <a href="../api/Terminal.Gui/Terminal.Gui.LayoutStyle.yml"><code>LayoutStyle</code></a>
+(controlled by the <a href="../api/Terminal.Gui/Terminal.Gui.LayoutStyle.html"><code>LayoutStyle</code></a>
 property on the view.</p>
 <p>The absolute system is used when you want the view to be positioned exactly in
 one location and want to manually control where the view is. This is done
@@ -240,7 +240,7 @@ var label = new Label (&quot;Hello&quot;) {
 
 // Absolute position using the provided rectangle
 var label2 = new Label (new Rect (1, 2, 20, 1), &quot;World&quot;)
-</code></pre><p>The computed layout system does not take integers, instead the <code>X</code> and <code>Y</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Pos.yml"><code>Pos</code></a> and the <code>Width</code> and <code>Height</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Dim.yml"><code>Dim</code></a> both which can be created implicitly from integer values.</p>
+</code></pre><p>The computed layout system does not take integers, instead the <code>X</code> and <code>Y</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Pos.html"><code>Pos</code></a> and the <code>Width</code> and <code>Height</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Dim.html"><code>Dim</code></a> both which can be created implicitly from integer values.</p>
 <h3 id="the-pos-type">The <code>Pos</code> Type</h3>
 <p>The <code>Pos</code> type on <code>X</code> and <code>Y</code> offers a few options:</p>
 <ul>
@@ -279,8 +279,8 @@ view.Height = Dim.Percent(20) - 1;
 
 anotherView.Height = Dim.Height (view)+1
 </code></pre><h1 id="toplevels-windows-and-dialogs">TopLevels, Windows and Dialogs.</h1>
-<p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.yml">Toplevel</a> view (or any of its subclasses,
-like <a href="../api/Terminal.Gui/Terminal.Gui.Window.yml">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.yml">Dialog</a> which is special kind of views
+<p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> view (or any of its subclasses,
+like <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> which is special kind of views
 that can be executed modally - that is, the view can take over all input and returns
 only when the user chooses to complete their work there. </p>
 <p>The following sections cover the differences.</p>
@@ -331,10 +331,10 @@ class Demo {
     }
 }
 </code></pre><h2 id="window-views">Window Views</h2>
-<p><a href="../api/Terminal.Gui/Terminal.Gui.Window.yml">Window</a> views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)</p>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)</p>
 <p>From a user interface perspective, you might have more than one Window on the screen at a given time.</p>
 <h2 id="dialogs">Dialogs</h2>
-<p><a href="../api/Terminal.Gui/Terminal.Gui.Dialog.yml">Dialog</a> are <a href="../api/Terminal.Gui/Terminal.Gui.Window.yml">Window</a> objects that happen to be centered in the middle of the screen.</p>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> are <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> objects that happen to be centered in the middle of the screen.</p>
 <p>Dialogs are instances of a Window that are centered in the screen, and are intended
 to be used modally - that is, they run, and they are expected to return a result 
 before resuming execution of your application.</p>
@@ -421,7 +421,7 @@ the toplevel, the normal views, the menu bar, popup dialog boxes and error dialo
 <p>You can use them for example like this to set the colors for a new Window:</p>
 <pre><code>var w = new Window (&quot;Hello&quot;);
 w.ColorScheme = Colors.Error
-</code></pre><p>The <a href="../api/Terminal.Gui/Terminal.Gui.ColorScheme.yml"><code>ColorScheme</code></a> represents
+</code></pre><p>The <a href="../api/Terminal.Gui/Terminal.Gui.ColorScheme.html"><code>ColorScheme</code></a> represents
 four values, the color used for Normal text, the color used for normal text when
 a view is focused an the colors for the hot-keys both in focused and unfocused modes.</p>
 <p>By using <code>ColorSchemes</code> you ensure that your application will work correctbly both

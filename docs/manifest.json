@@ -1,6 +1,6 @@
 {
   "homepages": [],
-  "source_base_path": "C:/Users/charlie/s/gui.cs/docfx",
+  "source_base_path": "E:/Repos/CSharp/gui.cs/docfx",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -49,9 +49,6 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/mainloop.md",
       "output": {
@@ -64,9 +61,6 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/overview.md",
       "output": {
@@ -79,9 +73,6 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/tableview.md",
       "output": {
@@ -94,9 +85,6 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/treeview.md",
       "output": {
@@ -146,9 +134,6 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "index.md",
       "output": {
@@ -166,7 +151,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "RzEHrUmDcV8g381qAu9r5p7UzxUUikQzT3/0c20774s="
+          "hash": "2h6IeymL5GhkkuORrHBvo/HfKKbMyAFpPw6Pc9b4ua8="
         }
       },
       "is_incremental": false,
@@ -189,6 +174,12 @@
           "incrementalPhase": "build",
           "total_file_count": 9,
           "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": true,
+          "incrementalPhase": "build",
+          "total_file_count": 253,
+          "skipped_file_count": 161
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
