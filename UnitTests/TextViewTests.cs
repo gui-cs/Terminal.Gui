@@ -5561,14 +5561,12 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
-			// Undo is disabled
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
+			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
-			Assert.Equal (new Point (1, 1), tv.CursorPosition);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			// Redo is disabled
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);

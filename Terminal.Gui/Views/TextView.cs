@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using NStack;
@@ -1371,6 +1372,8 @@ namespace Terminal.Gui {
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
+			SetWrapModel ();
+
 			var startLine = obj.CursorPosition.Y;
 
 			if (obj.RemovedOnAdded != null) {
@@ -1402,6 +1405,9 @@ namespace Terminal.Gui {
 			}
 
 			CursorPosition = obj.FinalCursorPosition;
+
+			UpdateWrapModel ();
+
 			Adjust ();
 		}
 
@@ -2021,6 +2027,8 @@ namespace Terminal.Gui {
 		//
 		void ClearRegion ()
 		{
+			SetWrapModel ();
+
 			long start, end;
 			long currentEncoded = ((long)(uint)currentRow << 32) | (uint)currentColumn;
 			GetEncodedRegionBounds (out start, out end);
@@ -2047,6 +2055,8 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 
@@ -2068,6 +2078,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> (removedLines), CursorPosition,
 				HistoryText.LineStatus.Removed);
+
+			UpdateWrapModel ();
 
 			SetNeedsDisplay ();
 		}
@@ -2211,12 +2223,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		string currentCaller;
+
 		/// <summary>
 		/// Restore from original model.
 		/// </summary>
-		void SetWrapModel ()
+		void SetWrapModel ([CallerMemberName] string caller = null)
 		{
+			if (currentCaller != null)
+				return;
+
 			if (wordWrap) {
+				currentCaller = caller;
+
 				currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 				currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				selectionStartColumn = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
@@ -2228,9 +2247,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Update the original model.
 		/// </summary>
-		void UpdateWrapModel ()
+		void UpdateWrapModel ([CallerMemberName] string caller = null)
 		{
+			if (currentCaller != null && currentCaller != caller)
+				return;
+
 			if (wordWrap) {
+				currentCaller = null;
+
 				wrapManager.UpdateModel (model, out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
@@ -2241,6 +2265,8 @@ namespace Terminal.Gui {
 				selectionStartColumn = nStartCol;
 				wrapNeeded = true;
 			}
+			if (currentCaller != null)
+				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
 		}
 
 		///<inheritdoc/>
@@ -2371,17 +2397,6 @@ namespace Terminal.Gui {
 				}
 				line.Insert (Math.Min (currentColumn, line.Count), rune);
 			}
-			if (wordWrap) {
-				if (Used) {
-					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
-				} else {
-					wrapNeeded = wrapManager.RemoveAt (currentRow, currentColumn);
-					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
-				}
-				if (wrapNeeded) {
-					SetNeedsDisplay ();
-				}
-			}
 			var prow = currentRow - topRow;
 			if (!wrapNeeded) {
 				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
@@ -2424,6 +2439,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var line = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
@@ -2444,6 +2461,9 @@ namespace Terminal.Gui {
 				} else {
 					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
 				}
+
+				UpdateWrapModel ();
+
 				return;
 			}
 
@@ -2486,6 +2506,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -2614,7 +2636,7 @@ namespace Terminal.Gui {
 
 		void RedoChanges ()
 		{
-			if (ReadOnly || wordWrap)
+			if (ReadOnly)
 				return;
 
 			historyText.Redo ();
@@ -2622,7 +2644,7 @@ namespace Terminal.Gui {
 
 		void UndoChanges ()
 		{
-			if (ReadOnly || wordWrap)
+			if (ReadOnly)
 				return;
 
 			historyText.Undo ();
@@ -2940,6 +2962,8 @@ namespace Terminal.Gui {
 				return ProcessMovePreviousView ();
 			}
 			if (currentColumn > 0) {
+				SetWrapModel ();
+
 				var currentLine = GetCurrentLine ();
 				if (currentLine.Count > 0 && currentLine [currentColumn - 1] == '\t') {
 
@@ -2951,6 +2975,8 @@ namespace Terminal.Gui {
 					historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Replaced);
 				}
+
+				UpdateWrapModel ();
 			}
 			DoNeededAction ();
 			return true;
@@ -2983,6 +3009,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
@@ -3003,10 +3031,6 @@ namespace Terminal.Gui {
 
 			historyText.Add (addedLines, CursorPosition, HistoryText.LineStatus.Added);
 
-			if (wordWrap) {
-				wrapManager.AddLine (currentRow, currentColumn);
-				wrapNeeded = true;
-			}
 			currentRow++;
 
 			bool fullNeedsDisplay = false;
@@ -3029,6 +3053,8 @@ namespace Terminal.Gui {
 			else
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
 
+			UpdateWrapModel ();
+
 			DoNeededAction ();
 			return true;
 		}
@@ -3037,6 +3063,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
@@ -3046,6 +3075,8 @@ namespace Terminal.Gui {
 
 				historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+
+				UpdateWrapModel ();
 
 				return;
 			}
@@ -3070,6 +3101,8 @@ namespace Terminal.Gui {
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
+			UpdateWrapModel ();
+
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
 			} else {
@@ -3082,6 +3115,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
@@ -3091,6 +3127,8 @@ namespace Terminal.Gui {
 
 				historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+
+				UpdateWrapModel ();
 
 				return;
 			}
@@ -3109,6 +3147,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
@@ -3149,9 +3189,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			var setLastWasKill = true;
 			if (currentLine.Count > 0 && currentColumn == 0) {
+				UpdateWrapModel ();
+
 				DeleteTextBackwards ();
 				return;
 			}
@@ -3203,7 +3247,12 @@ namespace Terminal.Gui {
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
-			SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			UpdateWrapModel ();
+
+			if (wrapNeeded)
+				SetNeedsDisplay ();
+			else
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3217,9 +3266,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			var setLastWasKill = true;
 			if (currentLine.Count > 0 && currentColumn == currentLine.Count) {
+				UpdateWrapModel ();
+
 				DeleteTextForwards ();
 				return;
 			}
@@ -3265,7 +3318,12 @@ namespace Terminal.Gui {
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
-			SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			UpdateWrapModel ();
+
+			if (wrapNeeded)
+				SetNeedsDisplay ();
+			else
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3293,6 +3351,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			if (selecting) {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
@@ -3304,11 +3365,18 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 			if (DeleteTextForwards ()) {
+				UpdateWrapModel ();
+
 				return;
 			}
+
+			UpdateWrapModel ();
+
 			DoNeededAction ();
 		}
 
@@ -3319,6 +3387,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			if (selecting) {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
@@ -3330,11 +3401,18 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 			if (DeleteTextBackwards ()) {
+				UpdateWrapModel ();
+
 				return;
 			}
+
+			UpdateWrapModel ();
+
 			DoNeededAction ();
 		}
 
@@ -3443,7 +3521,7 @@ namespace Terminal.Gui {
 			if (isReadOnly)
 				return true;
 
-			var curPos = CursorPosition;
+			SetWrapModel ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
 
@@ -3464,6 +3542,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 
 			return true;
 		}
@@ -3517,10 +3597,15 @@ namespace Terminal.Gui {
 
 		bool DeleteTextForwards ()
 		{
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			if (currentColumn == currentLine.Count) {
-				if (currentRow + 1 == model.Count)
+				if (currentRow + 1 == model.Count) {
+					UpdateWrapModel ();
+
 					return true;
+				}
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
@@ -3541,8 +3626,12 @@ namespace Terminal.Gui {
 				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
 					wrapNeeded = true;
 				}
-				var sr = currentRow - topRow;
-				SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					var sr = currentRow - topRow;
+					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+				}
 			} else {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
@@ -3554,15 +3643,24 @@ namespace Terminal.Gui {
 				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
 					wrapNeeded = true;
 				}
-				var r = currentRow - topRow;
-				SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					var r = currentRow - topRow;
+					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+				}
 			}
+
+			UpdateWrapModel ();
 
 			return false;
 		}
 
 		bool DeleteTextBackwards ()
 		{
+			SetWrapModel ();
+
 			if (currentColumn > 0) {
 				// Delete backwards 
 				var currentLine = GetCurrentLine ();
@@ -3618,6 +3716,8 @@ namespace Terminal.Gui {
 				}
 				SetNeedsDisplay ();
 			}
+
+			UpdateWrapModel ();
 
 			return false;
 		}
