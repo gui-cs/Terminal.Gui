@@ -32,7 +32,7 @@ When your code invokes `Application.Run (Toplevel)`, the application
 will prepare the current
 [`Toplevel`](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) instance by
 redrawing the screen appropriately and then calling the mainloop to
-run.    
+run.   
 
 You can configure the Mainloop before calling Application.Run, or you
 can configure the MainLoop in response to events during the execution.
@@ -83,8 +83,8 @@ Idle Handlers
 You can register code to be executed when the application is idling
 and there are no events to process by calling the
 [`AddIdle`]()
-method.  This method takes as a parameter a function that will be
-invoked when the application is idling.  
+method. This method takes as a parameter a function that will be
+invoked when the application is idling. 
 
 Idle functions should return `true` if they should be invoked again,
 and `false` if the idle invocations should stop.
@@ -98,18 +98,18 @@ Threading
 Like other UI toolkits, Terminal.Gui is generally not thread safe.
 You should avoid calling methods in the UI classes from a background
 thread as there is no guarantee that they will not corrupt the state
-of the UI application.  
+of the UI application. 
 
 Generally, as there is not much state, you will get lucky, but the
 application will not behave properly.
 
 You will be served better off by using C# async machinery and the
-various APIs in the `System.Threading.Tasks.Task` APIs.   But if you
+various APIs in the `System.Threading.Tasks.Task` APIs.  But if you
 absolutely must work with threads on your own you should only invoke
 APIs in Terminal.Gui from the main thread.
 
 To make this simple, you can use the `Application.MainLoop.Invoke`
-method and pass an `Action`.  This action will be queued for execution
+method and pass an `Action`. This action will be queued for execution
 on the main thread at an appropriate time and will run your code
 there.
 

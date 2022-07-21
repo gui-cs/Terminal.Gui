@@ -78,7 +78,7 @@ easy to write applications that will work on monochrome terminals, as
 well as modern color terminals with mouse support.</p>
 <p>This library works across Windows, Linux and MacOS.</p>
 <p>This library provides a text-based toolkit as works in a way similar
-to graphic toolkits.   There are many controls that can be used to
+to graphic toolkits. There are many controls that can be used to
 create your applications and it is event based, meaning that you
 create the user interface, hook up various events and then let the
 a processing loop run your application, and your code is invoked via
@@ -102,7 +102,7 @@ class Demo {
 which value was selected by the user (Yes, No, or if they use chose
 not to make a decision and instead pressed the ESC key).</p>
 <p>More interesting user interfaces can be created by composing some of
-the various views that are included.   In the following sections, you
+the various views that are included. In the following sections, you
 will see how applications are put together.</p>
 <p>In the example above, you can see that we have initialized the runtime by calling the 
 <a href="../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
@@ -158,12 +158,12 @@ class Demo {
 }
 </code></pre><h1 id="views">Views</h1>
 <p>All visible elements on a Terminal.Gui application are implemented as
-<a href="../api/Terminal.Gui/Terminal.Gui.View.html">Views</a>.   Views are self-contained
+<a href="../api/Terminal.Gui/Terminal.Gui.View.yml">Views</a>. Views are self-contained
 objects that take care of displaying themselves, can receive keyboard and mouse
 input and participate in the focus mechanism.</p>
-<p>Every view can contain an arbitrary number of children views.   These are called
-the Subviews.   You can add a view to an existing view, by calling the 
-<a href="../api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_"><code>Add</code></a> method, for example, to add a couple of buttons to a UI, you can do this:</p>
+<p>Every view can contain an arbitrary number of children views. These are called
+the Subviews. You can add a view to an existing view, by calling the 
+<a href="../api/Terminal.Gui/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_"><code>Add</code></a> method, for example, to add a couple of buttons to a UI, you can do this:</p>
 <pre><code class="lang-csharp">void SetupMyView (View myView)
 {
     var label = new Label (&quot;Username: &quot;) {
@@ -184,18 +184,48 @@ the Subviews.   You can add a view to an existing view, by calling the
 }
 </code></pre><p>The container of a given view is called the <code>SuperView</code> and it is a property of every
 View.</p>
-<p>There are many views that you can use to spice up your application:</p>
-<p><a href="../api/Terminal.Gui/Terminal.Gui.Button.html">Buttons</a>, <a href="../api/Terminal.Gui/Terminal.Gui.Label.html">Labels</a>, <a href="../api/Terminal.Gui/Terminal.Gui.TextField.html">Text entry</a>, <a href="../api/Terminal.Gui/Terminal.Gui.TextView.html">Text view</a>, <a href="../api/Terminal.Gui/Terminal.Gui.RadioGroup.html">Radio buttons</a>, <a href="../api/Terminal.Gui/Terminal.Gui.CheckBox.html">Checkboxes</a>, <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog boxes</a>, <a href="../api/Terminal.Gui/Terminal.Gui.MessageBox.html">Message boxes</a>, <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Windows</a>, <a href="../api/Terminal.Gui/Terminal.Gui.MenuBar.html">Menus</a>, <a href="../api/Terminal.Gui/Terminal.Gui.ListView.html">ListViews</a>, <a href="../api/Terminal.Gui/Terminal.Gui.FrameView.html">Frames</a>, <a href="../api/Terminal.Gui/Terminal.Gui.ProgressBar.html">ProgressBars</a>, <a href="../api/Terminal.Gui/Terminal.Gui.ScrollView.html">Scroll views</a> and <a href="../api/Terminal.Gui/Terminal.Gui.ScrollBarView.html">Scrollbars</a>.</p>
+<p><em>Terminal.Gui</em> provides a rich set of views and controls for building terminal user interfaces:</p>
+<ul>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html">Button</a> </li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html">CheckBox</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ColorPicker.html">ColorPicker</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ComboBox.html">ComboBox</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a><ul>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html">OpenDialog</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html">SaveDialog</a></li>
+</ul>
+</li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html">FrameView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.GraphView.html">GraphView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html">Hex viewer/editor</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html">Label</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html">ListView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html">Menu</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html">MessageBox</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html">ProgressBar</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html">Radio buttons</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html">TableView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html">Time &amp; Date Fields</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html">TextField</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html">TextValidateField</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html">TextView (Text Editor)</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html">TreeView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html">ScrollView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html">ScrollBarView</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html">StatusBar</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html">Window</a></li>
+<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Wizard.html">Wizard</a></li>
+</ul>
 <h2 id="layout">Layout</h2>
 <p><code>Terminal.Gui</code> supports two different layout systems, absolute and computed \
 (controlled by the <a href="../api/Terminal.Gui/Terminal.Gui.LayoutStyle.html"><code>LayoutStyle</code></a>
 property on the view.</p>
 <p>The absolute system is used when you want the view to be positioned exactly in
-one location and want to manually control where the view is.   This is done
-by invoking your View constructor with an argument of type <a href="../api/Terminal.Gui/Terminal.Gui.Rect.html"><code>Rect</code></a>.   When you do this, to change the
+one location and want to manually control where the view is. This is done
+by invoking your View constructor with an argument of type <a href="../api/Terminal.Gui/Terminal.Gui.Rect.yml"><code>Rect</code></a>. When you do this, to change the
 position of the View, you can change the <code>Frame</code> property on the View.</p>
 <p>The computed layout system offers a few additional capabilities, like automatic
-centering, expanding of dimensions and a handful of other features.  To use
+centering, expanding of dimensions and a handful of other features. To use
 this you construct your object without an initial <code>Frame</code>, but set the 
  <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code> properties after the object has been created.</p>
 <p>Examples:</p>
@@ -252,11 +282,11 @@ anotherView.Height = Dim.Height (view)+1
 <p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> view (or any of its subclasses,
 like <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> which is special kind of views
 that can be executed modally - that is, the view can take over all input and returns
-only when the user chooses to complete their work there.   </p>
+only when the user chooses to complete their work there. </p>
 <p>The following sections cover the differences.</p>
 <h2 id="toplevel-views">TopLevel Views</h2>
-<p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
-<p>You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example.   You 
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.yml">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
+<p>You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example. You 
 typically would add a Menu and a Window to your Toplevel, it would look like this:</p>
 <pre><code class="lang-csharp">using Terminal.Gui;
 
@@ -324,7 +354,7 @@ var dialog = new Dialog (&quot;Quit&quot;, 60, 7, ok, cancel);
 +------------------------------------------------------+
 </code></pre><h2 id="running-modally">Running Modally</h2>
 <p>To run your Dialog, Window or Toplevel modally, you will invoke the <code>Application.Run</code>
-method on the toplevel.   It is up to your code and event handlers to invoke the <code>Application.RequestStop()</code> method to terminate the modal execution.</p>
+method on the toplevel. It is up to your code and event handlers to invoke the <code>Application.RequestStop()</code> method to terminate the modal execution.</p>
 <pre><code class="lang-csharp">bool okpressed = false;
 var ok = new Button(3, 14, &quot;Ok&quot;) { 
     Clicked = () =&gt; { Application.RequestStop (); okpressed = true; }
@@ -349,15 +379,15 @@ of indicating the reason that the execution of the modal dialog was completed, i
 case above, the <code>okpressed</code> value is set to true if the user pressed or selected the Ok button.</p>
 <h1 id="input-handling">Input Handling</h1>
 <p>Every view has a focused view, and if that view has nested views, one of those is 
-the focused view.   This is called the focus chain, and at any given time, only one
-View has the focus.   </p>
+the focused view. This is called the focus chain, and at any given time, only one
+View has the focus. </p>
 <p>The library binds the key Tab to focus the next logical view,
-and the Shift-Tab combination to focus the previous logical view.   </p>
+and the Shift-Tab combination to focus the previous logical view. </p>
 <p>Keyboard processing is divided in three stages: HotKey processing, regular processing and
-cold key processing.   </p>
+cold key processing. </p>
 <ul>
 <li><p>Hot key processing happens first, and it gives all the views in the current
-toplevel a chance to monitor whether the key needs to be treated specially.  This
+toplevel a chance to monitor whether the key needs to be treated specially. This
 for example handles the scenarios where the user pressed Alt-o, and a view with a 
 highlighted &quot;o&quot; is being displayed.</p>
 </li>
@@ -365,7 +395,7 @@ highlighted &quot;o&quot; is being displayed.</p>
 view.</p>
 </li>
 <li><p>If the key was not processed by the normal processing, all views are given 
-a chance to process the keystroke in their cold processing stage.  Examples
+a chance to process the keystroke in their cold processing stage. Examples
 include the processing of the &quot;return&quot; key in a dialog when a button in the
 dialog has been flagged as the &quot;default&quot; action.</p>
 </li>
@@ -373,13 +403,13 @@ dialog has been flagged as the &quot;default&quot; action.</p>
 <p>The most common case is the normal processing, which sends the keystrokes to the
 currently focused view.</p>
 <p>Mouse events are processed in visual order, and the event will be sent to the
-view on the screen.   The only exception is that no mouse events are delivered
-to background views when a modal view is running.   </p>
+view on the screen. The only exception is that no mouse events are delivered
+to background views when a modal view is running. </p>
 <p>More details are available on the <a href="keyboard.html"><code>Keyboard Event Processing</code></a> document.</p>
 <h1 id="colors-and-color-schemes">Colors and Color Schemes</h1>
 <p>All views have been configured with a color scheme that will work both in color
-terminals as well as the more limited black and white terminals.   </p>
-<p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html"><code>Colors</code></a> class which defined color schemes for
+terminals as well as the more limited black and white terminals. </p>
+<p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.yml"><code>Colors</code></a> class which defined color schemes for
 the toplevel, the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:</p>
 <ul>
 <li><code>Colors.Toplevel</code></li>
