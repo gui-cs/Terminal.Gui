@@ -8,7 +8,7 @@
     <title>Event Processing and the Application Main Loop </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Event Processing and the Application Main Loop ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -99,7 +99,7 @@ provides access to these functions.</p>
 will prepare the current
 <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.yml"><code>Toplevel</code></a> instance by
 redrawing the screen appropriately and then calling the mainloop to
-run.    </p>
+run.   </p>
 <p>You can configure the Mainloop before calling Application.Run, or you
 can configure the MainLoop in response to events during the execution.</p>
 <p>The keyboard inputs is dispatched by the application class to the
@@ -130,8 +130,8 @@ you desire to cancel the timer before it runs:</p>
 <p>You can register code to be executed when the application is idling
 and there are no events to process by calling the
 <a href=""><code>AddIdle</code></a>
-method.  This method takes as a parameter a function that will be
-invoked when the application is idling.  </p>
+method. This method takes as a parameter a function that will be
+invoked when the application is idling. </p>
 <p>Idle functions should return <code>true</code> if they should be invoked again,
 and <code>false</code> if the idle invocations should stop.</p>
 <p>Like the timer APIs, the return value is a token that can be used to
@@ -140,15 +140,15 @@ cancel the scheduled idle function from being executed.</p>
 <p>Like other UI toolkits, Terminal.Gui is generally not thread safe.
 You should avoid calling methods in the UI classes from a background
 thread as there is no guarantee that they will not corrupt the state
-of the UI application.  </p>
+of the UI application. </p>
 <p>Generally, as there is not much state, you will get lucky, but the
 application will not behave properly.</p>
 <p>You will be served better off by using C# async machinery and the
-various APIs in the <code>System.Threading.Tasks.Task</code> APIs.   But if you
+various APIs in the <code>System.Threading.Tasks.Task</code> APIs.  But if you
 absolutely must work with threads on your own you should only invoke
 APIs in Terminal.Gui from the main thread.</p>
 <p>To make this simple, you can use the <code>Application.MainLoop.Invoke</code>
-method and pass an <code>Action</code>.  This action will be queued for execution
+method and pass an <code>Action</code>. This action will be queued for execution
 on the main thread at an appropriate time and will run your code
 there.</p>
 <p>For example, the following shows how to properly update a label from a

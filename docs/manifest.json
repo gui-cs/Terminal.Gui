@@ -18,7 +18,7 @@
       "output": {
         ".html": {
           "relative_path": "README.html",
-          "hash": "laW0ZhVnSCWLRJa08C1vrX4A34iZJKZf7iBAUeZ1TUo="
+          "hash": "uimq9mRFUx6ZWh03vSo63Ir800ZbrE6Tfs00ECASfgk="
         }
       },
       "is_incremental": false,
@@ -30,7 +30,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/index.html",
-          "hash": "AchWM0S6rqy1J1/lhagIa29GrBj67IyBtPqhWzu+Q4s="
+          "hash": "7CqwN06yHKOOFAEhsfJlBSzkmCY1tF2YOBqIjFp+2JA="
         }
       },
       "is_incremental": false,
@@ -42,7 +42,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/keyboard.html",
-          "hash": "p5xE6lCbB5mRFzyY0kllfceFi8zvtmaJfHOGusrbleo="
+          "hash": "WsRDy/OkMItI5EXC8AyCnAoSDmw3VfOIidwsFLcP3h8="
         }
       },
       "is_incremental": false,
@@ -57,7 +57,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/mainloop.html",
-          "hash": "KAzY/GJY3ouWoKqncSuYKEUTrkOb7DPqUFE2rXqjNJg="
+          "hash": "Vp1qDyy3tnoiTFRknHidknjvvdCK6LrLz4EsQ/7IDFs="
         }
       },
       "is_incremental": false,
@@ -72,7 +72,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/overview.html",
-          "hash": "iKrGZYVYFXfeaqAfYhbDT5Tmoee/9nRpESJ6zDmABa8="
+          "hash": "zDMzYXxrMAnt7L9Yo7X10tNy/umTgG/m+QifVRzQLWk="
         }
       },
       "is_incremental": false,
@@ -87,7 +87,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/tableview.html",
-          "hash": "rTnvqJvDSYeHI2eovxNt7PMeRMUReJWyd94nN8tdfOA="
+          "hash": "NhLgwv8sReyMyn2TogXfZ3zpadTfXEnIn86L0QnJtuM="
         }
       },
       "is_incremental": false,
@@ -102,19 +102,22 @@
       "output": {
         ".html": {
           "relative_path": "articles/treeview.html",
-          "hash": "Ap/o41/DUOBuHrteIllDUwhFTGfqNcZ/Xiib1cf5Z2A="
+          "hash": "dF6SE1Kx30ABFMhZGlYlLK186jP525sk73N75yvIG1o="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
+      "log_codes": [
+        "InvalidFileLink"
+      ],
       "type": "Conceptual",
       "source_relative_path": "articles/views.md",
       "output": {
         ".html": {
           "relative_path": "articles/views.html",
-          "hash": "E6qUiNBJLW9feq4wRo7i+h5s/hrVM+HL1pswf+mIF2M="
+          "hash": "UHgawh6rHH7GuzOVPshjbhRhzyADMmChZfGeaMrJJa8="
         }
       },
       "is_incremental": false,
@@ -151,7 +154,7 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "6li0nfQWQwibx+pw6TPyuYKqdyfaO2UHf1q3OMYaM4U="
+          "hash": "habK4HjH85ON5HI+trNOA9Sqe1Hg/qmWy/zopQC1FME="
         }
       },
       "is_incremental": false,
@@ -173,17 +176,19 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": true,
+        "can_incremental": false,
+        "details": "Cannot build incrementally because docfx version changed from 2.59.0.0 to 2.59.3.0.",
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0
+        "skipped_file_count": 0,
+        "full_build_reason_code": "DocfxVersionChanged"
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": true,
+          "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 9,
-          "skipped_file_count": 9
+          "skipped_file_count": 0
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
