@@ -5707,5 +5707,25 @@ line.
 			});
 			Assert.Null (exception);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ScrollDownTillCaretOffscreen_ThenType ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 5
+			};
+
+			// add 100 lines of wide text to view
+			for (int i = 0; i < 100; i++)
+				tv.Text += new string ('x', 100) + Environment.NewLine;
+
+			Assert.Equal (0, tv.CursorPosition.Y);
+			tv.ScrollTo (50);
+			Assert.Equal (0, tv.CursorPosition.Y);
+
+			tv.ProcessKey (new KeyEvent (Key.p, new KeyModifiers ()));
+		}
 	}
 }
