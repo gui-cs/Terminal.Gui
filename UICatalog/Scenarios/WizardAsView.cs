@@ -7,7 +7,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "WizardAsView", Description: "Shows using the Wizard class in an non-modal way")]
-	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("Wizards")]
 	public class WizardAsView : Scenario {
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
@@ -51,6 +51,14 @@ namespace UICatalog.Scenarios {
 				Application.RequestStop ();
 			};
 
+			wizard.Cancelled += (args) => {
+				var btn = MessageBox.Query ("Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
+				args.Cancel = btn == 1;
+				if (btn == 0) {
+					Application.RequestStop ();
+				}
+			};
+
 			// Add 1st step
 			var firstStep = new Wizard.WizardStep ("End User License Agreement");
 			wizard.AddStep (firstStep);
@@ -83,7 +91,7 @@ namespace UICatalog.Scenarios {
 			// Add last step
 			var lastStep = new Wizard.WizardStep ("The last step");
 			wizard.AddStep (lastStep);
-			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
+			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
 			// When run as a modal, Wizard gets a Loading event where it sets the
 			// Current Step. But when running non-modal it must be done manually.
