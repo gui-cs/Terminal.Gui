@@ -2384,7 +2384,7 @@ namespace Terminal.Gui {
 			}
 			var prow = currentRow - topRow;
 			if (!wrapNeeded) {
-				SetNeedsDisplay (new Rect (0, prow, Frame.Width, prow + 1));
+				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
 			}
 		}
 
