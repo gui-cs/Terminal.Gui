@@ -893,6 +893,8 @@ namespace Terminal.Gui {
 			RootMouseEvent = null;
 			RootKeyEvent = null;
 			Resized = null;
+			NotifyNewRunState = null;
+			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
 
@@ -1202,7 +1204,9 @@ namespace Terminal.Gui {
 					return;
 				}
 				Current.Running = false;
+				OnNotifyStopRunState (Current);
 				top.Running = false;
+				OnNotifyStopRunState (top);
 			} else if ((MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
 				&& Current?.Running == true && !top.Running)
 				|| (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
@@ -1213,11 +1217,13 @@ namespace Terminal.Gui {
 				&& Current?.Modal == true && top.Modal) {
 				// The Current and the top are both modal so needed to set the Current.Running to false too.
 				Current.Running = false;
+				OnNotifyStopRunState (Current);
 			} else if (MdiTop != null && Current == top && MdiTop?.Running == true && Current?.Running == true && top.Running
 				&& Current?.Modal == true && top.Modal) {
 				// The MdiTop was requested to stop inside a modal toplevel which is the Current and top,
 				// both are the same, so needed to set the Current.Running to false too.
 				Current.Running = false;
+				OnNotifyStopRunState (Current);
 			} else {
 				Toplevel currentTop;
 				if (top == Current || (Current?.Modal == true && !top.Modal)) {
@@ -1234,9 +1240,14 @@ namespace Terminal.Gui {
 					return;
 				}
 				currentTop.Running = false;
-				if (ExitRunLoopAfterFirstIteration)
-					NotifyStopRunState?.Invoke (currentTop);
+				OnNotifyStopRunState (currentTop);
 			}
+		}
+
+		static void OnNotifyStopRunState (Toplevel top)
+		{
+			if (ExitRunLoopAfterFirstIteration)
+				NotifyStopRunState?.Invoke (top);
 		}
 
 		/// <summary>
