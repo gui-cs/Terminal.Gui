@@ -1,24 +1,29 @@
-Views
-=====
+*Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
-Layout
-======
-
-Creating Custom Views
-=====================
-
-Constructor
------------
-
-Rendering
----------
-
-### Using Custom Colors
-
-Keyboard processing
--------------------
-
-Mouse event processing
-----------------------
-
-
+* [Button](~/api/Terminal.Gui/Terminal.Gui.Button.html) 
+* [CheckBox](~/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
+* [ColorPicker](~/api/Terminal.Gui/Terminal.Gui.ColorPicker.html)
+* [ComboBox](~/api/Terminal.Gui/Terminal.Gui.ComboBox.html)
+* [Dialog](~/api/Terminal.Gui/Terminal.Gui.Dialog.html)
+  * [OpenDialog](~/api/Terminal.Gui/Terminal.Gui.OpenDialog.html)
+  * [SaveDialog](~/api/Terminal.Gui/Terminal.Gui.SaveDialog.html)
+* [FrameView](~/api/Terminal.Gui/Terminal.Gui.FrameView.html)
+* [GraphView](~/api/Terminal.Gui/Terminal.Gui.GraphView.html)
+* [Hex viewer/editor](~/api/Terminal.Gui/Terminal.Gui.HexView.html)
+* [Label](~/api/Terminal.Gui/Terminal.Gui.Label.html)
+* [ListView](~/api/Terminal.Gui/Terminal.Gui.ListView.html)
+* [Menu](~/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
+* [MessageBox](~/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
+* [ProgressBar](~/api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
+* [Radio buttons](~/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
+* [TableView](~/api/Terminal.Gui/Terminal.Gui.TableView.html)
+* [Time & Date Fields](~/api/Terminal.Gui/Terminal.Gui.TimeField.html)
+* [TextField](~/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [TextValidateField](~/api/Terminal.Gui/Terminal.Gui.TextValidateField.html)
+* [TextView (Text Editor)](~/api/Terminal.Gui/Terminal.Gui.TextView.html)
+* [TreeView](~/api/Terminal.Gui/Terminal.Gui.TreeView.html)
+* [ScrollView](~/api/Terminal.Gui/Terminal.Gui.ScrollView.html)
+* [ScrollBarView](~/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+* [StatusBar](~/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
+* [Window](~/api/Terminal.Gui/Terminal.Gui.Window.html)
+* [Wizard](~/api/Terminal.Gui/Terminal.Gui.Wizard.html)
