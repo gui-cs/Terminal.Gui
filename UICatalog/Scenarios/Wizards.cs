@@ -7,7 +7,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Wizards", Description: "Demonstrates the Wizard class")]
-	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("Dialogs"), ScenarioCategory ("Top Level Windows"), ScenarioCategory ("Wizards")]
 	public class Wizards : Scenario {
 		public override void Setup ()
 		{
@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 				AutoSize = false
 			};
 			frame.Add (label);
-			var titleEdit = new TextField ("Title") {
+			var titleEdit = new TextField ("Gandolf") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = Dim.Fill (),
