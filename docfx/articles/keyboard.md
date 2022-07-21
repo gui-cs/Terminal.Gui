@@ -44,3 +44,31 @@ This method can be overwritten by views that want to provide
 accelerator functionality (Alt-key for example), but without
 interefering with normal ProcessKey behavior.
 
+Key Bindings
+-------------------
+**Terminal.Gui** supports rebinding keys. For example the default key
+for activating a button is Enter. You can change this using the 
+`ClearKeybinding` and `AddKeybinding` methods:
+
+```csharp
+var btn = new Button ("Press Me");
+btn.ClearKeybinding (Command.Accept);
+btn.AddKeyBinding (Key.b, Command.Accept);
+```
+
+The `Command` enum lists generic operations that are implemented by views.
+For example `Command.Accept` in a Button results in the `Clicked` event 
+firing while in `TableView` it is bound to `CellActivated`. Not all commands
+are implemented by all views (e.g. you cannot scroll in a Button). To see
+which commands are implemented by a View you can use the `GetSupportedCommands()`
+method.
+
+Not all controls have the same key bound for a given command, for example
+`Command.Accept` defaults to `Key.Enter` in a `Button` but defaults to `Key.Space`
+in `RadioGroup`.
+
+Global Key Handler
+--------------------
+Sometimes you may want to define global key handling logic for your entire 
+application that is invoked regardless of what Window/View has focus.  This can
+be achieved by using the `Application.RootKeyEvent` event.
