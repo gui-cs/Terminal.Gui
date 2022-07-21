@@ -11,14 +11,18 @@ namespace Terminal.Gui {
 	/// bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard. 
 	/// </summary>
 	/// <remarks>
+	/// The Wizard can be shown either as a modal pop-up (the default) or embedded in a containing <see cref="View"/>. To use a a <see cref="View"/>, 
+	/// set <see cref="Toplevel.Modal"/> to `false`.
 	/// </remarks>
 	public class Wizard : Dialog {
 
 		/// <summary>
-		/// One step for the Wizard. The <see cref="WizardStep"/> view hosts two sub-views: 1) add <see cref="View"/>s to <see cref="WizardStep.Controls"/>, 
-		/// 2) use <see cref="WizardStep.HelpText"/> to set the contents of the <see cref="TextView"/> that shows on the
-		/// right side. Use <see cref="WizardStep.showControls"/> and <see cref="WizardStep.showHelp"/> to 
-		/// control wether the control or help pane are shown. 
+		/// One step for the Wizard. The <see cref="WizardStep"/> view is divided horizontally in two. On the left is the
+		/// content view where <see cref="View"/>s can be added,  On the right is the help for the step.
+		/// Set <see cref="WizardStep.HelpText"/> to set the help text. If the help text is empty the help pane will not
+		/// be shown. 
+		/// If there are no Views added to the WizardStep, and the help text is not empty the help text will 
+		/// fill the wizard step. 
 		/// </summary>
 		/// <remarks>
 		/// If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
@@ -29,11 +33,11 @@ namespace Terminal.Gui {
 		/// To enable or disable a step from being shown to the user, set <see cref="View.Enabled"/>.
 		/// 
 		/// </remarks>
-		public class WizardStep : View {
+		public class WizardStep : FrameView {
 			/// <summary>
 			/// The title of the <see cref="WizardStep"/>.
 			/// </summary>
-			public ustring Title {
+			public new ustring Title {
 				get => title;
 				set {
 					if (!OnTitleChanging (title, value)) {
@@ -114,23 +118,21 @@ namespace Terminal.Gui {
 
 			// The controlPane is a separate view, so when devs add controls to the Step and help is visible, Y = Pos.AnchorEnd()
 			// will work as expected.
-			private View controlPane = new FrameView ();
+			private View contentView = new View ();
 
 			/// <summary>
-			/// THe pane that holds the controls for the <see cref="WizardStep"/>. Use <see cref="WizardStep.Controls"/> `Add(View`) to add 
-			/// controls. Note that the Controls view is sized to take 70% of the Wizard's width and the <see cref="WizardStep.HelpText"/> 
-			/// takes the other 30%. This can be adjusted by setting `Width` from `Dim.Percent(70)` to 
-			/// another value. If <see cref="WizardStep.ShowHelp"/> is set to `false` the control pane will fill the entire 
-			/// Wizard.
-			/// </summary>
-			public View Controls { get => controlPane; }
-
-			/// <summary>
-			/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.ShowHelp"/> is set to 
-			/// `false` the control pane will fill the entire wizard.
+			/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty
+			/// the help pane will not be visible and the content will fill the entire WizardStep.
 			/// </summary>
 			/// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
-			public ustring HelpText { get => helpTextView.Text; set => helpTextView.Text = value; }
+			public ustring HelpText { 
+				get => helpTextView.Text; 
+				set { 
+					helpTextView.Text = value;
+					ShowHide ();
+					SetNeedsDisplay ();
+				}
+			}
 			private TextView helpTextView = new TextView ();
 
 			/// <summary>
@@ -158,23 +160,14 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
-				this.ColorScheme = Colors.Dialog;
+				this.Border.BorderStyle = BorderStyle.Rounded;
 
-				Y = 0;
-				Height = Dim.Fill (1); // for button frame
-				Width = Dim.Fill ();
+				base.Add (contentView);
 
-				Controls.ColorScheme = Colors.Dialog;
-				Controls.Border.BorderStyle = BorderStyle.None;
-				Controls.Border.Padding = new Thickness (0);
-				Controls.Border.BorderThickness = new Thickness (0);
-				this.Add (Controls);
-
-				helpTextView.ColorScheme = Colors.Menu;
-				helpTextView.Y = 0;
+				helpTextView.ColorScheme = Colors.TopLevel;
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
-				this.Add (helpTextView);
+				base.Add (helpTextView);
 
 				ShowHide ();
 
@@ -222,70 +215,79 @@ namespace Terminal.Gui {
 					scrollBar.LayoutSubviews ();
 					scrollBar.Refresh ();
 				};
-				this.Add (scrollBar);
+				base.Add (scrollBar);
 			}
 
-			//public override void OnEnabledChanged()
-			//{
-			//	if (Enabled) { }
-			//	base.OnEnabledChanged ();
-			//}
-
-
 			/// <summary>
-			/// If true (the default) the help will be visible. If false, the help will not be shown and the control pane will
-			/// fill the wizard step.
+			/// Does the work to show and hide the contentView and helpView as appropriate
 			/// </summary>
-			public bool ShowHelp {
-				get => showHelp;
-				set {
-					showHelp = value;
-					ShowHide ();
-				}
-			}
-			private bool showHelp = true;
-
-			/// <summary>
-			/// If true (the default) the <see cref="Controls"/> View will be visible. If false, the controls will not be shown and the help will
-			/// fill the wizard step.
-			/// </summary>
-			public bool ShowControls {
-				get => showControls;
-				set {
-					showControls = value;
-					ShowHide ();
-				}
-			}
-			private bool showControls = true;
-
-			/// <summary>
-			/// Does the work to show and hide the controls, help, and buttons as appropriate
-			/// </summary>
-			private void ShowHide ()
+			internal void ShowHide ()
 			{
-				Controls.Height = Dim.Fill (1);
-				helpTextView.Height = Dim.Fill (1);
+				contentView.Height = Dim.Fill ();
+				helpTextView.Height = Dim.Fill ();
 				helpTextView.Width = Dim.Fill ();
 
-				if (showControls) {
-					if (showHelp) {
-						Controls.Width = Dim.Percent (70);
-						helpTextView.X = Pos.Right (Controls);
+				if (contentView.InternalSubviews?.Count > 0) {
+					if (helpTextView.Text.Length > 0) {
+						contentView.Width = Dim.Percent (70);
+						helpTextView.X = Pos.Right (contentView);
 						helpTextView.Width = Dim.Fill ();
 
 					} else {
-						Controls.Width = Dim.Percent (100);
+						contentView.Width = Dim.Percent (100);
 					}
 				} else {
-					if (showHelp) {
+					if (helpTextView.Text.Length > 0) {
 						helpTextView.X = 0;
 					} else {
 						// Error - no pane shown
 					}
 
 				}
-				Controls.Visible = showControls;
-				helpTextView.Visible = showHelp;
+				contentView.Visible = contentView.InternalSubviews?.Count > 0;
+				helpTextView.Visible = helpTextView.Text.Length > 0;
+			}
+
+			/// <summary>
+			/// Add the specified <see cref="View"/> to the <see cref="WizardStep"/>. 
+			/// </summary>
+			/// <param name="view"><see cref="View"/> to add to this container</param>
+			public override void Add (View view)
+			{
+				contentView.Add (view);
+				if (view.CanFocus)
+					CanFocus = true;
+				ShowHide ();
+			}
+
+			/// <summary>
+			///   Removes a <see cref="View"/> from <see cref="WizardStep"/>.
+			/// </summary>
+			/// <remarks>
+			/// </remarks>
+			public override void Remove (View view)
+			{
+				if (view == null)
+					return;
+
+				SetNeedsDisplay ();
+				var touched = view.Frame;
+				contentView.Remove (view);
+
+				if (contentView.InternalSubviews.Count < 1)
+					this.CanFocus = false;
+				ShowHide ();
+			}
+
+			/// <summary>
+			///   Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.
+			/// </summary>
+			/// <remarks>
+			/// </remarks>
+			public override void RemoveAll ()
+			{
+				contentView.RemoveAll ();
+				ShowHide ();
 			}
 
 		} // WizardStep
@@ -316,12 +318,13 @@ namespace Terminal.Gui {
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
 			this.Border.BorderStyle = BorderStyle.Double;
+			this.Border.Padding = new Thickness (0);
 
-			// Add a horiz separator
-			var separator = new LineView (Graphs.Orientation.Horizontal) {
-				Y = Pos.AnchorEnd (2)
-			};
-			Add (separator);
+			//// Add a horiz separator
+			//var separator = new LineView (Graphs.Orientation.Horizontal) {
+			//	Y = Pos.AnchorEnd (2)
+			//};
+			//Add (separator);
 
 			// BUGBUG: Space is to work around https://github.com/migueldeicaza/gui.cs/issues/1812
 			backBtn = new Button (Strings.wzBack) { AutoSize = true };
@@ -338,6 +341,11 @@ namespace Terminal.Gui {
 			Closing += Wizard_Closing;
 		}
 
+		private void Wizard_Loaded ()
+		{
+			CurrentStep = GetFirstStep (); // gets the first step if CurrentStep == null
+		}
+
 		private bool finishedPressed = false;
 
 		private void Wizard_Closing (ToplevelClosingEventArgs obj)
@@ -348,22 +356,19 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Wizard_Loaded ()
-		{
-			foreach (var step in steps) {
-				step.Y = 0;
-			}
-			CurrentStep = GetNextStep (); // gets the first step if CurrentStep == null
-		}
-
 		private void NextfinishBtn_Clicked ()
 		{
-			if (CurrentStep == GetLastStep()) {
+			if (CurrentStep == GetLastStep ()) {
 				var args = new WizardButtonEventArgs ();
 				Finished?.Invoke (args);
 				if (!args.Cancel) {
 					finishedPressed = true;
-					Application.RequestStop (this);
+					if (IsCurrentTop) {
+						Application.RequestStop (this);
+					} else {
+						// Wizard was created as a non-modal (just added to another View). 
+						// Do nothing
+					}
 				}
 			} else {
 				var args = new WizardButtonEventArgs ();
@@ -373,6 +378,19 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		///<inheritdoc/>
+		public override bool ProcessKey (KeyEvent kb)
+		{
+			switch (kb.Key) {
+			case Key.Esc:
+				// Dialog causes ESC to close/cancel; we dont want that with wizard
+				// Use QuitKey instead.
+				return false;
+			}
+			return base.ProcessKey (kb);
+		}
+
 
 		/// <summary>
 		/// Causes the wizad to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). 
@@ -396,7 +414,7 @@ namespace Terminal.Gui {
 		{
 			LinkedListNode<WizardStep> step = null;
 			if (CurrentStep == null) {
-				// Get last step, assume it is next
+				// Get first step, assume it is next
 				step = steps.First;
 			} else {
 				// Get the step after current
@@ -518,10 +536,12 @@ namespace Terminal.Gui {
 		/// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
 		public void AddStep (WizardStep newStep)
 		{
-			steps.AddLast (newStep);
-			this.Add (newStep);
+			SizeStep (newStep);
+
 			newStep.EnabledChanged += UpdateButtonsAndTitle;
 			newStep.TitleChanged += (args) => UpdateButtonsAndTitle ();
+			steps.AddLast (newStep);
+			this.Add (newStep);
 			UpdateButtonsAndTitle ();
 		}
 
@@ -679,6 +699,7 @@ namespace Terminal.Gui {
 			// Hide all but the new step
 			foreach (WizardStep step in steps) {
 				step.Visible = (step == newStep);
+				step.ShowHide ();
 			}
 
 			var oldStep = currentStep;
@@ -717,9 +738,55 @@ namespace Terminal.Gui {
 			} else {
 				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
 			}
+
+			SizeStep (CurrentStep);
+
 			SetNeedsLayout ();
 			LayoutSubviews ();
 			Redraw (Bounds);
+		}
+
+		private void SizeStep (WizardStep step)
+		{
+			if (Modal) {
+				// If we're modal, then we expand the WizardStep so that the top and side 
+				// borders and not visible. The bottom border is the separator above the buttons.
+				step.X = step.Y = -1;
+				step.Height = Dim.Fill (1); // for button frame
+				step.Width = Dim.Fill (-1);
+			} else {
+				// If we're not a modal, then we show the border around the WizardStep
+				step.X = step.Y = 0;
+				step.Height = Dim.Fill (1); // for button frame
+				step.Width = Dim.Fill (0);
+			}
+		}
+
+		/// <inheritdoc/>
+		public new bool Modal {
+			get => base.Modal;
+			set {
+				base.Modal = value;
+				foreach (var step in steps) {
+					SizeStep (step);
+				}
+				if (base.Modal) {
+					ColorScheme = Colors.Dialog;
+					Border.BorderStyle = BorderStyle.Rounded;
+					Border.Effect3D = true;
+					Border.DrawMarginFrame = true;
+				} else {
+					if (SuperView != null) {
+						ColorScheme = SuperView.ColorScheme;
+					} else {
+						ColorScheme = Colors.Base;
+					}
+					CanFocus = true;
+					Border.Effect3D = false;
+					Border.BorderStyle = BorderStyle.None;
+					Border.DrawMarginFrame = false;
+				}
+			}
 		}
 	}
 }
