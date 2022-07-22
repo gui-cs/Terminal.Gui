@@ -117,7 +117,7 @@ namespace Unix.Terminal {
 			}
 
 			if (this.handle == IntPtr.Zero) {
-				throw new IOException (string.Format ("Error loading native library \"{0}\"", this.libraryPath));
+				throw new IOException ($"Error loading native library \"{string.Join (", ", libraryPathAlternatives)}\"");
 			}
 		}
 
@@ -186,7 +186,12 @@ namespace Unix.Terminal {
 					return Mono.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 				}
 				if (IsNetCore) {
-					return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					try {
+						return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					} catch (Exception) {
+
+						IsNetCore = false;
+					}
 				}
 				return Linux.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 			}

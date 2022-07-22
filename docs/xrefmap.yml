@@ -110,6 +110,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.EnsuresTopOnFront
   nameWithType: Application.EnsuresTopOnFront
+- uid: Terminal.Gui.Application.ExitRunLoopAfterFirstIteration
+  name: ExitRunLoopAfterFirstIteration
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration
+  commentId: P:Terminal.Gui.Application.ExitRunLoopAfterFirstIteration
+  fullName: Terminal.Gui.Application.ExitRunLoopAfterFirstIteration
+  nameWithType: Application.ExitRunLoopAfterFirstIteration
+- uid: Terminal.Gui.Application.ExitRunLoopAfterFirstIteration*
+  name: ExitRunLoopAfterFirstIteration
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration_
+  commentId: Overload:Terminal.Gui.Application.ExitRunLoopAfterFirstIteration
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.ExitRunLoopAfterFirstIteration
+  nameWithType: Application.ExitRunLoopAfterFirstIteration
 - uid: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
   name: GrabMouse(View)
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_GrabMouse_Terminal_Gui_View_
@@ -246,6 +259,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.MovePrevious
   nameWithType: Application.MovePrevious
+- uid: Terminal.Gui.Application.NotifyNewRunState
+  name: NotifyNewRunState
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_NotifyNewRunState
+  commentId: E:Terminal.Gui.Application.NotifyNewRunState
+  fullName: Terminal.Gui.Application.NotifyNewRunState
+  nameWithType: Application.NotifyNewRunState
+- uid: Terminal.Gui.Application.NotifyStopRunState
+  name: NotifyStopRunState
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_NotifyStopRunState
+  commentId: E:Terminal.Gui.Application.NotifyStopRunState
+  fullName: Terminal.Gui.Application.NotifyStopRunState
+  nameWithType: Application.NotifyStopRunState
 - uid: Terminal.Gui.Application.QuitKey
   name: QuitKey
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_QuitKey
@@ -382,6 +407,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.RunLoop
   nameWithType: Application.RunLoop
+- uid: Terminal.Gui.Application.RunMainLoopIteration(Terminal.Gui.Application.RunState@,System.Boolean,System.Boolean@)
+  name: RunMainLoopIteration(ref Application.RunState, Boolean, ref Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_RunMainLoopIteration_Terminal_Gui_Application_RunState__System_Boolean_System_Boolean__
+  commentId: M:Terminal.Gui.Application.RunMainLoopIteration(Terminal.Gui.Application.RunState@,System.Boolean,System.Boolean@)
+  name.vb: RunMainLoopIteration(ByRef Application.RunState, Boolean, ByRef Boolean)
+  fullName: Terminal.Gui.Application.RunMainLoopIteration(ref Terminal.Gui.Application.RunState, System.Boolean, ref System.Boolean)
+  fullName.vb: Terminal.Gui.Application.RunMainLoopIteration(ByRef Terminal.Gui.Application.RunState, System.Boolean, ByRef System.Boolean)
+  nameWithType: Application.RunMainLoopIteration(ref Application.RunState, Boolean, ref Boolean)
+  nameWithType.vb: Application.RunMainLoopIteration(ByRef Application.RunState, Boolean, ByRef Boolean)
+- uid: Terminal.Gui.Application.RunMainLoopIteration*
+  name: RunMainLoopIteration
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_RunMainLoopIteration_
+  commentId: Overload:Terminal.Gui.Application.RunMainLoopIteration
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.RunMainLoopIteration
+  nameWithType: Application.RunMainLoopIteration
 - uid: Terminal.Gui.Application.RunState
   name: Application.RunState
   href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html
@@ -420,6 +461,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.RunState.Dispose
   nameWithType: Application.RunState.Dispose
+- uid: Terminal.Gui.Application.RunState.Toplevel
+  name: Toplevel
+  href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState_Toplevel
+  commentId: P:Terminal.Gui.Application.RunState.Toplevel
+  fullName: Terminal.Gui.Application.RunState.Toplevel
+  nameWithType: Application.RunState.Toplevel
+- uid: Terminal.Gui.Application.RunState.Toplevel*
+  name: Toplevel
+  href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState_Toplevel_
+  commentId: Overload:Terminal.Gui.Application.RunState.Toplevel
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.RunState.Toplevel
+  nameWithType: Application.RunState.Toplevel
 - uid: Terminal.Gui.Application.Shutdown
   name: Shutdown()
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown
@@ -478,6 +532,19 @@ references:
   commentId: F:Terminal.Gui.Application.UseSystemConsole
   fullName: Terminal.Gui.Application.UseSystemConsole
   nameWithType: Application.UseSystemConsole
+- uid: Terminal.Gui.Application.WantContinuousButtonPressedView
+  name: WantContinuousButtonPressedView
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_WantContinuousButtonPressedView
+  commentId: P:Terminal.Gui.Application.WantContinuousButtonPressedView
+  fullName: Terminal.Gui.Application.WantContinuousButtonPressedView
+  nameWithType: Application.WantContinuousButtonPressedView
+- uid: Terminal.Gui.Application.WantContinuousButtonPressedView*
+  name: WantContinuousButtonPressedView
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_WantContinuousButtonPressedView_
+  commentId: Overload:Terminal.Gui.Application.WantContinuousButtonPressedView
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.WantContinuousButtonPressedView
+  nameWithType: Application.WantContinuousButtonPressedView
 - uid: Terminal.Gui.Attribute
   name: Attribute
   href: api/Terminal.Gui/Terminal.Gui.Attribute.html
@@ -1455,19 +1522,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.Button
   nameWithType: Button.Button
-- uid: Terminal.Gui.Button.AutoSize
-  name: AutoSize
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_AutoSize
-  commentId: P:Terminal.Gui.Button.AutoSize
-  fullName: Terminal.Gui.Button.AutoSize
-  nameWithType: Button.AutoSize
-- uid: Terminal.Gui.Button.AutoSize*
-  name: AutoSize
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_AutoSize_
-  commentId: Overload:Terminal.Gui.Button.AutoSize
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.AutoSize
-  nameWithType: Button.AutoSize
 - uid: Terminal.Gui.Button.Clicked
   name: Clicked
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Clicked
@@ -1487,19 +1541,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.HotKey
   nameWithType: Button.HotKey
-- uid: Terminal.Gui.Button.HotKeySpecifier
-  name: HotKeySpecifier
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_HotKeySpecifier
-  commentId: P:Terminal.Gui.Button.HotKeySpecifier
-  fullName: Terminal.Gui.Button.HotKeySpecifier
-  nameWithType: Button.HotKeySpecifier
-- uid: Terminal.Gui.Button.HotKeySpecifier*
-  name: HotKeySpecifier
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_HotKeySpecifier_
-  commentId: Overload:Terminal.Gui.Button.HotKeySpecifier
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.HotKeySpecifier
-  nameWithType: Button.HotKeySpecifier
 - uid: Terminal.Gui.Button.IsDefault
   name: IsDefault
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_IsDefault
@@ -1604,19 +1645,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.ProcessKey
   nameWithType: Button.ProcessKey
-- uid: Terminal.Gui.Button.Text
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Text
-  commentId: P:Terminal.Gui.Button.Text
-  fullName: Terminal.Gui.Button.Text
-  nameWithType: Button.Text
-- uid: Terminal.Gui.Button.Text*
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Text_
-  commentId: Overload:Terminal.Gui.Button.Text
+- uid: Terminal.Gui.Button.UpdateTextFormatterText
+  name: UpdateTextFormatterText()
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_UpdateTextFormatterText
+  commentId: M:Terminal.Gui.Button.UpdateTextFormatterText
+  fullName: Terminal.Gui.Button.UpdateTextFormatterText()
+  nameWithType: Button.UpdateTextFormatterText()
+- uid: Terminal.Gui.Button.UpdateTextFormatterText*
+  name: UpdateTextFormatterText
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_UpdateTextFormatterText_
+  commentId: Overload:Terminal.Gui.Button.UpdateTextFormatterText
   isSpec: "True"
-  fullName: Terminal.Gui.Button.Text
-  nameWithType: Button.Text
+  fullName: Terminal.Gui.Button.UpdateTextFormatterText
+  nameWithType: Button.UpdateTextFormatterText
 - uid: Terminal.Gui.CheckBox
   name: CheckBox
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
@@ -1745,38 +1786,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.CheckBox.ProcessKey
   nameWithType: CheckBox.ProcessKey
-- uid: Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
-  name: Redraw(Rect)
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Redraw_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
-  fullName: Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
-  nameWithType: CheckBox.Redraw(Rect)
-- uid: Terminal.Gui.CheckBox.Redraw*
-  name: Redraw
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Redraw_
-  commentId: Overload:Terminal.Gui.CheckBox.Redraw
-  isSpec: "True"
-  fullName: Terminal.Gui.CheckBox.Redraw
-  nameWithType: CheckBox.Redraw
-- uid: Terminal.Gui.CheckBox.Text
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Text
-  commentId: P:Terminal.Gui.CheckBox.Text
-  fullName: Terminal.Gui.CheckBox.Text
-  nameWithType: CheckBox.Text
-- uid: Terminal.Gui.CheckBox.Text*
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Text_
-  commentId: Overload:Terminal.Gui.CheckBox.Text
-  isSpec: "True"
-  fullName: Terminal.Gui.CheckBox.Text
-  nameWithType: CheckBox.Text
 - uid: Terminal.Gui.CheckBox.Toggled
   name: Toggled
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Toggled
   commentId: E:Terminal.Gui.CheckBox.Toggled
   fullName: Terminal.Gui.CheckBox.Toggled
   nameWithType: CheckBox.Toggled
+- uid: Terminal.Gui.CheckBox.UpdateTextFormatterText
+  name: UpdateTextFormatterText()
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_UpdateTextFormatterText
+  commentId: M:Terminal.Gui.CheckBox.UpdateTextFormatterText
+  fullName: Terminal.Gui.CheckBox.UpdateTextFormatterText()
+  nameWithType: CheckBox.UpdateTextFormatterText()
+- uid: Terminal.Gui.CheckBox.UpdateTextFormatterText*
+  name: UpdateTextFormatterText
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_UpdateTextFormatterText_
+  commentId: Overload:Terminal.Gui.CheckBox.UpdateTextFormatterText
+  isSpec: "True"
+  fullName: Terminal.Gui.CheckBox.UpdateTextFormatterText
+  nameWithType: CheckBox.UpdateTextFormatterText
 - uid: Terminal.Gui.Clipboard
   name: Clipboard
   href: api/Terminal.Gui/Terminal.Gui.Clipboard.html
@@ -3209,6 +3237,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Cols
   nameWithType: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.Contents
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Contents
+  commentId: P:Terminal.Gui.ConsoleDriver.Contents
+  fullName: Terminal.Gui.ConsoleDriver.Contents
+  nameWithType: ConsoleDriver.Contents
+- uid: Terminal.Gui.ConsoleDriver.Contents*
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Contents_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.Contents
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.Contents
+  nameWithType: ConsoleDriver.Contents
 - uid: Terminal.Gui.ConsoleDriver.ContinuousMeterSegment
   name: ContinuousMeterSegment
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ContinuousMeterSegment
@@ -3585,6 +3626,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Refresh
   nameWithType: ConsoleDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.ResizeScreen
+  name: ResizeScreen()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ResizeScreen
+  commentId: M:Terminal.Gui.ConsoleDriver.ResizeScreen
+  fullName: Terminal.Gui.ConsoleDriver.ResizeScreen()
+  nameWithType: ConsoleDriver.ResizeScreen()
+- uid: Terminal.Gui.ConsoleDriver.ResizeScreen*
+  name: ResizeScreen
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ResizeScreen_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.ResizeScreen
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.ResizeScreen
+  nameWithType: ConsoleDriver.ResizeScreen
 - uid: Terminal.Gui.ConsoleDriver.RightArrow
   name: RightArrow
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightArrow
@@ -4417,6 +4471,49 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dialog.AddButton
   nameWithType: Dialog.AddButton
+- uid: Terminal.Gui.Dialog.ButtonAlignment
+  name: ButtonAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ButtonAlignment
+  commentId: P:Terminal.Gui.Dialog.ButtonAlignment
+  fullName: Terminal.Gui.Dialog.ButtonAlignment
+  nameWithType: Dialog.ButtonAlignment
+- uid: Terminal.Gui.Dialog.ButtonAlignment*
+  name: ButtonAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ButtonAlignment_
+  commentId: Overload:Terminal.Gui.Dialog.ButtonAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.Dialog.ButtonAlignment
+  nameWithType: Dialog.ButtonAlignment
+- uid: Terminal.Gui.Dialog.ButtonAlignments
+  name: Dialog.ButtonAlignments
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.ButtonAlignments.html
+  commentId: T:Terminal.Gui.Dialog.ButtonAlignments
+  fullName: Terminal.Gui.Dialog.ButtonAlignments
+  nameWithType: Dialog.ButtonAlignments
+- uid: Terminal.Gui.Dialog.ButtonAlignments.Center
+  name: Center
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.ButtonAlignments.html#Terminal_Gui_Dialog_ButtonAlignments_Center
+  commentId: F:Terminal.Gui.Dialog.ButtonAlignments.Center
+  fullName: Terminal.Gui.Dialog.ButtonAlignments.Center
+  nameWithType: Dialog.ButtonAlignments.Center
+- uid: Terminal.Gui.Dialog.ButtonAlignments.Justify
+  name: Justify
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.ButtonAlignments.html#Terminal_Gui_Dialog_ButtonAlignments_Justify
+  commentId: F:Terminal.Gui.Dialog.ButtonAlignments.Justify
+  fullName: Terminal.Gui.Dialog.ButtonAlignments.Justify
+  nameWithType: Dialog.ButtonAlignments.Justify
+- uid: Terminal.Gui.Dialog.ButtonAlignments.Left
+  name: Left
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.ButtonAlignments.html#Terminal_Gui_Dialog_ButtonAlignments_Left
+  commentId: F:Terminal.Gui.Dialog.ButtonAlignments.Left
+  fullName: Terminal.Gui.Dialog.ButtonAlignments.Left
+  nameWithType: Dialog.ButtonAlignments.Left
+- uid: Terminal.Gui.Dialog.ButtonAlignments.Right
+  name: Right
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.ButtonAlignments.html#Terminal_Gui_Dialog_ButtonAlignments_Right
+  commentId: F:Terminal.Gui.Dialog.ButtonAlignments.Right
+  fullName: Terminal.Gui.Dialog.ButtonAlignments.Right
+  nameWithType: Dialog.ButtonAlignments.Right
 - uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_
@@ -4462,6 +4559,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dim.Fill
   nameWithType: Dim.Fill
+- uid: Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  name: Function(Func<Int32>)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Function_System_Func_System_Int32__
+  commentId: M:Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  name.vb: Function(Func(Of Int32))
+  fullName: Terminal.Gui.Dim.Function(System.Func<System.Int32>)
+  fullName.vb: Terminal.Gui.Dim.Function(System.Func(Of System.Int32))
+  nameWithType: Dim.Function(Func<Int32>)
+  nameWithType.vb: Dim.Function(Func(Of Int32))
+- uid: Terminal.Gui.Dim.Function*
+  name: Function
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Function_
+  commentId: Overload:Terminal.Gui.Dim.Function
+  isSpec: "True"
+  fullName: Terminal.Gui.Dim.Function
+  nameWithType: Dim.Function
 - uid: Terminal.Gui.Dim.GetHashCode
   name: GetHashCode()
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_GetHashCode
@@ -5547,6 +5660,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FakeDriver.Cols
   nameWithType: FakeDriver.Cols
+- uid: Terminal.Gui.FakeDriver.Contents
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Contents
+  commentId: P:Terminal.Gui.FakeDriver.Contents
+  fullName: Terminal.Gui.FakeDriver.Contents
+  nameWithType: FakeDriver.Contents
+- uid: Terminal.Gui.FakeDriver.Contents*
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Contents_
+  commentId: Overload:Terminal.Gui.FakeDriver.Contents
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Contents
+  nameWithType: FakeDriver.Contents
 - uid: Terminal.Gui.FakeDriver.CookMouse
   name: CookMouse()
   href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_CookMouse
@@ -5725,6 +5851,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FakeDriver.Refresh
   nameWithType: FakeDriver.Refresh
+- uid: Terminal.Gui.FakeDriver.ResizeScreen
+  name: ResizeScreen()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_ResizeScreen
+  commentId: M:Terminal.Gui.FakeDriver.ResizeScreen
+  fullName: Terminal.Gui.FakeDriver.ResizeScreen()
+  nameWithType: FakeDriver.ResizeScreen()
+- uid: Terminal.Gui.FakeDriver.ResizeScreen*
+  name: ResizeScreen
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_ResizeScreen_
+  commentId: Overload:Terminal.Gui.FakeDriver.ResizeScreen
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.ResizeScreen
+  nameWithType: FakeDriver.ResizeScreen
 - uid: Terminal.Gui.FakeDriver.Rows
   name: Rows
   href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Rows
@@ -9420,6 +9559,19 @@ references:
   commentId: E:Terminal.Gui.Label.Clicked
   fullName: Terminal.Gui.Label.Clicked
   nameWithType: Label.Clicked
+- uid: Terminal.Gui.Label.OnClicked
+  name: OnClicked()
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_OnClicked
+  commentId: M:Terminal.Gui.Label.OnClicked
+  fullName: Terminal.Gui.Label.OnClicked()
+  nameWithType: Label.OnClicked()
+- uid: Terminal.Gui.Label.OnClicked*
+  name: OnClicked
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_OnClicked_
+  commentId: Overload:Terminal.Gui.Label.OnClicked
+  isSpec: "True"
+  fullName: Terminal.Gui.Label.OnClicked
+  nameWithType: Label.OnClicked
 - uid: Terminal.Gui.Label.OnEnter(Terminal.Gui.View)
   name: OnEnter(View)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_OnEnter_Terminal_Gui_View_
@@ -9446,6 +9598,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Label.OnMouseEvent
   nameWithType: Label.OnMouseEvent
+- uid: Terminal.Gui.Label.ProcessHotKey(Terminal.Gui.KeyEvent)
+  name: ProcessHotKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_ProcessHotKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.Label.ProcessHotKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.Label.ProcessHotKey(Terminal.Gui.KeyEvent)
+  nameWithType: Label.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.Label.ProcessHotKey*
+  name: ProcessHotKey
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_ProcessHotKey_
+  commentId: Overload:Terminal.Gui.Label.ProcessHotKey
+  isSpec: "True"
+  fullName: Terminal.Gui.Label.ProcessHotKey
+  nameWithType: Label.ProcessHotKey
 - uid: Terminal.Gui.LayoutStyle
   name: LayoutStyle
   href: api/Terminal.Gui/Terminal.Gui.LayoutStyle.html
@@ -10269,6 +10434,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MainLoop.EventsPending
   nameWithType: MainLoop.EventsPending
+- uid: Terminal.Gui.MainLoop.IdleHandlers
+  name: IdleHandlers
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_IdleHandlers
+  commentId: P:Terminal.Gui.MainLoop.IdleHandlers
+  fullName: Terminal.Gui.MainLoop.IdleHandlers
+  nameWithType: MainLoop.IdleHandlers
+- uid: Terminal.Gui.MainLoop.IdleHandlers*
+  name: IdleHandlers
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_IdleHandlers_
+  commentId: Overload:Terminal.Gui.MainLoop.IdleHandlers
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.IdleHandlers
+  nameWithType: MainLoop.IdleHandlers
 - uid: Terminal.Gui.MainLoop.Invoke(System.Action)
   name: Invoke(Action)
   href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Invoke_System_Action_
@@ -10350,6 +10528,43 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MainLoop.Stop
   nameWithType: MainLoop.Stop
+- uid: Terminal.Gui.MainLoop.Timeout
+  name: MainLoop.Timeout
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.Timeout.html
+  commentId: T:Terminal.Gui.MainLoop.Timeout
+  fullName: Terminal.Gui.MainLoop.Timeout
+  nameWithType: MainLoop.Timeout
+- uid: Terminal.Gui.MainLoop.Timeout.Callback
+  name: Callback
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.Timeout.html#Terminal_Gui_MainLoop_Timeout_Callback
+  commentId: F:Terminal.Gui.MainLoop.Timeout.Callback
+  fullName: Terminal.Gui.MainLoop.Timeout.Callback
+  nameWithType: MainLoop.Timeout.Callback
+- uid: Terminal.Gui.MainLoop.Timeout.Span
+  name: Span
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.Timeout.html#Terminal_Gui_MainLoop_Timeout_Span
+  commentId: F:Terminal.Gui.MainLoop.Timeout.Span
+  fullName: Terminal.Gui.MainLoop.Timeout.Span
+  nameWithType: MainLoop.Timeout.Span
+- uid: Terminal.Gui.MainLoop.TimeoutAdded
+  name: TimeoutAdded
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_TimeoutAdded
+  commentId: E:Terminal.Gui.MainLoop.TimeoutAdded
+  fullName: Terminal.Gui.MainLoop.TimeoutAdded
+  nameWithType: MainLoop.TimeoutAdded
+- uid: Terminal.Gui.MainLoop.Timeouts
+  name: Timeouts
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Timeouts
+  commentId: P:Terminal.Gui.MainLoop.Timeouts
+  fullName: Terminal.Gui.MainLoop.Timeouts
+  nameWithType: MainLoop.Timeouts
+- uid: Terminal.Gui.MainLoop.Timeouts*
+  name: Timeouts
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Timeouts_
+  commentId: Overload:Terminal.Gui.MainLoop.Timeouts
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.Timeouts
+  nameWithType: MainLoop.Timeouts
 - uid: Terminal.Gui.MenuBar
   name: MenuBar
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html
@@ -11170,6 +11385,19 @@ references:
   commentId: T:Terminal.Gui.MessageBox
   fullName: Terminal.Gui.MessageBox
   nameWithType: MessageBox
+- uid: Terminal.Gui.MessageBox.Clicked
+  name: Clicked
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Clicked
+  commentId: P:Terminal.Gui.MessageBox.Clicked
+  fullName: Terminal.Gui.MessageBox.Clicked
+  nameWithType: MessageBox.Clicked
+- uid: Terminal.Gui.MessageBox.Clicked*
+  name: Clicked
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Clicked_
+  commentId: Overload:Terminal.Gui.MessageBox.Clicked
+  isSpec: "True"
+  fullName: Terminal.Gui.MessageBox.Clicked
+  nameWithType: MessageBox.Clicked
 - uid: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,NStack.ustring[])
   name: ErrorQuery(ustring, ustring, ustring[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_NStack_ustring___
@@ -12227,6 +12455,48 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Pos.Center
   nameWithType: Pos.Center
+- uid: Terminal.Gui.Pos.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Equals_System_Object_
+  commentId: M:Terminal.Gui.Pos.Equals(System.Object)
+  fullName: Terminal.Gui.Pos.Equals(System.Object)
+  nameWithType: Pos.Equals(Object)
+- uid: Terminal.Gui.Pos.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Equals_
+  commentId: Overload:Terminal.Gui.Pos.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.Pos.Equals
+  nameWithType: Pos.Equals
+- uid: Terminal.Gui.Pos.Function(System.Func{System.Int32})
+  name: Function(Func<Int32>)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Function_System_Func_System_Int32__
+  commentId: M:Terminal.Gui.Pos.Function(System.Func{System.Int32})
+  name.vb: Function(Func(Of Int32))
+  fullName: Terminal.Gui.Pos.Function(System.Func<System.Int32>)
+  fullName.vb: Terminal.Gui.Pos.Function(System.Func(Of System.Int32))
+  nameWithType: Pos.Function(Func<Int32>)
+  nameWithType.vb: Pos.Function(Func(Of Int32))
+- uid: Terminal.Gui.Pos.Function*
+  name: Function
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Function_
+  commentId: Overload:Terminal.Gui.Pos.Function
+  isSpec: "True"
+  fullName: Terminal.Gui.Pos.Function
+  nameWithType: Pos.Function
+- uid: Terminal.Gui.Pos.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_GetHashCode
+  commentId: M:Terminal.Gui.Pos.GetHashCode
+  fullName: Terminal.Gui.Pos.GetHashCode()
+  nameWithType: Pos.GetHashCode()
+- uid: Terminal.Gui.Pos.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_GetHashCode_
+  commentId: Overload:Terminal.Gui.Pos.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.Pos.GetHashCode
+  nameWithType: Pos.GetHashCode
 - uid: Terminal.Gui.Pos.Left(Terminal.Gui.View)
   name: Left(View)
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Left_Terminal_Gui_View_
@@ -15613,6 +15883,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TableView.ColumnStyle.MaxWidth
   nameWithType: TableView.ColumnStyle.MaxWidth
+- uid: Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth
+  name: MinAcceptableWidth
+  href: api/Terminal.Gui/Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MinAcceptableWidth
+  commentId: P:Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth
+  fullName: Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth
+  nameWithType: TableView.ColumnStyle.MinAcceptableWidth
+- uid: Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth*
+  name: MinAcceptableWidth
+  href: api/Terminal.Gui/Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MinAcceptableWidth_
+  commentId: Overload:Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth
+  nameWithType: TableView.ColumnStyle.MinAcceptableWidth
 - uid: Terminal.Gui.TableView.ColumnStyle.MinWidth
   name: MinWidth
   href: api/Terminal.Gui/Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MinWidth
@@ -15638,6 +15921,12 @@ references:
   commentId: F:Terminal.Gui.TableView.DefaultMaxCellWidth
   fullName: Terminal.Gui.TableView.DefaultMaxCellWidth
   nameWithType: TableView.DefaultMaxCellWidth
+- uid: Terminal.Gui.TableView.DefaultMinAcceptableWidth
+  name: DefaultMinAcceptableWidth
+  href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_DefaultMinAcceptableWidth
+  commentId: F:Terminal.Gui.TableView.DefaultMinAcceptableWidth
+  fullName: Terminal.Gui.TableView.DefaultMinAcceptableWidth
+  nameWithType: TableView.DefaultMinAcceptableWidth
 - uid: Terminal.Gui.TableView.EnsureSelectedCellIsVisible
   name: EnsureSelectedCellIsVisible()
   href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_EnsureSelectedCellIsVisible
@@ -16298,6 +16587,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TableView.TableStyle.ShowHorizontalHeaderUnderline
   nameWithType: TableView.TableStyle.ShowHorizontalHeaderUnderline
+- uid: Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators
+  name: ShowHorizontalScrollIndicators
+  href: api/Terminal.Gui/Terminal.Gui.TableView.TableStyle.html#Terminal_Gui_TableView_TableStyle_ShowHorizontalScrollIndicators
+  commentId: P:Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators
+  fullName: Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators
+  nameWithType: TableView.TableStyle.ShowHorizontalScrollIndicators
+- uid: Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators*
+  name: ShowHorizontalScrollIndicators
+  href: api/Terminal.Gui/Terminal.Gui.TableView.TableStyle.html#Terminal_Gui_TableView_TableStyle_ShowHorizontalScrollIndicators_
+  commentId: Overload:Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.TableStyle.ShowHorizontalScrollIndicators
+  nameWithType: TableView.TableStyle.ShowHorizontalScrollIndicators
 - uid: Terminal.Gui.TableView.TableStyle.ShowVerticalCellLines
   name: ShowVerticalCellLines
   href: api/Terminal.Gui/Terminal.Gui.TableView.TableStyle.html#Terminal_Gui_TableView_TableStyle_ShowVerticalCellLines
@@ -17546,6 +17848,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.Format
   nameWithType: TextFormatter.Format
+- uid: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{NStack.ustring},System.Int32)
+  name: GetMaxColsForWidth(List<ustring>, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_GetMaxColsForWidth_System_Collections_Generic_List_NStack_ustring__System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{NStack.ustring},System.Int32)
+  name.vb: GetMaxColsForWidth(List(Of ustring), Int32)
+  fullName: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List<NStack.ustring>, System.Int32)
+  fullName.vb: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List(Of NStack.ustring), System.Int32)
+  nameWithType: TextFormatter.GetMaxColsForWidth(List<ustring>, Int32)
+  nameWithType.vb: TextFormatter.GetMaxColsForWidth(List(Of ustring), Int32)
+- uid: Terminal.Gui.TextFormatter.GetMaxColsForWidth*
+  name: GetMaxColsForWidth
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_GetMaxColsForWidth_
+  commentId: Overload:Terminal.Gui.TextFormatter.GetMaxColsForWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.GetMaxColsForWidth
+  nameWithType: TextFormatter.GetMaxColsForWidth
 - uid: Terminal.Gui.TextFormatter.GetMaxLengthForWidth(NStack.ustring,System.Int32)
   name: GetMaxLengthForWidth(ustring, Int32)
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_GetMaxLengthForWidth_NStack_ustring_System_Int32_
@@ -17778,6 +18096,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.NeedsFormat
   nameWithType: TextFormatter.NeedsFormat
+- uid: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  name: PreserveTrailingSpaces
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_PreserveTrailingSpaces
+  commentId: P:Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  fullName: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  nameWithType: TextFormatter.PreserveTrailingSpaces
+- uid: Terminal.Gui.TextFormatter.PreserveTrailingSpaces*
+  name: PreserveTrailingSpaces
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_PreserveTrailingSpaces_
+  commentId: Overload:Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  nameWithType: TextFormatter.PreserveTrailingSpaces
 - uid: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(NStack.ustring,System.Int32,System.Rune)
   name: RemoveHotKeySpecifier(ustring, Int32, Rune)
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_RemoveHotKeySpecifier_NStack_ustring_System_Int32_System_Rune_
@@ -19849,6 +20180,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.OnKeyUp
   nameWithType: Toplevel.OnKeyUp
+- uid: Terminal.Gui.Toplevel.OnLoaded
+  name: OnLoaded()
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnLoaded
+  commentId: M:Terminal.Gui.Toplevel.OnLoaded
+  fullName: Terminal.Gui.Toplevel.OnLoaded()
+  nameWithType: Toplevel.OnLoaded()
+- uid: Terminal.Gui.Toplevel.OnLoaded*
+  name: OnLoaded
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnLoaded_
+  commentId: Overload:Terminal.Gui.Toplevel.OnLoaded
+  isSpec: "True"
+  fullName: Terminal.Gui.Toplevel.OnLoaded
+  nameWithType: Toplevel.OnLoaded
 - uid: Terminal.Gui.Toplevel.OnQuitKeyChanged(Terminal.Gui.Key)
   name: OnQuitKeyChanged(Key)
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_
@@ -22442,6 +22786,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.FocusPrev
   nameWithType: View.FocusPrev
+- uid: Terminal.Gui.View.ForceValidatePosDim
+  name: ForceValidatePosDim
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim
+  commentId: P:Terminal.Gui.View.ForceValidatePosDim
+  fullName: Terminal.Gui.View.ForceValidatePosDim
+  nameWithType: View.ForceValidatePosDim
+- uid: Terminal.Gui.View.ForceValidatePosDim*
+  name: ForceValidatePosDim
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim_
+  commentId: Overload:Terminal.Gui.View.ForceValidatePosDim
+  isSpec: "True"
+  fullName: Terminal.Gui.View.ForceValidatePosDim
+  nameWithType: View.ForceValidatePosDim
 - uid: Terminal.Gui.View.Frame
   name: Frame
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Frame
@@ -22455,6 +22812,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Frame
   nameWithType: View.Frame
+- uid: Terminal.Gui.View.GetAutoSize
+  name: GetAutoSize()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize
+  commentId: M:Terminal.Gui.View.GetAutoSize
+  fullName: Terminal.Gui.View.GetAutoSize()
+  nameWithType: View.GetAutoSize()
+- uid: Terminal.Gui.View.GetAutoSize*
+  name: GetAutoSize
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize_
+  commentId: Overload:Terminal.Gui.View.GetAutoSize
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetAutoSize
+  nameWithType: View.GetAutoSize
+- uid: Terminal.Gui.View.GetBoundsTextFormatterSize
+  name: GetBoundsTextFormatterSize()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize
+  commentId: M:Terminal.Gui.View.GetBoundsTextFormatterSize
+  fullName: Terminal.Gui.View.GetBoundsTextFormatterSize()
+  nameWithType: View.GetBoundsTextFormatterSize()
+- uid: Terminal.Gui.View.GetBoundsTextFormatterSize*
+  name: GetBoundsTextFormatterSize
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize_
+  commentId: Overload:Terminal.Gui.View.GetBoundsTextFormatterSize
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetBoundsTextFormatterSize
+  nameWithType: View.GetBoundsTextFormatterSize
 - uid: Terminal.Gui.View.GetCurrentHeight(System.Int32@)
   name: GetCurrentHeight(out Int32)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__
@@ -22487,6 +22870,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.GetCurrentWidth
   nameWithType: View.GetCurrentWidth
+- uid: Terminal.Gui.View.GetHotKeySpecifierLength(System.Boolean)
+  name: GetHotKeySpecifierLength(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_
+  commentId: M:Terminal.Gui.View.GetHotKeySpecifierLength(System.Boolean)
+  fullName: Terminal.Gui.View.GetHotKeySpecifierLength(System.Boolean)
+  nameWithType: View.GetHotKeySpecifierLength(Boolean)
+- uid: Terminal.Gui.View.GetHotKeySpecifierLength*
+  name: GetHotKeySpecifierLength
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_
+  commentId: Overload:Terminal.Gui.View.GetHotKeySpecifierLength
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetHotKeySpecifierLength
+  nameWithType: View.GetHotKeySpecifierLength
 - uid: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)
   name: GetKeyFromCommand(Command)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_
@@ -22500,6 +22896,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.GetKeyFromCommand
   nameWithType: View.GetKeyFromCommand
+- uid: Terminal.Gui.View.GetMinWidthHeight(Terminal.Gui.Size@)
+  name: GetMinWidthHeight(out Size)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__
+  commentId: M:Terminal.Gui.View.GetMinWidthHeight(Terminal.Gui.Size@)
+  name.vb: GetMinWidthHeight(ByRef Size)
+  fullName: Terminal.Gui.View.GetMinWidthHeight(out Terminal.Gui.Size)
+  fullName.vb: Terminal.Gui.View.GetMinWidthHeight(ByRef Terminal.Gui.Size)
+  nameWithType: View.GetMinWidthHeight(out Size)
+  nameWithType.vb: View.GetMinWidthHeight(ByRef Size)
+- uid: Terminal.Gui.View.GetMinWidthHeight*
+  name: GetMinWidthHeight
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_
+  commentId: Overload:Terminal.Gui.View.GetMinWidthHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetMinWidthHeight
+  nameWithType: View.GetMinWidthHeight
 - uid: Terminal.Gui.View.GetNormalColor
   name: GetNormalColor()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor
@@ -22526,6 +22938,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.GetSupportedCommands
   nameWithType: View.GetSupportedCommands
+- uid: Terminal.Gui.View.GetTextFormatterBoundsSize
+  name: GetTextFormatterBoundsSize()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize
+  commentId: M:Terminal.Gui.View.GetTextFormatterBoundsSize
+  fullName: Terminal.Gui.View.GetTextFormatterBoundsSize()
+  nameWithType: View.GetTextFormatterBoundsSize()
+- uid: Terminal.Gui.View.GetTextFormatterBoundsSize*
+  name: GetTextFormatterBoundsSize
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize_
+  commentId: Overload:Terminal.Gui.View.GetTextFormatterBoundsSize
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetTextFormatterBoundsSize
+  nameWithType: View.GetTextFormatterBoundsSize
 - uid: Terminal.Gui.View.GetTopSuperView
   name: GetTopSuperView()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView
@@ -22629,6 +23054,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.InvokeKeybindings
   nameWithType: View.InvokeKeybindings
+- uid: Terminal.Gui.View.IsAdded
+  name: IsAdded
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsAdded
+  commentId: P:Terminal.Gui.View.IsAdded
+  fullName: Terminal.Gui.View.IsAdded
+  nameWithType: View.IsAdded
+- uid: Terminal.Gui.View.IsAdded*
+  name: IsAdded
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsAdded_
+  commentId: Overload:Terminal.Gui.View.IsAdded
+  isSpec: "True"
+  fullName: Terminal.Gui.View.IsAdded
+  nameWithType: View.IsAdded
 - uid: Terminal.Gui.View.IsCurrentTop
   name: IsCurrentTop
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsCurrentTop
@@ -23078,6 +23516,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.PositionCursor
   nameWithType: View.PositionCursor
+- uid: Terminal.Gui.View.PreserveTrailingSpaces
+  name: PreserveTrailingSpaces
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_PreserveTrailingSpaces
+  commentId: P:Terminal.Gui.View.PreserveTrailingSpaces
+  fullName: Terminal.Gui.View.PreserveTrailingSpaces
+  nameWithType: View.PreserveTrailingSpaces
+- uid: Terminal.Gui.View.PreserveTrailingSpaces*
+  name: PreserveTrailingSpaces
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_PreserveTrailingSpaces_
+  commentId: Overload:Terminal.Gui.View.PreserveTrailingSpaces
+  isSpec: "True"
+  fullName: Terminal.Gui.View.PreserveTrailingSpaces
+  nameWithType: View.PreserveTrailingSpaces
 - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   name: ProcessColdKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_
@@ -23117,6 +23568,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.ProcessKey
   nameWithType: View.ProcessKey
+- uid: Terminal.Gui.View.ProcessResizeView
+  name: ProcessResizeView()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView
+  commentId: M:Terminal.Gui.View.ProcessResizeView
+  fullName: Terminal.Gui.View.ProcessResizeView()
+  nameWithType: View.ProcessResizeView()
+- uid: Terminal.Gui.View.ProcessResizeView*
+  name: ProcessResizeView
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView_
+  commentId: Overload:Terminal.Gui.View.ProcessResizeView
+  isSpec: "True"
+  fullName: Terminal.Gui.View.ProcessResizeView
+  nameWithType: View.ProcessResizeView
 - uid: Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_
@@ -23269,6 +23733,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.SetHeight
   nameWithType: View.SetHeight
+- uid: Terminal.Gui.View.SetMinWidthHeight
+  name: SetMinWidthHeight()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight
+  commentId: M:Terminal.Gui.View.SetMinWidthHeight
+  fullName: Terminal.Gui.View.SetMinWidthHeight()
+  nameWithType: View.SetMinWidthHeight()
+- uid: Terminal.Gui.View.SetMinWidthHeight*
+  name: SetMinWidthHeight
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight_
+  commentId: Overload:Terminal.Gui.View.SetMinWidthHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.View.SetMinWidthHeight
+  nameWithType: View.SetMinWidthHeight
 - uid: Terminal.Gui.View.SetNeedsDisplay
   name: SetNeedsDisplay()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay
@@ -23473,6 +23950,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.ToString
   nameWithType: View.ToString
+- uid: Terminal.Gui.View.UpdateTextFormatterText
+  name: UpdateTextFormatterText()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText
+  commentId: M:Terminal.Gui.View.UpdateTextFormatterText
+  fullName: Terminal.Gui.View.UpdateTextFormatterText()
+  nameWithType: View.UpdateTextFormatterText()
+- uid: Terminal.Gui.View.UpdateTextFormatterText*
+  name: UpdateTextFormatterText
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText_
+  commentId: Overload:Terminal.Gui.View.UpdateTextFormatterText
+  isSpec: "True"
+  fullName: Terminal.Gui.View.UpdateTextFormatterText
+  nameWithType: View.UpdateTextFormatterText
 - uid: Terminal.Gui.View.VerticalTextAlignment
   name: VerticalTextAlignment
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment
@@ -23652,6 +24142,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Window.OnCanFocusChanged
   nameWithType: Window.OnCanFocusChanged
+- uid: Terminal.Gui.Window.OnTitleChanged(NStack.ustring,NStack.ustring)
+  name: OnTitleChanged(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanged_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Window.OnTitleChanged(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Window.OnTitleChanged(NStack.ustring, NStack.ustring)
+  nameWithType: Window.OnTitleChanged(ustring, ustring)
+- uid: Terminal.Gui.Window.OnTitleChanged*
+  name: OnTitleChanged
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanged_
+  commentId: Overload:Terminal.Gui.Window.OnTitleChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.OnTitleChanged
+  nameWithType: Window.OnTitleChanged
+- uid: Terminal.Gui.Window.OnTitleChanging(NStack.ustring,NStack.ustring)
+  name: OnTitleChanging(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanging_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Window.OnTitleChanging(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Window.OnTitleChanging(NStack.ustring, NStack.ustring)
+  nameWithType: Window.OnTitleChanging(ustring, ustring)
+- uid: Terminal.Gui.Window.OnTitleChanging*
+  name: OnTitleChanging
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanging_
+  commentId: Overload:Terminal.Gui.Window.OnTitleChanging
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.OnTitleChanging
+  nameWithType: Window.OnTitleChanging
 - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_
@@ -23730,6 +24246,641 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Window.Title
   nameWithType: Window.Title
+- uid: Terminal.Gui.Window.TitleChanged
+  name: TitleChanged
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_TitleChanged
+  commentId: E:Terminal.Gui.Window.TitleChanged
+  fullName: Terminal.Gui.Window.TitleChanged
+  nameWithType: Window.TitleChanged
+- uid: Terminal.Gui.Window.TitleChanging
+  name: TitleChanging
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_TitleChanging
+  commentId: E:Terminal.Gui.Window.TitleChanging
+  fullName: Terminal.Gui.Window.TitleChanging
+  nameWithType: Window.TitleChanging
+- uid: Terminal.Gui.Window.TitleEventArgs
+  name: Window.TitleEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html
+  commentId: T:Terminal.Gui.Window.TitleEventArgs
+  fullName: Terminal.Gui.Window.TitleEventArgs
+  nameWithType: Window.TitleEventArgs
+- uid: Terminal.Gui.Window.TitleEventArgs.#ctor(NStack.ustring,NStack.ustring)
+  name: TitleEventArgs(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs__ctor_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Window.TitleEventArgs.#ctor(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Window.TitleEventArgs.TitleEventArgs(NStack.ustring, NStack.ustring)
+  nameWithType: Window.TitleEventArgs.TitleEventArgs(ustring, ustring)
+- uid: Terminal.Gui.Window.TitleEventArgs.#ctor*
+  name: TitleEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.Window.TitleEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.TitleEventArgs.TitleEventArgs
+  nameWithType: Window.TitleEventArgs.TitleEventArgs
+- uid: Terminal.Gui.Window.TitleEventArgs.Cancel
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_Cancel
+  commentId: P:Terminal.Gui.Window.TitleEventArgs.Cancel
+  fullName: Terminal.Gui.Window.TitleEventArgs.Cancel
+  nameWithType: Window.TitleEventArgs.Cancel
+- uid: Terminal.Gui.Window.TitleEventArgs.Cancel*
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_Cancel_
+  commentId: Overload:Terminal.Gui.Window.TitleEventArgs.Cancel
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.TitleEventArgs.Cancel
+  nameWithType: Window.TitleEventArgs.Cancel
+- uid: Terminal.Gui.Window.TitleEventArgs.NewTitle
+  name: NewTitle
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_NewTitle
+  commentId: P:Terminal.Gui.Window.TitleEventArgs.NewTitle
+  fullName: Terminal.Gui.Window.TitleEventArgs.NewTitle
+  nameWithType: Window.TitleEventArgs.NewTitle
+- uid: Terminal.Gui.Window.TitleEventArgs.NewTitle*
+  name: NewTitle
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_NewTitle_
+  commentId: Overload:Terminal.Gui.Window.TitleEventArgs.NewTitle
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.TitleEventArgs.NewTitle
+  nameWithType: Window.TitleEventArgs.NewTitle
+- uid: Terminal.Gui.Window.TitleEventArgs.OldTitle
+  name: OldTitle
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_OldTitle
+  commentId: P:Terminal.Gui.Window.TitleEventArgs.OldTitle
+  fullName: Terminal.Gui.Window.TitleEventArgs.OldTitle
+  nameWithType: Window.TitleEventArgs.OldTitle
+- uid: Terminal.Gui.Window.TitleEventArgs.OldTitle*
+  name: OldTitle
+  href: api/Terminal.Gui/Terminal.Gui.Window.TitleEventArgs.html#Terminal_Gui_Window_TitleEventArgs_OldTitle_
+  commentId: Overload:Terminal.Gui.Window.TitleEventArgs.OldTitle
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.TitleEventArgs.OldTitle
+  nameWithType: Window.TitleEventArgs.OldTitle
+- uid: Terminal.Gui.Wizard
+  name: Wizard
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html
+  commentId: T:Terminal.Gui.Wizard
+  fullName: Terminal.Gui.Wizard
+  nameWithType: Wizard
+- uid: Terminal.Gui.Wizard.#ctor
+  name: Wizard()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard__ctor
+  commentId: M:Terminal.Gui.Wizard.#ctor
+  fullName: Terminal.Gui.Wizard.Wizard()
+  nameWithType: Wizard.Wizard()
+- uid: Terminal.Gui.Wizard.#ctor(NStack.ustring)
+  name: Wizard(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.Wizard.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.Wizard.Wizard(NStack.ustring)
+  nameWithType: Wizard.Wizard(ustring)
+- uid: Terminal.Gui.Wizard.#ctor*
+  name: Wizard
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard__ctor_
+  commentId: Overload:Terminal.Gui.Wizard.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.Wizard
+  nameWithType: Wizard.Wizard
+- uid: Terminal.Gui.Wizard.AddStep(Terminal.Gui.Wizard.WizardStep)
+  name: AddStep(Wizard.WizardStep)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_AddStep_Terminal_Gui_Wizard_WizardStep_
+  commentId: M:Terminal.Gui.Wizard.AddStep(Terminal.Gui.Wizard.WizardStep)
+  fullName: Terminal.Gui.Wizard.AddStep(Terminal.Gui.Wizard.WizardStep)
+  nameWithType: Wizard.AddStep(Wizard.WizardStep)
+- uid: Terminal.Gui.Wizard.AddStep*
+  name: AddStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_AddStep_
+  commentId: Overload:Terminal.Gui.Wizard.AddStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.AddStep
+  nameWithType: Wizard.AddStep
+- uid: Terminal.Gui.Wizard.BackButton
+  name: BackButton
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_BackButton
+  commentId: P:Terminal.Gui.Wizard.BackButton
+  fullName: Terminal.Gui.Wizard.BackButton
+  nameWithType: Wizard.BackButton
+- uid: Terminal.Gui.Wizard.BackButton*
+  name: BackButton
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_BackButton_
+  commentId: Overload:Terminal.Gui.Wizard.BackButton
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.BackButton
+  nameWithType: Wizard.BackButton
+- uid: Terminal.Gui.Wizard.Cancelled
+  name: Cancelled
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Cancelled
+  commentId: E:Terminal.Gui.Wizard.Cancelled
+  fullName: Terminal.Gui.Wizard.Cancelled
+  nameWithType: Wizard.Cancelled
+- uid: Terminal.Gui.Wizard.CurrentStep
+  name: CurrentStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep
+  commentId: P:Terminal.Gui.Wizard.CurrentStep
+  fullName: Terminal.Gui.Wizard.CurrentStep
+  nameWithType: Wizard.CurrentStep
+- uid: Terminal.Gui.Wizard.CurrentStep*
+  name: CurrentStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep_
+  commentId: Overload:Terminal.Gui.Wizard.CurrentStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.CurrentStep
+  nameWithType: Wizard.CurrentStep
+- uid: Terminal.Gui.Wizard.Finished
+  name: Finished
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Finished
+  commentId: E:Terminal.Gui.Wizard.Finished
+  fullName: Terminal.Gui.Wizard.Finished
+  nameWithType: Wizard.Finished
+- uid: Terminal.Gui.Wizard.GetFirstStep
+  name: GetFirstStep()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetFirstStep
+  commentId: M:Terminal.Gui.Wizard.GetFirstStep
+  fullName: Terminal.Gui.Wizard.GetFirstStep()
+  nameWithType: Wizard.GetFirstStep()
+- uid: Terminal.Gui.Wizard.GetFirstStep*
+  name: GetFirstStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetFirstStep_
+  commentId: Overload:Terminal.Gui.Wizard.GetFirstStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GetFirstStep
+  nameWithType: Wizard.GetFirstStep
+- uid: Terminal.Gui.Wizard.GetLastStep
+  name: GetLastStep()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetLastStep
+  commentId: M:Terminal.Gui.Wizard.GetLastStep
+  fullName: Terminal.Gui.Wizard.GetLastStep()
+  nameWithType: Wizard.GetLastStep()
+- uid: Terminal.Gui.Wizard.GetLastStep*
+  name: GetLastStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetLastStep_
+  commentId: Overload:Terminal.Gui.Wizard.GetLastStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GetLastStep
+  nameWithType: Wizard.GetLastStep
+- uid: Terminal.Gui.Wizard.GetNextStep
+  name: GetNextStep()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetNextStep
+  commentId: M:Terminal.Gui.Wizard.GetNextStep
+  fullName: Terminal.Gui.Wizard.GetNextStep()
+  nameWithType: Wizard.GetNextStep()
+- uid: Terminal.Gui.Wizard.GetNextStep*
+  name: GetNextStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetNextStep_
+  commentId: Overload:Terminal.Gui.Wizard.GetNextStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GetNextStep
+  nameWithType: Wizard.GetNextStep
+- uid: Terminal.Gui.Wizard.GetPreviousStep
+  name: GetPreviousStep()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetPreviousStep
+  commentId: M:Terminal.Gui.Wizard.GetPreviousStep
+  fullName: Terminal.Gui.Wizard.GetPreviousStep()
+  nameWithType: Wizard.GetPreviousStep()
+- uid: Terminal.Gui.Wizard.GetPreviousStep*
+  name: GetPreviousStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetPreviousStep_
+  commentId: Overload:Terminal.Gui.Wizard.GetPreviousStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GetPreviousStep
+  nameWithType: Wizard.GetPreviousStep
+- uid: Terminal.Gui.Wizard.GoBack
+  name: GoBack()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoBack
+  commentId: M:Terminal.Gui.Wizard.GoBack
+  fullName: Terminal.Gui.Wizard.GoBack()
+  nameWithType: Wizard.GoBack()
+- uid: Terminal.Gui.Wizard.GoBack*
+  name: GoBack
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoBack_
+  commentId: Overload:Terminal.Gui.Wizard.GoBack
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GoBack
+  nameWithType: Wizard.GoBack
+- uid: Terminal.Gui.Wizard.GoNext
+  name: GoNext()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoNext
+  commentId: M:Terminal.Gui.Wizard.GoNext
+  fullName: Terminal.Gui.Wizard.GoNext()
+  nameWithType: Wizard.GoNext()
+- uid: Terminal.Gui.Wizard.GoNext*
+  name: GoNext
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoNext_
+  commentId: Overload:Terminal.Gui.Wizard.GoNext
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GoNext
+  nameWithType: Wizard.GoNext
+- uid: Terminal.Gui.Wizard.GoToStep(Terminal.Gui.Wizard.WizardStep)
+  name: GoToStep(Wizard.WizardStep)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoToStep_Terminal_Gui_Wizard_WizardStep_
+  commentId: M:Terminal.Gui.Wizard.GoToStep(Terminal.Gui.Wizard.WizardStep)
+  fullName: Terminal.Gui.Wizard.GoToStep(Terminal.Gui.Wizard.WizardStep)
+  nameWithType: Wizard.GoToStep(Wizard.WizardStep)
+- uid: Terminal.Gui.Wizard.GoToStep*
+  name: GoToStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GoToStep_
+  commentId: Overload:Terminal.Gui.Wizard.GoToStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.GoToStep
+  nameWithType: Wizard.GoToStep
+- uid: Terminal.Gui.Wizard.Modal
+  name: Modal
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal
+  commentId: P:Terminal.Gui.Wizard.Modal
+  fullName: Terminal.Gui.Wizard.Modal
+  nameWithType: Wizard.Modal
+- uid: Terminal.Gui.Wizard.Modal*
+  name: Modal
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal_
+  commentId: Overload:Terminal.Gui.Wizard.Modal
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.Modal
+  nameWithType: Wizard.Modal
+- uid: Terminal.Gui.Wizard.MovingBack
+  name: MovingBack
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_MovingBack
+  commentId: E:Terminal.Gui.Wizard.MovingBack
+  fullName: Terminal.Gui.Wizard.MovingBack
+  nameWithType: Wizard.MovingBack
+- uid: Terminal.Gui.Wizard.MovingNext
+  name: MovingNext
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_MovingNext
+  commentId: E:Terminal.Gui.Wizard.MovingNext
+  fullName: Terminal.Gui.Wizard.MovingNext
+  nameWithType: Wizard.MovingNext
+- uid: Terminal.Gui.Wizard.NextFinishButton
+  name: NextFinishButton
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_NextFinishButton
+  commentId: P:Terminal.Gui.Wizard.NextFinishButton
+  fullName: Terminal.Gui.Wizard.NextFinishButton
+  nameWithType: Wizard.NextFinishButton
+- uid: Terminal.Gui.Wizard.NextFinishButton*
+  name: NextFinishButton
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_NextFinishButton_
+  commentId: Overload:Terminal.Gui.Wizard.NextFinishButton
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.NextFinishButton
+  nameWithType: Wizard.NextFinishButton
+- uid: Terminal.Gui.Wizard.OnStepChanged(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  name: OnStepChanged(Wizard.WizardStep, Wizard.WizardStep)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_OnStepChanged_Terminal_Gui_Wizard_WizardStep_Terminal_Gui_Wizard_WizardStep_
+  commentId: M:Terminal.Gui.Wizard.OnStepChanged(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  fullName: Terminal.Gui.Wizard.OnStepChanged(Terminal.Gui.Wizard.WizardStep, Terminal.Gui.Wizard.WizardStep)
+  nameWithType: Wizard.OnStepChanged(Wizard.WizardStep, Wizard.WizardStep)
+- uid: Terminal.Gui.Wizard.OnStepChanged*
+  name: OnStepChanged
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_OnStepChanged_
+  commentId: Overload:Terminal.Gui.Wizard.OnStepChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.OnStepChanged
+  nameWithType: Wizard.OnStepChanged
+- uid: Terminal.Gui.Wizard.OnStepChanging(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  name: OnStepChanging(Wizard.WizardStep, Wizard.WizardStep)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_OnStepChanging_Terminal_Gui_Wizard_WizardStep_Terminal_Gui_Wizard_WizardStep_
+  commentId: M:Terminal.Gui.Wizard.OnStepChanging(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  fullName: Terminal.Gui.Wizard.OnStepChanging(Terminal.Gui.Wizard.WizardStep, Terminal.Gui.Wizard.WizardStep)
+  nameWithType: Wizard.OnStepChanging(Wizard.WizardStep, Wizard.WizardStep)
+- uid: Terminal.Gui.Wizard.OnStepChanging*
+  name: OnStepChanging
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_OnStepChanging_
+  commentId: Overload:Terminal.Gui.Wizard.OnStepChanging
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.OnStepChanging
+  nameWithType: Wizard.OnStepChanging
+- uid: Terminal.Gui.Wizard.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.Wizard.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.Wizard.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: Wizard.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.Wizard.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_ProcessKey_
+  commentId: Overload:Terminal.Gui.Wizard.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.ProcessKey
+  nameWithType: Wizard.ProcessKey
+- uid: Terminal.Gui.Wizard.StepChanged
+  name: StepChanged
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_StepChanged
+  commentId: E:Terminal.Gui.Wizard.StepChanged
+  fullName: Terminal.Gui.Wizard.StepChanged
+  nameWithType: Wizard.StepChanged
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs
+  name: Wizard.StepChangeEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html
+  commentId: T:Terminal.Gui.Wizard.StepChangeEventArgs
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs
+  nameWithType: Wizard.StepChangeEventArgs
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.#ctor(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  name: StepChangeEventArgs(Wizard.WizardStep, Wizard.WizardStep)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs__ctor_Terminal_Gui_Wizard_WizardStep_Terminal_Gui_Wizard_WizardStep_
+  commentId: M:Terminal.Gui.Wizard.StepChangeEventArgs.#ctor(Terminal.Gui.Wizard.WizardStep,Terminal.Gui.Wizard.WizardStep)
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.StepChangeEventArgs(Terminal.Gui.Wizard.WizardStep, Terminal.Gui.Wizard.WizardStep)
+  nameWithType: Wizard.StepChangeEventArgs.StepChangeEventArgs(Wizard.WizardStep, Wizard.WizardStep)
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.#ctor*
+  name: StepChangeEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.Wizard.StepChangeEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.StepChangeEventArgs
+  nameWithType: Wizard.StepChangeEventArgs.StepChangeEventArgs
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.Cancel
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_Cancel
+  commentId: P:Terminal.Gui.Wizard.StepChangeEventArgs.Cancel
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.Cancel
+  nameWithType: Wizard.StepChangeEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.Cancel*
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_Cancel_
+  commentId: Overload:Terminal.Gui.Wizard.StepChangeEventArgs.Cancel
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.Cancel
+  nameWithType: Wizard.StepChangeEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.NewStep
+  name: NewStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_NewStep
+  commentId: P:Terminal.Gui.Wizard.StepChangeEventArgs.NewStep
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.NewStep
+  nameWithType: Wizard.StepChangeEventArgs.NewStep
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.NewStep*
+  name: NewStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_NewStep_
+  commentId: Overload:Terminal.Gui.Wizard.StepChangeEventArgs.NewStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.NewStep
+  nameWithType: Wizard.StepChangeEventArgs.NewStep
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.OldStep
+  name: OldStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_OldStep
+  commentId: P:Terminal.Gui.Wizard.StepChangeEventArgs.OldStep
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.OldStep
+  nameWithType: Wizard.StepChangeEventArgs.OldStep
+- uid: Terminal.Gui.Wizard.StepChangeEventArgs.OldStep*
+  name: OldStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.StepChangeEventArgs.html#Terminal_Gui_Wizard_StepChangeEventArgs_OldStep_
+  commentId: Overload:Terminal.Gui.Wizard.StepChangeEventArgs.OldStep
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.StepChangeEventArgs.OldStep
+  nameWithType: Wizard.StepChangeEventArgs.OldStep
+- uid: Terminal.Gui.Wizard.StepChanging
+  name: StepChanging
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_StepChanging
+  commentId: E:Terminal.Gui.Wizard.StepChanging
+  fullName: Terminal.Gui.Wizard.StepChanging
+  nameWithType: Wizard.StepChanging
+- uid: Terminal.Gui.Wizard.Title
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Title
+  commentId: P:Terminal.Gui.Wizard.Title
+  fullName: Terminal.Gui.Wizard.Title
+  nameWithType: Wizard.Title
+- uid: Terminal.Gui.Wizard.Title*
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Title_
+  commentId: Overload:Terminal.Gui.Wizard.Title
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.Title
+  nameWithType: Wizard.Title
+- uid: Terminal.Gui.Wizard.WizardButtonEventArgs
+  name: Wizard.WizardButtonEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardButtonEventArgs.html
+  commentId: T:Terminal.Gui.Wizard.WizardButtonEventArgs
+  fullName: Terminal.Gui.Wizard.WizardButtonEventArgs
+  nameWithType: Wizard.WizardButtonEventArgs
+- uid: Terminal.Gui.Wizard.WizardButtonEventArgs.#ctor
+  name: WizardButtonEventArgs()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs__ctor
+  commentId: M:Terminal.Gui.Wizard.WizardButtonEventArgs.#ctor
+  fullName: Terminal.Gui.Wizard.WizardButtonEventArgs.WizardButtonEventArgs()
+  nameWithType: Wizard.WizardButtonEventArgs.WizardButtonEventArgs()
+- uid: Terminal.Gui.Wizard.WizardButtonEventArgs.#ctor*
+  name: WizardButtonEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.Wizard.WizardButtonEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardButtonEventArgs.WizardButtonEventArgs
+  nameWithType: Wizard.WizardButtonEventArgs.WizardButtonEventArgs
+- uid: Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs_Cancel
+  commentId: P:Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel
+  fullName: Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel
+  nameWithType: Wizard.WizardButtonEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel*
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs_Cancel_
+  commentId: Overload:Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardButtonEventArgs.Cancel
+  nameWithType: Wizard.WizardButtonEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.WizardStep
+  name: Wizard.WizardStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html
+  commentId: T:Terminal.Gui.Wizard.WizardStep
+  fullName: Terminal.Gui.Wizard.WizardStep
+  nameWithType: Wizard.WizardStep
+- uid: Terminal.Gui.Wizard.WizardStep.#ctor(NStack.ustring)
+  name: WizardStep(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.Wizard.WizardStep.WizardStep(NStack.ustring)
+  nameWithType: Wizard.WizardStep.WizardStep(ustring)
+- uid: Terminal.Gui.Wizard.WizardStep.#ctor*
+  name: WizardStep
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep__ctor_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.WizardStep
+  nameWithType: Wizard.WizardStep.WizardStep
+- uid: Terminal.Gui.Wizard.WizardStep.Add(Terminal.Gui.View)
+  name: Add(View)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Add_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.Add(Terminal.Gui.View)
+  fullName: Terminal.Gui.Wizard.WizardStep.Add(Terminal.Gui.View)
+  nameWithType: Wizard.WizardStep.Add(View)
+- uid: Terminal.Gui.Wizard.WizardStep.Add*
+  name: Add
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Add_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.Add
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.Add
+  nameWithType: Wizard.WizardStep.Add
+- uid: Terminal.Gui.Wizard.WizardStep.BackButtonText
+  name: BackButtonText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_BackButtonText
+  commentId: P:Terminal.Gui.Wizard.WizardStep.BackButtonText
+  fullName: Terminal.Gui.Wizard.WizardStep.BackButtonText
+  nameWithType: Wizard.WizardStep.BackButtonText
+- uid: Terminal.Gui.Wizard.WizardStep.BackButtonText*
+  name: BackButtonText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_BackButtonText_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.BackButtonText
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.BackButtonText
+  nameWithType: Wizard.WizardStep.BackButtonText
+- uid: Terminal.Gui.Wizard.WizardStep.HelpText
+  name: HelpText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_HelpText
+  commentId: P:Terminal.Gui.Wizard.WizardStep.HelpText
+  fullName: Terminal.Gui.Wizard.WizardStep.HelpText
+  nameWithType: Wizard.WizardStep.HelpText
+- uid: Terminal.Gui.Wizard.WizardStep.HelpText*
+  name: HelpText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_HelpText_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.HelpText
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.HelpText
+  nameWithType: Wizard.WizardStep.HelpText
+- uid: Terminal.Gui.Wizard.WizardStep.NextButtonText
+  name: NextButtonText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_NextButtonText
+  commentId: P:Terminal.Gui.Wizard.WizardStep.NextButtonText
+  fullName: Terminal.Gui.Wizard.WizardStep.NextButtonText
+  nameWithType: Wizard.WizardStep.NextButtonText
+- uid: Terminal.Gui.Wizard.WizardStep.NextButtonText*
+  name: NextButtonText
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_NextButtonText_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.NextButtonText
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.NextButtonText
+  nameWithType: Wizard.WizardStep.NextButtonText
+- uid: Terminal.Gui.Wizard.WizardStep.OnTitleChanged(NStack.ustring,NStack.ustring)
+  name: OnTitleChanged(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_OnTitleChanged_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.OnTitleChanged(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Wizard.WizardStep.OnTitleChanged(NStack.ustring, NStack.ustring)
+  nameWithType: Wizard.WizardStep.OnTitleChanged(ustring, ustring)
+- uid: Terminal.Gui.Wizard.WizardStep.OnTitleChanged*
+  name: OnTitleChanged
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_OnTitleChanged_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.OnTitleChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.OnTitleChanged
+  nameWithType: Wizard.WizardStep.OnTitleChanged
+- uid: Terminal.Gui.Wizard.WizardStep.OnTitleChanging(NStack.ustring,NStack.ustring)
+  name: OnTitleChanging(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_OnTitleChanging_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.OnTitleChanging(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Wizard.WizardStep.OnTitleChanging(NStack.ustring, NStack.ustring)
+  nameWithType: Wizard.WizardStep.OnTitleChanging(ustring, ustring)
+- uid: Terminal.Gui.Wizard.WizardStep.OnTitleChanging*
+  name: OnTitleChanging
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_OnTitleChanging_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.OnTitleChanging
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.OnTitleChanging
+  nameWithType: Wizard.WizardStep.OnTitleChanging
+- uid: Terminal.Gui.Wizard.WizardStep.Remove(Terminal.Gui.View)
+  name: Remove(View)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Remove_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.Remove(Terminal.Gui.View)
+  fullName: Terminal.Gui.Wizard.WizardStep.Remove(Terminal.Gui.View)
+  nameWithType: Wizard.WizardStep.Remove(View)
+- uid: Terminal.Gui.Wizard.WizardStep.Remove*
+  name: Remove
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Remove_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.Remove
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.Remove
+  nameWithType: Wizard.WizardStep.Remove
+- uid: Terminal.Gui.Wizard.WizardStep.RemoveAll
+  name: RemoveAll()
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_RemoveAll
+  commentId: M:Terminal.Gui.Wizard.WizardStep.RemoveAll
+  fullName: Terminal.Gui.Wizard.WizardStep.RemoveAll()
+  nameWithType: Wizard.WizardStep.RemoveAll()
+- uid: Terminal.Gui.Wizard.WizardStep.RemoveAll*
+  name: RemoveAll
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_RemoveAll_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.RemoveAll
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.RemoveAll
+  nameWithType: Wizard.WizardStep.RemoveAll
+- uid: Terminal.Gui.Wizard.WizardStep.Title
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Title
+  commentId: P:Terminal.Gui.Wizard.WizardStep.Title
+  fullName: Terminal.Gui.Wizard.WizardStep.Title
+  nameWithType: Wizard.WizardStep.Title
+- uid: Terminal.Gui.Wizard.WizardStep.Title*
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Title_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.Title
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.Title
+  nameWithType: Wizard.WizardStep.Title
+- uid: Terminal.Gui.Wizard.WizardStep.TitleChanged
+  name: TitleChanged
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_TitleChanged
+  commentId: E:Terminal.Gui.Wizard.WizardStep.TitleChanged
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleChanged
+  nameWithType: Wizard.WizardStep.TitleChanged
+- uid: Terminal.Gui.Wizard.WizardStep.TitleChanging
+  name: TitleChanging
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_TitleChanging
+  commentId: E:Terminal.Gui.Wizard.WizardStep.TitleChanging
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleChanging
+  nameWithType: Wizard.WizardStep.TitleChanging
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs
+  name: Wizard.WizardStep.TitleEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html
+  commentId: T:Terminal.Gui.Wizard.WizardStep.TitleEventArgs
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs
+  nameWithType: Wizard.WizardStep.TitleEventArgs
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.#ctor(NStack.ustring,NStack.ustring)
+  name: TitleEventArgs(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs__ctor_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.#ctor(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.TitleEventArgs(NStack.ustring, NStack.ustring)
+  nameWithType: Wizard.WizardStep.TitleEventArgs.TitleEventArgs(ustring, ustring)
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.#ctor*
+  name: TitleEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.TitleEventArgs
+  nameWithType: Wizard.WizardStep.TitleEventArgs.TitleEventArgs
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_Cancel
+  commentId: P:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel
+  nameWithType: Wizard.WizardStep.TitleEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel*
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_Cancel_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.Cancel
+  nameWithType: Wizard.WizardStep.TitleEventArgs.Cancel
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle
+  name: NewTitle
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_NewTitle
+  commentId: P:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle
+  nameWithType: Wizard.WizardStep.TitleEventArgs.NewTitle
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle*
+  name: NewTitle
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_NewTitle_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.NewTitle
+  nameWithType: Wizard.WizardStep.TitleEventArgs.NewTitle
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle
+  name: OldTitle
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_OldTitle
+  commentId: P:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle
+  nameWithType: Wizard.WizardStep.TitleEventArgs.OldTitle
+- uid: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle*
+  name: OldTitle
+  href: api/Terminal.Gui/Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html#Terminal_Gui_Wizard_WizardStep_TitleEventArgs_OldTitle_
+  commentId: Overload:Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle
+  isSpec: "True"
+  fullName: Terminal.Gui.Wizard.WizardStep.TitleEventArgs.OldTitle
+  nameWithType: Wizard.WizardStep.TitleEventArgs.OldTitle
 - uid: UICatalog
   name: UICatalog
   href: api/UICatalog/UICatalog.html
@@ -26396,6 +27547,57 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenarios.WindowsAndFrameViews.Setup
   nameWithType: WindowsAndFrameViews.Setup
+- uid: UICatalog.Scenarios.WizardAsView
+  name: WizardAsView
+  href: api/UICatalog/UICatalog.Scenarios.WizardAsView.html
+  commentId: T:UICatalog.Scenarios.WizardAsView
+  fullName: UICatalog.Scenarios.WizardAsView
+  nameWithType: WizardAsView
+- uid: UICatalog.Scenarios.WizardAsView.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  name: Init(Toplevel, ColorScheme)
+  href: api/UICatalog/UICatalog.Scenarios.WizardAsView.html#UICatalog_Scenarios_WizardAsView_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_
+  commentId: M:UICatalog.Scenarios.WizardAsView.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  fullName: UICatalog.Scenarios.WizardAsView.Init(Terminal.Gui.Toplevel, Terminal.Gui.ColorScheme)
+  nameWithType: WizardAsView.Init(Toplevel, ColorScheme)
+- uid: UICatalog.Scenarios.WizardAsView.Init*
+  name: Init
+  href: api/UICatalog/UICatalog.Scenarios.WizardAsView.html#UICatalog_Scenarios_WizardAsView_Init_
+  commentId: Overload:UICatalog.Scenarios.WizardAsView.Init
+  isSpec: "True"
+  fullName: UICatalog.Scenarios.WizardAsView.Init
+  nameWithType: WizardAsView.Init
+- uid: UICatalog.Scenarios.WizardAsView.Run
+  name: Run()
+  href: api/UICatalog/UICatalog.Scenarios.WizardAsView.html#UICatalog_Scenarios_WizardAsView_Run
+  commentId: M:UICatalog.Scenarios.WizardAsView.Run
+  fullName: UICatalog.Scenarios.WizardAsView.Run()
+  nameWithType: WizardAsView.Run()
+- uid: UICatalog.Scenarios.WizardAsView.Run*
+  name: Run
+  href: api/UICatalog/UICatalog.Scenarios.WizardAsView.html#UICatalog_Scenarios_WizardAsView_Run_
+  commentId: Overload:UICatalog.Scenarios.WizardAsView.Run
+  isSpec: "True"
+  fullName: UICatalog.Scenarios.WizardAsView.Run
+  nameWithType: WizardAsView.Run
+- uid: UICatalog.Scenarios.Wizards
+  name: Wizards
+  href: api/UICatalog/UICatalog.Scenarios.Wizards.html
+  commentId: T:UICatalog.Scenarios.Wizards
+  fullName: UICatalog.Scenarios.Wizards
+  nameWithType: Wizards
+- uid: UICatalog.Scenarios.Wizards.Setup
+  name: Setup()
+  href: api/UICatalog/UICatalog.Scenarios.Wizards.html#UICatalog_Scenarios_Wizards_Setup
+  commentId: M:UICatalog.Scenarios.Wizards.Setup
+  fullName: UICatalog.Scenarios.Wizards.Setup()
+  nameWithType: Wizards.Setup()
+- uid: UICatalog.Scenarios.Wizards.Setup*
+  name: Setup
+  href: api/UICatalog/UICatalog.Scenarios.Wizards.html#UICatalog_Scenarios_Wizards_Setup_
+  commentId: Overload:UICatalog.Scenarios.Wizards.Setup
+  isSpec: "True"
+  fullName: UICatalog.Scenarios.Wizards.Setup
+  nameWithType: Wizards.Setup
 - uid: UICatalog.UICatalogApp
   name: UICatalogApp
   href: api/UICatalog/UICatalog.UICatalogApp.html

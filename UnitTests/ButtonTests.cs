@@ -17,47 +17,57 @@ namespace Terminal.Gui.Views {
 			var btn = new Button ();
 			Assert.Equal (string.Empty, btn.Text);
 			Application.Top.Add (btn);
-			btn.Redraw (btn.Bounds);
-			Assert.Equal ("[  ]", GetContents (btn.Bounds.Width));
+			var rs = Application.Begin (Application.Top);
+
+			Assert.Equal ("[  ]", btn.TextFormatter.Text);
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
+			var expected = @"
+[  ]
+";
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 
+			Application.End (rs);
 			btn = new Button ("ARGS", true) { Text = "Test" };
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
-			btn.Redraw (btn.Bounds);
-			Assert.Equal ("[◦ Test ◦]", GetContents (btn.Bounds.Width));
+			rs = Application.Begin (Application.Top);
+
+			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
+			expected = @"
+[◦ Test ◦]
+";
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 
+			Application.End (rs);
 			btn = new Button (3, 4, "Test", true);
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
-			btn.Redraw (btn.Bounds);
-			Assert.Equal ("[◦ Test ◦]", GetContents (btn.Bounds.Width));
+			rs = Application.Begin (Application.Top);
+
+			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
-		}
+			expected = @"
+   [◦ Test ◦]
+";
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 
-		private string GetContents (int width)
-		{
-			string output = "";
-			for (int i = 0; i < width; i++) {
-				output += (char)Application.Driver.Contents [0, i, 0];
-			}
-			return output;
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -268,13 +278,48 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void AutoSize_Stays_True_With_EmptyText ()
+		{
+			var btn = new Button () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				AutoSize = true
+			};
+
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Title = "Test Demo 你"
+			};
+			win.Add (btn);
+			Application.Top.Add (win);
+
+			Assert.True (btn.AutoSize);
+
+			btn.Text = "Say Hello 你";
+
+			Assert.True (btn.AutoSize);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			var expected = @"
+┌ Test Demo 你 ──────────────┐
+│                            │
+│      [ Say Hello 你 ]      │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void AutoSize_Stays_True_Center ()
 		{
 			var btn = new Button () {
 				X = Pos.Center (),
 				Y = Pos.Center (),
-				Text = "Say Hello 你",
-				AutoSize = true
+				Text = "Say Hello 你"
 			};
 
 			var win = new Window () {
@@ -322,7 +367,7 @@ namespace Terminal.Gui.Views {
 				Text = "Say Hello 你",
 				AutoSize = true
 			};
-			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth  (btn.TextFormatter.Text));
+			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (btn.TextFormatter.Text));
 
 			var win = new Window () {
 				Width = Dim.Fill (),
@@ -354,6 +399,185 @@ namespace Terminal.Gui.Views {
 ┌ Test Demo 你 ──────────────┐
 │                            │
 │    [ Say Hello 你 changed ]│
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoSize_False_With_Fixed_Width ()
+		{
+			var tab = new View ();
+
+			var lblWidth = 8;
+
+			var label = new Label ("Find:") {
+				Y = 1,
+				Width = lblWidth,
+				TextAlignment = TextAlignment.Right,
+				AutoSize = false
+			};
+			tab.Add (label);
+
+			var txtToFind = new TextField ("Testing buttons.") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 20
+			};
+			tab.Add (txtToFind);
+
+			var btnFindNext = new Button ("Find _Next") {
+				X = Pos.Right (txtToFind) + 1,
+				Y = Pos.Top (label),
+				Width = 20,
+				Enabled = !txtToFind.Text.IsEmpty,
+				TextAlignment = TextAlignment.Centered,
+				IsDefault = true,
+				AutoSize = false
+			};
+			tab.Add (btnFindNext);
+
+			var btnFindPrevious = new Button ("Find _Previous") {
+				X = Pos.Right (txtToFind) + 1,
+				Y = Pos.Top (btnFindNext) + 1,
+				Width = 20,
+				Enabled = !txtToFind.Text.IsEmpty,
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
+			};
+			tab.Add (btnFindPrevious);
+
+			var btnCancel = new Button ("Cancel") {
+				X = Pos.Right (txtToFind) + 1,
+				Y = Pos.Top (btnFindPrevious) + 2,
+				Width = 20,
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
+			};
+			tab.Add (btnCancel);
+
+			var ckbMatchCase = new CheckBox ("Match c_ase") {
+				X = 0,
+				Y = Pos.Top (txtToFind) + 2,
+				Checked = true
+			};
+			tab.Add (ckbMatchCase);
+
+			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+				X = 0,
+				Y = Pos.Top (ckbMatchCase) + 1,
+				Checked = false
+			};
+			tab.Add (ckbMatchWholeWord);
+
+			var tabView = new TabView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			tabView.AddTab (new TabView.Tab ("Find", tab), true);
+
+			var win = new Window ("Find") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			tab.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
+			tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
+
+			win.Add (tabView);
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (54, 11);
+
+			Assert.Equal (new Rect (0, 0, 54, 11), win.Frame);
+			Assert.Equal (new Rect (0, 0, 52, 9), tabView.Frame);
+			Assert.Equal (new Rect (0, 0, 50, 7), tab.Frame);
+			Assert.Equal (new Rect (0, 1, 8, 1), label.Frame);
+			Assert.Equal (new Rect (9, 1, 20, 1), txtToFind.Frame);
+
+			Assert.Equal (0, txtToFind.ScrollOffset);
+			Assert.Equal (16, txtToFind.CursorPosition);
+
+			Assert.Equal (new Rect (30, 1, 20, 1), btnFindNext.Frame);
+			Assert.Equal (new Rect (30, 2, 20, 1), btnFindPrevious.Frame);
+			Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
+			Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
+			Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
+			var expected = @"
+┌ Find ──────────────────────────────────────────────┐
+│┌────┐                                              │
+││Find│                                              │
+││    └─────────────────────────────────────────────┐│
+││                                                  ││
+││   Find: Testing buttons.       [◦ Find Next ◦]   ││
+││                               [ Find Previous ]  ││
+││√ Match case                                      ││
+││╴ Match whole word                 [ Cancel ]     ││
+│└──────────────────────────────────────────────────┘│
+└────────────────────────────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Pos_Center_Layout_AutoSize_True ()
+		{
+			var button = new Button ("Process keys") {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				IsDefault = true
+			};
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (button);
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			Assert.True (button.AutoSize);
+			Assert.Equal (new Rect (5, 1, 18, 1), button.Frame);
+			var expected = @"
+┌────────────────────────────┐
+│                            │
+│     [◦ Process keys ◦]     │
+│                            │
+└────────────────────────────┘
+";
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Pos_Center_Layout_AutoSize_False ()
+		{
+			var button = new Button ("Process keys") {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Width = 20,
+				IsDefault = true,
+				AutoSize = false
+			};
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (button);
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			Assert.False (button.AutoSize);
+			Assert.Equal (new Rect (4, 1, 20, 1), button.Frame);
+			var expected = @"
+┌────────────────────────────┐
+│                            │
+│     [◦ Process keys ◦]     │
 │                            │
 └────────────────────────────┘
 ";

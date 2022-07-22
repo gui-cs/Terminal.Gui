@@ -52,12 +52,27 @@ namespace Terminal.Gui.Views {
 
 	public class GraphViewTests {
 
+		static string LastInitFakeDriver;
 
 		public static FakeDriver InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			try {
+				Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			} catch (InvalidOperationException) {
+
+				// close it so that we don't get a thousand of these errors in a row
+				Application.Shutdown ();
+
+				// but still report a failure and name the test that didn't shut down.  Note
+				// that the test that didn't shutdown won't be the one currently running it will
+				// be the last one
+				throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
+			}
+			
 			driver.Init (() => { });
+
+			LastInitFakeDriver = Environment.StackTrace;
 			return driver;
 		}
 
@@ -169,7 +184,8 @@ namespace Terminal.Gui.Views {
 			for (int r = 0; r < lines.Count; r++) {
 				List<char> row = lines [r];
 				for (int c = row.Count - 1; c >= 0; c--) {
-					if (row [c] != ' ') {
+					var rune = row [c];
+					if (rune != ' ' || (row.Sum (x => Rune.ColumnWidth (x)) == w)) {
 						break;
 					}
 					row.RemoveAt (c);
@@ -249,7 +265,7 @@ namespace Terminal.Gui.Views {
 					var userExpected = line [c];
 
 					if (colorUsed != userExpected) {
-						throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor(colorUsed)} but test expected {DescribeColor(userExpected)} (these are indexes into the expectedColors array)");
+						throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor (colorUsed)} but test expected {DescribeColor (userExpected)} (these are indexes into the expectedColors array)");
 					}
 				}
 

@@ -42,6 +42,7 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 * [ScrollBarView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
 * [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
 * [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
+* [Wizard](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Wizard.html)
 
 ### Features
 
@@ -85,6 +86,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 * **[F# Example](https://github.com/migueldeicaza/gui.cs/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
 * **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)** - `OCGV` sends the output from a command to  an interactive table. 
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
+* **[TerminalGuiDesigner](https://github.com/tznind/TerminalGuiDesigner)** - Cross platform view designer for building Terminal.Gui applications.
 
 ## Documentation
 

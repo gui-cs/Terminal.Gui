@@ -1,25 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ComboBoxTests {
+		ITestOutputHelper output;
+
+		public ComboBoxTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
 			var cb = new ComboBox ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.Null (cb.Source);
+			Assert.False (cb.AutoSize);
+			Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
 
 			cb = new ComboBox ("Test");
 			Assert.Equal ("Test", cb.Text);
 			Assert.Null (cb.Source);
+			Assert.False (cb.AutoSize);
+			Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
 
 			cb = new ComboBox (new Rect (1, 2, 10, 20), new List<string> () { "One", "Two", "Three" });
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.NotNull (cb.Source);
+			Assert.False (cb.AutoSize);
+			Assert.Equal (new Rect (1, 2, 10, 20), cb.Frame);
 		}
 
 		[Fact]
@@ -44,12 +57,12 @@ namespace Terminal.Gui.Views {
 		public void KeyBindings_Command ()
 		{
 			List<string> source = new List<string> () { "One", "Two", "Three" };
-			ComboBox cb = new ComboBox ();
+			ComboBox cb = new ComboBox () { Width = 10 };
 			cb.SetSource (source);
 			Application.Top.Add (cb);
 			Application.Top.FocusFirst ();
 			Assert.Equal (-1, cb.SelectedItem);
-			Assert.Equal(string.Empty,cb.Text);
+			Assert.Equal (string.Empty, cb.Text);
 			var opened = false;
 			cb.OpenSelectedItem += (_) => opened = true;
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
@@ -63,7 +76,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.F4, new KeyModifiers ()))); // with no source also expand empty
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
-			cb.SetSource(source);
+			cb.SetSource (source);
 			cb.Text = "";
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.F4, new KeyModifiers ()))); // collapse
 			Assert.False (cb.IsShow);
@@ -106,7 +119,32 @@ namespace Terminal.Gui.Views {
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
+			Application.Begin (Application.Top);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+One      ▼
+One       
+", output);
+
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (1, cb.SelectedItem);
+			Assert.Equal ("Two", cb.Text);
+			Application.Begin (Application.Top);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Two      ▼
+Two       
+", output);
+
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.True (cb.IsShow);
+			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
+			Application.Begin (Application.Top);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Three    ▼
+Three     
+", output);
+			Assert.True (cb.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
@@ -167,10 +205,10 @@ namespace Terminal.Gui.Views {
 			var cb = new ComboBox ();
 			Application.Top.Add (cb);
 			Application.Top.FocusFirst ();
-			Assert.Null(cb.Source);
+			Assert.Null (cb.Source);
 			Assert.Equal (-1, cb.SelectedItem);
 			var source = new List<string> ();
-			cb.SetSource(source);
+			cb.SetSource (source);
 			Assert.NotNull (cb.Source);
 			Assert.Equal (0, cb.Source.Count);
 			Assert.Equal (-1, cb.SelectedItem);
@@ -197,7 +235,7 @@ namespace Terminal.Gui.Views {
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem); // retains last accept selected item
 			Assert.Equal ("", cb.Text); // clear text
-			cb.SetSource(new List<string> ());
+			cb.SetSource (new List<string> ());
 			Assert.Equal (0, cb.Source.Count);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);

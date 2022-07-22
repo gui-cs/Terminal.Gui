@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TableView.ColumnStyle
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -277,10 +277,44 @@ Set the maximum width of the column in characters.  This value will be ignored i
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_TableView_ColumnStyle_MinAcceptableWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_MinAcceptableWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MinAcceptableWidth">MinAcceptableWidth</h4>
+  <div class="markdown level1 summary">
+Enables flexible sizing of this column based on available screen space to render into.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MinAcceptableWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_TableView_ColumnStyle_MinWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth*"></a>
   <h4 id="Terminal_Gui_TableView_ColumnStyle_MinWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth">MinWidth</h4>
   <div class="markdown level1 summary">
-Set the minimum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> or the <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
+Set the minimum width of the column in characters.  Setting this will ensure that
+even when a column has short content/header it still fills a given width of the control.
+
+<p>This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> 
+or the <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
+</p>
+<remarks>
+For setting a flexible column width (down to a lower limit) use <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MinAcceptableWidth">MinAcceptableWidth</a>
+instead
+</remarks>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

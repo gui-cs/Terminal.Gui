@@ -90,6 +90,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (Label) + 1,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				TextAlignment = TextAlignment.Centered,
+				VerticalTextAlignment = VerticalTextAlignment.Middle
 			});
 			Label.Clicked += () => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -159,6 +161,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtn.Clicked += () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -190,6 +193,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtnA.Clicked += () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);

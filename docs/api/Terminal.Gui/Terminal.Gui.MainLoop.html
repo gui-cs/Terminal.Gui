@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MainLoop
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -181,6 +181,58 @@ The current IMainLoopDriver in use.
       <tr>
         <td><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></td>
         <td>The driver.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_MainLoop_IdleHandlers_" data-uid="Terminal.Gui.MainLoop.IdleHandlers*"></a>
+  <h4 id="Terminal_Gui_MainLoop_IdleHandlers" data-uid="Terminal.Gui.MainLoop.IdleHandlers">IdleHandlers</h4>
+  <div class="markdown level1 summary">
+Gets the list of all idle handlers.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Func&lt;bool&gt;&gt; IdleHandlers { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_MainLoop_Timeouts_" data-uid="Terminal.Gui.MainLoop.Timeouts*"></a>
+  <h4 id="Terminal_Gui_MainLoop_Timeouts" data-uid="Terminal.Gui.MainLoop.Timeouts">Timeouts</h4>
+  <div class="markdown level1 summary">
+Gets the list of all timeouts sorted by the <span class="xref">System.TimeSpan</span> time ticks./>.
+A shorter limit time can be added at the end, but it will be called before an
+earlier addition that has a longer limit time.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SortedList&lt;long, MainLoop.Timeout&gt; Timeouts { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.SortedList</span>&lt;<span class="xref">System.Int64</span>, <a class="xref" href="Terminal.Gui.MainLoop.Timeout.html">MainLoop.Timeout</a>&gt;</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -493,6 +545,33 @@ Stops the mainloop.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Stop()</code></pre>
   </div>
+  <h3 id="events">Events
+  </h3>
+  <h4 id="Terminal_Gui_MainLoop_TimeoutAdded" data-uid="Terminal.Gui.MainLoop.TimeoutAdded">TimeoutAdded</h4>
+  <div class="markdown level1 summary">
+Invoked when a new timeout is added to be used on the case
+if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration">ExitRunLoopAfterFirstIteration</a> is true,
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;long&gt; TimeoutAdded</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">System.Int64</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           

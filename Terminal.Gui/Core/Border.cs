@@ -173,26 +173,30 @@ namespace Terminal.Gui {
 				} else {
 					Border = border;
 				}
+				AdjustContentView (frame);
 			}
 
 			void AdjustContentView (Rect frame)
 			{
 				var borderLength = Border.DrawMarginFrame ? 1 : 0;
 				var sumPadding = Border.GetSumThickness ();
+				var wp = new Point ();
 				var wb = new Size ();
 				if (frame == Rect.Empty) {
+					wp.X = borderLength + sumPadding.Left;
+					wp.Y = borderLength + sumPadding.Top;
 					wb.Width = borderLength + sumPadding.Right;
 					wb.Height = borderLength + sumPadding.Bottom;
 					if (Border.Child == null) {
 						Border.Child = new ChildContentView (this) {
-							X = borderLength + sumPadding.Left,
-							Y = borderLength + sumPadding.Top,
+							X = wp.X,
+							Y = wp.Y,
 							Width = Dim.Fill (wb.Width),
 							Height = Dim.Fill (wb.Height)
 						};
 					} else {
-						Border.Child.X = borderLength + sumPadding.Left;
-						Border.Child.Y = borderLength + sumPadding.Top;
+						Border.Child.X = wp.X;
+						Border.Child.Y = wp.Y;
 						Border.Child.Width = Dim.Fill (wb.Width);
 						Border.Child.Height = Dim.Fill (wb.Height);
 					}
@@ -206,7 +210,8 @@ namespace Terminal.Gui {
 						Border.Child.Frame = cFrame;
 					}
 				}
-				base.Add (Border.Child);
+				if (Subviews?.Count == 0)
+					base.Add (Border.Child);
 				Border.ChildContainer = this;
 			}
 
@@ -248,7 +253,7 @@ namespace Terminal.Gui {
 			{
 				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (GetNormalColor ());
-					Border.DrawContent ();
+					Clear ();
 				}
 				var savedClip = Border.Child.ClipToBounds ();
 				Border.Child.Redraw (Border.Child.Bounds);
@@ -257,10 +262,13 @@ namespace Terminal.Gui {
 				ClearLayoutNeeded ();
 				ClearNeedsDisplay ();
 
-				if (Border.BorderStyle != BorderStyle.None) {
-					Driver.SetAttribute (GetNormalColor ());
-					Border.DrawTitle (this, this.Frame);
-				}
+				Driver.SetAttribute (GetNormalColor ());
+				Border.DrawContent (this, false);
+				if (HasFocus)
+					Driver.SetAttribute (ColorScheme.HotNormal);
+				if (Border.DrawMarginFrame)
+					Border.DrawTitle (this, Frame);
+				Driver.SetAttribute (GetNormalColor ());
 
 				// Checks if there are any SuperView view which intersect with this window.
 				if (SuperView != null) {
@@ -540,24 +548,26 @@ namespace Terminal.Gui {
 			driver.SetAttribute (savedAttribute);
 
 			// Draw margin frame
-			if (Parent?.Border != null) {
-				var sumPadding = GetSumThickness ();
-				borderRect = new Rect () {
-					X = scrRect.X + sumPadding.Left,
-					Y = scrRect.Y + sumPadding.Top,
-					Width = Math.Max (scrRect.Width - sumPadding.Right - sumPadding.Left, 0),
-					Height = Math.Max (scrRect.Height - sumPadding.Bottom - sumPadding.Top, 0)
-				};
-			} else {
-				borderRect = new Rect () {
-					X = borderRect.X + padding.Left,
-					Y = borderRect.Y + padding.Top,
-					Width = Math.Max (borderRect.Width - padding.Right - padding.Left, 0),
-					Height = Math.Max (borderRect.Height - padding.Bottom - padding.Top, 0)
-				};
-			}
-			if (borderRect.Width > 0 && borderRect.Height > 0) {
-				driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
+			if (DrawMarginFrame) {
+				if (Parent?.Border != null) {
+					var sumPadding = GetSumThickness ();
+					borderRect = new Rect () {
+						X = scrRect.X + sumPadding.Left,
+						Y = scrRect.Y + sumPadding.Top,
+						Width = Math.Max (scrRect.Width - sumPadding.Right - sumPadding.Left, 0),
+						Height = Math.Max (scrRect.Height - sumPadding.Bottom - sumPadding.Top, 0)
+					};
+				} else {
+					borderRect = new Rect () {
+						X = borderRect.X + padding.Left,
+						Y = borderRect.Y + padding.Top,
+						Width = Math.Max (borderRect.Width - padding.Right - padding.Left, 0),
+						Height = Math.Max (borderRect.Height - padding.Bottom - padding.Top, 0)
+					};
+				}
+				if (borderRect.Width > 0 && borderRect.Height > 0) {
+					driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
+				}
 			}
 		}
 
@@ -658,14 +668,16 @@ namespace Terminal.Gui {
 			driver.SetAttribute (savedAttribute);
 
 			// Draw the MarginFrame
-			var rect = new Rect () {
-				X = frame.X - drawMarginFrame,
-				Y = frame.Y - drawMarginFrame,
-				Width = frame.Width + (2 * drawMarginFrame),
-				Height = frame.Height + (2 * drawMarginFrame)
-			};
-			if (rect.Width > 0 && rect.Height > 0) {
-				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+			if (DrawMarginFrame) {
+				var rect = new Rect () {
+					X = frame.X - drawMarginFrame,
+					Y = frame.Y - drawMarginFrame,
+					Width = frame.Width + (2 * drawMarginFrame),
+					Height = frame.Height + (2 * drawMarginFrame)
+				};
+				if (rect.Width > 0 && rect.Height > 0) {
+					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+				}
 			}
 
 			if (Effect3D) {
@@ -810,14 +822,16 @@ namespace Terminal.Gui {
 			driver.SetAttribute (savedAttribute);
 
 			// Draw the MarginFrame
-			var rect = new Rect () {
-				X = frame.X + sumThickness.Left,
-				Y = frame.Y + sumThickness.Top,
-				Width = Math.Max (frame.Width - sumThickness.Right - sumThickness.Left, 0),
-				Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
-			};
-			if (rect.Width > 0 && rect.Height > 0) {
-				driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+			if (DrawMarginFrame) {
+				var rect = new Rect () {
+					X = frame.X + sumThickness.Left,
+					Y = frame.Y + sumThickness.Top,
+					Width = Math.Max (frame.Width - sumThickness.Right - sumThickness.Left, 0),
+					Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
+				};
+				if (rect.Width > 0 && rect.Height > 0) {
+					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+				}
 			}
 
 			if (Effect3D) {

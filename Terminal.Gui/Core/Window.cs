@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Window : Toplevel {
 		View contentView;
-		ustring title;
+		ustring title = ustring.Empty;
 
 		/// <summary>
 		/// The title to be displayed for this window.
@@ -32,9 +32,10 @@ namespace Terminal.Gui {
 		public ustring Title {
 			get => title;
 			set {
-				if (!OnTitleChanging (value)) {
+				if (!OnTitleChanging (title, value)) {
+					var old = title;
 					title = value;
-					OnTitleChanged (title);
+					OnTitleChanged (old, title);
 				}
 				SetNeedsDisplay ();
 			}
@@ -73,7 +74,6 @@ namespace Terminal.Gui {
 			}
 			AdjustContentView (frame);
 		}
-
 
 		/// <summary>
 		/// ContentView is an internal implementation detail of Window. It is used to host Views added with <see cref="Add(View)"/>. 
@@ -174,6 +174,7 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			ColorScheme = Colors.Base;
+			if (title == null) title = ustring.Empty;
 			Title = title;
 			if (border == null) {
 				Border = new Border () {
@@ -184,26 +185,30 @@ namespace Terminal.Gui {
 			} else {
 				Border = border;
 			}
+			AdjustContentView (frame);
 		}
 
 		void AdjustContentView (Rect frame)
 		{
 			var borderLength = Border.DrawMarginFrame ? 1 : 0;
 			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
 			var wb = new Size ();
 			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
 				wb.Width = borderLength + sumPadding.Right;
 				wb.Height = borderLength + sumPadding.Bottom;
 				if (contentView == null) {
 					contentView = new ContentView (this) {
-						X = borderLength + sumPadding.Left,
-						Y = borderLength + sumPadding.Top,
+						X = wp.X,
+						Y = wp.Y,
 						Width = Dim.Fill (wb.Width),
 						Height = Dim.Fill (wb.Height)
 					};
 				} else {
-					contentView.X = borderLength + sumPadding.Left;
-					contentView.Y = borderLength + sumPadding.Top;
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
 					contentView.Width = Dim.Fill (wb.Width);
 					contentView.Height = Dim.Fill (wb.Height);
 				}
@@ -217,7 +222,8 @@ namespace Terminal.Gui {
 					contentView.Frame = cFrame;
 				}
 			}
-			base.Add (contentView);
+			if (Subviews?.Count == 0)
+				base.Add (contentView);
 			Border.Child = contentView;
 		}
 
@@ -287,15 +293,15 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-			if (Border.BorderStyle != BorderStyle.None) {
-				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-				//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
-				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
+
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
+			//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
+			Border.DrawContent (this, false);
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			if (Border.DrawMarginFrame)
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			}
 			Driver.SetAttribute (GetNormalColor ());
 
 			// Checks if there are any SuperView view which intersect with this window.
@@ -318,7 +324,7 @@ namespace Terminal.Gui {
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public override ustring Text {
-			get => contentView.Text;
+			get => contentView?.Text;
 			set {
 				base.Text = value;
 				if (contentView != null) {
@@ -348,26 +354,35 @@ namespace Terminal.Gui {
 			public ustring NewTitle { get; set; }
 
 			/// <summary>
-			/// Flag which allows cancelling changing to the new TItle value.
+			/// The old Window Title.
+			/// </summary>
+			public ustring OldTitle { get; set; }
+
+			/// <summary>
+			/// Flag which allows cancelling the Title change.
 			/// </summary>
 			public bool Cancel { get; set; }
 
 			/// <summary>
 			/// Initializes a new instance of <see cref="TitleEventArgs"/>
 			/// </summary>
+			/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
 			/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
-			public TitleEventArgs (ustring newTitle)
+			public TitleEventArgs (ustring oldTitle, ustring newTitle)
 			{
+				OldTitle = oldTitle;
 				NewTitle = newTitle;
 			}
 		}
 		/// <summary>
 		/// Called before the <see cref="Window.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
 		/// </summary>
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
 		/// <returns>`true` if an event handler cancelled the Title change.</returns>
-		public virtual bool OnTitleChanging (ustring newTitle)
+		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 		{
-			var args = new TitleEventArgs (newTitle);
+			var args = new TitleEventArgs (oldTitle, newTitle);
 			TitleChanging?.Invoke (args);
 			return args.Cancel;
 		}
@@ -381,9 +396,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called when the <see cref="Window.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
 		/// </summary>
-		public virtual void OnTitleChanged (ustring newTitle)
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
 		{
-			var args = new TitleEventArgs (title);
+			var args = new TitleEventArgs (oldTitle, newTitle);
 			TitleChanged?.Invoke (args);
 		}
 

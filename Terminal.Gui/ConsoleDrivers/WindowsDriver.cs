@@ -876,7 +876,6 @@ namespace Terminal.Gui {
 							Y = me.Y,
 							Flags = ProcessButtonClick (inputEvent.MouseEvent)
 						});
-					processButtonClick = false;
 				}
 				break;
 
@@ -901,7 +900,8 @@ namespace Terminal.Gui {
 		bool isButtonPressed = false;
 		bool isButtonReleased = false;
 		bool isButtonDoubleClicked = false;
-		Point point;
+		Point? point;
+		Point pointMove;
 		//int buttonPressedCount;
 		bool isOneFingerDoubleClicked = false;
 		bool processButtonClick;
@@ -1013,12 +1013,14 @@ namespace Terminal.Gui {
 					break;
 				}
 
+				if (point == null)
+					point = p;
+
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					isButtonReleased = false;
 					processButtonClick = false;
 				}
-				point = p;
 				lastMouseButtonPressed = mouseEvent.ButtonState;
 				isButtonPressed = true;
 
@@ -1046,8 +1048,10 @@ namespace Terminal.Gui {
 				}
 				isButtonPressed = false;
 				isButtonReleased = true;
-				if (point.X == mouseEvent.MousePosition.X && point.Y == mouseEvent.MousePosition.Y) {
+				if (point != null && (((Point)point).X == mouseEvent.MousePosition.X && ((Point)point).Y == mouseEvent.MousePosition.Y)) {
 					processButtonClick = true;
+				} else {
+					point = null;
 				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
 				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
@@ -1119,9 +1123,9 @@ namespace Terminal.Gui {
 				}
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
-				if (mouseEvent.MousePosition.X != point.X || mouseEvent.MousePosition.Y != point.Y) {
+				if (mouseEvent.MousePosition.X != pointMove.X || mouseEvent.MousePosition.Y != pointMove.Y) {
 					mouseFlag = MouseFlags.ReportMousePosition;
-					point = new Point ();
+					pointMove = new Point ();
 				} else {
 					mouseFlag = 0;
 				}
@@ -1130,6 +1134,9 @@ namespace Terminal.Gui {
 			}
 
 			mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
+
+			//System.Diagnostics.Debug.WriteLine (
+			//	$"point.X:{(point != null ? ((Point)point).X : -1)};point.Y:{(point != null ? ((Point)point).Y : -1)}");
 
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
@@ -1160,6 +1167,8 @@ namespace Terminal.Gui {
 			};
 			lastMouseButtonPressed = null;
 			isButtonReleased = false;
+			processButtonClick = false;
+			point = null;
 			return mouseFlag;
 		}
 
@@ -1176,8 +1185,8 @@ namespace Terminal.Gui {
 			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = point.X,
-					Y = point.Y,
+					X = pointMove.X,
+					Y = pointMove.Y,
 					Flags = mouseFlag
 				};
 

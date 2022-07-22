@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> is redraws for the first time.
 		/// </summary>
-		internal virtual void OnLoaded ()
+		virtual public void OnLoaded ()
 		{
 			Loaded?.Invoke ();
 		}

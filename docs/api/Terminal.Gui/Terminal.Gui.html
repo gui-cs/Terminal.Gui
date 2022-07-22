@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -97,7 +97,7 @@ Event arguments for the <a class="xref" href="Terminal.Gui.Application.html#Term
 </section>
       <h4><a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a></h4>
       <section>
-Captures the execution state for the provided <span class="xref">Terminal.Gui.Application.RunState.Toplevel</span>  view.
+Captures the execution state for the provided <a class="xref" href="Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState_Toplevel">Toplevel</a>  view.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Autocomplete.html">Autocomplete</a></h4>
       <section>
@@ -248,6 +248,10 @@ Implements an <a class="xref" href="Terminal.Gui.IListDataSource.html">IListData
       <section>
 Simple main loop implementation that can be used to monitor
 file descriptor, run timers and idle handlers.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.MainLoop.Timeout.html">MainLoop.Timeout</a></h4>
+      <section>
+Provides data for timers running manipulation.
 </section>
       <h4><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></h4>
       <section>
@@ -492,6 +496,37 @@ Specifies the event arguments for <a class="xref" href="Terminal.Gui.View.MouseE
       <section>
 A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> that draws a border around its <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> with a <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Title</a> at the top.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.Window.TitleEventArgs.html">Window.TitleEventArgs</a></h4>
+      <section>
+An <span class="xref">System.EventArgs</span> which allows passing a cancelable new <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Title</a> value event.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a></h4>
+      <section>
+Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a>) can host 
+arbitrary <a class="xref" href="Terminal.Gui.View.html">View</a>s, much like a <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>. Each step also has a pane for help text. Along the
+bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard. 
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.StepChangeEventArgs.html">Wizard.StepChangeEventArgs</a></h4>
+      <section>
+<span class="xref">System.EventArgs</span> for <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a> events.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.WizardButtonEventArgs.html">Wizard.WizardButtonEventArgs</a></h4>
+      <section>
+<span class="xref">System.EventArgs</span> for <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a> transition events.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a></h4>
+      <section>
+Represents a basic step that is displayed in a <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a>. The <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a> view is divided horizontally in two. On the left is the
+content view where <a class="xref" href="Terminal.Gui.View.html">View</a>s can be added,  On the right is the help for the step.
+Set <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_HelpText">HelpText</a> to set the help text. If the help text is empty the help pane will not
+be shown. 
+
+If there are no Views added to the WizardStep the <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_HelpText">HelpText</a> (if not empty) will fill the wizard step. 
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.WizardStep.TitleEventArgs.html">Wizard.WizardStep.TitleEventArgs</a></h4>
+      <section>
+An <span class="xref">System.EventArgs</span> which allows passing a cancelable new <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html#Terminal_Gui_Wizard_WizardStep_Title">Title</a> value event.
+</section>
     <h3 id="structs">Structs
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></h4>
@@ -578,6 +613,10 @@ Enables diagnostic functions
       <h4><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></h4>
       <section>
 Cursors Visibility that are displayed
+</section>
+      <h4><a class="xref" href="Terminal.Gui.Dialog.ButtonAlignments.html">Dialog.ButtonAlignments</a></h4>
+      <section>
+Determines the horizontal alignment of the Dialog buttons.
 </section>
       <h4><a class="xref" href="Terminal.Gui.DisplayModeLayout.html">DisplayModeLayout</a></h4>
       <section>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class View
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -117,7 +117,7 @@ View is the base class for all views on the screen and represents a visible elem
       <div class="level3"><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
@@ -438,10 +438,12 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View
   <a id="Terminal_Gui_View_AutoSize_" data-uid="Terminal.Gui.View.AutoSize*"></a>
   <h4 id="Terminal_Gui_View_AutoSize" data-uid="Terminal.Gui.View.AutoSize">AutoSize</h4>
   <div class="markdown level1 summary">
-Used by <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> to resize the view&apos;s <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> with the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size">Size</a>.
-Setting <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">AutoSize</a> to true only work if the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a> and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> are null or
-<a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> values and doesn&apos;t work with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout,
-to avoid breaking the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> and <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> settings.
+Gets or sets a flag that determines whether the View will be automatically resized to fit the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a>.
+The default is `false`. Set to `true` to turn on AutoSize. If <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">AutoSize</a> is `true` the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>
+and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> will always be used if the text size is lower. If the text size is higher the bounds will
+be resized to fit it.
+In addition, if <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim">ForceValidatePosDim</a> is `true` the new values of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a> and
+<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> must be of the same types of the existing one to avoid breaking the <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> settings.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -678,6 +680,32 @@ Returns the currently focused view inside this view, or null if nothing is focus
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_ForceValidatePosDim_" data-uid="Terminal.Gui.View.ForceValidatePosDim*"></a>
+  <h4 id="Terminal_Gui_View_ForceValidatePosDim" data-uid="Terminal.Gui.View.ForceValidatePosDim">ForceValidatePosDim</h4>
+  <div class="markdown level1 summary">
+Forces validation with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout
+to avoid breaking the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> and <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> settings.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ForceValidatePosDim { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_Frame_" data-uid="Terminal.Gui.View.Frame*"></a>
   <h4 id="Terminal_Gui_View_Frame" data-uid="Terminal.Gui.View.Frame">Frame</h4>
   <div class="markdown level1 summary">
@@ -840,6 +868,31 @@ Gets or sets an identifier for the view;
   </table>
   <h5 id="Terminal_Gui_View_Id_remarks">Remarks</h5>
   <div class="markdown level1 remarks">The id should be unique across all Views that share a SuperView.</div>
+  <a id="Terminal_Gui_View_IsAdded_" data-uid="Terminal.Gui.View.IsAdded*"></a>
+  <h4 id="Terminal_Gui_View_IsAdded" data-uid="Terminal.Gui.View.IsAdded">IsAdded</h4>
+  <div class="markdown level1 summary">
+Gets information if the view was already added to the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAdded { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_IsCurrentTop_" data-uid="Terminal.Gui.View.IsCurrentTop*"></a>
   <h4 id="Terminal_Gui_View_IsCurrentTop" data-uid="Terminal.Gui.View.IsCurrentTop">IsCurrentTop</h4>
   <div class="markdown level1 summary">
@@ -940,6 +993,34 @@ Returns the most focused view in the chain of subviews (the leaf view that has t
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td>The most focused.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_PreserveTrailingSpaces_" data-uid="Terminal.Gui.View.PreserveTrailingSpaces*"></a>
+  <h4 id="Terminal_Gui_View_PreserveTrailingSpaces" data-uid="Terminal.Gui.View.PreserveTrailingSpaces">PreserveTrailingSpaces</h4>
+  <div class="markdown level1 summary">
+Gets or sets a flag that determines whether <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text">Text</a> will have trailing spaces preserved
+or not when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_Terminal_Gui_TextDirection_">WordWrap(ustring, Int32, Boolean, Int32, TextDirection)</a> is enabled. If `true` any trailing spaces will be trimmed when
+either the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> property is changed or when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_Terminal_Gui_TextDirection_">WordWrap(ustring, Int32, Boolean, Int32, TextDirection)</a> is set to `true`.
+The default is `false`.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool PreserveTrailingSpaces { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -2127,6 +2208,56 @@ Focuses the previous view.
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_GetAutoSize_" data-uid="Terminal.Gui.View.GetAutoSize*"></a>
+  <h4 id="Terminal_Gui_View_GetAutoSize" data-uid="Terminal.Gui.View.GetAutoSize">GetAutoSize()</h4>
+  <div class="markdown level1 summary">
+Gets the size to fit all text if <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">AutoSize</a> is true.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Size GetAutoSize()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+        <td>The <a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_GetBoundsTextFormatterSize_" data-uid="Terminal.Gui.View.GetBoundsTextFormatterSize*"></a>
+  <h4 id="Terminal_Gui_View_GetBoundsTextFormatterSize" data-uid="Terminal.Gui.View.GetBoundsTextFormatterSize">GetBoundsTextFormatterSize()</h4>
+  <div class="markdown level1 summary">
+Gets the text formatter size from a <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> size.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Size GetBoundsTextFormatterSize()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+        <td>The text formatter size more the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier">HotKeySpecifier</a> length.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_GetCurrentHeight_" data-uid="Terminal.Gui.View.GetCurrentHeight*"></a>
   <h4 id="Terminal_Gui_View_GetCurrentHeight_System_Int32__" data-uid="Terminal.Gui.View.GetCurrentHeight(System.Int32@)">GetCurrentHeight(out Int32)</h4>
   <div class="markdown level1 summary">
@@ -2211,6 +2342,48 @@ Gets the current width based on the <a class="xref" href="Terminal.Gui.View.html
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_GetHotKeySpecifierLength_" data-uid="Terminal.Gui.View.GetHotKeySpecifierLength*"></a>
+  <h4 id="Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_" data-uid="Terminal.Gui.View.GetHotKeySpecifierLength(System.Boolean)">GetHotKeySpecifierLength(Boolean)</h4>
+  <div class="markdown level1 summary">
+Get the width or height of the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier">HotKeySpecifier</a> length.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetHotKeySpecifierLength(bool isWidth = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isWidth</span></td>
+        <td><code>true</code>if is the width (default)<code>false</code>if is the height.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>The length of the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier">HotKeySpecifier</a>.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_GetKeyFromCommand_" data-uid="Terminal.Gui.View.GetKeyFromCommand*"></a>
   <h4 id="Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_" data-uid="Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)">GetKeyFromCommand(Command)</h4>
   <div class="markdown level1 summary">
@@ -2250,6 +2423,48 @@ Gets the key used by a command.
       <tr>
         <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
         <td>The <a class="xref" href="Terminal.Gui.Key.html">Key</a> used by a <a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_GetMinWidthHeight_" data-uid="Terminal.Gui.View.GetMinWidthHeight*"></a>
+  <h4 id="Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__" data-uid="Terminal.Gui.View.GetMinWidthHeight(Terminal.Gui.Size@)">GetMinWidthHeight(out Size)</h4>
+  <div class="markdown level1 summary">
+Verifies if the minimum width or height can be sets in the view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool GetMinWidthHeight(out Size size)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+        <td><span class="parametername">size</span></td>
+        <td>The size.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">true</span> if the size can be set, <span class="xref">false</span>otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -2301,6 +2516,31 @@ Returns all commands that are supported by this <a class="xref" href="Terminal.G
       <tr>
         <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Terminal.Gui.Command.html">Command</a>&gt;</td>
         <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_View_GetTextFormatterBoundsSize_" data-uid="Terminal.Gui.View.GetTextFormatterBoundsSize*"></a>
+  <h4 id="Terminal_Gui_View_GetTextFormatterBoundsSize" data-uid="Terminal.Gui.View.GetTextFormatterBoundsSize">GetTextFormatterBoundsSize()</h4>
+  <div class="markdown level1 summary">
+Gets the bounds size from a <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size">Size</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Size GetTextFormatterBoundsSize()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+        <td>The bounds size minus the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier">HotKeySpecifier</a> length.</td>
       </tr>
     </tbody>
   </table>
@@ -3043,6 +3283,17 @@ Positions the cursor in the right position based on the currently focused view i
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent_">Responder.ProcessKey(KeyEvent)</a></div>
+  <a id="Terminal_Gui_View_ProcessResizeView_" data-uid="Terminal.Gui.View.ProcessResizeView*"></a>
+  <h4 id="Terminal_Gui_View_ProcessResizeView" data-uid="Terminal.Gui.View.ProcessResizeView">ProcessResizeView()</h4>
+  <div class="markdown level1 summary">
+Can be overridden if the view resize behavior is
+different than the default.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ProcessResizeView()</code></pre>
+  </div>
   <a id="Terminal_Gui_View_Redraw_" data-uid="Terminal.Gui.View.Redraw*"></a>
   <h4 id="Terminal_Gui_View_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -3374,6 +3625,31 @@ Calculate the height based on the <a class="xref" href="Terminal.Gui.View.html#T
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_View_SetMinWidthHeight_" data-uid="Terminal.Gui.View.SetMinWidthHeight*"></a>
+  <h4 id="Terminal_Gui_View_SetMinWidthHeight" data-uid="Terminal.Gui.View.SetMinWidthHeight">SetMinWidthHeight()</h4>
+  <div class="markdown level1 summary">
+Sets the minimum width or height if the view can be resized.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SetMinWidthHeight()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">true</span> if the size can be set, <span class="xref">false</span>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_View_SetNeedsDisplay_" data-uid="Terminal.Gui.View.SetNeedsDisplay*"></a>
   <h4 id="Terminal_Gui_View_SetNeedsDisplay" data-uid="Terminal.Gui.View.SetNeedsDisplay">SetNeedsDisplay()</h4>
   <div class="markdown level1 summary">
@@ -3485,6 +3761,17 @@ Pretty prints the View
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><span class="xref">System.Object.ToString()</span></div>
+  <a id="Terminal_Gui_View_UpdateTextFormatterText_" data-uid="Terminal.Gui.View.UpdateTextFormatterText*"></a>
+  <h4 id="Terminal_Gui_View_UpdateTextFormatterText" data-uid="Terminal.Gui.View.UpdateTextFormatterText">UpdateTextFormatterText()</h4>
+  <div class="markdown level1 summary">
+Can be overridden if the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text">Text</a> has
+different format than the default.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void UpdateTextFormatterText()</code></pre>
+  </div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_View_Added" data-uid="Terminal.Gui.View.Added">Added</h4>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,15 +6,20 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
+using Terminal.Gui.Views;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
 	public class DimTests {
-		public DimTests ()
+		readonly ITestOutputHelper output;
+
+		public DimTests (ITestOutputHelper output)
 		{
+			this.output = output;
 			Console.OutputEncoding = System.Text.Encoding.Default;
 			// Change current culture
 			CultureInfo culture = CultureInfo.CreateSpecificCulture ("en-US");
@@ -245,7 +250,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Dim_Validation_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type ()
+		public void ForceValidatePosDim_True_Dim_Validation_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type ()
 		{
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
@@ -257,7 +262,8 @@ namespace Terminal.Gui.Core {
 			};
 			var v = new View ("v") {
 				Width = Dim.Width (w) - 2,
-				Height = Dim.Percent (10)
+				Height = Dim.Percent (10),
+				ForceValidatePosDim = true
 			};
 
 			w.Add (v);
@@ -268,6 +274,13 @@ namespace Terminal.Gui.Core {
 				Assert.Equal (2, w.Height = 2);
 				Assert.Throws<ArgumentException> (() => v.Width = 2);
 				Assert.Throws<ArgumentException> (() => v.Height = 2);
+				v.ForceValidatePosDim = false;
+				var exception = Record.Exception (() => v.Width = 2);
+				Assert.Null (exception);
+				Assert.Equal (2, v.Width);
+				exception = Record.Exception (() => v.Height = 2);
+				Assert.Null (exception);
+				Assert.Equal (2, v.Height);
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
@@ -357,39 +370,51 @@ namespace Terminal.Gui.Core {
 			};
 
 			var v1 = new Button ("v1") {
+				AutoSize = false,
 				X = Pos.X (f1) + 2,
 				Y = Pos.Bottom (f1) + 2,
 				Width = Dim.Width (f1) - 2,
-				Height = Dim.Fill () - 2
+				Height = Dim.Fill () - 2,
+				ForceValidatePosDim = true
 			};
 
 			var v2 = new Button ("v2") {
+				AutoSize = false,
 				X = Pos.X (f2) + 2,
 				Y = Pos.Bottom (f2) + 2,
 				Width = Dim.Width (f2) - 2,
-				Height = Dim.Fill () - 2
+				Height = Dim.Fill () - 2,
+				ForceValidatePosDim = true
 			};
 
 			var v3 = new Button ("v3") {
+				AutoSize = false,
 				Width = Dim.Percent (10),
-				Height = Dim.Percent (10)
+				Height = Dim.Percent (10),
+				ForceValidatePosDim = true
 			};
 
 			var v4 = new Button ("v4") {
+				AutoSize = false,
 				Width = Dim.Sized (50),
-				Height = Dim.Sized (50)
+				Height = Dim.Sized (50),
+				ForceValidatePosDim = true
 			};
 
 			var v5 = new Button ("v5") {
+				AutoSize = false,
 				Width = Dim.Width (v1) - Dim.Width (v3),
-				Height = Dim.Height (v1) - Dim.Height (v3)
+				Height = Dim.Height (v1) - Dim.Height (v3),
+				ForceValidatePosDim = true
 			};
 
 			var v6 = new Button ("v6") {
+				AutoSize = false,
 				X = Pos.X (f2),
 				Y = Pos.Bottom (f2) + 2,
 				Width = Dim.Percent (20, true),
-				Height = Dim.Percent (20, true)
+				Height = Dim.Percent (20, true),
+				ForceValidatePosDim = true
 			};
 
 			w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
@@ -415,7 +440,6 @@ namespace Terminal.Gui.Core {
 				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (47, v1.Frame.Width); // 49-2=47
 				Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
-
 
 				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=49,Y=0,Width=49,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
 				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v2.Height.ToString ());
@@ -466,26 +490,28 @@ namespace Terminal.Gui.Core {
 
 				v1.Text = "Button1";
 				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=0,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v1.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v1.Height.ToString ());
+				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (97, v1.Frame.Width); // 99-2=97
-				Assert.Equal (1, v1.Frame.Height); // 1 because is Dim.DimAbsolute
+				Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
 				v2.Text = "Button2";
 				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=99,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v2.Height.ToString ());
+				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (97, v2.Frame.Width); // 99-2=97
-				Assert.Equal (1, v2.Frame.Height); // 1 because is Dim.DimAbsolute
+				Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
 				v3.Text = "Button3";
 				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v3.Height.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Height.ToString ());
 				Assert.Equal (19, v3.Frame.Width); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
-				Assert.Equal (1, v3.Frame.Height); // 1 because is Dim.DimAbsolute
+				Assert.Equal (19, v3.Frame.Height); // 199*10%=19
 
 				v4.Text = "Button4";
 				v4.AutoSize = false;
 				Assert.Equal ("Dim.Absolute(50)", v4.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
+				Assert.Equal ("Dim.Absolute(50)", v4.Height.ToString ());
+				Assert.Equal (50, v4.Frame.Width);
+				Assert.Equal (50, v4.Frame.Height);
 				v4.AutoSize = true;
 				Assert.Equal ("Dim.Absolute(11)", v4.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
@@ -493,16 +519,16 @@ namespace Terminal.Gui.Core {
 				Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v5.Text = "Button5";
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=97,Height=1}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=19,Height=1})))", v5.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v5.Height.ToString ());
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=97,Height=189}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
+				Assert.Equal ("Dim.Combine(DimView(side=Height, target=Button()({X=2,Y=7,Width=97,Height=189}))-DimView(side=Height, target=Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
 				Assert.Equal (78, v5.Frame.Width); // 97-19=78
-				Assert.Equal (1, v5.Frame.Height); // 1 because is Dim.DimAbsolute
+				Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
 				v6.Text = "Button6";
 				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v6.Height.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Height.ToString ());
 				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
-				Assert.Equal (1, v6.Frame.Height); // 1 because is Dim.DimAbsolute
+				Assert.Equal (38, v6.Frame.Height); // 198-7*20=38
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
@@ -641,6 +667,324 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 		}
 
+		private string [] expecteds = new string [21] {
+@"
+┌────────────────────┐
+│View with long text │
+│                    │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 0             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 1             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 2             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 3             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 4             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 5             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 6             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 7             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 8             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 9             │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 10            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 11            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 12            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 13            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 14            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 15            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 16            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 17            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+│Label 18            │
+└────────────────────┘",
+@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+│Label 19            │
+│Label 19            │
+└────────────────────┘",
+};
+
 		[Fact]
 		public void Dim_Add_Operator_With_Text ()
 		{
@@ -649,28 +993,45 @@ namespace Terminal.Gui.Core {
 
 			var top = Application.Top;
 
-			var view = new View ("View") { X = 0, Y = 0, Width = 20, Height = 0 };
+			// Although view height is zero the text it's draw due the SetMinWidthHeight method
+			var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 0 };
 			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
 			var count = 0;
+			var listLabels = new List<Label> ();
 
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
-					field.Text = $"Label {count}";
-					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
-					view.Add (label);
-					Assert.Equal ($"Label {count}", label.Text);
-					Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
-					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
-					view.Height += 1;
-					count++;
+					if (count < 20) {
+						field.Text = $"Label {count}";
+						var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
+						view.Add (label);
+						Assert.Equal ($"Label {count}", label.Text);
+						Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+						listLabels.Add (label);
+						if (count == 0) {
+							Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+							view.Height += 2;
+						} else {
+							Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+							view.Height += 1;
+						}
+						count++;
+					}
 					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
 			Application.Iteration += () => {
-				while (count < 20) {
+				while (count < 21) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					if (count == 20) {
+						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						break;
+					}
 				}
 
 				Application.RequestStop ();
@@ -685,6 +1046,7 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (20, count);
+			Assert.Equal (count, listLabels.Count);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -758,42 +1120,60 @@ namespace Terminal.Gui.Core {
 
 			var top = Application.Top;
 
-			var view = new View ("View") { X = 0, Y = 0, Width = 20, Height = 0 };
+			// Although view height is zero the text it's draw due the SetMinWidthHeight method
+			var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 0 };
 			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
 			var count = 20;
 			var listLabels = new List<Label> ();
 
 			for (int i = 0; i < count; i++) {
 				field.Text = $"Label {i}";
-				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
-				Assert.Equal ($"Pos.Absolute({i})", label.Y.ToString ());
+				Assert.Equal ($"Pos.Absolute({i + 1})", label.Y.ToString ());
 				listLabels.Add (label);
 
-				Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
-				view.Height += 1;
-				Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+				if (i == 0) {
+					Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
+					view.Height += 2;
+					Assert.Equal ($"Dim.Absolute({i + 2})", view.Height.ToString ());
+				} else {
+					Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+					view.Height += 1;
+					Assert.Equal ($"Dim.Absolute({i + 2})", view.Height.ToString ());
+				}
 			}
 
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
-					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-					view.Remove (listLabels [count - 1]);
+					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
-					view.Height -= 1;
-					count--;
-					if (count == 0)
+					if (count > 0) {
+						Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
+						view.Remove (listLabels [count - 1]);
+						listLabels.RemoveAt (count - 1);
 						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
-					else
-						Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+						view.Height -= 1;
+						count--;
+						if (listLabels.Count > 0)
+							field.Text = listLabels [count - 1].Text;
+						else
+							field.Text = NStack.ustring.Empty;
+					}
+					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
 			Application.Iteration += () => {
-				while (count > 0) {
+				while (count > -1) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					if (count == 0) {
+						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						break;
+					}
 				}
 
 				Application.RequestStop ();
@@ -808,6 +1188,7 @@ namespace Terminal.Gui.Core {
 			Application.Run (top);
 
 			Assert.Equal (0, count);
+			Assert.Equal (count, listLabels.Count);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();

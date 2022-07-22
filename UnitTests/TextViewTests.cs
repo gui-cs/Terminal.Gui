@@ -5561,14 +5561,12 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
-			// Undo is disabled
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
+			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
-			Assert.Equal (new Point (1, 1), tv.CursorPosition);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			// Redo is disabled
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -5706,6 +5704,26 @@ line.
 				};
 			});
 			Assert.Null (exception);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ScrollDownTillCaretOffscreen_ThenType ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 5
+			};
+
+			// add 100 lines of wide text to view
+			for (int i = 0; i < 100; i++)
+				tv.Text += new string ('x', 100) + Environment.NewLine;
+
+			Assert.Equal (0, tv.CursorPosition.Y);
+			tv.ScrollTo (50);
+			Assert.Equal (0, tv.CursorPosition.Y);
+
+			tv.ProcessKey (new KeyEvent (Key.p, new KeyModifiers ()));
 		}
 	}
 }

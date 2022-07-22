@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ConsoleDriver
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -1139,6 +1139,31 @@ The current number of columns in the terminal.
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_ConsoleDriver_Contents_" data-uid="Terminal.Gui.ConsoleDriver.Contents*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Contents" data-uid="Terminal.Gui.ConsoleDriver.Contents">Contents</h4>
+  <div class="markdown level1 summary">
+The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int[,, ] Contents { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span>[,,]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_ConsoleDriver_Diagnostics_" data-uid="Terminal.Gui.ConsoleDriver.Diagnostics*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_Diagnostics" data-uid="Terminal.Gui.ConsoleDriver.Diagnostics">Diagnostics</h4>
   <div class="markdown level1 summary">
@@ -1900,6 +1925,16 @@ Updates the screen to reflect all the changes that have been done to the display
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract void Refresh()</code></pre>
+  </div>
+  <a id="Terminal_Gui_ConsoleDriver_ResizeScreen_" data-uid="Terminal.Gui.ConsoleDriver.ResizeScreen*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_ResizeScreen" data-uid="Terminal.Gui.ConsoleDriver.ResizeScreen">ResizeScreen()</h4>
+  <div class="markdown level1 summary">
+Resizes the clip area when the screen is resized.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void ResizeScreen()</code></pre>
   </div>
   <a id="Terminal_Gui_ConsoleDriver_SendKeys_" data-uid="Terminal.Gui.ConsoleDriver.SendKeys*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)">SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</h4>
