@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,25 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_Button_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  Provides a button showing text invokes an <span class="xref">System.Action</span> when clicked on with a mouse
+  or when the user presses SPACE, ENTER, or hotkey. The hotkey is the first letter or digit following the first underscore (&apos;_&apos;) 
+  in the button text. 
+</p>
+<p>
+  Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">HotKeySpecifier</a> to change the hotkey specifier from the default of (&apos;_&apos;). 
+</p>
+<p>
+  If no hotkey specifier is found, the first uppercase letter encountered will be used as the hotkey.
+</p>
+<p>
+  When the button is configured as the default (<a class="xref" href="Terminal.Gui.Button.html#Terminal_Gui_Button_IsDefault">IsDefault</a>) and the user presses
+  the ENTER key, if no other <a class="xref" href="Terminal.Gui.View.html">View</a> processes the <a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a>, the <a class="xref" href="Terminal.Gui.Button.html">Button</a>&apos;s
+<span class="xref">System.Action</span> will be invoked.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -505,25 +525,6 @@ Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Button : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Button_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  Provides a button showing text invokes an <span class="xref">System.Action</span> when clicked on with a mouse
-  or when the user presses SPACE, ENTER, or hotkey. The hotkey is the first letter or digit following the first underscore (&apos;_&apos;) 
-  in the button text. 
-</p>
-<p>
-  Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">HotKeySpecifier</a> to change the hotkey specifier from the default of (&apos;_&apos;). 
-</p>
-<p>
-  If no hotkey specifier is found, the first uppercase letter encountered will be used as the hotkey.
-</p>
-<p>
-  When the button is configured as the default (<a class="xref" href="Terminal.Gui.Button.html#Terminal_Gui_Button_IsDefault">IsDefault</a>) and the user presses
-  the ENTER key, if no other <a class="xref" href="Terminal.Gui.View.html">View</a> processes the <a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a>, the <a class="xref" href="Terminal.Gui.Button.html">Button</a>&apos;s
-<span class="xref">System.Action</span> will be invoked.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
@@ -536,11 +537,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.Button.html">Bu
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Button()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Button__ctor_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
-text length. The height will always be 1.
-</div>
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)">Button(ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -576,11 +572,6 @@ in a <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> will implicitly 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
-text length. The height will always be 1.
-</div>
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)">Button(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
@@ -618,11 +609,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.Button.html">Bu
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
-text length. The height will always be 1.
-</div>
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">Button(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -668,11 +654,6 @@ in a <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> will implicitly 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The width of the <a class="xref" href="Terminal.Gui.Button.html">Button</a> is computed based on the
-text length. The height will always be 1.
-</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Terminal_Gui_Button_HotKey_" data-uid="Terminal.Gui.Button.HotKey*"></a>
@@ -886,22 +867,6 @@ interefering with normal ProcessKey behavior.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Button_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  After keys are sent to the subviews on the
-  current view, all the view are
-  processed and the key is passed to the views
-  to allow some of them to process the keystroke
-  as a cold-key. </p>
-<p>
-  This functionality is used, for example, by
-  default buttons to act on the enter key.
-  Processing this as a hot-key would prevent
-  non-default buttons from consuming the enter
-  keypress when they have the focus.
-</p>
-</div>
   <a id="Terminal_Gui_Button_ProcessHotKey_" data-uid="Terminal.Gui.Button.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_Button_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Button.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -948,23 +913,6 @@ want to provide accelerator functionality
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Button_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Before keys are sent to the subview on the
-  current view, all the views are
-  processed and the key is passed to the widgets
-  to allow some of them to process the keystroke
-  as a hot-key. </p>
-<p>
-   For example, if you implement a button that
-   has a hotkey ok &quot;o&quot;, you would catch the
-   combination Alt-o here.  If the event is
-   caught, you must return true to stop the
-   keystroke from being dispatched to other
-   views.
-</p>
-</div>
   <a id="Terminal_Gui_Button_ProcessKey_" data-uid="Terminal.Gui.Button.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Button_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Button.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -1010,25 +958,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Button_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_Button_UpdateTextFormatterText_" data-uid="Terminal.Gui.Button.UpdateTextFormatterText*"></a>
   <h4 id="Terminal_Gui_Button_UpdateTextFormatterText" data-uid="Terminal.Gui.Button.UpdateTextFormatterText">UpdateTextFormatterText()</h4>
   <div class="markdown level1 summary">
@@ -1069,12 +998,6 @@ or if the user presses the action key while this view is focused. (TODO: IsDefau
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Button_Clicked_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Client code can hook up to this event, it is
-raised when the button is activated either with
-the mouse or the keyboard.
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

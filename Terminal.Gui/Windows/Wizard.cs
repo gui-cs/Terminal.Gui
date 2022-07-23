@@ -5,6 +5,7 @@ using NStack;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
+
 	/// <summary>
 	/// Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<see cref="WizardStep"/>) can host 
 	/// arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step also has a pane for help text. Along the
@@ -13,19 +14,47 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as an embedded <see cref="View"/>. 
 	/// 
-	/// By default, <see cref="Modal"/> is true; launch the Wizard using `Application.Run(wizard)`. 
+	/// By default, <see cref="Wizard.Modal"/> is <c>true</c>. In this case launch the Wizard with <c>Application.Run(wizard)</c>. 
 	/// 
-	/// Set <see cref="Modal"/> to `false` to use Wizard as an embedded View, and add the Wizard to a containing view with <see cref="View.Add(View)"/>.
-	/// 
-	/// When used as a modal pop-up window, the Esc key will cause the <see cref="Cancelled"/> event to fire and (if the event is not cancelled),
-	/// will cause <see cref="Application.RequestStop(Toplevel)"/> to be called, closing the Wizard.
-	/// 
-	/// When used as an embedded View, no frame is drawn around the Wizard. To detect if the user wants to cancel
-	/// the Wizard, subscrie to the <see cref="Cancelled"/> event.
-	/// 
+	/// See <see cref="Wizard.Modal"/> for more details.
 	/// </remarks>
+	/// <example>
+	/// <code>
+	/// using Terminal.Gui;
+	/// using NStack;
+	/// 
+	/// Application.Init();
+	/// 
+	/// var wizard = new Wizard ($"Setup Wizard");
+	/// 
+	/// // Add 1st step
+	/// var firstStep = new Wizard.WizardStep ("End User License Agreement");
+	/// wizard.AddStep(firstStep);
+	/// firstStep.NextButtonText = "Accept!";
+	/// firstStep.HelpText = "This is the End User License Agreement.";
+	/// 
+	/// // Add 2nd step
+	/// var secondStep = new Wizard.WizardStep ("Second Step");
+	/// wizard.AddStep(secondStep);
+	/// secondStep.HelpText = "This is the help text for the Second Step.";
+	/// var lbl = new Label ("Name:") { AutoSize = true };
+	/// secondStep.Add(lbl);
+	/// 
+	/// var name = new TextField () { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };
+	/// secondStep.Add(name);
+	/// 
+	/// wizard.Finished += (args) =>
+	/// {
+	///     MessageBox.Query("Wizard", $"Finished. The Name entered is '{name.Text}'", "Ok");
+	///     Application.RequestStop();
+	/// };
+	/// 
+	/// Application.Top.Add (wizard);
+	/// Application.Run ();
+	/// Application.Shutdown ();
+	/// </code>
+	/// </example>
 	public class Wizard : Dialog {
-
 		/// <summary>
 		/// Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is divided horizontally in two. On the left is the
 		/// content view where <see cref="View"/>s can be added,  On the right is the help for the step.
@@ -47,7 +76,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The title of the <see cref="WizardStep"/>. 
 			/// </summary>
-			/// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up.</remarks>
+			/// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
 			public new ustring Title {
 				get => title;
 				set {
@@ -99,7 +128,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
 			/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
-			/// <returns>`true` if an event handler cancelled the Title change.</returns>
+			/// <returns><c>true</c> if an event handler cancelled the Title change.</returns>
 			public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 			{
 				var args = new TitleEventArgs (oldTitle, newTitle);
@@ -109,7 +138,7 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
-			/// `true` to cancel the Title change.
+			/// <c>true</c> to cancel the Title change.
 			/// </summary>
 			public event Action<TitleEventArgs> TitleChanging;
 
@@ -395,14 +424,19 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc/>
+		/// <summary>
+		/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
+		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="Responder.ProcessKey(KeyEvent)"/>
+		/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
+		/// See <see cref="Responder.ProcessKey(KeyEvent)"/> for more.
+		/// </summary>
+		/// <param name="kb"></param>
+		/// <returns></returns>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (!Modal) {
 				switch (kb.Key) {
 				case Key.Esc:
-					// Dialog causes ESC to RequestStop; we dont want that with a non-modal wizard
-					// Instead, we fire the Cancelled event.
 					var args = new WizardButtonEventArgs ();
 					Cancelled?.Invoke (args);
 					return false;
@@ -425,9 +459,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns the next enabled <see cref="WizardStep"/> after the current step. Takes into account steps which
-		/// are disabled. If <see cref="CurrentStep"/> is `null` returns the first enabled step.
+		/// are disabled. If <see cref="CurrentStep"/> is <c>null</c> returns the first enabled step.
 		/// </summary>
-		/// <returns>The next step after the current step, if there is one; otherwise returns `null`, which 
+		/// <returns>The next step after the current step, if there is one; otherwise returns <c>null</c>, which 
 		/// indicates either there are no enabled steps or the current step is the last enabled step.</returns>
 		public WizardStep GetNextStep ()
 		{
@@ -476,9 +510,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns the first enabled <see cref="WizardStep"/> before the current step. Takes into account steps which
-		/// are disabled. If <see cref="CurrentStep"/> is `null` returns the last enabled step.
+		/// are disabled. If <see cref="CurrentStep"/> is <c>null</c> returns the last enabled step.
 		/// </summary>
-		/// <returns>The first step ahead of the current step, if there is one; otherwise returns `null`, which 
+		/// <returns>The first step ahead of the current step, if there is one; otherwise returns <c>null</c>, which 
 		/// indicates either there are no enabled steps or the current step is the first enabled step.</returns>
 		public WizardStep GetPreviousStep ()
 		{
@@ -567,7 +601,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
 		/// </summary>
-		/// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up.</remarks>
+		/// <remarks>
+		/// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
+		/// </remarks>
 		public new ustring Title {
 			get {
 				// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
@@ -599,13 +635,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This event is raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always
+		/// Raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always
 		/// the first button in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any.
 		/// </summary>
 		public event Action<WizardButtonEventArgs> MovingBack;
 
 		/// <summary>
-		/// This event is raised when the Next/Finish button in the <see cref="Wizard"/> is clicked (or the user presses Enter). 
+		/// Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked (or the user presses Enter). 
 		/// The Next/Finish button is always the last button in the array of Buttons passed to the <see cref="Wizard"/> constructor, 
 		/// if any. This event is only raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow 
 		/// (otherwise the <see cref="Finished"/> event is raised).
@@ -613,7 +649,7 @@ namespace Terminal.Gui {
 		public event Action<WizardButtonEventArgs> MovingNext;
 
 		/// <summary>
-		/// This event is raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
+		/// Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
 		/// the last button in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any. This event is only
 		/// raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow 
 		/// (otherwise the <see cref="Finished"/> event is raised).
@@ -621,9 +657,10 @@ namespace Terminal.Gui {
 		public event Action<WizardButtonEventArgs> Finished;
 
 		/// <summary>
-		/// This event is raised when the user has cancelled the <see cref="Wizard"/> by pressin the Esc key. 
-		/// To prevent a <see cref="Modal"/> Wizard from
-		/// closing, cancel the event by setting <see cref="WizardButtonEventArgs.Cancel"/> to `true` before returning from the event handler.
+		/// Raised when the user has cancelled the <see cref="Wizard"/> by pressin the Esc key. 
+		/// To prevent a modal (<see cref="Wizard.Modal"/> is <c>true</c>) Wizard from
+		/// closing, cancel the event by setting <see cref="WizardButtonEventArgs.Cancel"/> to 
+		/// <c>true</c> before returning from the event handler.
 		/// </summary>
 		public event Action<WizardButtonEventArgs> Cancelled;
 
@@ -786,11 +823,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not.
 		/// 
-		/// The default is `true`. The Wizard will be shown with a frame with <see cref="Title"/> and will behave like
+		/// The default is <c>true</c>. The Wizard will be shown with a frame with <see cref="Title"/> and will behave like
 		/// any <see cref="Toplevel"/> window.
 		/// 
-		/// If set to `false` the Wizard will have no frame and will behave like any embedded <see cref="View"/>.
+		/// If set to <c>false</c> the Wizard will have no frame and will behave like any embedded <see cref="View"/>.
 		/// 
+		/// To use Wizard as an embedded View 
+		/// <list type="number">
+		/// <item><description>Set <see cref="Modal"/> to <c>false</c>.</description></item>
+		/// <item><description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description></item>
+		/// </list>
+		/// 
+		/// If a non-Modal Wizard is added to the application after <see cref="Application.Run(Func{Exception, bool})"/> has been called
+		/// the first step must be explicitly set by setting <see cref="CurrentStep"/> to <see cref="GetNextStep()"/>:
+		/// <code>
+		///    wizard.CurrentStep = wizard.GetNextStep();
+		/// </code>
 		/// </summary>
 		public new bool Modal {
 			get => base.Modal;

@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -102,6 +103,10 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_TextField_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> <a class="xref" href="Terminal.Gui.View.html">View</a> provides editing functionality and mouse support.
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -504,10 +509,6 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class TextField : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TextField_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> <a class="xref" href="Terminal.Gui.View.html">View</a> provides editing functionality and mouse support.
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_TextField__ctor_" data-uid="Terminal.Gui.TextField.#ctor*"></a>
@@ -773,16 +774,6 @@ Gets or sets the frame for the view. The frame is relative to the view&apos;s co
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a></div>
-  <h5 id="Terminal_Gui_TextField_Frame_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Change the Frame when using the <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout style to move or resize views. 
-</p>
-<p>
-   Altering the Frame of a view will trigger the redrawing of the
-   view as well as the redrawing of the affected regions of the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a>.
-</p>
-</div>
   <a id="Terminal_Gui_TextField_HasHistoryChanges_" data-uid="Terminal.Gui.TextField.HasHistoryChanges*"></a>
   <h4 id="Terminal_Gui_TextField_HasHistoryChanges" data-uid="Terminal.Gui.TextField.HasHistoryChanges">HasHistoryChanges</h4>
   <div class="markdown level1 summary">
@@ -910,10 +901,6 @@ Sets the secret property.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextField_Secret_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This makes the text entry suitable for entering passwords.
-</div>
   <a id="Terminal_Gui_TextField_SelectedLength_" data-uid="Terminal.Gui.TextField.SelectedLength*"></a>
   <h4 id="Terminal_Gui_TextField_SelectedLength" data-uid="Terminal.Gui.TextField.SelectedLength">SelectedLength</h4>
   <div class="markdown level1 summary">
@@ -1014,9 +1001,6 @@ Sets or gets the text held by the view.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextField_Text_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <a id="Terminal_Gui_TextField_Used_" data-uid="Terminal.Gui.TextField.Used*"></a>
   <h4 id="Terminal_Gui_TextField_Used" data-uid="Terminal.Gui.TextField.Used">Used</h4>
   <div class="markdown level1 summary">
@@ -1424,11 +1408,6 @@ Processes key presses for the <a class="xref" href="Terminal.Gui.TextField.html"
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_TextField_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control responds to the following keys:
-<table><thead><tr><th>Keys</th><th>Function</th></tr></thead><tbody><tr><td><a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Delete">Delete</a>, <a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Backspace">Backspace</a></td><td>Deletes the character before cursor.</td></tr></tbody></table>
-</div>
   <a id="Terminal_Gui_TextField_Redraw_" data-uid="Terminal.Gui.TextField.Redraw*"></a>
   <h4 id="Terminal_Gui_TextField_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1458,20 +1437,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_TextField_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_TextField_SelectAll_" data-uid="Terminal.Gui.TextField.SelectAll*"></a>
   <h4 id="Terminal_Gui_TextField_SelectAll" data-uid="Terminal.Gui.TextField.SelectAll">SelectAll()</h4>
   <div class="markdown level1 summary">
@@ -1508,10 +1473,6 @@ Changed event, raised when the text has changed.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextField_TextChanged_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This event is raised when the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes. 
-</div>
   <h4 id="Terminal_Gui_TextField_TextChanging" data-uid="Terminal.Gui.TextField.TextChanging">TextChanging</h4>
   <div class="markdown level1 summary">
 Changing event, raised before the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes and can be canceled or changing the new text.

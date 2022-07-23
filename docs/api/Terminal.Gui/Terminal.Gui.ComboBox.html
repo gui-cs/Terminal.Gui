@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -704,10 +705,6 @@ Gets or sets the <a class="xref" href="Terminal.Gui.IListDataSource.html">IListD
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ComboBox_Source_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use <a class="xref" href="Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SetSource_System_Collections_IList_">SetSource(IList)</a> to set a new <span class="xref">System.Collections.IList</span> source.
-</div>
   <a id="Terminal_Gui_ComboBox_Text_" data-uid="Terminal.Gui.ComboBox.Text*"></a>
   <h4 id="Terminal_Gui_ComboBox_Text" data-uid="Terminal.Gui.ComboBox.Text">Text</h4>
   <div class="markdown level1 summary">
@@ -1014,25 +1011,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_ComboBox_Redraw_" data-uid="Terminal.Gui.ComboBox.Redraw*"></a>
   <h4 id="Terminal_Gui_ComboBox_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1062,20 +1040,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_ComboBox_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_ComboBox_SetSource_" data-uid="Terminal.Gui.ComboBox.SetSource*"></a>
   <h4 id="Terminal_Gui_ComboBox_SetSource_System_Collections_IList_" data-uid="Terminal.Gui.ComboBox.SetSource(System.Collections.IList)">SetSource(IList)</h4>
   <div class="markdown level1 summary">
@@ -1103,10 +1067,6 @@ Sets the source of the <a class="xref" href="Terminal.Gui.ComboBox.html">ComboBo
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ComboBox_SetSource_System_Collections_IList__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use the <a class="xref" href="Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Source">Source</a> property to set a new <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> source and use custome rendering.
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_ComboBox_OpenSelectedItem" data-uid="Terminal.Gui.ComboBox.OpenSelectedItem">OpenSelectedItem</h4>

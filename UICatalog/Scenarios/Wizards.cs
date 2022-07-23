@@ -11,9 +11,6 @@ namespace UICatalog.Scenarios {
 	public class Wizards : Scenario {
 		public override void Setup ()
 		{
-			// Set the colorschem to Base so the non-modal part of the demo looks right
-			Win.ColorScheme = Colors.Base;
-
 			var frame = new FrameView ("Wizard Options") {
 				X = Pos.Center (),
 				Y = 0,
@@ -94,17 +91,9 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (actionLabel);
 
-			var modalCheckBox = new CheckBox ("Modal (pop-up)") {
-				X = Pos.Center (),
-				Y = Pos.Bottom (frame) + 2,
-				AutoSize = true,
-				Checked = true
-			};
-			Win.Add (modalCheckBox);
-
 			var showWizardButton = new Button ("Show Wizard") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (modalCheckBox) + 1,
+				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
 
@@ -234,7 +223,7 @@ namespace UICatalog.Scenarios {
 					var hideHelpBtn = new Button () {
 						Text = "Press me to show/hide help",
 						X = Pos.Center (),
-						Y = Pos.AnchorEnd(1)
+						Y = Pos.AnchorEnd (1)
 					};
 					hideHelpBtn.Clicked += () => {
 						if (fourthStep.HelpText.Length > 0) {
@@ -291,24 +280,7 @@ namespace UICatalog.Scenarios {
 						finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.Checked;
 					};
 
-					if (modalCheckBox.Checked) {
-						Application.Run (wizard);
-					} else {
-						// Disable the Show button so this only happens once
-						showWizardButton.Visible = false;
-						// To use Wizard as a View, you must set Modal = false
-						wizard.Modal = false;
-
-						// When run as a modal, Wizard gets a Loading event where it sets the
-						// Current Step. But when running non-modal it must be done manually.
-						wizard.CurrentStep = wizard.GetNextStep ();
-
-						Win.Add (wizard);
-						
-						// Ensure the wizard has focus
-						wizard.SetFocus ();
-						
-					}
+					Application.Run (wizard);
 
 				} catch (FormatException) {
 					actionLabel.Text = "Invalid Options";

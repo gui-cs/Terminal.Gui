@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,51 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_TextView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+<a class="xref" href="Terminal.Gui.TextView.html">TextView</a> provides a multi-line text editor. Users interact
+with it with the standard Emacs commands for movement or the arrow
+keys. 
+</p> 
+<table><thead><tr><th>Shortcut</th><th>Action performed</th></tr></thead><tbody><tr><td>Left cursor, Control-b</td><td>
+       Moves the editing point left.
+</td></tr><tr><td>Right cursor, Control-f</td><td>
+  Moves the editing point right.
+</td></tr><tr><td>Alt-b</td><td>
+  Moves one word back.
+</td></tr><tr><td>Alt-f</td><td>
+  Moves one word forward.
+</td></tr><tr><td>Up cursor, Control-p</td><td>
+  Moves the editing point one line up.
+</td></tr><tr><td>Down cursor, Control-n</td><td>
+  Moves the editing point one line down
+</td></tr><tr><td>Home key, Control-a</td><td>
+  Moves the cursor to the beginning of the line.
+</td></tr><tr><td>End key, Control-e</td><td>
+  Moves the cursor to the end of the line.
+</td></tr><tr><td>Control-Home</td><td>
+  Scrolls to the first line and moves the cursor there.
+</td></tr><tr><td>Control-End</td><td>
+  Scrolls to the last line and moves the cursor there.
+</td></tr><tr><td>Delete, Control-d</td><td>
+  Deletes the character in front of the cursor.
+</td></tr><tr><td>Backspace</td><td>
+  Deletes the character behind the cursor.
+</td></tr><tr><td>Control-k</td><td>
+  Deletes the text until the end of the line and replaces the kill buffer
+  with the deleted text.   You can paste this text in a different place by
+  using Control-y.
+</td></tr><tr><td>Control-y</td><td>
+   Pastes the content of the kill ring into the current position.
+</td></tr><tr><td>Alt-d</td><td>
+   Deletes the word above the cursor and adds it to the kill ring.  You 
+   can paste the contents of the kill ring with Control-y.
+</td></tr><tr><td>Control-q</td><td>
+  Quotes the next input character, to prevent the normal processing of
+  key handling to take place.
+</td></tr></tbody></table>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -499,51 +545,6 @@ Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class TextView : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TextView_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-<a class="xref" href="Terminal.Gui.TextView.html">TextView</a> provides a multi-line text editor. Users interact
-with it with the standard Emacs commands for movement or the arrow
-keys. 
-</p> 
-<table><thead><tr><th>Shortcut</th><th>Action performed</th></tr></thead><tbody><tr><td>Left cursor, Control-b</td><td>
-       Moves the editing point left.
-</td></tr><tr><td>Right cursor, Control-f</td><td>
-  Moves the editing point right.
-</td></tr><tr><td>Alt-b</td><td>
-  Moves one word back.
-</td></tr><tr><td>Alt-f</td><td>
-  Moves one word forward.
-</td></tr><tr><td>Up cursor, Control-p</td><td>
-  Moves the editing point one line up.
-</td></tr><tr><td>Down cursor, Control-n</td><td>
-  Moves the editing point one line down
-</td></tr><tr><td>Home key, Control-a</td><td>
-  Moves the cursor to the beginning of the line.
-</td></tr><tr><td>End key, Control-e</td><td>
-  Moves the cursor to the end of the line.
-</td></tr><tr><td>Control-Home</td><td>
-  Scrolls to the first line and moves the cursor there.
-</td></tr><tr><td>Control-End</td><td>
-  Scrolls to the last line and moves the cursor there.
-</td></tr><tr><td>Delete, Control-d</td><td>
-  Deletes the character in front of the cursor.
-</td></tr><tr><td>Backspace</td><td>
-  Deletes the character behind the cursor.
-</td></tr><tr><td>Control-k</td><td>
-  Deletes the text until the end of the line and replaces the kill buffer
-  with the deleted text.   You can paste this text in a different place by
-  using Control-y.
-</td></tr><tr><td>Control-y</td><td>
-   Pastes the content of the kill ring into the current position.
-</td></tr><tr><td>Alt-d</td><td>
-   Deletes the word above the cursor and adds it to the kill ring.  You 
-   can paste the contents of the kill ring with Control-y.
-</td></tr><tr><td>Control-q</td><td>
-  Quotes the next input character, to prevent the normal processing of
-  key handling to take place.
-</td></tr></tbody></table>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_TextView__ctor_" data-uid="Terminal.Gui.TextView.#ctor*"></a>
@@ -584,9 +585,6 @@ Initializes a <a class="xref" href="Terminal.Gui.TextView.html">TextView</a> on 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextView__ctor_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Terminal_Gui_TextView_AllowsReturn_" data-uid="Terminal.Gui.TextView.AllowsReturn*"></a>
@@ -874,16 +872,6 @@ Gets or sets the frame for the view. The frame is relative to the view&apos;s co
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a></div>
-  <h5 id="Terminal_Gui_TextView_Frame_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Change the Frame when using the <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout style to move or resize views. 
-</p>
-<p>
-   Altering the Frame of a view will trigger the redrawing of the
-   view as well as the redrawing of the affected regions of the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a>.
-</p>
-</div>
   <a id="Terminal_Gui_TextView_HasHistoryChanges_" data-uid="Terminal.Gui.TextView.HasHistoryChanges*"></a>
   <h4 id="Terminal_Gui_TextView_HasHistoryChanges" data-uid="Terminal.Gui.TextView.HasHistoryChanges">HasHistoryChanges</h4>
   <div class="markdown level1 summary">
@@ -1264,9 +1252,6 @@ Sets or gets the text in the <a class="xref" href="Terminal.Gui.TextView.html">T
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a></div>
-  <h5 id="Terminal_Gui_TextView_Text_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <a id="Terminal_Gui_TextView_TopRow_" data-uid="Terminal.Gui.TextView.TopRow*"></a>
   <h4 id="Terminal_Gui_TextView_TopRow" data-uid="Terminal.Gui.TextView.TopRow">TopRow</h4>
   <div class="markdown level1 summary">
@@ -2073,25 +2058,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_TextView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_TextView_Redraw_" data-uid="Terminal.Gui.TextView.Redraw*"></a>
   <h4 id="Terminal_Gui_TextView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -2121,20 +2087,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_TextView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_TextView_ReplaceAllText_" data-uid="Terminal.Gui.TextView.ReplaceAllText*"></a>
   <h4 id="Terminal_Gui_TextView_ReplaceAllText_NStack_ustring_System_Boolean_System_Boolean_NStack_ustring_" data-uid="Terminal.Gui.TextView.ReplaceAllText(NStack.ustring,System.Boolean,System.Boolean,NStack.ustring)">ReplaceAllText(ustring, Boolean, Boolean, ustring)</h4>
   <div class="markdown level1 summary">
