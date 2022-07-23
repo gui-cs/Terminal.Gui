@@ -1794,9 +1794,18 @@ namespace Terminal.Gui {
 		/// <param name="path">Path to the file to load.</param>
 		public bool LoadFile (string path)
 		{
-			var res = model.LoadFile (path);
-			ResetPosition ();
-			SetNeedsDisplay ();
+			bool res;
+			try {
+				SetWrapModel ();
+				res = model.LoadFile (path);
+				ResetPosition ();
+			} catch (Exception) {
+				throw;
+			} finally {
+				UpdateWrapModel ();
+				SetNeedsDisplay ();
+				Adjust ();
+			}
 			return res;
 		}
 
@@ -4292,7 +4301,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearHistoryChanges ()
 		{
-			historyText.Clear (Text);
+			historyText?.Clear (Text);
 		}
 	}
 
