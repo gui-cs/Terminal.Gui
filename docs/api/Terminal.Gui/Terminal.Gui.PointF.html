@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct PointF
+    <title>Class PointF
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct PointF
+    <meta name="title" content="Class PointF
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,33 +81,26 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.PointF">
   
   
-  <h1 id="Terminal_Gui_PointF" data-uid="Terminal.Gui.PointF" class="text-break">Struct PointF
+  <h1 id="Terminal_Gui_PointF" data-uid="Terminal.Gui.PointF" class="text-break">Class PointF
   </h1>
   <div class="markdown level0 summary">
 Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">PointF</span></div>
+  </div>
   <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="Terminal.Gui.PointF.html">PointF</a>&gt;</div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_PointF_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct PointF : IEquatable&lt;PointF&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class PointF : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -179,8 +172,7 @@ Gets a value indicating whether this <a class="xref" href="Terminal.Gui.PointF.h
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly bool IsEmpty { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -387,8 +379,6 @@ Compares two <a class="xref" href="Terminal.Gui.PointF.html">PointF</a> objects.
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
   <a id="Terminal_Gui_PointF_Equals_" data-uid="Terminal.Gui.PointF.Equals*"></a>
   <h4 id="Terminal_Gui_PointF_Equals_Terminal_Gui_PointF_" data-uid="Terminal.Gui.PointF.Equals(Terminal.Gui.PointF)">Equals(PointF)</h4>
   <div class="markdown level1 summary">
@@ -458,8 +448,6 @@ Generates a hashcode from the X and Y components
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
   <a id="Terminal_Gui_PointF_Subtract_" data-uid="Terminal.Gui.PointF.Subtract*"></a>
   <h4 id="Terminal_Gui_PointF_Subtract_Terminal_Gui_PointF_Terminal_Gui_Size_" data-uid="Terminal.Gui.PointF.Subtract(Terminal.Gui.PointF,Terminal.Gui.Size)">Subtract(PointF, Size)</h4>
   <div class="markdown level1 summary">
@@ -579,8 +567,6 @@ Returns a string including the X and Y values
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
   <h3 id="operators">Operators
   </h3>
   <a id="Terminal_Gui_PointF_op_Addition_" data-uid="Terminal.Gui.PointF.op_Addition*"></a>
@@ -871,7 +857,7 @@ Translates a <a class="xref" href="Terminal.Gui.PointF.html">PointF</a> by the n
   </table>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <span class="xref">System.IEquatable&lt;&gt;</span>
   </div>
 </article>
           </div>

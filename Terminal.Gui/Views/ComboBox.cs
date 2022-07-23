@@ -12,7 +12,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// ComboBox control
+	/// Provides a drop-down list of items the user can select from.
 	/// </summary>
 	public class ComboBox : View {
 

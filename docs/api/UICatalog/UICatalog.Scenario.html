@@ -83,16 +83,7 @@
   
   <h1 id="UICatalog_Scenario" data-uid="UICatalog.Scenario" class="text-break">Class Scenario
   </h1>
-  <div class="markdown level0 summary"><p>Base class for each demo/scenario.</p>
-<p>
- To define a new scenario:
-<ol><li>Create a new <code>.cs</code> file in the <cs>Scenarios</cs> directory that derives from <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</li><li>Annotate the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> derived class with a <a class="xref" href="UICatalog.Scenario.ScenarioMetadata.html">Scenario.ScenarioMetadata</a> attribute specifying the scenario&apos;s name and description.</li><li>Add one or more <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a> attributes to the class specifying which categories the scenario belongs to. If you don&apos;t specify a category the scenario will show up in &quot;_All&quot;.</li><li>Implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Setup()</a> override which will be called when a user selects the scenario to run.</li><li>Optionally, implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_">Init(Toplevel, ColorScheme)</a> and/or <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a> overrides to provide a custom implementation.</li></ol>
-</p>
-<p>
-The UI Catalog program uses reflection to find all scenarios and adds them to the
-ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.   /
-</p>
-</div>
+  <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -161,59 +152,27 @@ ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.   
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="UICatalog.html">UICatalog</a></h6>
   <h6><strong>Assembly</strong>: UICatalog.dll</h6>
   <h5 id="UICatalog_Scenario_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Scenario : IDisposable</code></pre>
+    <pre><code class="lang-csharp hljs">public class Scenario : Object</code></pre>
   </div>
-  <h5 id="UICatalog_Scenario_examples"><strong>Examples</strong></h5>
-  <p>The example below is provided in the <code>Scenarios</code> directory as a generic sample that can be copied and re-named:</p>
-<pre><code>using Terminal.Gui;
-
-namespace UICatalog {
-    [ScenarioMetadata (Name: &quot;Generic&quot;, Description: &quot;Generic sample - A template for creating new Scenarios&quot;)]
-    [ScenarioCategory (&quot;Controls&quot;)]
-    class MyScenario : Scenario {
-        public override void Setup ()
-        {
-            // Put your scenario code here, e.g.
-            Win.Add (new Button (&quot;Press me!&quot;) {
-                X = Pos.Center (),
-                Y = Pos.Center (),
-                Clicked = () => MessageBox.Query (20, 7, &quot;Hi&quot;, &quot;Neat?&quot;, &quot;Yes&quot;, &quot;No&quot;)
-            });
-        }
-    }
-}</code></pre>
-
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="UICatalog_Scenario__ctor_" data-uid="UICatalog.Scenario.#ctor*"></a>
+  <h4 id="UICatalog_Scenario__ctor" data-uid="UICatalog.Scenario.#ctor">Scenario()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Scenario()</code></pre>
+  </div>
   <h3 id="properties">Properties
   </h3>
   <a id="UICatalog_Scenario_Top_" data-uid="UICatalog.Scenario.Top*"></a>
   <h4 id="UICatalog_Scenario_Top" data-uid="UICatalog.Scenario.Top">Top</h4>
-  <div class="markdown level1 summary"><p>The Top level for the <a class="xref" href="UICatalog.Scenario.html">Scenario</a>. This should be set to <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a> in most cases.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -236,8 +195,7 @@ namespace UICatalog {
   </table>
   <a id="UICatalog_Scenario_Win_" data-uid="UICatalog.Scenario.Win*"></a>
   <h4 id="UICatalog_Scenario_Win" data-uid="UICatalog.Scenario.Win">Win</h4>
-  <div class="markdown level1 summary"><p>The Window for the <a class="xref" href="UICatalog.Scenario.html">Scenario</a>. This should be set within the <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a> in most cases.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -295,8 +253,7 @@ namespace UICatalog {
   </table>
   <a id="UICatalog_Scenario_GetCategories_" data-uid="UICatalog.Scenario.GetCategories*"></a>
   <h4 id="UICatalog_Scenario_GetCategories" data-uid="UICatalog.Scenario.GetCategories">GetCategories()</h4>
-  <div class="markdown level1 summary"><p>Helper function to get the list of categories a <a class="xref" href="UICatalog.Scenario.html">Scenario</a> belongs to (defined in <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a>)</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -313,16 +270,13 @@ namespace UICatalog {
     <tbody>
       <tr>
         <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.String</span>&gt;</td>
-        <td><p>list of category names</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <a id="UICatalog_Scenario_GetDerivedClasses_" data-uid="UICatalog.Scenario.GetDerivedClasses*"></a>
   <h4 id="UICatalog_Scenario_GetDerivedClasses__1" data-uid="UICatalog.Scenario.GetDerivedClasses``1">GetDerivedClasses&lt;T&gt;()</h4>
-  <div class="markdown level1 summary"><p>Returns an instance of each <a class="xref" href="UICatalog.Scenario.html">Scenario</a> defined in the project. 
-<a href="https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class">https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class</a></p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -360,8 +314,7 @@ namespace UICatalog {
   </table>
   <a id="UICatalog_Scenario_GetDescription_" data-uid="UICatalog.Scenario.GetDescription*"></a>
   <h4 id="UICatalog_Scenario_GetDescription" data-uid="UICatalog.Scenario.GetDescription">GetDescription()</h4>
-  <div class="markdown level1 summary"><p>Helper to get the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> Description (defined in <a class="xref" href="UICatalog.Scenario.ScenarioMetadata.html">Scenario.ScenarioMetadata</a>)</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -384,8 +337,7 @@ namespace UICatalog {
   </table>
   <a id="UICatalog_Scenario_GetName_" data-uid="UICatalog.Scenario.GetName*"></a>
   <h4 id="UICatalog_Scenario_GetName" data-uid="UICatalog.Scenario.GetName">GetName()</h4>
-  <div class="markdown level1 summary"><p>Helper to get the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> Name (defined in <a class="xref" href="UICatalog.Scenario.ScenarioMetadata.html">Scenario.ScenarioMetadata</a>)</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -408,11 +360,7 @@ namespace UICatalog {
   </table>
   <a id="UICatalog_Scenario_Init_" data-uid="UICatalog.Scenario.Init*"></a>
   <h4 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_" data-uid="UICatalog.Scenario.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)">Init(Toplevel, ColorScheme)</h4>
-  <div class="markdown level1 summary"><p>Helper that provides the default <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> implementation with a frame and 
-label showing the name of the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> and logic to exit back to 
-the Scenario picker UI.
-Override <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_">Init(Toplevel, ColorScheme)</a> to provide any <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> behavior needed.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -431,29 +379,18 @@ Override <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_T
       <tr>
         <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td><span class="parametername">top</span></td>
-        <td><p>The Toplevel created by the UI Catalog host.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
         <td><span class="parametername">colorScheme</span></td>
-        <td><p>The colorscheme to use.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>
-The base implementation calls <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>, sets <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a> to the passed in <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a>, creates a <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> for <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Win">Win</a> and adds it to <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a>.
-</p>
-<p>
-Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a>, must call <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a> before creating any views or calling other Terminal.Gui APIs.
-</p>
-</div>
   <a id="UICatalog_Scenario_RequestStop_" data-uid="UICatalog.Scenario.RequestStop*"></a>
   <h4 id="UICatalog_Scenario_RequestStop" data-uid="UICatalog.Scenario.RequestStop">RequestStop()</h4>
-  <div class="markdown level1 summary"><p>Stops the scenario. Override to change shutdown behavior for the <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -461,28 +398,20 @@ Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.htm
   </div>
   <a id="UICatalog_Scenario_Run_" data-uid="UICatalog.Scenario.Run*"></a>
   <h4 id="UICatalog_Scenario_Run" data-uid="UICatalog.Scenario.Run">Run()</h4>
-  <div class="markdown level1 summary"><p>Runs the <a class="xref" href="UICatalog.Scenario.html">Scenario</a>. Override to start the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> using a <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> different than <code>Top</code>.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void Run()</code></pre>
   </div>
-  <h5 id="UICatalog_Scenario_Run_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a>, must call <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown">Shutdown()</a> before returning.</p>
-</div>
   <a id="UICatalog_Scenario_Setup_" data-uid="UICatalog.Scenario.Setup*"></a>
   <h4 id="UICatalog_Scenario_Setup" data-uid="UICatalog.Scenario.Setup">Setup()</h4>
-  <div class="markdown level1 summary"><p>Override this to implement the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> setup logic (create controls, etc...). </p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void Setup()</code></pre>
   </div>
-  <h5 id="UICatalog_Scenario_Setup_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>This is typically the best place to put scenario logic code.</p>
-</div>
   <a id="UICatalog_Scenario_ToString_" data-uid="UICatalog.Scenario.ToString*"></a>
   <h4 id="UICatalog_Scenario_ToString" data-uid="UICatalog.Scenario.ToString">ToString()</h4>
   <div class="markdown level1 summary"></div>
@@ -506,8 +435,6 @@ Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.htm
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

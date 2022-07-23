@@ -93,35 +93,11 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
     <div class="level1"><span class="xref">MenuItem</span></div>
       <div class="level2"><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_MenuItem_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MenuItem</code></pre>
+    <pre><code class="lang-csharp hljs">public class MenuItem : Object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -133,7 +109,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null, Key shortcut = Key.Null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null, Key shortcut)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -185,7 +161,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(Key shortcut = Key.Null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(Key shortcut)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
