@@ -10,7 +10,7 @@
 
 A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
-![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
+![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/images/sample.gif)
 
 ## Controls and Views
 

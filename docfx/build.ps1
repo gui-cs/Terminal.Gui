@@ -6,4 +6,4 @@ rm ../docs -Recurse -Force
 
 #docfx --metadata
 
-docfx --metadata --serve
+docfx --serve --force
