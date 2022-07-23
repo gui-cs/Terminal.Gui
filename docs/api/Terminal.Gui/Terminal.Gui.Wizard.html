@@ -652,16 +652,9 @@ bottom of the Wizard view are customizable buttons enabling the user to navigate
   <div class="markdown level0 remarks">
 The Wizard can be displayed either as a modal (pop-up) <a class="xref" href="Terminal.Gui.Window.html">Window</a> (like <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>) or as an embedded <a class="xref" href="Terminal.Gui.View.html">View</a>. 
 
-By default, <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> is true; launch the Wizard using `Application.Run(wizard)`. 
+By default, <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> is <code>true</code>. In this case launch the Wizard with <code>Application.Run(wizard)</code>. 
 
-Set <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> to `false` to use Wizard as an embedded View, and add the Wizard to a containing view with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a>.
-
-When used as a modal pop-up window, the Esc key will cause the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Cancelled">Cancelled</a> event to fire and (if the event is not cancelled),
-will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> to be called, closing the Wizard.
-
-When used as an embedded View, no frame is drawn around the Wizard. To detect if the user wants to cancel
-the Wizard, subscrie to the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Cancelled">Cancelled</a> event.
-
+See <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> for more details.
 </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -774,11 +767,17 @@ Gets or sets the currently active <a class="xref" href="Terminal.Gui.Wizard.Wiza
   <div class="markdown level1 summary">
 Determines whether the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is displayed as modal pop-up or not.
 
-The default is `true`. The Wizard will be shown with a frame with <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Title">Title</a> and will behave like
+The default is <code>true</code>. The Wizard will be shown with a frame with <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Title">Title</a> and will behave like
 any <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> window.
 
-If set to `false` the Wizard will have no frame and will behave like any embedded <a class="xref" href="Terminal.Gui.View.html">View</a>.
+If set to <code>false</code> the Wizard will have no frame and will behave like any embedded <a class="xref" href="Terminal.Gui.View.html">View</a>.
 
+To use Wizard as an embedded View 
+<ol><li>Set <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> to <code>false</code>.</li><li>Add the Wizard to a containing view with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a>.</li></ol>
+
+If a non-Modal Wizard is added to the application after <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a> has been called
+the first step must be explicitly set by setting <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> to <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_GetNextStep">GetNextStep()</a>:
+<pre><code>   wizard.CurrentStep = wizard.GetNextStep();</code></pre>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -858,7 +857,9 @@ The title of the Wizard, shown at the top of the Wizard with &quot; - currentSte
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Wizard_Title_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">The Title is only displayed when the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is used as a modal pop-up.</div>
+  <div class="markdown level1 remarks">
+The Title is only displayed when the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> is set to <code>false</code>.
+</div>
   <h3 id="methods">Methods
   </h3>
   <a id="Terminal_Gui_Wizard_AddStep_" data-uid="Terminal.Gui.Wizard.AddStep*"></a>
@@ -945,7 +946,7 @@ Returns the last enabled step in the Wizard
   <h4 id="Terminal_Gui_Wizard_GetNextStep" data-uid="Terminal.Gui.Wizard.GetNextStep">GetNextStep()</h4>
   <div class="markdown level1 summary">
 Returns the next enabled <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a> after the current step. Takes into account steps which
-are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is `null` returns the first enabled step.
+are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is <code>null</code> returns the first enabled step.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -963,7 +964,7 @@ are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wiz
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a></td>
-        <td>The next step after the current step, if there is one; otherwise returns `null`, which 
+        <td>The next step after the current step, if there is one; otherwise returns <code>null</code>, which 
 indicates either there are no enabled steps or the current step is the last enabled step.</td>
       </tr>
     </tbody>
@@ -972,7 +973,7 @@ indicates either there are no enabled steps or the current step is the last enab
   <h4 id="Terminal_Gui_Wizard_GetPreviousStep" data-uid="Terminal.Gui.Wizard.GetPreviousStep">GetPreviousStep()</h4>
   <div class="markdown level1 summary">
 Returns the first enabled <a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a> before the current step. Takes into account steps which
-are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is `null` returns the last enabled step.
+are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is <code>null</code> returns the last enabled step.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -990,7 +991,7 @@ are disabled. If <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wiz
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Wizard.WizardStep.html">Wizard.WizardStep</a></td>
-        <td>The first step ahead of the current step, if there is one; otherwise returns `null`, which 
+        <td>The first step ahead of the current step, if there is one; otherwise returns <code>null</code>, which 
 indicates either there are no enabled steps or the current step is the first enabled step.</td>
       </tr>
     </tbody>
@@ -1156,8 +1157,10 @@ Called when the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is ab
   <a id="Terminal_Gui_Wizard_ProcessKey_" data-uid="Terminal.Gui.Wizard.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Wizard_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Wizard.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
-If the view is focused, gives the view a
-chance to process the keystroke.
+<a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is derived from <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> and Dialog causes <code>Esc</code> to call
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a>, closing the Dialog. Wizard overrides <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent_">ProcessKey(KeyEvent)</a>
+to instead fire the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Cancelled">Cancelled</a> event when Wizard is being used as a non-modal (see <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a>.
+See <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent_">ProcessKey(KeyEvent)</a> for more.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1198,32 +1201,14 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_">Dialog.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Wizard_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_Wizard_Cancelled" data-uid="Terminal.Gui.Wizard.Cancelled">Cancelled</h4>
   <div class="markdown level1 summary">
-This event is raised when the user has cancelled the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> by pressin the Esc key. 
-To prevent a <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> Wizard from
-closing, cancel the event by setting <a class="xref" href="Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs_Cancel">Cancel</a> to `true` before returning from the event handler.
+Raised when the user has cancelled the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> by pressin the Esc key. 
+To prevent a modal (<a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Modal">Modal</a> is <code>true</code>) Wizard from
+closing, cancel the event by setting <a class="xref" href="Terminal.Gui.Wizard.WizardButtonEventArgs.html#Terminal_Gui_Wizard_WizardButtonEventArgs_Cancel">Cancel</a> to 
+<code>true</code> before returning from the event handler.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1247,7 +1232,7 @@ closing, cancel the event by setting <a class="xref" href="Terminal.Gui.Wizard.W
   </table>
   <h4 id="Terminal_Gui_Wizard_Finished" data-uid="Terminal.Gui.Wizard.Finished">Finished</h4>
   <div class="markdown level1 summary">
-This event is raised when the Next/Finish button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked. The Next/Finish button is always
+Raised when the Next/Finish button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked. The Next/Finish button is always
 the last button in the array of Buttons passed to the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> constructor, if any. This event is only
 raised if the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is the last Step in the Wizard flow 
 (otherwise the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Finished">Finished</a> event is raised).
@@ -1274,7 +1259,7 @@ raised if the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard
   </table>
   <h4 id="Terminal_Gui_Wizard_MovingBack" data-uid="Terminal.Gui.Wizard.MovingBack">MovingBack</h4>
   <div class="markdown level1 summary">
-This event is raised when the Back button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked. The Back button is always
+Raised when the Back button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked. The Back button is always
 the first button in the array of Buttons passed to the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> constructor, if any.
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -1299,7 +1284,7 @@ the first button in the array of Buttons passed to the <a class="xref" href="Ter
   </table>
   <h4 id="Terminal_Gui_Wizard_MovingNext" data-uid="Terminal.Gui.Wizard.MovingNext">MovingNext</h4>
   <div class="markdown level1 summary">
-This event is raised when the Next/Finish button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked (or the user presses Enter). 
+Raised when the Next/Finish button in the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> is clicked (or the user presses Enter). 
 The Next/Finish button is always the last button in the array of Buttons passed to the <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a> constructor, 
 if any. This event is only raised if the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_CurrentStep">CurrentStep</a> is the last Step in the Wizard flow 
 (otherwise the <a class="xref" href="Terminal.Gui.Wizard.html#Terminal_Gui_Wizard_Finished">Finished</a> event is raised).
