@@ -94,7 +94,8 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
 					CreateAutocomplete(),
-					CreateAllowsTabChecked ()
+					CreateAllowsTabChecked (),
+					CreateReadOnlyChecked ()
 				}),
 				new MenuBarItem ("_Responder", new MenuItem [] {
 					CreateCanFocusChecked (),
@@ -568,6 +569,18 @@ namespace UICatalog.Scenarios {
 			item.Action += () => {
 				_textView.AllowsTab = item.Checked = !item.Checked;
 			};
+
+			return item;
+		}
+
+		private MenuItem CreateReadOnlyChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Read Only"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = _textView.ReadOnly;
+			item.Action += () => _textView.ReadOnly = item.Checked = !item.Checked;
 
 			return item;
 		}
