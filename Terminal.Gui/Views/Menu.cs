@@ -826,7 +826,7 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
-	/// The MenuBar provides a menu for Terminal.Gui applications. 
+	/// Provides a menu bar with drop-down and cascading menus. 
 	/// </summary>
 	/// <remarks>
 	///	<para>

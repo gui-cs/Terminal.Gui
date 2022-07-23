@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct SizeF
+    <title>Class SizeF
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct SizeF
+    <meta name="title" content="Class SizeF
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,33 +81,26 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.SizeF">
   
   
-  <h1 id="Terminal_Gui_SizeF" data-uid="Terminal.Gui.SizeF" class="text-break">Struct SizeF
+  <h1 id="Terminal_Gui_SizeF" data-uid="Terminal.Gui.SizeF" class="text-break">Class SizeF
   </h1>
   <div class="markdown level0 summary">
 Represents the size of a rectangular region with an ordered pair of width and height.
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">SizeF</span></div>
+  </div>
   <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="Terminal.Gui.SizeF.html">SizeF</a>&gt;</div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_SizeF_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct SizeF : IEquatable&lt;SizeF&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class SizeF : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -260,8 +253,7 @@ Tests whether this <a class="xref" href="Terminal.Gui.SizeF.html">SizeF</a> has 
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly bool IsEmpty { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -395,8 +387,6 @@ as this <a class="xref" href="Terminal.Gui.SizeF.html">SizeF</a>.
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
   <a id="Terminal_Gui_SizeF_Equals_" data-uid="Terminal.Gui.SizeF.Equals*"></a>
   <h4 id="Terminal_Gui_SizeF_Equals_Terminal_Gui_SizeF_" data-uid="Terminal.Gui.SizeF.Equals(Terminal.Gui.SizeF)">Equals(SizeF)</h4>
   <div class="markdown level1 summary">
@@ -464,8 +454,6 @@ Generates a hashcode from the width and height
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
   <a id="Terminal_Gui_SizeF_Subtract_" data-uid="Terminal.Gui.SizeF.Subtract*"></a>
   <h4 id="Terminal_Gui_SizeF_Subtract_Terminal_Gui_SizeF_Terminal_Gui_SizeF_" data-uid="Terminal.Gui.SizeF.Subtract(Terminal.Gui.SizeF,Terminal.Gui.SizeF)">Subtract(SizeF, SizeF)</h4>
   <div class="markdown level1 summary">
@@ -538,8 +526,6 @@ Creates a human-readable string that represents this <a class="xref" href="Termi
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
   <h3 id="operators">Operators
   </h3>
   <a id="Terminal_Gui_SizeF_op_Addition_" data-uid="Terminal.Gui.SizeF.op_Addition*"></a>
@@ -915,7 +901,7 @@ Contracts a <a class="xref" href="Terminal.Gui.SizeF.html">SizeF</a> by another 
   </table>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <span class="xref">System.IEquatable&lt;&gt;</span>
   </div>
 </article>
           </div>

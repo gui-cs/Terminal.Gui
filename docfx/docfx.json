@@ -4,34 +4,32 @@
       "src": [
         {
           "files": [
-            "Terminal.Gui.csproj"
+            "Terminal.Gui.dll"
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**",
             "_site/**"
           ],
-          "src": "../Terminal.Gui"
+          "src": "../Terminal.Gui/bin/Release/net6.0"
         }
       ],
       "dest": "api/Terminal.Gui",
       "shouldSkipMarkup": true,
       "properties": {
-          "TargetFramework": "netstandard2.0"
+          "TargetFramework": "net6.0"
       }
     },
     {
       "src": [
         {
           "files": [
-            "UICatalog.csproj"
+            "UICatalog.dll"
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**",
             "_site/**"
           ],
-          "src": "../UICatalog"
+          "src": "../UICatalog/bin/Release/net6.0"
         }
       ],
       "dest": "api/UICatalog",

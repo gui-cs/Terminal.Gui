@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Enum Curses.Event
+    <title>Class Curses.Event
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Enum Curses.Event
+    <meta name="title" content="Class Curses.Event
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,137 +81,639 @@
             <article class="content wrap" id="_content" data-uid="Unix.Terminal.Curses.Event">
   
   
-  <h1 id="Unix_Terminal_Curses_Event" data-uid="Unix.Terminal.Curses.Event" class="text-break">Enum Curses.Event
+  <h1 id="Unix_Terminal_Curses_Event" data-uid="Unix.Terminal.Curses.Event" class="text-break">Class Curses.Event
   </h1>
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Curses.Event</span></div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Unix.Terminal.html">Unix.Terminal</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Unix_Terminal_Curses_Event_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Flags]
-public enum Event : long</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Event : Enum</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
+  <h4 id="Unix_Terminal_Curses_Event_AllEvents" data-uid="Unix.Terminal.Curses.Event.AllEvents">AllEvents</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event AllEvents</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Type</th>
         <th>Description</th>
       </tr>
-    <thead>
+    </thead>
     <tbody>
       <tr>
-        <td id="Unix_Terminal_Curses_Event_AllEvents">AllEvents</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button1Clicked">Button1Clicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button1DoubleClicked">Button1DoubleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button1Pressed">Button1Pressed</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button1Released">Button1Released</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button1TripleClicked">Button1TripleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button2Clicked">Button2Clicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button2DoubleClicked">Button2DoubleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button2Pressed">Button2Pressed</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button2Released">Button2Released</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button2TrippleClicked">Button2TrippleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button3Clicked">Button3Clicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button3DoubleClicked">Button3DoubleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button3Pressed">Button3Pressed</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button3Released">Button3Released</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button3TripleClicked">Button3TripleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button4Clicked">Button4Clicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button4DoubleClicked">Button4DoubleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button4Pressed">Button4Pressed</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button4Released">Button4Released</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_Button4TripleClicked">Button4TripleClicked</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ButtonAlt">ButtonAlt</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ButtonCtrl">ButtonCtrl</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ButtonShift">ButtonShift</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ButtonWheeledDown">ButtonWheeledDown</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ButtonWheeledUp">ButtonWheeledUp</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td id="Unix_Terminal_Curses_Event_ReportMousePosition">ReportMousePosition</td>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
         <td></td>
       </tr>
     </tbody>
-  </thead></thead></table>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button1Clicked" data-uid="Unix.Terminal.Curses.Event.Button1Clicked">Button1Clicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button1Clicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button1DoubleClicked" data-uid="Unix.Terminal.Curses.Event.Button1DoubleClicked">Button1DoubleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button1DoubleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button1Pressed" data-uid="Unix.Terminal.Curses.Event.Button1Pressed">Button1Pressed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button1Pressed</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button1Released" data-uid="Unix.Terminal.Curses.Event.Button1Released">Button1Released</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button1Released</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button1TripleClicked" data-uid="Unix.Terminal.Curses.Event.Button1TripleClicked">Button1TripleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button1TripleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button2Clicked" data-uid="Unix.Terminal.Curses.Event.Button2Clicked">Button2Clicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button2Clicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button2DoubleClicked" data-uid="Unix.Terminal.Curses.Event.Button2DoubleClicked">Button2DoubleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button2DoubleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button2Pressed" data-uid="Unix.Terminal.Curses.Event.Button2Pressed">Button2Pressed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button2Pressed</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button2Released" data-uid="Unix.Terminal.Curses.Event.Button2Released">Button2Released</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button2Released</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button2TrippleClicked" data-uid="Unix.Terminal.Curses.Event.Button2TrippleClicked">Button2TrippleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button2TrippleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button3Clicked" data-uid="Unix.Terminal.Curses.Event.Button3Clicked">Button3Clicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button3Clicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button3DoubleClicked" data-uid="Unix.Terminal.Curses.Event.Button3DoubleClicked">Button3DoubleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button3DoubleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button3Pressed" data-uid="Unix.Terminal.Curses.Event.Button3Pressed">Button3Pressed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button3Pressed</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button3Released" data-uid="Unix.Terminal.Curses.Event.Button3Released">Button3Released</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button3Released</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button3TripleClicked" data-uid="Unix.Terminal.Curses.Event.Button3TripleClicked">Button3TripleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button3TripleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button4Clicked" data-uid="Unix.Terminal.Curses.Event.Button4Clicked">Button4Clicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button4Clicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button4DoubleClicked" data-uid="Unix.Terminal.Curses.Event.Button4DoubleClicked">Button4DoubleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button4DoubleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button4Pressed" data-uid="Unix.Terminal.Curses.Event.Button4Pressed">Button4Pressed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button4Pressed</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button4Released" data-uid="Unix.Terminal.Curses.Event.Button4Released">Button4Released</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button4Released</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_Button4TripleClicked" data-uid="Unix.Terminal.Curses.Event.Button4TripleClicked">Button4TripleClicked</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event Button4TripleClicked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ButtonAlt" data-uid="Unix.Terminal.Curses.Event.ButtonAlt">ButtonAlt</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ButtonAlt</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ButtonCtrl" data-uid="Unix.Terminal.Curses.Event.ButtonCtrl">ButtonCtrl</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ButtonCtrl</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ButtonShift" data-uid="Unix.Terminal.Curses.Event.ButtonShift">ButtonShift</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ButtonShift</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ButtonWheeledDown" data-uid="Unix.Terminal.Curses.Event.ButtonWheeledDown">ButtonWheeledDown</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ButtonWheeledDown</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ButtonWheeledUp" data-uid="Unix.Terminal.Curses.Event.ButtonWheeledUp">ButtonWheeledUp</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ButtonWheeledUp</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_ReportMousePosition" data-uid="Unix.Terminal.Curses.Event.ReportMousePosition">ReportMousePosition</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Curses.Event ReportMousePosition</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Unix.Terminal.Curses.Event.html">Curses.Event</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Unix_Terminal_Curses_Event_value__" data-uid="Unix.Terminal.Curses.Event.value__">value__</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long value__</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int64</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           

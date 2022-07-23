@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Enum Command
+    <title>Class Command
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Enum Command
+    <meta name="title" content="Class Command
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,483 +81,1850 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Command">
   
   
-  <h1 id="Terminal_Gui_Command" data-uid="Terminal.Gui.Command" class="text-break">Enum Command
+  <h1 id="Terminal_Gui_Command" data-uid="Terminal.Gui.Command" class="text-break">Class Command
   </h1>
   <div class="markdown level0 summary">
 Actions which can be performed by the application or bound to keys in a <a class="xref" href="Terminal.Gui.View.html">View</a> control.
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Command</span></div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Command_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum Command</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Command : Enum</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
+  <h4 id="Terminal_Gui_Command_Accept" data-uid="Terminal.Gui.Command.Accept">Accept</h4>
+  <div class="markdown level1 summary">
+Accepts the current state (e.g. selection, button press etc)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Accept</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Type</th>
         <th>Description</th>
       </tr>
-    <thead>
+    </thead>
     <tbody>
       <tr>
-        <td id="Terminal_Gui_Command_Accept">Accept</td>
-        <td>
-Accepts the current state (e.g. selection, button press etc)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_BackTab">BackTab</td>
-        <td>
-Inserts a shift tab.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_BottomEnd">BottomEnd</td>
-        <td>
-Moves to bottom end.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_BottomEndExtend">BottomEndExtend</td>
-        <td>
-Extends the selection to the bottom end.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Cancel">Cancel</td>
-        <td>
-Cancels any current temporary states on the control e.g. expanding
-a combo list
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Collapse">Collapse</td>
-        <td>
-Collapses a list or item (with subitems)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_CollapseAll">CollapseAll</td>
-        <td>
-Recursively collapses a list items of their children (if any)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Copy">Copy</td>
-        <td>
-Copies the current selection.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Cut">Cut</td>
-        <td>
-Cuts the current selection.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_CutToEndLine">CutToEndLine</td>
-        <td>
-Deletes and copies to the clipboard the characters from the current position to the end of the line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_CutToStartLine">CutToStartLine</td>
-        <td>
-Deletes and copies to the clipboard the characters from the current position to the start of the line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_DeleteAll">DeleteAll</td>
-        <td>
-Deletes all objects in the control.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_DeleteCharLeft">DeleteCharLeft</td>
-        <td>
-Deletes the character on the left.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_DeleteCharRight">DeleteCharRight</td>
-        <td>
-Deletes the character on the right.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_DisableOverwrite">DisableOverwrite</td>
-        <td>
-Disables overwrite mode (<a class="xref" href="Terminal.Gui.Command.html#Terminal_Gui_Command_EnableOverwrite">EnableOverwrite</a>)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_EnableOverwrite">EnableOverwrite</td>
-        <td>
-Enables overwrite mode such that newly typed text overwrites the text that is
-already there (typically associated with the Insert key).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_EndOfLine">EndOfLine</td>
-        <td>
-Moves the cursor to the end of line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_EndOfLineExtend">EndOfLineExtend</td>
-        <td>
-Extends the selection to the end of line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_EndOfPage">EndOfPage</td>
-        <td>
-Moves the cursor to the bottom of page.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Expand">Expand</td>
-        <td>
-Expands a list or item (with subitems)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ExpandAll">ExpandAll</td>
-        <td>
-Recursively Expands all child items and their child items (if any)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_KillWordBackwards">KillWordBackwards</td>
-        <td>
-Deletes the characters backwards.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_KillWordForwards">KillWordForwards</td>
-        <td>
-Deletes the characters forwards.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Left">Left</td>
-        <td>
-Moves the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LeftExtend">LeftExtend</td>
-        <td>
-Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LeftHome">LeftHome</td>
-        <td>
-Moves to the left begin.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LeftHomeExtend">LeftHomeExtend</td>
-        <td>
-Extends the selection to the left begin.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineDown">LineDown</td>
-        <td>
-Moves the caret down one line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineDownExtend">LineDownExtend</td>
-        <td>
-Extends the selection down one line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineDownToLastBranch">LineDownToLastBranch</td>
-        <td>
-Moves the caret down to the last child node of the branch that holds the current selection
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineUp">LineUp</td>
-        <td>
-Moves the caret up one line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineUpExtend">LineUpExtend</td>
-        <td>
-Extends the selection up one line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_LineUpToFirstBranch">LineUpToFirstBranch</td>
-        <td>
-Moves the caret up to the first child node of the branch that holds the current selection
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_NewLine">NewLine</td>
-        <td>
-Inserts a new line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_NextView">NextView</td>
-        <td>
-Moves focus to the next view.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_NextViewOrTop">NextViewOrTop</td>
-        <td>
-Moves focus to the next view or toplevel (case of Mdi).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_OpenSelectedItem">OpenSelectedItem</td>
-        <td>
-Open selected item.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageDown">PageDown</td>
-        <td>
-Move the page down.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageDownExtend">PageDownExtend</td>
-        <td>
-Move the page down increase selection area to cover revealed objects/characters.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageLeft">PageLeft</td>
-        <td>
-Moves to the left page.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageRight">PageRight</td>
-        <td>
-Moves to the right page.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageUp">PageUp</td>
-        <td>
-Move the page up.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PageUpExtend">PageUpExtend</td>
-        <td>
-Move the page up increase selection area to cover revealed objects/characters.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Paste">Paste</td>
-        <td>
-Pastes the current selection.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PreviousView">PreviousView</td>
-        <td>
-Moves focuss to the previous view.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_PreviousViewOrTop">PreviousViewOrTop</td>
-        <td>
-Moves focus to the next previous or toplevel (case of Mdi).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_QuitToplevel">QuitToplevel</td>
-        <td>
-Quit a toplevel.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Redo">Redo</td>
-        <td>
-Redo changes.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Refresh">Refresh</td>
-        <td>
-Refresh the application.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Right">Right</td>
-        <td>
-Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_RightEnd">RightEnd</td>
-        <td>
-Moves to the right end.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_RightEndExtend">RightEndExtend</td>
-        <td>
-Extends the selection to the right end.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_RightExtend">RightExtend</td>
-        <td>
-Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ScrollDown">ScrollDown</td>
-        <td>
-Scrolls down one line (without changing the selection).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ScrollLeft">ScrollLeft</td>
-        <td>
-Scrolls one character to the left
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ScrollRight">ScrollRight</td>
-        <td>
-Scrolls one character to the right.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ScrollUp">ScrollUp</td>
-        <td>
-Scrolls up one line (without changing the selection).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_SelectAll">SelectAll</td>
-        <td>
-Selects all objects in the control.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_StartOfLine">StartOfLine</td>
-        <td>
-Moves the cursor to the start of line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_StartOfLineExtend">StartOfLineExtend</td>
-        <td>
-Extends the selection to the start of line.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_StartOfPage">StartOfPage</td>
-        <td>
-Moves the cursor to the top of page.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Suspend">Suspend</td>
-        <td>
-Suspend a application (used on Linux).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Tab">Tab</td>
-        <td>
-Inserts a tab.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ToggleChecked">ToggleChecked</td>
-        <td>
-Toggle the checked state.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ToggleExpandCollapse">ToggleExpandCollapse</td>
-        <td>
-Toggles the Expanded or collapsed state of a a list or item (with subitems)
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ToggleExtend">ToggleExtend</td>
-        <td>
-Toggles the extended selection.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_ToggleOverwrite">ToggleOverwrite</td>
-        <td>
-Toggles overwrite mode such that newly typed text overwrites the text that is
-already there (typically associated with the Insert key).
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_TopHome">TopHome</td>
-        <td>
-Moves to top begin.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_TopHomeExtend">TopHomeExtend</td>
-        <td>
-Extends the selection to the top begin.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_Undo">Undo</td>
-        <td>
-Undo changes.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_UnixEmulation">UnixEmulation</td>
-        <td>
-Unix emulation
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_WordLeft">WordLeft</td>
-        <td>
-Moves the caret to the start of the previous word.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_WordLeftExtend">WordLeftExtend</td>
-        <td>
-Extends the selection to the start of the previous word.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_WordRight">WordRight</td>
-        <td>
-Moves the caret to the start of the next word.
-</td>
-      </tr>
-      <tr>
-        <td id="Terminal_Gui_Command_WordRightExtend">WordRightExtend</td>
-        <td>
-Extends the selection to the start of the next word.
-</td>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
       </tr>
     </tbody>
-  </thead></thead></table>
+  </table>
+  <h4 id="Terminal_Gui_Command_BackTab" data-uid="Terminal.Gui.Command.BackTab">BackTab</h4>
+  <div class="markdown level1 summary">
+Inserts a shift tab.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command BackTab</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_BottomEnd" data-uid="Terminal.Gui.Command.BottomEnd">BottomEnd</h4>
+  <div class="markdown level1 summary">
+Moves to bottom end.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command BottomEnd</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_BottomEndExtend" data-uid="Terminal.Gui.Command.BottomEndExtend">BottomEndExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the bottom end.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command BottomEndExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Cancel" data-uid="Terminal.Gui.Command.Cancel">Cancel</h4>
+  <div class="markdown level1 summary">
+Cancels any current temporary states on the control e.g. expanding
+a combo list
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Cancel</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Collapse" data-uid="Terminal.Gui.Command.Collapse">Collapse</h4>
+  <div class="markdown level1 summary">
+Collapses a list or item (with subitems)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Collapse</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_CollapseAll" data-uid="Terminal.Gui.Command.CollapseAll">CollapseAll</h4>
+  <div class="markdown level1 summary">
+Recursively collapses a list items of their children (if any)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command CollapseAll</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Copy" data-uid="Terminal.Gui.Command.Copy">Copy</h4>
+  <div class="markdown level1 summary">
+Copies the current selection.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Copy</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Cut" data-uid="Terminal.Gui.Command.Cut">Cut</h4>
+  <div class="markdown level1 summary">
+Cuts the current selection.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Cut</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_CutToEndLine" data-uid="Terminal.Gui.Command.CutToEndLine">CutToEndLine</h4>
+  <div class="markdown level1 summary">
+Deletes and copies to the clipboard the characters from the current position to the end of the line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command CutToEndLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_CutToStartLine" data-uid="Terminal.Gui.Command.CutToStartLine">CutToStartLine</h4>
+  <div class="markdown level1 summary">
+Deletes and copies to the clipboard the characters from the current position to the start of the line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command CutToStartLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_DeleteAll" data-uid="Terminal.Gui.Command.DeleteAll">DeleteAll</h4>
+  <div class="markdown level1 summary">
+Deletes all objects in the control.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command DeleteAll</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_DeleteCharLeft" data-uid="Terminal.Gui.Command.DeleteCharLeft">DeleteCharLeft</h4>
+  <div class="markdown level1 summary">
+Deletes the character on the left.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command DeleteCharLeft</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_DeleteCharRight" data-uid="Terminal.Gui.Command.DeleteCharRight">DeleteCharRight</h4>
+  <div class="markdown level1 summary">
+Deletes the character on the right.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command DeleteCharRight</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_DisableOverwrite" data-uid="Terminal.Gui.Command.DisableOverwrite">DisableOverwrite</h4>
+  <div class="markdown level1 summary">
+Disables overwrite mode (<a class="xref" href="Terminal.Gui.Command.html#Terminal_Gui_Command_EnableOverwrite">EnableOverwrite</a>)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command DisableOverwrite</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_EnableOverwrite" data-uid="Terminal.Gui.Command.EnableOverwrite">EnableOverwrite</h4>
+  <div class="markdown level1 summary">
+Enables overwrite mode such that newly typed text overwrites the text that is
+already there (typically associated with the Insert key).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command EnableOverwrite</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_EndOfLine" data-uid="Terminal.Gui.Command.EndOfLine">EndOfLine</h4>
+  <div class="markdown level1 summary">
+Moves the cursor to the end of line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command EndOfLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_EndOfLineExtend" data-uid="Terminal.Gui.Command.EndOfLineExtend">EndOfLineExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the end of line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command EndOfLineExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_EndOfPage" data-uid="Terminal.Gui.Command.EndOfPage">EndOfPage</h4>
+  <div class="markdown level1 summary">
+Moves the cursor to the bottom of page.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command EndOfPage</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Expand" data-uid="Terminal.Gui.Command.Expand">Expand</h4>
+  <div class="markdown level1 summary">
+Expands a list or item (with subitems)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Expand</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ExpandAll" data-uid="Terminal.Gui.Command.ExpandAll">ExpandAll</h4>
+  <div class="markdown level1 summary">
+Recursively Expands all child items and their child items (if any)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ExpandAll</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_KillWordBackwards" data-uid="Terminal.Gui.Command.KillWordBackwards">KillWordBackwards</h4>
+  <div class="markdown level1 summary">
+Deletes the characters backwards.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command KillWordBackwards</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_KillWordForwards" data-uid="Terminal.Gui.Command.KillWordForwards">KillWordForwards</h4>
+  <div class="markdown level1 summary">
+Deletes the characters forwards.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command KillWordForwards</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Left" data-uid="Terminal.Gui.Command.Left">Left</h4>
+  <div class="markdown level1 summary">
+Moves the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Left</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LeftExtend" data-uid="Terminal.Gui.Command.LeftExtend">LeftExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LeftExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LeftHome" data-uid="Terminal.Gui.Command.LeftHome">LeftHome</h4>
+  <div class="markdown level1 summary">
+Moves to the left begin.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LeftHome</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LeftHomeExtend" data-uid="Terminal.Gui.Command.LeftHomeExtend">LeftHomeExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the left begin.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LeftHomeExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineDown" data-uid="Terminal.Gui.Command.LineDown">LineDown</h4>
+  <div class="markdown level1 summary">
+Moves the caret down one line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineDown</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineDownExtend" data-uid="Terminal.Gui.Command.LineDownExtend">LineDownExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection down one line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineDownExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineDownToLastBranch" data-uid="Terminal.Gui.Command.LineDownToLastBranch">LineDownToLastBranch</h4>
+  <div class="markdown level1 summary">
+Moves the caret down to the last child node of the branch that holds the current selection
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineDownToLastBranch</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineUp" data-uid="Terminal.Gui.Command.LineUp">LineUp</h4>
+  <div class="markdown level1 summary">
+Moves the caret up one line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineUp</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineUpExtend" data-uid="Terminal.Gui.Command.LineUpExtend">LineUpExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection up one line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineUpExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_LineUpToFirstBranch" data-uid="Terminal.Gui.Command.LineUpToFirstBranch">LineUpToFirstBranch</h4>
+  <div class="markdown level1 summary">
+Moves the caret up to the first child node of the branch that holds the current selection
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command LineUpToFirstBranch</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_NewLine" data-uid="Terminal.Gui.Command.NewLine">NewLine</h4>
+  <div class="markdown level1 summary">
+Inserts a new line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command NewLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_NextView" data-uid="Terminal.Gui.Command.NextView">NextView</h4>
+  <div class="markdown level1 summary">
+Moves focus to the next view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command NextView</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_NextViewOrTop" data-uid="Terminal.Gui.Command.NextViewOrTop">NextViewOrTop</h4>
+  <div class="markdown level1 summary">
+Moves focus to the next view or toplevel (case of Mdi).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command NextViewOrTop</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_OpenSelectedItem" data-uid="Terminal.Gui.Command.OpenSelectedItem">OpenSelectedItem</h4>
+  <div class="markdown level1 summary">
+Open selected item.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command OpenSelectedItem</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageDown" data-uid="Terminal.Gui.Command.PageDown">PageDown</h4>
+  <div class="markdown level1 summary">
+Move the page down.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageDown</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageDownExtend" data-uid="Terminal.Gui.Command.PageDownExtend">PageDownExtend</h4>
+  <div class="markdown level1 summary">
+Move the page down increase selection area to cover revealed objects/characters.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageDownExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageLeft" data-uid="Terminal.Gui.Command.PageLeft">PageLeft</h4>
+  <div class="markdown level1 summary">
+Moves to the left page.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageLeft</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageRight" data-uid="Terminal.Gui.Command.PageRight">PageRight</h4>
+  <div class="markdown level1 summary">
+Moves to the right page.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageRight</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageUp" data-uid="Terminal.Gui.Command.PageUp">PageUp</h4>
+  <div class="markdown level1 summary">
+Move the page up.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageUp</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PageUpExtend" data-uid="Terminal.Gui.Command.PageUpExtend">PageUpExtend</h4>
+  <div class="markdown level1 summary">
+Move the page up increase selection area to cover revealed objects/characters.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PageUpExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Paste" data-uid="Terminal.Gui.Command.Paste">Paste</h4>
+  <div class="markdown level1 summary">
+Pastes the current selection.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Paste</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PreviousView" data-uid="Terminal.Gui.Command.PreviousView">PreviousView</h4>
+  <div class="markdown level1 summary">
+Moves focuss to the previous view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PreviousView</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_PreviousViewOrTop" data-uid="Terminal.Gui.Command.PreviousViewOrTop">PreviousViewOrTop</h4>
+  <div class="markdown level1 summary">
+Moves focus to the next previous or toplevel (case of Mdi).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command PreviousViewOrTop</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_QuitToplevel" data-uid="Terminal.Gui.Command.QuitToplevel">QuitToplevel</h4>
+  <div class="markdown level1 summary">
+Quit a toplevel.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command QuitToplevel</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Redo" data-uid="Terminal.Gui.Command.Redo">Redo</h4>
+  <div class="markdown level1 summary">
+Redo changes.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Redo</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Refresh" data-uid="Terminal.Gui.Command.Refresh">Refresh</h4>
+  <div class="markdown level1 summary">
+Refresh the application.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Refresh</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Right" data-uid="Terminal.Gui.Command.Right">Right</h4>
+  <div class="markdown level1 summary">
+Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Right</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_RightEnd" data-uid="Terminal.Gui.Command.RightEnd">RightEnd</h4>
+  <div class="markdown level1 summary">
+Moves to the right end.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command RightEnd</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_RightEndExtend" data-uid="Terminal.Gui.Command.RightEndExtend">RightEndExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the right end.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command RightEndExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_RightExtend" data-uid="Terminal.Gui.Command.RightExtend">RightExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command RightExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ScrollDown" data-uid="Terminal.Gui.Command.ScrollDown">ScrollDown</h4>
+  <div class="markdown level1 summary">
+Scrolls down one line (without changing the selection).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ScrollDown</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ScrollLeft" data-uid="Terminal.Gui.Command.ScrollLeft">ScrollLeft</h4>
+  <div class="markdown level1 summary">
+Scrolls one character to the left
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ScrollLeft</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ScrollRight" data-uid="Terminal.Gui.Command.ScrollRight">ScrollRight</h4>
+  <div class="markdown level1 summary">
+Scrolls one character to the right.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ScrollRight</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ScrollUp" data-uid="Terminal.Gui.Command.ScrollUp">ScrollUp</h4>
+  <div class="markdown level1 summary">
+Scrolls up one line (without changing the selection).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ScrollUp</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_SelectAll" data-uid="Terminal.Gui.Command.SelectAll">SelectAll</h4>
+  <div class="markdown level1 summary">
+Selects all objects in the control.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command SelectAll</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_StartOfLine" data-uid="Terminal.Gui.Command.StartOfLine">StartOfLine</h4>
+  <div class="markdown level1 summary">
+Moves the cursor to the start of line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command StartOfLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_StartOfLineExtend" data-uid="Terminal.Gui.Command.StartOfLineExtend">StartOfLineExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the start of line.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command StartOfLineExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_StartOfPage" data-uid="Terminal.Gui.Command.StartOfPage">StartOfPage</h4>
+  <div class="markdown level1 summary">
+Moves the cursor to the top of page.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command StartOfPage</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Suspend" data-uid="Terminal.Gui.Command.Suspend">Suspend</h4>
+  <div class="markdown level1 summary">
+Suspend a application (used on Linux).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Suspend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Tab" data-uid="Terminal.Gui.Command.Tab">Tab</h4>
+  <div class="markdown level1 summary">
+Inserts a tab.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Tab</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ToggleChecked" data-uid="Terminal.Gui.Command.ToggleChecked">ToggleChecked</h4>
+  <div class="markdown level1 summary">
+Toggle the checked state.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ToggleChecked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ToggleExpandCollapse" data-uid="Terminal.Gui.Command.ToggleExpandCollapse">ToggleExpandCollapse</h4>
+  <div class="markdown level1 summary">
+Toggles the Expanded or collapsed state of a a list or item (with subitems)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ToggleExpandCollapse</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ToggleExtend" data-uid="Terminal.Gui.Command.ToggleExtend">ToggleExtend</h4>
+  <div class="markdown level1 summary">
+Toggles the extended selection.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ToggleExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_ToggleOverwrite" data-uid="Terminal.Gui.Command.ToggleOverwrite">ToggleOverwrite</h4>
+  <div class="markdown level1 summary">
+Toggles overwrite mode such that newly typed text overwrites the text that is
+already there (typically associated with the Insert key).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command ToggleOverwrite</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_TopHome" data-uid="Terminal.Gui.Command.TopHome">TopHome</h4>
+  <div class="markdown level1 summary">
+Moves to top begin.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command TopHome</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_TopHomeExtend" data-uid="Terminal.Gui.Command.TopHomeExtend">TopHomeExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the top begin.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command TopHomeExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_Undo" data-uid="Terminal.Gui.Command.Undo">Undo</h4>
+  <div class="markdown level1 summary">
+Undo changes.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command Undo</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_UnixEmulation" data-uid="Terminal.Gui.Command.UnixEmulation">UnixEmulation</h4>
+  <div class="markdown level1 summary">
+Unix emulation
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command UnixEmulation</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_value__" data-uid="Terminal.Gui.Command.value__">value__</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int value__</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_WordLeft" data-uid="Terminal.Gui.Command.WordLeft">WordLeft</h4>
+  <div class="markdown level1 summary">
+Moves the caret to the start of the previous word.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command WordLeft</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_WordLeftExtend" data-uid="Terminal.Gui.Command.WordLeftExtend">WordLeftExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the start of the previous word.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command WordLeftExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_WordRight" data-uid="Terminal.Gui.Command.WordRight">WordRight</h4>
+  <div class="markdown level1 summary">
+Moves the caret to the start of the next word.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command WordRight</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Command_WordRightExtend" data-uid="Terminal.Gui.Command.WordRightExtend">WordRightExtend</h4>
+  <div class="markdown level1 summary">
+Extends the selection to the start of the next word.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const Command WordRightExtend</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Command.html">Command</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
