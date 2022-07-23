@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,17 @@ A Progress Bar view that can indicate progress of an activity visually.
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_ProgressBar_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+<a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a> can operate in two modes, percentage mode, or
+activity mode.  The progress bar starts in percentage mode and
+setting the Fraction property will reflect on the UI the progress 
+made so far.   Activity mode is used when the application has no 
+way of knowing how much time is left, and is started when the <a class="xref" href="Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse">Pulse()</a> method is called.  
+Call <a class="xref" href="Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse">Pulse()</a> repeatedly as progress is made.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -520,17 +532,6 @@ A Progress Bar view that can indicate progress of an activity visually.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ProgressBar : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ProgressBar_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-<a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a> can operate in two modes, percentage mode, or
-activity mode.  The progress bar starts in percentage mode and
-setting the Fraction property will reflect on the UI the progress 
-made so far.   Activity mode is used when the application has no 
-way of knowing how much time is left, and is started when the <a class="xref" href="Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse">Pulse()</a> method is called.  
-Call <a class="xref" href="Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse">Pulse()</a> repeatedly as progress is made.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_ProgressBar__ctor_" data-uid="Terminal.Gui.ProgressBar.#ctor*"></a>
@@ -726,22 +727,6 @@ The text displayed by the <a class="xref" href="Terminal.Gui.View.html">View</a>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a></div>
-  <h5 id="Terminal_Gui_ProgressBar_Text_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
- If provided, the text will be drawn before any subviews are drawn.
-</p>
-<p>
- The text will be drawn starting at the view origin (0, 0) and will be formatted according
- to the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">TextAlignment</a> property. If the view&apos;s height is greater than 1, the
- text will word-wrap to additional lines if it does not fit horizontally. If the view&apos;s height
- is 1, the text will be clipped.
-</p>
-<p>
- Set the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">HotKeySpecifier</a> to enable hotkey support. To disable hotkey support set <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">HotKeySpecifier</a> to
-<code>(Rune)0xffff</code>.
-</p>
-</div>
   <h3 id="methods">Methods
   </h3>
   <a id="Terminal_Gui_ProgressBar_OnEnter_" data-uid="Terminal.Gui.ProgressBar.OnEnter*"></a>
@@ -798,11 +783,6 @@ Notifies the <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Pulse()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ProgressBar_Pulse_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-If the <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a> is percentage mode, it switches to activity
-mode. If is in activity mode, the marker is moved.
-</div>
   <a id="Terminal_Gui_ProgressBar_Redraw_" data-uid="Terminal.Gui.ProgressBar.Redraw*"></a>
   <h4 id="Terminal_Gui_ProgressBar_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ProgressBar.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -832,20 +812,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_ProgressBar_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

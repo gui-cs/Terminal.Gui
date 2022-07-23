@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -592,11 +593,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The size of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is computed based on the
-text length. This <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is not toggled.
-</div>
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">CheckBox(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -639,11 +635,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The size of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is computed based on the
-text length. 
-</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Terminal_Gui_CheckBox_Checked_" data-uid="Terminal.Gui.CheckBox.Checked*"></a>
@@ -846,23 +837,6 @@ want to provide accelerator functionality
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_CheckBox_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Before keys are sent to the subview on the
-  current view, all the views are
-  processed and the key is passed to the widgets
-  to allow some of them to process the keystroke
-  as a hot-key. </p>
-<p>
-   For example, if you implement a button that
-   has a hotkey ok &quot;o&quot;, you would catch the
-   combination Alt-o here.  If the event is
-   caught, you must return true to stop the
-   keystroke from being dispatched to other
-   views.
-</p>
-</div>
   <a id="Terminal_Gui_CheckBox_ProcessKey_" data-uid="Terminal.Gui.CheckBox.ProcessKey*"></a>
   <h4 id="Terminal_Gui_CheckBox_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -908,25 +882,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_CheckBox_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_CheckBox_UpdateTextFormatterText_" data-uid="Terminal.Gui.CheckBox.UpdateTextFormatterText*"></a>
   <h4 id="Terminal_Gui_CheckBox_UpdateTextFormatterText" data-uid="Terminal.Gui.CheckBox.UpdateTextFormatterText">UpdateTextFormatterText()</h4>
   <div class="markdown level1 summary">
@@ -966,12 +921,6 @@ Toggled event, raised when the <a class="xref" href="Terminal.Gui.CheckBox.html"
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_CheckBox_Toggled_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Client code can hook up to this event, it is
-raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is activated either with
-the mouse or the keyboard. The passed <code>bool</code> contains the previous state. 
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

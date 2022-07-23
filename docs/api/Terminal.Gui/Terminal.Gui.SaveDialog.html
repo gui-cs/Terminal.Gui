@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -105,6 +106,15 @@ save.
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_SaveDialog_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  To use, create an instance of <a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a>, and pass it to
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a>. This will run the dialog modally,
+and when this returns, the <a class="xref" href="Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog_FileName">FileName</a>property will contain the selected file name or 
+null if the user canceled. 
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -690,15 +700,6 @@ save.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class SaveDialog : FileDialog</code></pre>
   </div>
-  <h5 id="Terminal_Gui_SaveDialog_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  To use, create an instance of <a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a>, and pass it to
-<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a>. This will run the dialog modally,
-and when this returns, the <a class="xref" href="Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog_FileName">FileName</a>property will contain the selected file name or 
-null if the user canceled. 
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_SaveDialog__ctor_" data-uid="Terminal.Gui.SaveDialog.#ctor*"></a>

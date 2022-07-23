@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -339,13 +340,6 @@ Gets the formatted lines.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Lines_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-Upon a &apos;get&apos; of this property, if the text needs to be formatted (if <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat">NeedsFormat</a> is <code>true</code>)
-<a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32_Terminal_Gui_TextDirection_">Format(ustring, Int32, Boolean, Boolean, Boolean, Int32, TextDirection)</a> will be called internally. 
-</p>
-</div>
   <a id="Terminal_Gui_TextFormatter_NeedsFormat_" data-uid="Terminal.Gui.TextFormatter.NeedsFormat*"></a>
   <h4 id="Terminal_Gui_TextFormatter_NeedsFormat" data-uid="Terminal.Gui.TextFormatter.NeedsFormat">NeedsFormat</h4>
   <div class="markdown level1 summary">
@@ -372,12 +366,6 @@ If it is <code>false</code> when Draw is called, the Draw call will be faster.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_NeedsFormat_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This is set to true when the properties of <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> are set.
-</p>
-</div>
   <a id="Terminal_Gui_TextFormatter_PreserveTrailingSpaces_" data-uid="Terminal.Gui.TextFormatter.PreserveTrailingSpaces*"></a>
   <h4 id="Terminal_Gui_TextFormatter_PreserveTrailingSpaces" data-uid="Terminal.Gui.TextFormatter.PreserveTrailingSpaces">PreserveTrailingSpaces</h4>
   <div class="markdown level1 summary">
@@ -880,18 +868,6 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Int32_Terminal_Gui_TextDirection__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-An empty <code>text</code> string will result in one empty line.
-</p>
-<p>
-If <code>width</code> is 0, a single, empty line will be returned.
-</p>
-<p>
-If <code>width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
-</p>
-</div>
   <a id="Terminal_Gui_TextFormatter_Format_" data-uid="Terminal.Gui.TextFormatter.Format*"></a>
   <h4 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_System_Int32_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection)">Format(ustring, Int32, TextAlignment, Boolean, Boolean, Int32, TextDirection)</h4>
   <div class="markdown level1 summary">
@@ -964,18 +940,6 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_System_Int32_Terminal_Gui_TextDirection__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-An empty <code>text</code> string will result in one empty line.
-</p>
-<p>
-If <code>width</code> is 0, a single, empty line will be returned.
-</p>
-<p>
-If <code>width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
-</p>
-</div>
   <a id="Terminal_Gui_TextFormatter_GetMaxColsForWidth_" data-uid="Terminal.Gui.TextFormatter.GetMaxColsForWidth*"></a>
   <h4 id="Terminal_Gui_TextFormatter_GetMaxColsForWidth_System_Collections_Generic_List_NStack_ustring__System_Int32_" data-uid="Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{NStack.ustring},System.Int32)">GetMaxColsForWidth(List&lt;ustring&gt;, Int32)</h4>
   <div class="markdown level1 summary">
@@ -1685,11 +1649,6 @@ it as the hotkey.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_NStack_ustring_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The returned string will not render correctly without first un-doing the tag. To undo the tag, search for 
-Runes with a bitmask of <code>otKeyTagMask</code> and remove that bitmask.
-</div>
   <a id="Terminal_Gui_TextFormatter_WordWrap_" data-uid="Terminal.Gui.TextFormatter.WordWrap*"></a>
   <h4 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_Terminal_Gui_TextDirection_" data-uid="Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)">WordWrap(ustring, Int32, Boolean, Int32, TextDirection)</h4>
   <div class="markdown level1 summary">
@@ -1753,15 +1712,6 @@ Formats the provided text to fit within the width provided using word wrapping.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_System_Int32_Terminal_Gui_TextDirection__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This method does not do any justification.
-</p>
-<p>
-This method strips Newline (&apos;\n&apos; and &apos;\r\n&apos;) sequences before processing.
-</p>
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_TextFormatter_HotKeyChanged" data-uid="Terminal.Gui.TextFormatter.HotKeyChanged">HotKeyChanged</h4>

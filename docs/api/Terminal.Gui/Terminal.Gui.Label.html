@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -101,6 +102,10 @@ Multi-line Labels support word wrap.
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_Label_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionality identical to <a class="xref" href="Terminal.Gui.View.html">View</a> and is included for API backwards compatibility.
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -521,10 +526,6 @@ Multi-line Labels support word wrap.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Label : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Label_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionality identical to <a class="xref" href="Terminal.Gui.View.html">View</a> and is included for API backwards compatibility.
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
@@ -851,23 +852,6 @@ want to provide accelerator functionality
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Label_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Before keys are sent to the subview on the
-  current view, all the views are
-  processed and the key is passed to the widgets
-  to allow some of them to process the keystroke
-  as a hot-key. </p>
-<p>
-   For example, if you implement a button that
-   has a hotkey ok &quot;o&quot;, you would catch the
-   combination Alt-o here.  If the event is
-   caught, you must return true to stop the
-   keystroke from being dispatched to other
-   views.
-</p>
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_Label_Clicked" data-uid="Terminal.Gui.Label.Clicked">Clicked</h4>
@@ -895,12 +879,6 @@ or if the user presses the action key while this view is focused. (TODO: IsDefau
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Label_Clicked_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Client code can hook up to this event, it is
-raised when the button is activated either with
-the mouse or the keyboard.
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
