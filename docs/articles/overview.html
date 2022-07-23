@@ -158,12 +158,11 @@ class Demo {
 }
 </code></pre><h1 id="views">Views</h1>
 <p>All visible elements on a Terminal.Gui application are implemented as
-<a href="../api/Terminal.Gui/Terminal.Gui.View.yml">Views</a>. Views are self-contained
-objects that take care of displaying themselves, can receive keyboard and mouse
-input and participate in the focus mechanism.</p>
+<a href="../api/Terminal.Gui/Terminal.Gui.View.html">Views</a>. Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.</p>
+<p>See the full list of <a href="views.html">Views provided by the Terminal.Gui library here</a>.</p>
 <p>Every view can contain an arbitrary number of children views. These are called
 the Subviews. You can add a view to an existing view, by calling the 
-<a href="../api/Terminal.Gui/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_"><code>Add</code></a> method, for example, to add a couple of buttons to a UI, you can do this:</p>
+<a href="../api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_"><code>Add</code></a> method, for example, to add a couple of buttons to a UI, you can do this:</p>
 <pre><code class="lang-csharp">void SetupMyView (View myView)
 {
     var label = new Label (&quot;Username: &quot;) {
@@ -184,45 +183,13 @@ the Subviews. You can add a view to an existing view, by calling the
 }
 </code></pre><p>The container of a given view is called the <code>SuperView</code> and it is a property of every
 View.</p>
-<p><em>Terminal.Gui</em> provides a rich set of views and controls for building terminal user interfaces:</p>
-<ul>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html">Button</a> </li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html">CheckBox</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ColorPicker.html">ColorPicker</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ComboBox.html">ComboBox</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a><ul>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html">OpenDialog</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html">SaveDialog</a></li>
-</ul>
-</li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html">FrameView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.GraphView.html">GraphView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html">Hex viewer/editor</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html">Label</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html">ListView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html">Menu</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html">MessageBox</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html">ProgressBar</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html">Radio buttons</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html">TableView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html">Time &amp; Date Fields</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html">TextField</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html">TextValidateField</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html">TextView (Text Editor)</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html">TreeView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html">ScrollView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html">ScrollBarView</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html">StatusBar</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html">Window</a></li>
-<li><a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Wizard.html">Wizard</a></li>
-</ul>
 <h2 id="layout">Layout</h2>
 <p><code>Terminal.Gui</code> supports two different layout systems, absolute and computed \
 (controlled by the <a href="../api/Terminal.Gui/Terminal.Gui.LayoutStyle.html"><code>LayoutStyle</code></a>
 property on the view.</p>
 <p>The absolute system is used when you want the view to be positioned exactly in
 one location and want to manually control where the view is. This is done
-by invoking your View constructor with an argument of type <a href="../api/Terminal.Gui/Terminal.Gui.Rect.yml"><code>Rect</code></a>. When you do this, to change the
+by invoking your View constructor with an argument of type <a href="../api/Terminal.Gui/Terminal.Gui.Rect.html"><code>Rect</code></a>. When you do this, to change the
 position of the View, you can change the <code>Frame</code> property on the View.</p>
 <p>The computed layout system offers a few additional capabilities, like automatic
 centering, expanding of dimensions and a handful of other features. To use
@@ -285,7 +252,7 @@ that can be executed modally - that is, the view can take over all input and ret
 only when the user chooses to complete their work there. </p>
 <p>The following sections cover the differences.</p>
 <h2 id="toplevel-views">TopLevel Views</h2>
-<p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.yml">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
 <p>You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example. You 
 typically would add a Menu and a Window to your Toplevel, it would look like this:</p>
 <pre><code class="lang-csharp">using Terminal.Gui;
@@ -409,7 +376,7 @@ to background views when a modal view is running. </p>
 <h1 id="colors-and-color-schemes">Colors and Color Schemes</h1>
 <p>All views have been configured with a color scheme that will work both in color
 terminals as well as the more limited black and white terminals. </p>
-<p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.yml"><code>Colors</code></a> class which defined color schemes for
+<p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html"><code>Colors</code></a> class which defined color schemes for
 the toplevel, the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:</p>
 <ul>
 <li><code>Colors.Toplevel</code></li>

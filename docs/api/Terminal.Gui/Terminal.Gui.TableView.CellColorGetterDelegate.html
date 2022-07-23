@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Delegate TableView.CellColorGetterDelegate
+    <title>Class TableView.CellColorGetterDelegate
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Delegate TableView.CellColorGetterDelegate
+    <meta name="title" content="Class TableView.CellColorGetterDelegate
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,17 +81,64 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate">
   
   
-  <h1 id="Terminal_Gui_TableView_CellColorGetterDelegate" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate" class="text-break">Delegate TableView.CellColorGetterDelegate
+  <h1 id="Terminal_Gui_TableView_CellColorGetterDelegate" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate" class="text-break">Class TableView.CellColorGetterDelegate
   </h1>
   <div class="markdown level0 summary">
 Delegate for providing color to <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> cells based on the value being rendered
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">TableView.CellColorGetterDelegate</span></div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_TableView_CellColorGetterDelegate_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate ColorScheme CellColorGetterDelegate(TableView.CellColorGetterArgs args);</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class CellColorGetterDelegate : MulticastDelegate</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="Terminal_Gui_TableView_CellColorGetterDelegate__ctor_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.#ctor*"></a>
+  <h4 id="Terminal_Gui_TableView_CellColorGetterDelegate__ctor_System_Object_System_IntPtr_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.#ctor(System.Object,System.IntPtr)">CellColorGetterDelegate(Object, IntPtr)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CellColorGetterDelegate(object object, IntPtr method)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">object</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IntPtr</span></td>
+        <td><span class="parametername">method</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Terminal_Gui_TableView_CellColorGetterDelegate_BeginInvoke_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.BeginInvoke*"></a>
+  <h4 id="Terminal_Gui_TableView_CellColorGetterDelegate_BeginInvoke_Terminal_Gui_TableView_CellColorGetterArgs_System_AsyncCallback_System_Object_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.BeginInvoke(Terminal.Gui.TableView.CellColorGetterArgs,System.AsyncCallback,System.Object)">BeginInvoke(TableView.CellColorGetterArgs, AsyncCallback, Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual IAsyncResult BeginInvoke(TableView.CellColorGetterArgs args, AsyncCallback callback, object object)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -106,7 +153,97 @@ Delegate for providing color to <a class="xref" href="Terminal.Gui.TableView.htm
       <tr>
         <td><a class="xref" href="Terminal.Gui.TableView.CellColorGetterArgs.html">TableView.CellColorGetterArgs</a></td>
         <td><span class="parametername">args</span></td>
-        <td>Contains information about the cell for which color is needed</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.AsyncCallback</span></td>
+        <td><span class="parametername">callback</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IAsyncResult</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_CellColorGetterDelegate_EndInvoke_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.EndInvoke*"></a>
+  <h4 id="Terminal_Gui_TableView_CellColorGetterDelegate_EndInvoke_System_IAsyncResult_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.EndInvoke(System.IAsyncResult)">EndInvoke(IAsyncResult)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual ColorScheme EndInvoke(IAsyncResult result)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IAsyncResult</span></td>
+        <td><span class="parametername">result</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_TableView_CellColorGetterDelegate_Invoke_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.Invoke*"></a>
+  <h4 id="Terminal_Gui_TableView_CellColorGetterDelegate_Invoke_Terminal_Gui_TableView_CellColorGetterArgs_" data-uid="Terminal.Gui.TableView.CellColorGetterDelegate.Invoke(Terminal.Gui.TableView.CellColorGetterArgs)">Invoke(TableView.CellColorGetterArgs)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual ColorScheme Invoke(TableView.CellColorGetterArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TableView.CellColorGetterArgs.html">TableView.CellColorGetterArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

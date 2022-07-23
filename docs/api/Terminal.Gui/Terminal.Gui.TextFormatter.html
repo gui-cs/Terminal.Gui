@@ -92,35 +92,21 @@ Provides text formatting capabilities for console apps. Supports, hotkeys, horiz
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">TextFormatter</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_TextFormatter_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class TextFormatter</code></pre>
+    <pre><code class="lang-csharp hljs">public class TextFormatter : Object</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="Terminal_Gui_TextFormatter__ctor_" data-uid="Terminal.Gui.TextFormatter.#ctor*"></a>
+  <h4 id="Terminal_Gui_TextFormatter__ctor" data-uid="Terminal.Gui.TextFormatter.#ctor">TextFormatter()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextFormatter()</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -505,7 +491,7 @@ Calculates the rectangle required to hold text, assuming no word wrapping.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Rect CalcRect(int x, int y, ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Rect CalcRect(int x, int y, ustring text, TextDirection direction)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -562,7 +548,7 @@ Justifies text within a specified width.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ustring ClipAndJustify(ustring text, int width, bool justify, TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static ustring ClipAndJustify(ustring text, int width, bool justify, TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -619,7 +605,7 @@ Justifies text within a specified width.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ustring ClipAndJustify(ustring text, int width, TextAlignment talign, TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static ustring ClipAndJustify(ustring text, int width, TextAlignment talign, TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -725,7 +711,7 @@ Draws the text held by <a class="xref" href="Terminal.Gui.TextFormatter.html">Te
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Draw(Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default(Rect))</code></pre>
+    <pre><code class="lang-csharp hljs">public void Draw(Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -830,7 +816,7 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -914,7 +900,7 @@ Reformats text into lines, applying text alignment and optionally wrapping text 
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; Format(ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1456,7 +1442,7 @@ make the text just fit <code>width</code>. Spaces will not be added to the ends.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ustring Justify(ustring text, int width, char spaceChar = ' ', TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static ustring Justify(ustring text, int width, char spaceChar = ' ', TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1712,7 +1698,7 @@ Formats the provided text to fit within the width provided using word wrapping.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)</code></pre>
+    <pre><code class="lang-csharp hljs">public static List&lt;ustring&gt; WordWrap(ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">

@@ -131,30 +131,12 @@ View is the base class for all views on the screen and represents a visible elem
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_View_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class View : Responder, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class View : Responder</code></pre>
   </div>
   <h5 id="Terminal_Gui_View_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -264,7 +246,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public View(ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public View(ustring text, TextDirection direction, Border border = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -528,7 +510,9 @@ control for tasks such as drawing on the surface of the control.
 </div>
   <a id="Terminal_Gui_View_CanFocus_" data-uid="Terminal.Gui.View.CanFocus*"></a>
   <h4 id="Terminal_Gui_View_CanFocus" data-uid="Terminal.Gui.View.CanFocus">CanFocus</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> can focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -545,7 +529,7 @@ control for tasks such as drawing on the surface of the control.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code> if can focus; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -632,7 +616,9 @@ for simplifying the development of new views.
   </table>
   <a id="Terminal_Gui_View_Enabled_" data-uid="Terminal.Gui.View.Enabled*"></a>
   <h4 id="Terminal_Gui_View_Enabled" data-uid="Terminal.Gui.View.Enabled">Enabled</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> can respond to user interaction.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -743,7 +729,9 @@ Gets or sets the frame for the view. The frame is relative to the view&apos;s co
 </div>
   <a id="Terminal_Gui_View_HasFocus_" data-uid="Terminal.Gui.View.HasFocus*"></a>
   <h4 id="Terminal_Gui_View_HasFocus" data-uid="Terminal.Gui.View.HasFocus">HasFocus</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> has focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -760,7 +748,7 @@ Gets or sets the frame for the view. The frame is relative to the view&apos;s co
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code> if has focus; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -1367,7 +1355,9 @@ Gets or sets how the View&apos;s <a class="xref" href="Terminal.Gui.View.html#Te
   </table>
   <a id="Terminal_Gui_View_Visible_" data-uid="Terminal.Gui.View.Visible*"></a>
   <h4 id="Terminal_Gui_View_Visible" data-uid="Terminal.Gui.View.Visible">Visible</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> and all its child controls are displayed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1603,7 +1593,7 @@ will replace the old one</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected void AddCommand(Command command, Func&lt;bool?&gt; f)</code></pre>
+    <pre><code class="lang-csharp hljs">protected void AddCommand(Command command, Func&lt;Nullable&lt;bool&gt;&gt; f)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1977,7 +1967,9 @@ Checks if key combination already exist.
   </table>
   <a id="Terminal_Gui_View_Dispose_" data-uid="Terminal.Gui.View.Dispose*"></a>
   <h4 id="Terminal_Gui_View_Dispose_System_Boolean_" data-uid="Terminal.Gui.View.Dispose(System.Boolean)">Dispose(Boolean)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2002,6 +1994,15 @@ Checks if key combination already exist.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose_System_Boolean_">Responder.Dispose(Boolean)</a></div>
+  <h5 id="Terminal_Gui_View_Dispose_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+If disposing equals true, the method has been called directly
+or indirectly by a user&apos;s code. Managed and unmanaged resources
+can be disposed.
+If disposing equals false, the method has been called by the
+runtime from inside the finalizer and you should not reference
+other objects. Only unmanaged resources can be disposed.		
+</div>
   <a id="Terminal_Gui_View_DrawFrame_" data-uid="Terminal.Gui.View.DrawFrame*"></a>
   <h4 id="Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_" data-uid="Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)">DrawFrame(Rect, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -2490,7 +2491,7 @@ Determines the current <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui
       <tr>
         <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
         <td><a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Normal">Normal</a> if <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">Enabled</a> is <span class="xref">true</span>
-    or <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Disabled">Disabled</a> if <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">Enabled</a> is <span class="xref">false</span></td>
+            or <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Disabled">Disabled</a> if <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">Enabled</a> is <span class="xref">false</span></td>
       </tr>
     </tbody>
   </table>
@@ -2578,7 +2579,7 @@ and matches the <code data-dev-comment-type="paramref" class="paramref">keyEvent
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected bool? InvokeKeybindings(KeyEvent keyEvent)</code></pre>
+    <pre><code class="lang-csharp hljs">protected Nullable&lt;bool&gt; InvokeKeybindings(KeyEvent keyEvent)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2694,7 +2695,9 @@ Method invoked  when a subview is being added to this view.
   </table>
   <a id="Terminal_Gui_View_OnCanFocusChanged_" data-uid="Terminal.Gui.View.OnCanFocusChanged*"></a>
   <h4 id="Terminal_Gui_View_OnCanFocusChanged" data-uid="Terminal.Gui.View.OnCanFocusChanged">OnCanFocusChanged()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when the <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_CanFocus">CanFocus</a> property from a view is changed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2766,7 +2769,9 @@ This method will be called after any subviews removed with <a class="xref" href=
 </div>
   <a id="Terminal_Gui_View_OnEnabledChanged_" data-uid="Terminal.Gui.View.OnEnabledChanged*"></a>
   <h4 id="Terminal_Gui_View_OnEnabledChanged" data-uid="Terminal.Gui.View.OnEnabledChanged">OnEnabledChanged()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when the <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Enabled">Enabled</a> property from a view is changed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2776,7 +2781,9 @@ This method will be called after any subviews removed with <a class="xref" href=
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnEnabledChanged">Responder.OnEnabledChanged()</a></div>
   <a id="Terminal_Gui_View_OnEnter_" data-uid="Terminal.Gui.View.OnEnter*"></a>
   <h4 id="Terminal_Gui_View_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.View.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a view gets focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2795,7 +2802,7 @@ This method will be called after any subviews removed with <a class="xref" href=
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td></td>
+        <td>The view that is losing focus.</td>
       </tr>
     </tbody>
   </table>
@@ -2810,7 +2817,7 @@ This method will be called after any subviews removed with <a class="xref" href=
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -2818,7 +2825,9 @@ This method will be called after any subviews removed with <a class="xref" href=
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnEnter_Terminal_Gui_View_">Responder.OnEnter(View)</a></div>
   <a id="Terminal_Gui_View_OnKeyDown_" data-uid="Terminal.Gui.View.OnKeyDown*"></a>
   <h4 id="Terminal_Gui_View_OnKeyDown_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)">OnKeyDown(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a key is pressed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2837,7 +2846,7 @@ This method will be called after any subviews removed with <a class="xref" href=
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -2852,7 +2861,7 @@ This method will be called after any subviews removed with <a class="xref" href=
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the event was handled</td>
       </tr>
     </tbody>
   </table>
@@ -2860,7 +2869,9 @@ This method will be called after any subviews removed with <a class="xref" href=
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnKeyDown_Terminal_Gui_KeyEvent_">Responder.OnKeyDown(KeyEvent)</a></div>
   <a id="Terminal_Gui_View_OnKeyUp_" data-uid="Terminal.Gui.View.OnKeyUp*"></a>
   <h4 id="Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)">OnKeyUp(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a key is released.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2879,7 +2890,7 @@ This method will be called after any subviews removed with <a class="xref" href=
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -2894,7 +2905,7 @@ This method will be called after any subviews removed with <a class="xref" href=
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the event was handled</td>
       </tr>
     </tbody>
   </table>
@@ -2902,7 +2913,9 @@ This method will be called after any subviews removed with <a class="xref" href=
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnKeyUp_Terminal_Gui_KeyEvent_">Responder.OnKeyUp(KeyEvent)</a></div>
   <a id="Terminal_Gui_View_OnLeave_" data-uid="Terminal.Gui.View.OnLeave*"></a>
   <h4 id="Terminal_Gui_View_OnLeave_Terminal_Gui_View_" data-uid="Terminal.Gui.View.OnLeave(Terminal.Gui.View)">OnLeave(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a view loses focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -2921,7 +2934,7 @@ This method will be called after any subviews removed with <a class="xref" href=
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td></td>
+        <td>The view that is getting focus.</td>
       </tr>
     </tbody>
   </table>
@@ -2936,7 +2949,7 @@ This method will be called after any subviews removed with <a class="xref" href=
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -2986,7 +2999,9 @@ Invokes the MouseClick event.
   </table>
   <a id="Terminal_Gui_View_OnMouseEnter_" data-uid="Terminal.Gui.View.OnMouseEnter*"></a>
   <h4 id="Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)">OnMouseEnter(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated for the first time.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3020,7 +3035,7 @@ Invokes the MouseClick event.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -3070,7 +3085,9 @@ Method invoked when a mouse event is generated
   </table>
   <a id="Terminal_Gui_View_OnMouseLeave_" data-uid="Terminal.Gui.View.OnMouseLeave*"></a>
   <h4 id="Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)">OnMouseLeave(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated for the last time.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3104,7 +3121,7 @@ Method invoked when a mouse event is generated
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -3139,7 +3156,9 @@ Method invoked when a subview is being removed from this view.
   </table>
   <a id="Terminal_Gui_View_OnVisibleChanged_" data-uid="Terminal.Gui.View.OnVisibleChanged*"></a>
   <h4 id="Terminal_Gui_View_OnVisibleChanged" data-uid="Terminal.Gui.View.OnVisibleChanged">OnVisibleChanged()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when the <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Visible">Visible</a> property from a view is changed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3159,7 +3178,12 @@ Positions the cursor in the right position based on the currently focused view i
   </div>
   <a id="Terminal_Gui_View_ProcessColdKey_" data-uid="Terminal.Gui.View.ProcessColdKey*"></a>
   <h4 id="Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+This method can be overwritten by views that
+want to provide accelerator functionality
+(Alt-key for example), but without
+interefering with normal ProcessKey behavior.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3178,7 +3202,7 @@ Positions the cursor in the right position based on the currently focused view i
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -3199,9 +3223,29 @@ Positions the cursor in the right position based on the currently focused view i
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessColdKey_Terminal_Gui_KeyEvent_">Responder.ProcessColdKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  After keys are sent to the subviews on the
+  current view, all the view are
+  processed and the key is passed to the views
+  to allow some of them to process the keystroke
+  as a cold-key. </p>
+<p>
+  This functionality is used, for example, by
+  default buttons to act on the enter key.
+  Processing this as a hot-key would prevent
+  non-default buttons from consuming the enter
+  keypress when they have the focus.
+</p>
+</div>
   <a id="Terminal_Gui_View_ProcessHotKey_" data-uid="Terminal.Gui.View.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+This method can be overwritten by view that
+want to provide accelerator functionality
+(Alt-key for example).
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3241,9 +3285,29 @@ Positions the cursor in the right position based on the currently focused view i
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessHotKey_Terminal_Gui_KeyEvent_">Responder.ProcessHotKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Before keys are sent to the subview on the
+  current view, all the views are
+  processed and the key is passed to the widgets
+  to allow some of them to process the keystroke
+  as a hot-key. </p>
+<p>
+   For example, if you implement a button that
+   has a hotkey ok &quot;o&quot;, you would catch the
+   combination Alt-o here.  If the event is
+   caught, you must return true to stop the
+   keystroke from being dispatched to other
+   views.
+</p>
+</div>
   <a id="Terminal_Gui_View_ProcessKey_" data-uid="Terminal.Gui.View.ProcessKey*"></a>
   <h4 id="Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -3262,7 +3326,7 @@ Positions the cursor in the right position based on the currently focused view i
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -3283,6 +3347,25 @@ Positions the cursor in the right position based on the currently focused view i
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent_">Responder.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   <a id="Terminal_Gui_View_ProcessResizeView_" data-uid="Terminal.Gui.View.ProcessResizeView*"></a>
   <h4 id="Terminal_Gui_View_ProcessResizeView" data-uid="Terminal.Gui.View.ProcessResizeView">ProcessResizeView()</h4>
   <div class="markdown level1 summary">
@@ -3759,8 +3842,6 @@ Pretty prints the View
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
   <a id="Terminal_Gui_View_UpdateTextFormatterText_" data-uid="Terminal.Gui.View.UpdateTextFormatterText*"></a>
   <h4 id="Terminal_Gui_View_UpdateTextFormatterText" data-uid="Terminal.Gui.View.UpdateTextFormatterText">UpdateTextFormatterText()</h4>
   <div class="markdown level1 summary">

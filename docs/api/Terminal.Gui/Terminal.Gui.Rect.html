@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct Rect
+    <title>Class Rect
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct Rect
+    <meta name="title" content="Class Rect
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,29 +81,22 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Rect">
   
   
-  <h1 id="Terminal_Gui_Rect" data-uid="Terminal.Gui.Rect" class="text-break">Struct Rect
+  <h1 id="Terminal_Gui_Rect" data-uid="Terminal.Gui.Rect" class="text-break">Class Rect
   </h1>
   <div class="markdown level0 summary">
 Stores a set of four integers that represent the location and size of a rectangle
 </div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Rect</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Rect_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct Rect</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Rect : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -278,7 +271,7 @@ Bottom Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly int Bottom { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Bottom { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -333,7 +326,7 @@ IsEmpty Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly bool IsEmpty { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -362,7 +355,7 @@ Left Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly int Left { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Left { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -421,7 +414,7 @@ Right Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly int Right { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Right { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -480,7 +473,7 @@ Top Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly int Top { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Top { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -715,8 +708,6 @@ Equals Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
   <h5 id="Terminal_Gui_Rect_Equals_System_Object__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 Checks equivalence of this Rectangle and another object.
@@ -808,8 +799,6 @@ GetHashCode Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
   <h5 id="Terminal_Gui_Rect_GetHashCode_remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 Calculates a hashing value.
@@ -1160,8 +1149,6 @@ ToString Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
   <h5 id="Terminal_Gui_Rect_ToString_remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 Formats the Rectangle as a string in (x,y,w,h) notation.

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Delegate AspectGetterDelegate&lt;T&gt;
+    <title>Class AspectGetterDelegate&lt;T&gt;
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Delegate AspectGetterDelegate&lt;T&gt;
+    <meta name="title" content="Class AspectGetterDelegate&lt;T&gt;
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,19 +81,79 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1">
   
   
-  <h1 id="Terminal_Gui_Trees_AspectGetterDelegate_1" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1" class="text-break">Delegate AspectGetterDelegate&lt;T&gt;
+  <h1 id="Terminal_Gui_Trees_AspectGetterDelegate_1" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1" class="text-break">Class AspectGetterDelegate&lt;T&gt;
   </h1>
   <div class="markdown level0 summary">
 Delegates of this type are used to fetch string representations of user&apos;s model objects
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">AspectGetterDelegate&lt;T&gt;</span></div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Trees.html">Terminal.Gui.Trees</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Trees_AspectGetterDelegate_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate string AspectGetterDelegate&lt;T&gt;(T toRender)
-
-    where T : class;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class AspectGetterDelegate&lt;T&gt; : MulticastDelegate where T : class</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="Terminal_Gui_Trees_AspectGetterDelegate_1__ctor_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.#ctor*"></a>
+  <h4 id="Terminal_Gui_Trees_AspectGetterDelegate_1__ctor_System_Object_System_IntPtr_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.#ctor(System.Object,System.IntPtr)">AspectGetterDelegate(Object, IntPtr)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AspectGetterDelegate(object object, IntPtr method)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">object</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IntPtr</span></td>
+        <td><span class="parametername">method</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Terminal_Gui_Trees_AspectGetterDelegate_1_BeginInvoke_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.BeginInvoke*"></a>
+  <h4 id="Terminal_Gui_Trees_AspectGetterDelegate_1_BeginInvoke__0_System_AsyncCallback_System_Object_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.BeginInvoke(`0,System.AsyncCallback,System.Object)">BeginInvoke(T, AsyncCallback, Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual IAsyncResult BeginInvoke(T toRender, AsyncCallback callback, object object)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -108,7 +168,57 @@ Delegates of this type are used to fetch string representations of user&apos;s m
       <tr>
         <td><span class="xref">T</span></td>
         <td><span class="parametername">toRender</span></td>
-        <td>The object that is being rendered</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.AsyncCallback</span></td>
+        <td><span class="parametername">callback</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IAsyncResult</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Trees_AspectGetterDelegate_1_EndInvoke_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.EndInvoke*"></a>
+  <h4 id="Terminal_Gui_Trees_AspectGetterDelegate_1_EndInvoke_System_IAsyncResult_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.EndInvoke(System.IAsyncResult)">EndInvoke(IAsyncResult)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string EndInvoke(IAsyncResult result)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IAsyncResult</span></td>
+        <td><span class="parametername">result</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -127,17 +237,42 @@ Delegates of this type are used to fetch string representations of user&apos;s m
       </tr>
     </tbody>
   </table>
-  <h5 class="typeParameters">Type Parameters</h5>
+  <a id="Terminal_Gui_Trees_AspectGetterDelegate_1_Invoke_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.Invoke*"></a>
+  <h4 id="Terminal_Gui_Trees_AspectGetterDelegate_1_Invoke__0_" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1.Invoke(`0)">Invoke(T)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string Invoke(T toRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
+        <th>Type</th>
         <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="parametername">T</span></td>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">toRender</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>

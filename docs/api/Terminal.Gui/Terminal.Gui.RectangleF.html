@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct RectangleF
+    <title>Class RectangleF
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct RectangleF
+    <meta name="title" content="Class RectangleF
    ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -81,33 +81,26 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.RectangleF">
   
   
-  <h1 id="Terminal_Gui_RectangleF" data-uid="Terminal.Gui.RectangleF" class="text-break">Struct RectangleF
+  <h1 id="Terminal_Gui_RectangleF" data-uid="Terminal.Gui.RectangleF" class="text-break">Class RectangleF
   </h1>
   <div class="markdown level0 summary">
 Stores the location and size of a rectangular region.
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">RectangleF</span></div>
+  </div>
   <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a>&gt;</div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_RectangleF_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct RectangleF : IEquatable&lt;RectangleF&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class RectangleF : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -224,8 +217,7 @@ Gets the y-coordinate of the lower-right corner of the rectangular region define
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly float Bottom { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public float Bottom { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -275,8 +267,7 @@ Tests whether this <a class="xref" href="Terminal.Gui.RectangleF.html">Rectangle
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly bool IsEmpty { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -302,8 +293,7 @@ Gets the x-coordinate of the upper-left corner of the rectangular region defined
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly float Left { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public float Left { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -329,8 +319,7 @@ Gets or sets the coordinates of the upper-left corner of the rectangular region 
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public PointF Location { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public PointF Location { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -356,8 +345,7 @@ Gets the x-coordinate of the lower-right corner of the rectangular region define
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly float Right { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public float Right { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -382,8 +370,7 @@ Gets or sets the size of this <a class="xref" href="Terminal.Gui.RectangleF.html
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public SizeF Size { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public SizeF Size { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -409,8 +396,7 @@ Gets the y-coordinate of the upper-left corner of the rectangular region defined
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Browsable(false)]
-public readonly float Top { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public float Top { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -683,8 +669,6 @@ size of this <a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a>.
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
   <a id="Terminal_Gui_RectangleF_Equals_" data-uid="Terminal.Gui.RectangleF.Equals*"></a>
   <h4 id="Terminal_Gui_RectangleF_Equals_Terminal_Gui_RectangleF_" data-uid="Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)">Equals(RectangleF)</h4>
   <div class="markdown level1 summary">
@@ -809,8 +793,6 @@ Gets the hash code for this <a class="xref" href="Terminal.Gui.RectangleF.html">
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
   <a id="Terminal_Gui_RectangleF_Inflate_" data-uid="Terminal.Gui.RectangleF.Inflate*"></a>
   <h4 id="Terminal_Gui_RectangleF_Inflate_System_Single_System_Single_" data-uid="Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)">Inflate(Single, Single)</h4>
   <div class="markdown level1 summary">
@@ -1124,8 +1106,6 @@ of this <a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a> to a 
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
   <a id="Terminal_Gui_RectangleF_Union_" data-uid="Terminal.Gui.RectangleF.Union*"></a>
   <h4 id="Terminal_Gui_RectangleF_Union_Terminal_Gui_RectangleF_Terminal_Gui_RectangleF_" data-uid="Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)">Union(RectangleF, RectangleF)</h4>
   <div class="markdown level1 summary">
@@ -1314,7 +1294,7 @@ Tests whether two <a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF
   </table>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <span class="xref">System.IEquatable&lt;&gt;</span>
   </div>
 </article>
           </div>
