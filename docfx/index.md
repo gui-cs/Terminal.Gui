@@ -1,6 +1,8 @@
-# Terminal.Gui - Terminal UI toolkit for .NET
+# Terminal.Gui - Cross Platform Terminal UI toolkit for .NET
 
-A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+
+![Sample](images/sample.gif)
 
 * [Terminal.Gui Project on GitHub](https://github.com/migueldeicaza/gui.cs)
 
