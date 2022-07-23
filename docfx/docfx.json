@@ -40,6 +40,10 @@
     }
   ],
   "build": {
+    "template": [
+      "default",
+      "./templates/default"
+    ],
     "content": [
       {
         "files": [

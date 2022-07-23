@@ -11,9 +11,6 @@ namespace UICatalog.Scenarios {
 	public class Wizards : Scenario {
 		public override void Setup ()
 		{
-			// Set the colorschem to Base so the non-modal part of the demo looks right
-			Win.ColorScheme = Colors.Base;
-
 			var frame = new FrameView ("Wizard Options") {
 				X = Pos.Center (),
 				Y = 0,

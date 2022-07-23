@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -96,12 +97,6 @@ subtraction operators.
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Pos</span></div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
-  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_Pos_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Pos : Object</code></pre>
-  </div>
   <h5 id="Terminal_Gui_Pos_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 <p>
@@ -119,6 +114,12 @@ subtraction operators.
   aliases to Left(View) and Top(View) respectively.
 </p>
 </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Pos_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class Pos : Object</code></pre>
+  </div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Pos__ctor_" data-uid="Terminal.Gui.Pos.#ctor*"></a>
@@ -174,13 +175,6 @@ useful to flush the layout from the right or bottom.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Pos_AnchorEnd_System_Int32__examples">Examples</h5>
-  
-This sample shows how align a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the bottom-right of a <a class="xref" href="Terminal.Gui.View.html">View</a>.
-<pre><code>// See Issue #502 
-anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-anchorButton.Y = Pos.AnchorEnd (1);</code></pre>
-
   <a id="Terminal_Gui_Pos_At_" data-uid="Terminal.Gui.Pos.At*"></a>
   <h4 id="Terminal_Gui_Pos_At_System_Int32_" data-uid="Terminal.Gui.Pos.At(System.Int32)">At(Int32)</h4>
   <div class="markdown level1 summary">
@@ -290,17 +284,6 @@ Returns a <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object that can b
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Pos_Center_examples">Examples</h5>
-  
-This creates a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>that is centered horizontally, is 50% of the way down, 
-is 30% the height, and is 80% the width of the <a class="xref" href="Terminal.Gui.View.html">View</a> it added to.
-<pre><code>var textView = new TextView () {
-X = Pos.Center (),
-Y = Pos.Percent (50),
-Width = Dim.Percent (80),
-	Height = Dim.Percent (30),
-};</code></pre>
-
   <a id="Terminal_Gui_Pos_Equals_" data-uid="Terminal.Gui.Pos.Equals*"></a>
   <h4 id="Terminal_Gui_Pos_Equals_System_Object_" data-uid="Terminal.Gui.Pos.Equals(System.Object)">Equals(Object)</h4>
   <div class="markdown level1 summary">Determines whether the specified object is equal to the current object.</div>
@@ -491,17 +474,6 @@ Creates a percentage <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> object
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Pos_Percent_System_Single__examples">Examples</h5>
-  
-This creates a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>that is centered horizontally, is 50% of the way down, 
-is 30% the height, and is 80% the width of the <a class="xref" href="Terminal.Gui.View.html">View</a> it added to.
-<pre><code>var textView = new TextView () {
-X = Pos.Center (),
-Y = Pos.Percent (50),
-Width = Dim.Percent (80),
-	Height = Dim.Percent (30),
-};</code></pre>
-
   <a id="Terminal_Gui_Pos_Right_" data-uid="Terminal.Gui.Pos.Right*"></a>
   <h4 id="Terminal_Gui_Pos_Right_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Right(Terminal.Gui.View)">Right(View)</h4>
   <div class="markdown level1 summary">

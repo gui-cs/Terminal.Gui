@@ -5,6 +5,7 @@ using NStack;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
+
 	/// <summary>
 	/// Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<see cref="WizardStep"/>) can host 
 	/// arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step also has a pane for help text. Along the
@@ -17,8 +18,43 @@ namespace Terminal.Gui {
 	/// 
 	/// See <see cref="Wizard.Modal"/> for more details.
 	/// </remarks>
+	/// <example>
+	/// <code>
+	/// using Terminal.Gui;
+	/// using NStack;
+	/// 
+	/// Application.Init();
+	/// 
+	/// var wizard = new Wizard ($"Setup Wizard");
+	/// 
+	/// // Add 1st step
+	/// var firstStep = new Wizard.WizardStep ("End User License Agreement");
+	/// wizard.AddStep(firstStep);
+	/// firstStep.NextButtonText = "Accept!";
+	/// firstStep.HelpText = "This is the End User License Agreement.";
+	/// 
+	/// // Add 2nd step
+	/// var secondStep = new Wizard.WizardStep ("Second Step");
+	/// wizard.AddStep(secondStep);
+	/// secondStep.HelpText = "This is the help text for the Second Step.";
+	/// var lbl = new Label ("Name:") { AutoSize = true };
+	/// secondStep.Add(lbl);
+	/// 
+	/// var name = new TextField () { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };
+	/// secondStep.Add(name);
+	/// 
+	/// wizard.Finished += (args) =>
+	/// {
+	///     MessageBox.Query("Wizard", $"Finished. The Name entered is '{name.Text}'", "Ok");
+	///     Application.RequestStop();
+	/// };
+	/// 
+	/// Application.Top.Add (wizard);
+	/// Application.Run ();
+	/// Application.Shutdown ();
+	/// </code>
+	/// </example>
 	public class Wizard : Dialog {
-
 		/// <summary>
 		/// Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is divided horizontally in two. On the left is the
 		/// content view where <see cref="View"/>s can be added,  On the right is the help for the step.

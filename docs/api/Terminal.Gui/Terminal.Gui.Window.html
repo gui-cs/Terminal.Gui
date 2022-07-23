@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -102,6 +103,11 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_Window_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+The &apos;client area&apos; of a <a class="xref" href="Terminal.Gui.Window.html">Window</a> is a rectangle deflated by one or more rows/columns from <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a>. A this time there is no
+API to determine this rectangle.
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -609,11 +615,6 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Window : Toplevel</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Window_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-The &apos;client area&apos; of a <a class="xref" href="Terminal.Gui.Window.html">Window</a> is a rectangle deflated by one or more rows/columns from <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a>. A this time there is no
-API to determine this rectangle.
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
@@ -653,11 +654,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Window__ctor_NStack_ustring__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This constructor initializes a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
-Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
-</div>
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_Terminal_Gui_Border_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring,System.Int32,Terminal.Gui.Border)">Window(ustring, Int32, Border)</h4>
   <div class="markdown level1 summary">
@@ -696,11 +692,6 @@ and an optional title.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_Terminal_Gui_Border__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This constructor initializes a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
-Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
-</div>
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)">Window(Rect, ustring)</h4>
   <div class="markdown level1 summary">
@@ -733,11 +724,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This constructor initializes a Window with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use constructors
-that do not take <code>Rect</code> parameters to initialize a Window with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
-</div>
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_Terminal_Gui_Border_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Int32,Terminal.Gui.Border)">Window(Rect, ustring, Int32, Border)</h4>
   <div class="markdown level1 summary">
@@ -781,11 +767,6 @@ and an optional title.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_Terminal_Gui_Border__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This constructor initializes a Window with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use constructors
-that do not take <code>Rect</code> parameters to initialize a Window with  <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> 
-</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Terminal_Gui_Window_Border_" data-uid="Terminal.Gui.Window.Border*"></a>
@@ -923,10 +904,6 @@ Adds a subview (child) to this view.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Add_Terminal_Gui_View_">Toplevel.Add(View)</a></div>
-  <h5 id="Terminal_Gui_Window_Add_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Views that have been added to this view can be retrieved via the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> property. See also <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">RemoveAll()</a> 
-</div>
   <a id="Terminal_Gui_Window_OnCanFocusChanged_" data-uid="Terminal.Gui.Window.OnCanFocusChanged*"></a>
   <h4 id="Terminal_Gui_Window_OnCanFocusChanged" data-uid="Terminal.Gui.Window.OnCanFocusChanged">OnCanFocusChanged()</h4>
   <div class="markdown level1 summary">
@@ -1047,20 +1024,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_">Toplevel.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_Window_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_Window_Remove_" data-uid="Terminal.Gui.Window.Remove*"></a>
   <h4 id="Terminal_Gui_Window_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Window.Remove(Terminal.Gui.View)">Remove(View)</h4>
   <div class="markdown level1 summary">
@@ -1090,9 +1053,6 @@ Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Termina
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_">Toplevel.Remove(View)</a></div>
-  <h5 id="Terminal_Gui_Window_Remove_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <a id="Terminal_Gui_Window_RemoveAll_" data-uid="Terminal.Gui.Window.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Window_RemoveAll" data-uid="Terminal.Gui.Window.RemoveAll">RemoveAll()</h4>
   <div class="markdown level1 summary">

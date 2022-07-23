@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -660,8 +661,6 @@ Horizontal scroll offset.  The index of the first column in <a class="xref" href
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_TableView_ColumnOffset_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">This property allows very wide tables to be rendered with horizontal scrolling</div>
   <a id="Terminal_Gui_TableView_FullRowSelect_" data-uid="Terminal.Gui.TableView.FullRowSelect*"></a>
   <h4 id="Terminal_Gui_TableView_FullRowSelect" data-uid="Terminal.Gui.TableView.FullRowSelect">FullRowSelect</h4>
   <div class="markdown level1 summary">
@@ -1141,8 +1140,6 @@ Updates scroll offsets to ensure that the selected cell is visible.  Has no effe
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void EnsureSelectedCellIsVisible()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TableView_EnsureSelectedCellIsVisible_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
   <a id="Terminal_Gui_TableView_EnsureValidScrollOffsets_" data-uid="Terminal.Gui.TableView.EnsureValidScrollOffsets*"></a>
   <h4 id="Terminal_Gui_TableView_EnsureValidScrollOffsets" data-uid="Terminal.Gui.TableView.EnsureValidScrollOffsets">EnsureValidScrollOffsets()</h4>
   <div class="markdown level1 summary">
@@ -1153,8 +1150,6 @@ Updates <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void EnsureValidScrollOffsets()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TableView_EnsureValidScrollOffsets_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
   <a id="Terminal_Gui_TableView_EnsureValidSelection_" data-uid="Terminal.Gui.TableView.EnsureValidSelection*"></a>
   <h4 id="Terminal_Gui_TableView_EnsureValidSelection" data-uid="Terminal.Gui.TableView.EnsureValidSelection">EnsureValidSelection()</h4>
   <div class="markdown level1 summary">
@@ -1165,8 +1160,6 @@ Updates <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void EnsureValidSelection()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TableView_EnsureValidSelection_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
   <a id="Terminal_Gui_TableView_GetAllSelectedCells_" data-uid="Terminal.Gui.TableView.GetAllSelectedCells*"></a>
   <h4 id="Terminal_Gui_TableView_GetAllSelectedCells" data-uid="Terminal.Gui.TableView.GetAllSelectedCells">GetAllSelectedCells()</h4>
   <div class="markdown level1 summary">
@@ -1448,25 +1441,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_TableView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_TableView_Redraw_" data-uid="Terminal.Gui.TableView.Redraw*"></a>
   <h4 id="Terminal_Gui_TableView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TableView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1496,20 +1470,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_TableView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_TableView_RenderCell_" data-uid="Terminal.Gui.TableView.RenderCell*"></a>
   <h4 id="Terminal_Gui_TableView_RenderCell_Terminal_Gui_Attribute_System_String_System_Boolean_" data-uid="Terminal.Gui.TableView.RenderCell(Terminal.Gui.Attribute,System.String,System.Boolean)">RenderCell(Attribute, String, Boolean)</h4>
   <div class="markdown level1 summary">
@@ -1655,8 +1615,6 @@ Updates the view to reflect changes to <a class="xref" href="Terminal.Gui.TableV
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Update()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_TableView_Update_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">This always calls <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_TableView_CellActivated" data-uid="Terminal.Gui.TableView.CellActivated">CellActivated</h4>

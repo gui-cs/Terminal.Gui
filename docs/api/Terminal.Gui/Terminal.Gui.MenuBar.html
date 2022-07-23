@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,15 @@ Provides a menu bar with drop-down and cascading menus.
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_MenuBar_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+The <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> appears on the first row of the terminal.
+</p>
+<p>
+The <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> provides global hotkeys for the application.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -496,15 +506,6 @@ Provides a menu bar with drop-down and cascading menus.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class MenuBar : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_MenuBar_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-The <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> appears on the first row of the terminal.
-</p>
-<p>
-The <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> provides global hotkeys for the application.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_MenuBar__ctor_" data-uid="Terminal.Gui.MenuBar.#ctor*"></a>
@@ -1168,22 +1169,6 @@ interefering with normal ProcessKey behavior.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_MenuBar_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  After keys are sent to the subviews on the
-  current view, all the view are
-  processed and the key is passed to the views
-  to allow some of them to process the keystroke
-  as a cold-key. </p>
-<p>
-  This functionality is used, for example, by
-  default buttons to act on the enter key.
-  Processing this as a hot-key would prevent
-  non-default buttons from consuming the enter
-  keypress when they have the focus.
-</p>
-</div>
   <a id="Terminal_Gui_MenuBar_ProcessHotKey_" data-uid="Terminal.Gui.MenuBar.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_MenuBar_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.MenuBar.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -1230,23 +1215,6 @@ want to provide accelerator functionality
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_MenuBar_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Before keys are sent to the subview on the
-  current view, all the views are
-  processed and the key is passed to the widgets
-  to allow some of them to process the keystroke
-  as a hot-key. </p>
-<p>
-   For example, if you implement a button that
-   has a hotkey ok &quot;o&quot;, you would catch the
-   combination Alt-o here.  If the event is
-   caught, you must return true to stop the
-   keystroke from being dispatched to other
-   views.
-</p>
-</div>
   <a id="Terminal_Gui_MenuBar_ProcessKey_" data-uid="Terminal.Gui.MenuBar.ProcessKey*"></a>
   <h4 id="Terminal_Gui_MenuBar_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.MenuBar.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -1292,25 +1260,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_MenuBar_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_MenuBar_Redraw_" data-uid="Terminal.Gui.MenuBar.Redraw*"></a>
   <h4 id="Terminal_Gui_MenuBar_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.MenuBar.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1340,20 +1289,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_MenuBar_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_MenuBar_MenuAllClosed" data-uid="Terminal.Gui.MenuBar.MenuAllClosed">MenuAllClosed</h4>

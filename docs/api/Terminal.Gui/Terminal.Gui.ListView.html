@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,35 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_ListView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> displays lists of data and allows the user to scroll through the data.
+  Items in the can be activated firing an event (with the ENTER key or a mouse double-click). 
+  If the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> property is true, elements of the list can be marked by the user.
+</p>
+<p>
+  By default <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> uses <span class="xref">System.Object.ToString</span> to render the items of any
+<span class="xref">System.Collections.IList</span> object (e.g. arrays, <span class="xref">System.Collections.Generic.List&lt;&gt;</span>,
+and other collections). Alternatively, an object that implements the <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a>
+interface can be provided giving full control of what is rendered.
+</p>
+<p>
+<a class="xref" href="Terminal.Gui.ListView.html">ListView</a> can display any object that implements the <span class="xref">System.Collections.IList</span> interface.
+<span class="xref">System.String</span> values are converted into <span class="xref">NStack.ustring</span> values before rendering, and other values are
+converted into <span class="xref">System.String</span> by calling <span class="xref">System.Object.ToString</span> and then converting to <span class="xref">NStack.ustring</span> .
+</p>
+<p>
+  To change the contents of the ListView, set the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source">Source</a> property (when 
+  providing custom rendering via <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a>) or call <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_System_Collections_IList_">SetSource(IList)</a>
+  an <span class="xref">System.Collections.IList</span> is being used.
+</p>
+<p>
+  When <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> is set to true the rendering will prefix the rendered items with
+  [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different
+  marking style set <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> to false and implement custom rendering.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -511,35 +541,6 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ListView : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ListView_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  The <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> displays lists of data and allows the user to scroll through the data.
-  Items in the can be activated firing an event (with the ENTER key or a mouse double-click). 
-  If the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> property is true, elements of the list can be marked by the user.
-</p>
-<p>
-  By default <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> uses <span class="xref">System.Object.ToString</span> to render the items of any
-<span class="xref">System.Collections.IList</span> object (e.g. arrays, <span class="xref">System.Collections.Generic.List&lt;&gt;</span>,
-and other collections). Alternatively, an object that implements the <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a>
-interface can be provided giving full control of what is rendered.
-</p>
-<p>
-<a class="xref" href="Terminal.Gui.ListView.html">ListView</a> can display any object that implements the <span class="xref">System.Collections.IList</span> interface.
-<span class="xref">System.String</span> values are converted into <span class="xref">NStack.ustring</span> values before rendering, and other values are
-converted into <span class="xref">System.String</span> by calling <span class="xref">System.Object.ToString</span> and then converting to <span class="xref">NStack.ustring</span> .
-</p>
-<p>
-  To change the contents of the ListView, set the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source">Source</a> property (when 
-  providing custom rendering via <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a>) or call <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_System_Collections_IList_">SetSource(IList)</a>
-  an <span class="xref">System.Collections.IList</span> is being used.
-</p>
-<p>
-  When <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> is set to true the rendering will prefix the rendered items with
-  [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different
-  marking style set <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking">AllowsMarking</a> to false and implement custom rendering.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
@@ -701,11 +702,6 @@ Gets or sets whether this <a class="xref" href="Terminal.Gui.ListView.html">List
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ListView_AllowsMarking_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-If set to true, <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> will render items marked items with &quot;[x]&quot;, and unmarked items with &quot;[ ]&quot;
-spaces. SPACE key will toggle marking.
-</div>
   <a id="Terminal_Gui_ListView_AllowsMultipleSelection_" data-uid="Terminal.Gui.ListView.AllowsMultipleSelection*"></a>
   <h4 id="Terminal_Gui_ListView_AllowsMultipleSelection" data-uid="Terminal.Gui.ListView.AllowsMultipleSelection">AllowsMultipleSelection</h4>
   <div class="markdown level1 summary">
@@ -831,10 +827,6 @@ Gets or sets the <a class="xref" href="Terminal.Gui.IListDataSource.html">IListD
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ListView_Source_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_System_Collections_IList_">SetSource(IList)</a> to set a new <span class="xref">System.Collections.IList</span> source.
-</div>
   <a id="Terminal_Gui_ListView_TopItem_" data-uid="Terminal.Gui.ListView.TopItem*"></a>
   <h4 id="Terminal_Gui_ListView_TopItem" data-uid="Terminal.Gui.ListView.TopItem">TopItem</h4>
   <div class="markdown level1 summary">
@@ -1328,25 +1320,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_ListView_Redraw_" data-uid="Terminal.Gui.ListView.Redraw*"></a>
   <h4 id="Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1376,20 +1349,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_ListView_ScrollDown_" data-uid="Terminal.Gui.ListView.ScrollDown*"></a>
   <h4 id="Terminal_Gui_ListView_ScrollDown_System_Int32_" data-uid="Terminal.Gui.ListView.ScrollDown(System.Int32)">ScrollDown(Int32)</h4>
   <div class="markdown level1 summary">
@@ -1585,10 +1544,6 @@ Sets the source of the <a class="xref" href="Terminal.Gui.ListView.html">ListVie
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ListView_SetSource_System_Collections_IList__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source">Source</a> property to set a new <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> source and use custome rendering.
-</div>
   <a id="Terminal_Gui_ListView_SetSourceAsync_" data-uid="Terminal.Gui.ListView.SetSourceAsync*"></a>
   <h4 id="Terminal_Gui_ListView_SetSourceAsync_System_Collections_IList_" data-uid="Terminal.Gui.ListView.SetSourceAsync(System.Collections.IList)">SetSourceAsync(IList)</h4>
   <div class="markdown level1 summary">
@@ -1631,10 +1586,6 @@ Sets the source to an <span class="xref">System.Collections.IList</span> value a
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ListView_SetSourceAsync_System_Collections_IList__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source">Source</a> property to set a new <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> source and use custom rendering.
-</div>
   <h3 id="events">Events
   </h3>
   <h4 id="Terminal_Gui_ListView_OpenSelectedItem" data-uid="Terminal.Gui.ListView.OpenSelectedItem">OpenSelectedItem</h4>

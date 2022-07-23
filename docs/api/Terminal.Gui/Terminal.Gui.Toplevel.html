@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -103,6 +104,33 @@ for pop-up views such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog<
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>. 
+  They return control to the caller when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> has 
+  been called (which sets the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property to <code>false</code>). 
+</p>
+<p>
+  A Toplevel is created when an application initializes Terminal.Gui by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>.
+  The application Toplevel can be accessed via <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>. Additional Toplevels can be created 
+  and run (e.g. <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>s. To run a Toplevel, create the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and 
+  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>.
+</p>
+<p>
+  Toplevels can also opt-in to more sophisticated initialization
+  by implementing <span class="xref">System.ComponentModel.ISupportInitialize</span>. When they do
+  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit</span> and
+<span class="xref">System.ComponentModel.ISupportInitialize.EndInit</span> methods will be called
+before running the view.
+If first-run-only initialization is preferred, the <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
+can be implemented too, in which case the <span class="xref">System.ComponentModel.ISupportInitialize</span>
+methods will only be called if <span class="xref">System.ComponentModel.ISupportInitializeNotification.IsInitialized</span>
+is <span class="xref">false</span>. This allows proper <a class="xref" href="Terminal.Gui.View.html">View</a> inheritance hierarchies
+to override base class layout code optimally by doing so only on first run,
+instead of on every run.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -499,33 +527,6 @@ for pop-up views such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog<
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Toplevel : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>. 
-  They return control to the caller when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> has 
-  been called (which sets the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property to <code>false</code>). 
-</p>
-<p>
-  A Toplevel is created when an application initializes Terminal.Gui by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>.
-  The application Toplevel can be accessed via <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>. Additional Toplevels can be created 
-  and run (e.g. <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>s. To run a Toplevel, create the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and 
-  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>.
-</p>
-<p>
-  Toplevels can also opt-in to more sophisticated initialization
-  by implementing <span class="xref">System.ComponentModel.ISupportInitialize</span>. When they do
-  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit</span> and
-<span class="xref">System.ComponentModel.ISupportInitialize.EndInit</span> methods will be called
-before running the view.
-If first-run-only initialization is preferred, the <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
-can be implemented too, in which case the <span class="xref">System.ComponentModel.ISupportInitialize</span>
-methods will only be called if <span class="xref">System.ComponentModel.ISupportInitializeNotification.IsInitialized</span>
-is <span class="xref">false</span>. This allows proper <a class="xref" href="Terminal.Gui.View.html">View</a> inheritance hierarchies
-to override base class layout code optimally by doing so only on first run,
-instead of on every run.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Toplevel__ctor_" data-uid="Terminal.Gui.Toplevel.#ctor*"></a>
@@ -727,10 +728,6 @@ Gets or sets whether the <a class="xref" href="Terminal.Gui.MainLoop.html">MainL
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Toplevel_Running_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Setting this property directly is discouraged. Use <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> instead. 
-</div>
   <a id="Terminal_Gui_Toplevel_StatusBar_" data-uid="Terminal.Gui.Toplevel.StatusBar*"></a>
   <h4 id="Terminal_Gui_Toplevel_StatusBar" data-uid="Terminal.Gui.Toplevel.StatusBar">StatusBar</h4>
   <div class="markdown level1 summary">
@@ -787,10 +784,6 @@ Adds a subview (child) to this view.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Add_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Views that have been added to this view can be retrieved via the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> property. See also <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">RemoveAll()</a> 
-</div>
   <a id="Terminal_Gui_Toplevel_Create_" data-uid="Terminal.Gui.Toplevel.Create*"></a>
   <h4 id="Terminal_Gui_Toplevel_Create" data-uid="Terminal.Gui.Toplevel.Create">Create()</h4>
   <div class="markdown level1 summary">
@@ -1192,22 +1185,6 @@ interefering with normal ProcessKey behavior.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  After keys are sent to the subviews on the
-  current view, all the view are
-  processed and the key is passed to the views
-  to allow some of them to process the keystroke
-  as a cold-key. </p>
-<p>
-  This functionality is used, for example, by
-  default buttons to act on the enter key.
-  Processing this as a hot-key would prevent
-  non-default buttons from consuming the enter
-  keypress when they have the focus.
-</p>
-</div>
   <a id="Terminal_Gui_Toplevel_ProcessKey_" data-uid="Terminal.Gui.Toplevel.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -1253,25 +1230,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <a id="Terminal_Gui_Toplevel_Redraw_" data-uid="Terminal.Gui.Toplevel.Redraw*"></a>
   <h4 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
@@ -1301,20 +1259,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_Toplevel_Remove_" data-uid="Terminal.Gui.Toplevel.Remove*"></a>
   <h4 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Remove(Terminal.Gui.View)">Remove(View)</h4>
   <div class="markdown level1 summary">
@@ -1344,9 +1288,6 @@ Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Termina
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <a id="Terminal_Gui_Toplevel_RemoveAll_" data-uid="Terminal.Gui.Toplevel.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Toplevel_RemoveAll" data-uid="Terminal.Gui.Toplevel.RemoveAll">RemoveAll()</h4>
   <div class="markdown level1 summary">

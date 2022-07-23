@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -100,6 +101,17 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_ScrollBarView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  The scrollbar is drawn to be a representation of the Size, assuming that the 
+  scroll position is set at Position.
+</p>
+<p>
+  If the region to display the scrollbar is larger than three characters, 
+  arrow indicators are drawn.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -520,17 +532,6 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ScrollBarView : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ScrollBarView_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  The scrollbar is drawn to be a representation of the Size, assuming that the 
-  scroll position is set at Position.
-</p>
-<p>
-  If the region to display the scrollbar is larger than three characters, 
-  arrow indicators are drawn.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_ScrollBarView__ctor_" data-uid="Terminal.Gui.ScrollBarView.#ctor*"></a>
@@ -888,9 +889,6 @@ The size of content the scrollbar represents.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ScrollBarView_Size_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">The <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size">Size</a> is typically the size of the virtual content. E.g. when a Scrollbar is
-part of a <a class="xref" href="Terminal.Gui.View.html">View</a> the Size is set to the appropriate dimension of <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Host">Host</a>.</div>
   <h3 id="methods">Methods
   </h3>
   <a id="Terminal_Gui_ScrollBarView_MouseEvent_" data-uid="Terminal.Gui.ScrollBarView.MouseEvent*"></a>
@@ -1020,20 +1018,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_ScrollBarView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <a id="Terminal_Gui_ScrollBarView_Refresh_" data-uid="Terminal.Gui.ScrollBarView.Refresh*"></a>
   <h4 id="Terminal_Gui_ScrollBarView_Refresh" data-uid="Terminal.Gui.ScrollBarView.Refresh">Refresh()</h4>
   <div class="markdown level1 summary">
