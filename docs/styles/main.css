@@ -114,6 +114,7 @@ article h4 {
   -webkit-box-shadow: var(--card-box-shadow);
   -moz-box-shadow: var(--card-box-shadow);
   box-shadow: var(--card-box-shadow);
+  font-family: 'Source Code Pro', 'Courier New', Courier, monospace
 }
 
 .subnav {
