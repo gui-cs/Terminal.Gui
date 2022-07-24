@@ -1509,7 +1509,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the left column.
 		/// </summary>
-		public int LeftColumn { get => leftColumn; set => leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0); }
+		public int LeftColumn {
+			get => leftColumn;
+			set {
+				if (value > 0 && wordWrap)
+					return;
+				leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+			}
+		}
 
 		/// <summary>
 		/// Gets the maximum visible length line.
@@ -1640,7 +1647,7 @@ namespace Terminal.Gui {
 		public int RightOffset {
 			get => rightOffset;
 			set {
-				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+				if (!wordWrap && currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
 					leftColumn = Math.Max (leftColumn - rightOffset, 0);
 				}
 				rightOffset = value;
@@ -2554,8 +2561,8 @@ namespace Terminal.Gui {
 				leftColumn = TextModel.CalculateLeftColumn (line, leftColumn, currentColumn,
 					Frame.Width + offB.width - RightOffset, TabWidth);
 				need = true;
-			} else if (dSize.size + RightOffset < Frame.Width + offB.width
-				&& tSize.size + RightOffset < Frame.Width + offB.width) {
+			} else if ((wordWrap && leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width
+				&& tSize.size + RightOffset < Frame.Width + offB.width)) {
 				leftColumn = 0;
 				need = true;
 			}
@@ -2609,7 +2616,7 @@ namespace Terminal.Gui {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else if (!wordWrap) {
 				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset, TabWidth);
-				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+				leftColumn = Math.Max (!wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
 		}

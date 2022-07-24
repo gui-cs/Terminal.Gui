@@ -1994,6 +1994,7 @@ line.
 			Application.Begin (Application.Top);
 
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 aaaa
 ", output);
@@ -2001,30 +2002,35 @@ aaaa
 			tv.CursorPosition = new Point (5, 0);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 aaa
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 aa
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 a
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
 			GraphViewTests.AssertDriverContentsAre (@"
 
 ", output);
