@@ -920,12 +920,13 @@ namespace Terminal.Gui {
 			var line = GetCurrentLine (modelRow);
 			var modelCol = GetModelColFromWrappedLines (row, col);
 
-			if (modelCol >= line.Count) {
+			if (modelCol > line.Count) {
 				Model.RemoveLine (modelRow);
 				RemoveAt (row, 0);
 				return false;
 			}
-			line.RemoveAt (modelCol);
+			if (modelCol < line.Count)
+				line.RemoveAt (modelCol);
 			if (line.Count > frameWidth || (row + 1 < wrappedModelLines.Count
 				&& wrappedModelLines [row + 1].ModelLine == modelRow)) {
 				return true;
@@ -1462,7 +1463,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -1484,7 +1485,7 @@ namespace Terminal.Gui {
 		void WrapTextModel ()
 		{
 			if (wordWrap && wrapManager != null) {
-				model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0),
+				model = wrapManager.WrapModel (frameWidth,
 					out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
@@ -1497,6 +1498,8 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
+
+		int frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
 
 		/// <summary>
 		/// Gets or sets the top row.
@@ -1607,7 +1610,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}

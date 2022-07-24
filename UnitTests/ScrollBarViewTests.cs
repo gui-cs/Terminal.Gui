@@ -744,7 +744,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (textView.WordWrap);
 			Assert.True (scrollBar.AutoHideScrollBars);
 			Assert.Equal (7, textView.Lines);
-			Assert.Equal (22, textView.Maxlength);
+			Assert.Equal (23, textView.Maxlength);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
@@ -752,8 +752,8 @@ namespace Terminal.Gui.Views {
 │This is the help text   │
 │for the Second Step.    │
 │                        │
-│Press the button to     │
-│see a message box.      │
+│Press the button to see │
+│ a message box.         │
 │                        │
 │Enter name too.         │
 │                        │

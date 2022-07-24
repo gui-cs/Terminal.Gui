@@ -1941,31 +1941,31 @@ ScrollViewBar against the TextView. - 10
 			Assert.True (tv.WordWrap);
 			Assert.False (tv.IsDirty);
 			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-Hello world.                         
-This is a test of the Emergency      
-Broadcast System.                    
-0 - This is a test with a very long  
-line and many lines to test the      
-ScrollViewBar against the TextView. -
-0                                    
-1 - This is a test with a very long  
-line and many lines to test the      
-ScrollViewBar against the TextView. -
-1                                    
-2 - This is a test with a very long  
-line and many lines to test the      
-ScrollViewBar against the TextView. -
-2                                    
-3 - This is a test with a very long  
-line and many lines to test the      
-ScrollViewBar against the TextView. -
-3                                    
-4 - This is a test with a very long  
-line and many lines to test the      
-ScrollViewBar against the TextView. -
-4                                    
-5 - This is a test with a very long  
-line and many lines to test the      
+Hello world.                           
+This is a test of the Emergency        
+Broadcast System.                      
+0 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 0
+1 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 1
+2 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 2
+3 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 3
+4 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 4
+5 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 5
+6 - This is a test with a very long    
+line and many lines to test the        
+ScrollViewBar against the TextView. - 6
+7 - This is a test with a very long    
 ", output);
 		}
 
@@ -2063,17 +2063,66 @@ line and many lines to test the
 			tv.Redraw (tv.Bounds);
 
 			string expected = @"
-This is 
-the 
-first 
-line.
-This is 
-the 
-second 
+This is
+the first
+ line.
+This is
+the
+second
 line.
 ";
 
 			GraphViewTests.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void WordWrap_Deleting_Backwards ()
+		{
+			var tv = new TextView () {
+				Width = 5,
+				Height = 2,
+				WordWrap = true,
+				Text = "aaaa"
+			};
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsAre (@"
+aaaa
+", output);
+
+			tv.CursorPosition = new Point (5, 0);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsAre (@"
+aaa
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsAre (@"
+aa
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsAre (@"
+a
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsAre (@"
+
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			GraphViewTests.AssertDriverContentsAre (@"
+
+", output);
 		}
 
 		[Fact]
