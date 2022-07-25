@@ -93,10 +93,6 @@ namespace UICatalog.Scenarios {
 			wizard.AddStep (lastStep);
 			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-			// When run as a modal, Wizard gets a Loading event where it sets the
-			// Current Step. But when running non-modal it must be done manually.
-			wizard.CurrentStep = wizard.GetNextStep ();
-
 			Top.Add (wizard);
 			Application.Run (Top);
 		}

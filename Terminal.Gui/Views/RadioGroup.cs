@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// <see cref="RadioGroup"/> shows a group of radio labels, only one of those can be selected at a given time
+	/// Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.
 	/// </summary>
 	public class RadioGroup : View {
 		int selected = -1;

@@ -4,6 +4,6 @@ dotnet build --configuration Release ../Terminal.sln
 
 rm ../docs -Recurse -Force
 
-docfx --metadata
+#docfx --metadata
 
-docfx --serve
+docfx --serve --force

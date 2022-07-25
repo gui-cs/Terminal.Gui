@@ -106,9 +106,9 @@ Views
 =====
 
 All visible elements on a Terminal.Gui application are implemented as
-[Views](~/api/Terminal.Gui/Terminal.Gui.View.yml). Views are self-contained
-objects that take care of displaying themselves, can receive keyboard and mouse
-input and participate in the focus mechanism.
+[Views](~/api/Terminal.Gui/Terminal.Gui.View.yml). Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.
+
+See the full list of [Views provided by the Terminal.Gui library here](views.md).
 
 Every view can contain an arbitrary number of children views. These are called
 the Subviews. You can add a view to an existing view, by calling the 
@@ -137,36 +137,6 @@ void SetupMyView (View myView)
 
 The container of a given view is called the `SuperView` and it is a property of every
 View.
-
-*Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
-
-* [Button](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
-* [CheckBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
-* [ColorPicker](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ColorPicker.html)
-* [ComboBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ComboBox.html)
-* [Dialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html)
-  * [OpenDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html)
-  * [SaveDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html)
-* [FrameView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
-* [GraphView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.GraphView.html)
-* [Hex viewer/editor](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html)
-* [Label](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
-* [ListView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html)
-* [Menu](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
-* [MessageBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
-* [ProgressBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
-* [Radio buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
-* [TableView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html)
-* [Time & Date Fields](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html)
-* [TextField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
-* [TextValidateField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html)
-* [TextView (Text Editor)](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)
-* [TreeView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html)
-* [ScrollView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html)
-* [ScrollBarView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
-* [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
-* [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
-* [Wizard](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Wizard.html)
 
 Layout
 ------
