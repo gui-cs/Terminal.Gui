@@ -4,7 +4,7 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample](images/sample.gif)
 
-* [Terminal.Gui Project on GitHub](https://github.com/migueldeicaza/gui.cs)
+* [Terminal.Gui Project on GitHub](https://github.com/gui-cs/Terminal.Gui)
 
 ## Terminal.Gui API Documentation
 
@@ -21,4 +21,4 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
 
 * [UI Catalog API Reference](~/api/UICatalog/UICatalog.yml)
-* [UI Catalog Source](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)
+* [UI Catalog Source](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)
