@@ -548,7 +548,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ($"Pos.Combine(Pos.Combine(Pos.View(side={side}, target=View()({{X={testRect.X},Y={testRect.Y},Width={testRect.Width},Height={testRect.Height}}}))+Pos.Absolute(0)){(testInt < 0 ? '-' : '+')}Pos.Absolute({testInt}))", pos.ToString ());
 		}
 
-		// See: https://github.com/migueldeicaza/gui.cs/issues/504
+		// See: https://github.com/gui-cs/Terminal.Gui/issues/504
 		[Fact]
 		public void LeftTopBottomRight_Win_ShouldNotThrow ()
 		{
