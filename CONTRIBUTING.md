@@ -14,14 +14,24 @@ Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branchin
 * The `develop` branch is where new development and bug-fixes happen. It is the default branch.
 
 ### Forking Terminal.Gui
-* Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
-* Clone your fork to your local machine (`git clone https://github.com/<yourID>/Terminal.Gui`)
-*   This will be your `origin` remote
-* Add a remote for `upstream`: `git remote add upstream https://github.com/gui-cs/Terminal.Gui`
 
-### Making Changes and Submitting Pull Requests
+1. Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
 
-#### When you start to make a change
+2. Clone your fork to your local machine
+
+```
+git clone https://github.com/<yourID>/Terminal.Gui
+```
+
+Now, your local repo will have an `origin` remote pointing to `https://github.com/<yourID>/Terminal.Gui`.
+
+3. Add a remote for `upstream`: 
+```
+git remote add upstream https://github.com/gui-cs/Terminal.Gui
+```
+You now have your own fork and a local repo that references it as `origin`. Your local repo also now references the orignal Terminal.Gui repo as `upstream`. 
+
+### Starting to Make a Change
 
 Ensure your local `develop` branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
 ```powershell
@@ -32,7 +42,7 @@ git pull upstream develop
 
 Create a new local branch:
 ```powershell
-git checkout -b "my_new_branch"
+git checkout -b my_new_branch
 ```
 
 #### Making Changes
@@ -53,13 +63,34 @@ git commit -m "Fixes #1234. Some bug"
 
 ### Submitting a Pull Request
 
-Push your local branch to your fork (`origin`):
+1. Push your local branch to your fork (`origin`):
 
 ```powershell
-git push
+git push --set-upstream origin my_new_branch
 ```
 
-## Coding Style
+2. Create the Pull Request:
+
+In the output of the `git push` command you'll see instructions with a link to the Pull Request:
+
+```powershell
+ $ git push --set-upstream origin my_new_branch
+Enumerating objects: 8, done.
+...
+remote:
+remote: Create a pull request for 'my_new_branch' on GitHub by visiting:
+remote:      https://github.com/<yourID>/Terminal.Gui/pull/new/more_doc_fixes
+remote:
+...
+```
+
+3. Go to that URL and create the Pull Request:
+
+(in Windows Terminal, just CTRL-Click on the URL)
+
+Follow the template instructions found on Github.
+
+## Terminal.Gui Coding Style
 
 **Terminal.Gui** follows the [Mono Coding Guidelines](https://www.mono-project.com/community/contributing/coding-guidelines/). [`/.editorconfig`](https://github.com/gui-cs/Terminal.Gui/blob/b0a43ba338adf5ec069066e5a7dff8fea39b41db/.editorconfig) enforces this style in Visual Studio. Use `Ctrl-K-D` in Visual Studio to have it reformat code.
 
@@ -87,13 +118,13 @@ git push
 
 ### Include API Documentation
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
 
 - All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
 - Keep the `<summary></summary>` terse.
 - Use `<see cref=""/>` liberally to cross-link topics.
 - Use `<remarks></remarks>` to add more context and explanation.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html).
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html).
 - Use proper English and good grammar.
 
 ### Defining Events
@@ -136,7 +167,7 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 ## Breaking Changes to User Behavior or the Public API
 
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
-- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html).
+- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html).
 
 ## Unit Tests
 

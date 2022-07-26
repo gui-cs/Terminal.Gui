@@ -198,7 +198,7 @@ namespace UICatalog.Scenarios {
 				return maxLength;
 			}
 
-			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+			// A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
 			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;

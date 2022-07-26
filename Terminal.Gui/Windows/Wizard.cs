@@ -365,7 +365,7 @@ namespace Terminal.Gui {
 			//};
 			//Add (separator);
 
-			// BUGBUG: Space is to work around https://github.com/migueldeicaza/gui.cs/issues/1812
+			// BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
 			backBtn = new Button (Strings.wzBack) { AutoSize = true };
 			AddButton (backBtn);
 
