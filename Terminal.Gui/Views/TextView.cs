@@ -919,12 +919,13 @@ namespace Terminal.Gui {
 			var line = GetCurrentLine (modelRow);
 			var modelCol = GetModelColFromWrappedLines (row, col);
 
-			if (modelCol >= line.Count) {
+			if (modelCol > line.Count) {
 				Model.RemoveLine (modelRow);
 				RemoveAt (row, 0);
 				return false;
 			}
-			line.RemoveAt (modelCol);
+			if (modelCol < line.Count)
+				line.RemoveAt (modelCol);
 			if (line.Count > frameWidth || (row + 1 < wrappedModelLines.Count
 				&& wrappedModelLines [row + 1].ModelLine == modelRow)) {
 				return true;
@@ -1491,7 +1492,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: !ReadOnly);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -1513,7 +1514,7 @@ namespace Terminal.Gui {
 		void WrapTextModel ()
 		{
 			if (wordWrap && wrapManager != null) {
-				model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0),
+				model = wrapManager.WrapModel (frameWidth,
 					out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
@@ -1527,6 +1528,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		int frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
+
 		/// <summary>
 		/// Gets or sets the top row.
 		/// </summary>
@@ -1535,7 +1538,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the left column.
 		/// </summary>
-		public int LeftColumn { get => leftColumn; set => leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0); }
+		public int LeftColumn {
+			get => leftColumn;
+			set {
+				if (value > 0 && wordWrap)
+					return;
+				leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+			}
+		}
 
 		/// <summary>
 		/// Gets the maximum visible length line.
@@ -1639,7 +1649,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: !ReadOnly);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}
@@ -1669,7 +1679,7 @@ namespace Terminal.Gui {
 		public int RightOffset {
 			get => rightOffset;
 			set {
-				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+				if (!wordWrap && currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
 					leftColumn = Math.Max (leftColumn - rightOffset, 0);
 				}
 				rightOffset = value;
@@ -1826,9 +1836,18 @@ namespace Terminal.Gui {
 		/// <param name="path">Path to the file to load.</param>
 		public bool LoadFile (string path)
 		{
-			var res = model.LoadFile (path);
-			ResetPosition ();
-			SetNeedsDisplay ();
+			bool res;
+			try {
+				SetWrapModel ();
+				res = model.LoadFile (path);
+				ResetPosition ();
+			} catch (Exception) {
+				throw;
+			} finally {
+				UpdateWrapModel ();
+				SetNeedsDisplay ();
+				Adjust ();
+			}
 			return res;
 		}
 
@@ -2596,8 +2615,8 @@ namespace Terminal.Gui {
 				leftColumn = TextModel.CalculateLeftColumn (line, leftColumn, currentColumn,
 					Frame.Width + offB.width - RightOffset, TabWidth);
 				need = true;
-			} else if (dSize.size + RightOffset < Frame.Width + offB.width
-				&& tSize.size + RightOffset < Frame.Width + offB.width) {
+			} else if ((wordWrap && leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width
+				&& tSize.size + RightOffset < Frame.Width + offB.width)) {
 				leftColumn = 0;
 				need = true;
 			}
@@ -2651,7 +2670,7 @@ namespace Terminal.Gui {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else if (!wordWrap) {
 				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset, TabWidth);
-				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+				leftColumn = Math.Max (!wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
 		}
@@ -4349,7 +4368,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearHistoryChanges ()
 		{
-			historyText.Clear (Text);
+			historyText?.Clear (Text);
 		}
 	}
 
