@@ -38,7 +38,7 @@ using Rune = System.Rune;
 /// </list>
 /// </para>	
 /// <para>
-///	See the project README for more details (https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog/README.md).
+///	See the project README for more details (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 /// </para>	
 /// </remarks>
 namespace UICatalog {
@@ -156,18 +156,16 @@ namespace UICatalog {
 			_baseColorScheme = Colors.Base;
 
 			StringBuilder aboutMessage = new StringBuilder ();
+			aboutMessage.AppendLine (@"A comprehensive sample library for");
 			aboutMessage.AppendLine (@"");
-			aboutMessage.AppendLine (@"UI Catalog is a comprehensive sample library for Terminal.Gui");
+			aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
+			aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
+			aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
+			aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
+			aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
+			aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
 			aboutMessage.AppendLine (@"");
-			aboutMessage.AppendLine (@"  _______                  _             _   _____       _ ");
-			aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_)");
-			aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ ");
-			aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |");
-			aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |");
-			aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|");
-			aboutMessage.AppendLine (@"");
-			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {FileVersionInfo.GetVersionInfo (typeof (Terminal.Gui.Application).Assembly.Location).FileVersion}");
-			aboutMessage.AppendLine (@"");
+			aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -176,9 +174,10 @@ namespace UICatalog {
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 				new MenuBarItem ("_Help", new MenuItem [] {
-					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
-					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
-					new MenuItem ("_About...", "About this app", () =>  MessageBox.Query (aboutMessage.Length + 2, 15, "About", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
+					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
+					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
+					new MenuItem ("_About...",
+						"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 				})
 			});
 
@@ -587,7 +586,7 @@ namespace UICatalog {
 				return maxLength;
 			}
 
-			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+			// A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
 			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;

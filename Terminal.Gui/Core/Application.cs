@@ -901,7 +901,7 @@ namespace Terminal.Gui {
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
 			// gui.cs does no longer process any callbacks. See #1084 for more details:
-			// (https://github.com/migueldeicaza/gui.cs/issues/1084).
+			// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
 			SynchronizationContext.SetSynchronizationContext (syncContext: null);
 		}
 

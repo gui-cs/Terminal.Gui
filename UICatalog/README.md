@@ -10,11 +10,12 @@ UI Catalog is a comprehensive sample library for Terminal.Gui. It attempts to sa
 
 ## Motivation
 
-The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. See [Issue #368](https://github.com/migueldeicaza/Terminal.Gui/issues/368) for more background.
+The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. 
+See [Issue #368](https://github.com/giu-cs/Terminal.Gui/issues/368) for more background.
 
 # API Reference
 
-* [UI Catalog API Reference](https://migueldeicaza.github.io/gui.cs/api/UICatalog/UICatalog.html)
+* [UI Catalog API Reference](https://gui-cs.github.io/Terminal.Gui/api/UICatalog/UICatalog.html)
 
 ## How To Use
 
@@ -127,4 +128,4 @@ For complete control, the `Init` and `Run` overrides can be implemented. The `ba
 - Use the `Bug Rero` Category for `Scnarios` that reproduce bugs. 
 	- Include the Github Issue # in the Description.
 	- Once the bug has been fixed in `master` submit another PR to remove the `Scenario` (or modify it to provide a good regression test).
-- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/migueldeicaza/gui.cs/issues) with "UICatalog: ".
+- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/gui-cs/Terminal.Gui/issues) with "UICatalog: ".

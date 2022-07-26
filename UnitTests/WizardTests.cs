@@ -222,7 +222,7 @@ namespace Terminal.Gui.Views {
 			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new String (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var separatorRow = $"{d.VDLine}{new String (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
 
-			// Once this is fixed, revert to commented out line: https://github.com/migueldeicaza/gui.cs/issues/1791
+			// Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
 			var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new String (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
@@ -512,7 +512,7 @@ namespace Terminal.Gui.Views {
 		[Fact, AutoInitShutdown]
 		public void Finish_Button_Closes ()
 		{
-			// https://github.com/migueldeicaza/gui.cs/issues/1833
+			// https://github.com/gui-cs/Terminal.Gui/issues/1833
 			var wizard = new Wizard ();
 			var step1 = new Wizard.WizardStep ("step1") { };
 			wizard.AddStep (step1);
