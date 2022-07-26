@@ -50,7 +50,7 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 * **Cross Platform** - Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean apps will work well on both color and monochrome terminals. 
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including support for drag & drop.
-* **[Flexible Layout](https://gui-cs.github.io/gui.cs/articles/overview.html#layout)** - Supports both *Absolute layout* and an innovative *Computed Layout* system. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic terminal UIs.
+* **[Flexible Layout](https://gui-cs.github.io/Terminal.Gui/articles/overview.html#layout)** - Supports both *Absolute layout* and an innovative *Computed Layout* system. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic terminal UIs.
 * **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
 * **[Arbitrary Views](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
 * **Advanced App Features** - The [Mainloop](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
@@ -92,11 +92,11 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Documentation
 
-* [Overview](https://gui-cs.github.io/gui.cs/articles/overview.html)
-* [Conceptual Documentation](https://gui-cs.github.io/gui.cs/articles/index.html)
+* [Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
+* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
 * [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html)
 
-See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/gui.cs/articles/index.html) provides insight into core concepts.
+See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html) provides insight into core concepts.
 
 ### Sample Usage
 (This code uses C# 9.0 [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements).) 
@@ -178,7 +178,7 @@ Application.Run();
 Application.Shutdown();
 ```
 
-The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://gui-cs.github.io/gui.cs/articles/overview.html#layout)**.
+The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://gui-cs.github.io/Terminal.Gui/articles/overview.html#layout)**.
 
 Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
 
