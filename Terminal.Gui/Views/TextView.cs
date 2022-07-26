@@ -1601,7 +1601,7 @@ namespace Terminal.Gui {
 
 				SetWrapModel ();
 				var savedCurrentColumn = CurrentColumn;
-				currentColumn = SetCurrentColumnReadOnyWrapModel (true);
+				currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 				var sel = GetRegion ();
 				currentColumn = savedCurrentColumn;
 				UpdateWrapModel ();
@@ -1975,7 +1975,7 @@ namespace Terminal.Gui {
 					isReadOnly = value;
 
 					SetWrapModel ();
-					currentColumn = SetCurrentColumnReadOnyWrapModel ();
+					currentColumn = GetCurrentColumnReadOnyWrapModel ();
 					UpdateWrapModel ();
 					SetNeedsDisplay ();
 					Adjust ();
@@ -2308,7 +2308,7 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
 		}
 
-		int SetCurrentColumnReadOnyWrapModel (bool forcePreserveTrailingSpaces = false)
+		int GetCurrentColumnReadOnyWrapModel (bool forcePreserveTrailingSpaces = false)
 		{
 			if (wordWrap) {
 				var wManager = new WordWrapManager (wrapManager.Model);
@@ -3785,7 +3785,7 @@ namespace Terminal.Gui {
 		{
 			SetWrapModel ();
 			var savedCurrentColumn = CurrentColumn;
-			currentColumn = SetCurrentColumnReadOnyWrapModel (true);
+			currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 			if (selecting) {
 				SetClipboard (GetRegion ());
 				copyWithoutSelection = false;
