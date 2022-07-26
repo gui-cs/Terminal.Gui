@@ -14,10 +14,22 @@ Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branchin
 * The `develop` branch is where new development and bug-fixes happen. It is the default branch.
 
 ### Forking Terminal.Gui
-* Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
-* Clone your fork to your local machine (`git clone https://github.com/<yourID>/Terminal.Gui`)
-*   This will be your `origin` remote
-* Add a remote for `upstream`: `git remote add upstream https://github.com/gui-cs/Terminal.Gui`
+
+1. Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
+
+2. Clone your fork to your local machine
+
+```
+git clone https://github.com/<yourID>/Terminal.Gui
+```
+
+Now, your local repo will have an `origin` remote pointing to `https://github.com/<yourID>/Terminal.Gui`.
+
+3. Add a remote for `upstream`: 
+```
+git remote add upstream https://github.com/gui-cs/Terminal.Gui
+```
+4. 
 
 ### Making Changes and Submitting Pull Requests
 
