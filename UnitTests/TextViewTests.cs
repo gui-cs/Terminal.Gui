@@ -1976,6 +1976,52 @@ line.
 		}
 
 		[Fact]
+		[InitShutdown]
+		public void WordWrap_ReadOnly_CursorPosition_SelectedText_Copy ()
+		{
+			//          0123456789
+			var text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () { Width = 11, Height = 9 };
+			tv.Text = text;
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+			tv.WordWrap = true;
+
+			Application.Top.Add (tv);
+
+			tv.Redraw (tv.Bounds);
+			GraphViewTests.AssertDriverContentsAre (@"
+This is
+the first
+ line.
+This is
+the
+second
+line.
+", output);
+
+			tv.ReadOnly = true;
+			tv.CursorPosition = new Point (6, 2);
+			Assert.Equal (new Point (5, 2), tv.CursorPosition);
+			tv.Redraw (tv.Bounds);
+			GraphViewTests.AssertDriverContentsAre (@"
+This is
+the first
+line.
+This is
+the
+second
+line.
+", output);
+
+			tv.SelectionStartRow = 0;
+			tv.SelectionStartColumn = 0;
+			Assert.Equal ("This is the first line.", tv.SelectedText);
+
+			tv.Copy ();
+			Assert.Equal ("This is the first line.", Clipboard.Contents);
+		}
+
+		[Fact]
 		public void Internal_Tests ()
 		{
 			var txt = "This is a text.";

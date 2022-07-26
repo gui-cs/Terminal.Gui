@@ -1003,6 +1003,36 @@ namespace Terminal.Gui {
 			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol, tabWidth: 0, preserveTrailingSpaces);
 			isWrapModelRefreshing = false;
 		}
+
+		public int GetWrappedLineColWidth (int line, int col, WordWrapManager wrapManager)
+		{
+			if (wrappedModelLines?.Count == 0)
+				return 0;
+
+			var wModelLines = wrapManager.wrappedModelLines;
+			var modelLine = GetModelLineFromWrappedLines (line);
+			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
+			int modelCol = 0;
+			int colWidthOffset = 0;
+			int i = firstLine;
+
+			while (modelCol < col) {
+				var wLine = wrappedModelLines [i];
+				var wLineToCompare = wModelLines [i];
+
+				if (wLine.ModelLine != modelLine || wLineToCompare.ModelLine != modelLine)
+					break;
+
+				modelCol += Math.Max (wLine.ColWidth, wLineToCompare.ColWidth);
+				colWidthOffset += wLine.ColWidth - wLineToCompare.ColWidth;
+				if (modelCol > col) {
+					modelCol += col - modelCol;
+				}
+				i++;
+			}
+
+			return modelCol - colWidthOffset;
+		}
 	}
 
 	/// <summary>
@@ -1570,7 +1600,10 @@ namespace Terminal.Gui {
 				}
 
 				SetWrapModel ();
+				var savedCurrentColumn = CurrentColumn;
+				currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 				var sel = GetRegion ();
+				currentColumn = savedCurrentColumn;
 				UpdateWrapModel ();
 				Adjust ();
 
@@ -1938,8 +1971,15 @@ namespace Terminal.Gui {
 		public bool ReadOnly {
 			get => isReadOnly;
 			set {
-				isReadOnly = value;
-				SetNeedsDisplay ();
+				if (value != isReadOnly) {
+					isReadOnly = value;
+
+					SetWrapModel ();
+					currentColumn = GetCurrentColumnReadOnyWrapModel ();
+					UpdateWrapModel ();
+					SetNeedsDisplay ();
+					Adjust ();
+				}
 			}
 		}
 
@@ -2266,6 +2306,21 @@ namespace Terminal.Gui {
 			}
 			if (currentCaller != null)
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
+		}
+
+		int GetCurrentColumnReadOnyWrapModel (bool forcePreserveTrailingSpaces = false)
+		{
+			if (wordWrap) {
+				var wManager = new WordWrapManager (wrapManager.Model);
+				if (ReadOnly && !forcePreserveTrailingSpaces) {
+					wManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: false);
+				} else {
+					wManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: true);
+				}
+				var currentLine = wrapManager.GetWrappedLineColWidth (CurrentRow, CurrentColumn, wManager);
+				return currentLine;
+			}
+			return currentColumn;
 		}
 
 		///<inheritdoc/>
@@ -3729,6 +3784,8 @@ namespace Terminal.Gui {
 		public void Copy ()
 		{
 			SetWrapModel ();
+			var savedCurrentColumn = CurrentColumn;
+			currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 			if (selecting) {
 				SetClipboard (GetRegion ());
 				copyWithoutSelection = false;
@@ -3737,6 +3794,7 @@ namespace Terminal.Gui {
 				SetClipboard (ustring.Make (currentLine));
 				copyWithoutSelection = true;
 			}
+			currentColumn = savedCurrentColumn;
 			UpdateWrapModel ();
 			DoNeededAction ();
 		}
