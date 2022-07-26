@@ -2053,11 +2053,10 @@ a
 			GraphViewTests.AssertDriverContentsAre (@"
 This is
 the first
- line.
-This is
-the
-second
 line.
+This is
+the second
+ line.
 ", output);
 
 			tv.ReadOnly = true;
@@ -2069,8 +2068,7 @@ This is
 the first
 line.
 This is
-the
-second
+the second
 line.
 ", output);
 

@@ -2332,9 +2332,9 @@ namespace Terminal.Gui {
 			if (wordWrap) {
 				var wManager = new WordWrapManager (wrapManager.Model);
 				if (ReadOnly && !forcePreserveTrailingSpaces) {
-					wManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: false);
+					wManager.WrapModel (frameWidth, out _, out _, out _, out _, preserveTrailingSpaces: false);
 				} else {
-					wManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _, preserveTrailingSpaces: true);
+					wManager.WrapModel (frameWidth, out _, out _, out _, out _, preserveTrailingSpaces: true);
 				}
 				var currentLine = wrapManager.GetWrappedLineColWidth (CurrentRow, CurrentColumn, wManager);
 				return currentLine;
