@@ -644,7 +644,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Hosting_ShowBothScrollIndicator_Invisible ()
+		public void Hosting_ShowBothScrollIndicator_Invisible_RENDERING ()
 		{
 			var textView = new TextView () {
 				Width = Dim.Fill (),
