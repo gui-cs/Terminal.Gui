@@ -1,10 +1,10 @@
-name: Build Terminal.Gui with .NET Core
+name: Build & Test Terminal.Gui with .NET Core
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   build:
