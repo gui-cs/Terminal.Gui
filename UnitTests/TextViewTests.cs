@@ -5786,5 +5786,47 @@ a
 
 			tv.ProcessKey (new KeyEvent (Key.p, new KeyModifiers ()));
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void MoveDown_By_Setting_CursorPosition ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 5
+			};
+
+			// add 100 lines of wide text to view
+			for (int i = 0; i < 100; i++)
+				tv.Text += new string ('x', 100) + (i == 99 ? "" : Environment.NewLine);
+
+			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+			tv.CursorPosition = new Point (5, 50);
+			Assert.Equal (new Point (5, 50), tv.CursorPosition);
+
+			tv.CursorPosition = new Point (200, 200);
+			Assert.Equal (new Point (100, 99), tv.CursorPosition);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ScrollTo_CursorPosition ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 5
+			};
+
+			// add 100 lines of wide text to view
+			for (int i = 0; i < 100; i++)
+				tv.Text += new string ('x', 100) + (i == 99 ? "" : Environment.NewLine);
+
+			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+			tv.ScrollTo (50);
+			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+
+			tv.CursorPosition = new Point (tv.LeftColumn, tv.TopRow);
+			Assert.Equal (new Point (0, 50), tv.CursorPosition);
+		}
 	}
 }
