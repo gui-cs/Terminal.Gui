@@ -3157,15 +3157,12 @@
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Conceptual",
       "source_relative_path": "articles/views.md",
       "output": {
         ".html": {
           "relative_path": "articles/views.html",
-          "hash": "lGm0ADuULHQBWWb0zYAZO5MmIudgHUxDp8IvKHNnIjY="
+          "hash": "g9sE7ikfpaAJU7igs3/Dk2ZYH3T/GKa/fDU4IYaw2yE="
         }
       },
       "is_incremental": false,
@@ -3194,12 +3191,45 @@
       "version": ""
     },
     {
+      "type": "Resource",
+      "source_relative_path": "images/sample.gif",
+      "output": {
+        "resource": {
+          "relative_path": "images/sample.gif"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/sample.png",
+      "output": {
+        "resource": {
+          "relative_path": "images/sample.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/wizard.gif",
+      "output": {
+        "resource": {
+          "relative_path": "images/wizard.gif"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "index.md",
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "nONipyTdueJl9Zb0V9z/8z0QQdE08fJbUVEBVToo/Po="
+          "hash": "5m6PICMhIF/iJ6HucthRU2dXWNaqyHLzlov4l6ViHag="
         }
       },
       "is_incremental": false,
@@ -3211,7 +3241,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "2h6IeymL5GhkkuORrHBvo/HfKKbMyAFpPw6Pc9b4ua8="
+          "hash": "fo4MFxjm0/wuS5J8UWSHREcBqQEE37ys6ZXvrm8lwRE="
         }
       },
       "is_incremental": false,
@@ -3221,23 +3251,25 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": true,
+        "can_incremental": false,
+        "details": "Disable incremental build by force rebuild option.",
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0
+        "skipped_file_count": 0,
+        "full_build_reason_code": "ForceRebuild"
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": true,
+          "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 9,
-          "skipped_file_count": 9
+          "skipped_file_count": 0
         },
         "ManagedReferenceDocumentProcessor": {
-          "can_incremental": true,
+          "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 253,
-          "skipped_file_count": 253
+          "skipped_file_count": 0
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,

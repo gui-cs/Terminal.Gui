@@ -10,50 +10,50 @@
 
 A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
-![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
+![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/images/sample.gif)
 
 ## Controls and Views
 
 *Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
-* [Button](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) - A View that provides an item that invokes an System.Action when activated by the user.
-* [CheckBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html) - Shows an on/off toggle that the user can set.
-* [ColorPicker](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ColorPicker.html) - Enables to user to pick a color.
-* [ComboBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ComboBox.html) - Provides a drop-down list of items the user can select from.
-* [Dialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html) - A pop-up Window that contains one or more Buttons.
-  * [OpenDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html) - A Dialog providing an interactive pop-up Window for users to select files or directories.
-  * [SaveDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html) - A Dialog providing an interactive pop-up Window for users to save files.
-* [FrameView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html) - A container View that draws a frame around its contents. Similar to a GroupBox in Windows.
-* [GraphView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.GraphView.html) - A View for rendering graphs (bar, scatter etc).
-* [Hex viewer/editor](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html) - A hex viewer and editor that operates over a file stream. 
-* [Label](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html) - Displays a string at a given position and supports multiple lines.
-* [ListView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html) - Displays a scrollable list of data where each item can be activated to perform an action.
-* [MenuBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html) - Provides a menu bar with drop-down and cascading menus.
-* [MessageBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html) - Displays a modal (pup-up) message to the user, with a title, a message and a series of options that the user can choose from. 
-* [ProgressBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html) - Displays a progress Bar indicating progress of an activity.
-* [RadioGroup](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html) - Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time
-* [ScrollView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html) - Present a window into a virtual space where subviews are added. Similar to the iOS UIScrollView.
-* [ScrollBarView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html) - display a 1-character scrollbar, either horizontal or vertical.
-* [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html) - A View that snaps to the bottom of a Toplevel displaying set of status items. Includes support for global app keyboard shortcuts.
-* [TableView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html) - A View for tabular data based on a System.Data.DataTable. 
-* [TimeField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html) & [DateField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html) - Enables structured editing of dates and times.
-* [TextField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html) - Provides a single-line text entry.
-* [TextValidateField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html) - Text field that validates input through a ITextValidateProvider.
-* [TextView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)- A multi-line text editing View supporting word-wrap, auto-complete, context menus, undo/redo, and clipboard operations, 
-* [TopLevel](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Toplevel.html) - The base class for modal/pop-up Windows.
-* [TreeView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html) - A hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined ITreeBuilder.
-* [View](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html) - The base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-* [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html) - A Toplevel view that draws a border around its Frame with a title at the top.
-* [Wizard](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Wizard.html) - Provides navigation and a user interface to collect related data across multiple steps.
+* [Button](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Button.html) - A View that provides an item that invokes an System.Action when activated by the user.
+* [CheckBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.CheckBox.html) - Shows an on/off toggle that the user can set.
+* [ColorPicker](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ColorPicker.html) - Enables to user to pick a color.
+* [ComboBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ComboBox.html) - Provides a drop-down list of items the user can select from.
+* [Dialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Dialog.html) - A pop-up Window that contains one or more Buttons.
+  * [OpenDialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.OpenDialog.html) - A Dialog providing an interactive pop-up Window for users to select files or directories.
+  * [SaveDialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.SaveDialog.html) - A Dialog providing an interactive pop-up Window for users to save files.
+* [FrameView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.FrameView.html) - A container View that draws a frame around its contents. Similar to a GroupBox in Windows.
+* [GraphView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.GraphView.html) - A View for rendering graphs (bar, scatter etc).
+* [Hex viewer/editor](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.HexView.html) - A hex viewer and editor that operates over a file stream. 
+* [Label](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Label.html) - Displays a string at a given position and supports multiple lines.
+* [ListView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ListView.html) - Displays a scrollable list of data where each item can be activated to perform an action.
+* [MenuBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MenuBar.html) - Provides a menu bar with drop-down and cascading menus.
+* [MessageBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MessageBox.html) - Displays a modal (pup-up) message to the user, with a title, a message and a series of options that the user can choose from. 
+* [ProgressBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ProgressBar.html) - Displays a progress Bar indicating progress of an activity.
+* [RadioGroup](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.RadioGroup.html) - Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time
+* [ScrollView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ScrollView.html) - Present a window into a virtual space where subviews are added. Similar to the iOS UIScrollView.
+* [ScrollBarView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html) - display a 1-character scrollbar, either horizontal or vertical.
+* [StatusBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.StatusBar.html) - A View that snaps to the bottom of a Toplevel displaying set of status items. Includes support for global app keyboard shortcuts.
+* [TableView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TableView.html) - A View for tabular data based on a System.Data.DataTable. 
+* [TimeField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TimeField.html) & [DateField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TimeField.html) - Enables structured editing of dates and times.
+* [TextField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextField.html) - Provides a single-line text entry.
+* [TextValidateField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextValidateField.html) - Text field that validates input through a ITextValidateProvider.
+* [TextView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextView.html)- A multi-line text editing View supporting word-wrap, auto-complete, context menus, undo/redo, and clipboard operations, 
+* [TopLevel](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Toplevel.html) - The base class for modal/pop-up Windows.
+* [TreeView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TreeView.html) - A hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined ITreeBuilder.
+* [View](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.View.html) - The base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
+* [Window](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Window.html) - A Toplevel view that draws a border around its Frame with a title at the top.
+* [Wizard](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Wizard.html) - Provides navigation and a user interface to collect related data across multiple steps.
 
 ### Features
 
 * **Cross Platform** - Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean apps will work well on both color and monochrome terminals. 
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including support for drag & drop.
-* **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - Supports both *Absolute layout* and an innovative *Computed Layout* system. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic terminal UIs.
-* **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
-* **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
-* **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
+* **[Flexible Layout](https://gui-cs.github.io/gui.cs/articles/overview.html#layout)** - Supports both *Absolute layout* and an innovative *Computed Layout* system. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic terminal UIs.
+* **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
+* **[Arbitrary Views](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
+* **Advanced App Features** - The [Mainloop](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors. Most classes are safe for threading.
 * **Reactive Extensions** - Use [reactive extensions](https://github.com/dotnet/reactive) and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) of a sample app in order to learn how to achieve this.
 
@@ -92,11 +92,11 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Documentation
 
-* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
-* [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
-* [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
+* [Overview](https://gui-cs.github.io/gui.cs/articles/overview.html)
+* [Conceptual Documentation](https://gui-cs.github.io/gui.cs/articles/index.html)
+* [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html)
 
-See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
+See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/gui.cs/articles/index.html) provides insight into core concepts.
 
 ### Sample Usage
 (This code uses C# 9.0 [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements).) 
@@ -178,7 +178,7 @@ Application.Run();
 Application.Shutdown();
 ```
 
-The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)**.
+The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://gui-cs.github.io/gui.cs/articles/overview.html#layout)**.
 
 Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
 

@@ -1301,8 +1301,8 @@
   },
   "index.html": {
     "href": "index.html",
-    "title": "Terminal.Gui - Terminal UI toolkit for .NET",
-    "keywords": "Terminal.Gui - Terminal UI toolkit for .NET A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix. Terminal.Gui Project on GitHub Terminal.Gui API Documentation API Reference Views and controls built into the Terminal.Gui library Terminal.Gui API Overview Keyboard Event Processing Event Processing and the Application Main Loop TableView Deep Dive TreeView Deep Dive UI Catalog UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios. UI Catalog API Reference UI Catalog Source"
+    "title": "Terminal.Gui - Cross Platform Terminal UI toolkit for .NET",
+    "keywords": "Terminal.Gui - Cross Platform Terminal UI toolkit for .NET A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix. Terminal.Gui Project on GitHub Terminal.Gui API Documentation API Reference Views and controls built into the Terminal.Gui library Terminal.Gui API Overview Keyboard Event Processing Event Processing and the Application Main Loop TableView Deep Dive TreeView Deep Dive UI Catalog UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios. UI Catalog API Reference UI Catalog Source"
   },
   "README.html": {
     "href": "README.html",
