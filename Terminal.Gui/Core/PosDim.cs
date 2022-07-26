@@ -36,6 +36,40 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
+		// Helper class to provide dynamic value by the execution of a function that returns an integer.
+		internal class PosFunc : Pos {
+			Func<int> function;
+
+			public PosFunc (Func<int> n)
+			{
+				this.function = n;
+			}
+
+			internal override int Anchor (int width)
+			{
+				return function ();
+			}
+
+			public override string ToString ()
+			{
+				return $"Pos.PosFunc({function ()})";
+			}
+
+			public override int GetHashCode () => function.GetHashCode ();
+
+			public override bool Equals (object other) => other is PosFunc f && f.function () == function ();
+		}
+
+		/// <summary>
+		/// Creates a "PosFunc" from the specified function.
+		/// </summary>
+		/// <param name="function">The function to be executed.</param>
+		/// <returns>The <see cref="Pos"/> returned from the function.</returns>
+		public static Pos Function (Func<int> function)
+		{
+			return new PosFunc (function);
+		}
+
 		internal class PosFactor : Pos {
 			float factor;
 
@@ -53,6 +87,10 @@ namespace Terminal.Gui {
 			{
 				return $"Pos.Factor({factor})";
 			}
+
+			public override int GetHashCode () => factor.GetHashCode ();
+
+			public override bool Equals (object other) => other is PosFactor f && f.factor == factor;
 		}
 
 		/// <summary>
@@ -182,7 +220,6 @@ namespace Terminal.Gui {
 			public override int GetHashCode () => n.GetHashCode ();
 
 			public override bool Equals (object other) => other is PosAbsolute abs && abs.n == n;
-
 		}
 
 		/// <summary>
@@ -310,6 +347,10 @@ namespace Terminal.Gui {
 				}
 				return $"Pos.View(side={tside}, target={Target.ToString ()})";
 			}
+
+			public override int GetHashCode () => Target.GetHashCode ();
+
+			public override bool Equals (object other) => other is PosView abs && abs.Target == Target;
 		}
 
 		/// <summary>
@@ -353,6 +394,16 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
 		public static Pos Bottom (View view) => new PosCombine (true, new PosView (view, 3), new Pos.PosAbsolute (0));
+
+		/// <summary>Serves as the default hash function. </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode () => Anchor (0).GetHashCode ();
+
+		/// <summary>Determines whether the specified object is equal to the current object.</summary>
+		/// <param name="other">The object to compare with the current object. </param>
+		/// <returns>
+		///     <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
+		public override bool Equals (object other) => other is Pos abs && abs == this;
 	}
 
 	/// <summary>
@@ -373,6 +424,40 @@ namespace Terminal.Gui {
 		internal virtual int Anchor (int width)
 		{
 			return 0;
+		}
+
+		// Helper class to provide dynamic value by the execution of a function that returns an integer.
+		internal class DimFunc : Dim {
+			Func<int> function;
+
+			public DimFunc (Func<int> n)
+			{
+				this.function = n;
+			}
+
+			internal override int Anchor (int width)
+			{
+				return function ();
+			}
+
+			public override string ToString ()
+			{
+				return $"Dim.DimFunc({function ()})";
+			}
+
+			public override int GetHashCode () => function.GetHashCode ();
+
+			public override bool Equals (object other) => other is DimFunc f && f.function () == function ();
+		}
+
+		/// <summary>
+		/// Creates a "DimFunc" from the specified function.
+		/// </summary>
+		/// <param name="function">The function to be executed.</param>
+		/// <returns>The <see cref="Dim"/> returned from the function.</returns>
+		public static Dim Function (Func<int> function)
+		{
+			return new DimFunc (function);
 		}
 
 		internal class DimFactor : Dim {
@@ -403,7 +488,6 @@ namespace Terminal.Gui {
 			public override int GetHashCode () => factor.GetHashCode ();
 
 			public override bool Equals (object other) => other is DimFactor f && f.factor == factor && f.remaining == remaining;
-
 		}
 
 		/// <summary>
@@ -449,7 +533,6 @@ namespace Terminal.Gui {
 			public override int GetHashCode () => n.GetHashCode ();
 
 			public override bool Equals (object other) => other is DimAbsolute abs && abs.n == n;
-
 		}
 
 		internal class DimFill : Dim {
@@ -590,6 +673,16 @@ namespace Terminal.Gui {
 				this.side = side;
 			}
 
+			internal override int Anchor (int width)
+			{
+				switch (side) {
+				case 0: return Target.Frame.Height;
+				case 1: return Target.Frame.Width;
+				default:
+					return 0;
+				}
+			}
+
 			public override string ToString ()
 			{
 				string tside;
@@ -601,20 +694,9 @@ namespace Terminal.Gui {
 				return $"DimView(side={tside}, target={Target.ToString ()})";
 			}
 
-			internal override int Anchor (int width)
-			{
-				switch (side) {
-				case 0: return Target.Frame.Height;
-				case 1: return Target.Frame.Width;
-				default:
-					return 0;
-				}
-			}
-
 			public override int GetHashCode () => Target.GetHashCode ();
 
 			public override bool Equals (object other) => other is DimView abs && abs.Target == Target;
-
 		}
 		/// <summary>
 		/// Returns a <see cref="Dim"/> object tracks the Width of the specified <see cref="View"/>.
@@ -632,7 +714,7 @@ namespace Terminal.Gui {
 
 		/// <summary>Serves as the default hash function. </summary>
 		/// <returns>A hash code for the current object.</returns>
-		public override int GetHashCode () => GetHashCode ();
+		public override int GetHashCode () => Anchor (0).GetHashCode ();
 
 		/// <summary>Determines whether the specified object is equal to the current object.</summary>
 		/// <param name="other">The object to compare with the current object. </param>

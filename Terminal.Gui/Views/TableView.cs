@@ -68,6 +68,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public const int DefaultMaxCellWidth = 100;
 
+
+		/// <summary>
+		/// The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/>
+		/// </summary>
+		public const int DefaultMinAcceptableWidth = 100;
+
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
 		/// </summary>
@@ -480,6 +486,8 @@ namespace Terminal.Gui {
 		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
+			var focused = HasFocus;
+
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs(Table,rowToRender))) ?? ColorScheme;
 
@@ -489,8 +497,18 @@ namespace Terminal.Gui {
 
 			//start by clearing the entire line
 			Move (0, row);
-			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus
-				: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+			Attribute color;
+
+			if(FullRowSelect && IsSelected (0, rowToRender)) {
+				color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+			}
+			else 
+			{
+				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+			}
+
+			Driver.SetAttribute (color);
 			Driver.AddStr (new string (' ', Bounds.Width));
 
 			// Render cells for each visible header for the current row
@@ -530,7 +548,12 @@ namespace Terminal.Gui {
 					scheme = rowScheme;
 				}
 
-				var cellColor = isSelectedCell ? scheme.HotFocus : Enabled ? scheme.Normal : scheme.Disabled;
+				Attribute cellColor;
+				if (isSelectedCell) {
+					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+				} else {
+					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
+				}
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
@@ -541,8 +564,14 @@ namespace Terminal.Gui {
 								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
-					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
-						: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+					if(isSelectedCell) {
+						color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+					}
+					else {
+						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+					}
+					Driver.SetAttribute (color);
 				}
 
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
@@ -840,11 +869,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y)
 		{
-			var top = Math.Min (pt1Y, pt2Y);
-			var bot = Math.Max (pt1Y, pt2Y);
+			var top = Math.Max(Math.Min (pt1Y, pt2Y), 0);
+			var bot = Math.Max(Math.Max (pt1Y, pt2Y), 0);
 
-			var left = Math.Min (pt1X, pt2X);
-			var right = Math.Max (pt1X, pt2X);
+			var left = Math.Max(Math.Min (pt1X, pt2X), 0);
+			var right = Math.Max(Math.Max (pt1X, pt2X), 0);
 
 			// Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
 			return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1));
@@ -1214,11 +1243,40 @@ namespace Terminal.Gui {
 				int colWidth;
 
 				// is there enough space for this column (and it's data)?
-				usedSpace += colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
 
-				// no (don't render it) unless its the only column we are render (that must be one massively wide column!)
-				if (!first && usedSpace > availableHorizontalSpace)
-					yield break;
+				// there is not enough space for this columns 
+				// visible content
+				if (usedSpace + colWidth > availableHorizontalSpace)
+				{
+					bool showColumn = false;
+
+					// if this column accepts flexible width rendering and
+					// is therefore happy rendering into less space
+					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 &&
+						// is there enough space to meet the MinAcceptableWidth
+						(availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth)
+					{
+						// show column and use use whatever space is 
+						// left for rendering it
+						showColumn = true;
+						colWidth = availableHorizontalSpace - usedSpace;
+					}
+
+					// If its the only column we are able to render then
+					// accept it anyway (that must be one massively wide column!)
+					if (first)
+					{
+						showColumn = true;
+					}
+
+					// no special exceptions and we are out of space
+					// so stop accepting new columns for the render area
+					if(!showColumn)
+						break;
+				}
+
+				usedSpace += colWidth;
 
 				// there is space
 				yield return new ColumnToRender (col, startingIdxForCurrentHeader,
@@ -1351,9 +1409,23 @@ namespace Terminal.Gui {
 			public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
 			/// <summary>
-			/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// Set the minimum width of the column in characters.  Setting this will ensure that
+			/// even when a column has short content/header it still fills a given width of the control.
+			/// 
+			/// <para>This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> 
+			/// or the <see cref="MaxWidth"/>
+			/// </para>
+			/// <remarks>
+			/// For setting a flexible column width (down to a lower limit) use <see cref="MinAcceptableWidth"/>
+			/// instead
+			/// </remarks>
 			/// </summary>
 			public int MinWidth { get; set; }
+
+			/// <summary>
+			/// Enables flexible sizing of this column based on available screen space to render into.
+			/// </summary>
+			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>

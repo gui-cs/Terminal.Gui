@@ -12,7 +12,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// ComboBox control
+	/// Provides a drop-down list of items the user can select from.
 	/// </summary>
 	public class ComboBox : View {
 
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
-			if (Bounds.Height < minimumHeight && Height is Dim.DimAbsolute) {
+			if (Bounds.Height < minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
 				Height = minimumHeight;
 			}
 

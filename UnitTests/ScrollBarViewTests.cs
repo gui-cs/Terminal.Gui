@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ScrollBarViewTests {
+		readonly ITestOutputHelper output;
+
+		public ScrollBarViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
@@ -13,7 +20,7 @@ namespace Terminal.Gui.Views {
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
 		// as a pair, and b) all unit test functions should be atomic.
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+		public class InitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
@@ -634,6 +641,137 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (100, max);
 			Assert.True (sbv.Visible);
 			Assert.True (sbv.OtherScrollBarView.Visible);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Hosting_ShowBothScrollIndicator_Invisible ()
+		{
+			var textView = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
+			};
+			var win = new Window ("Test") {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (textView);
+
+			var scrollBar = new ScrollBarView (textView, true);
+
+			scrollBar.ChangedPosition += () => {
+				textView.TopRow = scrollBar.Position;
+				if (textView.TopRow != scrollBar.Position) {
+					scrollBar.Position = textView.TopRow;
+				}
+				textView.SetNeedsDisplay ();
+			};
+
+			scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				textView.LeftColumn = scrollBar.OtherScrollBarView.Position;
+				if (textView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
+					scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
+				}
+				textView.SetNeedsDisplay ();
+			};
+
+			scrollBar.VisibleChanged += () => {
+				if (scrollBar.Visible && textView.RightOffset == 0) {
+					textView.RightOffset = 1;
+				} else if (!scrollBar.Visible && textView.RightOffset == 1) {
+					textView.RightOffset = 0;
+				}
+			};
+
+			scrollBar.OtherScrollBarView.VisibleChanged += () => {
+				if (scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 0) {
+					textView.BottomOffset = 1;
+				} else if (!scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 1) {
+					textView.BottomOffset = 0;
+				}
+			};
+
+			textView.DrawContent += (e) => {
+				scrollBar.Size = textView.Lines;
+				scrollBar.Position = textView.TopRow;
+				if (scrollBar.OtherScrollBarView != null) {
+					scrollBar.OtherScrollBarView.Size = textView.Maxlength;
+					scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
+				}
+				scrollBar.LayoutSubviews ();
+				scrollBar.Refresh ();
+			};
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (45, 20);
+
+			Assert.True (scrollBar.AutoHideScrollBars);
+			Assert.Equal (5, textView.Lines);
+			Assert.Equal (42, textView.Maxlength);
+			Assert.Equal (0, scrollBar.Position);
+			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
+			var expected = @"
+┌ Test ─────────────────────────────────────┐
+│This is the help text for the Second Step. │
+│                                           │
+│Press the button to see a message box.     │
+│                                           │
+│Enter name too.                            │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 45, 20), pos);
+
+			textView.WordWrap = true;
+			((FakeDriver)Application.Driver).SetBufferSize (26, 20);
+			Application.Refresh ();
+
+			Assert.True (textView.WordWrap);
+			Assert.True (scrollBar.AutoHideScrollBars);
+			Assert.Equal (7, textView.Lines);
+			Assert.Equal (22, textView.Maxlength);
+			Assert.Equal (0, scrollBar.Position);
+			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
+			expected = @"
+┌ Test ──────────────────┐
+│This is the help text   │
+│for the Second Step.    │
+│                        │
+│Press the button to     │
+│see a message box.      │
+│                        │
+│Enter name too.         │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+│                        │
+└────────────────────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 26, 20), pos);
 		}
 	}
 }

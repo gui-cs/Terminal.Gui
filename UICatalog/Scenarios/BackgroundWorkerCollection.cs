@@ -286,7 +286,7 @@ namespace UICatalog.Scenarios {
 			public void WriteLog (string msg)
 			{
 				log.Add (msg);
-				listLog.MoveEnd ();
+				listLog.MoveDown ();
 			}
 		}
 

@@ -54,3 +54,15 @@ tableView = new TableView () {
 
 tableView.Table = yourDataTable;
 ```
+
+## Table Rendering
+TableView supports any size of table (limited only by the RAM requirements of `System.DataTable`). You can have
+thousands of columns and/or millions of rows if you want. Horizontal and vertical scrolling can be done using
+the mouse or keyboard.
+
+TableView uses `ColumnOffset` and `RowOffset` to determine the first visible cell of the `System.DataTable`.
+Rendering then continues until the avaialble console space is exhausted. Updating the `ColumnOffset` and 
+`RowOffset` changes which part of the table is rendered (scrolls the viewport).
+
+This approach ensures that no matter how big the table, only a small number of columns/rows need to be
+evaluated for rendering.

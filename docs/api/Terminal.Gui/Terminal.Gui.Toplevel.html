@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Toplevel
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -84,7 +85,8 @@
   <h1 id="Terminal_Gui_Toplevel" data-uid="Terminal.Gui.Toplevel" class="text-break">Class Toplevel
   </h1>
   <div class="markdown level0 summary">
-Toplevel views can be modally executed.
+Toplevel views can be modally executed. They are used for both an application&apos;s main view (filling the entire screeN and
+for pop-up views such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a>, and <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a>.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -96,46 +98,247 @@ Toplevel views can be modally executed.
       <div class="level4"><a class="xref" href="Terminal.Gui.Border.ToplevelContainer.html">Border.ToplevelContainer</a></div>
       <div class="level4"><a class="xref" href="Terminal.Gui.Window.html">Window</a></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
+  <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+<p>
+  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>. 
+  They return control to the caller when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> has 
+  been called (which sets the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property to <code>false</code>). 
+</p>
+<p>
+  A Toplevel is created when an application initializes Terminal.Gui by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>.
+  The application Toplevel can be accessed via <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>. Additional Toplevels can be created 
+  and run (e.g. <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>s. To run a Toplevel, create the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and 
+  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>.
+</p>
+<p>
+  Toplevels can also opt-in to more sophisticated initialization
+  by implementing <span class="xref">System.ComponentModel.ISupportInitialize</span>. When they do
+  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit</span> and
+<span class="xref">System.ComponentModel.ISupportInitialize.EndInit</span> methods will be called
+before running the view.
+If first-run-only initialization is preferred, the <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
+can be implemented too, in which case the <span class="xref">System.ComponentModel.ISupportInitialize</span>
+methods will only be called if <span class="xref">System.ComponentModel.ISupportInitializeNotification.IsInitialized</span>
+is <span class="xref">false</span>. This allows proper <a class="xref" href="Terminal.Gui.View.html">View</a> inheritance hierarchies
+to override base class layout code optimally by doing so only on first run,
+instead of on every run.
+</p>
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__">View.GetMinWidthHeight(Size)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight">View.SetMinWidthHeight()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText">View.UpdateTextFormatterText()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView">View.ProcessResizeView()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize">View.GetAutoSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_">View.GetHotKeySpecifierLength(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize">View.GetTextFormatterBoundsSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize">View.GetBoundsTextFormatterSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -204,79 +407,16 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim">View.ForceValidatePosDim</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Focused">View.Focused</a>
@@ -288,100 +428,13 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted">View.LayoutStarted</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Initialized">View.Initialized</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PreserveTrailingSpaces">View.PreserveTrailingSpaces</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
@@ -396,6 +449,9 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsAdded">View.IsAdded</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
     </div>
     <div>
@@ -405,117 +461,79 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted">View.LayoutStarted</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Initialized">View.Initialized</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Toplevel_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Toplevel : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class Toplevel : View</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>. 
-  They return control to the caller when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> has 
-  been called (which sets the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property to false). 
-</p>
-<p>
-  A Toplevel is created when an application initializes Terminal.Gui by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>.
-  The application Toplevel can be accessed via <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>. Additional Toplevels can be created 
-  and run (e.g. <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>s. To run a Toplevel, create the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and 
-  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>.
-</p>
-<p>
-  Toplevels can also opt-in to more sophisticated initialization
-  by implementing <span class="xref">System.ComponentModel.ISupportInitialize</span>. When they do
-  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit()</span> and
-<span class="xref">System.ComponentModel.ISupportInitialize.EndInit()</span> methods will be called
-before running the view.
-If first-run-only initialization is preferred, the <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
-can be implemented too, in which case the <span class="xref">System.ComponentModel.ISupportInitialize</span>
-methods will only be called if <span class="xref">System.ComponentModel.ISupportInitializeNotification.IsInitialized</span>
-is <span class="xref">false</span>. This allows proper <a class="xref" href="Terminal.Gui.View.html">View</a> inheritance hierarchies
-to override base class layout code optimally by doing so only on first run,
-instead of on every run.
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Terminal_Gui_Toplevel__ctor_" data-uid="Terminal.Gui.Toplevel.#ctor*"></a>
   <h4 id="Terminal_Gui_Toplevel__ctor" data-uid="Terminal.Gui.Toplevel.#ctor">Toplevel()</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> class with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout, defaulting to full screen.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> class with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout, 
+defaulting to full screen.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -525,7 +543,7 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.ht
   <a id="Terminal_Gui_Toplevel__ctor_" data-uid="Terminal.Gui.Toplevel.#ctor*"></a>
   <h4 id="Terminal_Gui_Toplevel__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)">Toplevel(Rect)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> class with the specified absolute layout.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> class with the specified <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -631,7 +649,7 @@ Gets or sets if this Toplevel is a Mdi container.
   <a id="Terminal_Gui_Toplevel_MenuBar_" data-uid="Terminal.Gui.Toplevel.MenuBar*"></a>
   <h4 id="Terminal_Gui_Toplevel_MenuBar" data-uid="Terminal.Gui.Toplevel.MenuBar">MenuBar</h4>
   <div class="markdown level1 summary">
-Gets or sets the menu for this Toplevel
+Gets or sets the menu for this Toplevel.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -656,9 +674,14 @@ Gets or sets the menu for this Toplevel
   <a id="Terminal_Gui_Toplevel_Modal_" data-uid="Terminal.Gui.Toplevel.Modal*"></a>
   <h4 id="Terminal_Gui_Toplevel_Modal" data-uid="Terminal.Gui.Toplevel.Modal">Modal</h4>
   <div class="markdown level1 summary">
-Determines whether the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> is modal or not.
-Causes <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">ProcessKey(KeyEvent)</a> to propagate keys upwards
-by default unless set to <span class="xref">true</span>.
+Determines whether the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> is modal or not. 
+If set to <code>false</code> (the default):
+
+<ul><li><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">ProcessKey(KeyEvent)</a> events will propagate keys upwards.</li><li>The Toplevel will act as an embedded view (not a modal/pop-up).</li></ul>
+
+If set to <code>true</code>:
+
+<ul><li><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">ProcessKey(KeyEvent)</a> events will NOT propogate keys upwards.</li><li>The Toplevel will and look like a modal (pop-up) (e.g. see <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>.</li></ul>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -705,14 +728,10 @@ Gets or sets whether the <a class="xref" href="Terminal.Gui.MainLoop.html">MainL
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Toplevel_Running_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Setting this property directly is discouraged. Use <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> instead. 
-</div>
   <a id="Terminal_Gui_Toplevel_StatusBar_" data-uid="Terminal.Gui.Toplevel.StatusBar*"></a>
   <h4 id="Terminal_Gui_Toplevel_StatusBar" data-uid="Terminal.Gui.Toplevel.StatusBar">StatusBar</h4>
   <div class="markdown level1 summary">
-Gets or sets the status bar for this Toplevel
+Gets or sets the status bar for this Toplevel.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -738,7 +757,9 @@ Gets or sets the status bar for this Toplevel
   </h3>
   <a id="Terminal_Gui_Toplevel_Add_" data-uid="Terminal.Gui.Toplevel.Add*"></a>
   <h4 id="Terminal_Gui_Toplevel_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Add(Terminal.Gui.View)">Add(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Adds a subview (child) to this view.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -784,14 +805,14 @@ Convenience factory method that creates a new Toplevel with the current terminal
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></td>
-        <td>The create.</td>
+        <td>The created Toplevel.</td>
       </tr>
     </tbody>
   </table>
   <a id="Terminal_Gui_Toplevel_GetTopMdiChild_" data-uid="Terminal.Gui.Toplevel.GetTopMdiChild*"></a>
   <h4 id="Terminal_Gui_Toplevel_GetTopMdiChild_System_Type_System_String___" data-uid="Terminal.Gui.Toplevel.GetTopMdiChild(System.Type,System.String[])">GetTopMdiChild(Type, String[])</h4>
   <div class="markdown level1 summary">
-Gets the current visible toplevel Mdi child that match the arguments pattern.
+Gets the current visible Toplevel Mdi child that matches the arguments pattern.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -837,7 +858,9 @@ Gets the current visible toplevel Mdi child that match the arguments pattern.
   </table>
   <a id="Terminal_Gui_Toplevel_MouseEvent_" data-uid="Terminal.Gui.Toplevel.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Toplevel_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Toplevel.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -856,7 +879,7 @@ Gets the current visible toplevel Mdi child that match the arguments pattern.
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
         <td><span class="parametername">mouseEvent</span></td>
-        <td></td>
+        <td>Contains the details about the mouse event.</td>
       </tr>
     </tbody>
   </table>
@@ -871,7 +894,7 @@ Gets the current visible toplevel Mdi child that match the arguments pattern.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -953,7 +976,9 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
   </table>
   <a id="Terminal_Gui_Toplevel_OnKeyDown_" data-uid="Terminal.Gui.Toplevel.OnKeyDown*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)">OnKeyDown(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a key is pressed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -972,7 +997,7 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -987,7 +1012,7 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the event was handled</td>
       </tr>
     </tbody>
   </table>
@@ -995,7 +1020,9 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyDown_Terminal_Gui_KeyEvent_">View.OnKeyDown(KeyEvent)</a></div>
   <a id="Terminal_Gui_Toplevel_OnKeyUp_" data-uid="Terminal.Gui.Toplevel.OnKeyUp*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)">OnKeyUp(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a key is released.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1014,7 +1041,7 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -1029,12 +1056,22 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the event was handled</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
+  <a id="Terminal_Gui_Toplevel_OnLoaded_" data-uid="Terminal.Gui.Toplevel.OnLoaded*"></a>
+  <h4 id="Terminal_Gui_Toplevel_OnLoaded" data-uid="Terminal.Gui.Toplevel.OnLoaded">OnLoaded()</h4>
+  <div class="markdown level1 summary">
+Called from <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> before the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> redraws for the first time. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnLoaded()</code></pre>
+  </div>
   <a id="Terminal_Gui_Toplevel_OnQuitKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged(Terminal.Gui.Key)">OnQuitKeyChanged(Key)</h4>
   <div class="markdown level1 summary">
@@ -1064,7 +1101,9 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
   </table>
   <a id="Terminal_Gui_Toplevel_PositionCursor_" data-uid="Terminal.Gui.Toplevel.PositionCursor*"></a>
   <h4 id="Terminal_Gui_Toplevel_PositionCursor" data-uid="Terminal.Gui.Toplevel.PositionCursor">PositionCursor()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Positions the cursor in the right position based on the currently focused view in the chain.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1075,7 +1114,7 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
   <a id="Terminal_Gui_Toplevel_PositionToplevel_" data-uid="Terminal.Gui.Toplevel.PositionToplevel*"></a>
   <h4 id="Terminal_Gui_Toplevel_PositionToplevel_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.PositionToplevel(Terminal.Gui.Toplevel)">PositionToplevel(Toplevel)</h4>
   <div class="markdown level1 summary">
-Virtual method which allow to be overridden to implement specific positions for inherited <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>.
+Virtual method enabling implementation of specific positions for inherited <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> views.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1101,7 +1140,12 @@ Virtual method which allow to be overridden to implement specific positions for 
   </table>
   <a id="Terminal_Gui_Toplevel_ProcessColdKey_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+This method can be overwritten by views that
+want to provide accelerator functionality
+(Alt-key for example), but without
+interefering with normal ProcessKey behavior.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1120,7 +1164,7 @@ Virtual method which allow to be overridden to implement specific positions for 
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -1143,7 +1187,10 @@ Virtual method which allow to be overridden to implement specific positions for 
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
   <a id="Terminal_Gui_Toplevel_ProcessKey_" data-uid="Terminal.Gui.Toplevel.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1162,7 +1209,7 @@ Virtual method which allow to be overridden to implement specific positions for 
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -1185,7 +1232,9 @@ Virtual method which allow to be overridden to implement specific positions for 
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
   <a id="Terminal_Gui_Toplevel_Redraw_" data-uid="Terminal.Gui.Toplevel.Redraw*"></a>
   <h4 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1204,7 +1253,7 @@ Virtual method which allow to be overridden to implement specific positions for 
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
@@ -1212,7 +1261,9 @@ Virtual method which allow to be overridden to implement specific positions for 
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
   <a id="Terminal_Gui_Toplevel_Remove_" data-uid="Terminal.Gui.Toplevel.Remove*"></a>
   <h4 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Remove(Terminal.Gui.View)">Remove(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1239,7 +1290,9 @@ Virtual method which allow to be overridden to implement specific positions for 
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a></div>
   <a id="Terminal_Gui_Toplevel_RemoveAll_" data-uid="Terminal.Gui.Toplevel.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Toplevel_RemoveAll" data-uid="Terminal.Gui.Toplevel.RemoveAll">RemoveAll()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1250,7 +1303,8 @@ Virtual method which allow to be overridden to implement specific positions for 
   <a id="Terminal_Gui_Toplevel_RequestStop_" data-uid="Terminal.Gui.Toplevel.RequestStop*"></a>
   <h4 id="Terminal_Gui_Toplevel_RequestStop" data-uid="Terminal.Gui.Toplevel.RequestStop">RequestStop()</h4>
   <div class="markdown level1 summary">
-Stops running this <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>.
+Stops and closes this <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>. If this Toplevel is the top-most Toplevel, 
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> will be called, causing the application to exit.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1260,7 +1314,8 @@ Stops running this <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a
   <a id="Terminal_Gui_Toplevel_RequestStop_" data-uid="Terminal.Gui.Toplevel.RequestStop*"></a>
   <h4 id="Terminal_Gui_Toplevel_RequestStop_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.RequestStop(Terminal.Gui.Toplevel)">RequestStop(Toplevel)</h4>
   <div class="markdown level1 summary">
-Stops running the <code data-dev-comment-type="paramref" class="paramref">top</code> <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>.
+Stops and closes the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> specified by <code data-dev-comment-type="paramref" class="paramref">top</code>. If <code data-dev-comment-type="paramref" class="paramref">top</code> is the top-most Toplevel, 
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> will be called, causing the application to exit.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1287,7 +1342,7 @@ Stops running the <code data-dev-comment-type="paramref" class="paramref">top</c
   <a id="Terminal_Gui_Toplevel_ShowChild_" data-uid="Terminal.Gui.Toplevel.ShowChild*"></a>
   <h4 id="Terminal_Gui_Toplevel_ShowChild_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.ShowChild(Terminal.Gui.Toplevel)">ShowChild(Toplevel)</h4>
   <div class="markdown level1 summary">
-Shows the Mdi child indicated by the <code data-dev-comment-type="paramref" class="paramref">top</code> setting as <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a>.
+Shows the Mdi child indicated by <code data-dev-comment-type="paramref" class="paramref">top</code>, setting it as <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1307,7 +1362,7 @@ Shows the Mdi child indicated by the <code data-dev-comment-type="paramref" clas
       <tr>
         <td><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td><span class="parametername">top</span></td>
-        <td>The toplevel.</td>
+        <td>The Toplevel.</td>
       </tr>
     </tbody>
   </table>
@@ -1322,15 +1377,15 @@ Shows the Mdi child indicated by the <code data-dev-comment-type="paramref" clas
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><span class="xref">true</span> if the toplevel can be showed.<span class="xref">false</span> otherwise.</td>
+        <td><code>true</code> if the toplevel can be shown or <code>false</code> if not.</td>
       </tr>
     </tbody>
   </table>
   <a id="Terminal_Gui_Toplevel_WillPresent_" data-uid="Terminal.Gui.Toplevel.WillPresent*"></a>
   <h4 id="Terminal_Gui_Toplevel_WillPresent" data-uid="Terminal.Gui.Toplevel.WillPresent">WillPresent()</h4>
   <div class="markdown level1 summary">
-Invoked by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> as part of the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> after
-the views have been laid out, and before the views are drawn for the first time.
+Invoked by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> as part of  <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> 
+after the views have been laid out, and before the views are drawn for the first time.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1341,7 +1396,7 @@ the views have been laid out, and before the views are drawn for the first time.
   </h3>
   <h4 id="Terminal_Gui_Toplevel_Activate" data-uid="Terminal.Gui.Toplevel.Activate">Activate</h4>
   <div class="markdown level1 summary">
-Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> becomes the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a>.
+Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> becomes the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a> Toplevel.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1365,7 +1420,8 @@ Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
   </table>
   <h4 id="Terminal_Gui_Toplevel_AllChildClosed" data-uid="Terminal.Gui.Toplevel.AllChildClosed">AllChildClosed</h4>
   <div class="markdown level1 summary">
-Invoked once the last child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from the <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>
+Invoked when the last child of the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from 
+by <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1437,7 +1493,8 @@ Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gu
   </table>
   <h4 id="Terminal_Gui_Toplevel_ChildClosed" data-uid="Terminal.Gui.Toplevel.ChildClosed">ChildClosed</h4>
   <div class="markdown level1 summary">
-Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from the <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>
+Invoked when a child of the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed by  
+<span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1461,7 +1518,7 @@ Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Applic
   </table>
   <h4 id="Terminal_Gui_Toplevel_ChildLoaded" data-uid="Terminal.Gui.Toplevel.ChildLoaded">ChildLoaded</h4>
   <div class="markdown level1 summary">
-Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin loaded.
+Invoked when a child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been loaded.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1485,7 +1542,7 @@ Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Applic
   </table>
   <h4 id="Terminal_Gui_Toplevel_ChildUnloaded" data-uid="Terminal.Gui.Toplevel.ChildUnloaded">ChildUnloaded</h4>
   <div class="markdown level1 summary">
-Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin unloaded.
+Invoked when a cjhild Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been unloaded.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1509,7 +1566,7 @@ Invoked once the child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Applic
   </table>
   <h4 id="Terminal_Gui_Toplevel_Closed" data-uid="Terminal.Gui.Toplevel.Closed">Closed</h4>
   <div class="markdown level1 summary">
-Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from the <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>
+Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed by <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1533,7 +1590,8 @@ Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
   </table>
   <h4 id="Terminal_Gui_Toplevel_Closing" data-uid="Terminal.Gui.Toplevel.Closing">Closing</h4>
   <div class="markdown level1 summary">
-Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is being closing from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a>
+Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is being closed by  
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1557,7 +1615,7 @@ Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
   </table>
   <h4 id="Terminal_Gui_Toplevel_Deactivate" data-uid="Terminal.Gui.Toplevel.Deactivate">Deactivate</h4>
   <div class="markdown level1 summary">
-Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> ceases to be the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a>.
+Invoked when the Toplevel<a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> ceases to be the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a> Toplevel.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1581,8 +1639,9 @@ Invoked once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
   </table>
   <h4 id="Terminal_Gui_Toplevel_Loaded" data-uid="Terminal.Gui.Toplevel.Loaded">Loaded</h4>
   <div class="markdown level1 summary">
-Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin loaded.
-A Loaded event handler is a good place to finalize initialization before calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>.
+Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin loaded.
+A Loaded event handler is a good place to finalize initialization before calling 
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1630,9 +1689,11 @@ Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gu
   </table>
   <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
   <div class="markdown level1 summary">
-Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
+Invoked when the Toplevel <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
 Subscribe to this event to perform tasks when the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> has been laid out and focus has been set.
-changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a>(topLevel)`.
+changes. 
+<p>A Ready event handler is a good place to finalize initialization after calling 
+<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a> on this Toplevel.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1656,7 +1717,7 @@ changes. A Ready event handler is a good place to finalize initialization after 
   </table>
   <h4 id="Terminal_Gui_Toplevel_Resized" data-uid="Terminal.Gui.Toplevel.Resized">Resized</h4>
   <div class="markdown level1 summary">
-Invoked when the terminal was resized. The new <a class="xref" href="Terminal.Gui.Size.html">Size</a> of the terminal is provided.
+Invoked when the terminal has been resized. The new <a class="xref" href="Terminal.Gui.Size.html">Size</a> of the terminal is provided.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1680,8 +1741,8 @@ Invoked when the terminal was resized. The new <a class="xref" href="Terminal.Gu
   </table>
   <h4 id="Terminal_Gui_Toplevel_Unloaded" data-uid="Terminal.Gui.Toplevel.Unloaded">Unloaded</h4>
   <div class="markdown level1 summary">
-Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin unloaded.
-A Unloaded event handler is a good place to disposing after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
+Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been unloaded.
+A Unloaded event handler is a good place to dispose objects after calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

@@ -474,6 +474,9 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
+			if (!IsAdded)
+				return;
+
 			int offB = OffSetBackground ();
 			if (point < first) {
 				first = point;

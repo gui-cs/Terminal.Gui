@@ -665,8 +665,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract bool HeightAsBuffer { get; set; }
 
-		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		internal abstract int [,,] Contents { get; }
+		/// <summary>
+		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public virtual int [,,] Contents { get; }
 
 		/// <summary>
 		/// Initializes the driver
@@ -768,6 +770,11 @@ namespace Terminal.Gui {
 		/// Ends the execution of the console driver.
 		/// </summary>
 		public abstract void End ();
+
+		/// <summary>
+		/// Resizes the clip area when the screen is resized.
+		/// </summary>
+		public abstract void ResizeScreen ();
 
 		/// <summary>
 		/// Reset and recreate the contents and the driver buffer.

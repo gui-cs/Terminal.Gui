@@ -1181,35 +1181,53 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Test_RootKeyEvent_Cancel()
+		public void Test_RootKeyEvent_Cancel ()
 		{
 			Application.RootKeyEvent += SuppressKey;
 
-			var tf = new TextField();
+			var tf = new TextField ();
 
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
-			
-			Application.Driver.SendKeys('a',ConsoleKey.A,false,false,false);
-			Assert.Equal("a", tf.Text.ToString ());
+
+			Application.Driver.SendKeys ('a', ConsoleKey.A, false, false, false);
+			Assert.Equal ("a", tf.Text.ToString ());
 
 			// SuppressKey suppresses the 'j' key
-			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
-			Assert.Equal("a", tf.Text.ToString ());
+			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Assert.Equal ("a", tf.Text.ToString ());
 
 			Application.RootKeyEvent -= SuppressKey;
 
 			// Now that the delegate has been removed we can type j again
-			Application.Driver.SendKeys('j',ConsoleKey.A,false,false,false);
-			Assert.Equal("aj", tf.Text.ToString ());
+			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Assert.Equal ("aj", tf.Text.ToString ());
 		}
 
 		private bool SuppressKey (KeyEvent arg)
 		{
-			if(arg.KeyValue == 'j')
+			if (arg.KeyValue == 'j')
 				return true;
 
 			return false;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ScrollOffset_Initialize ()
+		{
+			var tf = new TextField ("Testing Scrolls.") {
+				X = 1,
+				Y = 1,
+				Width = 20
+			};
+			Assert.Equal (0, tf.ScrollOffset);
+			Assert.Equal (16, tf.CursorPosition);
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (0, tf.ScrollOffset);
+			Assert.Equal (16, tf.CursorPosition);
 		}
 	}
 }

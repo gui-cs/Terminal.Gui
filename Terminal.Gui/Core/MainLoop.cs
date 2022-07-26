@@ -45,8 +45,17 @@ namespace Terminal.Gui {
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
 	public class MainLoop {
-		internal class Timeout {
+		/// <summary>
+		/// Provides data for timers running manipulation.
+		/// </summary>
+		public sealed class Timeout {
+			/// <summary>
+			/// Time to wait before invoke the callback.
+			/// </summary>
 			public TimeSpan Span;
+			/// <summary>
+			/// The function that will be invoked.
+			/// </summary>
 			public Func<MainLoop, bool> Callback;
 		}
 
@@ -55,10 +64,28 @@ namespace Terminal.Gui {
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		/// <summary>
+		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks./>.
+		/// A shorter limit time can be added at the end, but it will be called before an
+		///  earlier addition that has a longer limit time.
+		/// </summary>
+		public SortedList<long, Timeout> Timeouts => timeouts;
+
+		/// <summary>
+		/// Gets the list of all idle handlers.
+		/// </summary>
+		public List<Func<bool>> IdleHandlers => idleHandlers;
+
+		/// <summary>
 		/// The current IMainLoopDriver in use.
 		/// </summary>
 		/// <value>The driver.</value>
 		public IMainLoopDriver Driver { get; }
+
+		/// <summary>
+		/// Invoked when a new timeout is added to be used on the case
+		/// if <see cref="Application.ExitRunLoopAfterFirstIteration"/> is true,
+		/// </summary>
+		public event Action<long> TimeoutAdded;
 
 		/// <summary>
 		///  Creates a new Mainloop. 
@@ -120,7 +147,8 @@ namespace Terminal.Gui {
 		{
 			lock (timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
-				timeouts.Add (NudgeToUniqueKey(k), timeout);
+				timeouts.Add (NudgeToUniqueKey (k), timeout);
+				TimeoutAdded?.Invoke (k);
 			}
 		}
 
@@ -188,11 +216,10 @@ namespace Terminal.Gui {
 						AddTimeout (timeout.Span, timeout);
 				} else {
 					lock (timeoutsLockToken) {
-						timeouts.Add (NudgeToUniqueKey(k), timeout);
+						timeouts.Add (NudgeToUniqueKey (k), timeout);
 					}
 				}
 			}
-			
 		}
 
 		/// <summary>
@@ -203,7 +230,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private long NudgeToUniqueKey (long k)
 		{
-			lock(timeoutsLockToken) {
+			lock (timeoutsLockToken) {
 				while (timeouts.ContainsKey (k)) {
 					k++;
 				}

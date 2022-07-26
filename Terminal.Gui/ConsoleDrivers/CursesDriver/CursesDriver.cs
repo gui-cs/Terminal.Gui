@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 		IClipboard clipboard;
 		int [,,] contents;
 
-		internal override int [,,] Contents => contents;
+		public override int [,,] Contents => contents;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -119,8 +119,13 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.refresh ();
+			ProcessWinChange ();
+		}
+
+		private void ProcessWinChange ()
+		{
 			if (Curses.CheckWinChange ()) {
-				Clip = new Rect (0, 0, Cols, Rows);
+				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
 			}
@@ -382,18 +387,16 @@ namespace Terminal.Gui {
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 					mouseFlag = MapCursesButton ((Curses.Event)lastMouseButtonPressed) | MouseFlags.ReportMousePosition;
-					point = new Point ();
 					cancelButtonClicked = true;
-				} else {
-					point = new Point () {
-						X = cev.X,
-						Y = cev.Y
-					};
 				}
+				point = new Point () {
+					X = cev.X,
+					Y = cev.Y
+				};
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync (cev, mouseFlag));
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 						return false;
 					});
 				}
@@ -480,18 +483,17 @@ namespace Terminal.Gui {
 			return mf;
 		}
 
-		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
 		{
-			await Task.Delay (200);
-			while (isButtonPressed && lastMouseButtonPressed != null) {
+			while (isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = cev.X,
-					Y = cev.Y,
+					X = point.X,
+					Y = point.Y,
 					Flags = mouseFlag
 				};
 
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null)
 					break;
 				if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
@@ -628,10 +630,7 @@ namespace Terminal.Gui {
 
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
-					if (Curses.CheckWinChange ()) {
-						TerminalResized?.Invoke ();
-						return;
-					}
+					ProcessWinChange ();
 				}
 				if (wch == Curses.KeyMouse) {
 					Curses.getmouse (out Curses.MouseEvent ev);
@@ -805,11 +804,7 @@ namespace Terminal.Gui {
 			});
 
 			mLoop.WinChanged += () => {
-				if (Curses.CheckWinChange ()) {
-					Clip = new Rect (0, 0, Cols, Rows);
-					UpdateOffScreen ();
-					TerminalResized?.Invoke ();
-				}
+				ProcessWinChange ();
 			};
 		}
 
@@ -826,7 +821,7 @@ namespace Terminal.Gui {
 
 				window = Curses.initscr ();
 			} catch (Exception e) {
-				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
+				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
 			}
 
 			// Ensures that all procedures are performed at some previous closing.
@@ -874,6 +869,9 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
+			ResizeScreen ();
+			UpdateOffScreen ();
+
 			//HLine = Curses.ACS_HLINE;
 			//VLine = Curses.ACS_VLINE;
 			//Stipple = Curses.ACS_CKBOARD;
@@ -896,8 +894,7 @@ namespace Terminal.Gui {
 			Colors.Dialog = new ColorScheme ();
 			Colors.Menu = new ColorScheme ();
 			Colors.Error = new ColorScheme ();
-			Clip = new Rect (0, 0, Cols, Rows);
-			UpdateOffScreen ();
+
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
@@ -965,6 +962,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public override void ResizeScreen ()
+		{
+			Clip = new Rect (0, 0, Cols, Rows);
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
+		}
+
 		public override void UpdateOffScreen ()
 		{
 			contents = new int [Rows, Cols, 3];
@@ -982,6 +986,9 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
+			if (new CursesClipboard ().IsSupported) {
+				return false;
+			}
 			var result = BashRunner.Run ("uname -a", runCurses: false);
 			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
@@ -1357,6 +1364,7 @@ namespace Terminal.Gui {
 						FileName = "bash",
 						Arguments = arguments,
 						RedirectStandardInput = true,
+						RedirectStandardError = true,
 						UseShellExecute = false,
 						CreateNoWindow = false
 					}
@@ -1495,14 +1503,13 @@ namespace Terminal.Gui {
 					RedirectStandardOutput = true,
 					FileName = "powershell.exe",
 					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = Application.Driver is CursesDriver,
+					UseShellExecute = false,
 					CreateNoWindow = true
 				}
 			}) {
 				powershell.Start ();
 				var result = powershell.StandardOutput.ReadToEnd ();
 				powershell.StandardOutput.Close ();
-				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
@@ -1529,7 +1536,6 @@ namespace Terminal.Gui {
 				}
 			}) {
 				powershell.Start ();
-				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}

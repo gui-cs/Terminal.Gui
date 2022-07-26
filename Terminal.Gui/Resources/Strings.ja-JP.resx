@@ -159,4 +159,13 @@
   <data name="fdSelectMixed" xml:space="preserve">
     <value>混在選択</value>
   </data>
+  <data name="wzBack" xml:space="preserve">
+    <value>戻る</value>
+  </data>
+  <data name="wzFinish" xml:space="preserve">
+    <value>終える</value>
+  </data>
+  <data name="wzNext" xml:space="preserve">
+    <value>次に</value>
+  </data>
 </root>

@@ -359,7 +359,7 @@ namespace Terminal.Gui {
 		void SetTitle (ustring title)
 		{
 			if (title == null)
-				title = "";
+				title = ustring.Empty;
 			Title = title;
 		}
 
@@ -421,9 +421,12 @@ namespace Terminal.Gui {
 			AddCommand (Command.LineDown, () => MoveDown ());
 			AddCommand (Command.Left, () => { this.host.PreviousMenu (true); return true; });
 			AddCommand (Command.Right, () => {
-				this.host.NextMenu (this.barItems.IsTopLevel || (this.barItems.Children != null
-					&& current > -1 && current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
-					current > -1 && host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
+				this.host.NextMenu (!this.barItems.IsTopLevel || (this.barItems.Children != null
+					&& this.barItems.Children.Length > 0 && current > -1
+					&& current < this.barItems.Children.Length && this.barItems.Children [current].IsFromSubMenu),
+					this.barItems.Children != null && this.barItems.Children.Length > 0 && current > -1
+					&& host.UseSubMenusSingleFrame && this.barItems.SubMenu (this.barItems.Children [current]) != null);
+
 				return true;
 			});
 			AddCommand (Command.Cancel, () => { CloseAllMenus (); return true; });
@@ -654,7 +657,7 @@ namespace Terminal.Gui {
 				if (current >= barItems.Children.Length) {
 					current = 0;
 				}
-				if (this != host.openCurrentMenu && barItems.Children [current].IsFromSubMenu && host.selectedSub > -1) {
+				if (this != host.openCurrentMenu && barItems.Children [current]?.IsFromSubMenu == true && host.selectedSub > -1) {
 					host.PreviousMenu (true);
 					host.SelectEnabledItem (barItems.Children, current, out current);
 					host.openCurrentMenu = this;
@@ -823,7 +826,7 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
-	/// The MenuBar provides a menu for Terminal.Gui applications. 
+	/// Provides a menu bar with drop-down and cascading menus. 
 	/// </summary>
 	/// <remarks>
 	///	<para>
@@ -843,10 +846,21 @@ namespace Terminal.Gui {
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
 
+		private bool useKeysUpDownAsKeysLeftRight = false;
+
 		/// <summary>
 		/// Used for change the navigation key style.
 		/// </summary>
-		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
+		public bool UseKeysUpDownAsKeysLeftRight {
+			get => useKeysUpDownAsKeysLeftRight;
+			set {
+				useKeysUpDownAsKeysLeftRight = value;
+				if (value && UseSubMenusSingleFrame) {
+					UseSubMenusSingleFrame = false;
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		static ustring shortcutDelimiter = "+";
 		/// <summary>
@@ -866,10 +880,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		new public static Rune HotKeySpecifier => '_';
 
+		private bool useSubMenusSingleFrame;
+
 		/// <summary>
 		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
 		/// </summary>
-		public bool UseSubMenusSingleFrame { get; set; }
+		public bool UseSubMenusSingleFrame {
+			get => useSubMenusSingleFrame;
+			set {
+				useSubMenusSingleFrame = value;
+				if (value && UseKeysUpDownAsKeysLeftRight) {
+					useKeysUpDownAsKeysLeftRight = false;
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
@@ -1122,8 +1147,12 @@ namespace Terminal.Gui {
 		public virtual void OnMenuOpened ()
 		{
 			MenuItem mi = null;
-			if (openCurrentMenu.barItems.Children != null) {
+			if (openCurrentMenu.barItems.Children != null && openCurrentMenu?.current > -1) {
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
+			} else if (openCurrentMenu.barItems.IsTopLevel) {
+				mi = openCurrentMenu.barItems;
+			} else {
+				mi = openMenu.barItems.Children [openMenu.current];
 			}
 			MenuOpened?.Invoke (mi);
 		}
@@ -1270,11 +1299,6 @@ namespace Terminal.Gui {
 				previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 
 			OpenMenu (idx, sIdx, subMenu);
-			if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)
-				&& subMenu == null && !CloseMenu (false)) {
-
-				return;
-			}
 			SetNeedsDisplay ();
 		}
 
@@ -1395,7 +1419,9 @@ namespace Terminal.Gui {
 
 		void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
 		{
-			if (openSubMenu == null || (UseSubMenusSingleFrame && !ignoreUseSubMenusSingleFrame && openSubMenu.Count > 0))
+			if (openSubMenu == null || (UseSubMenusSingleFrame
+				&& !ignoreUseSubMenusSingleFrame && openSubMenu.Count == 0))
+
 				return;
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
 				isMenuClosing = true;
@@ -1503,9 +1529,6 @@ namespace Terminal.Gui {
 				OpenMenu (selected);
 				if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current, false)) {
 					openCurrentMenu.current = 0;
-					if (!SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-						CloseMenu (ignoreUseSubMenusSingleFrame);
-					}
 				}
 				break;
 			case true:
@@ -1542,18 +1565,27 @@ namespace Terminal.Gui {
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
 					}
 				} else {
-					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
+					var subMenu = openCurrentMenu.current > -1 && openCurrentMenu.barItems.Children.Length > 0
+						? openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current])
+						: null;
 					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
 						if (openSubMenu != null && !CloseMenu (false, true))
 							return;
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
-					} else if (subMenu != null ||
-						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
+					} else if (subMenu != null || (openCurrentMenu.current > -1
+						&& !openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)) {
 						selectedSub++;
-					else
+						openCurrentMenu.CheckSubMenu ();
+					} else {
+						if (CloseMenu (false, true, ignoreUseSubMenusSingleFrame)) {
+							NextMenu (false, ignoreUseSubMenusSingleFrame);
+						}
 						return;
+					}
+
 					SetNeedsDisplay ();
-					openCurrentMenu.CheckSubMenu ();
+					if (UseKeysUpDownAsKeysLeftRight)
+						openCurrentMenu.CheckSubMenu ();
 				}
 				break;
 			}

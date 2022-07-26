@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 			set {
 				text = value;
 
-				if (text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.ConsoleWidth)) {
+				if (text != null && text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.ConsoleWidth)) {
 					// Provide a default size (width = length of longest line, height = 1)
 					// TODO: It might makes more sense for the default to be width = length of first line?
 					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
@@ -154,9 +154,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool AutoSize { get; set; }
 
-		// TODO: Add Vertical Text Alignment
 		/// <summary>
-		/// Controls the horizontal text-alignment property. 
+		/// Gets or sets a flag that determines whether <see cref="Text"/> will have trailing spaces preserved
+		/// or not when <see cref="WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
+		/// either the <see cref="Text"/> property is changed or when <see cref="WordWrap"/> is set to `true`.
+		/// The default is `false`.
+		/// </summary>
+		public bool PreserveTrailingSpaces { get; set; }
+
+		/// <summary>
+		/// Controls the horizontal text-alignment property.
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public TextAlignment Alignment {
@@ -309,7 +316,7 @@ namespace Terminal.Gui {
 		public List<ustring> Lines {
 			get {
 				// With this check, we protect against subclasses with overrides of Text
-				if (ustring.IsNullOrEmpty (Text)) {
+				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
 					lines = new List<ustring> ();
 					lines.Add (ustring.Empty);
 					NeedsFormat = false;
@@ -323,19 +330,20 @@ namespace Terminal.Gui {
 						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
 					}
-					if (Size.IsEmpty) {
-						throw new InvalidOperationException ("Size must be set before accessing Lines");
-					}
 
 					if (IsVerticalDirection (textDirection)) {
-						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1,
-							false, 0, textDirection);
-						if (!AutoSize && lines.Count > Size.Width) {
-							lines.RemoveRange (Size.Width, lines.Count - Size.Width);
+						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1);
+						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth,
+							PreserveTrailingSpaces, 0, textDirection);
+						if (!AutoSize) {
+							colsWidth = GetMaxColsForWidth (lines, Size.Width);
+							if (lines.Count > colsWidth) {
+								lines.RemoveRange (colsWidth, lines.Count - colsWidth);
+							}
 						}
 					} else {
 						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1,
-							false, 0, textDirection);
+							PreserveTrailingSpaces, 0, textDirection);
 						if (!AutoSize && lines.Count > Size.Height) {
 							lines.RemoveRange (Size.Height, lines.Count - Size.Height);
 						}
@@ -465,7 +473,7 @@ namespace Terminal.Gui {
 			var runes = StripCRLF (text).ToRuneList ();
 			if (!preserveTrailingSpaces) {
 				if (IsHorizontalDirection (textDirection)) {
-					while ((end = start + GetMaxLengthForWidth (runes.GetRange (start, runes.Count - start), width)) < runes.Count) {
+					while ((end = start + Math.Max (GetMaxLengthForWidth (runes.GetRange (start, runes.Count - start), width), 1)) < runes.Count) {
 						while (runes [end] != ' ' && end > start)
 							end--;
 						if (end == start)
@@ -491,16 +499,25 @@ namespace Terminal.Gui {
 				}
 			} else {
 				while ((end = start) < runes.Count) {
-					end = GetNextWhiteSpace (start, width);
+					end = GetNextWhiteSpace (start, width, out bool incomplete);
+					if (end == 0 && incomplete) {
+						start = text.RuneCount;
+						break;
+					}
 					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
 					start = end;
+					if (incomplete) {
+						start = text.RuneCount;
+						break;
+					}
 				}
 			}
 
-			int GetNextWhiteSpace (int from, int cWidth, int cLength = 0)
+			int GetNextWhiteSpace (int from, int cWidth, out bool incomplete, int cLength = 0)
 			{
 				var to = from;
 				var length = cLength;
+				incomplete = false;
 
 				while (length < cWidth && to < runes.Count) {
 					var rune = runes [to];
@@ -509,13 +526,19 @@ namespace Terminal.Gui {
 					} else {
 						length++;
 					}
+					if (length > cWidth) {
+						if (to >= runes.Count || (length > 1 && cWidth <= 1)) {
+							incomplete = true;
+						}
+						return to;
+					}
 					if (rune == ' ') {
 						if (length == cWidth) {
 							return to + 1;
 						} else if (length > cWidth) {
 							return to;
 						} else {
-							return GetNextWhiteSpace (to + 1, cWidth, length);
+							return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
 						}
 					} else if (rune == '\t') {
 						length += tabWidth + 1;
@@ -524,7 +547,7 @@ namespace Terminal.Gui {
 						} else if (length > cWidth && tabWidth > cWidth) {
 							return to;
 						} else {
-							return GetNextWhiteSpace (to + 1, cWidth, length);
+							return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
 						}
 					}
 					to++;
@@ -576,11 +599,15 @@ namespace Terminal.Gui {
 			var runes = text.ToRuneList ();
 			int slen = runes.Count;
 			if (slen > width) {
-				return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+				if (IsHorizontalDirection (textDirection)) {
+					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+				} else {
+					return ustring.Make (runes.GetRange (0, width));
+				}
 			} else {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
-				} else if (GetTextWidth (text) > width && IsHorizontalDirection (textDirection)) {
+				} else if (IsHorizontalDirection (textDirection) && GetTextWidth (text) > width) {
 					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
 				}
 				return text;
@@ -686,9 +713,6 @@ namespace Terminal.Gui {
 		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("width cannot be negative");
-			}
-			if (preserveTrailingSpaces && !wordWrap) {
-				throw new ArgumentException ("if 'preserveTrailingSpaces' is true, then 'wordWrap' must be true either.");
 			}
 			List<ustring> lineResult = new List<ustring> ();
 
@@ -847,6 +871,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets the index position from the list based on the <paramref name="width"/>.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
+		/// <param name="width">The width.</param>
+		/// <returns>The index of the list that fit the width.</returns>
+		public static int GetMaxColsForWidth (List<ustring> lines, int width)
+		{
+			var runesLength = 0;
+			var lineIdx = 0;
+			for (; lineIdx < lines.Count; lineIdx++) {
+				var runes = lines [lineIdx].ToRuneList ();
+				var maxRruneWidth = runes.Count > 0
+					? runes.Max (r => Math.Max (Rune.ColumnWidth (r), 1)) : 1;
+				if (runesLength + maxRruneWidth > width) {
+					break;
+				}
+				runesLength += maxRruneWidth;
+			}
+			return lineIdx;
+		}
+
+		/// <summary>
 		///  Calculates the rectangle required to hold text, assuming no word wrapping.
 		/// </summary>
 		/// <param name="x">The x location of the rectangle</param>
@@ -889,7 +935,7 @@ namespace Terminal.Gui {
 				w = mw;
 				h = ml;
 			} else {
-				int vw = 0;
+				int vw = 1, cw = 1;
 				int vh = 0;
 
 				int rows = 0;
@@ -900,14 +946,13 @@ namespace Terminal.Gui {
 							vh = rows;
 						}
 						rows = 0;
+						cw = 1;
 					} else if (rune != '\r') {
 						rows++;
 						var rw = Rune.ColumnWidth (rune);
-						if (rw < 0) {
-							rw++;
-						}
-						if (rw > vw) {
-							vw = rw;
+						if (cw < rw) {
+							cw = rw;
+							vw++;
 						}
 					}
 				}
@@ -1064,10 +1109,10 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			for (int line = 0; line < linesFormated.Count; line++) {
-				var isVertical = IsVerticalDirection (textDirection);
+			var isVertical = IsVerticalDirection (textDirection);
 
-				if ((isVertical && (line > bounds.Width)) || (!isVertical && (line > bounds.Height)))
+			for (int line = 0; line < linesFormated.Count; line++) {
+				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
 
 				var runes = lines [line].ToRunes ();

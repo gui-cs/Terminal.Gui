@@ -174,11 +174,11 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
+			UpdatePollMap ();
+
 			if (CheckTimers (wait, out var pollTimeout)) {
 				return true;
 			}
-
-			UpdatePollMap ();
 
 			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
 

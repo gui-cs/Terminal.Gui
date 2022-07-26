@@ -8,19 +8,20 @@
     <title>Table View </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Table View ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
     <meta property="docfx:rel" content="../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -109,7 +110,16 @@ using(var con = new SqlConnection(&quot;Server=myServerAddress;Database=myDataBa
 };
 
 tableView.Table = yourDataTable;
-</code></pre></article>
+</code></pre><h2 id="table-rendering">Table Rendering</h2>
+<p>TableView supports any size of table (limited only by the RAM requirements of <code>System.DataTable</code>). You can have
+thousands of columns and/or millions of rows if you want. Horizontal and vertical scrolling can be done using
+the mouse or keyboard.</p>
+<p>TableView uses <code>ColumnOffset</code> and <code>RowOffset</code> to determine the first visible cell of the <code>System.DataTable</code>.
+Rendering then continues until the avaialble console space is exhausted. Updating the <code>ColumnOffset</code> and 
+<code>RowOffset</code> changes which part of the table is rendered (scrolls the viewport).</p>
+<p>This approach ensures that no matter how big the table, only a small number of columns/rows need to be
+evaluated for rendering.</p>
+</article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">

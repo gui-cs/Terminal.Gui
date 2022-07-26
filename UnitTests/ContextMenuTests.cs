@@ -309,7 +309,7 @@ namespace Terminal.Gui.Core {
                                                                       │ One  │
                                                                       │ Two  │
                                                                       └──────┘
-                                                                      View
+                                                                      View    
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -340,7 +340,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (10, 5), cm.Position);
 
 			var expected = @"
-          View
+          View    
           ┌──────┐
           │ One  │
           │ Two  │
@@ -361,9 +361,9 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (5, 12), cm.Position);
 
 			expected = @"
-     View
-
-
+     View    
+             
+             
      ┌──────┐
      │ One  │
      │ Two  │
@@ -592,10 +592,10 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit
-
-
-  Label: TextField
+  File   Edit                         
+                                      
+                                      
+  Label: TextField                    
          ┌───────────────────────────┐
          │ Select All         Ctrl+T │
          │ Delete All   Ctrl+Shift+D │
@@ -605,10 +605,10 @@ namespace Terminal.Gui.Core {
          │ Undo               Ctrl+Z │
          │ Redo               Ctrl+Y │
          └───────────────────────────┘
-
-
-
- F1 Help │ ^Q Quit
+                                      
+                                      
+                                      
+ F1 Help │ ^Q Quit                    
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
@@ -657,7 +657,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit
+  File   Edit                               
 ┌ Window ──────────────────────────────────┐
 │                                          │
 │                                          │
@@ -673,7 +673,7 @@ namespace Terminal.Gui.Core {
 │         │ Redo               Ctrl+Y │    │
 │         └───────────────────────────┘    │
 └──────────────────────────────────────────┘
- F1 Help │ ^Q Quit
+ F1 Help │ ^Q Quit                          
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
