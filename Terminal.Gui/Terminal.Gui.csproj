@@ -62,8 +62,8 @@
     <!--<GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>-->
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/migueldeicaza/gui.cs.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

@@ -3,8 +3,8 @@
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 ![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
-[![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
-![Bugs](https://img.shields.io/github/issues/migueldeicaza/gui.cs/bug)
+[![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
+![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)
 
 # Terminal.Gui - Cross Platform Terminal UI toolkit for .NET
 

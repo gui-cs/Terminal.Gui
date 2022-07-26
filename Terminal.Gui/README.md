@@ -43,10 +43,6 @@ dotnet-gitversion /updateprojectfiles
 dotnet build -c Release
 ```
 
-You can see the version in the `UICatalog` about box.
-
-![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/aboutbox.png)
-
 ## Publishing a Release of Terminal.Gui
 
 To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the upstream repo.

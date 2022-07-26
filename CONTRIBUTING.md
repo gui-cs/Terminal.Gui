@@ -118,13 +118,13 @@ Follow the template instructions found on Github.
 
 ### Include API Documentation
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
 
 - All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
 - Keep the `<summary></summary>` terse.
 - Use `<see cref=""/>` liberally to cross-link topics.
 - Use `<remarks></remarks>` to add more context and explanation.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html).
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html).
 - Use proper English and good grammar.
 
 ### Defining Events
@@ -167,7 +167,7 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 ## Breaking Changes to User Behavior or the Public API
 
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
-- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html).
+- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html).
 
 ## Unit Tests
 
