@@ -29,11 +29,9 @@ Now, your local repo will have an `origin` remote pointing to `https://github.co
 ```
 git remote add upstream https://github.com/gui-cs/Terminal.Gui
 ```
-4. 
+You now have your own fork and a local repo that references it as `origin`. Your local repo also now references the orignal Terminal.Gui repo as `upstream`. 
 
-### Making Changes and Submitting Pull Requests
-
-#### When you start to make a change
+### Starting to Make a Change
 
 Ensure your local `develop` branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
 ```powershell
@@ -44,7 +42,7 @@ git pull upstream develop
 
 Create a new local branch:
 ```powershell
-git checkout -b "my_new_branch"
+git checkout -b my_new_branch
 ```
 
 #### Making Changes
@@ -65,13 +63,34 @@ git commit -m "Fixes #1234. Some bug"
 
 ### Submitting a Pull Request
 
-Push your local branch to your fork (`origin`):
+1. Push your local branch to your fork (`origin`):
 
 ```powershell
-git push
+git push --set-upstream origin my_new_branch
 ```
 
-## Coding Style
+2. Create the Pull Request:
+
+In the output of the `git push` command you'll see instructions with a link to the Pull Request:
+
+```powershell
+ $ git push --set-upstream origin my_new_branch
+Enumerating objects: 8, done.
+...
+remote:
+remote: Create a pull request for 'my_new_branch' on GitHub by visiting:
+remote:      https://github.com/<yourID>/Terminal.Gui/pull/new/more_doc_fixes
+remote:
+...
+```
+
+3. Go to that URL and create the Pull Request:
+
+(in Windows Terminal, just CTRL-Click on the URL)
+
+Follow the template instructions found on Github.
+
+## Terminal.Gui Coding Style
 
 **Terminal.Gui** follows the [Mono Coding Guidelines](https://www.mono-project.com/community/contributing/coding-guidelines/). [`/.editorconfig`](https://github.com/gui-cs/Terminal.Gui/blob/b0a43ba338adf5ec069066e5a7dff8fea39b41db/.editorconfig) enforces this style in Visual Studio. Use `Ctrl-K-D` in Visual Studio to have it reformat code.
 

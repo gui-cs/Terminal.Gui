@@ -119,7 +119,7 @@ git push upstream v2.3.4
 
 https://www.nuget.org/packages/Terminal.Gui
 
-10) Add a new Release in Github: https://github.com/migueldeicaza/gui.cs/releases
+10) Add a new Release in Github: https://github.com/gui-cs/Terminal.Gui/releases
 
 ## Nuget
 
@@ -133,4 +133,4 @@ Miguel can hide defunct/old nuget packages.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.Gui/blob/master/CONTRIBUTING.md).

@@ -127,4 +127,4 @@ For complete control, the `Init` and `Run` overrides can be implemented. The `ba
 - Use the `Bug Rero` Category for `Scnarios` that reproduce bugs. 
 	- Include the Github Issue # in the Description.
 	- Once the bug has been fixed in `master` submit another PR to remove the `Scenario` (or modify it to provide a good regression test).
-- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/migueldeicaza/gui.cs/issues) with "UICatalog: ".
+- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/gui-cs/Terminal.Gui/issues) with "UICatalog: ".
