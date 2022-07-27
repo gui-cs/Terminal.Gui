@@ -5,14 +5,23 @@ name: "Code scanning"
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [develop]
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
       - '**/*.html'
       - docs
       - docfx
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.html'
+      - docs
+      - docfx
+  # Scan every Monday
+  schedule:
+    - cron: '20 14 * * 1'      
 
 jobs:
   CodeQL-Build:
