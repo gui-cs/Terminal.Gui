@@ -281,9 +281,7 @@ namespace Terminal.Gui {
 			{
 				if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
 					d (state);
-				} 
-				else 
-				{
+				} else {
 					var wasExecuted = false;
 					mainLoop.Invoke (() => {
 						d (state);
@@ -319,7 +317,7 @@ namespace Terminal.Gui {
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
-		
+
 		/// <summary>
 		/// Initializes the Terminal.Gui application
 		/// </summary>

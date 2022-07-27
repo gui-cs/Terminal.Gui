@@ -1349,12 +1349,12 @@ namespace Terminal.Gui.Core {
 
 				// non blocking
 				context.Post (
-			       delegate (object o) {
-				       success = true;
+					delegate (object o) {
+						success = true;
 
-				       // then tell the application to quit
-				       Application.MainLoop.Invoke (() => Application.RequestStop ());
-			       }, null);
+						// then tell the application to quit
+						Application.MainLoop.Invoke (() => Application.RequestStop ());
+					}, null);
 				Assert.False (success);
 			});
 
@@ -1377,12 +1377,12 @@ namespace Terminal.Gui.Core {
 
 				// blocking
 				context.Send (
-			       delegate (object o) {
-				       success = true;
+					delegate (object o) {
+						success = true;
 
-				       // then tell the application to quit
-				       Application.MainLoop.Invoke (() => Application.RequestStop ());
-			       }, null);
+						// then tell the application to quit
+						Application.MainLoop.Invoke (() => Application.RequestStop ());
+					}, null);
 				Assert.True (success);
 			});
 
