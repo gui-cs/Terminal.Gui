@@ -22,6 +22,10 @@
     "WizardAsView": {
       "commandName": "Project",
       "commandLineArgs": "WizardAsView"
+    },
+    "Issue1719Repro": {
+      "commandName": "Project",
+      "commandLineArgs": "\"ProgressBar Styles\""
     }
   }
 }
