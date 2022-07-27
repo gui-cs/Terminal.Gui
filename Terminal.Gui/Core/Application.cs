@@ -1022,6 +1022,12 @@ namespace Terminal.Gui {
 			if (state.Toplevel != Top
 				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
+				foreach (var top in toplevels.Reverse ()) {
+					if (top != Top && top != state.Toplevel) {
+						top.SetNeedsDisplay ();
+						top.Redraw (top.Bounds);
+					}
+				}
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
