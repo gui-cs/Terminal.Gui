@@ -94,6 +94,7 @@
       * Fixes #1837. Setting Unix clipboard freezes.
       * Fixes #1839. Process WindowsDriver click event if location is the same after pressed and released.
       * Fixes #1830. If "libcoreclr.so" is not present then "libncursesw.so" will be used.
+      * Fixes #1816. MessageBox: Hides underlying dialog when visible
       * Fixes #1815. Now returns false if WSL clipboard isn't supported.
       * Fixes #1825. Parent MenuItem stay focused if child MenuItem is empty.
       * Fixes #1812, #1797, #1791. AutoSize fixes.
