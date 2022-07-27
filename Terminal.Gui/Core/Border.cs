@@ -311,7 +311,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event to be invoked when any border property change except <see cref="Child"/>.
+		/// Invoked when any property of Border changes (except <see cref="Child"/>).
 		/// </summary>
 		public event Action<Border> BorderChanged;
 
@@ -940,7 +940,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Drawn the view title from a <see cref="View"/>.
+		/// Draws the view <see cref="Title"/> to the screen.
 		/// </summary>
 		/// <param name="view">The view.</param>
 		public void DrawTitle (View view)
@@ -966,7 +966,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Drawn the view text from a <see cref="View"/>.
+		/// Draws the <see cref="View.Text"/> to the screen.
 		/// </summary>
 		/// <param name="view">The view.</param>
 		/// <param name="rect">The frame.</param>
