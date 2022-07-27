@@ -280,9 +280,7 @@ namespace Terminal.Gui {
 			public override void Send (SendOrPostCallback d, object state)
 			{
 				if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
-					mainLoop.Invoke (() => {
-						d (state);
-					});
+					d (state);
 				} 
 				else 
 				{
