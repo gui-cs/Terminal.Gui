@@ -1392,5 +1392,21 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void SynchronizationContext_CreateCopy ()
+		{
+			Init ();
+
+			var context = SynchronizationContext.Current;
+			Assert.NotNull (context);
+
+			var contextCopy = context.CreateCopy ();
+			Assert.NotNull (contextCopy);
+
+			Assert.NotEqual (context, contextCopy);
+
+			Application.Shutdown ();
+		}
 	}
 }
