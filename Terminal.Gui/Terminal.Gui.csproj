@@ -80,11 +80,13 @@
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
       Release v1.7.0
-      * First release after moving Terminal.Gui to the github.com/gui-cs organization.
-      * Adds multi-step Wizard View for setup experiences.
+      * Moved Terminal.Gui (and NStack) to the github.com/gui-cs organization.
+      * Adds multi-step Wizard View for setup experiences (#124)
+      * The synchronization context method Send is now blocking (#1854).
       * Fixes #1893: Fix URLs to match gui-cs Org
       * Fixes #1883. Child TopLevels now get Loaded/Ready events.
       * Fixes #1867, #1866, #1796. TextView enhancements for ReadOnly and WordWrap.
+      * Fixes #1861. Border: Title property is preferable to Text.
       * Fixes #1855. Window and Frame content view without the margin frame.
       * Fixes #1848. Mouse clicks in Windows Terminal.
       * Fixes #1846. TabView now clips to the draw bounds.
