@@ -84,6 +84,7 @@ namespace Terminal.Gui.Core {
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
+			Assert.NotNull (SynchronizationContext.Current);
 		}
 
 		void Shutdown ()
@@ -1334,6 +1335,62 @@ namespace Terminal.Gui.Core {
 				// that it should have run at least 2 seconds worth of delegates
 				Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 			}
+		}
+
+		[Fact]
+		public void SynchronizationContext_Post ()
+		{
+			Init ();
+			var context = SynchronizationContext.Current;
+
+			var success = false;
+			Task.Run (() => {
+				Thread.Sleep (1_000);
+
+				// non blocking
+				context.Post (
+			       delegate (object o) {
+				       success = true;
+
+				       // then tell the application to quit
+				       Application.MainLoop.Invoke (() => Application.RequestStop ());
+			       }, null);
+				Assert.False (success);
+			});
+
+			// blocks here until the RequestStop is processed at the end of the test
+			Application.Run ();
+			Assert.True (success);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void SynchronizationContext_Send ()
+		{
+			Init ();
+			var context = SynchronizationContext.Current;
+
+			var success = false;
+			Task.Run (() => {
+				Thread.Sleep (1_000);
+
+				// blocking
+				context.Send (
+			       delegate (object o) {
+				       success = true;
+
+				       // then tell the application to quit
+				       Application.MainLoop.Invoke (() => Application.RequestStop ());
+			       }, null);
+				Assert.True (success);
+			});
+
+			// blocks here until the RequestStop is processed at the end of the test
+			Application.Run ();
+			Assert.True (success);
+
+			Application.Shutdown ();
 		}
 	}
 }
