@@ -655,7 +655,7 @@ namespace Terminal.Gui {
 			ShowWindow (thisConsole, state);
 		}
 #endif
-		// See: https://github.com/migueldeicaza/gui.cs/issues/357
+		// See: https://github.com/gui-cs/Terminal.Gui/issues/357
 
 		[StructLayout (LayoutKind.Sequential)]
 		public struct CONSOLE_SCREEN_BUFFER_INFOEX {

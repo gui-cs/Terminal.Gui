@@ -146,6 +146,8 @@ namespace UICatalog.Scenarios {
 			};
 			showDialogButton.Clicked += () => {
 				try {
+					Dialog dialog = null;
+
 					int width = 0;
 					int.TryParse (widthEdit.Text.ToString (), out width);
 					int height = 0;
@@ -182,7 +184,7 @@ namespace UICatalog.Scenarios {
 
 					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 					// the buttons are laid out correctly
-					var dialog = new Dialog (titleEdit.Text, width, height,
+					dialog = new Dialog (titleEdit.Text, width, height,
 						buttons.ToArray ()) {
 						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
 					};
@@ -204,6 +206,7 @@ namespace UICatalog.Scenarios {
 						button.Clicked += () => {
 							clicked = buttonId;
 							Application.RequestStop ();
+
 						};
 						buttons.Add (button);
 						dialog.AddButton (button);
@@ -223,10 +226,12 @@ namespace UICatalog.Scenarios {
 						}
 						dialog.LayoutSubviews ();
 					};
+					dialog.Closed += (args) => {
+						buttonPressedLabel.Text = $"{clicked}";
+					};
 					dialog.Add (addChar);
 
 					Application.Run (dialog);
-					buttonPressedLabel.Text = $"{clicked}";
 
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";

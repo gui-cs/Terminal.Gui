@@ -182,7 +182,7 @@ namespace Terminal.Gui {
 					} else {
 						if (i == 0) {
 							// first (leftmost) button - always hard flush left
-							var left = Bounds.Width - 2;
+							var left = Bounds.Width - ((Border.DrawMarginFrame ? 2 : 0) + Border.BorderThickness.Left + Border.BorderThickness.Right);
 							button.X = Pos.AnchorEnd (left);
 						} else {
 							shiftLeft += button.Frame.Width + (spacing);

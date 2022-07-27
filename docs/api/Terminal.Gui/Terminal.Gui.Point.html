@@ -5,24 +5,25 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct Point
+    <title>Class Point
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct Point
+    <meta name="title" content="Class Point
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -81,29 +82,22 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Point">
   
   
-  <h1 id="Terminal_Gui_Point" data-uid="Terminal.Gui.Point" class="text-break">Struct Point
+  <h1 id="Terminal_Gui_Point" data-uid="Terminal.Gui.Point" class="text-break">Class Point
   </h1>
   <div class="markdown level0 summary">
 Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
 </div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Point</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Point_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct Point</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Point : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -139,10 +133,6 @@ Point Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point__ctor_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Point from a specified x,y coordinate pair.
-</div>
   <a id="Terminal_Gui_Point__ctor_" data-uid="Terminal.Gui.Point.#ctor*"></a>
   <h4 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.#ctor(Terminal.Gui.Size)">Point(Size)</h4>
   <div class="markdown level1 summary">
@@ -170,10 +160,6 @@ Point Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Point from a Size value.
-</div>
   <h3 id="fields">Fields
   </h3>
   <h4 id="Terminal_Gui_Point_Empty" data-uid="Terminal.Gui.Point.Empty">Empty</h4>
@@ -200,10 +186,6 @@ Empty Shared Field
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_Empty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-An uninitialized Point Structure.
-</div>
   <h4 id="Terminal_Gui_Point_X" data-uid="Terminal.Gui.Point.X">X</h4>
   <div class="markdown level1 summary">
 Gets or sets the x-coordinate of this Point.
@@ -262,7 +244,7 @@ IsEmpty Property
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly bool IsEmpty { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -279,10 +261,6 @@ IsEmpty Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_IsEmpty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Indicates if both X and Y are zero.
-</div>
   <h3 id="methods">Methods
   </h3>
   <a id="Terminal_Gui_Point_Add_" data-uid="Terminal.Gui.Point.Add*"></a>
@@ -374,12 +352,6 @@ Equals Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
-  <h5 id="Terminal_Gui_Point_Equals_System_Object__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks equivalence of this Point and another object.
-</div>
   <a id="Terminal_Gui_Point_GetHashCode_" data-uid="Terminal.Gui.Point.GetHashCode*"></a>
   <h4 id="Terminal_Gui_Point_GetHashCode" data-uid="Terminal.Gui.Point.GetHashCode">GetHashCode()</h4>
   <div class="markdown level1 summary">
@@ -405,12 +377,6 @@ GetHashCode Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
-  <h5 id="Terminal_Gui_Point_GetHashCode_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Calculates a hashing value.
-</div>
   <a id="Terminal_Gui_Point_Offset_" data-uid="Terminal.Gui.Point.Offset*"></a>
   <h4 id="Terminal_Gui_Point_Offset_System_Int32_System_Int32_" data-uid="Terminal.Gui.Point.Offset(System.Int32,System.Int32)">Offset(Int32, Int32)</h4>
   <div class="markdown level1 summary">
@@ -443,10 +409,6 @@ Offset Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_Offset_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Moves the Point a specified distance.
-</div>
   <a id="Terminal_Gui_Point_Offset_" data-uid="Terminal.Gui.Point.Offset*"></a>
   <h4 id="Terminal_Gui_Point_Offset_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.Offset(Terminal.Gui.Point)">Offset(Point)</h4>
   <div class="markdown level1 summary">
@@ -546,12 +508,6 @@ ToString Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
-  <h5 id="Terminal_Gui_Point_ToString_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Formats the Point as a string in coordinate notation.
-</div>
   <h3 id="operators">Operators
   </h3>
   <a id="Terminal_Gui_Point_op_Addition_" data-uid="Terminal.Gui.Point.op_Addition*"></a>
@@ -601,11 +557,6 @@ Addition Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Addition_Terminal_Gui_Point_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Translates a Point using the Width and Height
-properties of the given <typeref>Size</typeref>.
-</div>
   <a id="Terminal_Gui_Point_op_Equality_" data-uid="Terminal.Gui.Point.op_Equality*"></a>
   <h4 id="Terminal_Gui_Point_op_Equality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)">Equality(Point, Point)</h4>
   <div class="markdown level1 summary">
@@ -653,12 +604,6 @@ Equality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Equality_Terminal_Gui_Point_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Point objects. The return value is
-based on the equivalence of the X and Y properties 
-of the two points.
-</div>
   <a id="Terminal_Gui_Point_op_Explicit_" data-uid="Terminal.Gui.Point.op_Explicit*"></a>
   <h4 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point__Terminal_Gui_Size" data-uid="Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size">Explicit(Point to Size)</h4>
   <div class="markdown level1 summary">
@@ -701,11 +646,6 @@ Point to Size Conversion
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point__Terminal_Gui_Size_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Returns a Size based on the Coordinates of a given 
-Point. Requires explicit cast.
-</div>
   <a id="Terminal_Gui_Point_op_Inequality_" data-uid="Terminal.Gui.Point.op_Inequality*"></a>
   <h4 id="Terminal_Gui_Point_op_Inequality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)">Inequality(Point, Point)</h4>
   <div class="markdown level1 summary">
@@ -753,12 +693,6 @@ Inequality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Inequality_Terminal_Gui_Point_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Point objects. The return value is
-based on the equivalence of the X and Y properties 
-of the two points.
-</div>
   <a id="Terminal_Gui_Point_op_Subtraction_" data-uid="Terminal.Gui.Point.op_Subtraction*"></a>
   <h4 id="Terminal_Gui_Point_op_Subtraction_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)">Subtraction(Point, Size)</h4>
   <div class="markdown level1 summary">
@@ -806,11 +740,6 @@ Subtraction Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Subtraction_Terminal_Gui_Point_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Translates a Point using the negation of the Width 
-and Height properties of the given Size.
-</div>
 </article>
           </div>
           

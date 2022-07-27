@@ -18,6 +18,10 @@
     "Buttons": {
       "commandName": "Project",
       "commandLineArgs": "Buttons"
+    },
+    "WizardAsView": {
+      "commandName": "Project",
+      "commandLineArgs": "WizardAsView"
     }
   }
 }

@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Application
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -92,36 +93,6 @@ A static, singleton class providing the main application driver for Terminal.Gui
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Application</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
-  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_Application_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class Application</code></pre>
-  </div>
   <h5 id="Terminal_Gui_Application_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 <p>
@@ -151,6 +122,12 @@ var win = new Window (&quot;Hello World - CTRL-Q to quit&quot;) {
 Application.Top.Add(win);
 Application.Run();</code></pre>
 
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Application_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class Application : Object</code></pre>
+  </div>
   <h3 id="fields">Fields
   </h3>
   <h4 id="Terminal_Gui_Application_Driver" data-uid="Terminal.Gui.Application.Driver">Driver</h4>
@@ -201,10 +178,6 @@ This event is raised on each iteration of the <a class="xref" href="Terminal.Gui
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Iteration_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-See also <span class="xref">System.Threading.Timeout</span>
-</div>
   <h4 id="Terminal_Gui_Application_Resized" data-uid="Terminal.Gui.Application.Resized">Resized</h4>
   <div class="markdown level1 summary">
 Invoked when the terminal was resized. The new size of the terminal is provided.
@@ -379,6 +352,32 @@ The current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> objec
       <tr>
         <td><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td>The current.</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Terminal_Gui_Application_ExitRunLoopAfterFirstIteration_" data-uid="Terminal.Gui.Application.ExitRunLoopAfterFirstIteration*"></a>
+  <h4 id="Terminal_Gui_Application_ExitRunLoopAfterFirstIteration" data-uid="Terminal.Gui.Application.ExitRunLoopAfterFirstIteration">ExitRunLoopAfterFirstIteration</h4>
+  <div class="markdown level1 summary">
+Set to true to cause the RunLoop method to exit after the first iterations.
+Set to false (the default) to cause the RunLoop to continue running until Application.RequestStop() is called.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool ExitRunLoopAfterFirstIteration { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -582,6 +581,31 @@ The <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> object used f
       </tr>
     </tbody>
   </table>
+  <a id="Terminal_Gui_Application_WantContinuousButtonPressedView_" data-uid="Terminal.Gui.Application.WantContinuousButtonPressedView*"></a>
+  <h4 id="Terminal_Gui_Application_WantContinuousButtonPressedView" data-uid="Terminal.Gui.Application.WantContinuousButtonPressedView">WantContinuousButtonPressedView</h4>
+  <div class="markdown level1 summary">
+The current <a class="xref" href="Terminal.Gui.View.html">View</a> object that wants continuous mouse button pressed events.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static View WantContinuousButtonPressedView { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   <a id="Terminal_Gui_Application_Begin_" data-uid="Terminal.Gui.Application.Begin*"></a>
@@ -626,15 +650,6 @@ Building block API: Prepares the provided <a class="xref" href="Terminal.Gui.Top
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This method prepares the provided toplevel for running with the focus,
-it adds this to the list of toplevels, sets up the mainloop to process the
-event, lays out the subviews, focuses the first element, and draws the
-toplevel in the screen. This is usually followed by executing
-the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> method, and then the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a> method upon termination which will
-undo these changes.
-</div>
   <a id="Terminal_Gui_Application_DoEvents_" data-uid="Terminal.Gui.Application.DoEvents*"></a>
   <h4 id="Terminal_Gui_Application_DoEvents" data-uid="Terminal.Gui.Application.DoEvents">DoEvents()</h4>
   <div class="markdown level1 summary">
@@ -741,18 +756,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.html">Terminal.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-Call this method once per instance (or after <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown">Shutdown()</a> has been called).
-</p>
-<p>
-Loads the right <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a> for the platform.
-</p>
-<p>
-Creates a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and assigns it to <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
-</p>
-</div>
   <a id="Terminal_Gui_Application_MakeCenteredRect_" data-uid="Terminal.Gui.Application.MakeCenteredRect*"></a>
   <h4 id="Terminal_Gui_Application_MakeCenteredRect_Terminal_Gui_Size_" data-uid="Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)">MakeCenteredRect(Size)</h4>
   <div class="markdown level1 summary">
@@ -852,15 +855,6 @@ Stops running the most recent <a class="xref" href="Terminal.Gui.Toplevel.html">
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a> to return.
-</p>
-<p>
-  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a> is equivalent to setting the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property on the currently running <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> to false.
-</p>
-</div>
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
   <h4 id="Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__" data-uid="Terminal.Gui.Application.Run(System.Func{System.Exception,System.Boolean})">Run(Func&lt;Exception, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -920,31 +914,6 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean___remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  This method is used to start processing events
-  for the main application, but it is also used to
-  run other modal <a class="xref" href="Terminal.Gui.View.html">View</a>s such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> boxes.
-</p>
-<p>
-  To make a <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> stop execution, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a>.
-</p>
-<p>
-  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> is equivalent to calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a>, followed by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>,
-  and then calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
-</p>
-<p>
-  Alternatively, to have a program control the main loop and 
-  process events manually, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> to set things up manually and then
-  repeatedly call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> with the wait parameter set to false.   By doing this
-  the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> method will only process any pending events, timers, idle handlers and
-  then return control immediately.
-</p>
-<p>
-  When <code data-dev-comment-type="paramref" class="paramref">errorHandler</code> is null the exception is rethrown, when it returns true the application is resumed and when false method exits gracefully.
-</p>
-</div>
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
   <h4 id="Terminal_Gui_Application_Run__1_System_Func_System_Exception_System_Boolean__" data-uid="Terminal.Gui.Application.Run``1(System.Func{System.Exception,System.Boolean})">Run&lt;T&gt;(Func&lt;Exception, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -954,7 +923,6 @@ Runs the application by calling <a class="xref" href="Terminal.Gui.Application.h
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;(Func&lt;Exception, bool&gt; errorHandler = null)
-
     where T : Toplevel, new()</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
@@ -1021,11 +989,43 @@ Building block API: Runs the main loop for the created dialog
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Use the wait parameter to control whether this is a
-blocking or non-blocking call.
+  <a id="Terminal_Gui_Application_RunMainLoopIteration_" data-uid="Terminal.Gui.Application.RunMainLoopIteration*"></a>
+  <h4 id="Terminal_Gui_Application_RunMainLoopIteration_Terminal_Gui_Application_RunState__System_Boolean_System_Boolean__" data-uid="Terminal.Gui.Application.RunMainLoopIteration(Terminal.Gui.Application.RunState@,System.Boolean,System.Boolean@)">RunMainLoopIteration(ref Application.RunState, Boolean, ref Boolean)</h4>
+  <div class="markdown level1 summary">
+Run one iteration of the MainLoop.
 </div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RunMainLoopIteration(ref Application.RunState state, bool wait, ref bool firstIteration)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a></td>
+        <td><span class="parametername">state</span></td>
+        <td>The state returned by the Begin method.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">wait</span></td>
+        <td>If will execute the runloop waiting for events.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">firstIteration</span></td>
+        <td>If it&apos;s the first run loop iteration.</td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Terminal_Gui_Application_Shutdown_" data-uid="Terminal.Gui.Application.Shutdown*"></a>
   <h4 id="Terminal_Gui_Application_Shutdown" data-uid="Terminal.Gui.Application.Shutdown">Shutdown()</h4>
   <div class="markdown level1 summary">
@@ -1046,6 +1046,58 @@ Releases the mouse grab, so mouse events will be routed to the view on which the
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static void UngrabMouse()</code></pre>
   </div>
+  <h3 id="events">Events
+  </h3>
+  <h4 id="Terminal_Gui_Application_NotifyNewRunState" data-uid="Terminal.Gui.Application.NotifyNewRunState">NotifyNewRunState</h4>
+  <div class="markdown level1 summary">
+Notify that a new <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> token was created,
+used if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration">ExitRunLoopAfterFirstIteration</a> is true.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static event Action&lt;Application.RunState&gt; NotifyNewRunState</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="Terminal_Gui_Application_NotifyStopRunState" data-uid="Terminal.Gui.Application.NotifyStopRunState">NotifyStopRunState</h4>
+  <div class="markdown level1 summary">
+Notify that a existent <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> token is stopping,
+used if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration">ExitRunLoopAfterFirstIteration</a> is true.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static event Action&lt;Toplevel&gt; NotifyStopRunState</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           

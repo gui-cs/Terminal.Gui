@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuItem
    ">
-    <meta name="generator" content="docfx 2.59.0.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -93,35 +94,11 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
     <div class="level1"><span class="xref">MenuItem</span></div>
       <div class="level2"><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_MenuItem_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MenuItem</code></pre>
+    <pre><code class="lang-csharp hljs">public class MenuItem : Object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -133,7 +110,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null, Key shortcut = Key.Null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null, Key shortcut)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -185,7 +162,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(Key shortcut = Key.Null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(Key shortcut)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -359,8 +336,6 @@ Gets or sets arbitrary data for the menu item.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_MenuItem_Data_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">This property is not used internally.</div>
   <a id="Terminal_Gui_MenuItem_Help_" data-uid="Terminal.Gui.MenuItem.Help*"></a>
   <h4 id="Terminal_Gui_MenuItem_Help" data-uid="Terminal.Gui.MenuItem.Help">Help</h4>
   <div class="markdown level1 summary">
