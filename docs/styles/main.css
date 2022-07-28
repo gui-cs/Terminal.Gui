@@ -29,7 +29,7 @@ code,kbd,pre,samp{
 
 button,
 a {
-  color: var(--highlight-dark);
+  color: var(--highlight-light);
   cursor: pointer;
 }
 
