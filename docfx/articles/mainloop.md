@@ -1,5 +1,6 @@
-Event Processing and the Application Main Loop
-==============================================
+# Event Processing and the Application Main Loop
+
+_See also [Cross-platform Driver Model](drivers.md)_
 
 The method `Application.Run` that we covered before will wait for
 events from either the keyboard or mouse and route those events to the
@@ -40,7 +41,6 @@ can configure the MainLoop in response to events during the execution.
 The keyboard inputs is dispatched by the application class to the
 current TopLevel window this is covered in more detail in the
 [Keyboard Event Processing](keyboard.md) document.
-
 
 Async Execution
 ---------------

@@ -102,8 +102,7 @@ class Demo {
 }
 ```
 
-Views
-=====
+## Views
 
 All visible elements on a Terminal.Gui application are implemented as
 [Views](~/api/Terminal.Gui/Terminal.Gui.View.yml). Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.
@@ -138,8 +137,7 @@ void SetupMyView (View myView)
 The container of a given view is called the `SuperView` and it is a property of every
 View.
 
-Layout
-------
+## Layout
 
 `Terminal.Gui` supports two different layout systems, absolute and computed \
 (controlled by the [`LayoutStyle`](~/api/Terminal.Gui/Terminal.Gui.LayoutStyle.yml)
@@ -220,7 +218,7 @@ view.Height = Dim.Percent(20) - 1;
 anotherView.Height = Dim.Height (view)+1
 ```
 
-# TopLevels, Windows and Dialogs.
+## TopLevels, Windows and Dialogs.
 
 Among the many kinds of views, you typically will create a [Toplevel](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) view (or any of its subclasses,
 like [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) or [Dialog](~/api/Terminal.Gui/Terminal.Gui.Dialog.yml) which is special kind of views
@@ -229,7 +227,7 @@ only when the user chooses to complete their work there.
 
 The following sections cover the differences.
 
-## TopLevel Views
+### TopLevel Views
 
 [Toplevel](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) views have no visible user interface elements and occupy an arbitrary portion of the screen.
 
@@ -281,15 +279,13 @@ class Demo {
 }
 ```
 
-Window Views
-------------
+### Window Views
 
 [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)
 
 From a user interface perspective, you might have more than one Window on the screen at a given time.
 
-Dialogs
--------
+### Dialogs
 
 [Dialog](~/api/Terminal.Gui/Terminal.Gui.Dialog.yml) are [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) objects that happen to be centered in the middle of the screen.
 
@@ -318,8 +314,7 @@ Which will show something like this:
 +------------------------------------------------------+
 ```
 
-Running Modally
----------------
+### Running Modally
 
 To run your Dialog, Window or Toplevel modally, you will invoke the `Application.Run`
 method on the toplevel. It is up to your code and event handlers to invoke the `Application.RequestStop()` method to terminate the modal execution.
@@ -350,8 +345,7 @@ There is no return value from running modally, so your code will need to have a 
 of indicating the reason that the execution of the modal dialog was completed, in the 
 case above, the `okpressed` value is set to true if the user pressed or selected the Ok button.
 
-Input Handling
-==============
+## Input Handling
 
 Every view has a focused view, and if that view has nested views, one of those is 
 the focused view. This is called the focus chain, and at any given time, only one
@@ -385,8 +379,7 @@ to background views when a modal view is running.
 
 More details are available on the [`Keyboard Event Processing`](keyboard.md) document.
 
-Colors and Color Schemes
-========================
+## Colors and Color Schemes
 
 All views have been configured with a color scheme that will work both in color
 terminals as well as the more limited black and white terminals. 
@@ -423,7 +416,10 @@ var label = new Label (...);
 label.TextColor = myColor
 ```
 
-MainLoop, Threads and Input Handling
-====================================
+## MainLoop, Threads and Input Handling
 
 Detailed description of the mainloop is described on the [Event Processing and the Application Main Loop](~/articles/mainloop.md) document.
+
+## Cross-Platform Drivers
+
+See [Cross-platform Driver Model](drivers.md).
