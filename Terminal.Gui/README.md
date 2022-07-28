@@ -108,7 +108,9 @@ git checkout main
 git merge develop
 ```
 
-### 7) Create a new tag for the release
+Fix any merge errors.
+
+### 7) Create a new annotated tag for the release
 
 ```powershell
 git tag v2.3.4 -a -m "Release v2.3.4"
@@ -117,8 +119,10 @@ git tag v2.3.4 -a -m "Release v2.3.4"
 ### 8) Push the new tag to `main` on `origin`
 
 ```powershell
-git push origin v2.3.4
+git push --atomic origin main v2.3.4
 ```       
+
+*See https://stackoverflow.com/a/3745250/297526*
 
 ### 9) Monitor Github actions to ensure the Nuget publishing worked.
 
