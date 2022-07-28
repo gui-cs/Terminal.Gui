@@ -1,6 +1,18 @@
 Keyboard Event Processing
 =========================
 
+**Terminal.Gui** respects common Linux, Mac, and Windows keyboard idioms. For example, clipboard operations use the familiar `Control/Command-C, X, V` model. `CTRL-Q` is used for exiting views (and apps).
+
+The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
+
+The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key. So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
+
+To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or you can press `ESC` twice.
+
+`ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to `F10`, and `F1` to `F9` respectively.
+
+Apps can change key bindings using the `AddKeyBinding` API. 
+
 Keyboard events are sent by the [Main Loop](mainloop.md) to the
 Application class for processing. The keyboard events are sent
 exclusively to the current `Toplevel`, this being either the default
