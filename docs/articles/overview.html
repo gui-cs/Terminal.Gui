@@ -157,7 +157,7 @@ class Demo {
         Application.Shutdown ();
     }
 }
-</code></pre><h1 id="views">Views</h1>
+</code></pre><h2 id="views">Views</h2>
 <p>All visible elements on a Terminal.Gui application are implemented as
 <a href="../api/Terminal.Gui/Terminal.Gui.View.html">Views</a>. Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.</p>
 <p>See the full list of <a href="views.html">Views provided by the Terminal.Gui library here</a>.</p>
@@ -246,13 +246,13 @@ view.Width = Dim.Fill () - 10;
 view.Height = Dim.Percent(20) - 1;
 
 anotherView.Height = Dim.Height (view)+1
-</code></pre><h1 id="toplevels-windows-and-dialogs">TopLevels, Windows and Dialogs.</h1>
+</code></pre><h2 id="toplevels-windows-and-dialogs">TopLevels, Windows and Dialogs.</h2>
 <p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> view (or any of its subclasses,
 like <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> which is special kind of views
 that can be executed modally - that is, the view can take over all input and returns
 only when the user chooses to complete their work there. </p>
 <p>The following sections cover the differences.</p>
-<h2 id="toplevel-views">TopLevel Views</h2>
+<h3 id="toplevel-views">TopLevel Views</h3>
 <p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
 <p>You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example. You 
 typically would add a Menu and a Window to your Toplevel, it would look like this:</p>
@@ -298,10 +298,10 @@ class Demo {
         Application.Shutdown ();
     }
 }
-</code></pre><h2 id="window-views">Window Views</h2>
+</code></pre><h3 id="window-views">Window Views</h3>
 <p><a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)</p>
 <p>From a user interface perspective, you might have more than one Window on the screen at a given time.</p>
-<h2 id="dialogs">Dialogs</h2>
+<h3 id="dialogs">Dialogs</h3>
 <p><a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> are <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> objects that happen to be centered in the middle of the screen.</p>
 <p>Dialogs are instances of a Window that are centered in the screen, and are intended
 to be used modally - that is, they run, and they are expected to return a result 
@@ -320,7 +320,7 @@ var dialog = new Dialog (&quot;Quit&quot;, 60, 7, ok, cancel);
 |                                                      |
 |                  [ Ok ] [ Cancel ]                   |
 +------------------------------------------------------+
-</code></pre><h2 id="running-modally">Running Modally</h2>
+</code></pre><h3 id="running-modally">Running Modally</h3>
 <p>To run your Dialog, Window or Toplevel modally, you will invoke the <code>Application.Run</code>
 method on the toplevel. It is up to your code and event handlers to invoke the <code>Application.RequestStop()</code> method to terminate the modal execution.</p>
 <pre><code class="lang-csharp">bool okpressed = false;
@@ -345,7 +345,7 @@ if (okpressed)
 </code></pre><p>There is no return value from running modally, so your code will need to have a mechanism
 of indicating the reason that the execution of the modal dialog was completed, in the 
 case above, the <code>okpressed</code> value is set to true if the user pressed or selected the Ok button.</p>
-<h1 id="input-handling">Input Handling</h1>
+<h2 id="input-handling">Input Handling</h2>
 <p>Every view has a focused view, and if that view has nested views, one of those is 
 the focused view. This is called the focus chain, and at any given time, only one
 View has the focus. </p>
@@ -374,7 +374,7 @@ currently focused view.</p>
 view on the screen. The only exception is that no mouse events are delivered
 to background views when a modal view is running. </p>
 <p>More details are available on the <a href="keyboard.html"><code>Keyboard Event Processing</code></a> document.</p>
-<h1 id="colors-and-color-schemes">Colors and Color Schemes</h1>
+<h2 id="colors-and-color-schemes">Colors and Color Schemes</h2>
 <p>All views have been configured with a color scheme that will work both in color
 terminals as well as the more limited black and white terminals. </p>
 <p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html"><code>Colors</code></a> class which defined color schemes for
@@ -399,13 +399,22 @@ attribute for a particular pair of Foreground/Background like this:</p>
 <pre><code>var myColor = Application.Driver.MakeAttribute (Color.Blue, Color.Red);
 var label = new Label (...);
 label.TextColor = myColor
-</code></pre><h1 id="mainloop-threads-and-input-handling">MainLoop, Threads and Input Handling</h1>
+</code></pre><h2 id="mainloop-threads-and-input-handling">MainLoop, Threads and Input Handling</h2>
 <p>Detailed description of the mainloop is described on the <a href="mainloop.html">Event Processing and the Application Main Loop</a> document.</p>
+<h2 id="cross-platform-drivers">Cross-Platform Drivers</h2>
+<p>See <a href="drivers.html">Cross-platform Driver Model</a>.</p>
 </article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/develop/docfx/articles/overview.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

@@ -4,6 +4,8 @@ dotnet build --configuration Release ../Terminal.sln
 
 rm ../docs -Recurse -Force
 
-#docfx --metadata
+$env:DOCFX_SOURCE_BRANCH_NAME="main"
+
+docfx --metadata
 
 docfx --serve --force
