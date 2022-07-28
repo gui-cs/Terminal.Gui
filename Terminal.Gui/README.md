@@ -95,10 +95,10 @@ git push
 
 ### 4) On github.com, verify the build action worked on your fork, then merge the PR
 
-### 5) Pull the merged `develop` from `origin`
+### 5) Pull the merged `develop` from `upstream`
 
 ```powershell
-git pull origin `develop`
+git pull upstream `develop`
 ```
 
 ### 6) Merge `develop` into `main`
