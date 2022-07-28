@@ -901,7 +901,7 @@ namespace Terminal.Gui {
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
 			// gui.cs does no longer process any callbacks. See #1084 for more details:
-			// (https://github.com/migueldeicaza/gui.cs/issues/1084).
+			// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
 			SynchronizationContext.SetSynchronizationContext (syncContext: null);
 		}
 
@@ -1022,6 +1022,12 @@ namespace Terminal.Gui {
 			if (state.Toplevel != Top
 				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
+				foreach (var top in toplevels.Reverse ()) {
+					if (top != Top && top != state.Toplevel) {
+						top.SetNeedsDisplay ();
+						top.Redraw (top.Bounds);
+					}
+				}
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
