@@ -43,28 +43,17 @@ dotnet-gitversion /updateprojectfiles
 dotnet build -c Release
 ```
 
+**DO NOT COMMIT AFTER USING `/updateprojectfiles`!**
+
+Doing so will update the `.csproj` files in your branch with version info, which we do not want.
+
 ## Publishing a Release of Terminal.Gui
 
-To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui`.
+To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
 
-The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v1.2.3`.
-
-```powershell
-git checkout main
-git tag vmajor.minor.patch -a -m "Release vmajor.minor.patch"
-git push origin vmajor.minor.patch
-```      
+The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v2.3.4`.
 
 `patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...). 
-
-For example, to launch v1.3.4-beta.5 as a Pre-Release nuget package, do the following:
-       
-```powershell
-git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
-git push upstream v1.3.4-beta.5
-```
-
-## To launch version v2.3.4 as a new Nuget package do this
 
 ### 1) Generate release notes with the list of PRs since the last release 
 
@@ -119,7 +108,7 @@ git tag v2.3.4 -a -m "Release v2.3.4"
 ### 8) Push the new tag to `main` on `origin`
 
 ```powershell
-git push --atomic origin main v2.3.4
+git push --atomic upstream main v2.3.4
 ```       
 
 *See https://stackoverflow.com/a/3745250/297526*
