@@ -73,6 +73,12 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="keyboard-event-processing">Keyboard Event Processing</h1>
 
+<p><strong>Terminal.Gui</strong> respects common Linux, Mac, and Windows keyboard idioms. For example, clipboard operations use the familiar <code>Control/Command-C, X, V</code> model. <code>CTRL-Q</code> is used for exiting views (and apps).</p>
+<p>The input handling of <strong>Terminal.Gui</strong> is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.</p>
+<p>The key <code>ESC</code> can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key. So to produce the sequence <code>Alt-F</code>, you can press either <code>Alt-F</code>, or <code>ESC</code> followed by the key <code>F</code>.</p>
+<p>To enter the key <code>ESC</code>, you can either press <code>ESC</code> and wait 100 milliseconds, or you can press <code>ESC</code> twice.</p>
+<p><code>ESC-0</code>, and <code>ESC-1</code> through <code>ESC-9</code> have a special meaning, they map to <code>F10</code>, and <code>F1</code> to <code>F9</code> respectively.</p>
+<p>Apps can change key bindings using the <code>AddKeyBinding</code> API. </p>
 <p>Keyboard events are sent by the <a href="mainloop.html">Main Loop</a> to the
 Application class for processing. The keyboard events are sent
 exclusively to the current <code>Toplevel</code>, this being either the default
