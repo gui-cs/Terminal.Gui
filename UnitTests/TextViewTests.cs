@@ -1850,22 +1850,28 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void LoadFile_Throws_If_File_Is_Null ()
 		{
+			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentNullException> (() => tv.LoadFile (null));
+			Assert.Throws<ArgumentNullException> (() => result = tv.LoadFile (null));
+			Assert.False (result);
 		}
 
 		[Fact]
 		public void LoadFile_Throws_If_File_Is_Empty ()
 		{
+			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentException> (() => tv.LoadFile (""));
+			Assert.Throws<ArgumentException> (() => result = tv.LoadFile (""));
+			Assert.False (result);
 		}
 
 		[Fact]
 		public void LoadFile_Throws_If_File_Not_Exist ()
 		{
+			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<System.IO.FileNotFoundException> (() => tv.LoadFile ("blabla"));
+			Assert.Throws<System.IO.FileNotFoundException> (() => result = tv.LoadFile ("blabla"));
+			Assert.False (result);
 		}
 
 		[Fact]
@@ -1962,17 +1968,116 @@ namespace Terminal.Gui.Views {
 			tv.Redraw (tv.Bounds);
 
 			string expected = @"
-This is 
-the 
-first 
-line.
-This is 
-the 
-second 
+This is
+the first
+ line.
+This is
+the
+second
 line.
 ";
 
 			GraphViewTests.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void WordWrap_Deleting_Backwards ()
+		{
+			var tv = new TextView () {
+				Width = 5,
+				Height = 2,
+				WordWrap = true,
+				Text = "aaaa"
+			};
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (new Point (0, 0), tv.CursorPosition);
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+aaaa
+", output);
+
+			tv.CursorPosition = new Point (5, 0);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+aaa
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+aa
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+a
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			Assert.Equal (0, tv.LeftColumn);
+			GraphViewTests.AssertDriverContentsAre (@"
+
+", output);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void WordWrap_ReadOnly_CursorPosition_SelectedText_Copy ()
+		{
+			//          0123456789
+			var text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () { Width = 11, Height = 9 };
+			tv.Text = text;
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+			tv.WordWrap = true;
+
+			Application.Top.Add (tv);
+
+			tv.Redraw (tv.Bounds);
+			GraphViewTests.AssertDriverContentsAre (@"
+This is
+the first
+line.
+This is
+the second
+ line.
+", output);
+
+			tv.ReadOnly = true;
+			tv.CursorPosition = new Point (6, 2);
+			Assert.Equal (new Point (5, 2), tv.CursorPosition);
+			tv.Redraw (tv.Bounds);
+			GraphViewTests.AssertDriverContentsAre (@"
+This is
+the first
+line.
+This is
+the second
+line.
+", output);
+
+			tv.SelectionStartRow = 0;
+			tv.SelectionStartColumn = 0;
+			Assert.Equal ("This is the first line.", tv.SelectedText);
+
+			tv.Copy ();
+			Assert.Equal ("This is the first line.", Clipboard.Contents);
 		}
 
 		[Fact]
