@@ -1,10 +1,27 @@
+# For more info see https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#scanning-on-push
+
 name: "Code scanning"
 
 on:
   push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.html'
+      - docs
+      - docfx
   pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.html'
+      - docs
+      - docfx
+  # Scan every Monday
   schedule:
-    - cron: '0 4 * * 0'
+    - cron: '20 14 * * 1'      
 
 jobs:
   CodeQL-Build:
