@@ -1967,17 +1967,16 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			string expected = @"
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
 This is
-the first
- line.
+the    
+first  
+line.  
 This is
-the
-second
-line.
-";
-
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+the    
+second 
+line.  
+", output);
 		}
 
 		[Fact]
@@ -2050,26 +2049,28 @@ a
 			Application.Top.Add (tv);
 
 			tv.Redraw (tv.Bounds);
-			GraphViewTests.AssertDriverContentsAre (@"
-This is
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is  
 the first
-line.
-This is
-the second
- line.
+line.    
+This is  
+the      
+second   
+line.    
 ", output);
 
 			tv.ReadOnly = true;
 			tv.CursorPosition = new Point (6, 2);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			tv.Redraw (tv.Bounds);
-			GraphViewTests.AssertDriverContentsAre (@"
-This is
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is  
 the first
-line.
-This is
-the second
-line.
+line.    
+This is  
+the      
+second   
+line.    
 ", output);
 
 			tv.SelectionStartRow = 0;

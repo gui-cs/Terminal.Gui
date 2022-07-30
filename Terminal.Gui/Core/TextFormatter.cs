@@ -515,6 +515,7 @@ namespace Terminal.Gui {
 
 			int GetNextWhiteSpace (int from, int cWidth, out bool incomplete, int cLength = 0)
 			{
+				var lastFrom = from;
 				var to = from;
 				var length = cLength;
 				incomplete = false;
@@ -552,8 +553,10 @@ namespace Terminal.Gui {
 					}
 					to++;
 				}
-				if (cLength > 0 && to < runes.Count && runes [to] != ' ') {
+				if (cLength > 0 && to < runes.Count && runes [to] != ' ' && runes [to] != '\t') {
 					return from;
+				} else if (cLength > 0 && to < runes.Count && (runes [to] == ' ' || runes [to] == '\t')) {
+					return lastFrom;
 				} else {
 					return to;
 				}

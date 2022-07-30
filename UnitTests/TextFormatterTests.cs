@@ -2006,9 +2006,32 @@ namespace Terminal.Gui.Core {
 			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has", wrappedLines [0].ToString ());
-			Assert.Equal (" words.", wrappedLines [1].ToString ());
+			Assert.Equal ("A sentence ", wrappedLines [0].ToString ());
+			Assert.Equal ("has words.", wrappedLines [1].ToString ());
 			Assert.True (wrappedLines.Count == 2);
+
+			maxWidth = 8;
+			expectedClippedWidth = 8;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("sentence", wrappedLines [1].ToString ());
+			Assert.Equal (" has ", wrappedLines [2].ToString ());
+			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 4);
+
+			maxWidth = 6;
+			expectedClippedWidth = 6;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("senten", wrappedLines [1].ToString ());
+			Assert.Equal ("ce ", wrappedLines [2].ToString ());
+			Assert.Equal ("has ", wrappedLines [3].ToString ());
+			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 5);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
@@ -2311,6 +2334,18 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("\t\t has ", wrappedLines [1].ToString ());
 			Assert.Equal ("words.", wrappedLines [2].ToString ());
 			Assert.True (wrappedLines.Count == 3);
+
+			maxWidth = 8;
+			expectedClippedWidth = 8;
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth, true, tabWidth);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A ", wrappedLines [0].ToString ());
+			Assert.Equal ("sentence", wrappedLines [1].ToString ());
+			Assert.Equal ("\t\t", wrappedLines [2].ToString ());
+			Assert.Equal ("\t ", wrappedLines [3].ToString ());
+			Assert.Equal ("has ", wrappedLines [4].ToString ());
+			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (wrappedLines.Count == 6);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
@@ -2873,8 +2908,8 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (" A ", list2 [0].ToString ());
 			Assert.Equal ("sent", list2 [1].ToString ());
 			Assert.Equal ("ence", list2 [2].ToString ());
-			Assert.Equal (" has", list2 [3].ToString ());
-			Assert.Equal (" ", list2 [4].ToString ());
+			Assert.Equal (" ", list2 [3].ToString ());
+			Assert.Equal ("has ", list2 [4].ToString ());
 			Assert.Equal ("word", list2 [5].ToString ());
 			Assert.Equal ("s. ", list2 [6].ToString ());
 			Assert.Equal (" ", list2 [7].ToString ());
