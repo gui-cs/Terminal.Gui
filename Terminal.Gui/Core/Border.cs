@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Initializes with default null values.
 			/// </summary>
-			public ToplevelContainer () : this (null, null) { }
+			public ToplevelContainer () : this (null, string.Empty) { }
 
 			/// <summary>
 			/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Computed"/>
