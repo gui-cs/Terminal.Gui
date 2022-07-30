@@ -1954,7 +1954,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[InitShutdown]
-		public void WordWrap_WrapModel_Output_RENDERING ()
+		public void WordWrap_WrapModel_Output ()
 		{
 			//          0123456789
 			var text = "This is the first line.\nThis is the second line.\n";
