@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 			/// <param name="title">The title.</param>
 			public ToplevelContainer (Border border, string title = null)
 			{
-				Initialize (Rect.Empty, border, title);
+				Initialize (Rect.Empty, border, title ?? string.Empty);
 			}
 
 			/// <summary>
@@ -159,17 +159,17 @@ namespace Terminal.Gui {
 			/// <param name="title">The title.</param>
 			public ToplevelContainer (Rect frame, Border border, string title = null) : base (frame)
 			{
-				Initialize (frame, border, title);
+				Initialize (frame, border, title ?? string.Empty);
 			}
 
-			private void Initialize (Rect frame, Border border, string title = null)
+			private void Initialize (Rect frame, Border border, string title)
 			{
 				ColorScheme = Colors.TopLevel;
 				if (border == null) {
 					Border = new Border () {
 						BorderStyle = BorderStyle.Single,
 						BorderBrush = ColorScheme.Normal.Background,
-						Title = (title != null ? (ustring)title : "")
+						Title = (ustring)title
 					};
 				} else {
 					Border = border;
