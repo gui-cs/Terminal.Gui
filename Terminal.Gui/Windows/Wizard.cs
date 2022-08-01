@@ -204,7 +204,9 @@ namespace Terminal.Gui {
 				base.Add (contentView);
 
 				helpTextView.ColorScheme = new ColorScheme () {  
-					Normal = new Attribute(Color.Gray, Color.DarkGray)
+					Normal = new Attribute(Color.Gray, Color.DarkGray),
+					Focus = new Attribute(Color.DarkGray, Color.Gray),
+					HotFocus = new Attribute(Color.White, Color.DarkGray)
 				};
 				helpTextView.ReadOnly = true;
 				helpTextView.WordWrap = true;
