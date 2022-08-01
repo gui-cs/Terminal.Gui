@@ -90,7 +90,13 @@
     "globalMetadata": {
       "_enableSearch": "true",
       "_appLogoPath": "images/logo48.png",
-      "_disableContribution": true
+      "_disableContribution": false,
+      "_gitContribute": {
+        "repo": "https://github.com/gui-cs/Terminal.Gui",
+        "branch": "develop",
+        "apiSpecFolder": "apidoc"
+      },
+      "_gitUrlPattern": "github"
     },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],

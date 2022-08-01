@@ -9,7 +9,7 @@
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 1.0 for all projects. -->
-    <!-- Do not modify these. -->
+    <!-- Do not modify these. Do NOT commit after manually running `dotnet-gitversion /updateprojectfiles` -->
     <AssemblyVersion>1.0</AssemblyVersion>
     <FileVersion>1.0</FileVersion>
     <Version>1.0</Version>
@@ -79,387 +79,41 @@
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
-      v1.6.4
-      * Fixes #1750. Erroneous suppression of Button Text updates.
-      * Fixes #1753. Update all .csproj files with Release version # upon Release
-      * Fixes #1742. Explicitly dispose old TreeView instances in UICatalog scenario
-      * Fixes #1748. Add horizontal scroll idicators to TableView
-      * StandaloneExample: Updated to use latest version and added help menu
-
-      v1.6.0
-      * Adds ColorPicker control
-      * Adds Context Menu to TreeView
-      * Adds support for custom colors in TreeView
-      * Adds Data field to MenuItem
-      * Adds Timeout thread safety
-      * Adds better docs for Application.Shutdown ()
-      * Fixes #1699. Menu closes on button press and menu hot-key text renders correctly
-      * Fixes #1675. ContextMenu MenuItems typo
-      * Fixes #1715. UI Catalog about box version
-      * Fixes #1712. Intermittent Github Action build failures
-      * Fixes remaining wide runes render issues including #1693 Character Map
-      * Fixes the draw clip bounds issue visible on ScrollView.
-      * Fixes UpdateScreen running twice on Application.Refresh because Driver. Refresh already does.
-      * Fixes TextView throwing when WordWrap is true on constructor initialization.
-      * Fixes RunTimers not checking for key collisions in list when adding to timeouts
-      * Fixes erroneous namespace on LineView to match other views
-      * Fixes #1723. ProgressBar with Percentage has extra spaces on the right
-      * Fixes nullref on unclean shutdown
-      * Fixes Thin tabview
-      * Fixes #1732. Toplevel shouldn't clear the buffer.
-      * Fixes #1730. AllViewsTester throw exception on Dim.Percent.
-
-      v1.5.0
-      * Localization support added. en-US, Japanese, fr-FR, and pt-PT
-      * Adds Key Binding support. Also refactors Autocomplete.
-      * Adds a popup ContextMenu feature. Implements ContextMenu for TextField.
-      * Adds HistoryText class for undo and redo text.
-      * Adds mouse support and more features to the HexView.
-      * Adds feature to display the sub-menus on a single frame instead multiple frames.
-      * Adds Support for Colored ListView Items
-      * Adds context menu and localization on TextView.
-      * Cleanup of UI Catalog scenarios
-      * #1666  Fixes the MenuIem Width for wider runes
-      * #1658  Fixes wide runes not render well on NetDriver.
-      * #1656  Cursor visibility fix.
-      * #1652  Fixed Axis.Text being a field while every other class member is a property
-      * #1651  Dispose `FileSystemWatcher` instance before creating another in `FileDialog`
-      * #1639  Fixed TableView when redrawing a System.DataTable that has no columns
-      * #1633  Fixes the WindowsDriver dirty redrawn on resizing if HeightAsBuffer is true.
-      * #1630  Fixes TextField context menu not showing with the current localization.
-      * #1629  Bump actions/checkout from 2 to 3
-      * #1627  Table scroll fix
-      * #1622  Changed Button Text property to use override instead of new.
-      * #1614  Fixes the ProcessHotKey event.
-      * #1612  Fixes the CanFocus equal to false from setting HasFocus to true again.
-      * #1608  Implementing undo/redo to back tab key.
-      * #1606  Fixes ComboBox text and list if the height is equal to one.
-      * #1603  Fixes the auto-size text bug.
-      * #1600  Fixes FileSystemWatcher exception on Linux.
-      * #1599  Adding unit test for the ListView RowRender event.
-      * #1596  Standalone update fix
-      * #1595  Fixes #1588 - Documentation for keybinding
-      * #1593  Fixes TableView not activating after keybinding refactor
-      * #1586  fixing #1560 - Fix docfx errors and warnings
-      * #1585  Fixes #1584 - ComboBox is hiding elements below from being clicked/focused
-      * #1574  Use custom resolver for libcoreclr.so also for .NET 6.0
-      * #1572  Added MenuOpened event and others bug fixes.
-      * #1564  Fixes #1525 - Gives TextField the same backspace behavior as TextView
-      * #1563  Fixes #1557 - Border and PanelView fixes
-      * #1562  Fixes #1560. Documentation link broken.
-      * #1561  Fixes #1559 - Added DesiredCursorVisibility to TreeView
-      * #1550  Adding Application.Shutdown and updating ReactiveUI.Fody.
-
-      v1.4.0
-      * #1546  Fixes #1535. Added IsMouseDisabled prop to Application
-      * #1515  Upgrading to Net6.0
-      * #1508  Allows ListView trigger the Enter and Leave events.
-      * #1506  Prevents a Process breaks rendering on Linux.
-      * #1505  Fixes #1499. Allowing border settings for the MessageBox.
-      * #1504  Fixes #1502. Prevents high CPU usage.
-
-      v1.3.0
-      * #1491  Fix link to MainLoop docs in README.md
-      * #1489  Dynamic menu/statusbar and Enable property fix.
-      * #1488  Fixed label positions to begin at Margins not just bottom left of screen
-      * #1486  Scrollbarview ensures host always focused.
-      * #1484  NetDriver fixes keys modifiers not reseting and enter key on Windows Terminal.
-      * #1479  Trying updating FSharpExample to net5.0
-      * #1478  Fixes #1475. Selection ending with a white space error.
-      * #1476  Added PoshRedisViewer to the list of Showcases/Examples
-      * #1473  Bump ReportGenerator from 4.8.12 to 4.8.13
-      * #1472  ComboBox cursonDownKey nullref fix
-      * #1468  Fixes #1467. AlternateForward/BackwardKey bypasses dialog modality
-      * #1466  Fixes WindowsDriver HeightAsBuffer set to false.
-      * #1450  Added Application.QuitKey property to allow change the quitting application key.
-      * #1449  Bump ReactiveMarbles.ObservableEvents.SourceGenerator from 1.1.3 to 1.1.4
-      * #1448  Fixes #1445. Fixing more the Curses and WSL clipboard.
-      * #1447  Fixes #1446. Added more features to the Border and Toplevel focus.
-      * #1441  Fixes #1438. Backspace not redrawing screen under some situations.
-      * #1440  feature: Don't pull Terminal.Gui from NuGet, use ReactiveMarbles.ObservableEvents
-      * #1437  Fixed bug setting ColorScheme on Autocomplete
-      * #1436  Border feature
-      * #1432  tweaked readme
-
-      v1.2.1
-      * Fixes code block fencing
-      * NetDriver triple click mouse bug fix.
-      * WindowsDriver double click mouse bug fix.
-      * Fixes CursesDriver mouse and reset issue.
-      * Correctly mark the .NET Framework reference assemblies as private.
-      * Fix version conflicts caused by PR#1412
-      * Autocomplete for TextView
-      * Fixes #1402. Only WindowsDriver supports horizontal scroll.
-      * Fixes #1396. Using the Loaded event instead the Ready event.
-      * Fixes #1394. Added ReflectedType to check for overridden.
-      * Fixes #1389. Added a unidirectional feature to the Marquee styles to the ProgressBar.
-      * Fixes #1387. Allowing the UnitTests project to test internal keywords.
-      * Fixes #1384. Added a VisibleChanged event on the View class.
-      * Fixes #1381. Unit tests to demonstrate the Key enum ambiguity check.
-      * Fixes #546. Enhancement ProgressBar.
-      * Disables MinVer on Debug builds
-      * Adds Lineview
-      * CheckBox AutoSize should initialize with the Label default.
-      * Fixes to avoid exception with the ComboBox in All Views Tester.
-      * Simplifying FrameView constructors avoiding redundant code.
-      * Button text should be centered by default.
-      * Fixes #1078. ColorScheme setter now calls SetNeedsDisplay.
-      * Bump ReportGenerator from 4.8.11 to 4.8.12
-      * Fixes #1314. TextView now exposes file exceptions from callers.
-      * Prevents application crash if OS clipboard is not supported.
-      * Fixes #1358. Attribute.Foreground / Attribute.Background now working with CursesDriver
-      * Added support for coloring cells in TableView
-      * More unit test for issue #1344, testing IsVertical as False.
-      * Fix for #1353 (tab view not refreshing in some circumstances)
-      * Fixes #1344. Setting showBothScrollIndicator to false on the constructor don't throws NullReferenceException anymore.
-      * Fixes #1341. Now if AutoSize is true the Bounds size is always updated by using the Dim.Fill or the Dim.Absolute.
-      * Resolves: Add GitHub Codespaces configuration
-      * Expose TextView color methods as protected virtual (allows custom colors)
-      * Fixes InvalidOperationException from throwing when removing the label on the LabelsAsLabels scenario.
-      * Added a Initialize method to the Window to simplify the constructors.
-      * Fixes GetCurrentWidth and GetCurrentHeight providing the correct current values.
-      * Fixes CursesDriver resize issue.
-      * Toplevel improvement as a subviews container without frame borders.
-      * Prevents ListView top to be less than zero if source count is zero.
-      * Fixes #1326. Prevent selected item to be equal to the source count.
-      * Fixes #1327. Fixes TextField backspace and canceling TextChanging.
-      * Prevents WindowSize event from being always triggered in Netdriver unnecessarily.
-      * Fix bug where series/annotations are added during render
-      * Fixes #1318. Ensures that the OS clipboard is always sets.
-      * Fixes #983. Improving clipboard with interaction with the OS.
-      * Added Attributes tests; balanced Application.Init/Shutdown
-
-      v1.1.1
-      * Fixes #1307 - MainLoop timeouts duplicate keys error.
-
-      v1.1.0
-      * TextView CursorLeft/CursorRight change focus when at start/end #1271
-      * Fixes #1273 - Add direction summaries
-      * Fixes #1276 - Added TextDirection constructor to View and Label and improving AutoSize
-      * Fixes #1272 - Fixes Linux/Mac window sizing
-      * Fixes #1281 - Fixed CursesDriver colors. Added BasicColors scenario
-      * Fixes #1266 - Using Ctrl+PageUp/PageDown to allowing navigate through windows.
-      * TableView - adds last column dividing line #1289
-      * Fixes #1291. Combining two PosAbsolute or two DimAbsolute result on a PosAbsolute or DimAbsolute
-      * Changed Console.WriteLine to ITestOutputHelper in tests #1305
-
-      v1.0.0
-      * Version 1.0 Release!!! - Thank you to @migueldeicaza, @tig, @bdisp, @tznind, @jmprricone, and many more!
-
-      v1.0.0-rc.13
-      * NEW CONTROL: GraphView - thanks @tznind!
-      * Fixes #1256 - OutConsoleGridView no longer works - ENTER does not work
-
-      v1.0.0-rc.12
-      * Fixes #1257 - ListView's ProcessKey should return false if no OpenSelectedItem handler is defined
-
-      v1.0.0-rc.10
-      * Fixes #931. Fixed the limit 25 lines issue
-      * Fixes #1251. Fixes TextValidateProvider exception on the All View Tester scenario.
-
-      v1.0.0-rc.9
-      * Fixes #1210. Added AllowsReturn, AllowsTab and Multiline into the TextView.
-      * Fixes #1241. Added SendKeys feature to the ConsoleDriver.
-      * Fixes #418 and #931. Unix terminal hangs after exit.
-
-      v1.0.0-rc.7
-      * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
-      * Refactored TreeView and TabView to reduce api surface area
-      * Added code coverage reporting
-
-      v1.0.0-rc.1
-      * Added Dependabot support and updated dependencies
-      * Renamed master branch to main
-      * Fixes #1211. Added support to TextView for word based operations Ctrl+Del and Ctrl+Backspace
-      * Fixes #1208. Now the selected text is overwritten if SelectedStart is greater than CursorPosition.
-      * Fixes #1206. NetDriver now print the selected text. Attribute struct now create a valid Value for the current driver. Insert key is detected by NetDriver.
-      * Fixes #1202. CheckBox now deals with a functional '_' underscore hotkey.
-      * Fixes #1199. Normalize views constructors and did some typo fixing.
-      * Fixes #1197. Prevents width negative value if added directly to the A
-      * Added Vertical Alignment and Text Direction + UICatalog Demo (thanks @jmprricone!)
-      * Fixes #1193. A non auto size default Button now preserves his width and thus the text alignment now work.
-      * Fixes #1187. Prevents WordBackward throwing an exception if point is greater than the text length
-      * Fixes #1185. Button click is only processed if there are no mouse mov
-      * Fixes #1183. ListView now return true on the handled keys
-      * Fixes #1179. TextView does not copy to the clipboard on deleting
-      * Fixes #1177. Now is possible to copy or cut on the TextView with the...
-      * Fixes #1175. demo.cs editor now implement "Copy", "Cut" and "Paste".
-      * Fixes #1173. TextField only need to handle a single line.
-      * Fixes #1171. Delete and Backspace now deletes the selected text
-      * Fixes #1167. Application.Run method with #DEBUG can be simplified.
-      * Fixes #1165. Changing the directory name label or the field name crashes
-      * Fixes #1159. Dialog must have a default button if none is provided.
-
-      v1.0.0-beta.11
-      * NEW CONTROL: Tabview - thanks @tznind!
-      * UI Catalog now shows correct Terminal.gui.dll version
-      * Fixes #939 - README sample does not compile - thanks @buzzfrog!
-      * Fixes #1154 - FileDialog blank constructor results in unstable window
-      * Fixes #1155 - MoveForward/MoveBackward not bound on Text controls.
-      * Fixes #1152 - Generic TreeView`1 breaks upon selection in All Views Tester)
-      * Fixes #1148 - TextFormatter.Format does not keep the end spaces on wrapped text.
-      * Fixes #134 - (HUGE) TextView: Add line wrapping.
-      * Fixes #1145 - ScrollBar down arrow is not showing.
-      * Fixes #1143 - Cannot change the MenuBar's background color.
-      * Fixes #1141 - Cannot change the StatusBar's background color.
-      * Fixes #1048 - BrighCyan to BrightCyan spelling
-      * Fixes #1130 - Broken Table/TreeView links in docs.
-
-      v1.0.0-beta.8
-      * Now using MinVer to generate version numbers from git tags.
-      * Updated publish-to-nuget to work with minver
-
-      v1.0.0-pre.9
-      * NEW CONTROL: TreeView - Thanks @tznind!
-      * Fixes #1066. View sizing across the various terminals has been fixed; works in Windows Terminal again - thanks @bdisp
-      * Fixes #1117. Newfile Modal.
-
-      v1.0.0-pre.8
-      * NOTE: Windows Terminal is broken - see #1099
-      * NEW CONTROL: TableView - Thanks @tznind!
-      * NetDriver is signficantly imporved - thanks @bdisp!
-      * Fixes #1016. Window is drawing its frame over the menu.
-      * Fixes #1018. Since childNeedsDisplay is used outside the View class it must to be a property.
-      * Fixes #1024. TextView is printing theFixes #1030. Getting colors from the Attributes of a ColorScheme. new line character "\n" with a symbol
-      * Fixes #1030. Getting colors from the Attributes of a ColorScheme.
-      * Fixes #1034. The NuGet packages need to be updated.
-      * Fixes #1043. The menu separator is being printed in the wrong place.
-      * Fixes #93. Audit TextView just like we did TextField to ensure proper treatment of Unicode.
-      * Fixes #1050. ScrollView takes too long to scroll enormous content size.
-      * BREAKING CHANGE - Fixes #1052. Application.CurrentView looks unused.
-      * Fixes #1053. ProcessMouseEvent seems to initialize MouseEvent incorrectly.
-      * Fixes #1056. Window doesn't redraw his SuperView properly.
-      * Fixes #1061. ComputerLayout scenario does not drawn correctly.
-      * Added unhandled exception handling in Application.Run (#1063)
-      * Fixes #1068. The ResizeView doesn't handle the AutoSize properly.
-      * Fixes #1071. Toplevel.GetTopLevelSubviews (). Changed from HashSet to IList.
-      * Fixes #1073, #1058, #480 #1049. Provides more automation to the ScrollBarView, allowing easily implement on any view.
-      * Application.Shutdown() does not reset SynchronizationContext (#1085).
-      * Fixes #1088. On WindowsDriver moving the mouse with a button pressed, when it is released, the button clicked event is fired, causing an unintentional event.
-      * Fixes #1091. Continuous button pressed not working properly on Linux.
-      * Fixes #1100. TextFormatter doesn't handle ColumnWidth greater than 1.
-      * Cursor shape and visibility #1102
-
-      v1.0.0-pre.6
-      * If StatusBar.Visible is set to false, TopLevel resizes correctly enabling hiding/showing of a StatusBar. UICatalog demonstrates.
-      * New sample/demo app - ReactiveExample - Shows how to use reactive extensions and ReactiveUI with gui.cs. (Thanks @worldbeater)
-      * BREAKING API CHANGE - Removed IEnumerable from View and Window. Use Subviews property instead. See #950.
-      * Fixes #998. Added a cancelable TextChanging event to prevent the TextChanged event being called if the changing is canceled.
-      * Fixes #1002. Added a AutoSize property to the View class.
-      * Fixes #1009. AutoHideScrollBars is causing ScrollView always redrawing.
-      * Update to .NET 5 RTM
-      * Fixes #995. Improving TextField to work properly with Unicode characters
-      * Fixes #999. Toplevel should only redraw the subviews if !NeedDisplay.IsEmpty or layoutNeeded.
-      * Fixes #992. TextFormatter class now respect the view dimensions. Some typo fixing too.
-      * Fixes #990. Pos and Dim only can be properly used when all the views are totally initialized.
-      * Fixes #979. Force call LayoutSubviews to perform layout.
-      * Fixes #988. Update NStack.Core to version 0.15.0
-      * Fixes #41 and #949. Unit test to compare the difference between System.Rune and System.Text.Rune.
-      * Fixes #881, #928. Allowing more key combinations.
-      * Fixes #976. Mouse prints sequence characters on the terminal and the screen is not fully cleared. Only for netcoreapp3.1.
-      * BREAKING API CHANGE - #950 - Remove IEnumerable from View and Window
-      * Fixes #959. CursorPosition with hotkeys.
-      * Fixes #963. Added support for Unicode in TextField.
-      * Fixes #961. Recreates the Frame when necessary.
-      * Fixes #957. Terminal.Gui nuget package in Reactive example version.
-      * Fixes #933. Updated to work with libncurses 6.2
-      * Fixes #225 and maybe #41. Allowing Rune.ColumnWidth greater than one.
-      * Use glyphs for checkmarks and selection.
-
-      v0.90 - "Feature Complete" pre-release of Terminal.Gui (aka gui.cs) 1.0. This release is a signficant upgrade from the previous published release (0.81). Most of the major changes and bug fixes are listed below. NOTE: This release includes breaking changes to the API; we will strive to avoid any more breaking changes before 1.0.
-
-      What's new:
-      * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
-      * The API documentation is completely revamped and updated. Readme upated. Contributors guide added (Thanks @tig!)
-      * MenuBar can now have MenuItems directly (enables top-level menu items with no submenu). (Thanks @tig!)
-      * API semantics are much more consistent across classes. For example, all events are now defined in terms of event Action instead of EventHanlder. BREAKING CHANGE. (Thanks @bdisp, @worldbeater, and @tig!)
-      * The project has been refactored an reorganized to reduce risk of bugs and make it easier to contribute.
-      * Symbols are now included with the nuget package.
-
-      Fixes/Improvements (partial list; see Github issues for complete list):
-      * Fixes #396 - Text alignnment issues.  (Thanks @tig!)
-      * Fixes #423 - Fix putting results of ocgv on command line erases cursor. (Thanks @tig!)
-      * Apps can now get KeyUp/KeyDown events. (Thanks @tig!)
-      * Example/Designer csproj files updated to latest Visual Studio model. (Thanks @tig!)
-      * Adjusted the default colors for Windows to make more readable. (Thanks @tig!)
-      * Toplevel.Ready event - Fired once the Toplevel's MainLoop has started (#445). (Thanks @tig!)
-      * All compile warnings fixed. (Thanks @tig!)
-      * Fixed a crash in EnsureVisibleBounds. (Thanks @tig!)
-      * Application.Init/Shutdown are more robust. (Thanks @tig!)
-      * New "Draw Window Frame" code; consistent across Window, FrameView, and Menu. Fixes many drawing bugs. (Thanks @tig!)
-      * Fixes #522 - Last view of Frameview not drawn. (Thanks @tig!)
-      * Clipping has been fixed/restored - it now works properly. (#586) (Thanks @tig!)
-      * Added a View.LayoutComplete event (#569). (Thanks @tig!)
-      * Fixes #299 - MessageBox now auto sizes. (Thanks @tig!)
-      * Fixes #557 - MessageBoxes on small screens. (Thanks @tig!)
-      * Fixes #432 - MessageBox does not deal with long text; width/height params are goofy. (Thanks @tig!)
-      * Fixes #35 - Dialog should have 1 char padding. (Thanks @tig!)
-      * `MessageBox.Query` called with `width` and `height` == 0 get auto-size behavior. A new constructor is added making this easy to use. (Thanks @tig!)
-      * Multi-line `MessageBox`es are now supported. Just use `\n` to add lines. The height of the MessageBox will adjust automatically. (Thanks @tig!)
-      * The `MessageBoxes` Scenario in UI Catalog provides a full demo/test-case. (Thanks @tig!)
-      * `Dialog` called with `width` and `height` == 0 are sized to 85% container. A new constructor is added making this easy to use. (Thanks @tig!)
-      * Dialog (and MessageBox `Buttons` are now dynamically laid out using Computed layout. (Thanks @tig!)
-      * A `Dialogs` Scenario has been added to UI Catalog making it easy to test the API. (Thanks @tig!)
-      * `Button` now supports BOTH specifying a hotkey with '_' and the old behavior of using the first uppercase char (if '_' is not found). (Thanks @tig!)
-      * All UI Catalog scenarios that use `Dialog` or `MessageBox` now use the simplified API. (Thanks @tig!)
-      * `Terminal.Gui.dll` now has version metadata and UI Catalog's about box displays it as a test case. (Thanks @tig!)
-      * Button, Dialog, and MessageBox API documentation has been updated/revised. (Thanks @tig!)
-      * `View`, `Window`, `FrameView`, and `Dialog` have been upgraded to use the new `ConsoleDriver.DrawFrameWindow` API directly. (Thanks @tig!)
-      * New ComboBox control (Thanks @fergusonr!)
-      * ConsoleDriver now supports improved KeyModifers (shift keys) with an expanded Keys Sceanrio in UI Catalog. (Thanks @bdisp!)
-      * Tons of mouse handling improvements. (Thanks @bdisp!)
-      * Fsharp sample updated. (Thanks @bdisp!)
-      * Fixes #562 - Background drawing issue. (Thanks @bdisp!)
-      * Fixes #517 - Focus and mouse handlers enahced (BREAKING CHANGE). (Thanks @bdisp!)
-      * Fixed resizing update and correct Toplevel colors without colors. (Thanks @bdisp!)
-      * Fixed #515, #518, #536, #540. (Thanks @bdisp!)
-      * Added Threading Scenario to UI catalog. (Thanks @bdisp!)
-      * Added support for F11 and F12 keys. (Thanks @bdisp!)
-      * Multiple improvements to Date/TimeField. (Thanks @bdisp!)
-      * Fixes #409 - Invoke does not cause Wakeup #501. (Thanks @bdisp!)
-      * Fixed Label text alignment. (Thanks @bdisp!)
-      * Added mouse features in the Unix version. Supports xterm-1006. (Thanks @bdisp!)
-      * Several StatusBar fixes. (Thanks @bdisp!)
-      * Tons of mouse improvements including mouse wheel support (e.g. #404, #409). (Thanks @bdisp!)
-      * Added a CloseFile method to the TextView as stated in #452. (Thanks @bdisp)
-      * Added a OpenSelectedItem event to the ListView #429. (Thanks @bdisp!)
-      * Fixes the return value of the position cursor in the TextField. (Thanks @bdisp!)
-      * Updates screen on Unix window resizing. (Thanks @bdisp!)
-      * Fixes the functions of the Edit-Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
-      * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
-      * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
-      * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
-      * Fixes ScrollView in several key ways. (Thanks @tig!)
-      *   Now supports Computed layout and has constructors that don't require parameters.
-      *   ScrollBarViews are now positioned using Computed layout versus error prone absolute
-      *   ScrollBarViews now correctly position themselves when one, either, or both are on/off.
-      *   IsVertical is now a public property that does the expected thing when changed
-      *   Mouse handling is better; there's still a bug where the mouse doesn't get grabbed by the ScrollView initially but I think this is a broader problem. I need @BDisp's help on this.
-      *   Supports "infinite scrolling" via the new OnDrawContent/DrawContent event on the View class.
-      *   The Scrolling Scenario was enhanced to demo dynamically adding/removing horizontal/vertical scrollbars (and to prove it was working right).
-      * The Checkbox.Toggled event is now an EventHandler event and passes previous state. (Thanks @tig!)
-      * Fixes #102 All Views now support parameterless constructors. (Thanks @Bdisp and @tig!)
-      * Fixes #583 Button can now be sized. Button now supports TextAlignment. (Thanks @Bdisp!)
-      * Fixes #421 Now builds on Linux with "dotnet build". (Thanks @AArnott!)
-      * MenuItem now supports checked/selected items. (Thanks @tig!)
-      * Label no longer incorreclty displays formfeed char. (Thanks @tig!)
-      * Fixes #645 - RadioGroup now supports unicode. (Thanks @tig!)
-      * Fixes #573 - RadioGroup supports Computed Layout. (Thanks @tig!)
-      * RadioGroup now uses a single, good looking, glyph. (Thanks @tig!)
-      * RadioGroup now supportrs the Action-based event pattern correctly. BREAKING CHANGE. (Thanks @tig!)
-      * ConsoleDriver and Drivers have new standard glyph definitions for things like right arrow. (Thanks @tig!)
-      * ScrollView updated to use pretty glyphs. (Thanks @tig!)
-      * Menubar now uses pretty arrow glyph for sub-menus. (Thanks @tig!)
-      * View now has a Text property, implemented via the new TextFormatting class. (Thanks @tig!)
-      * TextAlignment is implemented once across all Views that support it.
-      * Unicode support is now much more robust and complete; dozens of bugs fixed.
-      * Any view dervied from View now has a Text property with multi-line text formatting, including word-wrap and hotkey support.
-      * Label is now mostly just an alias for View; supports Clicked
-      * Button is now a very thin class derived from View (no API changes).
-      * Dozens of unit tests for TextAlignment are provided reducing the chance of regressions.
-      * Fixes #351. Added a horizontal display for RadioGroup. (Thanks @bidsp!)
-      * Fixes #644. Added a UICatalog Scenario for a dynamic menu bar. (Thanks @bidsp!)
-      * Fixes #838. Added a Visible property to the View. (Thanks @bidsp!)
+      Release v1.7.0
+      * Moved Terminal.Gui (and NStack) to the github.com/gui-cs organization.
+      * Adds multi-step Wizard View for setup experiences (#124)
+      * The synchronization context method Send is now blocking (#1854).
+      * Fixes #1917. Sometimes Clipboard.IsSupported doesn't return the correct
+      * Fixes #1893: Fix URLs to match gui-cs Org
+      * Fixes #1883. Child TopLevels now get Loaded/Ready events.
+      * Fixes #1867, #1866, #1796. TextView enhancements for ReadOnly and WordWrap.
+      * Fixes #1861. Border: Title property is preferable to Text.
+      * Fixes #1855. Window and Frame content view without the margin frame.
+      * Fixes #1848. Mouse clicks in Windows Terminal.
+      * Fixes #1846. TabView now clips to the draw bounds.
+      * Fix TableView multi selections extending to -1 indexes
+      * Fixes #1837. Setting Unix clipboard freezes.
+      * Fixes #1839. Process WindowsDriver click event if location is the same after pressed and released.
+      * Fixes #1830. If "libcoreclr.so" is not present then "libncursesw.so" will be used.
+      * Fixes #1816. MessageBox: Hides underlying dialog when visible
+      * Fixes #1815. Now returns false if WSL clipboard isn't supported.
+      * Fixes #1825. Parent MenuItem stay focused if child MenuItem is empty.
+      * Fixes #1812, #1797, #1791. AutoSize fixes.
+      * Fixes #1818. Adds Title change events to Window.
+      * Fixes #1810. Dialog: Closing event is not fired when ESC is pressed to close dialog.
+      * Fixes #1793. ScrollBarView is hiding if the host fit the available space.
+      * Added Pos/Dim Function feature to automate layout.
+      * Fixes #1786. Windows Terminal is reporting well on mouse button pressed + mouse movement.
+      * Fixes #1777 - Dialog button justification. Adds unit tests.
+      * Fixes #1739. Setting menu UseKeysUpDownAsKeysLeftRight as false by default.
+      * Fixes #1772. Avoids WindowsDriver flickering when resizing.
+      * Fixed TableView always showing selected cell(s) even when not focused
+      * Fixes #1769. Supports a minimum view size for non-automatic size views.
+      * Exposes APIs to support upcoming Web console feature
+      * Fixes some scrolling performance issues
+      * Fixes #1763. Allowing read console inputs before idle handlers.
+      * TableView unicode scenario usability
+      * Added unicode testing code to TableEditor
     </PackageReleaseNotes>
   </PropertyGroup>
 </Project>

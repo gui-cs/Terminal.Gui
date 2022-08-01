@@ -107,6 +107,8 @@ does not seem to be a way of supporting this on Windows.
   </div>
   <h3 id="constructors">Constructors
   </h3>
+  
+  
   <a id="Terminal_Gui_MainLoop__ctor_" data-uid="Terminal.Gui.MainLoop.#ctor*"></a>
   <h4 id="Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_" data-uid="Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)">MainLoop(IMainLoopDriver)</h4>
   <div class="markdown level1 summary">
@@ -136,6 +138,8 @@ Creates a new Mainloop.
   </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
   <a id="Terminal_Gui_MainLoop_Driver_" data-uid="Terminal.Gui.MainLoop.Driver*"></a>
   <h4 id="Terminal_Gui_MainLoop_Driver" data-uid="Terminal.Gui.MainLoop.Driver">Driver</h4>
   <div class="markdown level1 summary">
@@ -161,6 +165,8 @@ The current IMainLoopDriver in use.
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_IdleHandlers_" data-uid="Terminal.Gui.MainLoop.IdleHandlers*"></a>
   <h4 id="Terminal_Gui_MainLoop_IdleHandlers" data-uid="Terminal.Gui.MainLoop.IdleHandlers">IdleHandlers</h4>
   <div class="markdown level1 summary">
@@ -186,6 +192,8 @@ Gets the list of all idle handlers.
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_Timeouts_" data-uid="Terminal.Gui.MainLoop.Timeouts*"></a>
   <h4 id="Terminal_Gui_MainLoop_Timeouts" data-uid="Terminal.Gui.MainLoop.Timeouts">Timeouts</h4>
   <div class="markdown level1 summary">
@@ -215,6 +223,8 @@ earlier addition that has a longer limit time.
   </table>
   <h3 id="methods">Methods
   </h3>
+  
+  
   <a id="Terminal_Gui_MainLoop_AddIdle_" data-uid="Terminal.Gui.MainLoop.AddIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})">AddIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -257,6 +267,8 @@ Adds specified idle handler function to mainloop processing. The handler functio
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_AddTimeout_" data-uid="Terminal.Gui.MainLoop.AddTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan,System.Func{Terminal.Gui.MainLoop,System.Boolean})">AddTimeout(TimeSpan, Func&lt;MainLoop, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -304,6 +316,8 @@ Adds a timeout to the mainloop.
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_EventsPending_" data-uid="Terminal.Gui.MainLoop.EventsPending*"></a>
   <h4 id="Terminal_Gui_MainLoop_EventsPending_System_Boolean_" data-uid="Terminal.Gui.MainLoop.EventsPending(System.Boolean)">EventsPending(Boolean)</h4>
   <div class="markdown level1 summary">
@@ -346,6 +360,8 @@ Determines whether there are pending events to be processed.
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_Invoke_" data-uid="Terminal.Gui.MainLoop.Invoke*"></a>
   <h4 id="Terminal_Gui_MainLoop_Invoke_System_Action_" data-uid="Terminal.Gui.MainLoop.Invoke(System.Action)">Invoke(Action)</h4>
   <div class="markdown level1 summary">
@@ -373,6 +389,8 @@ Runs <code>action</code> on the thread that is processing events
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_MainIteration_" data-uid="Terminal.Gui.MainLoop.MainIteration*"></a>
   <h4 id="Terminal_Gui_MainLoop_MainIteration" data-uid="Terminal.Gui.MainLoop.MainIteration">MainIteration()</h4>
   <div class="markdown level1 summary">
@@ -383,6 +401,8 @@ Runs one iteration of timers and file watches
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void MainIteration()</code></pre>
   </div>
+  
+  
   <a id="Terminal_Gui_MainLoop_RemoveIdle_" data-uid="Terminal.Gui.MainLoop.RemoveIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})">RemoveIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
@@ -425,6 +445,8 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_RemoveTimeout_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveTimeout_System_Object_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout(System.Object)">RemoveTimeout(Object)</h4>
   <div class="markdown level1 summary">
@@ -467,6 +489,8 @@ Removes a previously scheduled timeout
       </tr>
     </tbody>
   </table>
+  
+  
   <a id="Terminal_Gui_MainLoop_Run_" data-uid="Terminal.Gui.MainLoop.Run*"></a>
   <h4 id="Terminal_Gui_MainLoop_Run" data-uid="Terminal.Gui.MainLoop.Run">Run()</h4>
   <div class="markdown level1 summary">
@@ -477,6 +501,8 @@ Runs the mainloop.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Run()</code></pre>
   </div>
+  
+  
   <a id="Terminal_Gui_MainLoop_Stop_" data-uid="Terminal.Gui.MainLoop.Stop*"></a>
   <h4 id="Terminal_Gui_MainLoop_Stop" data-uid="Terminal.Gui.MainLoop.Stop">Stop()</h4>
   <div class="markdown level1 summary">
@@ -489,6 +515,8 @@ Stops the mainloop.
   </div>
   <h3 id="events">Events
   </h3>
+  
+  
   <h4 id="Terminal_Gui_MainLoop_TimeoutAdded" data-uid="Terminal.Gui.MainLoop.TimeoutAdded">TimeoutAdded</h4>
   <div class="markdown level1 summary">
 Invoked when a new timeout is added to be used on the case
@@ -519,6 +547,10 @@ if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_
           
           <div class="hidden-sm col-md-2" role="complementary">
             <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
                 <h5>In This Article</h5>
                 <div></div>

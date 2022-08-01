@@ -709,6 +709,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (scrollBar.AutoHideScrollBars);
 			Assert.Equal (5, textView.Lines);
 			Assert.Equal (42, textView.Maxlength);
+			Assert.Equal (0, textView.LeftColumn);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			var expected = @"
@@ -744,7 +745,8 @@ namespace Terminal.Gui.Views {
 			Assert.True (textView.WordWrap);
 			Assert.True (scrollBar.AutoHideScrollBars);
 			Assert.Equal (7, textView.Lines);
-			Assert.Equal (22, textView.Maxlength);
+			Assert.Equal (23, textView.Maxlength);
+			Assert.Equal (0, textView.LeftColumn);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
@@ -752,8 +754,8 @@ namespace Terminal.Gui.Views {
 │This is the help text   │
 │for the Second Step.    │
 │                        │
-│Press the button to     │
-│see a message box.      │
+│Press the button to see │
+│ a message box.         │
 │                        │
 │Enter name too.         │
 │                        │
@@ -772,6 +774,32 @@ namespace Terminal.Gui.Views {
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 26, 20), pos);
+
+			((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+			Application.Refresh ();
+
+			Assert.True (textView.WordWrap);
+			Assert.True (scrollBar.AutoHideScrollBars);
+			Assert.Equal (19, textView.Lines);
+			Assert.Equal (7, textView.Maxlength);
+			Assert.Equal (0, textView.LeftColumn);
+			Assert.Equal (0, scrollBar.Position);
+			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
+			expected = @"
+┌ Test ──┐
+│This is▲│
+│ the   ┬│
+│help   ││
+│text   ┴│
+│for the░│
+│ Second░│
+│ Step. ░│
+│       ▼│
+└────────┘
+";
+
+			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 10, 10), pos);
 		}
 	}
 }

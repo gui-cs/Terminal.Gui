@@ -10,43 +10,19 @@
 
 A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
-![Sample app](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/docfx/sample.gif)
+![Sample app](docfx/images/sample.gif)
 
-## Controls and Views
+## Documentation 
 
-*Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
+* [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
+* [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
+* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/views.html)
+* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
+* [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html)
 
-* [Button](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Button.html) - A View that provides an item that invokes an System.Action when activated by the user.
-* [CheckBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.CheckBox.html) - Shows an on/off toggle that the user can set.
-* [ColorPicker](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ColorPicker.html) - Enables to user to pick a color.
-* [ComboBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ComboBox.html) - Provides a drop-down list of items the user can select from.
-* [Dialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Dialog.html) - A pop-up Window that contains one or more Buttons.
-  * [OpenDialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.OpenDialog.html) - A Dialog providing an interactive pop-up Window for users to select files or directories.
-  * [SaveDialog](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.SaveDialog.html) - A Dialog providing an interactive pop-up Window for users to save files.
-* [FrameView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.FrameView.html) - A container View that draws a frame around its contents. Similar to a GroupBox in Windows.
-* [GraphView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.GraphView.html) - A View for rendering graphs (bar, scatter etc).
-* [Hex viewer/editor](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.HexView.html) - A hex viewer and editor that operates over a file stream. 
-* [Label](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Label.html) - Displays a string at a given position and supports multiple lines.
-* [ListView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ListView.html) - Displays a scrollable list of data where each item can be activated to perform an action.
-* [MenuBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MenuBar.html) - Provides a menu bar with drop-down and cascading menus.
-* [MessageBox](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MessageBox.html) - Displays a modal (pup-up) message to the user, with a title, a message and a series of options that the user can choose from. 
-* [ProgressBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ProgressBar.html) - Displays a progress Bar indicating progress of an activity.
-* [RadioGroup](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.RadioGroup.html) - Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time
-* [ScrollView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ScrollView.html) - Present a window into a virtual space where subviews are added. Similar to the iOS UIScrollView.
-* [ScrollBarView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html) - display a 1-character scrollbar, either horizontal or vertical.
-* [StatusBar](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.StatusBar.html) - A View that snaps to the bottom of a Toplevel displaying set of status items. Includes support for global app keyboard shortcuts.
-* [TableView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TableView.html) - A View for tabular data based on a System.Data.DataTable. 
-* [TimeField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TimeField.html) & [DateField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TimeField.html) - Enables structured editing of dates and times.
-* [TextField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextField.html) - Provides a single-line text entry.
-* [TextValidateField](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextValidateField.html) - Text field that validates input through a ITextValidateProvider.
-* [TextView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TextView.html)- A multi-line text editing View supporting word-wrap, auto-complete, context menus, undo/redo, and clipboard operations, 
-* [TopLevel](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Toplevel.html) - The base class for modal/pop-up Windows.
-* [TreeView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.TreeView.html) - A hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined ITreeBuilder.
-* [View](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.View.html) - The base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-* [Window](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Window.html) - A Toplevel view that draws a border around its Frame with a title at the top.
-* [Wizard](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Wizard.html) - Provides navigation and a user interface to collect related data across multiple steps.
+_The Documentation matches the most recent Nuget release from the `main` branch ([![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui))_
 
-### Features
+## Features
 
 * **Cross Platform** - Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/gui-cs/Terminal.Gui/issues/27), and the .NET Console mean apps will work well on both color and monochrome terminals. 
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including support for drag & drop.
@@ -56,28 +32,6 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 * **Advanced App Features** - The [Mainloop](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors. Most classes are safe for threading.
 * **Reactive Extensions** - Use [reactive extensions](https://github.com/dotnet/reactive) and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/gui-cs/Terminal.Gui/tree/master/ReactiveExample) of a sample app in order to learn how to achieve this.
-
-### Keyboard Input Handling
-
-**Terminal.Gui** respects common Linux, Mac, and Windows keyboard idioms. For example, clipboard operations use the familiar `Control/Command-C, X, V` model. `CTRL-Q` is used for exiting views (and apps).
-
-The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
-
-The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key. So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
-
-To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or you can press `ESC` twice.
-
-`ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to `F10`, and `F1` to `F9` respectively.
-
-Apps can change key bindings using the `AddKeyBinding` API. 
-
-### Driver Model
-
-**Terminal.Gui** has support for [ncurses](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/CursesDriver/CursesDriver.cs), [`System.Console`](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/NetDriver.cs), and a full [Win32 Console](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/WindowsDriver.cs) front-end.
-
-`ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
-
-You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Showcase & Examples
 
@@ -90,15 +44,9 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
 * **[TerminalGuiDesigner](https://github.com/tznind/TerminalGuiDesigner)** - Cross platform view designer for building Terminal.Gui applications.
 
-## Documentation
-
-* [Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
-* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
-* [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html)
-
 See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html) provides insight into core concepts.
 
-### Sample Usage
+## Sample Usage
 (This code uses C# 9.0 [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements).) 
 ```csharp
 using Terminal.Gui;
@@ -206,6 +154,8 @@ To install Terminal.Gui into a .NET Core project, use the `dotnet` CLI tool with
 dotnet add package Terminal.Gui
 ```
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
+
 ## Running and Building
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
@@ -225,6 +175,4 @@ The original **gui.cs** was a UI toolkit in a single file and tied to curses. Th
 
 A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
 
-Release history can be found in the [Terminal.Gui.csproj](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
-
-In 2019, 2020, and 2021, Charlie Kindel (https://github.com/tig), @BDisp (https://github.com/BDisp), and Thomas Nind (https://github.com/tznind) vastly extended, improved, polished and fixed gui.cs to what it is today.
+The most recent release notes can be found in the [Terminal.Gui.csproj](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
