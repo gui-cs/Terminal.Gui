@@ -236,6 +236,7 @@ namespace Terminal.Gui {
 		{
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (Child.GetNormalColor ());
+				Clear ();
 				Child.Border.DrawContent (Border.Child);
 			}
 			var savedClip = childContentView.ClipToBounds ();
