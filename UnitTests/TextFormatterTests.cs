@@ -3994,5 +3994,23 @@ e
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
+
+		[Fact]
+		public void Format_With_PreserveTrailingSpaces_And_Without_PreserveTrailingSpaces ()
+		{
+			var text = $"Line1{Environment.NewLine}Line2{Environment.NewLine}Line3{Environment.NewLine}";
+			var width = 60;
+			var preserveTrailingSpaces = false;
+			var formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
+			Assert.Equal ("Line1", formated [0]);
+			Assert.Equal ("Line2", formated [1]);
+			Assert.Equal ("Line3", formated [^1]);
+
+			preserveTrailingSpaces = true;
+			formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
+			Assert.Equal ("Line1", formated [0]);
+			Assert.Equal ("Line2", formated [1]);
+			Assert.Equal ("Line3", formated [^1]);
+		}
 	}
 }

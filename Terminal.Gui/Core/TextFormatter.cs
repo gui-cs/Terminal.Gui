@@ -366,22 +366,28 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool NeedsFormat { get => needsFormat; set => needsFormat = value; }
 
-		static ustring StripCRLF (ustring str)
+		static ustring StripCRLF (ustring str, bool keepNewLine = false)
 		{
 			var runes = str.ToRuneList ();
 			for (int i = 0; i < runes.Count; i++) {
 				switch (runes [i]) {
 				case '\n':
-					runes.RemoveAt (i);
+					if (!keepNewLine) {
+						runes.RemoveAt (i);
+					}
 					break;
 
 				case '\r':
 					if ((i + 1) < runes.Count && runes [i + 1] == '\n') {
 						runes.RemoveAt (i);
-						runes.RemoveAt (i + 1);
+						if (!keepNewLine) {
+							runes.RemoveAt (i);
+						}
 						i++;
 					} else {
-						runes.RemoveAt (i);
+						if (!keepNewLine) {
+							runes.RemoveAt (i);
+						}
 					}
 					break;
 				}
@@ -730,7 +736,7 @@ namespace Terminal.Gui {
 				return lineResult;
 			}
 
-			var runes = text.ToRuneList ();
+			var runes = StripCRLF (text, true).ToRuneList ();
 			int runeCount = runes.Count;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
