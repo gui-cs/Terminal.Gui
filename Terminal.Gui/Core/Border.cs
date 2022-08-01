@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -138,7 +139,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Initializes with default null values.
 			/// </summary>
-			public ToplevelContainer () : this (null, null) { }
+			public ToplevelContainer () : this (null, string.Empty) { }
 
 			/// <summary>
 			/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Computed"/>
@@ -147,7 +148,7 @@ namespace Terminal.Gui {
 			/// <param name="title">The title.</param>
 			public ToplevelContainer (Border border, string title = null)
 			{
-				Initialize (Rect.Empty, border, title);
+				Initialize (Rect.Empty, border, title ?? string.Empty);
 			}
 
 			/// <summary>
@@ -158,17 +159,17 @@ namespace Terminal.Gui {
 			/// <param name="title">The title.</param>
 			public ToplevelContainer (Rect frame, Border border, string title = null) : base (frame)
 			{
-				Initialize (frame, border, title);
+				Initialize (frame, border, title ?? string.Empty);
 			}
 
-			private void Initialize (Rect frame, Border border, string title = null)
+			private void Initialize (Rect frame, Border border, string title)
 			{
 				ColorScheme = Colors.TopLevel;
-				Text = title ?? "";
 				if (border == null) {
 					Border = new Border () {
 						BorderStyle = BorderStyle.Single,
-						BorderBrush = ColorScheme.Normal.Background
+						BorderBrush = ColorScheme.Normal.Background,
+						Title = (ustring)title
 					};
 				} else {
 					Border = border;
@@ -266,8 +267,12 @@ namespace Terminal.Gui {
 				Border.DrawContent (this, false);
 				if (HasFocus)
 					Driver.SetAttribute (ColorScheme.HotNormal);
-				if (Border.DrawMarginFrame)
-					Border.DrawTitle (this, Frame);
+				if (Border.DrawMarginFrame) {
+					if (!ustring.IsNullOrEmpty (Border.Title))
+						Border.DrawTitle (this);
+					else
+						Border.DrawTitle (this, Frame);
+				}
 				Driver.SetAttribute (GetNormalColor ());
 
 				// Checks if there are any SuperView view which intersect with this window.
@@ -306,16 +311,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event to be invoked when any border property change.
+		/// Invoked when any property of Border changes (except <see cref="Child"/>).
 		/// </summary>
 		public event Action<Border> BorderChanged;
 
 		private BorderStyle borderStyle;
 		private bool drawMarginFrame;
 		private Thickness borderThickness;
+		private Color borderBrush;
+		private Color background;
 		private Thickness padding;
 		private bool effect3D;
 		private Point effect3DOffset = new Point (1, 1);
+		private Attribute? effect3DBrush;
+		private ustring title = ustring.Empty;
 
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
@@ -363,12 +372,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that draws the outer border color.
 		/// </summary>
-		public Color BorderBrush { get; set; }
+		public Color BorderBrush {
+			get => borderBrush;
+			set {
+				borderBrush = value;
+				OnBorderChanged ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that fills the area between the bounds of a <see cref="Border"/>.
 		/// </summary>
-		public Color Background { get; set; }
+		public Color Background {
+			get => background;
+			set {
+				background = value;
+				OnBorderChanged ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a <see cref="Thickness"/> value that describes the amount of space between a
@@ -448,7 +469,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
-		public Attribute? Effect3DBrush { get; set; }
+		public Attribute? Effect3DBrush {
+			get => effect3DBrush;
+			set {
+				effect3DBrush = value;
+				OnBorderChanged ();
+			}
+		}
+
+		/// <summary>
+		/// The title to be displayed for this view.
+		/// </summary>
+		public ustring Title {
+			get => title;
+			set {
+				title = value;
+				OnBorderChanged ();
+			}
+		}
 
 		/// <summary>
 		/// Calculate the sum of the <see cref="Padding"/> and the <see cref="BorderThickness"/>
@@ -677,6 +715,7 @@ namespace Terminal.Gui {
 				};
 				if (rect.Width > 0 && rect.Height > 0) {
 					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+					DrawTitle (Child);
 				}
 			}
 
@@ -831,6 +870,7 @@ namespace Terminal.Gui {
 				};
 				if (rect.Width > 0 && rect.Height > 0) {
 					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+					DrawTitle (Parent);
 				}
 			}
 
@@ -900,18 +940,47 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Drawn the view text from a <see cref="View"/>.
+		/// Draws the view <see cref="Title"/> to the screen.
 		/// </summary>
+		/// <param name="view">The view.</param>
+		public void DrawTitle (View view)
+		{
+			var driver = Application.Driver;
+			if (DrawMarginFrame) {
+				driver.SetAttribute (Child.GetNormalColor ());
+				if (Child.HasFocus)
+					driver.SetAttribute (Child.ColorScheme.HotNormal);
+				var padding = view.Border.GetSumThickness ();
+				Rect scrRect;
+				if (view == Child) {
+					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width + 2, view.Frame.Height + 2));
+					scrRect = new Rect (scrRect.X - 1, scrRect.Y - 1, scrRect.Width, scrRect.Height);
+					driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
+				} else {
+					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
+					driver.DrawWindowTitle (scrRect, Title,
+						padding.Left, padding.Top, padding.Right, padding.Bottom);
+				}
+			}
+			driver.SetAttribute (Child.GetNormalColor ());
+		}
+
+		/// <summary>
+		/// Draws the <see cref="View.Text"/> to the screen.
+		/// </summary>
+		/// <param name="view">The view.</param>
+		/// <param name="rect">The frame.</param>
 		public void DrawTitle (View view, Rect rect)
 		{
 			var driver = Application.Driver;
-			if (BorderStyle != BorderStyle.None) {
+			if (DrawMarginFrame) {
 				driver.SetAttribute (view.GetNormalColor ());
 				if (view.HasFocus) {
 					driver.SetAttribute (view.ColorScheme.HotNormal);
 				}
-				var padding = GetSumThickness ();
-				driver.DrawWindowTitle (rect, view.Text,
+				var padding = Parent.Border.GetSumThickness ();
+				var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));
+				driver.DrawWindowTitle (scrRect, view.Text,
 					padding.Left, padding.Top, padding.Right, padding.Bottom);
 			}
 			driver.SetAttribute (view.GetNormalColor ());

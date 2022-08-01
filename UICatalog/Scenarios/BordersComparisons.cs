@@ -65,9 +65,9 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
-				},
-				"Test2") {
+					Effect3D = effect3D,
+					Title = "Test2"
+				}) {
 				ColorScheme = Colors.Base,
 			};
 
