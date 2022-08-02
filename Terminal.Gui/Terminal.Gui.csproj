@@ -79,6 +79,11 @@
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
+      Release v1.7.1
+      * Fixes #1930. Trailing whitespace makes MessageBox.Query buttons disappear.
+      * Fixes #1921. Mouse continuous button pressed is not working on ScrollView.
+      * Fixes #1924. Wizard: Selected help text is unreadable
+      
       Release v1.7.0
       * Moved Terminal.Gui (and NStack) to the github.com/gui-cs organization.
       * Adds multi-step Wizard View for setup experiences (#124)
