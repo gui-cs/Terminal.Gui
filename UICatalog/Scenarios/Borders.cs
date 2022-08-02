@@ -30,8 +30,10 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Panel"
 				},
+				ColorScheme = Colors.TopLevel
 			};
 			smartPanel.Add (new Label () { // Or smartPanel.Child = 
 				X = 0,
@@ -79,7 +81,8 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Label"
 				},
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwithout a \nPanelView",
