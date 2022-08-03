@@ -771,7 +771,7 @@ namespace Terminal.Gui {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)e.Height);
+					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 1));
 				left = 0;
 				top = 0;
 				cols = newSize.Width;
