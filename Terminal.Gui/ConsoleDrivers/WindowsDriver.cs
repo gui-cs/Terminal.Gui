@@ -771,7 +771,7 @@ namespace Terminal.Gui {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)e.Height);
+					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 1));
 				left = 0;
 				top = 0;
 				cols = newSize.Width;
@@ -1411,7 +1411,7 @@ namespace Terminal.Gui {
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
+			Colors.Base.HotNormal = MakeColor (ConsoleColor.Cyan, ConsoleColor.DarkBlue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
 			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
