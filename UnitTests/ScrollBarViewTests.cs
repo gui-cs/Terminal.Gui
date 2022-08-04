@@ -142,8 +142,8 @@ namespace Terminal.Gui.Views {
 			var v = new ScrollBarView (host, true);
 			var h = new ScrollBarView (host, true);
 
-			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
-			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+			Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
 		}
 
 		[Fact]
@@ -156,8 +156,8 @@ namespace Terminal.Gui.Views {
 			var v = new ScrollBarView (host, false);
 			var h = new ScrollBarView (host, false);
 
-			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
-			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+			Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
 		}
 
 		[Fact]
