@@ -907,7 +907,7 @@ namespace Terminal.Gui {
 
 				Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
 				Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
-				Colors.Base.HotNormal = MakeColor (Color.Cyan, Color.Blue);
+				Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
 				Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
 				Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
 
