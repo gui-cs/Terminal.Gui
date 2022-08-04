@@ -1519,7 +1519,7 @@ namespace Terminal.Gui {
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
 					selectionStartRow, selectionStartColumn,
-					tabWidth, preserveTrailingSpaces: !ReadOnly);
+					tabWidth, preserveTrailingSpaces: true);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
@@ -1610,10 +1610,7 @@ namespace Terminal.Gui {
 				}
 
 				SetWrapModel ();
-				var savedCurrentColumn = CurrentColumn;
-				currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 				var sel = GetRegion ();
-				currentColumn = savedCurrentColumn;
 				UpdateWrapModel ();
 				Adjust ();
 
@@ -1993,9 +1990,6 @@ namespace Terminal.Gui {
 				if (value != isReadOnly) {
 					isReadOnly = value;
 
-					SetWrapModel ();
-					currentColumn = GetCurrentColumnReadOnyWrapModel ();
-					UpdateWrapModel ();
 					SetNeedsDisplay ();
 					Adjust ();
 				}
@@ -2316,7 +2310,7 @@ namespace Terminal.Gui {
 				wrapManager.UpdateModel (model, out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
-					selectionStartRow, selectionStartColumn, preserveTrailingSpaces: !ReadOnly);
+					selectionStartRow, selectionStartColumn, preserveTrailingSpaces: true);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
@@ -2325,21 +2319,6 @@ namespace Terminal.Gui {
 			}
 			if (currentCaller != null)
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
-		}
-
-		int GetCurrentColumnReadOnyWrapModel (bool forcePreserveTrailingSpaces = false)
-		{
-			if (wordWrap) {
-				var wManager = new WordWrapManager (wrapManager.Model);
-				if (ReadOnly && !forcePreserveTrailingSpaces) {
-					wManager.WrapModel (frameWidth, out _, out _, out _, out _, preserveTrailingSpaces: false);
-				} else {
-					wManager.WrapModel (frameWidth, out _, out _, out _, out _, preserveTrailingSpaces: true);
-				}
-				var currentLine = wrapManager.GetWrappedLineColWidth (CurrentRow, CurrentColumn, wManager);
-				return currentLine;
-			}
-			return currentColumn;
 		}
 
 		///<inheritdoc/>
@@ -3803,8 +3782,6 @@ namespace Terminal.Gui {
 		public void Copy ()
 		{
 			SetWrapModel ();
-			var savedCurrentColumn = CurrentColumn;
-			currentColumn = GetCurrentColumnReadOnyWrapModel (true);
 			if (selecting) {
 				SetClipboard (GetRegion ());
 				copyWithoutSelection = false;
@@ -3813,7 +3790,6 @@ namespace Terminal.Gui {
 				SetClipboard (ustring.Make (currentLine));
 				copyWithoutSelection = true;
 			}
-			currentColumn = savedCurrentColumn;
 			UpdateWrapModel ();
 			DoNeededAction ();
 		}

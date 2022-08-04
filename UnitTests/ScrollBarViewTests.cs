@@ -142,8 +142,8 @@ namespace Terminal.Gui.Views {
 			var v = new ScrollBarView (host, true);
 			var h = new ScrollBarView (host, true);
 
-			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
-			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+			Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
 		}
 
 		[Fact]
@@ -156,8 +156,8 @@ namespace Terminal.Gui.Views {
 			var v = new ScrollBarView (host, false);
 			var h = new ScrollBarView (host, false);
 
-			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
-			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+			Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
 		}
 
 		[Fact]
@@ -745,7 +745,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (textView.WordWrap);
 			Assert.True (scrollBar.AutoHideScrollBars);
 			Assert.Equal (7, textView.Lines);
-			Assert.Equal (23, textView.Maxlength);
+			Assert.Equal (22, textView.Maxlength);
 			Assert.Equal (0, textView.LeftColumn);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
@@ -754,8 +754,8 @@ namespace Terminal.Gui.Views {
 │This is the help text   │
 │for the Second Step.    │
 │                        │
-│Press the button to see │
-│ a message box.         │
+│Press the button to     │
+│see a message box.      │
 │                        │
 │Enter name too.         │
 │                        │
@@ -780,21 +780,21 @@ namespace Terminal.Gui.Views {
 
 			Assert.True (textView.WordWrap);
 			Assert.True (scrollBar.AutoHideScrollBars);
-			Assert.Equal (19, textView.Lines);
+			Assert.Equal (20, textView.Lines);
 			Assert.Equal (7, textView.Maxlength);
 			Assert.Equal (0, textView.LeftColumn);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
 ┌ Test ──┐
-│This is▲│
-│ the   ┬│
+│This   ▲│
+│is the ┬│
 │help   ││
 │text   ┴│
-│for the░│
-│ Second░│
-│ Step. ░│
-│       ▼│
+│for    ░│
+│the    ░│
+│Second ░│
+│Step.  ▼│
 └────────┘
 ";
 
