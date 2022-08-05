@@ -5873,5 +5873,60 @@ line.
 			tv.CursorPosition = new Point (tv.LeftColumn, tv.TopRow);
 			Assert.Equal (new Point (0, 50), tv.CursorPosition);
 		}
+
+		[Fact]
+		[InitShutdown]
+		public void Mouse_Button_Shift_Preserves_Selection ()
+		{
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 12, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }));
+			Assert.Equal (0, _textView.SelectionStartColumn);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (12, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump ", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 12, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (12, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump ", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 19, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (19, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump between", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 19, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (19, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump between", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump between text", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 24, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("TAB to jump between text", _textView.SelectedText);
+
+			Assert.True (_textView.MouseEvent (new MouseEvent () { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed }));
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (0, _textView.SelectionStartRow);
+			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
+			Assert.True (_textView.Selecting);
+			Assert.Equal ("", _textView.SelectedText);
+		}
 	}
 }
