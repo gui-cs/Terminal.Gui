@@ -1468,8 +1468,7 @@ namespace Terminal.Gui {
 		void ResetPosition ()
 		{
 			topRow = leftColumn = currentRow = currentColumn = 0;
-			selecting = false;
-			shiftSelecting = false;
+			StopSelecting ();
 			ResetCursorVisibility ();
 		}
 
@@ -3872,6 +3871,7 @@ namespace Terminal.Gui {
 		{
 			shiftSelecting = false;
 			selecting = false;
+			isButtonShift = false;
 		}
 
 		void ClearSelectedRegion ()
@@ -4151,6 +4151,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool isButtonShift;
+
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
@@ -4182,9 +4184,8 @@ namespace Terminal.Gui {
 			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
-				if (shiftSelecting) {
-					shiftSelecting = false;
-					selecting = false;
+				if (shiftSelecting && !isButtonShift) {
+					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
 				PositionCursor ();
@@ -4235,6 +4236,7 @@ namespace Terminal.Gui {
 				columnTrack = currentColumn;
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)) {
 				if (!shiftSelecting) {
+					isButtonShift = true;
 					StartSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
@@ -4243,8 +4245,7 @@ namespace Terminal.Gui {
 				columnTrack = currentColumn;
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 				if (shiftSelecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
 				PositionCursor ();
