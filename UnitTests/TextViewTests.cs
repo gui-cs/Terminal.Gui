@@ -1323,20 +1323,26 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 			_textView.SelectionStartColumn = 0;
 			_textView.SelectionStartRow = 0;
+			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
 			Assert.True (_textView.Selecting);
 			_textView.Selecting = false;
 			_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			Assert.Equal (new Point (28, 0), _textView.CursorPosition);
+			Assert.False (_textView.Selecting);
 			Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
 			_textView.SelectionStartColumn = 24;
 			_textView.SelectionStartRow = 0;
 			_textView.ProcessKey (new KeyEvent (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
+			Assert.False (_textView.Selecting);
 			Assert.Equal ("", _textView.SelectedText);
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 			_textView.SelectionStartColumn = 0;
 			_textView.SelectionStartRow = 0;
-			Assert.True (_textView.Selecting);
 			_textView.Selecting = false;
 			_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			Assert.Equal (new Point (28, 0), _textView.CursorPosition);
+			Assert.False (_textView.Selecting);
 			Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
 		}
 
