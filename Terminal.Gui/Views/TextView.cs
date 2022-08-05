@@ -3871,6 +3871,7 @@ namespace Terminal.Gui {
 		{
 			shiftSelecting = false;
 			selecting = false;
+			isButtonShift = false;
 		}
 
 		void ClearSelectedRegion ()
@@ -4185,8 +4186,6 @@ namespace Terminal.Gui {
 			if (ev.Flags == MouseFlags.Button1Clicked) {
 				if (shiftSelecting && !isButtonShift) {
 					StopSelecting ();
-				} else if (!shiftSelecting && isButtonShift) {
-					isButtonShift = false;
 				}
 				ProcessMouseClick (ev, out _);
 				PositionCursor ();
