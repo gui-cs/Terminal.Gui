@@ -1177,6 +1177,11 @@ namespace Terminal.Gui {
 		public event Action TextChanged;
 
 		/// <summary>
+		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
+		/// </summary>
+		public event Action<Point> UnwrappedCursorPosition;
+
+		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
 		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
 		/// </summary>
@@ -2320,6 +2325,20 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
 		}
 
+		/// <summary>
+		/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
+		/// </summary>
+		public virtual void OnUnwrappedCursorPosition ()
+		{
+			var row = currentRow;
+			var col = currentColumn;
+			if (wordWrap) {
+				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
+				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+			}
+			UnwrappedCursorPosition?.Invoke (new Point (col, row));
+		}
+
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -2617,6 +2636,8 @@ namespace Terminal.Gui {
 			} else {
 				PositionCursor ();
 			}
+
+			OnUnwrappedCursorPosition ();
 		}
 
 		(int width, int height) OffSetBackground ()
