@@ -5934,5 +5934,96 @@ line.
 			Assert.True (_textView.Selecting);
 			Assert.Equal ("", _textView.SelectedText);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void UnwrappedCursorPosition_Event ()
+		{
+			var cp = Point.Empty;
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = "This is the first line.\nThis is the second line.\n"
+			};
+			tv.UnwrappedCursorPosition += (e) => {
+				cp = e;
+			};
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.False (tv.WordWrap);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			Assert.Equal (Point.Empty, cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			tv.WordWrap = true;
+			tv.CursorPosition = new Point (12, 0);
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (12, 0), tv.CursorPosition);
+			Assert.Equal (new Point (12, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (6, 25);
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (4, 2), tv.CursorPosition);
+			Assert.Equal (new Point (12, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This 
+is   
+the  
+first
+     
+line.
+This 
+is   
+the  
+secon
+d    
+line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 3), tv.CursorPosition);
+			Assert.Equal (new Point (12, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This 
+is   
+the  
+first
+     
+line.
+This 
+is   
+the  
+secon
+d    
+line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (1, 3), tv.CursorPosition);
+			Assert.Equal (new Point (13, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This 
+is   
+the  
+first
+     
+line.
+This 
+is   
+the  
+secon
+d    
+line.
+", output);
+		}
 	}
 }
