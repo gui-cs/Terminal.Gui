@@ -51,7 +51,12 @@ namespace Unix.Terminal {
 		public const int COLOR_MAGENTA = unchecked((int)0x5);
 		public const int COLOR_CYAN = unchecked((int)0x6);
 		public const int COLOR_WHITE = unchecked((int)0x7);
+		public const int COLOR_GRAY = unchecked((int)0x8);
 		public const int KEY_CODE_YES = unchecked((int)0x100);
+		public const int KEY_CODE_SEQ = unchecked((int)0x5b);
+		public const int ERR = unchecked((int)0xffffffff);
+		public const int TIOCGWINSZ  = unchecked((int)0x5413);
+		public const int TIOCGWINSZ_MAC  = unchecked((int)0x40087468);
 
 		[Flags]
 		public enum Event : long {
@@ -88,11 +93,10 @@ namespace Unix.Terminal {
 		public const int DownEnd = unchecked((int)0x6);
 		public const int Home = unchecked((int)0x7);
 #else
-		public const int LeftRightUpNPagePPage= unchecked((int)0x0);
+		public const int LeftRightUpNPagePPage = unchecked((int)0x0);
 		public const int DownEnd = unchecked((int)0x0);
 		public const int Home = unchecked((int)0x0);
 #endif
-		public const int ERR = unchecked((int)0xffffffff);
 		public const int KeyBackspace = unchecked((int)0x107);
 		public const int KeyUp = unchecked((int)0x103);
 		public const int KeyDown = unchecked((int)0x102);
@@ -152,9 +156,28 @@ namespace Unix.Terminal {
 		public const int ShiftCtrlKeyPPage = unchecked((int)0x22c + LeftRightUpNPagePPage);
 		public const int ShiftCtrlKeyHome = unchecked((int)0x218 + Home);
 		public const int ShiftCtrlKeyEnd = unchecked((int)0x213 + DownEnd);
+		public const int ShiftAltKeyUp = unchecked((int)0x235 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyDown = unchecked((int)0x20c + DownEnd);
+		public const int ShiftAltKeyLeft = unchecked((int)0x220 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyRight = unchecked((int)0x22f + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyNPage = unchecked((int)0x225 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyPPage = unchecked((int)0x22a + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyHome = unchecked((int)0x216 + Home);
+		public const int ShiftAltKeyEnd = unchecked((int)0x211 + DownEnd);
+		public const int AltCtrlKeyNPage = unchecked((int)0x228 + LeftRightUpNPagePPage);
+		public const int AltCtrlKeyPPage = unchecked((int)0x22d + LeftRightUpNPagePPage);
+		public const int AltCtrlKeyHome = unchecked((int)0x219 + Home);
+		public const int AltCtrlKeyEnd = unchecked((int)0x214 + DownEnd);
 
-		public const int LC_ALL = 6;
-		static public int ColorPair(int n){
+		// see #949
+		static public int LC_ALL { get; private set; }
+		static Curses ()
+		{
+			LC_ALL = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.OSX) ? 0 : 6;
+		}
+
+		static public int ColorPair (int n)
+		{
 			return 0 + n * 256;
 		}
 	}

@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Colors
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -92,35 +93,11 @@ The default <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Colors</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Colors_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class Colors</code></pre>
+    <pre><code class="lang-csharp hljs">public static class Colors : Object</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -151,12 +128,6 @@ The base color scheme, for the default toplevel views.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Colors_Base_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes">ColorSchemes</a> instead (e.g. <code>edit.ColorScheme = Colors.ColorSchemes[&quot;Base&quot;];</code>
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Colors_ColorSchemes_" data-uid="Terminal.Gui.Colors.ColorSchemes*"></a>
@@ -211,12 +182,6 @@ The dialog color scheme, for standard popup dialog boxes
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Colors_Dialog_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes">ColorSchemes</a> instead (e.g. <code>edit.ColorScheme = Colors.ColorSchemes[&quot;Dialog&quot;];</code>
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Colors_Error_" data-uid="Terminal.Gui.Colors.Error*"></a>
@@ -244,12 +209,6 @@ The color scheme for showing errors.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Colors_Error_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes">ColorSchemes</a> instead (e.g. <code>edit.ColorScheme = Colors.ColorSchemes[&quot;Error&quot;];</code>
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Colors_Menu_" data-uid="Terminal.Gui.Colors.Menu*"></a>
@@ -277,12 +236,6 @@ The menu bar color
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Colors_Menu_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes">ColorSchemes</a> instead (e.g. <code>edit.ColorScheme = Colors.ColorSchemes[&quot;Menu&quot;];</code>
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Colors_TopLevel_" data-uid="Terminal.Gui.Colors.TopLevel*"></a>
@@ -310,12 +263,6 @@ The application toplevel color scheme, for the default toplevel views.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Colors_TopLevel_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes">ColorSchemes</a> instead (e.g. <code>edit.ColorScheme = Colors.ColorSchemes[&quot;TopLevel&quot;];</code>
-</p>
-</div>
 </article>
           </div>
           
@@ -326,7 +273,8 @@ This API will be deprecated in the future. Use <a class="xref" href="Terminal.Gu
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

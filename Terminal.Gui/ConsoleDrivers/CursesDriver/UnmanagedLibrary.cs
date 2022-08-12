@@ -117,7 +117,7 @@ namespace Unix.Terminal {
 			}
 
 			if (this.handle == IntPtr.Zero) {
-				throw new IOException (string.Format ("Error loading native library \"{0}\"", this.libraryPath));
+				throw new IOException ($"Error loading native library \"{string.Join (", ", libraryPathAlternatives)}\"");
 			}
 		}
 
@@ -186,7 +186,12 @@ namespace Unix.Terminal {
 					return Mono.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 				}
 				if (IsNetCore) {
-					return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					try {
+						return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
+					} catch (Exception) {
+
+						IsNetCore = false;
+					}
 				}
 				return Linux.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
 			}
@@ -258,7 +263,7 @@ namespace Unix.Terminal {
 		/// </summary>
 		static class CoreCLR
 		{
-#if NET5_0
+#if NET6_0
 			// Custom resolver to support true single-file apps
 			// (those which run directly from bundle; in-memory).
 			//     -1 on Unix means self-referencing binary (libcoreclr.so)

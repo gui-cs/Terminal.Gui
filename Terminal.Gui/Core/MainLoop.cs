@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		bool EventsPending (bool wait);
 
 		/// <summary>
-		/// The interation function.
+		/// The iteration function.
 		/// </summary>
 		void MainIteration ();
 	}
@@ -45,19 +45,47 @@ namespace Terminal.Gui {
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
 	public class MainLoop {
-		internal class Timeout {
+		/// <summary>
+		/// Provides data for timers running manipulation.
+		/// </summary>
+		public sealed class Timeout {
+			/// <summary>
+			/// Time to wait before invoke the callback.
+			/// </summary>
 			public TimeSpan Span;
+			/// <summary>
+			/// The function that will be invoked.
+			/// </summary>
 			public Func<MainLoop, bool> Callback;
 		}
 
 		internal SortedList<long, Timeout> timeouts = new SortedList<long, Timeout> ();
+		object timeoutsLockToken = new object ();
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
+
+		/// <summary>
+		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks./>.
+		/// A shorter limit time can be added at the end, but it will be called before an
+		///  earlier addition that has a longer limit time.
+		/// </summary>
+		public SortedList<long, Timeout> Timeouts => timeouts;
+
+		/// <summary>
+		/// Gets the list of all idle handlers.
+		/// </summary>
+		public List<Func<bool>> IdleHandlers => idleHandlers;
 
 		/// <summary>
 		/// The current IMainLoopDriver in use.
 		/// </summary>
 		/// <value>The driver.</value>
 		public IMainLoopDriver Driver { get; }
+
+		/// <summary>
+		/// Invoked when a new timeout is added to be used on the case
+		/// if <see cref="Application.ExitRunLoopAfterFirstIteration"/> is true,
+		/// </summary>
+		public event Action<long> TimeoutAdded;
 
 		/// <summary>
 		///  Creates a new Mainloop. 
@@ -107,22 +135,28 @@ namespace Terminal.Gui {
 		///   Removes an idle handler added with <see cref="AddIdle(Func{bool})"/> from processing.
 		/// </summary>
 		/// <param name="token">A token returned by <see cref="AddIdle(Func{bool})"/></param>
-		public void RemoveIdle (Func<bool> token)
+		/// Returns <c>true</c>if the idle handler is successfully removed; otherwise, <c>false</c>.
+		///  This method also returns <c>false</c> if the idle handler is not found.
+		public bool RemoveIdle (Func<bool> token)
 		{
 			lock (token)
-				idleHandlers.Remove (token);
+				return idleHandlers.Remove (token);
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			timeouts.Add ((DateTime.UtcNow + time).Ticks, timeout);
+			lock (timeoutsLockToken) {
+				var k = (DateTime.UtcNow + time).Ticks;
+				timeouts.Add (NudgeToUniqueKey (k), timeout);
+				TimeoutAdded?.Invoke (k);
+			}
 		}
 
 		/// <summary>
 		///   Adds a timeout to the mainloop.
 		/// </summary>
 		/// <remarks>
-		///   When time time specified passes, the callback will be invoked.
+		///   When time specified passes, the callback will be invoked.
 		///   If the callback returns true, the timeout will be reset, repeating
 		///   the invocation. If it returns false, the timeout will stop and be removed.
 		///
@@ -147,27 +181,62 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The token parameter is the value returned by AddTimeout.
 		/// </remarks>
-		public void RemoveTimeout (object token)
+		/// Returns <c>true</c>if the timeout is successfully removed; otherwise, <c>false</c>.
+		/// This method also returns <c>false</c> if the timeout is not found.
+		public bool RemoveTimeout (object token)
 		{
-			var idx = timeouts.IndexOfValue (token as Timeout);
-			if (idx == -1)
-				return;
-			timeouts.RemoveAt (idx);
+			lock (timeoutsLockToken) {
+				var idx = timeouts.IndexOfValue (token as Timeout);
+				if (idx == -1)
+					return false;
+				timeouts.RemoveAt (idx);
+			}
+			return true;
 		}
 
 		void RunTimers ()
 		{
 			long now = DateTime.UtcNow.Ticks;
-			var copy = timeouts;
-			timeouts = new SortedList<long, Timeout> ();
-			foreach (var k in copy.Keys) {
-				var timeout = copy [k];
+			SortedList<long, Timeout> copy;
+
+			// lock prevents new timeouts being added
+			// after we have taken the copy but before
+			// we have allocated a new list (which would
+			// result in lost timeouts or errors during enumeration)
+			lock (timeoutsLockToken) {
+				copy = timeouts;
+				timeouts = new SortedList<long, Timeout> ();
+			}
+
+			foreach (var t in copy) {
+				var k = t.Key;
+				var timeout = t.Value;
 				if (k < now) {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);
-				} else
-					timeouts.Add (k, timeout);
+				} else {
+					lock (timeoutsLockToken) {
+						timeouts.Add (NudgeToUniqueKey (k), timeout);
+					}
+				}
 			}
+		}
+
+		/// <summary>
+		/// Finds the closest number to <paramref name="k"/> that is not
+		/// present in <see cref="timeouts"/> (incrementally).
+		/// </summary>
+		/// <param name="k"></param>
+		/// <returns></returns>
+		private long NudgeToUniqueKey (long k)
+		{
+			lock (timeoutsLockToken) {
+				while (timeouts.ContainsKey (k)) {
+					k++;
+				}
+			}
+
+			return k;
 		}
 
 		void RunIdle ()

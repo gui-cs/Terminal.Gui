@@ -14,11 +14,13 @@ using System.Collections.Generic;
 using NStack;
 using System.IO;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 	internal class DirListView : View {
 		int top, selected;
 		DirectoryInfo dirInfo;
+		FileSystemWatcher watcher;
 		List<(string, bool, bool)> infos;
 		internal bool canChooseFiles = true;
 		internal bool canChooseDirectories = false;
@@ -39,7 +41,7 @@ namespace Terminal.Gui {
 			if (allowedFileTypes == null)
 				return true;
 			foreach (var ft in allowedFileTypes)
-				if (fsi.Name.EndsWith (ft))
+				if (fsi.Name.EndsWith (ft) || ft == ".*")
 					return true;
 			return false;
 		}
@@ -49,6 +51,25 @@ namespace Terminal.Gui {
 			bool valid = false;
 			try {
 				dirInfo = new DirectoryInfo (value == null ? directory.ToString () : value.ToString ());
+
+				// Dispose of the old watcher
+				watcher?.Dispose ();
+
+				watcher = new FileSystemWatcher (dirInfo.FullName);
+				watcher.NotifyFilter = NotifyFilters.Attributes
+				 | NotifyFilters.CreationTime
+				 | NotifyFilters.DirectoryName
+				 | NotifyFilters.FileName
+				 | NotifyFilters.LastAccess
+				 | NotifyFilters.LastWrite
+				 | NotifyFilters.Security
+				 | NotifyFilters.Size;
+				watcher.Changed += Watcher_Changed;
+				watcher.Created += Watcher_Changed;
+				watcher.Deleted += Watcher_Changed;
+				watcher.Renamed += Watcher_Changed;
+				watcher.Error += Watcher_Error;
+				watcher.EnableRaisingEvents = true;
 				infos = (from x in dirInfo.GetFileSystemInfos ()
 					 where IsAllowed (x) && (!canChooseFiles ? x.Attributes.HasFlag (FileAttributes.Directory) : true)
 					 orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
@@ -62,6 +83,7 @@ namespace Terminal.Gui {
 				case DirectoryNotFoundException _:
 				case ArgumentException _:
 					dirInfo = null;
+					watcher = null;
 					infos.Clear ();
 					valid = true;
 					break;
@@ -75,6 +97,31 @@ namespace Terminal.Gui {
 				}
 			}
 			return valid;
+		}
+
+		private bool _disposedValue;
+		protected override void Dispose (bool disposing)
+		{
+			if (!_disposedValue) {
+				if (disposing) {
+					watcher?.Dispose ();
+				}
+
+				_disposedValue = true;
+			}
+
+			// Call base class implementation.
+			base.Dispose (disposing);
+		}
+
+		void Watcher_Error (object sender, ErrorEventArgs e)
+		{
+			Application.MainLoop.Invoke (() => Reload ());
+		}
+
+		void Watcher_Changed (object sender, FileSystemEventArgs e)
+		{
+			Application.MainLoop.Invoke (() => Reload ());
 		}
 
 		ustring directory;
@@ -168,13 +215,11 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private void UnMarkAll ()
+		void UnMarkAll ()
 		{
-			if (allowsMultipleSelection && infos.Count > 0) {
-				for (int i = 0; i < infos.Count; i++) {
-					if (infos [i].Item3) {
-						infos [i] = (infos [i].Item1, infos [i].Item2, false);
-					}
+			for (int i = 0; i < infos.Count; i++) {
+				if (infos [i].Item3) {
+					infos [i] = (infos [i].Item1, infos [i].Item2, false);
 				}
 			}
 		}
@@ -221,7 +266,8 @@ namespace Terminal.Gui {
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
 				Move (0, row);
-				var newcolor = focused ? (isSelected ? ColorScheme.HotNormal : ColorScheme.Focus) : ColorScheme.Focus;
+				var newcolor = focused ? (isSelected ? ColorScheme.HotNormal : ColorScheme.Focus)
+					: Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 				if (newcolor != current) {
 					Driver.SetAttribute (newcolor);
 					current = newcolor;
@@ -250,11 +296,13 @@ namespace Terminal.Gui {
 		public Action<ustring> DirectoryChanged { get; set; }
 		public Action<ustring> FileChanged { get; set; }
 
+		string splitString = ",";
+
 		void OnSelectionChanged ()
 		{
 			if (allowsMultipleSelection) {
 				if (FilePaths.Count > 0) {
-					FileChanged?.Invoke (string.Join (", ", GetFilesName (FilePaths)));
+					FileChanged?.Invoke (string.Join (splitString, GetFilesName (FilePaths)));
 				} else {
 					FileChanged?.Invoke (infos [selected].Item2 && !canChooseDirectories ? "" : Path.GetFileName (infos [selected].Item1));
 				}
@@ -275,20 +323,60 @@ namespace Terminal.Gui {
 			return filesName;
 		}
 
+		public bool GetValidFilesName (string files, out string result)
+		{
+			result = string.Empty;
+			if (infos?.Count == 0) {
+				return false;
+			}
+
+			var valid = true;
+			IReadOnlyList<string> filesList = new List<string> (files.Split (splitString.ToArray (), StringSplitOptions.None));
+			var filesName = new List<string> ();
+			UnMarkAll ();
+
+			foreach (var file in filesList) {
+				if (!allowsMultipleSelection && filesName.Count > 0) {
+					break;
+				}
+				var idx = infos.IndexOf (x => x.Item1.IndexOf (file, StringComparison.OrdinalIgnoreCase) >= 0);
+				if (idx > -1 && string.Equals (infos [idx].Item1, file, StringComparison.OrdinalIgnoreCase)) {
+					if (canChooseDirectories && !canChooseFiles && !infos [idx].Item2) {
+						valid = false;
+					}
+					if (allowsMultipleSelection && !infos [idx].Item3) {
+						infos [idx] = (infos [idx].Item1, infos [idx].Item2, true);
+					}
+					if (!allowsMultipleSelection) {
+						selected = idx;
+					}
+					filesName.Add (Path.GetFileName (infos [idx].Item1));
+				} else if (idx > -1) {
+					valid = false;
+					filesName.Add (Path.GetFileName (file));
+				}
+			}
+			result = string.Join (splitString, filesName);
+			if (string.IsNullOrEmpty (result)) {
+				valid = false;
+			}
+			return valid;
+		}
+
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorUp:
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 				MoveUp ();
 				return true;
 
 			case Key.CursorDown:
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 				MoveDown ();
 				return true;
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				var n = (selected + Frame.Height);
 				if (n > infos.Count)
@@ -325,7 +413,7 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Space:
-			case Key.ControlT:
+			case Key.T | Key.CtrlMask:
 				PerformMultipleSelection ();
 				return true;
 
@@ -378,7 +466,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal bool ExecuteSelection ()
+		internal bool ExecuteSelection (bool navigateFolder = true)
 		{
 			if (infos.Count == 0) {
 				return false;
@@ -388,8 +476,11 @@ namespace Terminal.Gui {
 			if (isDir) {
 				Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
 				DirectoryChanged?.Invoke (Directory);
+				if (canChooseDirectories && !navigateFolder) {
+					return true;
+				}
 			} else {
-				FileChanged?.Invoke (infos [selected].Item1);
+				OnSelectionChanged ();
 				if (canChooseFiles) {
 					// Ensures that at least one file is selected.
 					if (FilePaths.Count == 0)
@@ -465,6 +556,14 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>
@@ -472,38 +571,66 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
-		Label nameFieldLabel, message, dirLabel;
+		Label nameFieldLabel, message, nameDirLabel;
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
+		ComboBox cmbAllowedTypes;
 
 		/// <summary>
 		/// Initializes a new <see cref="FileDialog"/>.
 		/// </summary>
-		public FileDialog () : this (title: string.Empty, prompt: string.Empty, nameFieldLabel: string.Empty, message: string.Empty) { }
+		public FileDialog () : this (title: string.Empty, prompt: string.Empty,
+			nameFieldLabel: string.Empty, message: string.Empty)
+		{ }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+		/// <param name="allowedTypes">The allowed types.</param>
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message, List<string> allowedTypes = null)
+			: this (title, prompt, ustring.Empty, nameFieldLabel, message, allowedTypes) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="message">The message.</param>
+		/// <param name="allowedTypes">The allowed types.</param>
+		public FileDialog (ustring title, ustring prompt, ustring message, List<string> allowedTypes)
+			: this (title, prompt, ustring.Empty, message, allowedTypes) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="nameDirLabel">The name of the directory field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
+		/// <param name="message">The message.</param>
+		/// <param name="allowedTypes">The allowed types.</param>
+		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message,
+			List<string> allowedTypes = null) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
-			this.message = new Label (message) { 
+			this.message = new Label (message) {
 				X = 1,
 				Y = 0,
 			};
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			dirLabel = new Label ("Directory: ") {
+			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? $"{Strings.fdDirectory}: " : $"{nameDirLabel}: ") {
 				X = 1,
-				Y = 1 + msgLines
+				Y = 1 + msgLines,
+				AutoSize = true
 			};
 
 			dirEntry = new TextField ("") {
-				X = Pos.Right (dirLabel),
+				X = Pos.Right (this.nameDirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1,
 			};
@@ -511,18 +638,31 @@ namespace Terminal.Gui {
 				DirectoryPath = dirEntry.Text;
 				nameEntry.Text = ustring.Empty;
 			};
-			Add (dirLabel, dirEntry);
+			Add (this.nameDirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
-				X = 6,
+			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? $"{Strings.fdFile}: " : $"{nameFieldLabel}: ") {
+				X = 1,
 				Y = 3 + msgLines,
+				AutoSize = true
 			};
 			nameEntry = new TextField ("") {
 				X = Pos.Left (dirEntry),
 				Y = 3 + msgLines,
-				Width = Dim.Fill () - 1
+				Width = Dim.Percent (70, true)
 			};
 			Add (this.nameFieldLabel, nameEntry);
+
+			cmbAllowedTypes = new ComboBox () {
+				X = Pos.Right (nameEntry) + 2,
+				Y = Pos.Top (nameEntry),
+				Width = Dim.Fill (1),
+				Height = allowedTypes != null ? allowedTypes.Count + 1 : 1,
+				Text = allowedTypes?.Count > 0 ? allowedTypes [0] : string.Empty,
+				ReadOnly = true
+			};
+			cmbAllowedTypes.SetSource (allowedTypes ?? new List<string> ());
+			cmbAllowedTypes.OpenSelectedItem += (e) => AllowedFileTypes = cmbAllowedTypes.Text.ToString ().Split (';');
+			Add (cmbAllowedTypes);
 
 			dirListView = new DirListView (this) {
 				X = 1,
@@ -532,30 +672,70 @@ namespace Terminal.Gui {
 			};
 			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
 			Add (dirListView);
+
+			AllowedFileTypes = cmbAllowedTypes.Text.ToString ().Split (';');
 			dirListView.DirectoryChanged = (dir) => { nameEntry.Text = ustring.Empty; dirEntry.Text = dir; };
 			dirListView.FileChanged = (file) => nameEntry.Text = file == ".." ? "" : file;
 			dirListView.SelectedChanged = (file) => nameEntry.Text = file.Item1 == ".." ? "" : file.Item1;
 			this.cancel = new Button ("Cancel");
 			this.cancel.Clicked += () => {
-				canceled = true;
-				Application.RequestStop ();
+				Cancel ();
 			};
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt) {
+			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
+				Enabled = nameEntry.Text.IsEmpty ? false : true
 			};
 			this.prompt.Clicked += () => {
+				if (this is OpenDialog) {
+					if (!dirListView.GetValidFilesName (nameEntry.Text.ToString (), out string res)) {
+						nameEntry.Text = res;
+						dirListView.SetNeedsDisplay ();
+						return;
+					}
+					if (!dirListView.canChooseDirectories && !dirListView.ExecuteSelection (false)) {
+						return;
+					}
+				} else if (this is SaveDialog) {
+					var name = nameEntry.Text.ToString ();
+					if (FilePath.IsEmpty || name.Split (',').Length > 1) {
+						return;
+					}
+					var ext = name.EndsWith (cmbAllowedTypes.Text.ToString ())
+						? "" : cmbAllowedTypes.Text.ToString ();
+					FilePath = Path.Combine (FilePath.ToString (), $"{name}{ext}");
+				}
 				canceled = false;
 				Application.RequestStop ();
 			};
 			AddButton (this.prompt);
+
+			nameEntry.TextChanged += (e) => {
+				if (nameEntry.Text.IsEmpty) {
+					this.prompt.Enabled = false;
+				} else {
+					this.prompt.Enabled = true;
+				}
+			};
 
 			Width = Dim.Percent (80);
 			Height = Dim.Percent (80);
 
 			// On success, we will set this to false.
 			canceled = true;
+
+			KeyPress += (e) => {
+				if (e.KeyEvent.Key == Key.Esc) {
+					Cancel ();
+					e.Handled = true;
+				}
+			};
+			void Cancel ()
+			{
+				canceled = true;
+				Application.RequestStop ();
+			}
 		}
 
 		internal bool canceled;
@@ -564,7 +744,7 @@ namespace Terminal.Gui {
 		public override void WillPresent ()
 		{
 			base.WillPresent ();
-			//SetFocus (nameEntry);
+			dirListView.SetFocus ();
 		}
 
 		//protected override void Dispose (bool disposing)
@@ -585,13 +765,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the name of the directory field label.
+		/// </summary>
+		/// <value>The name of the directory field label.</value>
+		public ustring NameDirLabel {
+			get => nameDirLabel.Text;
+			set {
+				nameDirLabel.Text = $"{value}: ";
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the name field label.
 		/// </summary>
 		/// <value>The name field label.</value>
 		public ustring NameFieldLabel {
 			get => nameFieldLabel.Text;
 			set {
-				nameFieldLabel.Text = value;
+				nameFieldLabel.Text = $"{value}: ";
 			}
 		}
 
@@ -639,7 +830,6 @@ namespace Terminal.Gui {
 			set => dirListView.AllowedFileTypes = value;
 		}
 
-
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="FileDialog"/> allows the file to be saved with a different extension
 		/// </summary>
@@ -670,7 +860,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   To use, create an instance of <see cref="SaveDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally,
 	///   and when this returns, the <see cref="FileName"/>property will contain the selected file name or 
 	///   null if the user canceled. 
 	/// </para>
@@ -686,7 +876,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="message">The message.</param>
-		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message) { }
+		/// <param name="allowedTypes">The allowed types.</param>
+		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
+			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -713,14 +905,34 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
-	///   and when this returns, the list of filds will be available on the <see cref="FilePaths"/> property.
+	///   <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally,
+	///   and when this returns, the list of files will be available on the <see cref="FilePaths"/> property.
 	/// </para>
 	/// <para>
 	/// To select more than one file, users can use the spacebar, or control-t.
 	/// </para>
 	/// </remarks>
 	public class OpenDialog : FileDialog {
+		OpenMode openMode;
+
+		/// <summary>
+		/// Determine which <see cref="System.IO"/> type to open.
+		/// </summary>
+		public enum OpenMode {
+			/// <summary>
+			/// Opens only file or files.
+			/// </summary>
+			File,
+			/// <summary>
+			/// Opens only directory or directories.
+			/// </summary>
+			Directory,
+			/// <summary>
+			/// Opens files and directories.
+			/// </summary>
+			Mixed
+		}
+
 		/// <summary>
 		/// Initializes a new <see cref="OpenDialog"/>.
 		/// </summary>
@@ -729,10 +941,30 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new <see cref="OpenDialog"/>.
 		/// </summary>
-		/// <param name="title"></param>
-		/// <param name="message"></param>
-		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", nameFieldLabel: "Open", message: message)
+		/// <param name="title">The title.</param>
+		/// <param name="message">The message.</param>
+		/// <param name="allowedTypes">The allowed types.</param>
+		/// <param name="openMode">The open mode.</param>
+		public OpenDialog (ustring title, ustring message, List<string> allowedTypes = null, OpenMode openMode = OpenMode.File) : base (title,
+			prompt: openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed,
+			nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
 		{
+			this.openMode = openMode;
+			switch (openMode) {
+			case OpenMode.File:
+				CanChooseFiles = true;
+				CanChooseDirectories = false;
+				break;
+			case OpenMode.Directory:
+				CanChooseFiles = false;
+				CanChooseDirectories = true;
+				break;
+			case OpenMode.Mixed:
+				CanChooseFiles = true;
+				CanChooseDirectories = true;
+				AllowsMultipleSelection = true;
+				break;
+			}
 		}
 
 		/// <summary>
@@ -766,6 +998,9 @@ namespace Terminal.Gui {
 		public bool AllowsMultipleSelection {
 			get => dirListView.allowsMultipleSelection;
 			set {
+				if (!value && openMode == OpenMode.Mixed) {
+					return;
+				}
 				dirListView.allowsMultipleSelection = value;
 				dirListView.Reload ();
 			}

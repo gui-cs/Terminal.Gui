@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MainLoop
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -93,41 +94,17 @@ file descriptor, run timers and idle handlers.
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">MainLoop</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
-  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_MainLoop_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MainLoop</code></pre>
-  </div>
   <h5 id="Terminal_Gui_MainLoop_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 Monitoring of file descriptors is only available on Unix, there
 does not seem to be a way of supporting this on Windows.
 </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_MainLoop_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class MainLoop : Object</code></pre>
+  </div>
   <h3 id="constructors">Constructors
   </h3>
   
@@ -188,6 +165,62 @@ The current IMainLoopDriver in use.
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="Terminal_Gui_MainLoop_IdleHandlers_" data-uid="Terminal.Gui.MainLoop.IdleHandlers*"></a>
+  <h4 id="Terminal_Gui_MainLoop_IdleHandlers" data-uid="Terminal.Gui.MainLoop.IdleHandlers">IdleHandlers</h4>
+  <div class="markdown level1 summary">
+Gets the list of all idle handlers.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Func&lt;bool&gt;&gt; IdleHandlers { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MainLoop_Timeouts_" data-uid="Terminal.Gui.MainLoop.Timeouts*"></a>
+  <h4 id="Terminal_Gui_MainLoop_Timeouts" data-uid="Terminal.Gui.MainLoop.Timeouts">Timeouts</h4>
+  <div class="markdown level1 summary">
+Gets the list of all timeouts sorted by the <span class="xref">System.TimeSpan</span> time ticks./>.
+A shorter limit time can be added at the end, but it will be called before an
+earlier addition that has a longer limit time.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SortedList&lt;long, MainLoop.Timeout&gt; Timeouts { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.SortedList</span>&lt;<span class="xref">System.Int64</span>, <a class="xref" href="Terminal.Gui.MainLoop.Timeout.html">MainLoop.Timeout</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -234,15 +267,6 @@ Adds specified idle handler function to mainloop processing. The handler functio
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean___remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Remove an idle hander by calling <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__">RemoveIdle(Func&lt;Boolean&gt;)</a> with the token this method returns.
-</p>
-<p>
-  If the <code>idleHandler</code> returns <code>false</code> it will be removed and not called subsequently.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_MainLoop_AddTimeout_" data-uid="Terminal.Gui.MainLoop.AddTimeout*"></a>
@@ -292,15 +316,6 @@ Adds a timeout to the mainloop.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean___remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-When time time specified passes, the callback will be invoked.
-If the callback returns true, the timeout will be reset, repeating
-the invocation. If it returns false, the timeout will stop and be removed.
-
-The returned value is a token that can be used to stop the timeout
-by calling <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveTimeout_System_Object_">RemoveTimeout(Object)</a>.
-</div>
   
   
   <a id="Terminal_Gui_MainLoop_EventsPending_" data-uid="Terminal.Gui.MainLoop.EventsPending*"></a>
@@ -345,12 +360,6 @@ Determines whether there are pending events to be processed.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_MainLoop_EventsPending_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-You can use this method if you want to probe if events are pending.
-Typically used if you need to flush the input queue while still
-running some of your own code in your main thread.
-</div>
   
   
   <a id="Terminal_Gui_MainLoop_Invoke_" data-uid="Terminal.Gui.MainLoop.Invoke*"></a>
@@ -392,13 +401,6 @@ Runs one iteration of timers and file watches
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void MainIteration()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_MainLoop_MainIteration_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-You use this to process all pending events (timers, idle handlers and file watches).
-
-You can use it like this:
-while (main.EvensPending ()) MainIteration ();
-</div>
   
   
   <a id="Terminal_Gui_MainLoop_RemoveIdle_" data-uid="Terminal.Gui.MainLoop.RemoveIdle*"></a>
@@ -409,7 +411,7 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveIdle(Func&lt;bool&gt; token)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool RemoveIdle(Func&lt;bool&gt; token)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -428,6 +430,21 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_MainLoop_RemoveTimeout_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout*"></a>
@@ -438,7 +455,7 @@ Removes a previously scheduled timeout
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveTimeout(object token)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool RemoveTimeout(object token)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -457,10 +474,21 @@ Removes a previously scheduled timeout
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_MainLoop_RemoveTimeout_System_Object__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The token parameter is the value returned by AddTimeout.
-</div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_MainLoop_Run_" data-uid="Terminal.Gui.MainLoop.Run*"></a>
@@ -485,6 +513,35 @@ Stops the mainloop.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void Stop()</code></pre>
   </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_MainLoop_TimeoutAdded" data-uid="Terminal.Gui.MainLoop.TimeoutAdded">TimeoutAdded</h4>
+  <div class="markdown level1 summary">
+Invoked when a new timeout is added to be used on the case
+if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_ExitRunLoopAfterFirstIteration">ExitRunLoopAfterFirstIteration</a> is true,
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;long&gt; TimeoutAdded</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">System.Int64</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -495,7 +552,8 @@ Stops the mainloop.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Dialog
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -97,22 +98,22 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
     <div class="level4"><a class="xref" href="Terminal.Gui.Window.html">Window</a></div>
     <div class="level5"><span class="xref">Dialog</span></div>
       <div class="level6"><a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a></div>
+      <div class="level6"><a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
   </div>
+  <h5 id="Terminal_Gui_Dialog_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+To run the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> modally, create the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, and pass it to <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a>. 
+This will execute the dialog until it terminates via the [ESC] or [CTRL-Q] key, or when one of the views
+or buttons added to the dialog calls <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop_Terminal_Gui_Toplevel_">RequestStop(Toplevel)</a>.
+</div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Window.Title</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_GetEnumerator">Window.GetEnumerator()</a>
-    </div>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Add_Terminal_Gui_View_">Window.Add(View)</a>
     </div>
@@ -126,7 +127,19 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_">Window.Redraw(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_Terminal_Gui_MouseEvent_">Window.MouseEvent(MouseEvent)</a>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_OnCanFocusChanged">Window.OnCanFocusChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanging_NStack_ustring_NStack_ustring_">Window.OnTitleChanging(ustring, ustring)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_OnTitleChanged_NStack_ustring_NStack_ustring_">Window.OnTitleChanged(ustring, ustring)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Window.Title</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Border">Window.Border</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Text">Window.Text</a>
@@ -135,13 +148,67 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_TextAlignment">Window.TextAlignment</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Toplevel.Running</a>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_TitleChanging">Window.TitleChanging</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Ready">Toplevel.Ready</a>
+      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_TitleChanged">Window.TitleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnLoaded">Toplevel.OnLoaded()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateForwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_">Toplevel.OnAlternateBackwardKeyChanged(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_">Toplevel.OnQuitKeyChanged(Key)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Create">Toplevel.Create()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_">Toplevel.OnKeyDown(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_">Toplevel.OnKeyUp(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessColdKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_PositionToplevel_Terminal_Gui_Toplevel_">Toplevel.PositionToplevel(Toplevel)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_MouseEvent_Terminal_Gui_MouseEvent_">Toplevel.MouseEvent(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent">Toplevel.WillPresent()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_MoveNext">Toplevel.MoveNext()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_MovePrevious">Toplevel.MovePrevious()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_RequestStop">Toplevel.RequestStop()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_RequestStop_Terminal_Gui_Toplevel_">Toplevel.RequestStop(Toplevel)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_PositionCursor">Toplevel.PositionCursor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_GetTopMdiChild_System_Type_System_String___">Toplevel.GetTopMdiChild(Type, String[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ShowChild_Terminal_Gui_Toplevel_">Toplevel.ShowChild(Toplevel)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Toplevel.Running</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_CanFocus">Toplevel.CanFocus</a>
@@ -156,40 +223,277 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_StatusBar">Toplevel.StatusBar</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_">Toplevel.OnKeyDown(KeyEvent)</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_IsMdiContainer">Toplevel.IsMdiContainer</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_">Toplevel.OnKeyUp(KeyEvent)</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_IsMdiChild">Toplevel.IsMdiChild</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent">Toplevel.WillPresent()</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Loaded">Toplevel.Loaded</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Ready">Toplevel.Ready</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Unloaded">Toplevel.Unloaded</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Activate">Toplevel.Activate</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Deactivate">Toplevel.Deactivate</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ChildClosed">Toplevel.ChildClosed</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AllChildClosed">Toplevel.AllChildClosed</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Closing">Toplevel.Closing</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Closed">Toplevel.Closed</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ChildLoaded">Toplevel.ChildLoaded</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ChildUnloaded">Toplevel.ChildUnloaded</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Resized">Toplevel.Resized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateForwardKeyChanged">Toplevel.AlternateForwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_AlternateBackwardKeyChanged">Toplevel.AlternateBackwardKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_QuitKeyChanged">Toplevel.QuitKeyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__">View.GetMinWidthHeight(Size)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight">View.SetMinWidthHeight()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText">View.UpdateTextFormatterText()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView">View.ProcessResizeView()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize">View.GetAutoSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_">View.GetHotKeySpecifierLength(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize">View.GetTextFormatterBoundsSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize">View.GetBoundsTextFormatterSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">View.Shortcut</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag">View.ShortcutTag</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction">View.ShortcutAction</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -240,76 +544,16 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim">View.ForceValidatePosDim</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ChildNeedsDisplay">View.ChildNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Focused">View.Focused</a>
@@ -321,49 +565,76 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PreserveTrailingSpaces">View.PreserveTrailingSpaces</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsAdded">View.IsAdded</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enabled">View.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted">View.LayoutStarted</a>
@@ -375,69 +646,15 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Initialized">View.Initialized</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Dialog_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Dialog : Window, IDisposable, ISupportInitializeNotification, ISupportInitialize, IEnumerable</code></pre>
+    <pre><code class="lang-csharp hljs">public class Dialog : Window</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Dialog_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-To run the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> modally, create the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, and pass it to <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>. 
-This will execute the dialog until it terminates via the [ESC] or [CTRL-Q] key, or when one of the views
-or buttons added to the dialog calls <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a>.
-</div>
   <h3 id="constructors">Constructors
   </h3>
   
@@ -452,16 +669,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Dialog()</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Dialog__ctor_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
-</p>
-<p>
-Use <a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_">AddButton(Button)</a> to add buttons to the dialog.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
@@ -507,12 +714,6 @@ and an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button____remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-if <code>width</code> and <code>height</code> are both 0, the Dialog will be vertically and horizontally centered in the
-container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
-</div>
   
   
   <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
@@ -548,11 +749,36 @@ and with an optional set of <a class="xref" href="Terminal.Gui.Button.html">Butt
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_Terminal_Gui_Button____remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Terminal_Gui_Dialog_ButtonAlignment_" data-uid="Terminal.Gui.Dialog.ButtonAlignment*"></a>
+  <h4 id="Terminal_Gui_Dialog_ButtonAlignment" data-uid="Terminal.Gui.Dialog.ButtonAlignment">ButtonAlignment</h4>
+  <div class="markdown level1 summary">
+Determines how the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> <a class="xref" href="Terminal.Gui.Button.html">Button</a>s are aligned along the 
+bottom of the dialog. 
 </div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dialog.ButtonAlignments ButtonAlignment { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Dialog.ButtonAlignments.html">Dialog.ButtonAlignments</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -631,25 +857,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
@@ -659,9 +866,6 @@ chance to process the keystroke.
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitialize</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
 </article>
           </div>
@@ -673,7 +877,8 @@ chance to process the keystroke.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuItem
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -93,61 +94,25 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
     <div class="level1"><span class="xref">MenuItem</span></div>
       <div class="level2"><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_MenuItem_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MenuItem</code></pre>
+    <pre><code class="lang-csharp hljs">public class MenuItem : Object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="Terminal_Gui_MenuItem__ctor_" data-uid="Terminal.Gui.MenuItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuItem__ctor" data-uid="Terminal.Gui.MenuItem.#ctor">MenuItem()</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem()</code></pre>
-  </div>
-  
-  
-  <a id="Terminal_Gui_MenuItem__ctor_" data-uid="Terminal.Gui.MenuItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)">MenuItem(ustring, ustring, Action, Func&lt;Boolean&gt;, MenuItem)</h4>
+  <h4 id="Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_Terminal_Gui_Key_" data-uid="Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem,Terminal.Gui.Key)">MenuItem(ustring, ustring, Action, Func&lt;Boolean&gt;, MenuItem, Key)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null, Key shortcut)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -182,7 +147,41 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
       <tr>
         <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
         <td><span class="parametername">parent</span></td>
-        <td>The parent of this menu item.</td>
+        <td>The <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Parent">Parent</a> of this menu item.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">shortcut</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Shortcut">Shortcut</a> keystroke combination.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuItem__ctor_" data-uid="Terminal.Gui.MenuItem.#ctor*"></a>
+  <h4 id="Terminal_Gui_MenuItem__ctor_Terminal_Gui_Key_" data-uid="Terminal.Gui.MenuItem.#ctor(Terminal.Gui.Key)">MenuItem(Key)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuItem(Key shortcut)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td><span class="parametername">shortcut</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -194,7 +193,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   <div class="markdown level1 summary">
 The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 For example HotKey would be &quot;N&quot; when the File Menu is open (assuming there is a &quot;_New&quot; entry
-if the ShortCut is set to &quot;Control-N&quot;, this would be a global hotkey that would trigger as well
+if the Shortcut is set to &quot;Control-N&quot;, this would be a global hotkey that would trigger as well
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -212,32 +211,6 @@ if the ShortCut is set to &quot;Control-N&quot;, this would be a global hotkey t
     <tbody>
       <tr>
         <td><span class="xref">System.Rune</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_MenuItem_ShortCut" data-uid="Terminal.Gui.MenuItem.ShortCut">ShortCut</h4>
-  <div class="markdown level1 summary">
-This is the global setting that can be used as a global shortcut to invoke the action on the menu.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Key ShortCut</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -354,6 +327,33 @@ Sets or gets the type selection indicator the menu item will be displayed with.
   </table>
   
   
+  <a id="Terminal_Gui_MenuItem_Data_" data-uid="Terminal.Gui.MenuItem.Data*"></a>
+  <h4 id="Terminal_Gui_MenuItem_Data" data-uid="Terminal.Gui.MenuItem.Data">Data</h4>
+  <div class="markdown level1 summary">
+Gets or sets arbitrary data for the menu item.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Data { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_MenuItem_Help_" data-uid="Terminal.Gui.MenuItem.Help*"></a>
   <h4 id="Terminal_Gui_MenuItem_Help" data-uid="Terminal.Gui.MenuItem.Help">Help</h4>
   <div class="markdown level1 summary">
@@ -408,10 +408,64 @@ Gets or sets the parent for this <a class="xref" href="Terminal.Gui.MenuItem.htm
   </table>
   
   
+  <a id="Terminal_Gui_MenuItem_Shortcut_" data-uid="Terminal.Gui.MenuItem.Shortcut*"></a>
+  <h4 id="Terminal_Gui_MenuItem_Shortcut" data-uid="Terminal.Gui.MenuItem.Shortcut">Shortcut</h4>
+  <div class="markdown level1 summary">
+This is the global setting that can be used as a global <a class="xref" href="Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_Shortcut">Shortcut</a> to invoke the action on the menu.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Key Shortcut { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuItem_ShortcutTag_" data-uid="Terminal.Gui.MenuItem.ShortcutTag*"></a>
+  <h4 id="Terminal_Gui_MenuItem_ShortcutTag" data-uid="Terminal.Gui.MenuItem.ShortcutTag">ShortcutTag</h4>
+  <div class="markdown level1 summary">
+The keystroke combination used in the <a class="xref" href="Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutTag">ShortcutTag</a> as string.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ustring ShortcutTag { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_MenuItem_Title_" data-uid="Terminal.Gui.MenuItem.Title*"></a>
   <h4 id="Terminal_Gui_MenuItem_Title" data-uid="Terminal.Gui.MenuItem.Title">Title</h4>
   <div class="markdown level1 summary">
-Gets or sets the title. 
+Gets or sets the title.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -526,7 +580,8 @@ Shortcut to check if the menu item is enabled
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

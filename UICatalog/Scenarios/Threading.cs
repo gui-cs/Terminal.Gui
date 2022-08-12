@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Threading", Description: "Demonstration of how to use threading in different ways")]
 	[ScenarioCategory ("Threading")]
-	class Threading : Scenario {
+	public class Threading : Scenario {
 		private Action _action;
 		private Action _lambda;
 		private EventHandler _handler;
@@ -89,10 +89,16 @@ namespace UICatalog {
 			var _btnClearData = new Button (80, 20, "Clear Data");
 			_btnClearData.Clicked += () => { _itemsList.Source = null; LogJob ("Cleaning Data"); };
 			var _btnQuit = new Button (80, 22, "Quit");
-			_btnQuit.Clicked += Application.RequestStop;
+			_btnQuit.Clicked += () => Application.RequestStop ();
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);
 
+			void Top_Loaded ()
+			{
+				_btnActionCancel.SetFocus ();
+				Top.Loaded -= Top_Loaded;
+			}
+			Top.Loaded += Top_Loaded;
 		}
 
 		private async void LoadData ()
@@ -127,6 +133,7 @@ namespace UICatalog {
 			await Task.Delay (3000);
 			LogJob ("Returning from task method");
 			await _itemsList.SetSourceAsync (items);
+			_itemsList.SetNeedsDisplay ();
 		}
 
 		private CancellationTokenSource cancellationTokenSource;

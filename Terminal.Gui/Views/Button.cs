@@ -31,8 +31,11 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Button : View {
-		ustring text;
 		bool is_default;
+		Rune _leftBracket;
+		Rune _rightBracket;
+		Rune _leftDefault;
+		Rune _rightDefault;
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -55,9 +58,9 @@ namespace Terminal.Gui {
 		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
-		public Button (ustring text, bool is_default = false) : base ()
+		public Button (ustring text, bool is_default = false) : base (text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
 		/// <summary>
@@ -87,18 +90,16 @@ namespace Terminal.Gui {
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
 		public Button (int x, int y, ustring text, bool is_default)
-		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1))
+		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1), text)
 		{
-			Init (text, is_default);
+			Initialize (text, is_default);
 		}
 
-		Rune _leftBracket;
-		Rune _rightBracket;
-		Rune _leftDefault;
-		Rune _rightDefault;
-
-		void Init (ustring text, bool is_default)
+		void Initialize (ustring text, bool is_default)
 		{
+			TextAlignment = TextAlignment.Centered;
+			VerticalTextAlignment = VerticalTextAlignment.Middle;
+
 			HotKeySpecifier = new Rune ('_');
 
 			_leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
@@ -107,21 +108,20 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
-			this.IsDefault = is_default;
+			AutoSize = true;
+			this.is_default = is_default;
 			Text = text ?? string.Empty;
-		}
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 
-		/// <summary>
-		///   The text displayed by this <see cref="Button"/>.
-		/// </summary>
-		public new ustring Text {
-			get {
-				return text;
-			}
+			// Things this view knows how to do
+			AddCommand (Command.Accept, () => AcceptKey ());
 
-			set {
-				text = value;
-				Update ();
+			// Default keybindings for this view
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.Space, Command.Accept);
+			if (HotKey != Key.Null) {
+				AddKeyBinding (Key.Space | HotKey, Command.Accept);
 			}
 		}
 
@@ -133,69 +133,106 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
-				Update ();
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
-		internal void Update ()
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => base.HotKey;
+			set {
+				if (base.HotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					if (base.HotKey != Key.Null && ContainsKeyBinding (Key.Space | base.HotKey)) {
+						if (v == Key.Null) {
+							ClearKeybinding (Key.Space | base.HotKey);
+						} else {
+							ReplaceKeyBinding (Key.Space | base.HotKey, Key.Space | v);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v, Command.Accept);
+					}
+					base.HotKey = TextFormatter.HotKey = v;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		protected override void UpdateTextFormatterText ()
 		{
 			if (IsDefault)
-				base.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + Text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			if (Width is Dim.DimCombine) {
-				// It's a Dim.DimCombine and so can't be assigned. Let it have it's own anchor.
-				w = Width.Anchor (w);
-			} else {
-				Width = w;
-			}
-			Height = 1;
-			Frame = new Rect (Frame.Location, new Size (w, 1));
-			SetNeedsDisplay ();
-		}
-
-		bool CheckKey (KeyEvent key)
-		{
-			if (key.Key == (Key.AltMask | HotKey)) {
-				SetFocus ();
-				Clicked?.Invoke ();
-				return true;
-			}
-			return false;
+				TextFormatter.Text = ustring.Make (_leftBracket) + " " + Text + " " + ustring.Make (_rightBracket);
 		}
 
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
-			if (kb.IsAlt)
-				return CheckKey (kb);
+			if (!Enabled) {
+				return false;
+			}
 
-			return false;
+			return ExecuteHotKey (kb);
 		}
 
 		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
-			if (IsDefault && kb.KeyValue == '\n') {
-				Clicked?.Invoke ();
-				return true;
+			if (!Enabled) {
+				return false;
 			}
-			return CheckKey (kb);
+
+			return ExecuteColdKey (kb);
 		}
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || kb.Key == HotKey) {
-				Clicked?.Invoke ();
-				return true;
+			if (!Enabled) {
+				return false;
 			}
+
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
+
 			return base.ProcessKey (kb);
 		}
 
+		bool ExecuteHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				return AcceptKey ();
+			}
+			return false;
+		}
+
+		bool ExecuteColdKey (KeyEvent ke)
+		{
+			if (IsDefault && ke.KeyValue == '\n') {
+				return AcceptKey ();
+			}
+			return ExecuteHotKey (ke);
+		}
+
+		bool AcceptKey ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			OnClicked ();
+			return true;
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
+		}
 
 		/// <summary>
 		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
@@ -213,12 +250,13 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
 				me.Flags == MouseFlags.Button1TripleClicked) {
-				if (CanFocus) {
+				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
-					Clicked?.Invoke ();
+					OnClicked ();
 				}
 
 				return true;
@@ -229,15 +267,23 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			if (HotKey == Key.Unknown) {
-				for (int i = 0; i < base.Text.RuneCount; i++) {
-					if (base.Text [i] == text [0]) {
+			if (HotKey == Key.Unknown && Text != "") {
+				for (int i = 0; i < TextFormatter.Text.RuneCount; i++) {
+					if (TextFormatter.Text [i] == Text [0]) {
 						Move (i, 0);
 						return;
 					}
 				}
 			}
 			base.PositionCursor ();
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 }

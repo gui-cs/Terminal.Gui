@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ListWrapper
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -92,42 +93,18 @@ Implements an <a class="xref" href="Terminal.Gui.IListDataSource.html">IListData
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ListWrapper</span></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
+  <h5 id="Terminal_Gui_ListWrapper_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">Implements support for rendering marked items.</div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ListWrapper_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ListWrapper : IListDataSource</code></pre>
+    <pre><code class="lang-csharp hljs">public class ListWrapper : Object, IListDataSource</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ListWrapper_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">Implements support for rendering marked items.</div>
   <h3 id="constructors">Constructors
   </h3>
   
@@ -172,6 +149,33 @@ Gets the number of items in the <span class="xref">System.Collections.IList</spa
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListWrapper_Length_" data-uid="Terminal.Gui.ListWrapper.Length*"></a>
+  <h4 id="Terminal_Gui_ListWrapper_Length" data-uid="Terminal.Gui.ListWrapper.Length">Length</h4>
+  <div class="markdown level1 summary">
+Gets the maximum item length in the <span class="xref">System.Collections.IList</span>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Length { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -237,14 +241,14 @@ Returns true if the item is marked, false otherwise.
   
   
   <a id="Terminal_Gui_ListWrapper_Render_" data-uid="Terminal.Gui.ListWrapper.Render*"></a>
-  <h4 id="Terminal_Gui_ListWrapper_Render_Terminal_Gui_ListView_Terminal_Gui_ConsoleDriver_System_Boolean_System_Int32_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)">Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)</h4>
+  <h4 id="Terminal_Gui_ListWrapper_Render_Terminal_Gui_ListView_Terminal_Gui_ConsoleDriver_System_Boolean_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32, Int32)</h4>
   <div class="markdown level1 summary">
 Renders a <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> item to the appropriate type.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Render(ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Render(ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -290,6 +294,11 @@ Renders a <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> item to
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">width</span></td>
         <td>The item width.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">start</span></td>
+        <td>The index of the string to be displayed.</td>
       </tr>
     </tbody>
   </table>
@@ -368,7 +377,8 @@ Returns the source as IList.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

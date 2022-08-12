@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Unicode", Description: "Tries to test Unicode in all controls (#204)")]
-	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Text and Formatting")]
 	[ScenarioCategory ("Controls")]
-	class UnicodeInMenu : Scenario {
+	public class UnicodeInMenu : Scenario {
 		public override void Setup ()
 		{
 			const string IdenticalSign = "\u2261";
@@ -37,7 +37,7 @@ namespace UICatalog {
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.ControlQ, "~^Q~ Выход", () => Application.RequestStop()),
+				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Выход", () => Application.RequestStop()),
 				new StatusItem (Key.Unknown, "~F2~ Создать", null),
 				new StatusItem(Key.Unknown, "~F3~ Со_хранить", null),
 			});

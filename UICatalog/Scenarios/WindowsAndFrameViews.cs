@@ -2,12 +2,10 @@
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, FrameViews, and how TAB doesn't work right (#434, #522)")]
-	[ScenarioCategory ("Views")]
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, and FrameViews.")]
 	[ScenarioCategory ("Layout")]
-	[ScenarioCategory ("Bug Repro")]
-	class WindowsAndFrameViews : Scenario {
+	public class WindowsAndFrameViews : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
@@ -108,7 +106,7 @@ namespace UICatalog {
 				var frameView = new FrameView ("This is a Sub-FrameView") {
 					X = Pos.Percent (50),
 					Y = 1,
-					Width = Dim.Percent (100),
+					Width = Dim.Percent (100, true), // Or Dim.Percent (50)
 					Height = 5,
 					ColorScheme = Colors.Base,
 					Text = "The Text in the FrameView",

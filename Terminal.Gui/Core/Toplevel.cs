@@ -1,29 +1,24 @@
-﻿//
-// Toplevel.cs: Toplevel views can be modally executed
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Toplevel views can be modally executed.
+	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
+	/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel)"/>. 
-	///     They return control to the caller when <see cref="Application.RequestStop()"/> has 
-	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
+	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. 
+	///     They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has 
+	///     been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>). 
 	///   </para>
 	///   <para>
-	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
+	///     A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-	///     call <see cref="Application.Run(Toplevel)"/>.
+	///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 	///   </para>
 	///   <para>
 	///     Toplevels can also opt-in to more sophisticated initialization
@@ -49,22 +44,160 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begin loaded.
+		/// A Loaded event handler is a good place to finalize initialization before calling 
+		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
+		/// </summary>
+		public event Action Loaded;
+
+		/// <summary>
+		/// Invoked when the Toplevel <see cref="MainLoop"/> has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
+		/// changes. 
+		/// <para>A Ready event handler is a good place to finalize initialization after calling 
+		/// <see cref="Application.Run(Func{Exception, bool})"/> on this Toplevel.</para>
 		/// </summary>
 		public event Action Ready;
 
 		/// <summary>
-		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> has been unloaded.
+		/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(Application.RunState)"/>.
+		/// </summary>
+		public event Action Unloaded;
+
+		/// <summary>
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
+		/// </summary>
+		public event Action<Toplevel> Activate;
+
+		/// <summary>
+		/// Invoked when the Toplevel<see cref="Application.RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
+		/// </summary>
+		public event Action<Toplevel> Deactivate;
+
+		/// <summary>
+		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
+		/// <see cref="Application.End(View)"/>.
+		/// </summary>
+		public event Action<Toplevel> ChildClosed;
+
+		/// <summary>
+		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
+		/// by <see cref="Application.End(View)"/>.
+		/// </summary>
+		public event Action AllChildClosed;
+
+		/// <summary>
+		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is being closed by  
+		/// <see cref="Application.RequestStop(Toplevel)"/>.
+		/// </summary>
+		public event Action<ToplevelClosingEventArgs> Closing;
+
+		/// <summary>
+		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(View)"/>.
+		/// </summary>
+		public event Action<Toplevel> Closed;
+
+		/// <summary>
+		/// Invoked when a child Toplevel's <see cref="Application.RunState"/> has been loaded.
+		/// </summary>
+		public event Action<Toplevel> ChildLoaded;
+
+		/// <summary>
+		/// Invoked when a cjhild Toplevel's <see cref="Application.RunState"/> has been unloaded.
+		/// </summary>
+		public event Action<Toplevel> ChildUnloaded;
+
+		/// <summary>
+		/// Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.
+		/// </summary>
+		public event Action<Size> Resized;
+
+		internal virtual void OnResized (Size size)
+		{
+			Resized?.Invoke (size);
+		}
+
+		internal virtual void OnChildUnloaded (Toplevel top)
+		{
+			ChildUnloaded?.Invoke (top);
+		}
+
+		internal virtual void OnChildLoaded (Toplevel top)
+		{
+			ChildLoaded?.Invoke (top);
+		}
+
+		internal virtual void OnClosed (Toplevel top)
+		{
+			Closed?.Invoke (top);
+		}
+
+		internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
+		{
+			Closing?.Invoke (ev);
+			return ev.Cancel;
+		}
+
+		internal virtual void OnAllChildClosed ()
+		{
+			AllChildClosed?.Invoke ();
+		}
+
+		internal virtual void OnChildClosed (Toplevel top)
+		{
+			if (IsMdiContainer) {
+				SetChildNeedsDisplay ();
+			}
+			ChildClosed?.Invoke (top);
+		}
+
+		internal virtual void OnDeactivate (Toplevel activated)
+		{
+			Deactivate?.Invoke (activated);
+		}
+
+		internal virtual void OnActivate (Toplevel deactivated)
+		{
+			Activate?.Invoke (deactivated);
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time. 
+		/// </summary>
+		virtual public void OnLoaded ()
+		{
+			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
+				tl.OnLoaded ();
+			}
+			Loaded?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the 
+		/// first iteration of the loop.
 		/// </summary>
 		internal virtual void OnReady ()
 		{
+			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
+				tl.OnReady ();
+			}
 			Ready?.Invoke ();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified absolute layout.
+		/// Called from <see cref="Application.End(Application.RunState)"/> before the <see cref="Toplevel"/> is disposed.
+		/// </summary>
+		internal virtual void OnUnloaded ()
+		{
+			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
+				tl.OnUnloaded ();
+			}
+			Unloaded?.Invoke ();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <param name="frame">A superview-relative rectangle specifying the location and size for the new Toplevel</param>
 		public Toplevel (Rect frame) : base (frame)
@@ -73,7 +206,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen.
+		/// Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, 
+		/// defaulting to full screen.
 		/// </summary>
 		public Toplevel () : base ()
 		{
@@ -84,13 +218,92 @@ namespace Terminal.Gui {
 
 		void Initialize ()
 		{
-			ColorScheme = Colors.Base;
+			ColorScheme = Colors.TopLevel;
+
+			// Things this view knows how to do
+			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
+			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
+			AddCommand (Command.NextView, () => { MoveNextView (); return true; });
+			AddCommand (Command.PreviousView, () => { MovePreviousView (); return true; });
+			AddCommand (Command.NextViewOrTop, () => { MoveNextViewOrTop (); return true; });
+			AddCommand (Command.PreviousViewOrTop, () => { MovePreviousViewOrTop (); return true; });
+			AddCommand (Command.Refresh, () => { Application.Refresh (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
+			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
+
+			AddKeyBinding (Key.Tab, Command.NextView);
+
+			AddKeyBinding (Key.CursorRight, Command.NextView);
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);
+
+			AddKeyBinding (Key.CursorDown, Command.NextView);
+			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
+
+			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.PreviousView);
+			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
+			AddKeyBinding (Key.CursorUp, Command.PreviousView);
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);
+
+			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
+			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+
+			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
+			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+
+			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateForwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.AlternateForwardKey);
+			AlternateForwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
+		/// </summary>
+		public event Action<Key> AlternateBackwardKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.AlternateBackwardKey);
+			AlternateBackwardKeyChanged?.Invoke (oldKey);
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
+		/// </summary>
+		public event Action<Key> QuitKeyChanged;
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
+		/// </summary>
+		/// <param name="oldKey"></param>
+		public virtual void OnQuitKeyChanged (Key oldKey)
+		{
+			ReplaceKeyBinding (oldKey, Application.QuitKey);
+			QuitKeyChanged?.Invoke (oldKey);
 		}
 
 		/// <summary>
 		/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
 		/// </summary>
-		/// <returns>The create.</returns>
+		/// <returns>The created Toplevel.</returns>
 		public static Toplevel Create ()
 		{
 			return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
@@ -101,25 +314,58 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
-			get => true;
+			get => SuperView == null ? true : base.CanFocus;
 		}
 
 		/// <summary>
-		/// Determines whether the <see cref="Toplevel"/> is modal or not.
-		/// Causes <see cref="ProcessKey(KeyEvent)"/> to propagate keys upwards
-		/// by default unless set to <see langword="true"/>.
+		/// Determines whether the <see cref="Toplevel"/> is modal or not. 
+		/// If set to <c>false</c> (the default):
+		/// 
+		/// <list type="bullet">
+		///   <item>
+		///		<description><see cref="ProcessKey(KeyEvent)"/> events will propagate keys upwards.</description>
+		///   </item>
+		///   <item>
+		///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
+		///   </item>
+		/// </list>
+		///
+		/// If set to <c>true</c>:
+		/// 
+		/// <list type="bullet">
+		///   <item>
+		///		<description><see cref="ProcessKey(KeyEvent)"/> events will NOT propogate keys upwards.</description>
+		///	  </item>
+		///   <item>
+		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
+		///   </item>
+		/// </list>
 		/// </summary>
 		public bool Modal { get; set; }
 
 		/// <summary>
-		/// Gets or sets the menu for this Toplevel
+		/// Gets or sets the menu for this Toplevel.
 		/// </summary>
-		public MenuBar MenuBar { get; set; }
+		public virtual MenuBar MenuBar { get; set; }
 
 		/// <summary>
-		/// Gets or sets the status bar for this Toplevel
+		/// Gets or sets the status bar for this Toplevel.
 		/// </summary>
-		public StatusBar StatusBar { get; set; }
+		public virtual StatusBar StatusBar { get; set; }
+
+		/// <summary>
+		/// Gets or sets if this Toplevel is a Mdi container.
+		/// </summary>
+		public bool IsMdiContainer { get; set; }
+
+		/// <summary>
+		/// Gets or sets if this Toplevel is a Mdi child.
+		/// </summary>
+		public bool IsMdiChild {
+			get {
+				return Application.MdiTop != null && Application.MdiTop != this && !Modal;
+			}
+		}
 
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -130,10 +376,10 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
-				if (MenuBar != null && MenuBar.OnKeyDown (keyEvent)) {
-					return true;
-				}
-				break;
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
+			case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
+				return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
 			}
 
 			return false;
@@ -148,6 +394,8 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
 				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
 					return true;
 				}
@@ -163,51 +411,94 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (keyEvent.Key) {
-			case Key.ControlQ:
-				// FIXED: stop current execution of this container
-				Application.RequestStop ();
-				break;
-			case Key.ControlZ:
-				Driver.Suspend ();
-				return true;
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
+				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
+			if (result != null)
+				return (bool)result;
 
 #if false
-			case Key.F5:
+			if (keyEvent.Key == Key.F5) {
 				Application.DebugDrawBounds = !Application.DebugDrawBounds;
 				SetNeedsDisplay ();
 				return true;
+			}
 #endif
-			case Key.Tab:
-			case Key.CursorRight:
-			case Key.CursorDown:
-			case Key.ControlI: // Unix
-				var old = GetDeepestFocusedSubview (Focused);
-				if (!FocusNext ())
-					FocusNext ();
-				if (old != Focused) {
-					old?.SetNeedsDisplay ();
-					Focused?.SetNeedsDisplay ();
-				} else {
-					FocusNearestView (GetToplevelSubviews (true));
-				}
-				return true;
-			case Key.CursorLeft:
-			case Key.CursorUp:
-			case Key.BackTab:
-				old = GetDeepestFocusedSubview (Focused);
-				if (!FocusPrev ())
-					FocusPrev ();
-				if (old != Focused) {
-					old?.SetNeedsDisplay ();
-					Focused?.SetNeedsDisplay ();
-				} else {
-					FocusNearestView (GetToplevelSubviews (false));
-				}
-				return true;
+			return false;
+		}
 
-			case Key.ControlL:
-				Application.Refresh ();
+		private void MovePreviousViewOrTop ()
+		{
+			if (Application.MdiTop == null) {
+				var top = Modal ? this : Application.Top;
+				top.FocusPrev ();
+				if (top.Focused == null) {
+					top.FocusPrev ();
+				}
+				top.SetNeedsDisplay ();
+				Application.EnsuresTopOnFront ();
+			} else {
+				MovePrevious ();
+			}
+		}
+
+		private void MoveNextViewOrTop ()
+		{
+			if (Application.MdiTop == null) {
+				var top = Modal ? this : Application.Top;
+				top.FocusNext ();
+				if (top.Focused == null) {
+					top.FocusNext ();
+				}
+				top.SetNeedsDisplay ();
+				Application.EnsuresTopOnFront ();
+			} else {
+				MoveNext ();
+			}
+		}
+
+		private void MovePreviousView ()
+		{
+			var old = GetDeepestFocusedSubview (Focused);
+			if (!FocusPrev ())
+				FocusPrev ();
+			if (old != Focused && old != Focused?.Focused) {
+				old?.SetNeedsDisplay ();
+				Focused?.SetNeedsDisplay ();
+			} else {
+				FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
+			}
+		}
+
+		private void MoveNextView ()
+		{
+			var old = GetDeepestFocusedSubview (Focused);
+			if (!FocusNext ())
+				FocusNext ();
+			if (old != Focused && old != Focused?.Focused) {
+				old?.SetNeedsDisplay ();
+				Focused?.SetNeedsDisplay ();
+			} else {
+				FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
+			}
+		}
+
+		private void QuitToplevel ()
+		{
+			if (Application.MdiTop != null) {
+				Application.MdiTop.RequestStop ();
+			} else {
+				Application.RequestStop ();
+			}
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
 				return true;
 			}
 			return false;
@@ -227,48 +518,41 @@ namespace Terminal.Gui {
 			return view;
 		}
 
-		IEnumerable<View> GetToplevelSubviews (bool isForward)
-		{
-			if (SuperView == null) {
-				return null;
-			}
-
-			HashSet<View> views = new HashSet<View> ();
-
-			foreach (var v in SuperView.Subviews) {
-				views.Add (v);
-			}
-
-			return isForward ? views : views.Reverse ();
-		}
-
-		void FocusNearestView (IEnumerable<View> views)
+		void FocusNearestView (IEnumerable<View> views, Direction direction)
 		{
 			if (views == null) {
 				return;
 			}
 
 			bool found = false;
+			bool focusProcessed = false;
+			int idx = 0;
 
 			foreach (var v in views) {
 				if (v == this) {
 					found = true;
 				}
 				if (found && v != this) {
-					v.EnsureFocus ();
+					if (direction == Direction.Forward) {
+						SuperView?.FocusNext ();
+					} else {
+						SuperView?.FocusPrev ();
+					}
+					focusProcessed = true;
 					if (SuperView.Focused != null && SuperView.Focused != this) {
 						return;
 					}
+				} else if (found && !focusProcessed && idx == views.Count () - 1) {
+					views.ToList () [0].SetFocus ();
 				}
+				idx++;
 			}
 		}
 
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
-			if (this == Application.Top) {
-				AddMenuStatusBar (view);
-			}
+			AddMenuStatusBar (view);
 			base.Add (view);
 		}
 
@@ -315,35 +599,72 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
+		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
+			out int nx, out int ny, out View mb, out View sb)
 		{
-			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
-			bool m, s;
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				m = Application.Top.MenuBar != null;
-			} else {
-				m = ((Toplevel)SuperView).MenuBar != null;
-			}
 			int l;
-			if (SuperView == null || SuperView is Toplevel) {
+			View superView;
+			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+				l = Driver.Cols;
+				superView = Application.Top;
+			} else {
+				l = top.SuperView.Frame.Width;
+				superView = top.SuperView;
+			}
+			nx = Math.Max (x, 0);
+			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+			var canChange = SetWidth (top.Frame.Width, out int rWidth);
+			if (canChange && rWidth < 0 && nx >= top.Frame.X) {
+				nx = Math.Max (top.Frame.Right - 2, 0);
+			} else if (rWidth < 0 && nx >= top.Frame.X) {
+				nx = Math.Min (nx + 1, top.Frame.Right - 2);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
+			bool m, s;
+			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+				m = Application.Top.MenuBar?.Visible == true;
+				mb = Application.Top.MenuBar;
+			} else {
+				var t = top.SuperView;
+				while (!(t is Toplevel)) {
+					t = t.SuperView;
+				}
+				m = ((Toplevel)t).MenuBar?.Visible == true;
+				mb = ((Toplevel)t).MenuBar;
+			}
+			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = m ? 1 : 0;
 			} else {
 				l = 0;
 			}
 			ny = Math.Max (y, l);
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				s = Application.Top.StatusBar != null && Application.Top.StatusBar.Visible;
+			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+				s = Application.Top.StatusBar?.Visible == true;
+				sb = Application.Top.StatusBar;
 			} else {
-				s = ((Toplevel)SuperView).StatusBar != null && ((Toplevel)SuperView).StatusBar.Visible;
+				var t = top.SuperView;
+				while (!(t is Toplevel)) {
+					t = t.SuperView;
+				}
+				s = ((Toplevel)t).StatusBar?.Visible == true;
+				sb = ((Toplevel)t).StatusBar;
 			}
-			if (SuperView == null || SuperView is Toplevel) {
+			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = s ? Driver.Rows - 1 : Driver.Rows;
 			} else {
-				l = s ? SuperView.Frame.Height - 1 : SuperView.Frame.Height;
+				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			canChange = SetHeight (top.Frame.Height, out int rHeight);
+			if (canChange && rHeight < 0 && ny >= top.Frame.Y) {
+				ny = Math.Max (top.Frame.Bottom - 2, 0);
+			} else if (rHeight < 0 && ny >= top.Frame.Y) {
+				ny = Math.Min (ny + 1, top.Frame.Bottom - 2);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+
+			return superView;
 		}
 
 		internal void PositionToplevels ()
@@ -356,65 +677,383 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void PositionToplevel (Toplevel top)
+		/// <summary>
+		/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
+		/// </summary>
+		/// <param name="top">The toplevel.</param>
+		public virtual void PositionToplevel (Toplevel top)
 		{
-			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-			if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
-				if (top.X is Pos.PosAbsolute && top.Bounds.X != nx) {
+			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
+				out int nx, out int ny, out _, out View sb);
+			bool layoutSubviews = false;
+			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
+				|| (top?.SuperView == null && top.IsMdiChild))
+				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
+					layoutSubviews = true;
 				}
-				if (top.Y is Pos.PosAbsolute && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
 					top.Y = ny;
+					layoutSubviews = true;
 				}
 			}
-			if (top.StatusBar != null) {
-				if (ny + top.Frame.Height > top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
-					if (top.Height is Dim.DimFill)
-						top.Height = Dim.Fill () - (top.StatusBar.Visible ? 1 : 0);
-				}
-				if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
-					top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
-					top.LayoutSubviews ();
-				}
-				top.BringSubviewToFront (top.StatusBar);
+
+			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
+					&& top.Height is Dim.DimFill) {
+
+				top.Height = Dim.Fill (sb.Visible ? 1 : 0);
+				layoutSubviews = true;
+			}
+
+			if (layoutSubviews) {
+				superView.LayoutSubviews ();
 			}
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Application.CurrentView = this;
+			if (!Visible) {
+				return;
+			}
 
-			if (IsCurrentTop || this == Application.Top) {
-				if (!NeedDisplay.IsEmpty) {
-					Driver.SetAttribute (Colors.TopLevel.Normal);
+			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
+				Driver.SetAttribute (GetNormalColor ());
 
-					// This is the Application.Top. Clear just the region we're being asked to redraw 
-					// (the bounds passed to us).
-					Clear (bounds);
-					Driver.SetAttribute (Colors.Base.Normal);
-					PositionToplevels ();
-				}
-				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (bounds)) {
-						view.SetNeedsLayout ();
-						view.SetNeedsDisplay (view.Bounds);
+				// This is the Application.Top. Clear just the region we're being asked to redraw 
+				// (the bounds passed to us).
+				Clear ();
+				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+
+				LayoutSubviews ();
+				PositionToplevels ();
+
+				if (this == Application.MdiTop) {
+					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+						if (top.Frame.IntersectsWith (bounds)) {
+							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+								top.SetNeedsLayout ();
+								top.SetNeedsDisplay (top.Bounds);
+								top.Redraw (top.Bounds);
+							}
+						}
 					}
 				}
 
+				foreach (var view in Subviews) {
+					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
+						view.SetNeedsLayout ();
+						view.SetNeedsDisplay (view.Bounds);
+						//view.Redraw (view.Bounds);
+					}
+				}
+
+				ClearLayoutNeeded ();
 				ClearNeedsDisplay ();
 			}
 
-			base.Redraw (base.Bounds);
+			base.Redraw (Bounds);
+		}
+
+		bool OutsideTopFrame (Toplevel top)
+		{
+			if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows) {
+				return true;
+			}
+			return false;
+		}
+
+		internal static Point? dragPosition;
+		Point start;
+
+		///<inheritdoc/>
+		public override bool MouseEvent (MouseEvent mouseEvent)
+		{
+			if (!CanFocus) {
+				return true;
+			}
+
+			int nx, ny;
+			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
+				|| mouseEvent.Flags == MouseFlags.Button2Pressed
+				|| mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+
+				SetFocus ();
+				Application.EnsuresTopOnFront ();
+
+				// Only start grabbing if the user clicks on the title bar.
+				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
+					start = new Point (mouseEvent.X, mouseEvent.Y);
+					dragPosition = new Point ();
+					nx = mouseEvent.X - mouseEvent.OfX;
+					ny = mouseEvent.Y - mouseEvent.OfY;
+					dragPosition = new Point (nx, ny);
+					Application.GrabMouse (this);
+				}
+
+				//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
+				return true;
+			} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
+				mouseEvent.Flags == MouseFlags.Button3Pressed) {
+				if (dragPosition.HasValue) {
+					if (SuperView == null) {
+						// Redraw the entire app window using just our Frame. Since we are 
+						// Application.Top, and our Frame always == our Bounds (Location is always (0,0))
+						// our Frame is actually view-relative (which is what Redraw takes).
+						// We need to pass all the view bounds because since the windows was 
+						// moved around, we don't know exactly what was the affected region.
+						Application.Top.SetNeedsDisplay ();
+					} else {
+						SuperView.SetNeedsDisplay ();
+					}
+					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y),
+						out nx, out ny, out _, out _);
+
+					dragPosition = new Point (nx, ny);
+					LayoutSubviews ();
+					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
+					if (X == null || X is Pos.PosAbsolute) {
+						X = nx;
+					}
+					if (Y == null || Y is Pos.PosAbsolute) {
+						Y = ny;
+					}
+					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
+
+					SetNeedsDisplay ();
+					return true;
+				}
+			}
+
+			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
+				Application.UngrabMouse ();
+				Driver.UncookMouse ();
+				dragPosition = null;
+			}
+
+			//System.Diagnostics.Debug.WriteLine (mouseEvent.ToString ());
+			return false;
 		}
 
 		/// <summary>
-		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel)"/> after
-		/// the views have been laid out, and before the views are drawn for the first time.
+		/// Invoked by <see cref="Application.Begin"/> as part of  <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> 
+		/// after the views have been laid out, and before the views are drawn for the first time.
 		/// </summary>
 		public virtual void WillPresent ()
 		{
 			FocusFirst ();
+		}
+
+		/// <summary>
+		/// Move to the next Mdi child from the <see cref="Application.MdiTop"/>.
+		/// </summary>
+		public virtual void MoveNext ()
+		{
+			Application.MoveNext ();
+		}
+
+		/// <summary>
+		/// Move to the previous Mdi child from the <see cref="Application.MdiTop"/>.
+		/// </summary>
+		public virtual void MovePrevious ()
+		{
+			Application.MovePrevious ();
+		}
+
+		/// <summary>
+		/// Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel, 
+		/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
+		/// </summary>
+		public virtual void RequestStop ()
+		{
+			if (IsMdiContainer && Running
+				&& (Application.Current == this
+				|| Application.Current?.Modal == false
+				|| Application.Current?.Modal == true && Application.Current?.Running == false)) {
+
+				foreach (var child in Application.MdiChildes) {
+					var ev = new ToplevelClosingEventArgs (this);
+					if (child.OnClosing (ev)) {
+						return;
+					}
+					child.Running = false;
+					Application.RequestStop (child);
+				}
+				Running = false;
+				Application.RequestStop (this);
+			} else if (IsMdiContainer && Running && Application.Current?.Modal == true && Application.Current?.Running == true) {
+				var ev = new ToplevelClosingEventArgs (Application.Current);
+				if (OnClosing (ev)) {
+					return;
+				}
+				Application.RequestStop (Application.Current);
+			} else if (!IsMdiContainer && Running && (!Modal || (Modal && Application.Current != this))) {
+				var ev = new ToplevelClosingEventArgs (this);
+				if (OnClosing (ev)) {
+					return;
+				}
+				Running = false;
+				Application.RequestStop (this);
+			} else {
+				Application.RequestStop (Application.Current);
+			}
+		}
+
+		/// <summary>
+		/// Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is the top-most Toplevel, 
+		/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
+		/// </summary>
+		/// <param name="top">The toplevel to request stop.</param>
+		public virtual void RequestStop (Toplevel top)
+		{
+			top.RequestStop ();
+		}
+
+		///<inheritdoc/>
+		public override void PositionCursor ()
+		{
+			if (!IsMdiContainer) {
+				base.PositionCursor ();
+				return;
+			}
+
+			if (Focused == null) {
+				foreach (var top in Application.MdiChildes) {
+					if (top != this && top.Visible) {
+						top.SetFocus ();
+						return;
+					}
+				}
+			}
+			base.PositionCursor ();
+		}
+
+		/// <summary>
+		/// Gets the current visible Toplevel Mdi child that matches the arguments pattern.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <param name="exclude">The strings to exclude.</param>
+		/// <returns>The matched view.</returns>
+		public View GetTopMdiChild (Type type = null, string [] exclude = null)
+		{
+			if (Application.MdiTop == null) {
+				return null;
+			}
+
+			foreach (var top in Application.MdiChildes) {
+				if (type != null && top.GetType () == type
+					&& exclude?.Contains (top.Data.ToString ()) == false) {
+					return top;
+				} else if ((type != null && top.GetType () != type)
+					|| (exclude?.Contains (top.Data.ToString ()) == true)) {
+					continue;
+				}
+				return top;
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Shows the Mdi child indicated by <paramref name="top"/>, setting it as <see cref="Application.Current"/>.
+		/// </summary>
+		/// <param name="top">The Toplevel.</param>
+		/// <returns><c>true</c> if the toplevel can be shown or <c>false</c> if not.</returns>
+		public virtual bool ShowChild (Toplevel top = null)
+		{
+			if (Application.MdiTop != null) {
+				return Application.ShowChild (top == null ? this : top);
+			}
+			return false;
+		}
+	}
+
+	/// <summary>
+	/// Implements the <see cref="IEqualityComparer{T}"/> for comparing two <see cref="Toplevel"/>s
+	/// used by <see cref="StackExtensions"/>.
+	/// </summary>
+	public class ToplevelEqualityComparer : IEqualityComparer<Toplevel> {
+		/// <summary>Determines whether the specified objects are equal.</summary>
+		/// <param name="x">The first object of type <see cref="Toplevel" /> to compare.</param>
+		/// <param name="y">The second object of type <see cref="Toplevel" /> to compare.</param>
+		/// <returns>
+		///     <see langword="true" /> if the specified objects are equal; otherwise, <see langword="false" />.</returns>
+		public bool Equals (Toplevel x, Toplevel y)
+		{
+			if (y == null && x == null)
+				return true;
+			else if (x == null || y == null)
+				return false;
+			else if (x.Id == y.Id)
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>Returns a hash code for the specified object.</summary>
+		/// <param name="obj">The <see cref="Toplevel" /> for which a hash code is to be returned.</param>
+		/// <returns>A hash code for the specified object.</returns>
+		/// <exception cref="ArgumentNullException">The type of <paramref name="obj" /> 
+		/// is a reference type and <paramref name="obj" /> is <see langword="null" />.</exception>
+		public int GetHashCode (Toplevel obj)
+		{
+			if (obj == null)
+				throw new ArgumentNullException ();
+
+			int hCode = 0;
+			if (int.TryParse (obj.Id.ToString (), out int result)) {
+				hCode = result;
+			}
+			return hCode.GetHashCode ();
+		}
+	}
+
+	/// <summary>
+	/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> 
+	/// from the <see cref="Application.MdiChildes"/> if needed.
+	/// </summary>
+	public sealed class ToplevelComparer : IComparer<Toplevel> {
+		/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
+		/// <param name="x">The first object to compare.</param>
+		/// <param name="y">The second object to compare.</param>
+		/// <returns>A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />, as shown in the following table.Value Meaning Less than zero
+		///             <paramref name="x" /> is less than <paramref name="y" />.Zero
+		///             <paramref name="x" /> equals <paramref name="y" />.Greater than zero
+		///             <paramref name="x" /> is greater than <paramref name="y" />.</returns>
+		public int Compare (Toplevel x, Toplevel y)
+		{
+			if (ReferenceEquals (x, y))
+				return 0;
+			else if (x == null)
+				return -1;
+			else if (y == null)
+				return 1;
+			else
+				return string.Compare (x.Id.ToString (), y.Id.ToString ());
+		}
+	}
+	/// <summary>
+	/// <see cref="EventArgs"/> implementation for the <see cref="Toplevel.Closing"/> event.
+	/// </summary>
+	public class ToplevelClosingEventArgs : EventArgs {
+		/// <summary>
+		/// The toplevel requesting stop.
+		/// </summary>
+		public View RequestingTop { get; }
+		/// <summary>
+		/// Provides an event cancellation option.
+		/// </summary>
+		public bool Cancel { get; set; }
+
+		/// <summary>
+		/// Initializes the event arguments with the requesting toplevel.
+		/// </summary>
+		/// <param name="requestingTop">The <see cref="RequestingTop"/>.</param>
+		public ToplevelClosingEventArgs (Toplevel requestingTop)
+		{
+			RequestingTop = requestingTop;
 		}
 	}
 }

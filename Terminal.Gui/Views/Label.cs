@@ -6,14 +6,12 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
+	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by newline characters.
+	/// Multi-line Labels support word wrap.
 	/// </summary>
 	/// <remarks>
 	/// The <see cref="Label"/> view is functionality identical to <see cref="View"/> and is included for API backwards compatibility.
@@ -22,26 +20,43 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public Label ()
 		{
+			Initialize ();
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect frame) : base (frame)
+		public Label (Rect frame, bool autosize = false) : base (frame)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (ustring text) : base (text)
+		public Label (ustring text, bool autosize = true) : base (text)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect rect, ustring text) : base (rect, text)
+		public Label (Rect rect, ustring text, bool autosize = false) : base (rect, text)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (int x, int y, ustring text) : base (x, y, text)
+		public Label (int x, int y, ustring text, bool autosize = true) : base (x, y, text)
 		{
+			Initialize (autosize);
+		}
+
+		/// <inheritdoc/>
+		public Label (ustring text, TextDirection direction, bool autosize = true)
+			: base (text, direction)
+		{
+			Initialize (autosize);
+		}
+
+		void Initialize (bool autosize = true)
+		{
+			AutoSize = autosize;
 		}
 
 		/// <summary>
@@ -78,23 +93,53 @@ namespace Terminal.Gui {
 		public override bool OnMouseEvent (MouseEvent mouseEvent)
 		{
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			OnMouseClick (args);
-			if (args.Handled)
+			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
 				return true;
 
-
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
 				if (!HasFocus && SuperView != null) {
+					if (!SuperView.HasFocus) {
+						SuperView.SetFocus ();
+					}
 					SetFocus ();
 					SetNeedsDisplay ();
 				}
 
-				Clicked?.Invoke ();
+				OnClicked ();
 				return true;
 			}
 			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				if (!HasFocus) {
+					SetFocus ();
+				}
+				OnClicked ();
+				return true;
+			}
+			return base.ProcessHotKey (ke);
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
 		}
 	}
 }

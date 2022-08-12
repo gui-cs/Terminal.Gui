@@ -1,12 +1,19 @@
-﻿using System;
+﻿using NStack;
+using System;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Terminal.Gui;
+using Terminal.Gui.TextValidateProviders;
 
-namespace UICatalog {
+
+
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
-	class Text : Scenario {
+	[ScenarioCategory ("Mouse and Keyboard")]
+	[ScenarioCategory ("Text and Formatting")]
+	public class Text : Scenario {
 		public override void Setup ()
 		{
 			var s = "TAB to jump between text fields.";
@@ -16,6 +23,14 @@ namespace UICatalog {
 				Width = Dim.Percent (50),
 				//ColorScheme = Colors.Dialog
 			};
+			textField.TextChanging += TextField_TextChanging;
+
+			void TextField_TextChanging (TextChangingEventArgs e)
+			{
+				textField.Autocomplete.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			}
 			Win.Add (textField);
 
 			var labelMirroringTextField = new Label (textField.Text) {
@@ -37,6 +52,14 @@ namespace UICatalog {
 				ColorScheme = Colors.Dialog
 			};
 			textView.Text = s;
+			textView.DrawContent += TextView_DrawContent;
+
+			void TextView_DrawContent (Rect e)
+			{
+				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			}
 			Win.Add (textView);
 
 			var labelMirroringTextView = new Label (textView.Text) {
@@ -50,6 +73,13 @@ namespace UICatalog {
 			textView.TextChanged += () => {
 				labelMirroringTextView.Text = textView.Text;
 			};
+
+			var btnMultiline = new Button ("Toggle Multiline") {
+				X = Pos.Right (textView) + 1,
+				Y = Pos.Top (textView) + 1
+			};
+			btnMultiline.Clicked += () => textView.Multiline = !textView.Multiline;
+			Win.Add (btnMultiline);
 
 			// BUGBUG: 531 - TAB doesn't go to next control from HexView
 			var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (s))) {
@@ -101,6 +131,38 @@ namespace UICatalog {
 
 			_timeField.TimeChanged += TimeChanged;
 
+			// MaskedTextProvider
+			var netProviderLabel = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+				X = Pos.Left (dateField),
+				Y = Pos.Bottom (dateField) + 1
+			};
+			Win.Add (netProviderLabel);
+
+			var netProvider = new NetMaskedTextProvider ("999 000 LLL > LLL | AAA aaa");
+
+			var netProviderField = new TextValidateField (netProvider) {
+				X = Pos.Right (netProviderLabel) + 1,
+				Y = Pos.Y (netProviderLabel)
+			};
+
+			Win.Add (netProviderField);
+
+			// TextRegexProvider
+			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+				X = Pos.Left (netProviderLabel),
+				Y = Pos.Bottom (netProviderLabel) + 1
+			};
+			Win.Add (regexProvider);
+
+			var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+			var regexProviderField = new TextValidateField (provider2) {
+				X = Pos.Right (regexProvider) + 1,
+				Y = Pos.Y (regexProvider),
+				Width = 30,
+				TextAlignment = TextAlignment.Centered
+			};
+
+			Win.Add (regexProviderField);
 		}
 
 		TimeField _timeField;
@@ -109,7 +171,6 @@ namespace UICatalog {
 		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
 		{
 			_labelMirroringTimeField.Text = _timeField.Text;
-
 		}
 	}
 }

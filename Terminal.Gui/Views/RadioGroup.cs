@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// <see cref="RadioGroup"/> shows a group of radio labels, only one of those can be selected at a given time
+	/// Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.
 	/// </summary>
 	public class RadioGroup : View {
 		int selected = -1;
@@ -13,20 +13,6 @@ namespace Terminal.Gui {
 		DisplayModeLayout displayMode;
 		int horizontalSpace = 2;
 		List<(int pos, int length)> horizontal;
-
-		void Init (Rect rect, ustring [] radioLabels, int selected)
-		{
-			if (radioLabels == null) {
-				this.radioLabels = new List<ustring>();
-			} else {
-				this.radioLabels = radioLabels.ToList ();
-			}
-
-			this.selected = selected;
-			SetWidthHeight (this.radioLabels);
-			CanFocus = true;
-		}
-
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
@@ -40,7 +26,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (ustring [] radioLabels, int selected = 0) : base ()
 		{
-			Init (Rect.Empty, radioLabels, selected);
+			Initialize (Rect.Empty, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -51,7 +37,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (Rect rect, ustring [] radioLabels, int selected = 0) : base (rect)
 		{
-			Init (rect, radioLabels, selected);
+			Initialize (rect, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -61,9 +47,41 @@ namespace Terminal.Gui {
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
-		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		
+		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (int x, int y, ustring [] radioLabels, int selected = 0) :
-			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList() : null), radioLabels, selected) { }
+			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
+		{ }
+
+		void Initialize (Rect rect, ustring [] radioLabels, int selected)
+		{
+			if (radioLabels == null) {
+				this.radioLabels = new List<ustring> ();
+			} else {
+				this.radioLabels = radioLabels.ToList ();
+			}
+
+			this.selected = selected;
+			if (rect == Rect.Empty) {
+				SetWidthHeight (this.radioLabels);
+			} else {
+				Frame = rect;
+			}
+			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => { MoveUp (); return true; });
+			AddCommand (Command.LineDown, () => { MoveDown (); return true; });
+			AddCommand (Command.TopHome, () => { MoveHome (); return true; });
+			AddCommand (Command.BottomEnd, () => { MoveEnd (); return true; });
+			AddCommand (Command.Accept, () => { SelectItem (); return true; });
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
+			AddKeyBinding (Key.Space, Command.Accept);
+		}
 
 		/// <summary>
 		/// Gets or sets the <see cref="DisplayModeLayout"/> for this <see cref="RadioGroup"/>.
@@ -88,6 +106,7 @@ namespace Terminal.Gui {
 				if (horizontalSpace != value && displayMode == DisplayModeLayout.Horizontal) {
 					horizontalSpace = value;
 					SetWidthHeight (radioLabels);
+					UpdateTextFormatterText ();
 					SetNeedsDisplay ();
 				}
 			}
@@ -98,7 +117,7 @@ namespace Terminal.Gui {
 			switch (displayMode) {
 			case DisplayModeLayout.Vertical:
 				var r = MakeRect (0, 0, radioLabels);
-				if (LayoutStyle == LayoutStyle.Computed) {
+				if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
 					Width = r.Width;
 					Height = radioLabels.Count;
 				} else {
@@ -112,9 +131,11 @@ namespace Terminal.Gui {
 					length += item.length;
 				}
 				var hr = new Rect (0, 0, length, 1);
-				if (LayoutStyle == LayoutStyle.Computed) {
+				if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
 					Width = hr.Width;
 					Height = 1;
+				} else {
+					Frame = new Rect (Frame.Location, new Size (hr.Width, radioLabels.Count));
 				}
 				break;
 			}
@@ -122,17 +143,16 @@ namespace Terminal.Gui {
 
 		static Rect MakeRect (int x, int y, List<ustring> radioLabels)
 		{
-			int width = 0;
-
 			if (radioLabels == null) {
-				return new Rect (x, y, width, 0);
+				return new Rect (x, y, 0, 0);
 			}
 
+			int width = 0;
+
 			foreach (var s in radioLabels)
-				width = Math.Max (s.RuneCount + 3, width);
+				width = Math.Max (s.ConsoleWidth + 3, width);
 			return new Rect (x, y, width, radioLabels.Count);
 		}
-
 
 		List<ustring> radioLabels = new List<ustring> ();
 
@@ -141,7 +161,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The radio labels.</value>
 		public ustring [] RadioLabels {
-			get => radioLabels.ToArray();
+			get => radioLabels.ToArray ();
 			set {
 				var prevCount = radioLabels.Count;
 				radioLabels = value.ToList ();
@@ -162,7 +182,7 @@ namespace Terminal.Gui {
 				int length = 0;
 				for (int i = 0; i < radioLabels.Count; i++) {
 					start += length;
-					length = radioLabels [i].RuneCount + horizontalSpace;
+					length = radioLabels [i].ConsoleWidth + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
 					horizontal.Add ((start, length));
 				}
 			}
@@ -174,7 +194,7 @@ namespace Terminal.Gui {
 		//	for (int i = 0; i < radioLabels.Count; i++) {
 		//		Move(0, i);
 		//		Driver.SetAttribute(ColorScheme.Normal);
-		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].RuneCount + 4)));
+		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].ConsoleWidth + 4)));
 		//	}
 		//	if (newRadioLabels.Count != radioLabels.Count) {
 		//		SetWidthHeight(newRadioLabels);
@@ -184,7 +204,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 			for (int i = 0; i < radioLabels.Count; i++) {
 				switch (DisplayMode) {
@@ -195,8 +215,8 @@ namespace Terminal.Gui {
 					Move (horizontal [i].pos, 0);
 					break;
 				}
-				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.AddStr (ustring.Make(new Rune[] { (i == selected ? Driver.Selected : Driver.UnSelected), ' '}));
+				Driver.SetAttribute (GetNormalColor ());
+				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? Driver.Selected : Driver.UnSelected, ' ' }));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
 		}
@@ -211,33 +231,6 @@ namespace Terminal.Gui {
 			case DisplayModeLayout.Horizontal:
 				Move (horizontal [cursor].pos, 0);
 				break;
-			}
-		}
-
-		// TODO: Make this a global class
-		/// <summary>
-		/// Event arguments for the SelectedItemChagned event.
-		/// </summary>
-		public class SelectedItemChangedArgs : EventArgs {
-			/// <summary>
-			/// Gets the index of the item that was previously selected. -1 if there was no previous selection.
-			/// </summary>
-			public int PreviousSelectedItem { get;  }
-
-			/// <summary>
-			/// Gets the index of the item that is now selected. -1 if there is no selection.
-			/// </summary>
-			public int SelectedItem { get; }
-
-			/// <summary>
-			/// Initializes a new <see cref="SelectedItemChangedArgs"/> class.
-			/// </summary>
-			/// <param name="selectedItem"></param>
-			/// <param name="previousSelectedItem"></param>
-			public SelectedItemChangedArgs(int selectedItem, int previousSelectedItem)
-			{
-				PreviousSelectedItem = previousSelectedItem;
-				SelectedItem = selectedItem;
 			}
 		}
 
@@ -310,26 +303,48 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			switch (kb.Key) {
-			case Key.CursorUp:
-				if (cursor > 0) {
-					cursor--;
-					SetNeedsDisplay ();
-					return true;
-				}
-				break;
-			case Key.CursorDown:
-				if (cursor + 1 < radioLabels.Count) {
-					cursor++;
-					SetNeedsDisplay ();
-					return true;
-				}
-				break;
-			case Key.Space:
-				SelectedItem = cursor;
-				return true;
-			}
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
+
 			return base.ProcessKey (kb);
+		}
+
+		void SelectItem ()
+		{
+			SelectedItem = cursor;
+		}
+
+		void MoveEnd ()
+		{
+			cursor = Math.Max (radioLabels.Count - 1, 0);
+		}
+
+		void MoveHome ()
+		{
+			cursor = 0;
+		}
+
+		void MoveDown ()
+		{
+			if (cursor + 1 < radioLabels.Count) {
+				cursor++;
+				SetNeedsDisplay ();
+			} else if (cursor > 0) {
+				cursor = 0;
+				SetNeedsDisplay ();
+			}
+		}
+
+		void MoveUp ()
+		{
+			if (cursor > 0) {
+				cursor--;
+				SetNeedsDisplay ();
+			} else if (radioLabels.Count - 1 > 0) {
+				cursor = radioLabels.Count - 1;
+				SetNeedsDisplay ();
+			}
 		}
 
 		///<inheritdoc/>
@@ -355,6 +370,14 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>
@@ -369,5 +392,31 @@ namespace Terminal.Gui {
 		/// Horizontal mode display.
 		/// </summary>
 		Horizontal
+	}
+
+	/// <summary>
+	/// Event arguments for the SelectedItemChagned event.
+	/// </summary>
+	public class SelectedItemChangedArgs : EventArgs {
+		/// <summary>
+		/// Gets the index of the item that was previously selected. -1 if there was no previous selection.
+		/// </summary>
+		public int PreviousSelectedItem { get; }
+
+		/// <summary>
+		/// Gets the index of the item that is now selected. -1 if there is no selection.
+		/// </summary>
+		public int SelectedItem { get; }
+
+		/// <summary>
+		/// Initializes a new <see cref="SelectedItemChangedArgs"/> class.
+		/// </summary>
+		/// <param name="selectedItem"></param>
+		/// <param name="previousSelectedItem"></param>
+		public SelectedItemChangedArgs (int selectedItem, int previousSelectedItem)
+		{
+			PreviousSelectedItem = previousSelectedItem;
+			SelectedItem = selectedItem;
+		}
 	}
 }

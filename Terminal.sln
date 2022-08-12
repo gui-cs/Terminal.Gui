@@ -1,12 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.128
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Designer", "Designer\Designer.csproj", "{1228D992-C801-49BB-839A-7BD28A3FFF0A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
 EndProject
@@ -14,8 +10,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveExample", "ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E143FB1F-0B88-48CB-9086-72CDCECFCD22}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -27,6 +30,15 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.Build.0 = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.ActiveCfg = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.Build.0 = Release|Any CPU
+
 		{B0A602CD-E176-449D-8663-64238D54F857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0A602CD-E176-449D-8663-64238D54F857}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0A602CD-E176-449D-8663-64238D54F857}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -43,22 +55,7 @@ Global
 		{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}.Release|x86.Build.0 = Release|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Debug|x86.Build.0 = Debug|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Release|x86.ActiveCfg = Release|Any CPU
-		{1228D992-C801-49BB-839A-7BD28A3FFF0A}.Release|x86.Build.0 = Release|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.Build.0 = Debug|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.ActiveCfg = Release|Any CPU
-		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.Build.0 = Release|Any CPU
+
 		{8B901EDE-8974-4820-B100-5226917E2990}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B901EDE-8974-4820-B100-5226917E2990}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B901EDE-8974-4820-B100-5226917E2990}.Debug|x86.ActiveCfg = Debug|Any CPU

@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Clipboard
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -84,8 +85,7 @@
   <h1 id="Terminal_Gui_Clipboard" data-uid="Terminal.Gui.Clipboard" class="text-break">Class Clipboard
   </h1>
   <div class="markdown level0 summary">
-Provides cut, copy, and paste support for the clipboard. 
-NOTE: Currently not implemented.
+Provides cut, copy, and paste support for the clipboard with OS interaction.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -93,35 +93,11 @@ NOTE: Currently not implemented.
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Clipboard</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Clipboard_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class Clipboard</code></pre>
+    <pre><code class="lang-csharp hljs">public static class Clipboard : Object</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -130,7 +106,7 @@ NOTE: Currently not implemented.
   <a id="Terminal_Gui_Clipboard_Contents_" data-uid="Terminal.Gui.Clipboard.Contents*"></a>
   <h4 id="Terminal_Gui_Clipboard_Contents" data-uid="Terminal.Gui.Clipboard.Contents">Contents</h4>
   <div class="markdown level1 summary">
-
+Get or sets the operation system clipboard, otherwise the contents field.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -152,6 +128,123 @@ NOTE: Currently not implemented.
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="Terminal_Gui_Clipboard_IsSupported_" data-uid="Terminal.Gui.Clipboard.IsSupported*"></a>
+  <h4 id="Terminal_Gui_Clipboard_IsSupported" data-uid="Terminal.Gui.Clipboard.IsSupported">IsSupported</h4>
+  <div class="markdown level1 summary">
+Returns true if the environmental dependencies are in place to interact with the OS clipboard.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsSupported { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_Clipboard_TryGetClipboardData_" data-uid="Terminal.Gui.Clipboard.TryGetClipboardData*"></a>
+  <h4 id="Terminal_Gui_Clipboard_TryGetClipboardData_System_String__" data-uid="Terminal.Gui.Clipboard.TryGetClipboardData(System.String@)">TryGetClipboardData(out String)</h4>
+  <div class="markdown level1 summary">
+Gets the operation system clipboard if possible.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetClipboardData(out string result)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">result</span></td>
+        <td>Clipboard contents read</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true if it was possible to read the OS clipboard.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Clipboard_TrySetClipboardData_" data-uid="Terminal.Gui.Clipboard.TrySetClipboardData*"></a>
+  <h4 id="Terminal_Gui_Clipboard_TrySetClipboardData_System_String_" data-uid="Terminal.Gui.Clipboard.TrySetClipboardData(System.String)">TrySetClipboardData(String)</h4>
+  <div class="markdown level1 summary">
+Sets the operation system clipboard if possible.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TrySetClipboardData(string text)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>True if the clipboard content was set successfully.</td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -162,7 +255,8 @@ NOTE: Currently not implemented.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -7,6 +7,7 @@
 // TODO:
 //   Add mouse support
 using System;
+using System.Collections.Generic;
 using NStack;
 
 namespace Terminal.Gui {
@@ -82,8 +83,6 @@ namespace Terminal.Gui {
 		/// <param name="items">A list of statusbar items.</param>
 		public StatusBar (StatusItem [] items) : base ()
 		{
-			Width = Dim.Fill ();
-			Height = 1;
 			Items = items;
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
@@ -97,7 +96,17 @@ namespace Terminal.Gui {
 
 		private void StatusBar_Initialized (object sender, EventArgs e)
 		{
-			Y = SuperView.Frame.Height - 1;
+			if (SuperView.Frame == Rect.Empty) {
+				((Toplevel)SuperView).Loaded += StatusBar_Loaded;
+			} else {
+				Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
+			}
+		}
+
+		private void StatusBar_Loaded ()
+		{
+			Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
+			((Toplevel)SuperView).Loaded -= StatusBar_Loaded;
 		}
 
 		private Action<Application.ResizedEventArgs> Application_Resized ()
@@ -106,11 +115,24 @@ namespace Terminal.Gui {
 				X = 0;
 				Height = 1;
 				if (SuperView != null || SuperView is Toplevel) {
-					Y = SuperView.Frame.Height - (Visible ? 1 : 0);
-				} else {
-					//Y = Pos.Bottom (SuperView);
+					if (Frame.Y != SuperView.Frame.Height - (Visible ? 1 : 0)) {
+						Y = SuperView.Frame.Height - (Visible ? 1 : 0);
+					}
 				}
 			};
+		}
+
+		static ustring shortcutDelimiter = "-";
+		/// <summary>
+		/// Used for change the shortcut delimiter separator.
+		/// </summary>
+		public static ustring ShortcutDelimiter {
+			get => shortcutDelimiter;
+			set {
+				if (shortcutDelimiter != value) {
+					shortcutDelimiter = value == ustring.Empty ? " " : value;
+				}
+			}
 		}
 
 		Attribute ToggleScheme (Attribute scheme)
@@ -130,12 +152,12 @@ namespace Terminal.Gui {
 			//}
 
 			Move (0, 0);
-			Driver.SetAttribute (Colors.Menu.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
 			Move (1, 0);
-			var scheme = ColorScheme.Normal;
+			var scheme = GetNormalColor ();
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
 				var title = Items [i].Title.ToString ();
@@ -159,7 +181,7 @@ namespace Terminal.Gui {
 		{
 			foreach (var item in Items) {
 				if (kb.Key == item.Shortcut) {
-					item.Action?.Invoke ();
+					Run (item.Action);
 					return true;
 				}
 			}
@@ -176,6 +198,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Items.Length; i++) {
 				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title)) {
 					Run (Items [i].Action);
+					break;
 				}
 				pos += GetItemTitleLength (Items [i].Title) + 3;
 			}
@@ -214,6 +237,43 @@ namespace Terminal.Gui {
 				}
 				disposedValue = true;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
+
+		/// <summary>
+		/// Inserts a <see cref="StatusItem"/> in the specified index of <see cref="Items"/>.
+		/// </summary>
+		/// <param name="index">The zero-based index at which item should be inserted.</param>
+		/// <param name="item">The item to insert.</param>
+		public void AddItemAt (int index, StatusItem item)
+		{
+			var itemsList = new List<StatusItem> (Items);
+			itemsList.Insert (index, item);
+			Items = itemsList.ToArray ();
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Removes a <see cref="StatusItem"/> at specified index of <see cref="Items"/>.
+		/// </summary>
+		/// <param name="index">The zero-based index of the item to remove.</param>
+		/// <returns>The <see cref="StatusItem"/> removed.</returns>
+		public StatusItem RemoveItem (int index)
+		{
+			var itemsList = new List<StatusItem> (Items);
+			var item = itemsList [index];
+			itemsList.RemoveAt (index);
+			Items = itemsList.ToArray ();
+			SetNeedsDisplay ();
+
+			return item;
 		}
 	}
 }

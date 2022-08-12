@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ConsoleDriver
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -94,38 +95,52 @@ There are currently three implementations: <span class="xref">Terminal.Gui.Curse
     <div class="level1"><span class="xref">ConsoleDriver</span></div>
       <div class="level2"><a class="xref" href="Terminal.Gui.FakeDriver.html">FakeDriver</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ConsoleDriver_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class ConsoleDriver</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class ConsoleDriver : Object</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver__ctor_" data-uid="Terminal.Gui.ConsoleDriver.#ctor*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver__ctor" data-uid="Terminal.Gui.ConsoleDriver.#ctor">ConsoleDriver()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ConsoleDriver()</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_BlocksMeterSegment" data-uid="Terminal.Gui.ConsoleDriver.BlocksMeterSegment">BlocksMeterSegment</h4>
+  <div class="markdown level1 summary">
+Blocks Segment indicator for meter views (e.g. <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune BlocksMeterSegment</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <h4 id="Terminal_Gui_ConsoleDriver_BottomTee" data-uid="Terminal.Gui.ConsoleDriver.BottomTee">BottomTee</h4>
@@ -162,6 +177,32 @@ Checkmark.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Rune Checked</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_ContinuousMeterSegment" data-uid="Terminal.Gui.ConsoleDriver.ContinuousMeterSegment">ContinuousMeterSegment</h4>
+  <div class="markdown level1 summary">
+Continuous Segment indicator for meter views (e.g. <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune ContinuousMeterSegment</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -232,6 +273,32 @@ Down Arrow.
   </table>
   
   
+  <h4 id="Terminal_Gui_ConsoleDriver_HDLine" data-uid="Terminal.Gui.ConsoleDriver.HDLine">HDLine</h4>
+  <div class="markdown level1 summary">
+Horizontal double line character.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune HDLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="Terminal_Gui_ConsoleDriver_HLine" data-uid="Terminal.Gui.ConsoleDriver.HLine">HLine</h4>
   <div class="markdown level1 summary">
 Horizontal line character.
@@ -240,6 +307,32 @@ Horizontal line character.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Rune HLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_HRLine" data-uid="Terminal.Gui.ConsoleDriver.HRLine">HRLine</h4>
+  <div class="markdown level1 summary">
+Horizontal line character for rounded corners.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune HRLine</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -388,6 +481,58 @@ Lower left corner
   </table>
   
   
+  <h4 id="Terminal_Gui_ConsoleDriver_LLDCorner" data-uid="Terminal.Gui.ConsoleDriver.LLDCorner">LLDCorner</h4>
+  <div class="markdown level1 summary">
+Lower left double corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune LLDCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_LLRCorner" data-uid="Terminal.Gui.ConsoleDriver.LLRCorner">LLRCorner</h4>
+  <div class="markdown level1 summary">
+Lower left rounded corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune LLRCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="Terminal_Gui_ConsoleDriver_LRCorner" data-uid="Terminal.Gui.ConsoleDriver.LRCorner">LRCorner</h4>
   <div class="markdown level1 summary">
 Lower right corner
@@ -414,14 +559,14 @@ Lower right corner
   </table>
   
   
-  <h4 id="Terminal_Gui_ConsoleDriver_OffMeterSegement" data-uid="Terminal.Gui.ConsoleDriver.OffMeterSegement">OffMeterSegement</h4>
+  <h4 id="Terminal_Gui_ConsoleDriver_LRDCorner" data-uid="Terminal.Gui.ConsoleDriver.LRDCorner">LRDCorner</h4>
   <div class="markdown level1 summary">
-Off Segment indicator for meter views (e.g. <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a>.
+Lower right double corner
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune OffMeterSegement</code></pre>
+    <pre><code class="lang-csharp hljs">public Rune LRDCorner</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -440,14 +585,14 @@ Off Segment indicator for meter views (e.g. <a class="xref" href="Terminal.Gui.P
   </table>
   
   
-  <h4 id="Terminal_Gui_ConsoleDriver_OnMeterSegment" data-uid="Terminal.Gui.ConsoleDriver.OnMeterSegment">OnMeterSegment</h4>
+  <h4 id="Terminal_Gui_ConsoleDriver_LRRCorner" data-uid="Terminal.Gui.ConsoleDriver.LRRCorner">LRRCorner</h4>
   <div class="markdown level1 summary">
-On Segment indicator for meter views (e.g. <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a>.
+Lower right rounded corner
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Rune OnMeterSegment</code></pre>
+    <pre><code class="lang-csharp hljs">public Rune LRRCorner</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -700,6 +845,58 @@ Upper left corner
   </table>
   
   
+  <h4 id="Terminal_Gui_ConsoleDriver_ULDCorner" data-uid="Terminal.Gui.ConsoleDriver.ULDCorner">ULDCorner</h4>
+  <div class="markdown level1 summary">
+Upper left double corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune ULDCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_ULRCorner" data-uid="Terminal.Gui.ConsoleDriver.ULRCorner">ULRCorner</h4>
+  <div class="markdown level1 summary">
+Upper left rounded corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune ULRCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="Terminal_Gui_ConsoleDriver_UnChecked" data-uid="Terminal.Gui.ConsoleDriver.UnChecked">UnChecked</h4>
   <div class="markdown level1 summary">
 Un-checked checkmark.
@@ -804,6 +1001,84 @@ Upper right corner
   </table>
   
   
+  <h4 id="Terminal_Gui_ConsoleDriver_URDCorner" data-uid="Terminal.Gui.ConsoleDriver.URDCorner">URDCorner</h4>
+  <div class="markdown level1 summary">
+Upper right double corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune URDCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_URRCorner" data-uid="Terminal.Gui.ConsoleDriver.URRCorner">URRCorner</h4>
+  <div class="markdown level1 summary">
+Upper right rounded corner
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune URRCorner</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_VDLine" data-uid="Terminal.Gui.ConsoleDriver.VDLine">VDLine</h4>
+  <div class="markdown level1 summary">
+Vertical double line character.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune VDLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="Terminal_Gui_ConsoleDriver_VLine" data-uid="Terminal.Gui.ConsoleDriver.VLine">VLine</h4>
   <div class="markdown level1 summary">
 Vertical line character.
@@ -812,6 +1087,32 @@ Vertical line character.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Rune VLine</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ConsoleDriver_VRLine" data-uid="Terminal.Gui.ConsoleDriver.VRLine">VRLine</h4>
+  <div class="markdown level1 summary">
+Vertical line character for rounded corners.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rune VRLine</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -859,6 +1160,33 @@ Controls the current clipping region that AddRune/AddStr is subject to.
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_Clipboard_" data-uid="Terminal.Gui.ConsoleDriver.Clipboard*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Clipboard" data-uid="Terminal.Gui.ConsoleDriver.Clipboard">Clipboard</h4>
+  <div class="markdown level1 summary">
+Get the operation system clipboard.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract IClipboard Clipboard { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.IClipboard.html">IClipboard</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_Cols_" data-uid="Terminal.Gui.ConsoleDriver.Cols*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_Cols" data-uid="Terminal.Gui.ConsoleDriver.Cols">Cols</h4>
   <div class="markdown level1 summary">
@@ -880,6 +1208,33 @@ The current number of columns in the terminal.
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_Contents_" data-uid="Terminal.Gui.ConsoleDriver.Contents*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Contents" data-uid="Terminal.Gui.ConsoleDriver.Contents">Contents</h4>
+  <div class="markdown level1 summary">
+The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int[,, ] Contents { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span>[,,]</td>
         <td></td>
       </tr>
     </tbody>
@@ -913,6 +1268,61 @@ Set flags to enable/disable <a class="xref" href="Terminal.Gui.ConsoleDriver.htm
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_HeightAsBuffer_" data-uid="Terminal.Gui.ConsoleDriver.HeightAsBuffer*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_HeightAsBuffer" data-uid="Terminal.Gui.ConsoleDriver.HeightAsBuffer">HeightAsBuffer</h4>
+  <div class="markdown level1 summary">
+If false height is measured by the window height and thus no scrolling.
+If true then height is measured by the buffer height, enabling scrolling.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool HeightAsBuffer { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_Left_" data-uid="Terminal.Gui.ConsoleDriver.Left*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Left" data-uid="Terminal.Gui.ConsoleDriver.Left">Left</h4>
+  <div class="markdown level1 summary">
+The current left in the terminal.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract int Left { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_Rows_" data-uid="Terminal.Gui.ConsoleDriver.Rows*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_Rows" data-uid="Terminal.Gui.ConsoleDriver.Rows">Rows</h4>
   <div class="markdown level1 summary">
@@ -922,6 +1332,33 @@ The current number of rows in the terminal.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract int Rows { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_Top_" data-uid="Terminal.Gui.ConsoleDriver.Top*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Top" data-uid="Terminal.Gui.ConsoleDriver.Top">Top</h4>
+  <div class="markdown level1 summary">
+The current top in the terminal.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract int Top { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1049,19 +1486,17 @@ Draws a frame on the specified region with the specified padding around the fram
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">This API has been superceded by <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_">DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)</a>.</div>
   
   
   <a id="Terminal_Gui_ConsoleDriver_DrawWindowFrame_" data-uid="Terminal.Gui.ConsoleDriver.DrawWindowFrame*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)</h4>
+  <h4 id="Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_Terminal_Gui_Border_" data-uid="Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean,Terminal.Gui.Border)">DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean, Border)</h4>
   <div class="markdown level1 summary">
 Draws a frame for a window with padding and an optional visible border inside the padding. 
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void DrawWindowFrame(Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void DrawWindowFrame(Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1108,6 +1543,11 @@ Draws a frame for a window with padding and an optional visible border inside th
         <td><span class="parametername">fill</span></td>
         <td>If set to <code>true</code> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</td>
       </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Border.html">Border</a></td>
+        <td><span class="parametername">borderContent</span></td>
+        <td>The <a class="xref" href="Terminal.Gui.Border.html">Border</a> to be used if defined.</td>
+      </tr>
     </tbody>
   </table>
   
@@ -1120,7 +1560,7 @@ Draws the title for a Window-style view incorporating padding.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void DrawWindowTitle(Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void DrawWindowTitle(Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1165,7 +1605,7 @@ Draws the title for a Window-style view incorporating padding.
       <tr>
         <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
         <td><span class="parametername">textAlignment</span></td>
-        <td>Not yet immplemented.</td>
+        <td>Not yet implemented.</td>
       </tr>
     </tbody>
   </table>
@@ -1181,6 +1621,158 @@ Ends the execution of the console driver.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract void End()</code></pre>
   </div>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_EnsureCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.EnsureCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_EnsureCursorVisibility" data-uid="Terminal.Gui.ConsoleDriver.EnsureCursorVisibility">EnsureCursorVisibility()</h4>
+  <div class="markdown level1 summary">
+Ensure the cursor visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool EnsureCursorVisibility()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_GetAttribute_" data-uid="Terminal.Gui.ConsoleDriver.GetAttribute*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_GetAttribute" data-uid="Terminal.Gui.ConsoleDriver.GetAttribute">GetAttribute()</h4>
+  <div class="markdown level1 summary">
+Gets the current <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract Attribute GetAttribute()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td>The current attribute.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_GetColors_" data-uid="Terminal.Gui.ConsoleDriver.GetColors*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__" data-uid="Terminal.Gui.ConsoleDriver.GetColors(System.Int32,Terminal.Gui.Color@,Terminal.Gui.Color@)">GetColors(Int32, out Color, out Color)</h4>
+  <div class="markdown level1 summary">
+Gets the foreground and background colors based on the value.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool GetColors(int value, out Color foreground, out Color background)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">value</span></td>
+        <td>The value.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">foreground</span></td>
+        <td>The foreground.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">background</span></td>
+        <td>The background.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_GetCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.GetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__" data-uid="Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)">GetCursorVisibility(out CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Retreive the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool GetCursorVisibility(out CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The current <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_ConsoleDriver_Init_" data-uid="Terminal.Gui.ConsoleDriver.Init*"></a>
@@ -1207,6 +1799,60 @@ Initializes the driver
         <td><span class="xref">System.Action</span></td>
         <td><span class="parametername">terminalResized</span></td>
         <td>Method to invoke when the terminal is resized.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_IsValidContent_" data-uid="Terminal.Gui.ConsoleDriver.IsValidContent*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_IsValidContent_System_Int32_System_Int32_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ConsoleDriver.IsValidContent(System.Int32,System.Int32,Terminal.Gui.Rect)">IsValidContent(Int32, Int32, Rect)</h4>
+  <div class="markdown level1 summary">
+Ensures that the column and line are in a valid range from the size of the driver.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsValidContent(int col, int row, Rect clip)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">col</span></td>
+        <td>The column.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">row</span></td>
+        <td>The row.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">clip</span></td>
+        <td>The clip.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>if it&apos;s a valid range,<code>false</code>otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -1401,6 +2047,67 @@ Updates the screen to reflect all the changes that have been done to the display
   </div>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_ResizeScreen_" data-uid="Terminal.Gui.ConsoleDriver.ResizeScreen*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_ResizeScreen" data-uid="Terminal.Gui.ConsoleDriver.ResizeScreen">ResizeScreen()</h4>
+  <div class="markdown level1 summary">
+Resizes the clip area when the screen is resized.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void ResizeScreen()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_SendKeys_" data-uid="Terminal.Gui.ConsoleDriver.SendKeys*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)">SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary">
+Allows sending keys without typing on a keyboard.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void SendKeys(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Char</span></td>
+        <td><span class="parametername">keyChar</span></td>
+        <td>The character key.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.ConsoleKey</span></td>
+        <td><span class="parametername">key</span></td>
+        <td>The key.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">shift</span></td>
+        <td>If shift key is sending.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">alt</span></td>
+        <td>If alt key is sending.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">control</span></td>
+        <td>If control key is sending.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_SetAttribute_" data-uid="Terminal.Gui.ConsoleDriver.SetAttribute*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_" data-uid="Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)">SetAttribute(Attribute)</h4>
   <div class="markdown level1 summary">
@@ -1499,6 +2206,50 @@ that independently with the R, G, B values.
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_SetCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.SetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)">SetCursorVisibility(CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Change the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool SetCursorVisibility(CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The wished <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_SetTerminalResized_" data-uid="Terminal.Gui.ConsoleDriver.SetTerminalResized*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_SetTerminalResized_System_Action_" data-uid="Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)">SetTerminalResized(Action)</h4>
   <div class="markdown level1 summary">
@@ -1588,6 +2339,18 @@ Updates the location of the cursor position
   </div>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_UpdateOffScreen_" data-uid="Terminal.Gui.ConsoleDriver.UpdateOffScreen*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_UpdateOffScreen" data-uid="Terminal.Gui.ConsoleDriver.UpdateOffScreen">UpdateOffScreen()</h4>
+  <div class="markdown level1 summary">
+Reset and recreate the contents and the driver buffer.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void UpdateOffScreen()</code></pre>
+  </div>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_UpdateScreen_" data-uid="Terminal.Gui.ConsoleDriver.UpdateScreen*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_UpdateScreen" data-uid="Terminal.Gui.ConsoleDriver.UpdateScreen">UpdateScreen()</h4>
   <div class="markdown level1 summary">
@@ -1608,7 +2371,8 @@ Redraws the physical screen with the contents that have been queued up via any o
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

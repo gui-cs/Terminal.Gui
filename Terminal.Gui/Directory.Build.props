@@ -2,21 +2,9 @@
 
   <PropertyGroup>
     <!--
-       This file determines version info for Terminal.Gui
-       - Uses this guidance: https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/versioning
-       - Use major.minor.build.revision
-       - Version 
-          - Used for Nuget. Changing it will cause a new nuget package to be generated when a PR is merged to master as part of CI/CD.
-          - Version should be of the form major.minor.build[-pre].revision where [-pre] indicates it's a pre-release.
-          - Miguel can hide defunct/old nuget packages.
-       - AssemblyVersion & FileVersion are for the assembly. 
-          - Use major.minor.build.revision - revision is the same as used in Version
-          
-       e.g. If AssemblyVersion is 1.2.3.4, Version could be EITHER 1.2.3.4 or 1.2.3-pre.4 depending on whether it's a pre-release or not.
+       Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver)
+       See Terminal.Gui/README.md for more info.
     -->
-    <Version>1.0.0-pre.5</Version>
-    <AssemblyVersion>1.0.0.5</AssemblyVersion>
-    <FileVersion>1.0.0.5</FileVersion>    
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
 

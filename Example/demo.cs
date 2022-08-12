@@ -105,7 +105,7 @@ static class Demo {
 
 	static void ShowTextAlignments ()
 	{
-		var container = new Window ($"Show Text Alignments") {
+		var container = new Window ("Show Text Alignments - Press Esc to return") {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
@@ -119,10 +119,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today?";
 		container.Add (
-				new Label ($"{i+1}-{txt}") { TextAlignment = TextAlignment.Left,      Y = 3, Width = Dim.Fill () },
-				new Label ($"{i+2}-{txt}") { TextAlignment = TextAlignment.Right,     Y = 5, Width = Dim.Fill () },
-				new Label ($"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered,  Y = 7, Width = Dim.Fill () },
-				new Label ($"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
+				new Label ($"{i + 1}-{txt}") { TextAlignment = TextAlignment.Left, Y = 3, Width = Dim.Fill () },
+				new Label ($"{i + 2}-{txt}") { TextAlignment = TextAlignment.Right, Y = 5, Width = Dim.Fill () },
+				new Label ($"{i + 3}-{txt}") { TextAlignment = TextAlignment.Centered, Y = 7, Width = Dim.Fill () },
+				new Label ($"{i + 4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
 			);
 
 		Application.Run (container);
@@ -239,20 +239,11 @@ static class Demo {
 	static void Editor ()
 	{
 		Application.Init ();
+		Application.HeightAsBuffer = heightAsBuffer;
 
 		var ntop = Application.Top;
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }),
-			}),
-			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
-			}),
-		});
-		ntop.Add (menu);
+		var text = new TextView () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
 		string fname = GetFileName ();
 
@@ -264,11 +255,42 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var text = new TextView () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-
 		if (fname != null)
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
+
+		void Paste ()
+		{
+			if (text != null) {
+				text.Paste ();
+			}
+		}
+
+		void Cut ()
+		{
+			if (text != null) {
+				text.Cut ();
+			}
+		}
+
+		void Copy ()
+		{
+			if (text != null) {
+				text.Copy ();
+			}
+		}
+
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.Q),
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", Copy, null, null, Key.C | Key.CtrlMask),
+				new MenuItem ("C_ut", "", Cut, null, null, Key.X | Key.CtrlMask),
+				new MenuItem ("_Paste", "", Paste, null, null, Key.Y | Key.CtrlMask)
+			}),
+		});
+		ntop.Add (menu);
 
 		Application.Run (ntop);
 	}
@@ -309,13 +331,12 @@ static class Demo {
 			MessageBox.Query (50, 7, "Selected File", d.FilePaths.Count > 0 ? string.Join (", ", d.FilePaths) : d.FilePath, "Ok");
 	}
 
-	public static void ShowHex (Toplevel top)
+	public static void ShowHex ()
 	{
-		var tframe = top.Frame;
-		var ntop = new Toplevel (tframe);
+		var ntop = Application.Top;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
+				new MenuItem ("_Close", "", () => { running = MainApp; Application.RequestStop (); }, null, null, Key.AltMask | Key.Q),
 			}),
 		});
 		ntop.Add (menu);
@@ -338,7 +359,6 @@ static class Demo {
 		};
 		win.Add (hex);
 		Application.Run (ntop);
-
 	}
 
 	public class MenuItemDetails : MenuItem {
@@ -382,7 +402,7 @@ static class Demo {
 
 	static void Copy ()
 	{
-		TextField textField = menu.LastFocused as TextField;
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
 		if (textField != null && textField.SelectedLength != 0) {
 			textField.Copy ();
 		}
@@ -390,7 +410,7 @@ static class Demo {
 
 	static void Cut ()
 	{
-		TextField textField = menu.LastFocused as TextField;
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
 		if (textField != null && textField.SelectedLength != 0) {
 			textField.Cut ();
 		}
@@ -398,10 +418,8 @@ static class Demo {
 
 	static void Paste ()
 	{
-		TextField textField = menu.LastFocused as TextField;
-		if (textField != null) {
-			textField.Paste ();
-		}
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
+		textField?.Paste ();
 	}
 
 	static void Help ()
@@ -470,15 +488,15 @@ static class Demo {
 					.OrderBy (x => x).Select (x => ustring.Make (x)).ToList ();
 			}
 		}
-		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
-		list.SetSource(items);
+		var list = new ComboBox () { Width = Dim.Fill (), Height = Dim.Fill () };
+		list.SetSource (items);
 		list.OpenSelectedItem += (ListViewItemEventArgs text) => { Application.RequestStop (); };
 
 		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
 		d.Add (list);
 		Application.Run (d);
 
-		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
+		MessageBox.Query (60, 10, "Selected file", list.Text.ToString () == "" ? "Nothing selected" : list.Text.ToString (), "Ok");
 	}
 	#endregion
 
@@ -547,8 +565,12 @@ static class Demo {
 	#endregion
 
 	public static Action running = MainApp;
-	static void Main ()
+	static void Main (string [] args)
 	{
+		if (args.Length > 0 && args.Contains ("-usc")) {
+			Application.UseSystemConsole = true;
+		}
+
 		Console.OutputEncoding = System.Text.Encoding.Default;
 
 		while (running != null) {
@@ -561,14 +583,15 @@ static class Demo {
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
 	public static CheckBox menuAutoMouseNav;
+	private static bool heightAsBuffer = false;
 	static void MainApp ()
 	{
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-		//Application.UseSystemConsole = true;
-
-		Application.Init();
+		Application.Init ();
+		Application.HeightAsBuffer = heightAsBuffer;
+		//ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 		var top = Application.Top;
 
@@ -599,33 +622,61 @@ static class Demo {
 		menuItems [2].Action = () => ShowMenuItem (menuItems [2]);
 		menuItems [3].Action = () => ShowMenuItem (menuItems [3]);
 
+		MenuItem miUseSubMenusSingleFrame = null;
+		var useSubMenusSingleFrame = false;
+		MenuItem miUseKeysUpDownAsKeysLeftRight = null;
+		var useKeysUpDownAsKeysLeftRight = false;
+
+		MenuItem miHeightAsBuffer = null;
+
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }),
-				new MenuItem ("_New", "Creates new file", NewFile),
-				new MenuItem ("_Open", "", Open),
-				new MenuItem ("_Hex", "", () => ShowHex (top)),
-				new MenuItem ("_Close", "", () => Close ()),
+				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.D),
+				new MenuItem ("_New", "Creates new file", NewFile, null, null, Key.AltMask | Key.CtrlMask| Key.N),
+				new MenuItem ("_Open", "", Open, null, null, Key.AltMask | Key.CtrlMask| Key.O),
+				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.H),
+				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.Q),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
+				new MenuBarItem ("_SubMenu Disabled", new MenuItem [] {
+					new MenuItem ("_Disabled", "", () => { }, () => false)
+				}),
 				null,
-				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } })
+				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.CtrlMask | Key.Q)
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", Copy),
-				new MenuItem ("C_ut", "", Cut),
-				new MenuItem ("_Paste", "", Paste),
+				new MenuItem ("_Copy", "", Copy, null, null, Key.AltMask | Key.CtrlMask | Key.C),
+				new MenuItem ("C_ut", "", Cut, null, null, Key.AltMask | Key.CtrlMask| Key.X),
+				new MenuItem ("_Paste", "", Paste, null, null, Key.AltMask | Key.CtrlMask| Key.V),
 				new MenuBarItem ("_Find and Replace",
 					new MenuItem [] { menuItems [0], menuItems [1] }),
-				menuItems[3]
+				menuItems[3],
+				miUseKeysUpDownAsKeysLeftRight = new MenuItem ("Use_KeysUpDownAsKeysLeftRight", "",
+				() => {
+				menu.UseKeysUpDownAsKeysLeftRight = miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = !useKeysUpDownAsKeysLeftRight;
+					miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = menu.UseSubMenusSingleFrame;
+					}) {
+					CheckType = MenuItemCheckStyle.Checked, Checked = useKeysUpDownAsKeysLeftRight
+				},
+				miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
+				() => {
+				menu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame;
+					miUseKeysUpDownAsKeysLeftRight.Checked = useKeysUpDownAsKeysLeftRight = menu.UseKeysUpDownAsKeysLeftRight;
+					}) {
+					CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
+				},
+				miHeightAsBuffer = new MenuItem ("_Height As Buffer", "", () => {
+					miHeightAsBuffer.Checked = heightAsBuffer = !heightAsBuffer;
+					Application.HeightAsBuffer = heightAsBuffer;
+				}) { CheckType = MenuItemCheckStyle.Checked, Checked = heightAsBuffer }
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
-				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
-				new MenuItem ("Search Single Item", "", ComboBoxDemo)
+				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true), null, null, Key.AltMask + 0.ToString () [0]),
+				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false), null, null, Key.AltMask + 1.ToString () [0]),
+				new MenuItem ("Search Single Item", "", ComboBoxDemo, null, null, Key.AltMask + 2.ToString () [0])
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
-				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
-				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo ())
+				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments (), null, null, Key.AltMask | Key.CtrlMask | Key.G),
+				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo (), null, null, Key.AltMask | Key.CtrlMask | Key.K)
 			}),
 			new MenuBarItem ("_Test Menu and SubMenus", new MenuBarItem [] {
 				new MenuBarItem ("SubMenu1Item_1",  new MenuBarItem [] {
@@ -666,7 +717,8 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", Load),
 			new StatusItem(Key.F3, "~F3~ Save", Save),
-			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
+			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } }),
+			new StatusItem(Key.Null, Application.Driver.GetType().Name, null)
 		});
 
 		win.Add (drag, dragText);
@@ -693,12 +745,14 @@ static class Demo {
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)
 	{
-		if (e.KeyEvent.Key == Key.ControlT) {
+		switch (ShortcutHelper.GetModifiersKey (e.KeyEvent)) {
+		case Key.CtrlMask | Key.T:
 			if (menu.IsMenuOpen)
 				menu.CloseMenu ();
 			else
 				menu.OpenMenu ();
 			e.Handled = true;
+			break;
 		}
 	}
 }

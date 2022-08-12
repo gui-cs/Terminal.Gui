@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
-	[ScenarioCategory ("Input")]
-	class Keys : Scenario {
+	[ScenarioCategory ("Mouse and Keyboard")]
+	public class Keys : Scenario {
 
 		class TestWindow : Window {
 			public List<string> _processKeyList = new List<string> ();
@@ -87,9 +87,9 @@ namespace UICatalog {
 			var labelKeypress = new Label ("") {
 				X = Pos.Left (edit),
 				Y = Pos.Top (keyPressedLabel),
-				Width = 20,
 				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Error,
+				AutoSize = true
 			};
 			Win.Add (labelKeypress);
 
@@ -101,7 +101,7 @@ namespace UICatalog {
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-			var fakeKeyPress = new KeyEvent (Key.ControlA, new KeyModifiers () {
+			var fakeKeyPress = new KeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
 				Alt = true,
 				Ctrl = true,
 				Shift = true

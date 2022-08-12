@@ -9,6 +9,8 @@
 //  - Does not support IEnumerable
 // Any udpates done here should probably be done in Window as well; TODO: Merge these classes
 
+using System;
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
@@ -32,6 +34,40 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override Border Border {
+			get => base.Border;
+			set {
+				if (base.Border != null && base.Border.Child != null && value.Child == null) {
+					value.Child = base.Border.Child;
+				}
+				base.Border = value;
+				if (value == null) {
+					return;
+				}
+				Rect frame;
+				if (contentView != null && (contentView.Width is Dim || contentView.Height is Dim)) {
+					frame = Rect.Empty;
+				} else {
+					frame = Frame;
+				}
+				AdjustContentView (frame);
+
+				Border.BorderChanged += Border_BorderChanged;
+			}
+		}
+
+		void Border_BorderChanged (Border border)
+		{
+			Rect frame;
+			if (contentView != null && (contentView.Width is Dim || contentView.Height is Dim)) {
+				frame = Rect.Empty;
+			} else {
+				frame = Frame;
+			}
+			AdjustContentView (frame);
+		}
+
 		/// <summary>
 		/// ContentView is an internal implementation detail of Window. It is used to host Views added with <see cref="Add(View)"/>. 
 		/// Its ONLY reason for being is to provide a simple way for Window to expose to those SubViews that the Window's Bounds 
@@ -47,42 +83,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
-		public FrameView (Rect frame, ustring title = null) : base (frame)
+		/// <param name="views">Views.</param>
+		/// <param name="border">The <see cref="Border"/>.</param>
+		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) : base (frame)
 		{
-			var cFrame = new Rect (1, 1, frame.Width - 2, frame.Height - 2);
-			this.title = title;
-			contentView = new ContentView (cFrame);
-			Initialize ();
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
-		/// </summary>
-		/// <param name="frame">Frame.</param>
-		/// <param name="title">Title.</param>
-		/// /// <param name="views">Views.</param>
-		public FrameView (Rect frame, ustring title, View [] views) : this (frame, title)
-		{
-			foreach (var view in views) {
-				contentView.Add (view);
-			}
-			Initialize ();
+			//var cFrame = new Rect (1, 1, Math.Max (frame.Width - 2, 0), Math.Max (frame.Height - 2, 0));
+			Initialize (frame, title, views, border);
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="title">Title.</param>
-		public FrameView (ustring title)
+		/// <param name="border">The <see cref="Border"/>.</param>
+		public FrameView (ustring title, Border border = null)
 		{
-			this.title = title;
-			contentView = new ContentView () {
-				X = 1,
-				Y = 1,
-				Width = Dim.Fill (1),
-				Height = Dim.Fill (1)
-			};
-			Initialize ();
+			Initialize (Rect.Empty, title, null, border);
 		}
 
 		/// <summary>
@@ -90,12 +106,64 @@ namespace Terminal.Gui {
 		/// </summary>
 		public FrameView () : this (title: string.Empty) { }
 
-		void Initialize ()
+		void Initialize (Rect frame, ustring title, View [] views = null, Border border = null)
 		{
+			if (title == null) title = ustring.Empty;
+			this.Title = title;
+			if (border == null) {
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single
+				};
+			} else {
+				Border = border;
+			}
+			AdjustContentView (frame, views);
+		}
+
+		void AdjustContentView (Rect frame, View [] views = null)
+		{
+			var borderLength = Border.DrawMarginFrame ? 1 : 0;
+			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
+			var wb = new Size ();
+			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
+				wb.Width = borderLength + sumPadding.Right;
+				wb.Height = borderLength + sumPadding.Bottom;
+				if (contentView == null) {
+					contentView = new ContentView () {
+						X = wp.X,
+						Y = wp.Y,
+						Width = Dim.Fill (wb.Width),
+						Height = Dim.Fill (wb.Height)
+					};
+				} else {
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
+					contentView.Width = Dim.Fill (wb.Width);
+					contentView.Height = Dim.Fill (wb.Height);
+				}
+			} else {
+				wb.Width = (2 * borderLength) + sumPadding.Right + sumPadding.Left;
+				wb.Height = (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
+				var cFrame = new Rect (borderLength + sumPadding.Left, borderLength + sumPadding.Top, frame.Width - wb.Width, frame.Height - wb.Height);
+				if (contentView == null) {
+					contentView = new ContentView (cFrame);
+				} else {
+					contentView.Frame = cFrame;
+				}
+			}
+			if (views != null) {
+				foreach (var view in views) {
+					contentView.Add (view);
+				}
+			}
 			if (Subviews?.Count == 0) {
 				base.Add (contentView);
 				contentView.Text = base.Text;
 			}
+			Border.Child = contentView;
 		}
 
 		void DrawFrame ()
@@ -146,34 +214,36 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var padding = 0;
-			Application.CurrentView = this;
+			var padding = Border.GetSumThickness ();
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			if (!NeedDisplay.IsEmpty) {
-				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
+				Driver.SetAttribute (GetNormalColor ());
+				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
+				Clear ();
 			}
 
-			var savedClip = ClipToBounds ();
-			contentView.Redraw (contentView.Bounds);
+			var savedClip = contentView.ClipToBounds ();
+			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearNeedsDisplay ();
-			Driver.SetAttribute (ColorScheme.Normal);
-			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
+			Border.DrawContent (this, false);
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);
-			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
-			Driver.SetAttribute (ColorScheme.Normal);
+			if (Border.DrawMarginFrame)
+				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public override ustring Text {
-			get => contentView.Text;
+			get => contentView?.Text;
 			set {
 				base.Text = value;
 				if (contentView != null) {
@@ -191,6 +261,25 @@ namespace Terminal.Gui {
 			set {
 				base.TextAlignment = contentView.TextAlignment = value;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus)) {
+				Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+			}
+
+			return base.OnEnter (view);
+		}
+
+		/// <inheritdoc/>
+		public override void OnCanFocusChanged ()
+		{
+			if (contentView != null) {
+				contentView.CanFocus = CanFocus;
+			}
+			base.OnCanFocusChanged ();
 		}
 	}
 }

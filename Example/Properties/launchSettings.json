@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Example": {
+      "commandName": "Project"
+    },
+    "Example:-usc": {
+      "commandName": "Project",
+      "commandLineArgs": "-usc"
+    }
+  }
+}

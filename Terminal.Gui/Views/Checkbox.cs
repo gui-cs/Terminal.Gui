@@ -13,9 +13,9 @@ namespace Terminal.Gui {
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
-		ustring text;
-		int hot_pos = -1;
-		Rune hot_key;
+		Rune charChecked;
+		Rune charUnChecked;
+		bool @checked;
 
 		/// <summary>
 		///   Toggled event, raised when the <see cref="CheckBox"/>  is toggled.
@@ -47,11 +47,7 @@ namespace Terminal.Gui {
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
 		public CheckBox (ustring s, bool is_checked = false) : base ()
 		{
-			Checked = is_checked;
-			Text = s;
-			CanFocus = true;
-			Height = 1;
-			Width = s.RuneCount + 4;
+			Initialize (s, is_checked);
 		}
 
 		/// <summary>
@@ -72,57 +68,63 @@ namespace Terminal.Gui {
 		///   The size of <see cref="CheckBox"/> is computed based on the
 		///   text length. 
 		/// </remarks>
-		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
+		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
 		{
-			Checked = is_checked;
-			Text = s;
+			Initialize (s, is_checked);
+		}
 
+		void Initialize (ustring s, bool is_checked)
+		{
+			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
+			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
+			Checked = is_checked;
+			HotKeySpecifier = new Rune ('_');
 			CanFocus = true;
+			AutoSize = true;
+			Text = s;
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
+
+			// Things this view knows how to do
+			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
+
+			// Default keybindings for this view
+			AddKeyBinding ((Key)' ', Command.ToggleChecked);
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
+		}
+
+		/// <inheritdoc/>
+		protected override void UpdateTextFormatterText ()
+		{
+			switch (TextAlignment) {
+			case TextAlignment.Left:
+			case TextAlignment.Centered:
+			case TextAlignment.Justified:
+				TextFormatter.Text = ustring.Make (Checked ? charChecked : charUnChecked) + " " + GetFormatterText ();
+				break;
+			case TextAlignment.Right:
+				TextFormatter.Text = GetFormatterText () + " " + ustring.Make (Checked ? charChecked : charUnChecked);
+				break;
+			}
+		}
+
+		ustring GetFormatterText ()
+		{
+			if (AutoSize || ustring.IsNullOrEmpty (Text) || Frame.Width <= 2) {
+				return Text;
+			}
+			return Text.RuneSubstring (0, Math.Min (Frame.Width - 2, Text.RuneCount));
 		}
 
 		/// <summary>
 		///    The state of the <see cref="CheckBox"/>
 		/// </summary>
-		public bool Checked { get; set; }
-
-		/// <summary>
-		///   The text displayed by this <see cref="CheckBox"/>
-		/// </summary>
-		public new ustring Text {
-			get {
-				return text;
-			}
-
+		public bool Checked {
+			get => @checked;
 			set {
-				text = value;
-
-				int i = 0;
-				hot_pos = -1;
-				hot_key = (char)0;
-				foreach (Rune c in text) {
-					if (Rune.IsUpper (c)) {
-						hot_key = c;
-						hot_pos = i;
-						break;
-					}
-					i++;
-				}
-			}
-		}
-
-		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			Move (0, 0);
-			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
-			Driver.AddRune (' ');
-			Move (2, 0);
-			Driver.AddStr (Text);
-			if (hot_pos != -1) {
-				Move (2 + hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-				Driver.AddRune (hot_key);
+				@checked = value;
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
@@ -135,14 +137,32 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (kb.KeyValue == ' ') {
-				var previousChecked = Checked;
-				Checked = !Checked;
-				OnToggled (previousChecked);
-				SetNeedsDisplay ();
-				return true;
-			}
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
+
 			return base.ProcessKey (kb);
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent kb)
+		{
+			if (kb.Key == (Key.AltMask | HotKey))
+				return ToggleChecked ();
+
+			return false;
+		}
+
+		bool ToggleChecked ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			var previousChecked = Checked;
+			Checked = !Checked;
+			OnToggled (previousChecked);
+			SetNeedsDisplay ();
+			return true;
 		}
 
 		///<inheritdoc/>
@@ -158,6 +178,14 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 
 			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
 		}
 	}
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Mouse", Description: "Demonstrates how to capture mouse events")]
-	[ScenarioCategory ("Input")]
-	class Mouse : Scenario {
+	[ScenarioCategory ("Mouse and Keyboard")]
+	public class Mouse : Scenario {
 		public override void Setup ()
 		{
 			Label ml;

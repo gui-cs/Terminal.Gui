@@ -4,15 +4,14 @@ using System.Threading;
 using Terminal.Gui;
 using System.Linq;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	// 
 	// This would be a great scenario to show of threading (Issue #471)
 	//
-	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading")]
+	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("MainLoop")]
-	[ScenarioCategory ("Threading")]
-	class Progress : Scenario {
+	[ScenarioCategory ("Threading"), ScenarioCategory ("ProgressBar")]
+	public class Progress : Scenario {
 
 		class ProgressDemo : FrameView {
 			const int _verticalSpace = 1;
@@ -100,6 +99,7 @@ namespace UICatalog {
 				};
 				Add (_startedLabel);
 
+				LayoutSubviews ();
 
 				// Set height to height of controls + spacing + frame
 				Height = 2 + _verticalSpace + Dim.Height (startButton) + _verticalSpace + Dim.Height (ActivityProgressBar) + _verticalSpace + Dim.Height (PulseProgressBar) + _verticalSpace;

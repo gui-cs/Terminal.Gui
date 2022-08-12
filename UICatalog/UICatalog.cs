@@ -6,10 +6,14 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
 
+/// <summary>
+/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+/// </summary>
 /// <remarks>
 /// <para>
 ///	UI Catalog attempts to satisfy the following goals:
@@ -34,10 +38,9 @@ using Rune = System.Rune;
 /// </list>
 /// </para>	
 /// <para>
-///	See the project README for more details (https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog/README.md).
+///	See the project README for more details (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 /// </para>	
 /// </remarks>
-
 namespace UICatalog {
 	/// <summary>
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
@@ -61,6 +64,9 @@ namespace UICatalog {
 
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
+		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+		private static bool _heightAsBuffer = false;
+		private static bool _isFirstRunning = true;
 
 		static void Main (string [] args)
 		{
@@ -71,14 +77,20 @@ namespace UICatalog {
 
 			_scenarios = Scenario.GetDerivedClasses<Scenario> ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
 
+			if (args.Length > 0 && args.Contains ("-usc")) {
+				_useSystemConsole = true;
+				args = args.Where (val => val != "-usc").ToArray ();
+			}
 			if (args.Length > 0) {
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
 				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
+				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
 				_runningScenario.Init (Application.Top, _baseColorScheme);
 				_runningScenario.Setup ();
 				_runningScenario.Run ();
 				_runningScenario = null;
+				Application.Shutdown ();
 				return;
 			}
 
@@ -86,7 +98,7 @@ namespace UICatalog {
 			while ((scenario = GetScenarioToRun ()) != null) {
 #if DEBUG_IDISPOSABLE
 				// Validate there are no outstanding Responder-based instances 
-				// after a sceanario was selected to run. This proves the main UI Catalog
+				// after a scenario was selected to run. This proves the main UI Catalog
 				// 'app' closed cleanly.
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
@@ -94,18 +106,19 @@ namespace UICatalog {
 				Responder.Instances.Clear ();
 #endif
 
-				Application.UseSystemConsole = _useSystemConsole;
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
 
-				static void ReadyHandler ()
-				{
-					_rightPane.SetFocus ();
-					_top.Ready -= ReadyHandler;
-				}
-				
-				_top.Ready += ReadyHandler;
+				//static void LoadedHandler ()
+				//{
+				//	_rightPane.SetFocus ();
+				//	_top.Loaded -= LoadedHandler;
+				//}
+
+				//_top.Loaded += LoadedHandler;
+
+				Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
 				// After the scenario runs, validate all Responder-based instances
@@ -113,7 +126,7 @@ namespace UICatalog {
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
 				}
-				Responder.Instances.Clear();
+				Responder.Instances.Clear ();
 #endif
 			}
 
@@ -135,32 +148,37 @@ namespace UICatalog {
 		/// <returns></returns>
 		private static Scenario GetScenarioToRun ()
 		{
-			Application.UseSystemConsole = false;
+			Application.UseSystemConsole = _useSystemConsole;
 			Application.Init ();
+			Application.HeightAsBuffer = _heightAsBuffer;
 
 			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
 
 			StringBuilder aboutMessage = new StringBuilder ();
-			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
-			aboutMessage.AppendLine (@"             _           ");
-			aboutMessage.AppendLine (@"  __ _ _   _(_)  ___ ___ ");
-			aboutMessage.AppendLine (@" / _` | | | | | / __/ __|");
-			aboutMessage.AppendLine (@"| (_| | |_| | || (__\__ \");
-			aboutMessage.AppendLine (@" \__, |\__,_|_(_)___|___/");
-			aboutMessage.AppendLine (@" |___/                   ");
-			aboutMessage.AppendLine ("");
-			aboutMessage.AppendLine ($"Version: {typeof (UICatalogApp).Assembly.GetName ().Version}");
-			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
-			aboutMessage.AppendLine ("");
+			aboutMessage.AppendLine (@"A comprehensive sample library for");
+			aboutMessage.AppendLine (@"");
+			aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
+			aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
+			aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
+			aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
+			aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
+			aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
+			aboutMessage.AppendLine (@"");
+			aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop() )
+					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
-				new MenuBarItem ("_Diagostics", CreateDiagnosticMenuItems()),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok")),
+				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
+				new MenuBarItem ("_Help", new MenuItem [] {
+					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
+					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
+					new MenuItem ("_About...",
+						"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
+				})
 			});
 
 			_leftPane = new FrameView ("Categories") {
@@ -169,10 +187,12 @@ namespace UICatalog {
 				Width = 25,
 				Height = Dim.Fill (1),
 				CanFocus = false,
+				Shortcut = Key.CtrlMask | Key.C
 			};
+			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
+			_leftPane.ShortcutAction = () => _leftPane.SetFocus ();
 
-
-			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
+			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
 				X = 0,
 				Y = 0,
@@ -193,8 +213,10 @@ namespace UICatalog {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 				CanFocus = true,
-
+				Shortcut = Key.CtrlMask | Key.S
 			};
+			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortcutTag})";
+			_rightPane.ShortcutAction = () => _rightPane.SetFocus ();
 
 			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t).Length).FirstOrDefault ()).Length;
 
@@ -217,14 +239,14 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Num", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
-			_statusBar = new StatusBar () { 
+			_statusBar = new StatusBar () {
 				Visible = true,
 			};
 			_statusBar.Items = new StatusItem [] {
 				_capslock,
 				_numlock,
 				_scrolllock,
-				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
+				new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
 						// This causes GetScenarioToRun to return null
 						_runningScenario = null;
@@ -238,8 +260,9 @@ namespace UICatalog {
 					_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_top.LayoutSubviews();
-					_top.ChildNeedsDisplay();
+					_top.SetChildNeedsDisplay();
 				}),
+				new StatusItem (Key.CharMask, Application.Driver.GetType ().Name, null),
 			};
 
 			SetColorScheme ();
@@ -249,51 +272,231 @@ namespace UICatalog {
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
-			_top.Ready += () => {
+
+			void TopHandler () {
 				if (_runningScenario != null) {
 					_runningScenario = null;
+					_isFirstRunning = false;
 				}
-			};
+				if (!_isFirstRunning) {
+					_rightPane.SetFocus ();
+				}
+				_top.Loaded -= TopHandler;
+			}
+			_top.Loaded += TopHandler;
+			// The following code was moved to the TopHandler event
+			//  because in the MainLoop.EventsPending (wait)
+			//  from the Application.RunLoop with the WindowsDriver
+			//  the OnReady event is triggered due the Focus event.
+			//  On CursesDriver and NetDriver the focus event won't be triggered
+			//  and if it's possible I don't know how to do it.
+			//void ReadyHandler ()
+			//{
+			//	if (!_isFirstRunning) {
+			//		_rightPane.SetFocus ();
+			//	}
+			//	_top.Ready -= ReadyHandler;
+			//}
+			//_top.Ready += ReadyHandler;
 
 			Application.Run (_top);
 			return _runningScenario;
 		}
 
-		static MenuItem [] CreateDiagnosticMenuItems ()
+		static List<MenuItem []> CreateDiagnosticMenuItems ()
 		{
-			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
-			{
-				var mi = new MenuItem ();
-				mi.Title = menuItem;
-				mi.CheckType |= MenuItemCheckStyle.Checked;
-				mi.Checked = checkFunction ();
-				mi.Action = () => {
-					action?.Invoke ();
-					mi.Title = menuItem;
-					mi.Checked = checkFunction ();
+			List<MenuItem []> menuItems = new List<MenuItem []> ();
+			menuItems.Add (CreateDiagnosticFlagsMenuItems ());
+			menuItems.Add (new MenuItem [] { null });
+			menuItems.Add (CreateSizeStyle ());
+			menuItems.Add (CreateDisabledEnabledMouse ());
+			menuItems.Add (CreateKeybindings ());
+			return menuItems;
+		}
+
+		private static MenuItem [] CreateDisabledEnabledMouse ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Disable/Enable Mouse";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.IsMouseDisabled;
+			item.Action += () => {
+				item.Checked = Application.IsMouseDisabled = !item.Checked;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+		private static MenuItem[] CreateKeybindings()
+		{
+
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "Keybindings";
+			item.Action += () => {
+				var dlg = new KeyBindingsDialog ();
+				Application.Run (dlg);
+			};
+
+			menuItems.Add (null);
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+
+		static MenuItem [] CreateSizeStyle ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Height As Buffer";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.HeightAsBuffer;
+			item.Action += () => {
+				item.Checked = !item.Checked;
+				_heightAsBuffer = item.Checked;
+				Application.HeightAsBuffer = _heightAsBuffer;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+
+		static MenuItem [] CreateDiagnosticFlagsMenuItems ()
+		{
+			const string OFF = "Diagnostics: _Off";
+			const string FRAME_RULER = "Diagnostics: Frame _Ruler";
+			const string FRAME_PADDING = "Diagnostics: _Frame Padding";
+			var index = 0;
+
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
+				var item = new MenuItem ();
+				item.Title = GetDiagnosticsTitle (diag);
+				item.Shortcut = Key.AltMask + index.ToString () [0];
+				index++;
+				item.CheckType |= MenuItemCheckStyle.Checked;
+				if (GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off) == item.Title) {
+					item.Checked = (_diagnosticFlags & (ConsoleDriver.DiagnosticFlags.FramePadding
+					| ConsoleDriver.DiagnosticFlags.FrameRuler)) == 0;
+				} else {
+					item.Checked = _diagnosticFlags.HasFlag (diag);
+				}
+				item.Action += () => {
+					var t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
+					if (item.Title == t && !item.Checked) {
+						_diagnosticFlags &= ~(ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
+						item.Checked = true;
+					} else if (item.Title == t && item.Checked) {
+						_diagnosticFlags |= (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
+						item.Checked = false;
+					} else {
+						var f = GetDiagnosticsEnumValue (item.Title);
+						if (_diagnosticFlags.HasFlag (f)) {
+							SetDiagnosticsFlag (f, false);
+						} else {
+							SetDiagnosticsFlag (f, true);
+						}
+					}
+					foreach (var menuItem in menuItems) {
+						if (menuItem.Title == t) {
+							menuItem.Checked = !_diagnosticFlags.HasFlag (ConsoleDriver.DiagnosticFlags.FrameRuler)
+								&& !_diagnosticFlags.HasFlag (ConsoleDriver.DiagnosticFlags.FramePadding);
+						} else if (menuItem.Title != t) {
+							menuItem.Checked = _diagnosticFlags.HasFlag (GetDiagnosticsEnumValue (menuItem.Title));
+						}
+					}
+					ConsoleDriver.Diagnostics = _diagnosticFlags;
+					_top.SetNeedsDisplay ();
 				};
-				return mi;
+				menuItems.Add (item);
+			}
+			return menuItems.ToArray ();
+
+			string GetDiagnosticsTitle (Enum diag)
+			{
+				switch (Enum.GetName (_diagnosticFlags.GetType (), diag)) {
+				case "Off":
+					return OFF;
+				case "FrameRuler":
+					return FRAME_RULER;
+				case "FramePadding":
+					return FRAME_PADDING;
+				}
+				return "";
 			}
 
-			return new MenuItem [] {
-				CheckedMenuMenuItem ("Use _System Console",
-					() => {
-						_useSystemConsole = !_useSystemConsole;
-					},
-					() => _useSystemConsole),
-				CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
-				CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
-			};
+			Enum GetDiagnosticsEnumValue (ustring title)
+			{
+				switch (title.ToString ()) {
+				case FRAME_RULER:
+					return ConsoleDriver.DiagnosticFlags.FrameRuler;
+				case FRAME_PADDING:
+					return ConsoleDriver.DiagnosticFlags.FramePadding;
+				}
+				return null;
+			}
+
+			void SetDiagnosticsFlag (Enum diag, bool add)
+			{
+				switch (diag) {
+				case ConsoleDriver.DiagnosticFlags.FrameRuler:
+					if (add) {
+						_diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+					} else {
+						_diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FrameRuler;
+					}
+					break;
+				case ConsoleDriver.DiagnosticFlags.FramePadding:
+					if (add) {
+						_diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FramePadding;
+					} else {
+						_diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FramePadding;
+					}
+					break;
+				default:
+					_diagnosticFlags = default;
+					break;
+				}
+			}
+
+			//MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
+			//{
+			//	var mi = new MenuItem ();
+			//	mi.Title = menuItem;
+			//	mi.Shortcut = Key.AltMask + index.ToString () [0];
+			//	index++;
+			//	mi.CheckType |= MenuItemCheckStyle.Checked;
+			//	mi.Checked = checkFunction ();
+			//	mi.Action = () => {
+			//		action?.Invoke ();
+			//		mi.Title = menuItem;
+			//		mi.Checked = checkFunction ();
+			//	};
+			//	return mi;
+			//}
+
+			//return new MenuItem [] {
+			//	CheckedMenuMenuItem ("Use _System Console",
+			//		() => {
+			//			_useSystemConsole = !_useSystemConsole;
+			//		},
+			//		() => _useSystemConsole),
+			//	CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
+			//		() => {
+			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+			//			_top.SetNeedsDisplay ();
+			//		},
+			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
+			//	CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
+			//		() => {
+			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			//			_top.SetNeedsDisplay ();
+			//		},
+			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
+			//};
 		}
 
 		static void SetColorScheme ()
@@ -309,14 +512,15 @@ namespace UICatalog {
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			foreach (var sc in Colors.ColorSchemes) {
 				var item = new MenuItem ();
-				item.Title = sc.Key;
+				item.Title = $"_{sc.Key}";
+				item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
 				item.CheckType |= MenuItemCheckStyle.Radio;
 				item.Checked = sc.Value == _baseColorScheme;
 				item.Action += () => {
 					_baseColorScheme = sc.Value;
 					SetColorScheme ();
 					foreach (var menuItem in menuItems) {
-						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
+						menuItem.Checked = menuItem.Title.Equals ($"_{sc.Key}") && sc.Value == _baseColorScheme;
 					}
 				};
 				menuItems.Add (item);
@@ -335,31 +539,58 @@ namespace UICatalog {
 		}
 
 		internal class ScenarioListDataSource : IListDataSource {
+			private readonly int len;
+
 			public List<Type> Scenarios { get; set; }
 
 			public bool IsMarked (int item) => false;
 
 			public int Count => Scenarios.Count;
 
-			public ScenarioListDataSource (List<Type> itemList) => Scenarios = itemList;
+			public int Length => len;
 
-			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
+			public ScenarioListDataSource (List<Type> itemList)
+			{
+				Scenarios = itemList;
+				len = GetMaxLengthItem ();
+			}
+
+			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
 			{
 				container.Move (col, line);
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
 				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
-				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width);
+				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width, start);
 			}
 
 			public void SetMark (int item, bool value)
 			{
 			}
 
-			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+			int GetMaxLengthItem ()
+			{
+				if (Scenarios?.Count == 0) {
+					return 0;
+				}
+
+				int maxLength = 0;
+				for (int i = 0; i < Scenarios.Count; i++) {
+					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [i]));
+					var sc = $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [i])}";
+					var l = sc.Length;
+					if (l > maxLength) {
+						maxLength = l;
+					}
+				}
+
+				return maxLength;
+			}
+
+			// A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;
-				int index = 0;
+				int index = start;
 				while (index < ustr.Length) {
 					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
 					var count = Rune.ColumnWidth (rune);
@@ -428,9 +659,10 @@ namespace UICatalog {
 				_scenarioListViewItem = 0;
 			}
 			_categoryListViewItem = _categoryListView.SelectedItem;
-			var item = _categories [_categoryListView.SelectedItem];
+			var item = _categories [_categoryListViewItem];
 			List<Type> newlist;
-			if (item.Equals ("All")) {
+			if (_categoryListViewItem == 0) {
+				// First category is "All"
 				newlist = _scenarios;
 
 			} else {
@@ -439,6 +671,33 @@ namespace UICatalog {
 			_scenarioListView.Source = new ScenarioListDataSource (newlist);
 			_scenarioListView.SelectedItem = _scenarioListViewItem;
 
+		}
+
+		private static void OpenUrl (string url)
+		{
+			try {
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					url = url.Replace ("&", "^&");
+					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					using (var process = new Process {
+						StartInfo = new ProcessStartInfo {
+							FileName = "xdg-open",
+							Arguments = url,
+							RedirectStandardError = true,
+							RedirectStandardOutput = true,
+							CreateNoWindow = true,
+							UseShellExecute = false
+						}
+					}) {
+						process.Start ();
+					}
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					Process.Start ("open", url);
+				}
+			} catch {
+				throw;
+			}
 		}
 	}
 }

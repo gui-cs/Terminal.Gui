@@ -1,12 +1,11 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
-
-	class Scrolling : Scenario {
+	[ScenarioCategory ("ScrollView")]
+	public class Scrolling : Scenario {
 
 		class Box10x : View {
 			int w = 40;
@@ -124,30 +123,36 @@ namespace UICatalog {
 				ShowHorizontalScrollIndicator = true,
 			};
 
-			const string rule = "|123456789";
-			var horizontalRuler = new Label ("") {
+			const string rule = "0123456789";
+			var horizontalRuler = new Label () {
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
-				ColorScheme = Colors.Error
+				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Height = 2,
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
-			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
+			const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-			var verticalRuler = new Label ("") {
+			var verticalRuler = new Label () {
 				X = 0,
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
 
-			Win.LayoutComplete += (a) => {
+			void Top_Loaded ()
+			{
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
-			};
+				Top.Loaded -= Top_Loaded;
+			}
+			Top.Loaded += Top_Loaded;
 
 			var pressMeButton = new Button ("Press me!") {
 				X = 3,
@@ -202,8 +207,8 @@ namespace UICatalog {
 			scrollView.Add (anchorButton);
 
 			var hCheckBox = new CheckBox ("Horizontal Scrollbar", scrollView.ShowHorizontalScrollIndicator) {
-				X = Pos.X(scrollView),
-				Y = Pos.Bottom(scrollView) + 1,
+				X = Pos.X (scrollView),
+				Y = Pos.Bottom (scrollView) + 1,
 			};
 			Win.Add (hCheckBox);
 
@@ -271,7 +276,7 @@ namespace UICatalog {
 
 			int count = 0;
 			var mousePos = new Label ("Mouse: ");
-			mousePos.X = Pos.Right(scrollView) + 1;
+			mousePos.X = Pos.Right (scrollView) + 1;
 			mousePos.Y = Pos.AnchorEnd (1);
 			mousePos.Width = 50;
 			Application.RootMouseEvent += delegate (MouseEvent me) {
@@ -282,12 +287,20 @@ namespace UICatalog {
 			progress.X = Pos.Right (scrollView) + 1;
 			progress.Y = Pos.AnchorEnd (2);
 			progress.Width = 50;
+			bool pulsing = true;
 			bool timer (MainLoop caller)
 			{
 				progress.Pulse ();
-				return true;
+				return pulsing;
 			}
 			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+
+			void Top_Unloaded ()
+			{
+				pulsing = false;
+				Top.Unloaded -= Top_Unloaded;
+			}
+			Top.Unloaded += Top_Unloaded;
 
 			Win.Add (scrollView, scrollView2, scrollView3, mousePos, progress);
 		}

@@ -12,10 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Terminal.Gui {
+
+#pragma warning disable RCS1138 // Add summary to documentation comment.
 	/// <summary>
 	/// 
 	/// </summary>
 	public static class FakeConsole {
+#pragma warning restore RCS1138 // Add summary to documentation comment.
 
 		//
 		// Summary:
@@ -36,10 +39,22 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     Error reading or writing information.
+#pragma warning disable RCS1138 // Add summary to documentation comment.
+
+		/// <summary>
+		/// Specifies the initial console width.
+		/// </summary>
+		public const int WIDTH = 80;
+
+		/// <summary>
+		/// Specifies the initial console height.
+		/// </summary>
+		public const int HEIGHT = 25;
+
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int WindowWidth { get; set; } = 80;
+		public static int WindowWidth { get; set; } = WIDTH;
 		//
 		// Summary:
 		//     Gets a value that indicates whether output has been redirected from the standard
@@ -198,7 +213,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int BufferHeight { get; set; } = 25;
+		public static int BufferHeight { get; set; } = HEIGHT;
 		//
 		// Summary:
 		//     Gets or sets the width of the buffer area.
@@ -220,7 +235,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int BufferWidth { get; set; } = 80;
+		public static int BufferWidth { get; set; } = WIDTH;
 		//
 		// Summary:
 		//     Gets or sets the height of the console window area.
@@ -243,7 +258,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int WindowHeight { get; set; } = 25;
+		public static int WindowHeight { get; set; } = HEIGHT;
 		//
 		// Summary:
 		//     Gets or sets a value indicating whether the combination of the System.ConsoleModifiers.Control
@@ -531,7 +546,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Clear ()
 		{
-			_buffer = new char [WindowWidth, WindowHeight];
+			_buffer = new char [BufferWidth, BufferHeight];
 			SetCursorPosition (0, 0);
 		}
 
@@ -798,7 +813,7 @@ namespace Terminal.Gui {
 			if (MockKeyPresses.Count > 0) {
 				return MockKeyPresses.Pop();
 			} else {
-				return new ConsoleKeyInfo ('~', ConsoleKey.Oem3, false,false,false);
+				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false,false,false);
 			}
 		}
 
@@ -905,7 +920,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void SetBufferSize (int width, int height)
 		{
-			throw new NotImplementedException ();
+			BufferWidth = width;
+			BufferHeight = height;
+			_buffer = new char [BufferWidth, BufferHeight];
 		}
 
 		//
@@ -939,6 +956,8 @@ namespace Terminal.Gui {
 		{
 			CursorLeft = left;
 			CursorTop = top;
+			WindowLeft = Math.Max (Math.Min (left, BufferWidth - WindowWidth), 0);
+			WindowTop = Math.Max (Math.Min (top, BufferHeight - WindowHeight), 0);
 		}
 
 		//
@@ -1042,7 +1061,8 @@ namespace Terminal.Gui {
 		/// <param name="top"></param>
 		public static void SetWindowPosition (int left, int top)
 		{
-			throw new NotImplementedException ();
+			WindowLeft = left;
+			WindowTop = top;
 		}
 
 		//
@@ -1076,7 +1096,8 @@ namespace Terminal.Gui {
 		/// <param name="height"></param>
 		public static void SetWindowSize (int width, int height)
 		{
-			throw new NotImplementedException ();
+			WindowWidth = width;
+			WindowHeight = height;
 		}
 
 		//

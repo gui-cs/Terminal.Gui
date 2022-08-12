@@ -5,24 +5,25 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct Rect
+    <title>Class Rect
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct Rect
+    <meta name="title" content="Class Rect
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -81,29 +82,22 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Rect">
   
   
-  <h1 id="Terminal_Gui_Rect" data-uid="Terminal.Gui.Rect" class="text-break">Struct Rect
+  <h1 id="Terminal_Gui_Rect" data-uid="Terminal.Gui.Rect" class="text-break">Class Rect
   </h1>
   <div class="markdown level0 summary">
 Stores a set of four integers that represent the location and size of a rectangle
 </div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Rect</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Rect_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct Rect</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Rect : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -151,11 +145,6 @@ Rectangle Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect__ctor_System_Int32_System_Int32_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Rectangle from a specified x,y location and
-width and height values.
-</div>
   
   
   <a id="Terminal_Gui_Rect__ctor_" data-uid="Terminal.Gui.Rect.#ctor*"></a>
@@ -190,10 +179,6 @@ Rectangle Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect__ctor_Terminal_Gui_Point_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Rectangle from Point and Size values.
-</div>
   <h3 id="fields">Fields
   </h3>
   
@@ -222,10 +207,6 @@ Empty Shared Field
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Empty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-An uninitialized Rectangle Structure.
-</div>
   
   
   <h4 id="Terminal_Gui_Rect_X" data-uid="Terminal.Gui.Rect.X">X</h4>
@@ -307,11 +288,6 @@ Bottom Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Bottom_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Y coordinate of the bottom edge of the Rectangle.
-Read only.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Height_" data-uid="Terminal.Gui.Rect.Height*"></a>
@@ -366,10 +342,6 @@ IsEmpty Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_IsEmpty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Indicates if the width or height are zero. Read only.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Left_" data-uid="Terminal.Gui.Rect.Left*"></a>
@@ -397,11 +369,6 @@ Left Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Left_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The X coordinate of the left edge of the Rectangle.
-Read only.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Location_" data-uid="Terminal.Gui.Rect.Location*"></a>
@@ -429,10 +396,6 @@ Location Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Location_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Location of the top-left corner of the Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Right_" data-uid="Terminal.Gui.Rect.Right*"></a>
@@ -460,11 +423,6 @@ Right Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Right_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The X coordinate of the right edge of the Rectangle.
-Read only.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Size_" data-uid="Terminal.Gui.Rect.Size*"></a>
@@ -492,10 +450,6 @@ Size Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Size_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Size of the Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Top_" data-uid="Terminal.Gui.Rect.Top*"></a>
@@ -523,11 +477,6 @@ Top Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Top_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Y coordinate of the top edge of the Rectangle.
-Read only.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Width_" data-uid="Terminal.Gui.Rect.Width*"></a>
@@ -606,10 +555,6 @@ Contains Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Contains_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks if an x,y coordinate lies within this Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Contains_" data-uid="Terminal.Gui.Rect.Contains*"></a>
@@ -654,10 +599,6 @@ Contains Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Contains_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks if a Point lies within this Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Contains_" data-uid="Terminal.Gui.Rect.Contains*"></a>
@@ -702,11 +643,6 @@ Contains Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Contains_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks if a Rectangle lies entirely within this 
-Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Equals_" data-uid="Terminal.Gui.Rect.Equals*"></a>
@@ -751,12 +687,6 @@ Equals Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
-  <h5 id="Terminal_Gui_Rect_Equals_System_Object__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks equivalence of this Rectangle and another object.
-</div>
   
   
   <a id="Terminal_Gui_Rect_FromLTRB_" data-uid="Terminal.Gui.Rect.FromLTRB*"></a>
@@ -816,11 +746,6 @@ FromLTRB Shared Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_FromLTRB_System_Int32_System_Int32_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Produces a Rectangle structure from left, top, right
-and bottom coordinates.
-</div>
   
   
   <a id="Terminal_Gui_Rect_GetHashCode_" data-uid="Terminal.Gui.Rect.GetHashCode*"></a>
@@ -848,12 +773,6 @@ GetHashCode Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
-  <h5 id="Terminal_Gui_Rect_GetHashCode_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Calculates a hashing value.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Inflate_" data-uid="Terminal.Gui.Rect.Inflate*"></a>
@@ -888,10 +807,6 @@ Inflate Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Inflate_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Inflates the Rectangle by a specified width and height.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Inflate_" data-uid="Terminal.Gui.Rect.Inflate*"></a>
@@ -946,11 +861,6 @@ Inflate Shared Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Inflate_Terminal_Gui_Rect_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Produces a new Rectangle by inflating an existing 
-Rectangle by the specified coordinate values.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Inflate_" data-uid="Terminal.Gui.Rect.Inflate*"></a>
@@ -980,10 +890,6 @@ Inflate Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Inflate_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Inflates the Rectangle by a specified Size.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Intersect_" data-uid="Terminal.Gui.Rect.Intersect*"></a>
@@ -1013,11 +919,6 @@ Intersect Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Intersect_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Replaces the Rectangle with the intersection of itself
-and another Rectangle.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Intersect_" data-uid="Terminal.Gui.Rect.Intersect*"></a>
@@ -1067,11 +968,6 @@ Intersect Shared Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Intersect_Terminal_Gui_Rect_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Produces a new Rectangle by intersecting 2 existing 
-Rectangles. Returns null if there is no	intersection.
-</div>
   
   
   <a id="Terminal_Gui_Rect_IntersectsWith_" data-uid="Terminal.Gui.Rect.IntersectsWith*"></a>
@@ -1116,10 +1012,6 @@ IntersectsWith Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_IntersectsWith_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks if a Rectangle intersects with this one.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Offset_" data-uid="Terminal.Gui.Rect.Offset*"></a>
@@ -1154,10 +1046,6 @@ Offset Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Offset_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Moves the Rectangle a specified distance.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Offset_" data-uid="Terminal.Gui.Rect.Offset*"></a>
@@ -1187,10 +1075,6 @@ Offset Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Offset_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Moves the Rectangle a specified distance.
-</div>
   
   
   <a id="Terminal_Gui_Rect_ToString_" data-uid="Terminal.Gui.Rect.ToString*"></a>
@@ -1218,12 +1102,6 @@ ToString Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
-  <h5 id="Terminal_Gui_Rect_ToString_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Formats the Rectangle as a string in (x,y,w,h) notation.
-</div>
   
   
   <a id="Terminal_Gui_Rect_Union_" data-uid="Terminal.Gui.Rect.Union*"></a>
@@ -1273,11 +1151,6 @@ Union Shared Method
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_Union_Terminal_Gui_Rect_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Produces a new Rectangle from the union of 2 existing 
-Rectangles.
-</div>
   <h3 id="operators">Operators
   </h3>
   
@@ -1329,12 +1202,6 @@ Equality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_op_Equality_Terminal_Gui_Rect_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Rectangle objects. The return value is
-based on the equivalence of the Location and Size 
-properties of the two Rectangles.
-</div>
   
   
   <a id="Terminal_Gui_Rect_op_Inequality_" data-uid="Terminal.Gui.Rect.op_Inequality*"></a>
@@ -1384,12 +1251,6 @@ Inequality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Rect_op_Inequality_Terminal_Gui_Rect_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Rectangle objects. The return value is
-based on the equivalence of the Location and Size 
-properties of the two Rectangles.
-</div>
 </article>
           </div>
           
@@ -1400,7 +1261,8 @@ properties of the two Rectangles.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

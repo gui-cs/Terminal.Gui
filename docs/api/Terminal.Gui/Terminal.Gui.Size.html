@@ -5,24 +5,25 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Struct Size
+    <title>Class Size
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Struct Size
+    <meta name="title" content="Class Size
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -61,11 +62,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -81,29 +82,22 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Size">
   
   
-  <h1 id="Terminal_Gui_Size" data-uid="Terminal.Gui.Size" class="text-break">Struct Size
+  <h1 id="Terminal_Gui_Size" data-uid="Terminal.Gui.Size" class="text-break">Class Size
   </h1>
   <div class="markdown level0 summary">
 Stores an ordered pair of integers, which specify a Height and Width.
 </div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Size</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Size_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct Size</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class Size : ValueType</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -141,10 +135,6 @@ Size Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size__ctor_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Size from specified dimensions.
-</div>
   
   
   <a id="Terminal_Gui_Size__ctor_" data-uid="Terminal.Gui.Size.#ctor*"></a>
@@ -174,10 +164,6 @@ Size Constructor
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size__ctor_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Creates a Size from a Point value.
-</div>
   <h3 id="fields">Fields
   </h3>
   
@@ -235,10 +221,6 @@ Height Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_Height_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Height coordinate of the Size.
-</div>
   
   
   <a id="Terminal_Gui_Size_IsEmpty_" data-uid="Terminal.Gui.Size.IsEmpty*"></a>
@@ -266,10 +248,6 @@ IsEmpty Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_IsEmpty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Indicates if both Width and Height are zero.
-</div>
   
   
   <a id="Terminal_Gui_Size_Width_" data-uid="Terminal.Gui.Size.Width*"></a>
@@ -297,10 +275,6 @@ Width Property
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_Width_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Width coordinate of the Size.
-</div>
   <h3 id="methods">Methods
   </h3>
   
@@ -396,12 +370,6 @@ Equals Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
-  <h5 id="Terminal_Gui_Size_Equals_System_Object__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Checks equivalence of this Size and another object.
-</div>
   
   
   <a id="Terminal_Gui_Size_GetHashCode_" data-uid="Terminal.Gui.Size.GetHashCode*"></a>
@@ -429,12 +397,6 @@ GetHashCode Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
-  <h5 id="Terminal_Gui_Size_GetHashCode_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Calculates a hashing value.
-</div>
   
   
   <a id="Terminal_Gui_Size_Subtract_" data-uid="Terminal.Gui.Size.Subtract*"></a>
@@ -511,12 +473,6 @@ ToString Method
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
-  <h5 id="Terminal_Gui_Size_ToString_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Formats the Size as a string in coordinate notation.
-</div>
   <h3 id="operators">Operators
   </h3>
   
@@ -568,10 +524,6 @@ Addition Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_op_Addition_Terminal_Gui_Size_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Addition of two Size structures.
-</div>
   
   
   <a id="Terminal_Gui_Size_op_Equality_" data-uid="Terminal.Gui.Size.op_Equality*"></a>
@@ -621,12 +573,6 @@ Equality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_op_Equality_Terminal_Gui_Size_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Size objects. The return value is
-based on the equivalence of the Width and Height 
-properties of the two Sizes.
-</div>
   
   
   <a id="Terminal_Gui_Size_op_Explicit_" data-uid="Terminal.Gui.Size.op_Explicit*"></a>
@@ -671,11 +617,6 @@ Size to Point Conversion
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_op_Explicit_Terminal_Gui_Size__Terminal_Gui_Point_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Returns a Point based on the dimensions of a given 
-Size. Requires explicit cast.
-</div>
   
   
   <a id="Terminal_Gui_Size_op_Inequality_" data-uid="Terminal.Gui.Size.op_Inequality*"></a>
@@ -725,12 +666,6 @@ Inequality Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_op_Inequality_Terminal_Gui_Size_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Compares two Size objects. The return value is
-based on the equivalence of the Width and Height 
-properties of the two Sizes.
-</div>
   
   
   <a id="Terminal_Gui_Size_op_Subtraction_" data-uid="Terminal.Gui.Size.op_Subtraction*"></a>
@@ -780,10 +715,6 @@ Subtraction Operator
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Size_op_Subtraction_Terminal_Gui_Size_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Subtracts two Size structures.
-</div>
 </article>
           </div>
           
@@ -794,7 +725,8 @@ Subtracts two Size structures.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

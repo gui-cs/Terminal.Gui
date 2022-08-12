@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Labels As Buttons", Description: "Illustrates that Button is really just a Label++")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("POC")]
-	class LabelsAsLabels : Scenario {
+	[ScenarioCategory ("Proof of Concept")]
+	public class LabelsAsLabels : Scenario {
 		public override void Setup ()
 		{
 			// Add a label & text field so we can demo IsDefault
@@ -90,6 +90,8 @@ namespace UICatalog {
 				Y = Pos.Bottom (Label) + 1,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				TextAlignment = TextAlignment.Centered,
+				VerticalTextAlignment = VerticalTextAlignment.Middle
 			});
 			Label.Clicked += () => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -117,8 +119,14 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 			Win.Add (removeLabel);
-			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeLabel.Clicked += () => Win.Remove (removeLabel);
+			// This in interesting test case because `moveBtn` and below are laid out relative to this one!
+			removeLabel.Clicked += () => {
+				// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+				//Win.Remove (removeLabel);
+
+				removeLabel.Visible = false;
+				Win.SetNeedsDisplay ();
+			};
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
@@ -153,6 +161,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtn.Clicked += () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -184,6 +193,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtnA.Clicked += () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
@@ -235,7 +245,7 @@ namespace UICatalog {
 			var moveHotKeyBtn = new Label (mhkb) {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = mhkb.Length + 10,
+				Width = Dim.Width (computedFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
@@ -249,7 +259,7 @@ namespace UICatalog {
 			var moveUnicodeHotKeyBtn = new Label (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = muhkb.Length + 30,
+				Width = Dim.Width (absoluteFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
@@ -295,6 +305,8 @@ namespace UICatalog {
 					break;
 				}
 			};
+
+			Top.Ready += () => radioGroup.Refresh ();
 		}
 	}
 }

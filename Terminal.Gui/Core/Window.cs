@@ -9,6 +9,7 @@
 //  - FrameView Does not support IEnumerable
 // Any udpates done here should probably be done in FrameView as well; TODO: Merge these classes
 
+using System;
 using System.Collections;
 using NStack;
 
@@ -22,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Window : Toplevel {
 		View contentView;
-		ustring title;
+		ustring title = ustring.Empty;
 
 		/// <summary>
 		/// The title to be displayed for this window.
@@ -31,9 +32,47 @@ namespace Terminal.Gui {
 		public ustring Title {
 			get => title;
 			set {
-				title = value;
+				if (!OnTitleChanging (title, value)) {
+					var old = title;
+					title = value;
+					OnTitleChanged (old, title);
+				}
 				SetNeedsDisplay ();
 			}
+		}
+
+		/// <inheritdoc/>
+		public override Border Border {
+			get => base.Border;
+			set {
+				if (base.Border != null && base.Border.Child != null && value.Child == null) {
+					value.Child = base.Border.Child;
+				}
+				base.Border = value;
+				if (value == null) {
+					return;
+				}
+				Rect frame;
+				if (contentView != null && (contentView.Width is Dim || contentView.Height is Dim)) {
+					frame = Rect.Empty;
+				} else {
+					frame = Frame;
+				}
+				AdjustContentView (frame);
+
+				Border.BorderChanged += Border_BorderChanged;
+			}
+		}
+
+		void Border_BorderChanged (Border border)
+		{
+			Rect frame;
+			if (contentView != null && (contentView.Width is Dim || contentView.Height is Dim)) {
+				frame = Rect.Empty;
+			} else {
+				frame = Frame;
+			}
+			AdjustContentView (frame);
 		}
 
 		/// <summary>
@@ -42,8 +81,30 @@ namespace Terminal.Gui {
 		/// are actually deflated due to the border. 
 		/// </summary>
 		class ContentView : View {
-			public ContentView (Rect frame) : base (frame) { }
-			public ContentView () : base () { }
+			Window instance;
+
+			public ContentView (Rect frame, Window instance) : base (frame)
+			{
+				this.instance = instance;
+			}
+			public ContentView (Window instance) : base ()
+			{
+				this.instance = instance;
+			}
+
+			public override void OnCanFocusChanged ()
+			{
+				if (MostFocused == null && CanFocus && Visible) {
+					EnsureFocus ();
+				}
+
+				base.OnCanFocusChanged ();
+			}
+
+			public override bool OnMouseEvent (MouseEvent mouseEvent)
+			{
+				return instance.OnMouseEvent (mouseEvent);
+			}
 		}
 
 		/// <summary>
@@ -52,10 +113,10 @@ namespace Terminal.Gui {
 		/// <param name="frame">Superview-relative rectangle specifying the location and size</param>
 		/// <param name="title">Title</param>
 		/// <remarks>
-		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// This constructor initializes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
 		/// that do not take <c>Rect</c> parameters to initialize a Window with <see cref="LayoutStyle.Computed"/>. 
 		/// </remarks>
-		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
+		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0, border: null)
 		{
 		}
 
@@ -64,10 +125,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">Title.</param>
 		/// <remarks>
-		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initializes a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
 		/// </remarks>
-		public Window (ustring title = null) : this (title, padding: 0)
+		public Window (ustring title = null) : this (title, padding: 0, border: null)
 		{
 		}
 
@@ -76,50 +137,94 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Window () : this (title: null) { }
 
-		int padding;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
 		/// and an optional title.
 		/// </summary>
 		/// <param name="frame">Superview-relative rectangle specifying the location and size</param>
-		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title</param>
+		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
+		/// <param name="border">The <see cref="Border"/>.</param>
 		/// <remarks>
-		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// This constructor initializes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
 		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
 		/// </remarks>
-		public Window (Rect frame, ustring title = null, int padding = 0) : base (frame)
+		public Window (Rect frame, ustring title = null, int padding = 0, Border border = null) : base (frame)
 		{
-			this.Title = title;
-			int wb = 2 * (1 + padding);
-			this.padding = padding;
-			var cFrame = new Rect (1 + padding, 1 + padding, frame.Width - wb, frame.Height - wb);
-			contentView = new ContentView (cFrame);
-			base.Add (contentView);
+			Initialize (title, frame, padding, border);
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
+		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Computed"/> positioning,
 		/// and an optional title.
 		/// </summary>
-		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title.</param>
+		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
+		/// <param name="border">The <see cref="Border"/>.</param>
 		/// <remarks>
-		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initializes a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
 		/// </remarks>
-		public Window (ustring title = null, int padding = 0) : base ()
+		public Window (ustring title = null, int padding = 0, Border border = null) : base ()
 		{
-			this.Title = title;
-			int wb = 1 + padding;
-			this.padding = padding;
-			contentView = new ContentView () {
-				X = wb,
-				Y = wb,
-				Width = Dim.Fill (wb),
-				Height = Dim.Fill (wb)
-			};
-			base.Add (contentView);
+			Initialize (title, Rect.Empty, padding, border);
+		}
+
+		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
+		{
+			CanFocus = true;
+			ColorScheme = Colors.Base;
+			if (title == null) title = ustring.Empty;
+			Title = title;
+			if (border == null) {
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
+					Padding = new Thickness (padding),
+					BorderBrush = ColorScheme.Normal.Background
+				};
+			} else {
+				Border = border;
+			}
+			AdjustContentView (frame);
+		}
+
+		void AdjustContentView (Rect frame)
+		{
+			var borderLength = Border.DrawMarginFrame ? 1 : 0;
+			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
+			var wb = new Size ();
+			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
+				wb.Width = borderLength + sumPadding.Right;
+				wb.Height = borderLength + sumPadding.Bottom;
+				if (contentView == null) {
+					contentView = new ContentView (this) {
+						X = wp.X,
+						Y = wp.Y,
+						Width = Dim.Fill (wb.Width),
+						Height = Dim.Fill (wb.Height)
+					};
+				} else {
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
+					contentView.Width = Dim.Fill (wb.Width);
+					contentView.Height = Dim.Fill (wb.Height);
+				}
+			} else {
+				wb.Width = (2 * borderLength) + sumPadding.Right + sumPadding.Left;
+				wb.Height = (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
+				var cFrame = new Rect (borderLength + sumPadding.Left, borderLength + sumPadding.Top, frame.Width - wb.Width, frame.Height - wb.Height);
+				if (contentView == null) {
+					contentView = new ContentView (cFrame, this);
+				} else {
+					contentView.Frame = cFrame;
+				}
+			}
+			if (Subviews?.Count == 0)
+				base.Add (contentView);
+			Border.Child = contentView;
 		}
 
 		///// <summary>
@@ -150,13 +255,15 @@ namespace Terminal.Gui {
 			}
 
 			SetNeedsDisplay ();
-			var touched = view.Frame;
 			contentView.Remove (view);
 
 			if (contentView.InternalSubviews.Count < 1) {
 				CanFocus = false;
 			}
 			RemoveMenuStatusBar (view);
+			if (view != contentView && Focused == null) {
+				FocusFirst ();
+			}
 		}
 
 		/// <inheritdoc/>
@@ -168,103 +275,56 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			//var padding = 0;
-			Application.CurrentView = this;
+			var padding = Border.GetSumThickness ();
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			//var borderLength = Border.DrawMarginFrame ? 1 : 0;
 
-			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
+			// FIXED: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (!NeedDisplay.IsEmpty) {
-				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
+				Driver.SetAttribute (GetNormalColor ());
+				Clear ();
 			}
+			var savedClip = contentView.ClipToBounds ();
 
-			var savedClip = ClipToBounds ();
-
-			// Redraw our contenetView
-			// TODO: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
-			contentView.Redraw (contentView.Bounds);
+			// Redraw our contentView
+			// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
+			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-			Driver.SetAttribute (ColorScheme.Normal);
-			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
+			//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
+			Border.DrawContent (this, false);
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);
-			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
-			Driver.SetAttribute (ColorScheme.Normal);
+			if (Border.DrawMarginFrame)
+				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+			Driver.SetAttribute (GetNormalColor ());
+
+			// Checks if there are any SuperView view which intersect with this window.
+			if (SuperView != null) {
+				SuperView.SetNeedsLayout ();
+				SuperView.SetNeedsDisplay ();
+			}
 		}
 
-		//
-		// FIXED:It does not look like the event is raised on clicked-drag
-		// need to figure that out.
-		//
-		internal static Point? dragPosition;
-		Point start;
-
-		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent mouseEvent)
+		/// <inheritdoc/>
+		public override void OnCanFocusChanged ()
 		{
-			// FIXED:The code is currently disabled, because the
-			// Driver.UncookMouse does not seem to have an effect if there is
-			// a pending mouse event activated.
-
-			int nx, ny;
-			if (!dragPosition.HasValue && mouseEvent.Flags == (MouseFlags.Button1Pressed)) {
-				// Only start grabbing if the user clicks on the title bar.
-				if (mouseEvent.Y == 0) {
-					start = new Point (mouseEvent.X, mouseEvent.Y);
-					dragPosition = new Point ();
-					nx = mouseEvent.X - mouseEvent.OfX;
-					ny = mouseEvent.Y - mouseEvent.OfY;
-					dragPosition = new Point (nx, ny);
-					Application.GrabMouse (this);
-				}
-
-				//Demo.ml2.Text = $"Starting at {dragPosition}";
-				return true;
-			} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-				mouseEvent.Flags == MouseFlags.Button3Pressed) {
-				if (dragPosition.HasValue) {
-					if (SuperView == null) {
-						Application.Top.SetNeedsDisplay (Frame);
-						// Redraw the entire app window using just our Frame. Since we are 
-						// Application.Top, and our Frame always == our Bounds (Location is always (0,0))
-						// our Frame is actually view-relative (which is what Redraw takes).
-						Application.Top.Redraw (Frame);
-					} else {
-						SuperView.SetNeedsDisplay (Frame);
-					}
-					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y), out nx, out ny);
-
-					dragPosition = new Point (nx, ny);
-					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
-					X = nx;
-					Y = ny;
-					//Demo.ml2.Text = $"{dx},{dy}";
-
-					// FIXED: optimize, only SetNeedsDisplay on the before/after regions.
-					SetNeedsDisplay ();
-					return true;
-				}
+			if (contentView != null) {
+				contentView.CanFocus = CanFocus;
 			}
-
-			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
-				Application.UngrabMouse ();
-				Driver.UncookMouse ();
-				dragPosition = null;
-			}
-
-			//Demo.ml.Text = me.ToString ();
-			return false;
+			base.OnCanFocusChanged ();
 		}
 
 		/// <summary>
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public override ustring Text {
-			get => contentView.Text;
+			get => contentView?.Text;
 			set {
 				base.Text = value;
 				if (contentView != null) {
@@ -283,5 +343,70 @@ namespace Terminal.Gui {
 				base.TextAlignment = contentView.TextAlignment = value;
 			}
 		}
+
+		/// <summary>
+		/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
+		/// </summary>
+		public class TitleEventArgs : EventArgs {
+			/// <summary>
+			/// The new Window Title.
+			/// </summary>
+			public ustring NewTitle { get; set; }
+
+			/// <summary>
+			/// The old Window Title.
+			/// </summary>
+			public ustring OldTitle { get; set; }
+
+			/// <summary>
+			/// Flag which allows cancelling the Title change.
+			/// </summary>
+			public bool Cancel { get; set; }
+
+			/// <summary>
+			/// Initializes a new instance of <see cref="TitleEventArgs"/>
+			/// </summary>
+			/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+			/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+			public TitleEventArgs (ustring oldTitle, ustring newTitle)
+			{
+				OldTitle = oldTitle;
+				NewTitle = newTitle;
+			}
+		}
+		/// <summary>
+		/// Called before the <see cref="Window.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
+		/// </summary>
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+		/// <returns>`true` if an event handler cancelled the Title change.</returns>
+		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
+		{
+			var args = new TitleEventArgs (oldTitle, newTitle);
+			TitleChanging?.Invoke (args);
+			return args.Cancel;
+		}
+
+		/// <summary>
+		/// Event fired when the <see cref="Window.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
+		/// `true` to cancel the Title change.
+		/// </summary>
+		public event Action<TitleEventArgs> TitleChanging;
+
+		/// <summary>
+		/// Called when the <see cref="Window.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
+		/// </summary>
+		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
+		{
+			var args = new TitleEventArgs (oldTitle, newTitle);
+			TitleChanged?.Invoke (args);
+		}
+
+		/// <summary>
+		/// Event fired after the <see cref="Window.Title"/> has been changed. 
+		/// </summary>
+		public event Action<TitleEventArgs> TitleChanged;
 	}
 }
