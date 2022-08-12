@@ -2357,6 +2357,7 @@ namespace Terminal.Gui {
 				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
 				model = wrapManager.Model;
 			}
+			UnwrappedCursorPosition?.Invoke (new Point (cCol, cRow));
 			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
