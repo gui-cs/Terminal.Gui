@@ -1613,12 +1613,7 @@ namespace Terminal.Gui {
 					return ustring.Empty;
 				}
 
-				SetWrapModel ();
-				var sel = GetRegion ();
-				UpdateWrapModel ();
-				Adjust ();
-
-				return sel;
+				return GetSelectedRegion ();
 			}
 		}
 
@@ -2027,10 +2022,18 @@ namespace Terminal.Gui {
 		}
 
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
-		void GetEncodedRegionBounds (out long start, out long end)
+		void GetEncodedRegionBounds (out long start, out long end,
+			int? startRow = null, int? startCol = null, int? cRow = null, int? cCol = null)
 		{
-			long selection = ((long)(uint)selectionStartRow << 32) | (uint)selectionStartColumn;
-			long point = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			long selection;
+			long point;
+			if (startRow == null || startCol == null || cRow == null || cCol == null) {
+				selection = ((long)(uint)selectionStartRow << 32) | (uint)selectionStartColumn;
+				point = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			} else {
+				selection = ((long)(uint)startRow << 32) | (uint)startCol;
+				point = ((long)(uint)cRow << 32) | (uint)cCol;
+			}
 			if (selection > point) {
 				start = point;
 				end = selection;
@@ -2052,10 +2055,10 @@ namespace Terminal.Gui {
 		// Returns a ustring with the text in the selected 
 		// region.
 		//
-		ustring GetRegion ()
+		ustring GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel model = null)
 		{
 			long start, end;
-			GetEncodedRegionBounds (out start, out end);
+			GetEncodedRegionBounds (out start, out end, sRow, sCol, cRow, cCol);
 			if (start == end) {
 				return ustring.Empty;
 			}
@@ -2063,7 +2066,7 @@ namespace Terminal.Gui {
 			var maxrow = ((int)(end >> 32));
 			int startCol = (int)(start & 0xffffffff);
 			var endCol = (int)(end & 0xffffffff);
-			var line = model.GetLine (startRow);
+			var line = model == null ? this.model.GetLine (startRow) : model.GetLine (startRow);
 
 			if (startRow == maxrow)
 				return StringFromRunes (line.GetRange (startCol, endCol - startCol));
@@ -2071,9 +2074,10 @@ namespace Terminal.Gui {
 			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
 
 			for (int row = startRow + 1; row < maxrow; row++) {
-				res = res + ustring.Make (Environment.NewLine) + StringFromRunes (model.GetLine (row));
+				res = res + ustring.Make (Environment.NewLine) + StringFromRunes (model == null
+					? this.model.GetLine (row) : model.GetLine (row));
 			}
-			line = model.GetLine (maxrow);
+			line = model == null ? this.model.GetLine (maxrow) : model.GetLine (maxrow);
 			res = res + ustring.Make (Environment.NewLine) + StringFromRunes (line.GetRange (0, endCol));
 			return res;
 		}
@@ -2337,6 +2341,23 @@ namespace Terminal.Gui {
 				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 			}
 			UnwrappedCursorPosition?.Invoke (new Point (col, row));
+		}
+
+		ustring GetSelectedRegion ()
+		{
+			var cRow = currentRow;
+			var cCol = currentColumn;
+			var startRow = selectionStartRow;
+			var startCol = selectionStartColumn;
+			var model = this.model;
+			if (wordWrap) {
+				cRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
+				cCol = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+				startRow = wrapManager.GetModelLineFromWrappedLines (selectionStartRow);
+				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
+				model = wrapManager.Model;
+			}
+			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
 		///<inheritdoc/>
