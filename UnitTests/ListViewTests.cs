@@ -61,6 +61,26 @@ namespace Terminal.Gui.Views {
 			Assert.False (lv.Source.IsMarked (1));
 			Assert.False (lv.Source.IsMarked (2));
 
+			// Press key combo again
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem);
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+			// Press key combo again
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
+
+			// Press key combo again 
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2)); // untoggle toggle marked
 		}
 
 		private class NewListDataSource : IListDataSource {
