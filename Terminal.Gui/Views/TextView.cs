@@ -3760,9 +3760,12 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
-				currentLine.RemoveAt (currentColumn - 1);
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
-					wrapNeeded = true;
+				if (wordWrap) {
+					if (wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+						wrapNeeded = true;
+					}
+				} else {
+					currentLine.RemoveAt (currentColumn - 1);
 				}
 				currentColumn--;
 
