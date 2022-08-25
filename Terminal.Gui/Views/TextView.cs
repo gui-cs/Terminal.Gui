@@ -2332,15 +2332,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
 		/// </summary>
-		public virtual void OnUnwrappedCursorPosition ()
+		public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
 		{
-			var row = currentRow;
-			var col = currentColumn;
-			if (wordWrap) {
+			var row = cRow == null ? currentRow : cRow;
+			var col = cCol == null ? currentColumn : cCol;
+			if (cRow == null && cCol == null && wordWrap) {
 				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 			}
-			UnwrappedCursorPosition?.Invoke (new Point (col, row));
+			UnwrappedCursorPosition?.Invoke (new Point ((int)col, (int)row));
 		}
 
 		ustring GetSelectedRegion ()
@@ -2357,6 +2357,7 @@ namespace Terminal.Gui {
 				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
 				model = wrapManager.Model;
 			}
+			OnUnwrappedCursorPosition (cRow, cCol);
 			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
