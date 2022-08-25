@@ -543,6 +543,15 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tree.ScrollOffsetVertical);
 		}
 
+		[Fact]
+		public void GoToEnd_ShouldNotFailOnEmptyTreeView ()
+		{
+			var tree = new TreeView ();
+
+			var exception = Record.Exception (() => tree.GoToEnd ());
+
+			Assert.Null (exception);
+		}
 
 		[Fact]
 		public void ObjectActivated_CustomKey ()
