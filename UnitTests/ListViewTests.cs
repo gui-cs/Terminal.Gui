@@ -30,6 +30,39 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
 		}
 
+		[Fact]
+		public void ListViewSelectThenDown ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
+			lv.AllowsMarking = true;
+
+			Assert.NotNull (lv.Source);
+
+			// first item should be selected by default
+			Assert.Equal (0, lv.SelectedItem);
+
+			// nothing is ticked
+			Assert.False (lv.Source.IsMarked (0));
+			Assert.False (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+			lv.AddKeyBinding (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
+
+			var ev = new KeyEvent (Key.Space | Key.ShiftMask, new KeyModifiers () { Shift = true });
+
+			// view should indicate that it has accepted and consumed the event
+			Assert.True (lv.ProcessKey (ev));
+
+			// second item should now be selected
+			Assert.Equal (1, lv.SelectedItem);
+
+			// first item only should be ticked
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.False (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+		}
+
 		private class NewListDataSource : IListDataSource {
 			public int Count => throw new NotImplementedException ();
 
