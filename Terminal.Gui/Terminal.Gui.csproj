@@ -16,7 +16,7 @@
     <InformationalVersion>1.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="0.17.1" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
