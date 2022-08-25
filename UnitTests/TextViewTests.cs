@@ -6024,6 +6024,25 @@ secon
 d    
 line.
 ", output);
+
+			Assert.True (tv.MouseEvent (new MouseEvent () { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 3), tv.CursorPosition);
+			Assert.Equal (new Point (12, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This 
+is   
+the  
+first
+     
+line.
+This 
+is   
+the  
+secon
+d    
+line.
+", output);
 		}
 	}
 }
