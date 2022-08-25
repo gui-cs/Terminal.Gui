@@ -2332,15 +2332,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
 		/// </summary>
-		public virtual void OnUnwrappedCursorPosition ()
+		public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
 		{
-			var row = currentRow;
-			var col = currentColumn;
-			if (wordWrap) {
+			var row = cRow == null ? currentRow : cRow;
+			var col = cCol == null ? currentColumn : cCol;
+			if (cRow == null && cCol == null && wordWrap) {
 				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 			}
-			UnwrappedCursorPosition?.Invoke (new Point (col, row));
+			UnwrappedCursorPosition?.Invoke (new Point ((int)col, (int)row));
 		}
 
 		ustring GetSelectedRegion ()
@@ -2357,6 +2357,7 @@ namespace Terminal.Gui {
 				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
 				model = wrapManager.Model;
 			}
+			OnUnwrappedCursorPosition (cRow, cCol);
 			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
@@ -3177,14 +3178,14 @@ namespace Terminal.Gui {
 			if (newPos.HasValue && currentRow == newPos.Value.row) {
 				var restCount = currentColumn - newPos.Value.col;
 				currentLine.RemoveRange (newPos.Value.col, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
 			} else if (newPos.HasValue) {
 				var restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
@@ -3234,7 +3235,7 @@ namespace Terminal.Gui {
 				restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
 			}
-			if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+			if (wordWrap) {
 				wrapNeeded = true;
 			}
 
@@ -3716,7 +3717,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				if (wrapNeeded) {
@@ -3733,7 +3734,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 
@@ -3760,12 +3761,9 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
+				currentLine.RemoveAt (currentColumn - 1);
 				if (wordWrap) {
-					if (wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
-						wrapNeeded = true;
-					}
-				} else {
-					currentLine.RemoveAt (currentColumn - 1);
+					wrapNeeded = true;
 				}
 				currentColumn--;
 
@@ -3796,8 +3794,7 @@ namespace Terminal.Gui {
 				var prevCount = prevRow.Count;
 				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 				model.RemoveLine (currentRow);
-				bool lineRemoved = false;
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentRow--;
@@ -3805,11 +3802,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { GetCurrentLine () }, new Point (currentColumn, prowIdx),
 					HistoryText.LineStatus.Replaced);
 
-				if (wrapNeeded && !lineRemoved) {
-					currentColumn = Math.Max (prevCount - 1, 0);
-				} else {
-					currentColumn = prevCount;
-				}
+				currentColumn = prevCount;
 				SetNeedsDisplay ();
 			}
 
