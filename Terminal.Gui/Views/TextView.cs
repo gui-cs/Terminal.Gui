@@ -1962,7 +1962,25 @@ namespace Terminal.Gui {
 		/// <param name="idx"></param>
 		protected virtual void ColorSelection (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void ColorReadOnly (List<Rune> line, int idx)
+		{
+			Attribute attribute;
+			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
+				attribute = new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+			} else {
+				attribute = new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
+			}
+			Driver.SetAttribute (attribute);
 		}
 
 		/// <summary>
@@ -2383,7 +2401,9 @@ namespace Terminal.Gui {
 						ColorSelection (line, idxCol);
 					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						ColorUsed (line, idxCol);
+						ColorSelection (line, idxCol);
+					} else if (ReadOnly) {
+						ColorReadOnly (line, idxCol);
 					} else {
 						ColorNormal (line, idxCol);
 					}
@@ -2434,6 +2454,12 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		///<inheritdoc/>

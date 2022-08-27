@@ -412,7 +412,7 @@ namespace Terminal.Gui {
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (GetNormalColor ());
 			Move (0, 0);
 
 			int p = first;
@@ -462,6 +462,12 @@ namespace Terminal.Gui {
 				CursorPosition - ScrollOffset, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		Attribute GetReadOnlyColor ()

@@ -2971,8 +2971,9 @@ namespace Terminal.Gui {
 		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
 		/// </summary>
 		/// <returns><see cref="ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
-		/// or <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/></returns>
-		public Attribute GetNormalColor ()
+		/// or <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// If it's overridden can return other values.</returns>
+		public virtual Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
