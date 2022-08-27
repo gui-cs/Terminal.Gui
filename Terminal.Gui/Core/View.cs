@@ -1751,11 +1751,19 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
 		/// rebound to this one</para>
+		/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
+		/// cannot be used to switch focus to another view and perform multiple commands there)</remarks>
 		/// </summary>
 		/// <param name="key"></param>
-		/// <param name="command"></param>
+		/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
+		/// When specifying multiple, all commands will be applied in sequence.  The bound <paramref name="key"/> strike
+		/// will be consumed if any took effect.</param>
 		public void AddKeyBinding (Key key, params Command [] command)
 		{
+			if (command.Length == 0) {
+				throw new ArgumentException ("At least one command must be specified", nameof (command));
+			}
+
 			if (KeyBindings.ContainsKey (key)) {
 				KeyBindings [key] = command;
 			} else {

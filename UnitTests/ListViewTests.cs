@@ -82,6 +82,44 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.Source.IsMarked (1));
 			Assert.False (lv.Source.IsMarked (2)); // untoggle toggle marked
 		}
+		[Fact]
+		public void SettingEmptyKeybindingThrows ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
+			Assert.Throws<ArgumentException> (() => lv.AddKeyBinding (Key.Space));
+		}
+
+
+		/// <summary>
+		/// Tests that when none of the Commands in a chained keybinding are possible
+		/// the <see cref="View.ProcessKey(KeyEvent)"/> returns the appropriate result
+		/// </summary>
+		[Fact]
+		public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three", "Four" });
+
+			Assert.NotNull (lv.Source);
+
+			// first item should be selected by default
+			Assert.Equal (0, lv.SelectedItem);
+
+			// bind shift down to move down twice in control
+			lv.AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
+
+			var ev = new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers () { Shift = true });
+
+			Assert.True (lv.ProcessKey (ev), "The first time we move down 2 it should be possible");
+
+			// After moving down twice from One we should be at 'Three'
+			Assert.Equal (2, lv.SelectedItem);
+
+			// clear the items
+			lv.SetSource (null);
+
+			// Press key combo again - return should be false this time as none of the Commands are allowable
+			Assert.False (lv.ProcessKey (ev), "We cannot move down so will not respond to this");
+		}
 
 		private class NewListDataSource : IListDataSource {
 			public int Count => throw new NotImplementedException ();
