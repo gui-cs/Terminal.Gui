@@ -24,7 +24,6 @@ namespace UICatalog.Scenarios {
 		{
 			Win.Title = GetName ();
 			var width = 20;
-			var colorScheme = Colors.Dialog;
 			var text = " jamp jemp jimp jomp jump";
 
 			var menu = new MenuBar (new MenuBarItem [] {
@@ -39,7 +38,6 @@ namespace UICatalog.Scenarios {
 			textViewTopLeft = new TextView () {
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
@@ -49,7 +47,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.AnchorEnd (width),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
@@ -59,7 +56,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
@@ -70,7 +66,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
@@ -81,7 +76,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center (),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewCentered.DrawContent += TextViewCentered_DrawContent;
