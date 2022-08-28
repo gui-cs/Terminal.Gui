@@ -1309,6 +1309,11 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public override Attribute MakeColor (Color foreground, Color background)
+		{
+			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
+		}
+
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
@@ -1337,46 +1342,48 @@ namespace Terminal.Gui {
 
 			StartReportingMouseMoves ();
 
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
+			CreateColors ();
 
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
+			//Colors.TopLevel = new ColorScheme ();
+			//Colors.Base = new ColorScheme ();
+			//Colors.Dialog = new ColorScheme ();
+			//Colors.Menu = new ColorScheme ();
+			//Colors.Error = new ColorScheme ();
 
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.Cyan, ConsoleColor.DarkBlue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
+			//Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
+			//Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
+			//Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
+			//Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+			//Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
 
-			// Focused,
-			//    Selected, Hot: Yellow on Black
-			//    Selected, text: white on black
-			//    Unselected, hot: yellow on cyan
-			//    unselected, text: same as unfocused
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
+			//Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
+			//Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			//Colors.Base.HotNormal = MakeColor (ConsoleColor.Cyan, ConsoleColor.DarkBlue);
+			//Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+			//Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
 
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
-			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
+			//// Focused,
+			////    Selected, Hot: Yellow on Black
+			////    Selected, text: white on black
+			////    Unselected, hot: yellow on cyan
+			////    unselected, text: same as unfocused
+			//Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
+			//Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
+			//Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
+			//Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			//Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
 
-			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
-			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
-			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
-			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
+			//Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			//Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
+			//Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
+			//Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+			//Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
+
+			//Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
+			//Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
+			//Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
+			//Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
+			//Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
 
 			Clear ();
 		}
