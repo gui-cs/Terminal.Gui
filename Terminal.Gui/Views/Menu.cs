@@ -384,17 +384,26 @@ namespace Terminal.Gui {
 		internal int current;
 		internal View previousSubFocused;
 
-		internal static Rect MakeFrame (int x, int y, MenuItem [] items)
+		internal static Rect MakeFrame (int x, int y, MenuItem [] items, Menu parent = null)
 		{
 			if (items == null || items.Length == 0) {
 				return new Rect ();
 			}
-			int maxW = items.Max (z => z?.Width) ?? 0;
-
-			return new Rect (x, y, maxW + 2, items.Length + 2);
+			int minX = x;
+			int minY = y;
+			int maxW = (items.Max (z => z?.Width) ?? 0) + 2;
+			int maxH = items.Length + 2;
+			if (parent != null && x + maxW > Driver.Cols) {
+				minX = parent.Frame.Right - parent.Frame.Width - maxW;
+			}
+			if (parent != null && y + maxH > Driver.Rows) {
+				minY = parent.Frame.Bottom - maxH;
+			}
+			return new Rect (minX, minY, maxW, maxH);
 		}
 
-		public Menu (MenuBar host, int x, int y, MenuBarItem barItems) : base (MakeFrame (x, y, barItems.Children))
+		public Menu (MenuBar host, int x, int y, MenuBarItem barItems, Menu parent = null)
+			: base (MakeFrame (x, y, barItems.Children, parent))
 		{
 			this.barItems = barItems;
 			this.host = host;
@@ -1232,7 +1241,7 @@ namespace Terminal.Gui {
 				} else {
 					var last = openSubMenu.Count > 0 ? openSubMenu.Last () : openMenu;
 					if (!UseSubMenusSingleFrame) {
-						openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width, last.Frame.Top + 1 + last.current, subMenu);
+						openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width, last.Frame.Top + 1 + last.current, subMenu, last);
 					} else {
 						var first = openSubMenu.Count > 0 ? openSubMenu.First () : openMenu;
 						var mbi = new MenuItem [2 + subMenu.Children.Length];
