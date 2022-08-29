@@ -297,7 +297,7 @@ namespace Terminal.Gui.Core {
 				for (int c = frame.X; c < frame.X + frame.Width; c++) {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
-					Assert.Equal (Color.Green, color.Foreground);
+					Assert.Equal (Color.BrightGreen, color.Foreground);
 					Assert.Equal (Color.Black, color.Background);
 				}
 			}
@@ -534,7 +534,7 @@ namespace Terminal.Gui.Core {
 					c < frame.Right - drawMarginFrame - sumThickness.Right; c++) {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
-					Assert.Equal (Color.Green, color.Foreground);
+					Assert.Equal (Color.BrightGreen, color.Foreground);
 					Assert.Equal (Color.Black, color.Background);
 				}
 			}

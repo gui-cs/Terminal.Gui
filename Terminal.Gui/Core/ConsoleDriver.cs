@@ -1363,7 +1363,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Colors.TopLevel.Normal = MakeColor (Color.Green, Color.Black);
+			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
 			Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
