@@ -1375,27 +1375,22 @@ namespace Terminal.Gui {
 			Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
 			Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
 
-			// Focused,
-			//    Selected, Hot: Yellow on Black
-			//    Selected, text: white on black
-			//    Unselected, hot: yellow on cyan
-			//    unselected, text: same as unfocused
+			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
+			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
+			Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
 			Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
 			Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
 			Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
 			Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
 			Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
 
-			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
-			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
-			Colors.Dialog.HotFocus = MakeColor (Color.Blue, Color.DarkGray);
-			Colors.Dialog.Disabled = MakeColor (Color.DarkGray, Color.Gray);
-
 			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
-			Colors.Error.Focus = MakeColor (Color.White, Color.Red);
+			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
 			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-			Colors.Error.HotFocus = MakeColor (Color.Black, Color.Red);
+			Colors.Error.HotFocus = MakeColor (Color.BrightRed, Color.Gray);
 			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
 		}
 	}
