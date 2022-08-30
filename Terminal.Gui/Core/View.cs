@@ -1820,7 +1820,7 @@ namespace Terminal.Gui {
 		/// <param name="command"></param>
 		public void ClearKeybinding (params Command [] command)
 		{
-			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command))) {
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray()) {
 				KeyBindings.Remove (kvp.Key);
 			}
 		}
