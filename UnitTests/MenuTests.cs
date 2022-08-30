@@ -670,7 +670,7 @@ Edit
 
 			menu.CloseAllMenus ();
 			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
-			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
 			menu.OpenMenu ();
 			Application.Refresh ();
 
@@ -681,7 +681,7 @@ Edit
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 1, 7, 3), pos);
+			Assert.Equal (new Rect (0, 0, 7, 3), pos);
 		}
 
 		[Fact, AutoInitShutdown]

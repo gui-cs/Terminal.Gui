@@ -423,7 +423,7 @@ namespace Terminal.Gui.Core {
 			cm.Show ();
 			Assert.Equal (new Point (0, 0), cm.Position);
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (80, 4);
+			((FakeDriver)Application.Driver).SetBufferSize (80, 3);
 
 			var expected = @"
 ┌──────┐
@@ -432,7 +432,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 1, 8, 3), pos);
+			Assert.Equal (new Rect (0, 0, 8, 3), pos);
 
 			cm.Hide ();
 			Assert.Equal (new Point (0, 0), cm.Position);
@@ -782,6 +782,42 @@ namespace Terminal.Gui.Core {
                  └───────────┘          
 ", output);
 
+			cm.Position = new Point (41, 9);
+			cm.Show ();
+			Application.Refresh ();
+			Assert.Equal (new Point (41, 9), cm.Position);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+                              ┌────────┐
+                              │ One    │
+                              │ Two    │
+                              │ Three  │
+                              │ Four  ►│
+                              │ Five   │
+                              │ Six    │
+                              └────────┘
+", output);
+
+			Assert.True (top.Subviews [0].MouseEvent (new MouseEvent {
+				X = 30,
+				Y = 4,
+				Flags = MouseFlags.ReportMousePosition,
+				View = top.Subviews [0]
+			}));
+			Application.Refresh ();
+			Assert.Equal (new Point (41, 9), cm.Position);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+                              ┌────────┐
+                 ┌───────────┐│ One    │
+                 │ SubMenu1  ││ Two    │
+                 │ SubMenu2  ││ Three  │
+                 │ SubMenu3  ││ Four  ►│
+                 │ SubMenu4  ││ Five   │
+                 │ SubMenu5  ││ Six    │
+                 │ SubMenu6  │└────────┘
+                 │ SubMenu7  │          
+                 └───────────┘          
+", output);
+
 			cm.Position = new Point (41, 22);
 			cm.Show ();
 			Application.Refresh ();
@@ -815,6 +851,41 @@ namespace Terminal.Gui.Core {
                  │ SubMenu6  ││ Five   │
                  │ SubMenu7  ││ Six    │
                  └───────────┘└────────┘
+", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (18, 8);
+			cm.Position = new Point (19, 10);
+			cm.Show ();
+			Application.Refresh ();
+			Assert.Equal (new Point (19, 10), cm.Position);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+        ┌────────┐
+        │ One    │
+        │ Two    │
+        │ Three  │
+        │ Four  ►│
+        │ Five   │
+        │ Six    │
+        └────────┘
+", output);
+
+			Assert.True (top.Subviews [0].MouseEvent (new MouseEvent {
+				X = 30,
+				Y = 4,
+				Flags = MouseFlags.ReportMousePosition,
+				View = top.Subviews [0]
+			}));
+			Application.Refresh ();
+			Assert.Equal (new Point (19, 10), cm.Position);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌───────────┐────┐
+│ SubMenu1  │    │
+│ SubMenu2  │    │
+│ SubMenu3  │ee  │
+│ SubMenu4  │r  ►│
+│ SubMenu5  │e   │
+│ SubMenu6  │    │
+│ SubMenu7  │────┘
 ", output);
 		}
 	}

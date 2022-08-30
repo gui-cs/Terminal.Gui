@@ -394,10 +394,10 @@ namespace Terminal.Gui {
 			int maxW = (items.Max (z => z?.Width) ?? 0) + 2;
 			int maxH = items.Length + 2;
 			if (parent != null && x + maxW > Driver.Cols) {
-				minX = parent.Frame.Right - parent.Frame.Width - maxW;
+				minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
 			}
-			if (parent != null && y + maxH > Driver.Rows) {
-				minY = parent.Frame.Bottom - maxH;
+			if (y + maxH > Driver.Rows) {
+				minY = Math.Max (Driver.Rows - maxH, 0);
 			}
 			return new Rect (minX, minY, maxW, maxH);
 		}
