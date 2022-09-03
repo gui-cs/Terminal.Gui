@@ -17,6 +17,36 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class ComboBox : View {
 
+		private class ComboListView : ListView {
+			public bool HideDropdownListOnClick { get; set; }
+
+			public ComboListView (bool hideDropdownListOnClick)
+			{
+				HideDropdownListOnClick = hideDropdownListOnClick;
+			}
+
+			public ComboListView (Rect rect, IList source, bool hideDropdownListOnClick) : base (rect, source)
+			{
+				HideDropdownListOnClick = hideDropdownListOnClick;
+			}
+
+			public ComboListView (IList source, bool hideDropdownListOnClick) : base (source)
+			{
+				HideDropdownListOnClick = hideDropdownListOnClick;
+			}
+
+			public override bool MouseEvent (MouseEvent me)
+			{
+				var res = base.MouseEvent (me);
+
+				if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked) {
+					OnOpenSelectedItem ();
+					return true;
+				}
+				return res;
+			}
+		}
+
 		IListDataSource source;
 		/// <summary>
 		/// Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ComboBox"/>, enabling custom rendering.
@@ -70,7 +100,7 @@ namespace Terminal.Gui {
 		readonly IList searchset = new List<object> ();
 		ustring text = "";
 		readonly TextField search;
-		readonly ListView listview;
+		readonly ComboListView listview;
 		bool autoHide = true;
 		int minimumHeight = 2;
 
@@ -88,7 +118,7 @@ namespace Terminal.Gui {
 		public ComboBox (ustring text) : base ()
 		{
 			search = new TextField ("");
-			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
+			listview = new ComboListView (HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
 
 			Initialize ();
 			Text = text;
@@ -102,7 +132,7 @@ namespace Terminal.Gui {
 		public ComboBox (Rect rect, IList source) : base (rect)
 		{
 			search = new TextField ("") { Width = rect.Width };
-			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+			listview = new ComboListView (rect, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
 
 			Initialize ();
 			SetSource (source);
@@ -115,14 +145,11 @@ namespace Terminal.Gui {
 		public ComboBox (IList source) : this (string.Empty)
 		{
 			search = new TextField ("");
-			listview = new ListView (source) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+			listview = new ComboListView (source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
 
 			Initialize ();
 			SetSource (source);
 		}
-
-		bool itemPressed;
-		bool itemClicked;
 
 		private void Initialize ()
 		{
@@ -149,46 +176,9 @@ namespace Terminal.Gui {
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
-				if (itemClicked) {
-					itemPressed = false;
-					itemClicked = false;
-					SelectedItem = e.Item;
-					if (isShow) {
-						isShow = false;
-						HideList ();
-					}
-					OnOpenSelectedItem ();
-				}
+
 				if (!HideDropdownListOnClick && searchset.Count > 0) {
 					SetValue (searchset [listview.SelectedItem]);
-				}
-			};
-
-			listview.MouseClick += e => {
-				if (isShow && HideDropdownListOnClick && e.MouseEvent.Flags == MouseFlags.Button1Pressed) {
-					itemPressed = true;
-				} else if (itemPressed && isShow && HideDropdownListOnClick && e.MouseEvent.Flags == MouseFlags.Button1Clicked) {
-					if (itemClicked && SelectedItem == listview.SelectedItem) {
-						DoHideList ();
-						e.Handled = true;
-					} else if (itemPressed) {
-						itemClicked = true;
-						Task.Run (async () => {
-							await Task.Delay (100);
-							if (itemClicked && SelectedItem == listview.SelectedItem) {
-								DoHideList ();
-								Application.MainLoop.Invoke (() => SetNeedsDisplay ());
-							}
-						});
-					}
-				}
-
-				void DoHideList ()
-				{
-					itemPressed = false;
-					itemClicked = false;
-					isShow = false;
-					HideList ();
 				}
 			};
 
@@ -237,6 +227,7 @@ namespace Terminal.Gui {
 		private bool isShow = false;
 		private int selectedItem = -1;
 		private int lastSelectedItem = -1;
+		private bool hideDropdownListOnClick;
 
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
@@ -294,7 +285,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets if the drop-down list can be hide with a button click event.
 		/// </summary>
-		public bool HideDropdownListOnClick { get; set; }
+		public bool HideDropdownListOnClick {
+			get => hideDropdownListOnClick;
+			set => hideDropdownListOnClick = listview.HideDropdownListOnClick = value;
+		}
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)

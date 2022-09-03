@@ -280,32 +280,19 @@ Three
 
 			Assert.False (cb.HideDropdownListOnClick);
 			Assert.False (cb.IsShow);
+			Assert.Equal (-1, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
 
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
 				Flags = MouseFlags.Button1Pressed
 			}));
+			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 
-			Assert.False (cb.Subviews [1].OnMouseEvent (new MouseEvent {
-				X = 0,
-				Y = 1,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.False (cb.Subviews [1].MouseEvent (new MouseEvent {
-				X = 0,
-				Y = 1,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.True (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
-			Assert.True (cb.Subviews [1].OnMouseEvent (new MouseEvent {
-				X = 0,
-				Y = 1,
-				Flags = MouseFlags.Button1Clicked
-			}));
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
 				Y = 1,
@@ -314,25 +301,19 @@ Three
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
-
-			cb.HideDropdownListOnClick = true;
-			Assert.False (cb.Subviews [1].OnMouseEvent (new MouseEvent {
+			Assert.Equal ("Two", cb.Text);
+			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
-				Y = 2,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.False (cb.Subviews [1].MouseEvent (new MouseEvent {
-				X = 0,
-				Y = 2,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.True (cb.IsShow);
-			Assert.Equal (1, cb.SelectedItem);
-			Assert.True (cb.Subviews [1].OnMouseEvent (new MouseEvent {
-				X = 0,
-				Y = 2,
+				Y = 1,
 				Flags = MouseFlags.Button1Clicked
 			}));
+			Assert.Equal ("", selected);
+			Assert.True (cb.IsShow);
+			Assert.Equal (1, cb.SelectedItem);
+			Assert.Equal ("Two", cb.Text);
+
+			cb.HideDropdownListOnClick = true;
+
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
 				Y = 2,
@@ -341,44 +322,41 @@ Three
 			Assert.Equal ("Three", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
 
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
 				Flags = MouseFlags.Button1Pressed
 			}));
-			Assert.True (cb.IsShow);
-			Assert.Equal (2, cb.SelectedItem);
-			Assert.False (cb.Subviews [1].OnMouseEvent (new MouseEvent {
-				X = 0,
-				Y = 2,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.False (cb.Subviews [1].MouseEvent (new MouseEvent {
-				X = 0,
-				Y = 2,
-				Flags = MouseFlags.Button1Pressed
-			}));
-			Assert.True (cb.IsShow);
-			Assert.Equal (2, cb.SelectedItem);
-			Assert.True (cb.Subviews [1].OnMouseEvent (new MouseEvent {
-				X = 0,
-				Y = 2,
-				Flags = MouseFlags.Button1Clicked
-			}));
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
 				Y = 2,
 				Flags = MouseFlags.Button1Clicked
 			}));
 			Assert.Equal ("Three", selected);
-			lock (Application.MainLoop.IdleHandlers) {
-				while (cb.IsShow) {
-					Application.MainLoop.MainIteration ();
-				}
-			}
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
+
+			Assert.True (cb.MouseEvent (new MouseEvent {
+				X = cb.Bounds.Right - 1,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed
+			}));
+			Assert.Equal ("Three", selected);
+			Assert.True (cb.IsShow);
+			Assert.Equal (2, cb.SelectedItem);
+			Assert.Equal ("Three", cb.Text);
+			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1Clicked
+			}));
+			Assert.Equal ("One", selected);
+			Assert.False (cb.IsShow);
+			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal ("One", cb.Text);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -397,6 +375,8 @@ Three
 
 			Assert.True (cb.HideDropdownListOnClick);
 			Assert.False (cb.IsShow);
+			Assert.Equal (-1, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
 
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
@@ -457,6 +437,8 @@ Three
 
 			Assert.True (cb.HideDropdownListOnClick);
 			Assert.False (cb.IsShow);
+			Assert.Equal (-1, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
 
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
@@ -492,6 +474,8 @@ Three
 
 			Assert.True (cb.HideDropdownListOnClick);
 			Assert.False (cb.IsShow);
+			Assert.Equal (-1, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
 
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
