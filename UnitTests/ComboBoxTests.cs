@@ -244,11 +244,13 @@ Three
 		[Fact, AutoInitShutdown]
 		public void HideDropdownListOnClick_Gets_Sets ()
 		{
+			var selected = "";
 			var cb = new ComboBox {
 				Height = 4,
 				Width = 5
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
+			cb.OpenSelectedItem += (e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -285,6 +287,7 @@ Three
 				Y = 1,
 				Flags = MouseFlags.Button1Clicked
 			}));
+			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 
@@ -311,6 +314,7 @@ Three
 				Y = 2,
 				Flags = MouseFlags.Button1Clicked
 			}));
+			Assert.Equal ("Three", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 
@@ -343,6 +347,7 @@ Three
 				Y = 2,
 				Flags = MouseFlags.Button1Clicked
 			}));
+			Assert.Equal ("Three", selected);
 			lock (Application.MainLoop.IdleHandlers) {
 				while (cb.IsShow) {
 					Application.MainLoop.MainIteration ();

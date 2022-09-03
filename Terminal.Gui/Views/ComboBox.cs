@@ -144,6 +144,7 @@ namespace Terminal.Gui {
 						isShow = false;
 						HideList ();
 					}
+					OnOpenSelectedItem ();
 				}
 				if (searchset.Count > 0) {
 					SetValue (searchset [listview.SelectedItem]);
