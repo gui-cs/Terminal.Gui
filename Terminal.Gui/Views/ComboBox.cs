@@ -108,6 +108,19 @@ namespace Terminal.Gui {
 			SetSource (source);
 		}
 
+		/// <summary>
+		/// Initialize with the source.
+		/// </summary>
+		/// <param name="source">The source.</param>
+		public ComboBox (IList source) : this (string.Empty)
+		{
+			search = new TextField ("");
+			listview = new ListView (source) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+
+			Initialize ();
+			SetSource (source);
+		}
+
 		bool itemPressed;
 		bool itemClicked;
 
@@ -146,7 +159,7 @@ namespace Terminal.Gui {
 					}
 					OnOpenSelectedItem ();
 				}
-				if (searchset.Count > 0) {
+				if (!HideDropdownListOnClick && searchset.Count > 0) {
 					SetValue (searchset [listview.SelectedItem]);
 				}
 			};
@@ -223,6 +236,7 @@ namespace Terminal.Gui {
 
 		private bool isShow = false;
 		private int selectedItem = -1;
+		private int lastSelectedItem = -1;
 
 		/// <summary>
 		/// Gets the index of the currently selected item in the <see cref="Source"/>
@@ -314,6 +328,7 @@ namespace Terminal.Gui {
 		private void FocusSelectedItem ()
 		{
 			listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+			lastSelectedItem = SelectedItem;
 			if (SelectedItem > -1) {
 				listview.TabStop = true;
 				listview.SetFocus ();
@@ -370,6 +385,7 @@ namespace Terminal.Gui {
 		public virtual bool OnOpenSelectedItem ()
 		{
 			var value = search.Text;
+			lastSelectedItem = SelectedItem;
 			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (SelectedItem, value));
 
 			return true;
@@ -408,8 +424,15 @@ namespace Terminal.Gui {
 		bool CancelSelected ()
 		{
 			search.SetFocus ();
-			search.Text = text = "";
-			OnSelectedChanged ();
+			if (HideDropdownListOnClick) {
+				SelectedItem = lastSelectedItem;
+				if (SelectedItem > -1 && listview.Source?.Count > 0) {
+					search.Text = text = listview.Source.ToList () [SelectedItem].ToString ();
+				}
+			} else {
+				search.Text = text = "";
+				OnSelectedChanged ();
+			}
 			Collapse ();
 			return true;
 		}
