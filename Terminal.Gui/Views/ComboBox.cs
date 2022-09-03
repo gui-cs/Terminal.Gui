@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
@@ -107,6 +108,9 @@ namespace Terminal.Gui {
 			SetSource (source);
 		}
 
+		bool itemPressed;
+		bool itemClicked;
+
 		private void Initialize ()
 		{
 			if (Bounds.Height < minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
@@ -132,9 +136,45 @@ namespace Terminal.Gui {
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
-
+				if (itemClicked) {
+					itemPressed = false;
+					itemClicked = false;
+					SelectedItem = e.Item;
+					if (isShow) {
+						isShow = false;
+						HideList ();
+					}
+				}
 				if (searchset.Count > 0) {
 					SetValue (searchset [listview.SelectedItem]);
+				}
+			};
+
+			listview.MouseClick += e => {
+				if (isShow && HideDropdownListOnClick && e.MouseEvent.Flags == MouseFlags.Button1Pressed) {
+					itemPressed = true;
+				} else if (itemPressed && isShow && HideDropdownListOnClick && e.MouseEvent.Flags == MouseFlags.Button1Clicked) {
+					if (itemClicked && SelectedItem == listview.SelectedItem) {
+						DoHideList ();
+						e.Handled = true;
+					} else if (itemPressed) {
+						itemClicked = true;
+						Task.Run (async () => {
+							await Task.Delay (100);
+							if (itemClicked && SelectedItem == listview.SelectedItem) {
+								DoHideList ();
+								Application.MainLoop.Invoke (() => SetNeedsDisplay ());
+							}
+						});
+					}
+				}
+
+				void DoHideList ()
+				{
+					itemPressed = false;
+					itemClicked = false;
+					isShow = false;
+					HideList ();
 				}
 			};
 
@@ -235,6 +275,11 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets if the drop-down list can be hide with a button click event.
+		/// </summary>
+		public bool HideDropdownListOnClick { get; set; }
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
