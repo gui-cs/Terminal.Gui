@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Terminal.Gui.Views {
 	public class TextViewTests {
@@ -6269,6 +6270,73 @@ This is the second line.
 			Assert.Equal (envText, tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_InsertText_Newline ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 10,
+			};
+			tv.InsertText ("\naaa\nbbb");
+			//this fails
+			Assert.Throws<EqualException> (() => Assert.Equal ("\naaa\nbbb", tv.Text));
+			//this passes
+			Assert.Equal ($"{Environment.NewLine}aaa{Environment.NewLine}bbb", tv.Text);
+
+			var win = new Window ();
+			win.Add (tv);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+			Application.Refresh ();
+
+			//this passes
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+
+			Assert.Equal (new Rect (0, 0, 15, 15), pos);
+
+			Assert.True (tv.Used);
+			tv.Used = false;
+			tv.CursorPosition = new Point (0, 0);
+			tv.InsertText ("\naaa\nbbb");
+			Application.Refresh ();
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
 		}
 	}
 }

@@ -3624,16 +3624,22 @@ namespace Terminal.Gui {
 			if (selecting) {
 				ClearSelectedRegion ();
 			}
-			if (Used) {
-				Insert ((uint)kb.Key);
-				currentColumn++;
-				if (currentColumn >= leftColumn + Frame.Width) {
-					leftColumn++;
-					SetNeedsDisplay ();
-				}
+			if (kb.Key == Key.Enter) {
+				model.AddLine (currentRow + 1, new List<Rune> ());
+				currentRow++;
+				currentColumn = 0;
 			} else {
-				Insert ((uint)kb.Key);
-				currentColumn++;
+				if (Used) {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+					if (currentColumn >= leftColumn + Frame.Width) {
+						leftColumn++;
+						SetNeedsDisplay ();
+					}
+				} else {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+				}
 			}
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
