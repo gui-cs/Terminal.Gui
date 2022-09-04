@@ -529,8 +529,8 @@ namespace Terminal.Gui {
 			} else if (selected == 0) {
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
-			} else if (selected >= top + VisibleItems) {
-				top = source.Count - VisibleItems;
+			} else if (selected >= top + Frame.Height) {
+				top = source.Count - Frame.Height;
 				SetNeedsDisplay ();
 			}
 
