@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Terminal.Gui.Views {
 	public class TextViewTests {
@@ -6274,16 +6273,88 @@ This is the second line.
 
 		[Fact]
 		[InitShutdown]
-		public void TextView_InsertText_Newline ()
+		public void TextView_InsertText_Newline_LF ()
 		{
 			var tv = new TextView {
 				Width = 10,
 				Height = 10,
 			};
 			tv.InsertText ("\naaa\nbbb");
-			//this fails
-			Assert.Throws<EqualException> (() => Assert.Equal ("\naaa\nbbb", tv.Text));
+			var p = Environment.OSVersion.Platform;
+			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+				Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
+			} else {
+				Assert.Equal ("\naaa\nbbb", tv.Text);
+			}
+			Assert.Equal ($"{Environment.NewLine}aaa{Environment.NewLine}bbb", tv.Text);
+
+			var win = new Window ();
+			win.Add (tv);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+			Application.Refresh ();
 			//this passes
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+
+			Assert.Equal (new Rect (0, 0, 15, 15), pos);
+
+			Assert.True (tv.Used);
+			tv.Used = false;
+			tv.CursorPosition = new Point (0, 0);
+			tv.InsertText ("\naaa\nbbb");
+			Application.Refresh ();
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_InsertText_Newline_CRLF ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 10,
+			};
+			tv.InsertText ("\r\naaa\r\nbbb");
+			var p = Environment.OSVersion.Platform;
+			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+				Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
+			} else {
+				Assert.Equal ("\naaa\nbbb", tv.Text);
+			}
 			Assert.Equal ($"{Environment.NewLine}aaa{Environment.NewLine}bbb", tv.Text);
 
 			var win = new Window ();
@@ -6317,7 +6388,7 @@ This is the second line.
 			Assert.True (tv.Used);
 			tv.Used = false;
 			tv.CursorPosition = new Point (0, 0);
-			tv.InsertText ("\naaa\nbbb");
+			tv.InsertText ("\r\naaa\r\nbbb");
 			Application.Refresh ();
 
 			GraphViewTests.AssertDriverContentsWithFrameAre (

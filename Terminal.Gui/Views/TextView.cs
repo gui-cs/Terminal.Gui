@@ -3628,6 +3628,8 @@ namespace Terminal.Gui {
 				model.AddLine (currentRow + 1, new List<Rune> ());
 				currentRow++;
 				currentColumn = 0;
+			} else if ((uint)kb.Key == 13) {
+				currentColumn = 0;
 			} else {
 				if (Used) {
 					Insert ((uint)kb.Key);
