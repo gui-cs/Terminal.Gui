@@ -30,6 +30,97 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
 		}
 
+		[Fact]
+		public void ListViewSelectThenDown ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
+			lv.AllowsMarking = true;
+
+			Assert.NotNull (lv.Source);
+
+			// first item should be selected by default
+			Assert.Equal (0, lv.SelectedItem);
+
+			// nothing is ticked
+			Assert.False (lv.Source.IsMarked (0));
+			Assert.False (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+			lv.AddKeyBinding (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
+
+			var ev = new KeyEvent (Key.Space | Key.ShiftMask, new KeyModifiers () { Shift = true });
+
+			// view should indicate that it has accepted and consumed the event
+			Assert.True (lv.ProcessKey (ev));
+
+			// second item should now be selected
+			Assert.Equal (1, lv.SelectedItem);
+
+			// first item only should be ticked
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.False (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+			// Press key combo again
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem);
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2));
+
+			// Press key combo again
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
+
+			// Press key combo again 
+			Assert.True (lv.ProcessKey (ev));
+			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+			Assert.True (lv.Source.IsMarked (0));
+			Assert.True (lv.Source.IsMarked (1));
+			Assert.False (lv.Source.IsMarked (2)); // untoggle toggle marked
+		}
+		[Fact]
+		public void SettingEmptyKeybindingThrows ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
+			Assert.Throws<ArgumentException> (() => lv.AddKeyBinding (Key.Space));
+		}
+
+
+		/// <summary>
+		/// Tests that when none of the Commands in a chained keybinding are possible
+		/// the <see cref="View.ProcessKey(KeyEvent)"/> returns the appropriate result
+		/// </summary>
+		[Fact]
+		public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
+		{
+			var lv = new ListView (new List<string> () { "One", "Two", "Three", "Four" });
+
+			Assert.NotNull (lv.Source);
+
+			// first item should be selected by default
+			Assert.Equal (0, lv.SelectedItem);
+
+			// bind shift down to move down twice in control
+			lv.AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
+
+			var ev = new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers () { Shift = true });
+
+			Assert.True (lv.ProcessKey (ev), "The first time we move down 2 it should be possible");
+
+			// After moving down twice from One we should be at 'Three'
+			Assert.Equal (2, lv.SelectedItem);
+
+			// clear the items
+			lv.SetSource (null);
+
+			// Press key combo again - return should be false this time as none of the Commands are allowable
+			Assert.False (lv.ProcessKey (ev), "We cannot move down so will not respond to this");
+		}
+
 		private class NewListDataSource : IListDataSource {
 			public int Count => throw new NotImplementedException ();
 
