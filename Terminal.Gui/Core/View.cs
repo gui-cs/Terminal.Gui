@@ -2562,8 +2562,11 @@ namespace Terminal.Gui {
 			set {
 				if (base.Visible != value) {
 					base.Visible = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
+					if (!value) {
+						if (HasFocus) {
+							SetHasFocus (false, this);
+						}
+						Clear ();
 					}
 					OnVisibleChanged ();
 					SetNeedsDisplay ();

@@ -5,9 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ListViewTests {
+		readonly ITestOutputHelper output;
+
+		public ListViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
@@ -220,6 +228,208 @@ namespace Terminal.Gui.Views {
 				}
 				return item;
 			}
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
+		{
+			var source = new List<string> ();
+			for (int i = 0; i < 20; i++) {
+				source.Add ($"Line{i}");
+			}
+			var lv = new ListView (source) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var win = new Window ();
+			win.Add (lv);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (12, 12);
+			Application.Refresh ();
+
+			Assert.Equal (0, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘", output);
+
+			Assert.True (lv.ScrollDown (10));
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (0, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘", output);
+
+			Assert.True (lv.MoveDown ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (1, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+│Line10    │
+└──────────┘", output);
+
+			Assert.True (lv.MoveEnd ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (19, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line19    │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+└──────────┘", output);
+
+			Assert.True (lv.ScrollUp (20));
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (19, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘", output);
+
+			Assert.True (lv.MoveDown ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (19, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘", output);
+
+			Assert.True (lv.ScrollUp (20));
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (19, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘", output);
+
+			Assert.True (lv.MoveDown ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (19, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘", output);
+
+			Assert.True (lv.MoveHome ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (0, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘", output);
+
+			Assert.True (lv.ScrollDown (20));
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (0, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line19    │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+└──────────┘", output);
+
+			Assert.True (lv.MoveUp ());
+			lv.Redraw (lv.Bounds);
+			Assert.Equal (0, lv.SelectedItem);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘", output);
 		}
 	}
 }
