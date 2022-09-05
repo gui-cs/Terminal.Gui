@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 				background: MapCursesColor (background));
 		}
 
-		static Attribute MakeColor (Color fore, Color back)
+		public override Attribute MakeColor (Color fore, Color back)
 		{
 			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
 		}
@@ -890,51 +890,14 @@ namespace Terminal.Gui {
 			//UpArrow = Curses.ACS_UARROW;
 			//DownArrow = Curses.ACS_DARROW;
 
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
-
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				Colors.TopLevel.Normal = MakeColor (Color.Green, Color.Black);
-				Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
-				Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
-				Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
-				Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
-
-				Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
-				Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
-				Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
-				Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
-				Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
-
-				// Focused,
-				//    Selected, Hot: Yellow on Black
-				//    Selected, text: white on black
-				//    Unselected, hot: yellow on cyan
-				//    unselected, text: same as unfocused
-				Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
-				Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
-				Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
-				Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
-				Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
-
-				Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
-				Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
-				Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
-				Colors.Dialog.HotFocus = MakeColor (Color.Blue, Color.DarkGray);
-				Colors.Dialog.Disabled = MakeColor (Color.DarkGray, Color.Gray);
-
-				Colors.Error.Normal = MakeColor (Color.Red, Color.White);
-				Colors.Error.Focus = MakeColor (Color.White, Color.Red);
-				Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-				Colors.Error.HotFocus = MakeColor (Color.Black, Color.Red);
-				Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+				CreateColors ();
 			} else {
+				CreateColors (false);
+
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
