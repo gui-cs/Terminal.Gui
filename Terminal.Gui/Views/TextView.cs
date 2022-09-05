@@ -1936,7 +1936,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered.  Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
-		protected virtual void ColorNormal ()
+		protected virtual void SetNormalColor ()
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
@@ -1948,7 +1948,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorNormal (List<Rune> line, int idx)
+		protected virtual void SetNormalColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
@@ -1960,7 +1960,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorSelection (List<Rune> line, int idx)
+		protected virtual void SetSelectionColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
 		}
@@ -1972,7 +1972,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorReadOnly (List<Rune> line, int idx)
+		protected virtual void SetReadOnlyColor (List<Rune> line, int idx)
 		{
 			Attribute attribute;
 			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
@@ -1990,7 +1990,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorUsed (List<Rune> line, int idx)
+		protected virtual void SetUsedColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
@@ -2382,7 +2382,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			ColorNormal ();
+			SetNormalColor ();
 
 			var offB = OffSetBackground ();
 			int right = Frame.Width + offB.width + RightOffset;
@@ -2398,14 +2398,14 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);
 					if (idxCol < line.Count && selecting && PointInSelection (idxCol, idxRow)) {
-						ColorSelection (line, idxCol);
+						SetSelectionColor (line, idxCol);
 					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						ColorSelection (line, idxCol);
+						SetSelectionColor (line, idxCol);
 					} else if (ReadOnly) {
-						ColorReadOnly (line, idxCol);
+						SetReadOnlyColor (line, idxCol);
 					} else {
-						ColorNormal (line, idxCol);
+						SetNormalColor (line, idxCol);
 					}
 
 					if (rune == '\t') {
@@ -2429,13 +2429,13 @@ namespace Terminal.Gui {
 					}
 				}
 				if (col < right) {
-					ColorNormal ();
+					SetNormalColor ();
 					ClearRegion (col, row, right, row + 1);
 				}
 				row++;
 			}
 			if (row < bottom) {
-				ColorNormal ();
+				SetNormalColor ();
 				ClearRegion (bounds.Left, row, right, bottom);
 			}
 
