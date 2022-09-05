@@ -330,6 +330,7 @@ namespace Unix.Terminal {
 		static public int reset_shell_mode () => methods.reset_shell_mode ();
 		static public int savetty () => methods.savetty ();
 		static public int resetty () => methods.resetty ();
+		static public int set_escdelay (int size) => methods.set_escdelay (size);
 	}
 
 #pragma warning disable RCS1102 // Make class static.
@@ -405,6 +406,7 @@ namespace Unix.Terminal {
 		public delegate int reset_shell_mode ();
 		public delegate int savetty ();
 		public delegate int resetty ();
+		public delegate int set_escdelay (int size);
 	}
 
 	internal class NativeMethods {
@@ -478,6 +480,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.reset_shell_mode reset_shell_mode;
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
+		public readonly Delegates.set_escdelay set_escdelay;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -553,6 +556,7 @@ namespace Unix.Terminal {
 			reset_shell_mode = lib.GetNativeMethodDelegate<Delegates.reset_shell_mode> ("reset_shell_mode");
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
+			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

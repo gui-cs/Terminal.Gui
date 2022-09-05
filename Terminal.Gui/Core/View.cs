@@ -271,7 +271,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Configurable keybindings supported by the control
 		/// </summary>
-		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
+		private Dictionary<Key, Command []> KeyBindings { get; set; } = new Dictionary<Key, Command []> ();
 		private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 		/// <summary>
@@ -1716,17 +1716,32 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">The key event passed.</param>
 		protected bool? InvokeKeybindings (KeyEvent keyEvent)
 		{
+			bool? toReturn = null;
+
 			if (KeyBindings.ContainsKey (keyEvent.Key)) {
-				var command = KeyBindings [keyEvent.Key];
 
-				if (!CommandImplementations.ContainsKey (command)) {
-					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+				foreach (var command in KeyBindings [keyEvent.Key]) {
+
+					if (!CommandImplementations.ContainsKey (command)) {
+						throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+					}
+
+					// each command has its own return value
+					var thisReturn = CommandImplementations [command] ();
+
+					// if we haven't got anything yet, the current command result should be used
+					if (toReturn == null) {
+						toReturn = thisReturn;
+					}
+
+					// if ever see a true then that's what we will return
+					if (thisReturn ?? false) {
+						toReturn = thisReturn.Value;
+					}
 				}
-
-				return CommandImplementations [command] ();
 			}
 
-			return null;
+			return toReturn;
 		}
 
 
@@ -1736,11 +1751,19 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
 		/// rebound to this one</para>
+		/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
+		/// cannot be used to switch focus to another view and perform multiple commands there)</remarks>
 		/// </summary>
 		/// <param name="key"></param>
-		/// <param name="command"></param>
-		public void AddKeyBinding (Key key, Command command)
+		/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
+		/// When specifying multiple, all commands will be applied in sequence.  The bound <paramref name="key"/> strike
+		/// will be consumed if any took effect.</param>
+		public void AddKeyBinding (Key key, params Command [] command)
 		{
+			if (command.Length == 0) {
+				throw new ArgumentException ("At least one command must be specified", nameof (command));
+			}
+
 			if (KeyBindings.ContainsKey (key)) {
 				KeyBindings [key] = command;
 			} else {
@@ -1756,7 +1779,7 @@ namespace Terminal.Gui {
 		protected void ReplaceKeyBinding (Key fromKey, Key toKey)
 		{
 			if (KeyBindings.ContainsKey (fromKey)) {
-				Command value = KeyBindings [fromKey];
+				var value = KeyBindings [fromKey];
 				KeyBindings.Remove (fromKey);
 				KeyBindings [toKey] = value;
 			}
@@ -1795,9 +1818,9 @@ namespace Terminal.Gui {
 		/// keys bound to the same command and this method will clear all of them.
 		/// </summary>
 		/// <param name="command"></param>
-		public void ClearKeybinding (Command command)
+		public void ClearKeybinding (params Command [] command)
 		{
-			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray()) {
 				KeyBindings.Remove (kvp.Key);
 			}
 		}
@@ -1837,9 +1860,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="command">The command to search.</param>
 		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
-		public Key GetKeyFromCommand (Command command)
+		public Key GetKeyFromCommand (params Command [] command)
 		{
-			return KeyBindings.First (x => x.Value == command).Key;
+			return KeyBindings.First (x => x.Value.SequenceEqual (command)).Key;
 		}
 
 		/// <inheritdoc/>

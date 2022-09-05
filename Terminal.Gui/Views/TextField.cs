@@ -203,6 +203,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
+
+			AddKeyBinding (Key.R | Key.CtrlMask, Command.DeleteAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;

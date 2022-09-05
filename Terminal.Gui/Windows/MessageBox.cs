@@ -284,6 +284,7 @@ namespace Terminal.Gui {
 				l.Y = Pos.Center ();
 				l.Width = Dim.Fill (2);
 				l.Height = Dim.Fill (1);
+				l.AutoSize = false;
 				d.Add (l);
 			}
 
