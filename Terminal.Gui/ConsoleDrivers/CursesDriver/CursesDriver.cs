@@ -663,7 +663,7 @@ namespace Terminal.Gui {
 
 			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
-				Curses.timeout (200);
+				Curses.timeout (10);
 
 				code = Curses.get_wch (out int wch2);
 
@@ -820,6 +820,7 @@ namespace Terminal.Gui {
 				//Console.Out.Flush ();
 
 				window = Curses.initscr ();
+				Curses.set_escdelay (10);
 			} catch (Exception e) {
 				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
 			}
