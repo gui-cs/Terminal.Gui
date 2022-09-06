@@ -29,12 +29,18 @@ namespace Terminal.Gui.Core {
 		{
 			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-			Func<bool> fnTrue = () => { return true; };
-			Func<bool> fnFalse = () => { return false; };
+			Func<bool> fnTrue = () => true;
+			Func<bool> fnFalse = () => false;
+
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnFalse);
 
+			Assert.Equal (2, ml.IdleHandlers.Count);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Single (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -52,8 +58,19 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnTrue);
 
+			Assert.Equal (2, ml.IdleHandlers.Count);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.True (ml.IdleHandlers [0] ());
+			Assert.Equal (fnTrue, ml.IdleHandlers [1]);
+			Assert.True (ml.IdleHandlers [1] ());
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Single (ml.IdleHandlers);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Empty (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -125,14 +142,17 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fn);
 			ml.MainIteration ();
 			Assert.Equal (2, functionCalled);
+			Assert.Equal (2, ml.IdleHandlers.Count);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
+			Assert.Single (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (1, functionCalled);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
+			Assert.Empty (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
 			Assert.False (ml.RemoveIdle (fn));
