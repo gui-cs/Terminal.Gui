@@ -836,6 +836,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Determines the line with the highest width in the 
+		/// <paramref name="text"/> if it contains newlines.
+		/// </summary>
+		/// <param name="text">Text, may contain newlines.</param>
+		/// <returns>The highest line width.</returns>
+		public static int MaxWidthLine (ustring text)
+		{
+			var result = TextFormatter.SplitNewLine (text);
+			return result.Max (x => x.ConsoleWidth);
+		}
+
+		/// <summary>
 		/// Gets the total width of the passed text.
 		/// </summary>
 		/// <param name="text"></param>
