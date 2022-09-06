@@ -110,12 +110,11 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					// BUGBUG: I think the button isn't well centered here.
 					GraphViewTests.AssertDriverContentsWithFrameAre (@"
                                     ┌─────┐
                                     │Messa│
                                     │ ge  │
-                                    │Ok ◦]│
+                                    │ Ok ◦│
                                     └─────┘
 ", output);
 
