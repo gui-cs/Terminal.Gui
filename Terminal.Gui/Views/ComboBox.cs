@@ -8,7 +8,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
@@ -18,31 +17,156 @@ namespace Terminal.Gui {
 	public class ComboBox : View {
 
 		private class ComboListView : ListView {
-			public bool HideDropdownListOnClick { get; set; }
+			private int highlighted = -1;
+			private bool isFocusing;
+			private ComboBox container;
+			private bool hideDropdownListOnClick;
 
-			public ComboListView (bool hideDropdownListOnClick)
+			public ComboListView (ComboBox container, bool hideDropdownListOnClick)
 			{
+				Initialize (container, hideDropdownListOnClick);
+			}
+
+			public ComboListView (ComboBox container, Rect rect, IList source, bool hideDropdownListOnClick) : base (rect, source)
+			{
+				Initialize (container, hideDropdownListOnClick);
+			}
+
+			public ComboListView (ComboBox container, IList source, bool hideDropdownListOnClick) : base (source)
+			{
+				Initialize (container, hideDropdownListOnClick);
+			}
+
+			private void Initialize (ComboBox container, bool hideDropdownListOnClick)
+			{
+				if (container == null)
+					throw new ArgumentNullException ("ComboBox container cannot be null.", nameof (container));
+
+				this.container = container;
 				HideDropdownListOnClick = hideDropdownListOnClick;
 			}
 
-			public ComboListView (Rect rect, IList source, bool hideDropdownListOnClick) : base (rect, source)
-			{
-				HideDropdownListOnClick = hideDropdownListOnClick;
-			}
-
-			public ComboListView (IList source, bool hideDropdownListOnClick) : base (source)
-			{
-				HideDropdownListOnClick = hideDropdownListOnClick;
+			public bool HideDropdownListOnClick {
+				get => hideDropdownListOnClick;
+				set => hideDropdownListOnClick = WantContinuousButtonPressed = value;
 			}
 
 			public override bool MouseEvent (MouseEvent me)
 			{
-				var res = base.MouseEvent (me);
+				var res = false;
+				var isMousePositionValid = IsMousePositionValid (me);
+
+				if (isMousePositionValid) {
+					res = base.MouseEvent (me);
+				}
 
 				if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked) {
-					OnOpenSelectedItem ();
+					if (!isMousePositionValid && !isFocusing) {
+						container.isShow = false;
+						container.HideList ();
+					} else if (isMousePositionValid) {
+						OnOpenSelectedItem ();
+					} else {
+						isFocusing = false;
+					}
+					return true;
+				} else if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick) {
+					if (isMousePositionValid) {
+						highlighted = Math.Min (TopItem + me.Y / itemHeight, Source.Count);
+						SetNeedsDisplay ();
+					}
+					isFocusing = false;
 					return true;
 				}
+
+				return res;
+			}
+
+			private bool IsMousePositionValid (MouseEvent me)
+			{
+				if (me.X >= 0 && me.X < Frame.Width && me.Y >= 0 && me.Y < Frame.Height) {
+					return true;
+				}
+				return false;
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				var current = ColorScheme.Focus;
+				Driver.SetAttribute (current);
+				Move (0, 0);
+				var f = Frame;
+				var item = TopItem;
+				bool focused = HasFocus;
+				int col = AllowsMarking ? 2 : 0;
+				int start = LeftItem;
+
+				for (int row = 0; row < f.Height; row += itemHeight, item++) {
+					bool isSelected = item == container.SelectedItem;
+					bool isHighlighted = hideDropdownListOnClick && item == highlighted;
+
+					Attribute newcolor;
+					if (isHighlighted || (isSelected && !hideDropdownListOnClick)) {
+						newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+					} else if (isSelected && hideDropdownListOnClick) {
+						newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+					} else {
+						newcolor = focused ? GetNormalColor () : GetNormalColor ();
+					}
+
+					if (newcolor != current) {
+						Driver.SetAttribute (newcolor);
+						current = newcolor;
+					}
+
+					Move (0, row);
+					if (Source == null || item >= Source.Count) {
+						for (int c = 0; c < f.Width; c++)
+							Driver.AddRune (' ');
+					} else {
+						var rowEventArgs = new ListViewRowEventArgs (item);
+						OnRowRender (rowEventArgs);
+						if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+							current = (Attribute)rowEventArgs.RowAttribute;
+							Driver.SetAttribute (current);
+						}
+						if (AllowsMarking) {
+							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
+							Driver.AddRune (' ');
+						}
+						Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
+					}
+				}
+			}
+
+			public override bool OnEnter (View view)
+			{
+				if (hideDropdownListOnClick) {
+					isFocusing = true;
+					highlighted = container.SelectedItem;
+					Application.GrabMouse (this);
+				}
+
+				return base.OnEnter (view);
+			}
+
+			public override bool OnLeave (View view)
+			{
+				if (hideDropdownListOnClick) {
+					isFocusing = false;
+					highlighted = container.SelectedItem;
+					Application.UngrabMouse ();
+				}
+
+				return base.OnLeave (view);
+			}
+
+			public override bool OnSelectedChanged ()
+			{
+				var res = base.OnSelectedChanged ();
+
+				highlighted = SelectedItem;
+
 				return res;
 			}
 		}
@@ -93,6 +217,16 @@ namespace Terminal.Gui {
 		public event Action<ListViewItemEventArgs> SelectedItemChanged;
 
 		/// <summary>
+		/// This event is raised when the drop-down list is expanded.
+		/// </summary>
+		public event Action Expanded;
+
+		/// <summary>
+		/// This event is raised when the drop-down list is collapsed.
+		/// </summary>
+		public event Action Collapsed;
+
+		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
@@ -118,7 +252,7 @@ namespace Terminal.Gui {
 		public ComboBox (ustring text) : base ()
 		{
 			search = new TextField ("");
-			listview = new ComboListView (HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
+			listview = new ComboListView (this, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
 
 			Initialize ();
 			Text = text;
@@ -132,7 +266,7 @@ namespace Terminal.Gui {
 		public ComboBox (Rect rect, IList source) : base (rect)
 		{
 			search = new TextField ("") { Width = rect.Width };
-			listview = new ComboListView (rect, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+			listview = new ComboListView (this, rect, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
 
 			Initialize ();
 			SetSource (source);
@@ -145,7 +279,7 @@ namespace Terminal.Gui {
 		public ComboBox (IList source) : this (string.Empty)
 		{
 			search = new TextField ("");
-			listview = new ComboListView (source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+			listview = new ComboListView (this, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
 
 			Initialize ();
 			SetSource (source);
@@ -239,7 +373,7 @@ namespace Terminal.Gui {
 				if (selectedItem != value && (value == -1
 					|| (source != null && value > -1 && value < source.Count))) {
 
-					selectedItem = value;
+					selectedItem = lastSelectedItem = value;
 					if (selectedItem != -1) {
 						SetValue (source.ToList () [selectedItem].ToString (), true);
 					} else {
@@ -322,11 +456,25 @@ namespace Terminal.Gui {
 		private void FocusSelectedItem ()
 		{
 			listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
-			lastSelectedItem = SelectedItem;
-			if (SelectedItem > -1) {
-				listview.TabStop = true;
-				listview.SetFocus ();
-			}
+			listview.TabStop = true;
+			listview.SetFocus ();
+			OnExpanded ();
+		}
+
+		/// <summary>
+		/// Virtual method which invokes the <see cref="Expanded"/> event.
+		/// </summary>
+		public virtual void OnExpanded ()
+		{
+			Expanded?.Invoke ();
+		}
+
+		/// <summary>
+		/// Virtual method which invokes the <see cref="Collapsed"/> event.
+		/// </summary>
+		public virtual void OnCollapsed ()
+		{
+			Collapsed?.Invoke ();
 		}
 
 		///<inheritdoc/>
@@ -394,6 +542,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			Driver.SetAttribute (ColorScheme.Focus);
 			Move (Bounds.Right - 1, 0);
 			Driver.AddRune (Driver.DownArrow);
 		}
@@ -418,13 +567,14 @@ namespace Terminal.Gui {
 		bool CancelSelected ()
 		{
 			search.SetFocus ();
-			if (HideDropdownListOnClick) {
+			if (ReadOnly || HideDropdownListOnClick) {
 				SelectedItem = lastSelectedItem;
 				if (SelectedItem > -1 && listview.Source?.Count > 0) {
 					search.Text = text = listview.Source.ToList () [SelectedItem].ToString ();
 				}
-			} else {
+			} else if (!ReadOnly) {
 				search.Text = text = "";
+				selectedItem = lastSelectedItem;
 				OnSelectedChanged ();
 			}
 			Collapse ();
@@ -698,12 +848,16 @@ namespace Terminal.Gui {
 		/// Consider making public
 		private void HideList ()
 		{
+			if (lastSelectedItem != selectedItem) {
+				OnOpenSelectedItem ();
+			}
 			var rect = listview.ViewToScreen (listview.Bounds);
 			Reset (SelectedItem > -1);
 			listview.Clear (rect);
 			listview.TabStop = false;
 			SuperView?.SendSubviewToBack (this);
 			SuperView?.SetNeedsDisplay (rect);
+			OnCollapsed ();
 		}
 
 		/// <summary>
