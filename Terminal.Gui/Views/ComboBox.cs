@@ -72,7 +72,7 @@ namespace Terminal.Gui {
 					return true;
 				} else if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick) {
 					if (isMousePositionValid) {
-						highlighted = Math.Min (TopItem + me.Y / itemHeight, Source.Count);
+						highlighted = Math.Min (TopItem + me.Y, Source.Count);
 						SetNeedsDisplay ();
 					}
 					isFocusing = false;
@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 				int col = AllowsMarking ? 2 : 0;
 				int start = LeftItem;
 
-				for (int row = 0; row < f.Height; row += itemHeight, item++) {
+				for (int row = 0; row < f.Height; row++, item++) {
 					bool isSelected = item == container.SelectedItem;
 					bool isHighlighted = hideDropdownListOnClick && item == highlighted;
 
