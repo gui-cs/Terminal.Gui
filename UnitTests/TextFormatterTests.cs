@@ -4012,5 +4012,47 @@ e
 			Assert.Equal ("Line2", formated [1]);
 			Assert.Equal ("Line3", formated [^1]);
 		}
+
+		[Fact]
+		public void SplitNewLine_Ending_Without_NewLine_Probably_CRLF ()
+		{
+			var text = $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界";
+			var splited = TextFormatter.SplitNewLine (text);
+			Assert.Equal ("First Line 界", splited [0]);
+			Assert.Equal ("Second Line 界", splited [1]);
+			Assert.Equal ("Third Line 界", splited [^1]);
+		}
+
+		[Fact]
+		public void SplitNewLine_Ending_With_NewLine_Probably_CRLF ()
+		{
+			var text = $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界{Environment.NewLine}";
+			var splited = TextFormatter.SplitNewLine (text);
+			Assert.Equal ("First Line 界", splited [0]);
+			Assert.Equal ("Second Line 界", splited [1]);
+			Assert.Equal ("Third Line 界", splited [2]);
+			Assert.Equal ("", splited [^1]);
+		}
+
+		[Fact]
+		public void SplitNewLine_Ending_Without_NewLine_Only_LF ()
+		{
+			var text = $"First Line 界\nSecond Line 界\nThird Line 界";
+			var splited = TextFormatter.SplitNewLine (text);
+			Assert.Equal ("First Line 界", splited [0]);
+			Assert.Equal ("Second Line 界", splited [1]);
+			Assert.Equal ("Third Line 界", splited [^1]);
+		}
+
+		[Fact]
+		public void SplitNewLine_Ending_With_NewLine_Only_LF ()
+		{
+			var text = $"First Line 界\nSecond Line 界\nThird Line 界\n";
+			var splited = TextFormatter.SplitNewLine (text);
+			Assert.Equal ("First Line 界", splited [0]);
+			Assert.Equal ("Second Line 界", splited [1]);
+			Assert.Equal ("Third Line 界", splited [2]);
+			Assert.Equal ("", splited [^1]);
+		}
 	}
 }

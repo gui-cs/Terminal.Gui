@@ -521,11 +521,16 @@ namespace Terminal.Gui {
 					top++;
 				} else if (selected < top) {
 					top = selected;
+				} else if (selected < top) {
+					top = selected;
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected == 0) {
 				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			} else if (selected >= top + Frame.Height) {
+				top = source.Count - Frame.Height;
 				SetNeedsDisplay ();
 			}
 
@@ -560,6 +565,9 @@ namespace Terminal.Gui {
 					top = Math.Max (selected - Frame.Height + 1, 0);
 				}
 				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			} else if (selected < top) {
+				top = selected;
 				SetNeedsDisplay ();
 			}
 			return true;

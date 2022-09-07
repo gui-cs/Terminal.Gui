@@ -1820,7 +1820,7 @@ namespace Terminal.Gui {
 		/// <param name="command"></param>
 		public void ClearKeybinding (params Command [] command)
 		{
-			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command))) {
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray()) {
 				KeyBindings.Remove (kvp.Key);
 			}
 		}
@@ -2562,8 +2562,11 @@ namespace Terminal.Gui {
 			set {
 				if (base.Visible != value) {
 					base.Visible = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
+					if (!value) {
+						if (HasFocus) {
+							SetHasFocus (false, this);
+						}
+						Clear ();
 					}
 					OnVisibleChanged ();
 					SetNeedsDisplay ();

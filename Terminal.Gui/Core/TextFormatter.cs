@@ -417,6 +417,50 @@ namespace Terminal.Gui {
 			return ustring.Make (runes);
 		}
 
+		/// <summary>
+		/// Splits all newlines in the <paramref name="text"/> into a list
+		/// and supports both CRLF and LF, preserving the ending newline.
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <returns>A list of text without the newline characters.</returns>
+		public static List<ustring> SplitNewLine (ustring text)
+		{
+			var runes = text.ToRuneList ();
+			var lines = new List<ustring> ();
+			var start = 0;
+			var end = 0;
+
+			for (int i = 0; i < runes.Count; i++) {
+				end = i;
+				switch (runes [i]) {
+				case '\n':
+					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+					i++;
+					start = i;
+					break;
+
+				case '\r':
+					if ((i + 1) < runes.Count && runes [i + 1] == '\n') {
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						i += 2;
+						start = i;
+					} else {
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						i++;
+						start = i;
+					}
+					break;
+				}
+			}
+			if (runes.Count > 0 && lines.Count == 0) {
+				lines.Add (ustring.Make (runes));
+			} else if (runes.Count > 0 && start < runes.Count) {
+				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)));
+			} else {
+				lines.Add (ustring.Make (""));
+			}
+			return lines;
+		}
 
 		/// <summary>
 		/// Adds trailing whitespace or truncates <paramref name="text"/>
