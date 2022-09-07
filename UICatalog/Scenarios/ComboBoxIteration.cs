@@ -33,7 +33,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (listview) + 1,
 				Y = Pos.Bottom (lbListView) + 1,
 				Height = Dim.Fill (2),
-				Width = Dim.Percent (40)
+				Width = Dim.Percent (40),
+				HideDropdownListOnClick = true
 			};
 			comboBox.SetSource (items);
 
