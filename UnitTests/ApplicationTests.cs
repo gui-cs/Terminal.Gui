@@ -1467,6 +1467,8 @@ namespace Terminal.Gui.Core {
 							Flags = MouseFlags.ReportMousePosition
 						});
 
+					Assert.Null (Application.mouseGrabView);
+
 					ReflectionTools.InvokePrivate (
 						typeof (Application),
 						"ProcessMouseEvent",
