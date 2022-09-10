@@ -693,7 +693,7 @@ namespace Terminal.Gui {
 				textCount = words.Sum (arg => arg.RuneCount);
 			}
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
-			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
+			var extras = words.Length > 1 ? (width - textCount) % (words.Length - 1) : 0;
 
 			var s = new System.Text.StringBuilder ();
 			for (int w = 0; w < words.Length; w++) {
@@ -703,7 +703,13 @@ namespace Terminal.Gui {
 					for (int i = 0; i < spaces; i++)
 						s.Append (spaceChar);
 				if (extras > 0) {
+					for (int i = 0; i < 1; i++)
+						s.Append (spaceChar);
 					extras--;
+				}
+				if (w + 1 == words.Length - 1) {
+					for (int i = 0; i < extras; i++)
+						s.Append (spaceChar);
 				}
 			}
 			return ustring.Make (s.ToString ());
