@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -78,7 +79,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the list of all idle handlers.
 		/// </summary>
-		public List<Func<bool>> IdleHandlers => new List<Func<bool>>(idleHandlers);
+		public ReadOnlyCollection<Func<bool>> IdleHandlers => idleHandlers.AsReadOnly();
 
 		/// <summary>
 		/// The current IMainLoopDriver in use.
