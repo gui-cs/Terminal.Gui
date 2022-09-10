@@ -3334,6 +3334,35 @@ e
 			Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void Draw_Fill_Remaining ()
+		{
+			var view = new View ("A very long text behind the TextFormatter.");
+
+			var tf = new TextFormatter ();
+			tf.Text = "Hello";
+			tf.Size = new Size (10, 1);
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+A very long text behind the TextFormatter.
+", output);
+
+			tf.Draw (new Rect (0, 0, 10, 1), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
+			Application.Top.Redraw (Application.Top.Bounds);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Helloy long text behind the TextFormatter.
+", output);
+
+			tf.Draw (new Rect (0, 0, 10, 1), view.GetNormalColor (), view.ColorScheme.HotNormal, default);
+			Application.Top.Redraw (Application.Top.Bounds);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Hello     g text behind the TextFormatter.
+", output);
+		}
+
 		[Fact]
 		public void GetTextWidth_Simple_And_Wide_Runes ()
 		{
