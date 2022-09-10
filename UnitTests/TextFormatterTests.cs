@@ -3356,7 +3356,7 @@ A very long text behind the TextFormatter.
 Helloy long text behind the TextFormatter.
 ", output);
 
-			tf.Draw (new Rect (0, 0, 10, 1), view.GetNormalColor (), view.ColorScheme.HotNormal, default);
+			tf.Draw (new Rect (0, 0, 10, 1), view.GetNormalColor (), view.ColorScheme.HotNormal);
 			Application.Top.Redraw (Application.Top.Bounds);
 			GraphViewTests.AssertDriverContentsWithFrameAre (@"
 Hello     g text behind the TextFormatter.
