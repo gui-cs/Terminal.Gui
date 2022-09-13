@@ -77,9 +77,15 @@ namespace Terminal.Gui {
 		public SortedList<long, Timeout> Timeouts => timeouts;
 
 		/// <summary>
-		/// Gets the list of all idle handlers.
+		/// Gets a copy of the list of all idle handlers.
 		/// </summary>
-		public ReadOnlyCollection<Func<bool>> IdleHandlers => idleHandlers.AsReadOnly();
+		public ReadOnlyCollection<Func<bool>> IdleHandlers {
+			get {
+				lock (idleHandlersLock) {
+					return new List<Func<bool>> (idleHandlers).AsReadOnly ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// The current IMainLoopDriver in use.
