@@ -431,5 +431,25 @@ namespace Terminal.Gui.Views {
 │Line9     │
 └──────────┘", output);
 		}
+
+		[Fact]
+		public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
+		{
+			var lv = new ListView (new List<string> { "One", "Two" });
+
+			Assert.NotNull (lv.Source);
+
+			lv.SetSource (null);
+			Assert.NotNull (lv.Source);
+
+			lv.Source = null;
+			Assert.Null (lv.Source);
+
+			lv = new ListView (new List<string> { "One", "Two" });
+			Assert.NotNull (lv.Source);
+
+			lv.SetSourceAsync (null);
+			Assert.NotNull (lv.Source);
+		}
 	}
 }
