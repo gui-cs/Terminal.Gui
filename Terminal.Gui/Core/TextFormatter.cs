@@ -1141,7 +1141,7 @@ namespace Terminal.Gui {
 		/// <param name="normalColor">The color to use for all text except the hotkey</param>
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
 		/// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
-		/// <param name="fillRemaining">Determines if the bounds width will be used (default)or only the text width will be used.</param>
+		/// <param name="fillRemaining">Determines if the bounds width will be used (default) or only the text width will be used.</param>
 		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
