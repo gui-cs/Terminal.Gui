@@ -1408,5 +1408,87 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MouseGrabView_WithNullMouseEventView ()
+		{
+			var tf = new TextField () { Width = 10 };
+			var sv = new ScrollView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				ContentSize = new Size (100, 100)
+			};
+
+			sv.Add (tf);
+			Application.Top.Add (sv);
+
+			var iterations = -1;
+
+			Application.Iteration = () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.True (tf.HasFocus);
+					Assert.Null (Application.mouseGrabView);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 5,
+							Y = 5,
+							Flags = MouseFlags.ReportMousePosition
+						});
+
+					Assert.Equal (sv, Application.mouseGrabView);
+
+					MessageBox.Query ("Title", "Test", "Ok");
+
+					Assert.Null (Application.mouseGrabView);
+				} else if (iterations == 1) {
+					Assert.Equal (sv, Application.mouseGrabView);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 5,
+							Y = 5,
+							Flags = MouseFlags.ReportMousePosition
+						});
+
+					Assert.Null (Application.mouseGrabView);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 40,
+							Y = 12,
+							Flags = MouseFlags.ReportMousePosition
+						});
+
+					Assert.Null (Application.mouseGrabView);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 0,
+							Y = 0,
+							Flags = MouseFlags.Button1Pressed
+						});
+
+					Assert.Null (Application.mouseGrabView);
+
+					Application.RequestStop ();
+				} else if (iterations == 2) {
+					Assert.Null (Application.mouseGrabView);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
 	}
 }

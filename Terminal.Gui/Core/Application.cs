@@ -638,6 +638,11 @@ namespace Terminal.Gui {
 			}
 			RootMouseEvent?.Invoke (me);
 			if (mouseGrabView != null) {
+				if (view == null) {
+					UngrabMouse ();
+					return;
+				}
+
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
@@ -653,7 +658,9 @@ namespace Terminal.Gui {
 				// System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (mouseGrabView != null) {
 					mouseGrabView.OnMouseEvent (nme);
-					return;
+					if (mouseGrabView != null) {
+						return;
+					}
 				}
 			}
 
