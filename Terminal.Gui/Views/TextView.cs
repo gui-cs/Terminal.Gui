@@ -1372,6 +1372,8 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
 			AddKeyBinding (Key.R | Key.CtrlMask, Command.Redo);
+
+			AddKeyBinding (Key.G | Key.CtrlMask, Command.DeleteAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;
@@ -3204,14 +3206,14 @@ namespace Terminal.Gui {
 			if (newPos.HasValue && currentRow == newPos.Value.row) {
 				var restCount = currentColumn - newPos.Value.col;
 				currentLine.RemoveRange (newPos.Value.col, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
 			} else if (newPos.HasValue) {
 				var restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
@@ -3261,7 +3263,7 @@ namespace Terminal.Gui {
 				restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
 			}
-			if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+			if (wordWrap) {
 				wrapNeeded = true;
 			}
 
@@ -3648,16 +3650,24 @@ namespace Terminal.Gui {
 			if (selecting) {
 				ClearSelectedRegion ();
 			}
-			if (Used) {
-				Insert ((uint)kb.Key);
-				currentColumn++;
-				if (currentColumn >= leftColumn + Frame.Width) {
-					leftColumn++;
-					SetNeedsDisplay ();
-				}
+			if (kb.Key == Key.Enter) {
+				model.AddLine (currentRow + 1, new List<Rune> ());
+				currentRow++;
+				currentColumn = 0;
+			} else if ((uint)kb.Key == 13) {
+				currentColumn = 0;
 			} else {
-				Insert ((uint)kb.Key);
-				currentColumn++;
+				if (Used) {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+					if (currentColumn >= leftColumn + Frame.Width) {
+						leftColumn++;
+						SetNeedsDisplay ();
+					}
+				} else {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+				}
 			}
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
@@ -3743,7 +3753,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				if (wrapNeeded) {
@@ -3760,7 +3770,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 
@@ -3788,7 +3798,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (currentColumn - 1);
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn--;
@@ -3820,8 +3830,7 @@ namespace Terminal.Gui {
 				var prevCount = prevRow.Count;
 				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 				model.RemoveLine (currentRow);
-				bool lineRemoved = false;
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentRow--;
@@ -3829,11 +3838,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { GetCurrentLine () }, new Point (currentColumn, prowIdx),
 					HistoryText.LineStatus.Replaced);
 
-				if (wrapNeeded && !lineRemoved) {
-					currentColumn = Math.Max (prevCount - 1, 0);
-				} else {
-					currentColumn = prevCount;
-				}
+				currentColumn = prevCount;
 				SetNeedsDisplay ();
 			}
 
