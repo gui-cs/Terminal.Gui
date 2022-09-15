@@ -4054,5 +4054,15 @@ e
 			Assert.Equal ("Third Line 界", splited [2]);
 			Assert.Equal ("", splited [^1]);
 		}
+
+		[Fact]
+		public void MaxWidthLine_With_And_Without_Newlines ()
+		{
+			var text = "Single Line 界";
+			Assert.Equal (14, TextFormatter.MaxWidthLine (text));
+
+			text = $"First Line 界\nSecond Line 界\nThird Line 界\n";
+			Assert.Equal (14, TextFormatter.MaxWidthLine (text));
+		}
 	}
 }
