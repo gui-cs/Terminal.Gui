@@ -3365,6 +3365,48 @@ e
 			Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void Draw_Fill_Remaining ()
+		{
+			var view = new View ("This view needs to be cleared before rewritten.");
+
+			var tf1 = new TextFormatter ();
+			tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
+			var tf1Size = tf1.Size;
+
+			var tf2 = new TextFormatter ();
+			tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
+			var tf2Size = tf2.Size;
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
+
+			tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This view needs to be cleared before rewritten.                        
+This TextFormatter (tf1) without fill will not be cleared on rewritten.
+This TextFormatter (tf2) with fill will be cleared on rewritten.       
+", output);
+
+			view.Text = "This view is rewritten.";
+			view.Redraw (view.Bounds);
+
+			tf1.Text = "This TextFormatter (tf1) is rewritten.";
+			tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
+
+			tf2.Text = "This TextFormatter (tf2) is rewritten.";
+			tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This view is rewritten.                                                
+This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
+This TextFormatter (tf2) is rewritten.                                 
+", output);
+		}
+
 		[Fact]
 		public void GetTextWidth_Simple_And_Wide_Runes ()
 		{

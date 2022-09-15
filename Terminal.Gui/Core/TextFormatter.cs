@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect)"/> is called.
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool)"/> is called.
 		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
 		/// </summary>
 		/// <remarks>
@@ -1159,7 +1159,8 @@ namespace Terminal.Gui {
 		/// <param name="normalColor">The color to use for all text except the hotkey</param>
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
 		/// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
-		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default)
+		/// <param name="fillRemaining">Determines if the bounds width will be used (default) or only the text width will be used.</param>
+		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (ustring.IsNullOrEmpty (text)) {
@@ -1262,7 +1263,7 @@ namespace Terminal.Gui {
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start;
 				var savedClip = Application.Driver?.Clip;
-				if (Application.Driver != null && containerBounds != default) {
+				if (Application.Driver != null) {
 					Application.Driver.Clip = containerBounds == default
 						? bounds
 						: new Rect (Math.Max (containerBounds.X, bounds.X),
@@ -1272,10 +1273,10 @@ namespace Terminal.Gui {
 				}
 
 				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
-					if (idx < 0) {
+					if (!fillRemaining && idx < 0) {
 						current++;
 						continue;
-					} else if (idx > runes.Length - 1) {
+					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
 					var rune = (Rune)' ';
@@ -1307,7 +1308,8 @@ namespace Terminal.Gui {
 					} else {
 						current += runeWidth;
 					}
-					if (!isVertical && idx + 1 < runes.Length && current + Rune.ColumnWidth (runes [idx + 1]) > start + size) {
+					var nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length ? Rune.ColumnWidth (runes [idx + 1]) : 0;
+					if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size) {
 						break;
 					}
 				}
