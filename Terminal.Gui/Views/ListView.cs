@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void SetSource (IList source)
 		{
-			if (source == null)
+			if (source == null && (Source == null || !(Source is ListWrapper)))
 				Source = null;
 			else {
 				Source = MakeWrapper (source);
@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		public Task SetSourceAsync (IList source)
 		{
 			return Task.Factory.StartNew (() => {
-				if (source == null)
+				if (source == null && (Source == null || !(Source is ListWrapper)))
 					Source = null;
 				else
 					Source = MakeWrapper (source);
@@ -827,7 +827,7 @@ namespace Terminal.Gui {
 
 		int GetMaxLengthItem ()
 		{
-			if (src?.Count == 0) {
+			if (src == null || src?.Count == 0) {
 				return 0;
 			}
 
@@ -883,7 +883,7 @@ namespace Terminal.Gui {
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
 			container.Move (col, line);
-			var t = src [item];
+			var t = src? [item];
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
