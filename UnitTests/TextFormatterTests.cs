@@ -1093,11 +1093,11 @@ namespace Terminal.Gui.Core {
 			text = "A sentence has words.";
 			// should fit
 			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Max (text.RuneCount, maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Throws<ArgumentOutOfRangeException> (() => ustring.Make (text.ToRunes () [0..expectedClippedWidth]));
 
 			// Should fit.
 			maxWidth = text.RuneCount + 0;
@@ -1205,7 +1205,6 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// see Justify_ tests below
-
 		}
 
 		[Fact]
@@ -1310,7 +1309,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "012++456+89";
 			forceToWidth = text.RuneCount + 1;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1322,7 +1321,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "012+++456++89";
 			forceToWidth = text.RuneCount + 3;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1334,7 +1333,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+++");
+			justifiedText = "012++++456+++89";
 			forceToWidth = text.RuneCount + 5;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1352,7 +1351,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++++++++++++");
+			justifiedText = "012+++++++++++++456++++++++++++89";
 			forceToWidth = text.RuneCount + 23;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1368,13 +1367,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "012++456+89+end";
 			forceToWidth = text.RuneCount + 1;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "012++456++89+end";
 			forceToWidth = text.RuneCount + 2;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1386,13 +1385,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "012+++456++89++end";
 			forceToWidth = text.RuneCount + 4;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "012+++456+++89++end";
 			forceToWidth = text.RuneCount + 5;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1404,13 +1403,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+++++++");
+			justifiedText = "012++++++++456++++++++89+++++++end";
 			forceToWidth = text.RuneCount + 20;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++++++++");
+			justifiedText = "012+++++++++456+++++++++89++++++++end";
 			forceToWidth = text.RuneCount + 23;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1427,7 +1426,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "Ð¿ÑÐ++Ð²Ð+Ñ";
 			forceToWidth = text.RuneCount + 1;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1439,7 +1438,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "Ð¿ÑÐ+++Ð²Ð++Ñ";
 			forceToWidth = text.RuneCount + 3;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1451,7 +1450,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+++");
+			justifiedText = "Ð¿ÑÐ++++Ð²Ð+++Ñ";
 			forceToWidth = text.RuneCount + 5;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1469,7 +1468,7 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++++++++++++");
+			justifiedText = "Ð¿ÑÐ+++++++++++++Ð²Ð++++++++++++Ñ";
 			forceToWidth = text.RuneCount + 23;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1486,13 +1485,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "Ð++ÑÐ+Ð²Ð+Ñ";
 			forceToWidth = text.RuneCount + 1;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+");
+			justifiedText = "Ð++ÑÐ++Ð²Ð+Ñ";
 			forceToWidth = text.RuneCount + 2;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1504,13 +1503,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "Ð+++ÑÐ++Ð²Ð++Ñ";
 			forceToWidth = text.RuneCount + 4;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++");
+			justifiedText = "Ð+++ÑÐ+++Ð²Ð++Ñ";
 			forceToWidth = text.RuneCount + 5;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -1522,13 +1521,13 @@ namespace Terminal.Gui.Core {
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "+++++++");
+			justifiedText = "Ð++++++++ÑÐ++++++++Ð²Ð+++++++Ñ";
 			forceToWidth = text.RuneCount + 20;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
 			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
 
-			justifiedText = text.Replace (" ", "++++++++");
+			justifiedText = "Ð+++++++++ÑÐ+++++++++Ð²Ð++++++++Ñ";
 			forceToWidth = text.RuneCount + 23;
 			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
 			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
@@ -2932,6 +2931,38 @@ namespace Terminal.Gui.Core {
 		{
 			var exception = Record.Exception (() => TextFormatter.Format ("Some text", 4, TextAlignment.Left, false, true));
 			Assert.Null (exception);
+		}
+
+
+
+		[Fact, AutoInitShutdown]
+		public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Horizontal ()
+		{
+			ustring text = "Hello world, how are you today? Pretty neat!";
+
+			Assert.Equal (44, text.RuneCount);
+
+			for (int i = 44; i < 80; i++) {
+				var fmtText = TextFormatter.Format (text, i, TextAlignment.Justified, false, true) [0];
+				Assert.Equal (i, fmtText.RuneCount);
+				var c = (char)fmtText [^1];
+				Assert.Equal ('!', c);
+			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Vertical ()
+		{
+			ustring text = "Hello world, how are you today? Pretty neat!";
+
+			Assert.Equal (44, text.RuneCount);
+
+			for (int i = 44; i < 80; i++) {
+				var fmtText = TextFormatter.Format (text, i, TextAlignment.Justified, false, true, 0, TextDirection.TopBottom_LeftRight) [0];
+				Assert.Equal (i, fmtText.RuneCount);
+				var c = (char)fmtText [^1];
+				Assert.Equal ('!', c);
+			}
 		}
 
 		[Fact]
