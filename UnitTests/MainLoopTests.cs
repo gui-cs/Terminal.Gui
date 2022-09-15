@@ -525,5 +525,63 @@ namespace Terminal.Gui.Core {
 		// - wait = false
 
 		// TODO: Add IMainLoop tests
+
+		volatile static int tbCounter = 0;
+
+		private static void Launch (Random r, TextField tf)
+		{
+			Task.Run (() => {
+				Thread.Sleep (r.Next (2, 4));
+				Application.MainLoop.Invoke (() => {
+					tf.Text = $"index{r.Next ()}";
+					Interlocked.Increment (ref tbCounter);
+				});
+			});
+		}
+
+		private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
+		{
+			for (int j = 0; j < numPasses; j++) {
+				for (var i = 0; i < numIncrements; i++) {
+					Launch (r, tf);
+				}
+
+				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
+				{
+					var tbNow = tbCounter;
+					Thread.Sleep (pollMs);
+					if (tbCounter == tbNow) {
+						// No change after sleep: Idle handlers added via Application.MainLoop.Invoke have gone missing
+						Application.MainLoop.Invoke (() => Application.RequestStop ());
+						throw new TimeoutException (
+							$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
+							$"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
+					}
+				};
+			}
+			Application.MainLoop.Invoke (() => Application.RequestStop ());
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public async Task InvokeLeakTest ()
+		{
+			Random r = new ();
+			TextField tf = new ();
+			Application.Top.Add (tf);
+
+			const int numPasses = 10;
+			const int numIncrements = 10000;
+			const int pollMs = 500;
+
+			var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
+
+			// blocks here until the RequestStop is processed at the end of the test
+			Application.Run ();
+
+			await task; // Propagate exception if any occurred
+
+			Assert.Equal ((numIncrements * numPasses), tbCounter);
+		}
 	}
 }
