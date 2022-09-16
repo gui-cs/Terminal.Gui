@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class FakeDriver
    ">
-    <meta name="generator" content="docfx 2.59.3.0">
+    <meta name="generator" content="docfx 2.59.4.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -98,6 +98,30 @@ Implements a mock ConsoleDriver for unit testing
     <h5>Inherited Members</h5>
     <div>
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_TerminalResized">ConsoleDriver.TerminalResized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakePrintable_System_Rune_">ConsoleDriver.MakePrintable(Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_IsValidContent_System_Int32_System_Int32_Terminal_Gui_Rect_">ConsoleDriver.IsValidContent(Int32, Int32, Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetTerminalResized_System_Action_">ConsoleDriver.SetTerminalResized(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowTitle_Terminal_Gui_Rect_NStack_ustring_System_Int32_System_Int32_System_Int32_System_Int32_Terminal_Gui_TextAlignment_">ConsoleDriver.DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics">ConsoleDriver.Diagnostics</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_Terminal_Gui_Border_">ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean, Border)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">ConsoleDriver.DrawFrame(Rect, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip">ConsoleDriver.Clip</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HLine">ConsoleDriver.HLine</a>
@@ -214,28 +238,25 @@ Implements a mock ConsoleDriver for unit testing
       <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LRRCorner">ConsoleDriver.LRRCorner</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakePrintable_System_Rune_">ConsoleDriver.MakePrintable(Rune)</a>
+      <span class="xref">System.Object.Equals(System.Object)</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_IsValidContent_System_Int32_System_Int32_Terminal_Gui_Rect_">ConsoleDriver.IsValidContent(Int32, Int32, Rect)</a>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetTerminalResized_System_Action_">ConsoleDriver.SetTerminalResized(Action)</a>
+      <span class="xref">System.Object.GetHashCode()</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowTitle_Terminal_Gui_Rect_NStack_ustring_System_Int32_System_Int32_System_Int32_System_Int32_Terminal_Gui_TextAlignment_">ConsoleDriver.DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)</a>
+      <span class="xref">System.Object.GetType()</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_Terminal_Gui_Border_">ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean, Border)</a>
+      <span class="xref">System.Object.MemberwiseClone()</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">ConsoleDriver.DrawFrame(Rect, Int32, Boolean)</a>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics">ConsoleDriver.Diagnostics</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip">ConsoleDriver.Clip</a>
+      <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
@@ -246,8 +267,13 @@ Implements a mock ConsoleDriver for unit testing
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.%23ctor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L60">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver__ctor_" data-uid="Terminal.Gui.FakeDriver.#ctor*"></a>
   <h4 id="Terminal_Gui_FakeDriver__ctor" data-uid="Terminal.Gui.FakeDriver.#ctor">FakeDriver()</h4>
   <div class="markdown level1 summary"></div>
@@ -258,8 +284,13 @@ Implements a mock ConsoleDriver for unit testing
   </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Clipboard.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Clipboard%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L29">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Clipboard_" data-uid="Terminal.Gui.FakeDriver.Clipboard*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Clipboard" data-uid="Terminal.Gui.FakeDriver.Clipboard">Clipboard</h4>
   <div class="markdown level1 summary"></div>
@@ -285,8 +316,13 @@ Implements a mock ConsoleDriver for unit testing
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clipboard">ConsoleDriver.Clipboard</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Cols.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Cols%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L23">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Cols_" data-uid="Terminal.Gui.FakeDriver.Cols*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Cols" data-uid="Terminal.Gui.FakeDriver.Cols">Cols</h4>
   <div class="markdown level1 summary"></div>
@@ -312,8 +348,13 @@ Implements a mock ConsoleDriver for unit testing
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols">ConsoleDriver.Cols</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Contents.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Contents%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L38">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Contents_" data-uid="Terminal.Gui.FakeDriver.Contents*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Contents" data-uid="Terminal.Gui.FakeDriver.Contents">Contents</h4>
   <div class="markdown level1 summary">
@@ -341,8 +382,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Contents">ConsoleDriver.Contents</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_HeightAsBuffer.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.HeightAsBuffer%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L28">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_HeightAsBuffer_" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer*"></a>
   <h4 id="Terminal_Gui_FakeDriver_HeightAsBuffer" data-uid="Terminal.Gui.FakeDriver.HeightAsBuffer">HeightAsBuffer</h4>
   <div class="markdown level1 summary"></div>
@@ -368,8 +414,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HeightAsBuffer">ConsoleDriver.HeightAsBuffer</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Left.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Left%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L26">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Left_" data-uid="Terminal.Gui.FakeDriver.Left*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Left" data-uid="Terminal.Gui.FakeDriver.Left">Left</h4>
   <div class="markdown level1 summary"></div>
@@ -395,8 +446,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Left">ConsoleDriver.Left</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Rows.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Rows%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L24">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Rows_" data-uid="Terminal.Gui.FakeDriver.Rows*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Rows" data-uid="Terminal.Gui.FakeDriver.Rows">Rows</h4>
   <div class="markdown level1 summary"></div>
@@ -422,8 +478,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Rows">ConsoleDriver.Rows</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Top.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Top%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L27">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Top_" data-uid="Terminal.Gui.FakeDriver.Top*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Top" data-uid="Terminal.Gui.FakeDriver.Top">Top</h4>
   <div class="markdown level1 summary"></div>
@@ -451,8 +512,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Top">ConsoleDriver.Top</a></div>
   <h3 id="methods">Methods
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_AddRune_System_Rune_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.AddRune(System.Rune)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L94">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_AddRune_" data-uid="Terminal.Gui.FakeDriver.AddRune*"></a>
   <h4 id="Terminal_Gui_FakeDriver_AddRune_System_Rune_" data-uid="Terminal.Gui.FakeDriver.AddRune(System.Rune)">AddRune(Rune)</h4>
   <div class="markdown level1 summary"></div>
@@ -480,8 +546,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_System_Rune_">ConsoleDriver.AddRune(Rune)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_AddStr_NStack_ustring_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.AddStr(NStack.ustring)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L148">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_AddStr_" data-uid="Terminal.Gui.FakeDriver.AddStr*"></a>
   <h4 id="Terminal_Gui_FakeDriver_AddStr_NStack_ustring_" data-uid="Terminal.Gui.FakeDriver.AddStr(NStack.ustring)">AddStr(ustring)</h4>
   <div class="markdown level1 summary"></div>
@@ -509,8 +580,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_NStack_ustring_">ConsoleDriver.AddStr(ustring)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_CookMouse.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.CookMouse%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L632">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_CookMouse_" data-uid="Terminal.Gui.FakeDriver.CookMouse*"></a>
   <h4 id="Terminal_Gui_FakeDriver_CookMouse" data-uid="Terminal.Gui.FakeDriver.CookMouse">CookMouse()</h4>
   <div class="markdown level1 summary"></div>
@@ -521,8 +597,13 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CookMouse">ConsoleDriver.CookMouse()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_End.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.End%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L154">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_End_" data-uid="Terminal.Gui.FakeDriver.End*"></a>
   <h4 id="Terminal_Gui_FakeDriver_End" data-uid="Terminal.Gui.FakeDriver.End">End()</h4>
   <div class="markdown level1 summary"></div>
@@ -533,13 +614,16 @@ Assists with testing, the format is rows, columns and 3 values on the last colum
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_End">ConsoleDriver.End()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_EnsureCursorVisibility.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.EnsureCursorVisibility%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L465">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_EnsureCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility*"></a>
   <h4 id="Terminal_Gui_FakeDriver_EnsureCursorVisibility" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility">EnsureCursorVisibility()</h4>
-  <div class="markdown level1 summary">
-Ensure the cursor visibility
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -556,14 +640,19 @@ Ensure the cursor visibility
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td>true upon success</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_EnsureCursorVisibility">ConsoleDriver.EnsureCursorVisibility()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_GetAttribute.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.GetAttribute%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L442">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_GetAttribute_" data-uid="Terminal.Gui.FakeDriver.GetAttribute*"></a>
   <h4 id="Terminal_Gui_FakeDriver_GetAttribute" data-uid="Terminal.Gui.FakeDriver.GetAttribute">GetAttribute()</h4>
   <div class="markdown level1 summary"></div>
@@ -589,8 +678,13 @@ Ensure the cursor visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetAttribute">ConsoleDriver.GetAttribute()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.GetColors(System.Int32%2CTerminal.Gui.Color%40%2CTerminal.Gui.Color%40)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L576">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_GetColors_" data-uid="Terminal.Gui.FakeDriver.GetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__" data-uid="Terminal.Gui.FakeDriver.GetColors(System.Int32,Terminal.Gui.Color@,Terminal.Gui.Color@)">GetColors(Int32, out Color, out Color)</h4>
   <div class="markdown level1 summary"></div>
@@ -643,13 +737,16 @@ Ensure the cursor visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetColors_System_Int32_Terminal_Gui_Color__Terminal_Gui_Color__">ConsoleDriver.GetColors(Int32, out Color, out Color)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility%40)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L448">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_GetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility*"></a>
   <h4 id="Terminal_Gui_FakeDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)">GetCursorVisibility(out CursorVisibility)</h4>
-  <div class="markdown level1 summary">
-Retreive the cursor caret visibility
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -668,7 +765,7 @@ Retreive the cursor caret visibility
       <tr>
         <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
         <td><span class="parametername">visibility</span></td>
-        <td>The current <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -683,14 +780,19 @@ Retreive the cursor caret visibility
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td>true upon success</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__">ConsoleDriver.GetCursorVisibility(out CursorVisibility)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Init_System_Action_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Init(System.Action)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L170">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Init_" data-uid="Terminal.Gui.FakeDriver.Init*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Init_System_Action_" data-uid="Terminal.Gui.FakeDriver.Init(System.Action)">Init(Action)</h4>
   <div class="markdown level1 summary"></div>
@@ -718,8 +820,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Init_System_Action_">ConsoleDriver.Init(Action)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color%2CTerminal.Gui.Color)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L225">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_MakeAttribute_" data-uid="Terminal.Gui.FakeDriver.MakeAttribute*"></a>
   <h4 id="Terminal_Gui_FakeDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)">MakeAttribute(Color, Color)</h4>
   <div class="markdown level1 summary"></div>
@@ -767,8 +874,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_">ConsoleDriver.MakeAttribute(Color, Color)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Move_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Move(System.Int32%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L78">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Move_" data-uid="Terminal.Gui.FakeDriver.Move*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Move_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.Move(System.Int32,System.Int32)">Move(Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -801,8 +913,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Move_System_Int32_System_Int32_">ConsoleDriver.Move(Int32, Int32)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop%2CSystem.Action%7BTerminal.Gui.KeyEvent%7D%2CSystem.Action%7BTerminal.Gui.KeyEvent%7D%2CSystem.Action%7BTerminal.Gui.KeyEvent%7D%2CSystem.Action%7BTerminal.Gui.MouseEvent%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L412">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_PrepareToRun_" data-uid="Terminal.Gui.FakeDriver.PrepareToRun*"></a>
   <h4 id="Terminal_Gui_FakeDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__" data-uid="Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})">PrepareToRun(MainLoop, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;MouseEvent&gt;)</h4>
   <div class="markdown level1 summary"></div>
@@ -850,8 +967,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__">ConsoleDriver.PrepareToRun(MainLoop, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;KeyEvent&gt;, Action&lt;MouseEvent&gt;)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Refresh.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Refresh%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L282">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Refresh_" data-uid="Terminal.Gui.FakeDriver.Refresh*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Refresh" data-uid="Terminal.Gui.FakeDriver.Refresh">Refresh()</h4>
   <div class="markdown level1 summary"></div>
@@ -862,8 +984,13 @@ Retreive the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh">ConsoleDriver.Refresh()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_ResizeScreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.ResizeScreen%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L526">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_ResizeScreen_" data-uid="Terminal.Gui.FakeDriver.ResizeScreen*"></a>
   <h4 id="Terminal_Gui_FakeDriver_ResizeScreen" data-uid="Terminal.Gui.FakeDriver.ResizeScreen">ResizeScreen()</h4>
   <div class="markdown level1 summary"></div>
@@ -874,8 +1001,13 @@ Retreive the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ResizeScreen">ConsoleDriver.ResizeScreen()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SendKeys(System.Char%2CSystem.ConsoleKey%2CSystem.Boolean%2CSystem.Boolean%2CSystem.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L478">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SendKeys_" data-uid="Terminal.Gui.FakeDriver.SendKeys*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)">SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
@@ -923,8 +1055,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_">ConsoleDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetAttribute_Terminal_Gui_Attribute_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L289">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetAttribute_" data-uid="Terminal.Gui.FakeDriver.SetAttribute*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetAttribute_Terminal_Gui_Attribute_" data-uid="Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)">SetAttribute(Attribute)</h4>
   <div class="markdown level1 summary"></div>
@@ -952,8 +1089,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">ConsoleDriver.SetAttribute(Attribute)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetBufferSize_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetBufferSize(System.Int32%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L483">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetBufferSize_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetBufferSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)">SetBufferSize(Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -984,8 +1126,13 @@ Retreive the cursor caret visibility
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetColors_System_ConsoleColor_System_ConsoleColor_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor%2CSystem.ConsoleColor)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L623">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetColors_" data-uid="Terminal.Gui.FakeDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetColors_System_ConsoleColor_System_ConsoleColor_" data-uid="Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor,System.ConsoleColor)">SetColors(ConsoleColor, ConsoleColor)</h4>
   <div class="markdown level1 summary"></div>
@@ -1018,8 +1165,13 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetColors_System_ConsoleColor_System_ConsoleColor_">ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetColors_System_Int16_System_Int16_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetColors(System.Int16%2CSystem.Int16)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L627">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetColors_" data-uid="Terminal.Gui.FakeDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetColors_System_Int16_System_Int16_" data-uid="Terminal.Gui.FakeDriver.SetColors(System.Int16,System.Int16)">SetColors(Int16, Int16)</h4>
   <div class="markdown level1 summary"></div>
@@ -1052,13 +1204,16 @@ Retreive the cursor caret visibility
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetColors_System_Int16_System_Int16_">ConsoleDriver.SetColors(Int16, Int16)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L458">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)">SetCursorVisibility(CursorVisibility)</h4>
-  <div class="markdown level1 summary">
-Change the cursor caret visibility
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1077,7 +1232,7 @@ Change the cursor caret visibility
       <tr>
         <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
         <td><span class="parametername">visibility</span></td>
-        <td>The wished <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1092,14 +1247,19 @@ Change the cursor caret visibility
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td>true upon success</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_">ConsoleDriver.SetCursorVisibility(CursorVisibility)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetWindowPosition_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L507">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetWindowPosition_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetWindowPosition_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)">SetWindowPosition(Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -1130,8 +1290,13 @@ Change the cursor caret visibility
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_SetWindowSize_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetWindowSize(System.Int32%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L494">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_SetWindowSize_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize*"></a>
   <h4 id="Terminal_Gui_FakeDriver_SetWindowSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)">SetWindowSize(Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -1162,8 +1327,13 @@ Change the cursor caret visibility
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_StartReportingMouseMoves.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.StartReportingMouseMoves%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L611">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_StartReportingMouseMoves_" data-uid="Terminal.Gui.FakeDriver.StartReportingMouseMoves*"></a>
   <h4 id="Terminal_Gui_FakeDriver_StartReportingMouseMoves" data-uid="Terminal.Gui.FakeDriver.StartReportingMouseMoves">StartReportingMouseMoves()</h4>
   <div class="markdown level1 summary"></div>
@@ -1174,8 +1344,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StartReportingMouseMoves">ConsoleDriver.StartReportingMouseMoves()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_StopReportingMouseMoves.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.StopReportingMouseMoves%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L615">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_StopReportingMouseMoves_" data-uid="Terminal.Gui.FakeDriver.StopReportingMouseMoves*"></a>
   <h4 id="Terminal_Gui_FakeDriver_StopReportingMouseMoves" data-uid="Terminal.Gui.FakeDriver.StopReportingMouseMoves">StopReportingMouseMoves()</h4>
   <div class="markdown level1 summary"></div>
@@ -1186,8 +1361,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StopReportingMouseMoves">ConsoleDriver.StopReportingMouseMoves()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_Suspend.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Suspend%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L619">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_Suspend_" data-uid="Terminal.Gui.FakeDriver.Suspend*"></a>
   <h4 id="Terminal_Gui_FakeDriver_Suspend" data-uid="Terminal.Gui.FakeDriver.Suspend">Suspend()</h4>
   <div class="markdown level1 summary"></div>
@@ -1198,8 +1378,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Suspend">ConsoleDriver.Suspend()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_UncookMouse.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UncookMouse%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L636">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_UncookMouse_" data-uid="Terminal.Gui.FakeDriver.UncookMouse*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UncookMouse" data-uid="Terminal.Gui.FakeDriver.UncookMouse">UncookMouse()</h4>
   <div class="markdown level1 summary"></div>
@@ -1210,8 +1395,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse">ConsoleDriver.UncookMouse()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_UpdateCursor.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UpdateCursor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L596">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_UpdateCursor_" data-uid="Terminal.Gui.FakeDriver.UpdateCursor*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UpdateCursor" data-uid="Terminal.Gui.FakeDriver.UpdateCursor">UpdateCursor()</h4>
   <div class="markdown level1 summary"></div>
@@ -1222,8 +1412,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateCursor">ConsoleDriver.UpdateCursor()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_UpdateOffScreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UpdateOffScreen%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L558">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_UpdateOffScreen_" data-uid="Terminal.Gui.FakeDriver.UpdateOffScreen*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UpdateOffScreen" data-uid="Terminal.Gui.FakeDriver.UpdateOffScreen">UpdateOffScreen()</h4>
   <div class="markdown level1 summary"></div>
@@ -1234,8 +1429,13 @@ Change the cursor caret visibility
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateOffScreen">ConsoleDriver.UpdateOffScreen()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver_UpdateScreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UpdateScreen%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L245">View Source</a>
+  </span>
   <a id="Terminal_Gui_FakeDriver_UpdateScreen_" data-uid="Terminal.Gui.FakeDriver.UpdateScreen*"></a>
   <h4 id="Terminal_Gui_FakeDriver_UpdateScreen" data-uid="Terminal.Gui.FakeDriver.UpdateScreen">UpdateScreen()</h4>
   <div class="markdown level1 summary"></div>
@@ -1253,6 +1453,12 @@ Change the cursor caret visibility
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_FakeDriver.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L20" class="contribution-link">View Source</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">

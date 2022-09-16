@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ToplevelComparer
    ">
-    <meta name="generator" content="docfx 2.59.3.0">
+    <meta name="generator" content="docfx 2.59.4.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -85,7 +85,7 @@
   <h1 id="Terminal_Gui_ToplevelComparer" data-uid="Terminal.Gui.ToplevelComparer" class="text-break">Class ToplevelComparer
   </h1>
   <div class="markdown level0 summary">
-Implements the <span class="xref">System.Collections.Generic.IComparer&lt;&gt;</span> to sort the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> 
+Implements the <span class="xref">System.Collections.Generic.IComparer&lt;T&gt;</span> to sort the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> 
 from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_MdiChildes">MdiChildes</a> if needed.
 </div>
   <div class="markdown level0 conceptual"></div>
@@ -98,28 +98,45 @@ from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Applic
     <h5>Implements</h5>
     <div><span class="xref">System.Collections.Generic.IComparer</span>&lt;<a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>&gt;</div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ToplevelComparer_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ToplevelComparer : Object</code></pre>
-  </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_ToplevelComparer__ctor_" data-uid="Terminal.Gui.ToplevelComparer.#ctor*"></a>
-  <h4 id="Terminal_Gui_ToplevelComparer__ctor" data-uid="Terminal.Gui.ToplevelComparer.#ctor">ToplevelComparer()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ToplevelComparer()</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ToplevelComparer : IComparer&lt;Toplevel&gt;</code></pre>
   </div>
   <h3 id="methods">Methods
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ToplevelComparer_Compare_Terminal_Gui_Toplevel_Terminal_Gui_Toplevel_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ToplevelComparer.Compare(Terminal.Gui.Toplevel%2CTerminal.Gui.Toplevel)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/Toplevel.cs/#L1025">View Source</a>
+  </span>
   <a id="Terminal_Gui_ToplevelComparer_Compare_" data-uid="Terminal.Gui.ToplevelComparer.Compare*"></a>
   <h4 id="Terminal_Gui_ToplevelComparer_Compare_Terminal_Gui_Toplevel_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.ToplevelComparer.Compare(Terminal.Gui.Toplevel,Terminal.Gui.Toplevel)">Compare(Toplevel, Toplevel)</h4>
   <div class="markdown level1 summary">Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</div>
@@ -170,7 +187,7 @@ from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Applic
   </table>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.Collections.Generic.IComparer&lt;&gt;</span>
+      <span class="xref">System.Collections.Generic.IComparer&lt;T&gt;</span>
   </div>
 </article>
           </div>
@@ -179,6 +196,12 @@ from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Applic
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ToplevelComparer.md&amp;value=---%0Auid%3A%20Terminal.Gui.ToplevelComparer%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/Toplevel.cs/#L1017" class="contribution-link">View Source</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
