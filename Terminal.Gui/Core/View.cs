@@ -1797,7 +1797,7 @@ namespace Terminal.Gui {
 		/// <param name="command"></param>
 		public void ClearKeybinding (Command command)
 		{
-			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);
 			}
 		}
@@ -2533,14 +2533,24 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.
+		/// </summary>
+		public bool ClearOnVisibleFalse { get; set; } = true;
+
 		/// <inheritdoc/>>
 		public override bool Visible {
 			get => base.Visible;
 			set {
 				if (base.Visible != value) {
 					base.Visible = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
+					if (!value) {
+						if (HasFocus) {
+							SetHasFocus (false, this);
+						}
+						if (ClearOnVisibleFalse) {
+							Clear ();
+						}
 					}
 					OnVisibleChanged ();
 					SetNeedsDisplay ();
