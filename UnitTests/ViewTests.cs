@@ -3832,5 +3832,65 @@ e
 └────────────────────────────┘
 ", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void ClearOnVisibleFalse_Gets_Sets ()
+		{
+			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+			var label = new Label (text);
+			Application.Top.Add (label);
+
+			var sbv = new ScrollBarView (label, true, false) {
+				Size = 100,
+				ClearOnVisibleFalse = false
+			};
+			Application.Begin (Application.Top);
+
+			Assert.True (sbv.Visible);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is a tes▲
+This is a tes┬
+This is a tes┴
+This is a tes░
+This is a tes░
+This is a tes▼
+", output);
+
+			sbv.Visible = false;
+			Assert.False (sbv.Visible);
+			Application.Top.Redraw (Application.Top.Bounds);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is a test
+This is a test
+This is a test
+This is a test
+This is a test
+This is a test
+", output);
+
+			sbv.Visible = true;
+			Assert.True (sbv.Visible);
+			Application.Top.Redraw (Application.Top.Bounds);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is a tes▲
+This is a tes┬
+This is a tes┴
+This is a tes░
+This is a tes░
+This is a tes▼
+", output);
+
+			sbv.ClearOnVisibleFalse = true;
+			sbv.Visible = false;
+			Assert.False (sbv.Visible);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is a tes
+This is a tes
+This is a tes
+This is a tes
+This is a tes
+This is a tes
+", output);
+		}
 	}
 }
