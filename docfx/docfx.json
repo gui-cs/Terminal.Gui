@@ -4,13 +4,13 @@
       "src": [
         {
           "files": [
-            "Terminal.Gui.dll"
+            "Terminal.Gui.csproj"
           ],
           "exclude": [
             "**/obj/**",
             "_site/**"
           ],
-          "src": "../Terminal.Gui/bin/Release/net6.0"
+          "src": "../Terminal.Gui"
         }
       ],
       "dest": "api/Terminal.Gui",
@@ -23,13 +23,13 @@
       "src": [
         {
           "files": [
-            "UICatalog.dll"
+            "UICatalog.csproj"
           ],
           "exclude": [
             "**/obj/**",
             "_site/**"
           ],
-          "src": "../UICatalog/bin/Release/net6.0"
+          "src": "../UICatalog"
         }
       ],
       "dest": "api/UICatalog",

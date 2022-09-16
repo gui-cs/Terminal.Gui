@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Toplevel
    ">
-    <meta name="generator" content="docfx 2.59.3.0">
+    <meta name="generator" content="docfx 2.59.4.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -120,8 +120,8 @@ for pop-up views such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog<
 <p>
   Toplevels can also opt-in to more sophisticated initialization
   by implementing <span class="xref">System.ComponentModel.ISupportInitialize</span>. When they do
-  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit</span> and
-<span class="xref">System.ComponentModel.ISupportInitialize.EndInit</span> methods will be called
+  so, the <span class="xref">System.ComponentModel.ISupportInitialize.BeginInit()</span> and
+<span class="xref">System.ComponentModel.ISupportInitialize.EndInit()</span> methods will be called
 before running the view.
 If first-run-only initialization is preferred, the <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
 can be implemented too, in which case the <span class="xref">System.ComponentModel.ISupportInitialize</span>
@@ -134,211 +134,37 @@ instead of on every run.
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__">View.GetMinWidthHeight(Size)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight">View.SetMinWidthHeight()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText">View.UpdateTextFormatterText()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView">View.ProcessResizeView()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize">View.GetAutoSize()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_">View.GetHotKeySpecifierLength(Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize">View.GetTextFormatterBoundsSize()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize">View.GetBoundsTextFormatterSize()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">View.HotKey</a>
@@ -410,13 +236,91 @@ instead of on every run.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ForceValidatePosDim">View.ForceValidatePosDim</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetMinWidthHeight_Terminal_Gui_Size__">View.GetMinWidthHeight(Size)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetMinWidthHeight">View.SetMinWidthHeight()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextFormatter">View.TextFormatter</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">View.SuperView</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_UpdateTextFormatterText">View.UpdateTextFormatterText()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessResizeView">View.ProcessResizeView()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewToFront_Terminal_Gui_View_">View.BringSubviewToFront(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewToBack_Terminal_Gui_View_">View.SendSubviewToBack(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SendSubviewBackwards_Terminal_Gui_View_">View.SendSubviewBackwards(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BringSubviewForward_Terminal_Gui_View_">View.BringSubviewForward(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear">View.Clear()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_">View.Clear(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_">View.ScreenToView(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds">View.ClipToBounds()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_">View.SetClip(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(ustring, Boolean, ColorScheme)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_System_Boolean_">View.Move(Int32, Int32, Boolean)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_">View.OnAdded(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Focused">View.Focused</a>
@@ -426,6 +330,96 @@ instead of on every run.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContentComplete_Terminal_Gui_Rect_">View.OnDrawContentComplete(Rect)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command___">View.AddKeyBinding(Key, Command[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ContainsKeyBinding_Terminal_Gui_Key_">View.ContainsKeyBinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybindings">View.ClearKeybindings()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command___">View.ClearKeybinding(Command[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command___">View.GetKeyFromCommand(Command[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus">View.EnsureFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst">View.FocusFirst()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusLast">View.FocusLast()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusPrev">View.FocusPrev()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted">View.LayoutStarted</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Initialized">View.Initialized</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a>
@@ -461,76 +455,105 @@ instead of on every run.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Border">View.Border</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">View.Removed</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetAutoSize">View.GetAutoSize()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Enter">View.Enter</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetHotKeySpecifierLength_System_Boolean_">View.GetHotKeySpecifierLength(Boolean)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Leave">View.Leave</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTextFormatterBoundsSize">View.GetTextFormatterBoundsSize()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">View.MouseEnter</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetBoundsTextFormatterSize">View.GetBoundsTextFormatterSize()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocusChanged">View.CanFocusChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EnabledChanged">View.EnabledChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VisibleChanged">View.VisibleChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnCanFocusChanged">View.OnCanFocusChanged()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">View.HotKeyChanged</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnabledChanged">View.OnEnabledChanged()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnVisibleChanged">View.OnVisibleChanged()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContentComplete">View.DrawContentComplete</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BeginInit">View.BeginInit()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyUp">View.KeyUp</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted">View.LayoutStarted</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Initialized">View.Initialized</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetNormalColor">View.GetNormalColor()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetTopSuperView">View.GetTopSuperView()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Toplevel_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Toplevel : View</code></pre>
+    <pre><code class="lang-csharp hljs">public class Toplevel : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.%23ctor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L212">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel__ctor_" data-uid="Terminal.Gui.Toplevel.#ctor*"></a>
   <h4 id="Terminal_Gui_Toplevel__ctor" data-uid="Terminal.Gui.Toplevel.#ctor">Toplevel()</h4>
   <div class="markdown level1 summary">
@@ -542,8 +565,13 @@ defaulting to full screen.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Toplevel()</code></pre>
   </div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel__ctor_Terminal_Gui_Rect_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.%23ctor(Terminal.Gui.Rect)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L203">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel__ctor_" data-uid="Terminal.Gui.Toplevel.#ctor*"></a>
   <h4 id="Terminal_Gui_Toplevel__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)">Toplevel(Rect)</h4>
   <div class="markdown level1 summary">
@@ -573,8 +601,13 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.ht
   </table>
   <h3 id="properties">Properties
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_CanFocus.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.CanFocus%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L316">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_CanFocus_" data-uid="Terminal.Gui.Toplevel.CanFocus*"></a>
   <h4 id="Terminal_Gui_Toplevel_CanFocus" data-uid="Terminal.Gui.Toplevel.CanFocus">CanFocus</h4>
   <div class="markdown level1 summary">
@@ -602,8 +635,13 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_CanFocus">View.CanFocus</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_IsMdiChild.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.IsMdiChild%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L364">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_IsMdiChild_" data-uid="Terminal.Gui.Toplevel.IsMdiChild*"></a>
   <h4 id="Terminal_Gui_Toplevel_IsMdiChild" data-uid="Terminal.Gui.Toplevel.IsMdiChild">IsMdiChild</h4>
   <div class="markdown level1 summary">
@@ -629,8 +667,13 @@ Gets or sets if this Toplevel is a Mdi child.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_IsMdiContainer.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.IsMdiContainer%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L359">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_IsMdiContainer_" data-uid="Terminal.Gui.Toplevel.IsMdiContainer*"></a>
   <h4 id="Terminal_Gui_Toplevel_IsMdiContainer" data-uid="Terminal.Gui.Toplevel.IsMdiContainer">IsMdiContainer</h4>
   <div class="markdown level1 summary">
@@ -656,8 +699,13 @@ Gets or sets if this Toplevel is a Mdi container.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_MenuBar.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.MenuBar%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L349">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_MenuBar_" data-uid="Terminal.Gui.Toplevel.MenuBar*"></a>
   <h4 id="Terminal_Gui_Toplevel_MenuBar" data-uid="Terminal.Gui.Toplevel.MenuBar">MenuBar</h4>
   <div class="markdown level1 summary">
@@ -683,8 +731,13 @@ Gets or sets the menu for this Toplevel.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Modal.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Modal%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L344">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Modal_" data-uid="Terminal.Gui.Toplevel.Modal*"></a>
   <h4 id="Terminal_Gui_Toplevel_Modal" data-uid="Terminal.Gui.Toplevel.Modal">Modal</h4>
   <div class="markdown level1 summary">
@@ -717,8 +770,13 @@ If set to <code>true</code>:
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Running.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Running%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L44">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Running_" data-uid="Terminal.Gui.Toplevel.Running*"></a>
   <h4 id="Terminal_Gui_Toplevel_Running" data-uid="Terminal.Gui.Toplevel.Running">Running</h4>
   <div class="markdown level1 summary">
@@ -744,8 +802,13 @@ Gets or sets whether the <a class="xref" href="Terminal.Gui.MainLoop.html">MainL
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_StatusBar.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.StatusBar%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L354">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_StatusBar_" data-uid="Terminal.Gui.Toplevel.StatusBar*"></a>
   <h4 id="Terminal_Gui_Toplevel_StatusBar" data-uid="Terminal.Gui.Toplevel.StatusBar">StatusBar</h4>
   <div class="markdown level1 summary">
@@ -773,13 +836,16 @@ Gets or sets the status bar for this Toplevel.
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Add_Terminal_Gui_View_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Add(Terminal.Gui.View)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L553">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Add_" data-uid="Terminal.Gui.Toplevel.Add*"></a>
   <h4 id="Terminal_Gui_Toplevel_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Add(Terminal.Gui.View)">Add(View)</h4>
-  <div class="markdown level1 summary">
-Adds a subview (child) to this view.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -804,8 +870,13 @@ Adds a subview (child) to this view.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Create.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Create%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L307">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Create_" data-uid="Terminal.Gui.Toplevel.Create*"></a>
   <h4 id="Terminal_Gui_Toplevel_Create" data-uid="Terminal.Gui.Toplevel.Create">Create()</h4>
   <div class="markdown level1 summary">
@@ -831,8 +902,13 @@ Convenience factory method that creates a new Toplevel with the current terminal
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_GetTopMdiChild_System_Type_System_String___.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.GetTopMdiChild(System.Type%2CSystem.String%5B%5D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L940">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_GetTopMdiChild_" data-uid="Terminal.Gui.Toplevel.GetTopMdiChild*"></a>
   <h4 id="Terminal_Gui_Toplevel_GetTopMdiChild_System_Type_System_String___" data-uid="Terminal.Gui.Toplevel.GetTopMdiChild(System.Type,System.String[])">GetTopMdiChild(Type, String[])</h4>
   <div class="markdown level1 summary">
@@ -880,13 +956,16 @@ Gets the current visible Toplevel Mdi child that matches the arguments pattern.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_MouseEvent_Terminal_Gui_MouseEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.MouseEvent(Terminal.Gui.MouseEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L772">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_MouseEvent_" data-uid="Terminal.Gui.Toplevel.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Toplevel_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Toplevel.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a mouse event is generated
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -905,7 +984,7 @@ Method invoked when a mouse event is generated
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
         <td><span class="parametername">mouseEvent</span></td>
-        <td>Contains the details about the mouse event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -920,14 +999,19 @@ Method invoked when a mouse event is generated
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_MoveNext.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.MoveNext%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L853">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_MoveNext_" data-uid="Terminal.Gui.Toplevel.MoveNext*"></a>
   <h4 id="Terminal_Gui_Toplevel_MoveNext" data-uid="Terminal.Gui.Toplevel.MoveNext">MoveNext()</h4>
   <div class="markdown level1 summary">
@@ -938,8 +1022,13 @@ Move to the next Mdi child from the <a class="xref" href="Terminal.Gui.Applicati
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void MoveNext()</code></pre>
   </div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_MovePrevious.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.MovePrevious%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L861">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_MovePrevious_" data-uid="Terminal.Gui.Toplevel.MovePrevious*"></a>
   <h4 id="Terminal_Gui_Toplevel_MovePrevious" data-uid="Terminal.Gui.Toplevel.MovePrevious">MovePrevious()</h4>
   <div class="markdown level1 summary">
@@ -950,8 +1039,13 @@ Move to the previous Mdi child from the <a class="xref" href="Terminal.Gui.Appli
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void MovePrevious()</code></pre>
   </div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnAlternateBackwardKeyChanged(Terminal.Gui.Key)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L282">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnAlternateBackwardKeyChanged*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnAlternateBackwardKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnAlternateBackwardKeyChanged(Terminal.Gui.Key)">OnAlternateBackwardKeyChanged(Key)</h4>
   <div class="markdown level1 summary">
@@ -979,8 +1073,13 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnAlternateForwardKeyChanged(Terminal.Gui.Key)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L267">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnAlternateForwardKeyChanged*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnAlternateForwardKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnAlternateForwardKeyChanged(Terminal.Gui.Key)">OnAlternateForwardKeyChanged(Key)</h4>
   <div class="markdown level1 summary">
@@ -1008,13 +1107,16 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L371">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnKeyDown_" data-uid="Terminal.Gui.Toplevel.OnKeyDown*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)">OnKeyDown(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a key is pressed.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1033,7 +1135,7 @@ Method invoked when a key is pressed.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1048,19 +1150,22 @@ Method invoked when a key is pressed.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td>true if the event was handled</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyDown_Terminal_Gui_KeyEvent_">View.OnKeyDown(KeyEvent)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L389">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnKeyUp_" data-uid="Terminal.Gui.Toplevel.OnKeyUp*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)">OnKeyUp(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a key is released.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1079,7 +1184,7 @@ Method invoked when a key is released.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1094,14 +1199,19 @@ Method invoked when a key is released.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td>true if the event was handled</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnLoaded.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnLoaded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L168">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnLoaded_" data-uid="Terminal.Gui.Toplevel.OnLoaded*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnLoaded" data-uid="Terminal.Gui.Toplevel.OnLoaded">OnLoaded()</h4>
   <div class="markdown level1 summary">
@@ -1112,8 +1222,13 @@ Called from <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_App
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void OnLoaded()</code></pre>
   </div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.OnQuitKeyChanged(Terminal.Gui.Key)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L297">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_OnQuitKeyChanged_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged*"></a>
   <h4 id="Terminal_Gui_Toplevel_OnQuitKeyChanged_Terminal_Gui_Key_" data-uid="Terminal.Gui.Toplevel.OnQuitKeyChanged(Terminal.Gui.Key)">OnQuitKeyChanged(Key)</h4>
   <div class="markdown level1 summary">
@@ -1141,13 +1256,16 @@ Virtual method to invoke the <a class="xref" href="Terminal.Gui.Toplevel.html#Te
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_PositionCursor.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.PositionCursor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L916">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_PositionCursor_" data-uid="Terminal.Gui.Toplevel.PositionCursor*"></a>
   <h4 id="Terminal_Gui_Toplevel_PositionCursor" data-uid="Terminal.Gui.Toplevel.PositionCursor">PositionCursor()</h4>
-  <div class="markdown level1 summary">
-Positions the cursor in the right position based on the currently focused view in the chain.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1155,8 +1273,13 @@ Positions the cursor in the right position based on the currently focused view i
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_PositionToplevel_Terminal_Gui_Toplevel_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.PositionToplevel(Terminal.Gui.Toplevel)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L684">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_PositionToplevel_" data-uid="Terminal.Gui.Toplevel.PositionToplevel*"></a>
   <h4 id="Terminal_Gui_Toplevel_PositionToplevel_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.PositionToplevel(Terminal.Gui.Toplevel)">PositionToplevel(Toplevel)</h4>
   <div class="markdown level1 summary">
@@ -1184,16 +1307,16 @@ Virtual method enabling implementation of specific positions for inherited <a cl
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L495">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_ProcessColdKey_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-This method can be overwritten by views that
-want to provide accelerator functionality
-(Alt-key for example), but without
-interefering with normal ProcessKey behavior.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1212,7 +1335,7 @@ interefering with normal ProcessKey behavior.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1233,14 +1356,16 @@ interefering with normal ProcessKey behavior.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L409">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_ProcessKey_" data-uid="Terminal.Gui.Toplevel.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-If the view is focused, gives the view a
-chance to process the keystroke.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1259,7 +1384,7 @@ chance to process the keystroke.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1280,13 +1405,16 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L716">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Redraw_" data-uid="Terminal.Gui.Toplevel.Redraw*"></a>
   <h4 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary">
-Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1305,19 +1433,22 @@ Redraws this view and its subviews; only redraws the views that have been flagge
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td>The bounds (view-relative region) to redraw.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Remove(Terminal.Gui.View)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L570">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_Remove_" data-uid="Terminal.Gui.Toplevel.Remove*"></a>
   <h4 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Remove(Terminal.Gui.View)">Remove(View)</h4>
-  <div class="markdown level1 summary">
-Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1342,13 +1473,16 @@ Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Termina
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_RemoveAll.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.RemoveAll%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L579">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_RemoveAll_" data-uid="Terminal.Gui.Toplevel.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Toplevel_RemoveAll" data-uid="Terminal.Gui.Toplevel.RemoveAll">RemoveAll()</h4>
-  <div class="markdown level1 summary">
-Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1356,8 +1490,13 @@ Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.Vie
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">View.RemoveAll()</a></div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_RequestStop.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.RequestStop%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L870">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_RequestStop_" data-uid="Terminal.Gui.Toplevel.RequestStop*"></a>
   <h4 id="Terminal_Gui_Toplevel_RequestStop" data-uid="Terminal.Gui.Toplevel.RequestStop">RequestStop()</h4>
   <div class="markdown level1 summary">
@@ -1369,8 +1508,13 @@ Stops and closes this <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void RequestStop()</code></pre>
   </div>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_RequestStop_Terminal_Gui_Toplevel_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.RequestStop(Terminal.Gui.Toplevel)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L910">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_RequestStop_" data-uid="Terminal.Gui.Toplevel.RequestStop*"></a>
   <h4 id="Terminal_Gui_Toplevel_RequestStop_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.RequestStop(Terminal.Gui.Toplevel)">RequestStop(Toplevel)</h4>
   <div class="markdown level1 summary">
@@ -1399,8 +1543,13 @@ Stops and closes the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel<
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ShowChild_Terminal_Gui_Toplevel_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ShowChild(Terminal.Gui.Toplevel)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L964">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_ShowChild_" data-uid="Terminal.Gui.Toplevel.ShowChild*"></a>
   <h4 id="Terminal_Gui_Toplevel_ShowChild_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Toplevel.ShowChild(Terminal.Gui.Toplevel)">ShowChild(Toplevel)</h4>
   <div class="markdown level1 summary">
@@ -1443,8 +1592,13 @@ Shows the Mdi child indicated by <code data-dev-comment-type="paramref" class="p
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_WillPresent.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.WillPresent%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L845">View Source</a>
+  </span>
   <a id="Terminal_Gui_Toplevel_WillPresent_" data-uid="Terminal.Gui.Toplevel.WillPresent*"></a>
   <h4 id="Terminal_Gui_Toplevel_WillPresent" data-uid="Terminal.Gui.Toplevel.WillPresent">WillPresent()</h4>
   <div class="markdown level1 summary">
@@ -1458,8 +1612,13 @@ after the views have been laid out, and before the views are drawn for the first
   </div>
   <h3 id="events">Events
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Activate.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Activate%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L71">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Activate" data-uid="Terminal.Gui.Toplevel.Activate">Activate</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> becomes the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a> Toplevel.
@@ -1484,8 +1643,13 @@ Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunStat
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_AllChildClosed.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.AllChildClosed%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L88">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_AllChildClosed" data-uid="Terminal.Gui.Toplevel.AllChildClosed">AllChildClosed</h4>
   <div class="markdown level1 summary">
 Invoked when the last child of the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed from 
@@ -1511,8 +1675,13 @@ by <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_AlternateBackwardKeyChanged.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.AlternateBackwardKeyChanged%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L276">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_AlternateBackwardKeyChanged" data-uid="Terminal.Gui.Toplevel.AlternateBackwardKeyChanged">AlternateBackwardKeyChanged</h4>
   <div class="markdown level1 summary">
 Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_AlternateBackwardKey">AlternateBackwardKey</a> is changed.
@@ -1537,8 +1706,13 @@ Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gu
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_AlternateForwardKeyChanged.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.AlternateForwardKeyChanged%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L261">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_AlternateForwardKeyChanged" data-uid="Terminal.Gui.Toplevel.AlternateForwardKeyChanged">AlternateForwardKeyChanged</h4>
   <div class="markdown level1 summary">
 Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_AlternateForwardKey">AlternateForwardKey</a> is changed.
@@ -1563,8 +1737,13 @@ Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gu
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ChildClosed.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ChildClosed%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L82">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_ChildClosed" data-uid="Terminal.Gui.Toplevel.ChildClosed">ChildClosed</h4>
   <div class="markdown level1 summary">
 Invoked when a child of the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed by  
@@ -1590,8 +1769,13 @@ Invoked when a child of the Toplevel <a class="xref" href="Terminal.Gui.Applicat
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ChildLoaded.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ChildLoaded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L104">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_ChildLoaded" data-uid="Terminal.Gui.Toplevel.ChildLoaded">ChildLoaded</h4>
   <div class="markdown level1 summary">
 Invoked when a child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been loaded.
@@ -1616,8 +1800,13 @@ Invoked when a child Toplevel&apos;s <a class="xref" href="Terminal.Gui.Applicat
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_ChildUnloaded.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.ChildUnloaded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L109">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_ChildUnloaded" data-uid="Terminal.Gui.Toplevel.ChildUnloaded">ChildUnloaded</h4>
   <div class="markdown level1 summary">
 Invoked when a cjhild Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been unloaded.
@@ -1642,8 +1831,13 @@ Invoked when a cjhild Toplevel&apos;s <a class="xref" href="Terminal.Gui.Applica
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Closed.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Closed%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L99">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Closed" data-uid="Terminal.Gui.Toplevel.Closed">Closed</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is closed by <span class="xref">Terminal.Gui.Application.End(Terminal.Gui.View)</span>.
@@ -1668,8 +1862,13 @@ Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Closing.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Closing%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L94">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Closing" data-uid="Terminal.Gui.Toplevel.Closing">Closing</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> is being closed by  
@@ -1695,8 +1894,13 @@ Invoked when the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Deactivate.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Deactivate%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L76">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Deactivate" data-uid="Terminal.Gui.Toplevel.Deactivate">Deactivate</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel<a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> ceases to be the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Current">Current</a> Toplevel.
@@ -1721,8 +1925,13 @@ Invoked when the Toplevel<a class="xref" href="Terminal.Gui.Application.RunState
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Loaded.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Loaded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L51">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Loaded" data-uid="Terminal.Gui.Toplevel.Loaded">Loaded</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin loaded.
@@ -1749,8 +1958,13 @@ A Loaded event handler is a good place to finalize initialization before calling
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_QuitKeyChanged.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.QuitKeyChanged%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L291">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_QuitKeyChanged" data-uid="Terminal.Gui.Toplevel.QuitKeyChanged">QuitKeyChanged</h4>
   <div class="markdown level1 summary">
 Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_QuitKey">QuitKey</a> is changed.
@@ -1775,8 +1989,13 @@ Invoked when the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gu
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Ready.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Ready%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L60">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
@@ -1805,8 +2024,13 @@ changes.
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Resized.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Resized%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L114">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Resized" data-uid="Terminal.Gui.Toplevel.Resized">Resized</h4>
   <div class="markdown level1 summary">
 Invoked when the terminal has been resized. The new <a class="xref" href="Terminal.Gui.Size.html">Size</a> of the terminal is provided.
@@ -1831,8 +2055,13 @@ Invoked when the terminal has been resized. The new <a class="xref" href="Termin
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel_Unloaded.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel.Unloaded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L66">View Source</a>
+  </span>
   <h4 id="Terminal_Gui_Toplevel_Unloaded" data-uid="Terminal.Gui.Toplevel.Unloaded">Unloaded</h4>
   <div class="markdown level1 summary">
 Invoked when the Toplevel <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has been unloaded.
@@ -1875,6 +2104,12 @@ A Unloaded event handler is a good place to dispose objects after calling <a cla
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Toplevel.md&amp;value=---%0Auid%3A%20Terminal.Gui.Toplevel%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Toplevel.cs/#L37" class="contribution-link">View Source</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
