@@ -94,7 +94,7 @@
       "_gitContribute": {
         "repo": "https://github.com/gui-cs/Terminal.Gui",
         "branch": "develop",
-        "apiSpecFolder": "apidoc"
+        "apiSpecFolder": "docfx/overrides"
       },
       "_gitUrlPattern": "github"
     },
