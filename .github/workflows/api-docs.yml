@@ -1,12 +1,18 @@
+name: Build and publish API docs
+
+on:
+  push:
+    branches: [main]
+
 jobs:
-  build-publish-api-docs:
+  build:
     runs-on: ubuntu-latest
-    name: Build and publish API docs
+
     steps:
     - uses: actions/checkout@v1
     # ...
-    - uses: nikeee/docfx-action@v1.0.0
-      name: Build API Documentation
+    - name: Use docfx to build API Docs
+      uses: nikeee/docfx-action@v1.0.0
       with:
         args: docfx/docfx.json
 
