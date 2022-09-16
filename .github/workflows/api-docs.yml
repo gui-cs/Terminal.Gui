@@ -29,7 +29,7 @@ jobs:
       working-directory: docfx
       # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
-        del ../docs /F /S
+        rm ../docs -Recurse -Force
         docfx docfx.json
       continue-on-error: false      
 
