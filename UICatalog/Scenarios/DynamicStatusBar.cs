@@ -383,6 +383,7 @@ namespace UICatalog.Scenarios {
 				Add (_lblAction);
 
 				_txtAction = new TextView () {
+					ColorScheme = Colors.Dialog,
 					X = Pos.Left (_txtTitle),
 					Y = Pos.Top (_lblAction),
 					Width = Dim.Fill (),

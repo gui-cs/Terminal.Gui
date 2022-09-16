@@ -90,6 +90,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = Dim.Fill (),
 				Height = 5,
+				ColorScheme = Colors.Dialog,
 			};
 			frame.Add (messageEdit);
 

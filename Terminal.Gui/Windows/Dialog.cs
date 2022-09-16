@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 			switch (ButtonAlignment) {
 			case ButtonAlignments.Center:
 				// Center Buttons
-				shiftLeft = (Bounds.Width - buttonsWidth - buttons.Count - 2) / 2 + 1;
+				shiftLeft = Math.Max ((Bounds.Width - buttonsWidth - buttons.Count - 2) / 2 + 1, 0);
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					shiftLeft += button.Frame.Width + (i == buttons.Count - 1 ? 0 : 1);
@@ -231,5 +231,6 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
+
 	}
 }

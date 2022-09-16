@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool)"/> is called.
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect)"/> is called.
 		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
 		/// </summary>
 		/// <remarks>
@@ -417,50 +417,6 @@ namespace Terminal.Gui {
 			return ustring.Make (runes);
 		}
 
-		/// <summary>
-		/// Splits all newlines in the <paramref name="text"/> into a list
-		/// and supports both CRLF and LF, preserving the ending newline.
-		/// </summary>
-		/// <param name="text">The text.</param>
-		/// <returns>A list of text without the newline characters.</returns>
-		public static List<ustring> SplitNewLine (ustring text)
-		{
-			var runes = text.ToRuneList ();
-			var lines = new List<ustring> ();
-			var start = 0;
-			var end = 0;
-
-			for (int i = 0; i < runes.Count; i++) {
-				end = i;
-				switch (runes [i]) {
-				case '\n':
-					lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-					i++;
-					start = i;
-					break;
-
-				case '\r':
-					if ((i + 1) < runes.Count && runes [i + 1] == '\n') {
-						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-						i += 2;
-						start = i;
-					} else {
-						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-						i++;
-						start = i;
-					}
-					break;
-				}
-			}
-			if (runes.Count > 0 && lines.Count == 0) {
-				lines.Add (ustring.Make (runes));
-			} else if (runes.Count > 0 && start < runes.Count) {
-				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)));
-			} else {
-				lines.Add (ustring.Make (""));
-			}
-			return lines;
-		}
 
 		/// <summary>
 		/// Adds trailing whitespace or truncates <paramref name="text"/>
@@ -693,7 +649,7 @@ namespace Terminal.Gui {
 				textCount = words.Sum (arg => arg.RuneCount);
 			}
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
-			var extras = words.Length > 1 ? (width - textCount) % (words.Length - 1) : 0;
+			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
 
 			var s = new System.Text.StringBuilder ();
 			for (int w = 0; w < words.Length; w++) {
@@ -703,13 +659,7 @@ namespace Terminal.Gui {
 					for (int i = 0; i < spaces; i++)
 						s.Append (spaceChar);
 				if (extras > 0) {
-					for (int i = 0; i < 1; i++)
-						s.Append (spaceChar);
 					extras--;
-				}
-				if (w + 1 == words.Length - 1) {
-					for (int i = 0; i < extras; i++)
-						s.Append (spaceChar);
 				}
 			}
 			return ustring.Make (s.ToString ());
@@ -839,18 +789,6 @@ namespace Terminal.Gui {
 				}
 			});
 			return max;
-		}
-
-		/// <summary>
-		/// Determines the line with the highest width in the 
-		/// <paramref name="text"/> if it contains newlines.
-		/// </summary>
-		/// <param name="text">Text, may contain newlines.</param>
-		/// <returns>The highest line width.</returns>
-		public static int MaxWidthLine (ustring text)
-		{
-			var result = TextFormatter.SplitNewLine (text);
-			return result.Max (x => x.ConsoleWidth);
 		}
 
 		/// <summary>
@@ -1159,8 +1097,7 @@ namespace Terminal.Gui {
 		/// <param name="normalColor">The color to use for all text except the hotkey</param>
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
 		/// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
-		/// <param name="fillRemaining">Determines if the bounds width will be used (default) or only the text width will be used.</param>
-		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true)
+		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (ustring.IsNullOrEmpty (text)) {
@@ -1263,7 +1200,7 @@ namespace Terminal.Gui {
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start;
 				var savedClip = Application.Driver?.Clip;
-				if (Application.Driver != null) {
+				if (Application.Driver != null && containerBounds != default) {
 					Application.Driver.Clip = containerBounds == default
 						? bounds
 						: new Rect (Math.Max (containerBounds.X, bounds.X),
@@ -1273,10 +1210,10 @@ namespace Terminal.Gui {
 				}
 
 				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
-					if (!fillRemaining && idx < 0) {
+					if (idx < 0) {
 						current++;
 						continue;
-					} else if (!fillRemaining && idx > runes.Length - 1) {
+					} else if (idx > runes.Length - 1) {
 						break;
 					}
 					var rune = (Rune)' ';
@@ -1308,8 +1245,7 @@ namespace Terminal.Gui {
 					} else {
 						current += runeWidth;
 					}
-					var nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length ? Rune.ColumnWidth (runes [idx + 1]) : 0;
-					if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size) {
+					if (!isVertical && idx + 1 < runes.Length && current + Rune.ColumnWidth (runes [idx + 1]) > start + size) {
 						break;
 					}
 				}

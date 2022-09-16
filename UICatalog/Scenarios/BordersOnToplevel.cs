@@ -56,6 +56,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
+				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			smartView.Add (tf1, button, label, tf2, tv);

@@ -136,7 +136,7 @@ does not seem to be a way of supporting this on Windows.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.%23ctor(Terminal.Gui.IMainLoopDriver)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L106">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L94">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop__ctor_" data-uid="Terminal.Gui.MainLoop.#ctor*"></a>
   <h4 id="Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_" data-uid="Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)">MainLoop(IMainLoopDriver)</h4>
@@ -172,7 +172,7 @@ Creates a new Mainloop.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_Driver.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.Driver%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L94">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L82">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_Driver_" data-uid="Terminal.Gui.MainLoop.Driver*"></a>
   <h4 id="Terminal_Gui_MainLoop_Driver" data-uid="Terminal.Gui.MainLoop.Driver">Driver</h4>
@@ -204,17 +204,17 @@ The current IMainLoopDriver in use.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_IdleHandlers.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.IdleHandlers%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L82">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L76">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_IdleHandlers_" data-uid="Terminal.Gui.MainLoop.IdleHandlers*"></a>
   <h4 id="Terminal_Gui_MainLoop_IdleHandlers" data-uid="Terminal.Gui.MainLoop.IdleHandlers">IdleHandlers</h4>
   <div class="markdown level1 summary">
-Gets a copy of the list of all idle handlers.
+Gets the list of all idle handlers.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ReadOnlyCollection&lt;Func&lt;bool&gt;&gt; IdleHandlers { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public List&lt;Func&lt;bool&gt;&gt; IdleHandlers { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -226,7 +226,7 @@ Gets a copy of the list of all idle handlers.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.ObjectModel.ReadOnlyCollection</span>&lt;<span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;&gt;</td>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -236,7 +236,7 @@ Gets a copy of the list of all idle handlers.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_Timeouts.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.Timeouts%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L77">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L71">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_Timeouts_" data-uid="Terminal.Gui.MainLoop.Timeouts*"></a>
   <h4 id="Terminal_Gui_MainLoop_Timeouts" data-uid="Terminal.Gui.MainLoop.Timeouts">Timeouts</h4>
@@ -272,7 +272,7 @@ earlier addition that has a longer limit time.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.AddIdle(System.Func%7BSystem.Boolean%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L136">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L124">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_AddIdle_" data-uid="Terminal.Gui.MainLoop.AddIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})">AddIdle(Func&lt;Boolean&gt;)</h4>
@@ -321,7 +321,7 @@ Adds specified idle handler function to mainloop processing. The handler functio
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean__.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan%2CSystem.Func%7BTerminal.Gui.MainLoop%2CSystem.Boolean%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L178">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L166">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_AddTimeout_" data-uid="Terminal.Gui.MainLoop.AddTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan,System.Func{Terminal.Gui.MainLoop,System.Boolean})">AddTimeout(TimeSpan, Func&lt;MainLoop, Boolean&gt;)</h4>
@@ -375,7 +375,7 @@ Adds a timeout to the mainloop.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_EventsPending_System_Boolean_.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.EventsPending(System.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L288">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L276">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_EventsPending_" data-uid="Terminal.Gui.MainLoop.EventsPending*"></a>
   <h4 id="Terminal_Gui_MainLoop_EventsPending_System_Boolean_" data-uid="Terminal.Gui.MainLoop.EventsPending(System.Boolean)">EventsPending(Boolean)</h4>
@@ -424,7 +424,7 @@ Determines whether there are pending events to be processed.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_Invoke_System_Action_.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.Invoke(System.Action)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L116">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L104">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_Invoke_" data-uid="Terminal.Gui.MainLoop.Invoke*"></a>
   <h4 id="Terminal_Gui_MainLoop_Invoke_System_Action_" data-uid="Terminal.Gui.MainLoop.Invoke(System.Action)">Invoke(Action)</h4>
@@ -458,7 +458,7 @@ Runs <code>action</code> on the thread that is processing events
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_MainIteration.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.MainIteration%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L302">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L290">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_MainIteration_" data-uid="Terminal.Gui.MainLoop.MainIteration*"></a>
   <h4 id="Terminal_Gui_MainLoop_MainIteration" data-uid="Terminal.Gui.MainLoop.MainIteration">MainIteration()</h4>
@@ -475,7 +475,7 @@ Runs one iteration of timers and file watches
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.RemoveIdle(System.Func%7BSystem.Boolean%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L152">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L140">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_RemoveIdle_" data-uid="Terminal.Gui.MainLoop.RemoveIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})">RemoveIdle(Func&lt;Boolean&gt;)</h4>
@@ -524,7 +524,7 @@ Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.h
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_RemoveTimeout_System_Object_.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.RemoveTimeout(System.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L198">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L186">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_RemoveTimeout_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveTimeout_System_Object_" data-uid="Terminal.Gui.MainLoop.RemoveTimeout(System.Object)">RemoveTimeout(Object)</h4>
@@ -573,7 +573,7 @@ Removes a previously scheduled timeout
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_Run.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.Run%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L318">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L306">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_Run_" data-uid="Terminal.Gui.MainLoop.Run*"></a>
   <h4 id="Terminal_Gui_MainLoop_Run" data-uid="Terminal.Gui.MainLoop.Run">Run()</h4>
@@ -590,7 +590,7 @@ Runs the mainloop.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_Stop.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.Stop%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L274">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L262">View Source</a>
   </span>
   <a id="Terminal_Gui_MainLoop_Stop_" data-uid="Terminal.Gui.MainLoop.Stop*"></a>
   <h4 id="Terminal_Gui_MainLoop_Stop" data-uid="Terminal.Gui.MainLoop.Stop">Stop()</h4>
@@ -609,7 +609,7 @@ Stops the mainloop.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop_TimeoutAdded.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop.TimeoutAdded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L100">View Source</a>
+    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L88">View Source</a>
   </span>
   <h4 id="Terminal_Gui_MainLoop_TimeoutAdded" data-uid="Terminal.Gui.MainLoop.TimeoutAdded">TimeoutAdded</h4>
   <div class="markdown level1 summary">
@@ -647,7 +647,7 @@ if <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_
                     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_MainLoop.md&amp;value=---%0Auid%3A%20Terminal.Gui.MainLoop%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/MainLoop.cs/#L48" class="contribution-link">View Source</a>
+                    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Core/MainLoop.cs/#L47" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

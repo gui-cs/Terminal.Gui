@@ -135,15 +135,11 @@ namespace UICatalog.Scenarios {
 
 			void Top_Unloaded ()
 			{
-				if (_fractionTimer != null) {
-					_fractionTimer.Dispose ();
-					_fractionTimer = null;
-				}
 				if (_pulseTimer != null) {
 					_pulseTimer.Dispose ();
 					_pulseTimer = null;
+					Top.Unloaded -= Top_Unloaded;
 				}
-				Top.Unloaded -= Top_Unloaded;
 			}
 		}
 	}
