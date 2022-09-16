@@ -527,14 +527,19 @@ namespace Terminal.Gui.Core {
 		// TODO: Add IMainLoop tests
 
 		volatile static int tbCounter = 0;
+		static ManualResetEventSlim _wakeUp = new ManualResetEventSlim (false);
 
-		private static void Launch (Random r, TextField tf)
+		private static void Launch (Random r, TextField tf, int target)
 		{
 			Task.Run (() => {
 				Thread.Sleep (r.Next (2, 4));
 				Application.MainLoop.Invoke (() => {
 					tf.Text = $"index{r.Next ()}";
 					Interlocked.Increment (ref tbCounter);
+					if (target == tbCounter) {
+						// On last increment wake up the check
+						_wakeUp.Set ();
+					}
 				});
 			});
 		}
@@ -542,16 +547,19 @@ namespace Terminal.Gui.Core {
 		private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
 		{
 			for (int j = 0; j < numPasses; j++) {
+
+				_wakeUp.Reset ();
 				for (var i = 0; i < numIncrements; i++) {
-					Launch (r, tf);
+					Launch (r, tf, (j + 1) * numIncrements);
 				}
+
 
 				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
 				{
 					var tbNow = tbCounter;
-					Thread.Sleep (pollMs);
+					_wakeUp.Wait (pollMs);
 					if (tbCounter == tbNow) {
-						// No change after sleep: Idle handlers added via Application.MainLoop.Invoke have gone missing
+						// No change after wait: Idle handlers added via Application.MainLoop.Invoke have gone missing
 						Application.MainLoop.Invoke (() => Application.RequestStop ());
 						throw new TimeoutException (
 							$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
@@ -572,7 +580,7 @@ namespace Terminal.Gui.Core {
 
 			const int numPasses = 10;
 			const int numIncrements = 10000;
-			const int pollMs = 500;
+			const int pollMs = 20000;
 
 			var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 
