@@ -16,7 +16,7 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
 * [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
-* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/views.html)
+* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/articles/views.html)
 * [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
 * [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html)
 
