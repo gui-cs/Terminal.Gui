@@ -27,8 +27,10 @@ jobs:
 
     - name: DocFX Build
       working-directory: docfx
-      run: del ../docs /F /S
-      run: docfx docfx.json
+      # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
+      run: |
+        del ../docs /F /S
+        docfx docfx.json
       continue-on-error: false      
 
     - name: Publish
