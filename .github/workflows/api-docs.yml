@@ -31,13 +31,13 @@ jobs:
       run: docfx docfx.json
       continue-on-error: false      
 
-      - name: Publish
-        if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs
-          force_orphan: true
+    - name: Publish
+      if: github.event_name == 'push'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs
+        force_orphan: true
 
     # - name: Use docfx to build API Docs
     #   uses: nikeee/docfx-action@v1.0.0
