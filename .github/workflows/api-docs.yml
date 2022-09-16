@@ -1,0 +1,18 @@
+jobs:
+  build-publish-api-docs:
+    runs-on: ubuntu-latest
+    name: Build and publish API docs
+    steps:
+    - uses: actions/checkout@v1
+    # ...
+    - uses: nikeee/docfx-action@v1.0.0
+      name: Build API Documentation
+      with:
+        args: docfx/docfx.json
+
+    # # Publish generated site using GitHub Pages
+    # - uses: maxheld83/ghpages@master
+    #   name: Publish API Documentation on GitHub Pages
+    #   env:
+    #     BUILD_DIR: docs # docfx's default output directory is _site
+    #     GH_PAT: ${{ secrets.GH_PAT }} # See https://github.com/maxheld83/ghpages
