@@ -84,7 +84,6 @@ namespace Terminal.Gui.Core {
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
-			Assert.NotNull (SynchronizationContext.Current);
 		}
 
 		void Shutdown ()
@@ -1301,7 +1300,7 @@ namespace Terminal.Gui.Core {
 					var myi = i;
 
 					Task.Run (() => {
-						Thread.Sleep (100);
+						Task.Delay (100).Wait ();
 
 						// each thread registers lots of 1s timeouts
 						for (int j = 0; j < numberOfTimeoutsPerThread; j++) {
@@ -1318,7 +1317,7 @@ namespace Terminal.Gui.Core {
 						if (myi == 0) {
 
 							// let the timeouts run for a bit
-							Thread.Sleep (5000);
+							Task.Delay (5000).Wait ();
 
 							// then tell the application to quit
 							Application.MainLoop.Invoke (() => Application.RequestStop ());
@@ -1335,160 +1334,6 @@ namespace Terminal.Gui.Core {
 				// that it should have run at least 2 seconds worth of delegates
 				Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
 			}
-		}
-
-		[Fact]
-		public void SynchronizationContext_Post ()
-		{
-			Init ();
-			var context = SynchronizationContext.Current;
-
-			var success = false;
-			Task.Run (() => {
-				Thread.Sleep (1_000);
-
-				// non blocking
-				context.Post (
-					delegate (object o) {
-						success = true;
-
-						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-					}, null);
-				Assert.False (success);
-			});
-
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-			Assert.True (success);
-
-			Application.Shutdown ();
-		}
-
-		[Fact]
-		public void SynchronizationContext_Send ()
-		{
-			Init ();
-			var context = SynchronizationContext.Current;
-
-			var success = false;
-			Task.Run (() => {
-				Thread.Sleep (1_000);
-
-				// blocking
-				context.Send (
-					delegate (object o) {
-						success = true;
-
-						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-					}, null);
-				Assert.True (success);
-			});
-
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-			Assert.True (success);
-
-			Application.Shutdown ();
-		}
-
-		[Fact]
-		public void SynchronizationContext_CreateCopy ()
-		{
-			Init ();
-
-			var context = SynchronizationContext.Current;
-			Assert.NotNull (context);
-
-			var contextCopy = context.CreateCopy ();
-			Assert.NotNull (contextCopy);
-
-			Assert.NotEqual (context, contextCopy);
-
-			Application.Shutdown ();
-		}
-
-		[Fact, AutoInitShutdown]
-		public void MouseGrabView_WithNullMouseEventView ()
-		{
-			var tf = new TextField () { Width = 10 };
-			var sv = new ScrollView () {
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ContentSize = new Size (100, 100)
-			};
-
-			sv.Add (tf);
-			Application.Top.Add (sv);
-
-			var iterations = -1;
-
-			Application.Iteration = () => {
-				iterations++;
-				if (iterations == 0) {
-					Assert.True (tf.HasFocus);
-					Assert.Null (Application.mouseGrabView);
-
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 5,
-							Y = 5,
-							Flags = MouseFlags.ReportMousePosition
-						});
-
-					Assert.Equal (sv, Application.mouseGrabView);
-
-					MessageBox.Query ("Title", "Test", "Ok");
-
-					Assert.Null (Application.mouseGrabView);
-				} else if (iterations == 1) {
-					Assert.Equal (sv, Application.mouseGrabView);
-
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 5,
-							Y = 5,
-							Flags = MouseFlags.ReportMousePosition
-						});
-
-					Assert.Null (Application.mouseGrabView);
-
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 40,
-							Y = 12,
-							Flags = MouseFlags.ReportMousePosition
-						});
-
-					Assert.Null (Application.mouseGrabView);
-
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 0,
-							Y = 0,
-							Flags = MouseFlags.Button1Pressed
-						});
-
-					Assert.Null (Application.mouseGrabView);
-
-					Application.RequestStop ();
-				} else if (iterations == 2) {
-					Assert.Null (Application.mouseGrabView);
-
-					Application.RequestStop ();
-				}
-			};
-
-			Application.Run ();
 		}
 	}
 }

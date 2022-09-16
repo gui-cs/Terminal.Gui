@@ -33,6 +33,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center (),
 				Width = 20,
 				Height = 5,
+				ColorScheme = color,
 				Text = text
 			};
 
