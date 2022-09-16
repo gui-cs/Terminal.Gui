@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class PathAnnotation
    ">
-    <meta name="generator" content="docfx 2.59.3.0">
+    <meta name="generator" content="docfx 2.59.4.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -97,28 +97,45 @@ Sequence of lines to connect points e.g. of a <a class="xref" href="Terminal.Gui
     <h5>Implements</h5>
     <div><a class="xref" href="Terminal.Gui.Graphs.IAnnotation.html">IAnnotation</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Graphs.html">Terminal.Gui.Graphs</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Graphs_PathAnnotation_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class PathAnnotation : Object, IAnnotation</code></pre>
-  </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_Graphs_PathAnnotation__ctor_" data-uid="Terminal.Gui.Graphs.PathAnnotation.#ctor*"></a>
-  <h4 id="Terminal_Gui_Graphs_PathAnnotation__ctor" data-uid="Terminal.Gui.Graphs.PathAnnotation.#ctor">PathAnnotation()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public PathAnnotation()</code></pre>
+    <pre><code class="lang-csharp hljs">public class PathAnnotation : IAnnotation</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation_BeforeSeries.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation.BeforeSeries%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L239">View Source</a>
+  </span>
   <a id="Terminal_Gui_Graphs_PathAnnotation_BeforeSeries_" data-uid="Terminal.Gui.Graphs.PathAnnotation.BeforeSeries*"></a>
   <h4 id="Terminal_Gui_Graphs_PathAnnotation_BeforeSeries" data-uid="Terminal.Gui.Graphs.PathAnnotation.BeforeSeries">BeforeSeries</h4>
   <div class="markdown level1 summary">
@@ -144,8 +161,13 @@ True to add line before plotting series.  Defaults to false
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation_LineColor.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation.LineColor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L229">View Source</a>
+  </span>
   <a id="Terminal_Gui_Graphs_PathAnnotation_LineColor_" data-uid="Terminal.Gui.Graphs.PathAnnotation.LineColor*"></a>
   <h4 id="Terminal_Gui_Graphs_PathAnnotation_LineColor" data-uid="Terminal.Gui.Graphs.PathAnnotation.LineColor">LineColor</h4>
   <div class="markdown level1 summary">
@@ -154,7 +176,7 @@ Color for the line that connects points
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Nullable&lt;Attribute&gt; LineColor { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Attribute? LineColor { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -171,8 +193,13 @@ Color for the line that connects points
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation_LineRune.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation.LineRune%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L234">View Source</a>
+  </span>
   <a id="Terminal_Gui_Graphs_PathAnnotation_LineRune_" data-uid="Terminal.Gui.Graphs.PathAnnotation.LineRune*"></a>
   <h4 id="Terminal_Gui_Graphs_PathAnnotation_LineRune" data-uid="Terminal.Gui.Graphs.PathAnnotation.LineRune">LineRune</h4>
   <div class="markdown level1 summary">
@@ -198,8 +225,13 @@ The symbol that gets drawn along the line, defaults to &apos;.&apos;
       </tr>
     </tbody>
   </table>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation_Points.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation.Points%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L224">View Source</a>
+  </span>
   <a id="Terminal_Gui_Graphs_PathAnnotation_Points_" data-uid="Terminal.Gui.Graphs.PathAnnotation.Points*"></a>
   <h4 id="Terminal_Gui_Graphs_PathAnnotation_Points" data-uid="Terminal.Gui.Graphs.PathAnnotation.Points">Points</h4>
   <div class="markdown level1 summary">
@@ -228,8 +260,13 @@ they appear in the list
   </table>
   <h3 id="methods">Methods
   </h3>
-  
-  
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation_Render_Terminal_Gui_GraphView_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation.Render(Terminal.Gui.GraphView)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L246">View Source</a>
+  </span>
   <a id="Terminal_Gui_Graphs_PathAnnotation_Render_" data-uid="Terminal.Gui.Graphs.PathAnnotation.Render*"></a>
   <h4 id="Terminal_Gui_Graphs_PathAnnotation_Render_Terminal_Gui_GraphView_" data-uid="Terminal.Gui.Graphs.PathAnnotation.Render(Terminal.Gui.GraphView)">Render(GraphView)</h4>
   <div class="markdown level1 summary">
@@ -268,6 +305,12 @@ Draws lines connecting each of the <a class="xref" href="Terminal.Gui.Graphs.Pat
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_Graphs_PathAnnotation.md&amp;value=---%0Auid%3A%20Terminal.Gui.Graphs.PathAnnotation%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Core/Graphs/Annotations.cs/#L218" class="contribution-link">View Source</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
