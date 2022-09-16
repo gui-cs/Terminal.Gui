@@ -1372,6 +1372,8 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
 			AddKeyBinding (Key.R | Key.CtrlMask, Command.Redo);
+
+			AddKeyBinding (Key.G | Key.CtrlMask, Command.DeleteAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;
@@ -1936,7 +1938,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered.  Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
-		protected virtual void ColorNormal ()
+		protected virtual void SetNormalColor ()
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
@@ -1948,7 +1950,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorNormal (List<Rune> line, int idx)
+		protected virtual void SetNormalColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
@@ -1960,9 +1962,27 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorSelection (List<Rune> line, int idx)
+		protected virtual void SetSelectionColor (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void SetReadOnlyColor (List<Rune> line, int idx)
+		{
+			Attribute attribute;
+			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
+				attribute = new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+			} else {
+				attribute = new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
+			}
+			Driver.SetAttribute (attribute);
 		}
 
 		/// <summary>
@@ -1972,7 +1992,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorUsed (List<Rune> line, int idx)
+		protected virtual void SetUsedColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
@@ -2332,15 +2352,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
 		/// </summary>
-		public virtual void OnUnwrappedCursorPosition ()
+		public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
 		{
-			var row = currentRow;
-			var col = currentColumn;
-			if (wordWrap) {
+			var row = cRow == null ? currentRow : cRow;
+			var col = cCol == null ? currentColumn : cCol;
+			if (cRow == null && cCol == null && wordWrap) {
 				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 			}
-			UnwrappedCursorPosition?.Invoke (new Point (col, row));
+			UnwrappedCursorPosition?.Invoke (new Point ((int)col, (int)row));
 		}
 
 		ustring GetSelectedRegion ()
@@ -2357,13 +2377,14 @@ namespace Terminal.Gui {
 				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
 				model = wrapManager.Model;
 			}
+			OnUnwrappedCursorPosition (cRow, cCol);
 			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			ColorNormal ();
+			SetNormalColor ();
 
 			var offB = OffSetBackground ();
 			int right = Frame.Width + offB.width + RightOffset;
@@ -2379,12 +2400,14 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);
 					if (idxCol < line.Count && selecting && PointInSelection (idxCol, idxRow)) {
-						ColorSelection (line, idxCol);
+						SetSelectionColor (line, idxCol);
 					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						ColorUsed (line, idxCol);
+						SetSelectionColor (line, idxCol);
+					} else if (ReadOnly) {
+						SetReadOnlyColor (line, idxCol);
 					} else {
-						ColorNormal (line, idxCol);
+						SetNormalColor (line, idxCol);
 					}
 
 					if (rune == '\t') {
@@ -2408,13 +2431,13 @@ namespace Terminal.Gui {
 					}
 				}
 				if (col < right) {
-					ColorNormal ();
+					SetNormalColor ();
 					ClearRegion (col, row, right, row + 1);
 				}
 				row++;
 			}
 			if (row < bottom) {
-				ColorNormal ();
+				SetNormalColor ();
 				ClearRegion (bounds.Left, row, right, bottom);
 			}
 
@@ -2433,6 +2456,12 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		///<inheritdoc/>
@@ -3177,14 +3206,14 @@ namespace Terminal.Gui {
 			if (newPos.HasValue && currentRow == newPos.Value.row) {
 				var restCount = currentColumn - newPos.Value.col;
 				currentLine.RemoveRange (newPos.Value.col, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
 			} else if (newPos.HasValue) {
 				var restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
@@ -3234,7 +3263,7 @@ namespace Terminal.Gui {
 				restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
 			}
-			if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+			if (wordWrap) {
 				wrapNeeded = true;
 			}
 
@@ -3621,16 +3650,24 @@ namespace Terminal.Gui {
 			if (selecting) {
 				ClearSelectedRegion ();
 			}
-			if (Used) {
-				Insert ((uint)kb.Key);
-				currentColumn++;
-				if (currentColumn >= leftColumn + Frame.Width) {
-					leftColumn++;
-					SetNeedsDisplay ();
-				}
+			if (kb.Key == Key.Enter) {
+				model.AddLine (currentRow + 1, new List<Rune> ());
+				currentRow++;
+				currentColumn = 0;
+			} else if ((uint)kb.Key == 13) {
+				currentColumn = 0;
 			} else {
-				Insert ((uint)kb.Key);
-				currentColumn++;
+				if (Used) {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+					if (currentColumn >= leftColumn + Frame.Width) {
+						leftColumn++;
+						SetNeedsDisplay ();
+					}
+				} else {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+				}
 			}
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
@@ -3716,7 +3753,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				if (wrapNeeded) {
@@ -3733,7 +3770,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 
@@ -3761,7 +3798,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (currentColumn - 1);
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn--;
@@ -3793,8 +3830,7 @@ namespace Terminal.Gui {
 				var prevCount = prevRow.Count;
 				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 				model.RemoveLine (currentRow);
-				bool lineRemoved = false;
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentRow--;
@@ -3802,11 +3838,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { GetCurrentLine () }, new Point (currentColumn, prowIdx),
 					HistoryText.LineStatus.Replaced);
 
-				if (wrapNeeded && !lineRemoved) {
-					currentColumn = Math.Max (prevCount - 1, 0);
-				} else {
-					currentColumn = prevCount;
-				}
+				currentColumn = prevCount;
 				SetNeedsDisplay ();
 			}
 

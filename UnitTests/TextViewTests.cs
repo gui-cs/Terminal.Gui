@@ -6024,6 +6024,390 @@ secon
 d    
 line.
 ", output);
+
+			Assert.True (tv.MouseEvent (new MouseEvent () { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 3), tv.CursorPosition);
+			Assert.Equal (new Point (12, 0), cp);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This 
+is   
+the  
+first
+     
+line.
+This 
+is   
+the  
+secon
+d    
+line.
+", output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void DeleteTextBackwards_WordWrap_False_Return_Undo ()
+		{
+			const string text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text
+			};
+			var envText = tv.Text;
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.False (tv.WordWrap);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (3, 0);
+			Assert.Equal (new Point (3, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (0, 1);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.This is the second line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			while (tv.Text != envText) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal (envText, tv.Text);
+			Assert.Equal (new Point (3, 0), tv.CursorPosition);
+			Assert.False (tv.IsDirty);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void DeleteTextBackwards_WordWrap_True_Return_Undo ()
+		{
+			const string text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text,
+				WordWrap = true
+			};
+			var envText = tv.Text;
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (tv.WordWrap);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (3, 0);
+			Assert.Equal (new Point (3, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (0, 1);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.This is the second line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			while (tv.Text != envText) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal (envText, tv.Text);
+			Assert.Equal (new Point (3, 0), tv.CursorPosition);
+			Assert.False (tv.IsDirty);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void DeleteTextForwards_WordWrap_False_Return_Undo ()
+		{
+			const string text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text
+			};
+			var envText = tv.Text;
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.False (tv.WordWrap);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (2, 0);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (22, 0);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.This is the second line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			while (tv.Text != envText) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal (envText, tv.Text);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			Assert.False (tv.IsDirty);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void DeleteTextForwards_WordWrap_True_Return_Undo ()
+		{
+			const string text = "This is the first line.\nThis is the second line.\n";
+			var tv = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text,
+				WordWrap = true
+			};
+			var envText = tv.Text;
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (tv.WordWrap);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (2, 0);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			tv.CursorPosition = new Point (22, 0);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (22, 0), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.This is the second line.
+", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			tv.Redraw (tv.Bounds);
+			Assert.Equal (new Point (0, 1), tv.CursorPosition);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+Ths is the first line.  
+This is the second line.
+", output);
+
+			while (tv.Text != envText) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal (envText, tv.Text);
+			Assert.Equal (new Point (2, 0), tv.CursorPosition);
+			Assert.False (tv.IsDirty);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_InsertText_Newline_LF ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 10,
+			};
+			tv.InsertText ("\naaa\nbbb");
+			var p = Environment.OSVersion.Platform;
+			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+				Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
+			} else {
+				Assert.Equal ("\naaa\nbbb", tv.Text);
+			}
+			Assert.Equal ($"{Environment.NewLine}aaa{Environment.NewLine}bbb", tv.Text);
+
+			var win = new Window ();
+			win.Add (tv);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+			Application.Refresh ();
+			//this passes
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+
+			Assert.Equal (new Rect (0, 0, 15, 15), pos);
+
+			Assert.True (tv.Used);
+			tv.Used = false;
+			tv.CursorPosition = new Point (0, 0);
+			tv.InsertText ("\naaa\nbbb");
+			Application.Refresh ();
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextView_InsertText_Newline_CRLF ()
+		{
+			var tv = new TextView {
+				Width = 10,
+				Height = 10,
+			};
+			tv.InsertText ("\r\naaa\r\nbbb");
+			var p = Environment.OSVersion.Platform;
+			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+				Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
+			} else {
+				Assert.Equal ("\naaa\nbbb", tv.Text);
+			}
+			Assert.Equal ($"{Environment.NewLine}aaa{Environment.NewLine}bbb", tv.Text);
+
+			var win = new Window ();
+			win.Add (tv);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+			Application.Refresh ();
+
+			//this passes
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
+
+			Assert.Equal (new Rect (0, 0, 15, 15), pos);
+
+			Assert.True (tv.Used);
+			tv.Used = false;
+			tv.CursorPosition = new Point (0, 0);
+			tv.InsertText ("\r\naaa\r\nbbb");
+			Application.Refresh ();
+
+			GraphViewTests.AssertDriverContentsWithFrameAre (
+			@"
+┌─────────────┐
+│             │
+│aaa          │
+│bbb          │
+│aaa          │
+│bbb          │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+│             │
+└─────────────┘", output);
 		}
 	}
 }
