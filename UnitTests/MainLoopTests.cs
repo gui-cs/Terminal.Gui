@@ -29,18 +29,12 @@ namespace Terminal.Gui.Core {
 		{
 			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-			Func<bool> fnTrue = () => true;
-			Func<bool> fnFalse = () => false;
-
+			Func<bool> fnTrue = () => { return true; };
+			Func<bool> fnFalse = () => { return false; };
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnFalse);
 
-			Assert.Equal (2, ml.IdleHandlers.Count);
-			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
-			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
-
 			Assert.True (ml.RemoveIdle (fnTrue));
-			Assert.Single (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -58,19 +52,8 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnTrue);
 
-			Assert.Equal (2, ml.IdleHandlers.Count);
-			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
-			Assert.True (ml.IdleHandlers [0] ());
-			Assert.Equal (fnTrue, ml.IdleHandlers [1]);
-			Assert.True (ml.IdleHandlers [1] ());
-
 			Assert.True (ml.RemoveIdle (fnTrue));
-			Assert.Single (ml.IdleHandlers);
-			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
-			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
-
 			Assert.True (ml.RemoveIdle (fnTrue));
-			Assert.Empty (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -142,17 +125,14 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fn);
 			ml.MainIteration ();
 			Assert.Equal (2, functionCalled);
-			Assert.Equal (2, ml.IdleHandlers.Count);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
-			Assert.Single (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (1, functionCalled);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
-			Assert.Empty (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
 			Assert.False (ml.RemoveIdle (fn));
@@ -525,71 +505,5 @@ namespace Terminal.Gui.Core {
 		// - wait = false
 
 		// TODO: Add IMainLoop tests
-
-		volatile static int tbCounter = 0;
-		static ManualResetEventSlim _wakeUp = new ManualResetEventSlim (false);
-
-		private static void Launch (Random r, TextField tf, int target)
-		{
-			Task.Run (() => {
-				Thread.Sleep (r.Next (2, 4));
-				Application.MainLoop.Invoke (() => {
-					tf.Text = $"index{r.Next ()}";
-					Interlocked.Increment (ref tbCounter);
-					if (target == tbCounter) {
-						// On last increment wake up the check
-						_wakeUp.Set ();
-					}
-				});
-			});
-		}
-
-		private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
-		{
-			for (int j = 0; j < numPasses; j++) {
-
-				_wakeUp.Reset ();
-				for (var i = 0; i < numIncrements; i++) {
-					Launch (r, tf, (j + 1) * numIncrements);
-				}
-
-
-				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
-				{
-					var tbNow = tbCounter;
-					_wakeUp.Wait (pollMs);
-					if (tbCounter == tbNow) {
-						// No change after wait: Idle handlers added via Application.MainLoop.Invoke have gone missing
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-						throw new TimeoutException (
-							$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
-							$"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
-					}
-				};
-			}
-			Application.MainLoop.Invoke (() => Application.RequestStop ());
-		}
-
-		[Fact]
-		[AutoInitShutdown]
-		public async Task InvokeLeakTest ()
-		{
-			Random r = new ();
-			TextField tf = new ();
-			Application.Top.Add (tf);
-
-			const int numPasses = 10;
-			const int numIncrements = 10000;
-			const int pollMs = 20000;
-
-			var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
-
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-
-			await task; // Propagate exception if any occurred
-
-			Assert.Equal ((numIncrements * numPasses), tbCounter);
-		}
 	}
 }

@@ -217,7 +217,6 @@ namespace UICatalog.Scenarios {
 						Height = Dim.Fill (1),
 						WordWrap = true,
 						AllowsTab = false,
-						ColorScheme = Colors.Base
 					};
 					var help = "This is helpful.";
 					fourthStep.Add (someText);

@@ -314,18 +314,10 @@ namespace Terminal.Gui.Views {
 		[Fact, AutoInitShutdown]
 		public void TextAlignment_Justified ()
 		{
-			var checkBox1 = new CheckBox () {
+			var checkBox = new CheckBox () {
 				X = 1,
 				Y = Pos.Center (),
-				Text = "Check first out 你",
-				TextAlignment = TextAlignment.Justified,
-				AutoSize = false,
-				Width = 25
-			};
-			var checkBox2 = new CheckBox () {
-				X = 1,
-				Y = Pos.Bottom (checkBox1),
-				Text = "Check second out 你",
+				Text = "Check this out 你",
 				TextAlignment = TextAlignment.Justified,
 				AutoSize = false,
 				Width = 25
@@ -335,56 +327,44 @@ namespace Terminal.Gui.Views {
 				Height = Dim.Fill (),
 				Title = "Test Demo 你"
 			};
-			win.Add (checkBox1, checkBox2);
+			win.Add (checkBox);
 			Application.Top.Add (win);
 
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (30, 6);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-			Assert.Equal (TextAlignment.Justified, checkBox1.TextAlignment);
-			Assert.Equal (new Rect (1, 1, 25, 1), checkBox1.Frame);
-			Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
-			Assert.Equal ("Check first out 你", checkBox1.Text);
-			Assert.Equal ("╴ Check first out 你", checkBox1.TextFormatter.Text);
-			Assert.False (checkBox1.AutoSize);
-			Assert.Equal (TextAlignment.Justified, checkBox2.TextAlignment);
-			Assert.Equal (new Rect (1, 2, 25, 1), checkBox2.Frame);
-			Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
-			Assert.Equal ("Check second out 你", checkBox2.Text);
-			Assert.Equal ("╴ Check second out 你", checkBox2.TextFormatter.Text);
-			Assert.False (checkBox2.AutoSize);
-
+			Assert.Equal (TextAlignment.Justified, checkBox.TextAlignment);
+			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
+			Assert.Equal ("Check this out 你", checkBox.Text);
+			Assert.Equal ("╴ Check this out 你", checkBox.TextFormatter.Text);
+			Assert.False (checkBox.AutoSize);
 
 			var expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
-│ ╴   Check  first  out  你  │
-│ ╴  Check  second  out  你  │
+│ ╴  Check  this  out  你    │
 │                            │
 └────────────────────────────┘
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 30, 6), pos);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-			checkBox1.Checked = true;
-			Assert.Equal (new Rect (1, 1, 25, 1), checkBox1.Frame);
-			Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
-			checkBox2.Checked = true;
-			Assert.Equal (new Rect (1, 2, 25, 1), checkBox2.Frame);
-			Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+			checkBox.Checked = true;
+			Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
+			Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
 			Application.Refresh ();
 			expected = @"
 ┌ Test Demo 你 ──────────────┐
 │                            │
-│ √   Check  first  out  你  │
-│ √  Check  second  out  你  │
+│ √  Check  this  out  你    │
 │                            │
 └────────────────────────────┘
 ";
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 30, 6), pos);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
 		[Fact, AutoInitShutdown]

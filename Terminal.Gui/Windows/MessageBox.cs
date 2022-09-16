@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -239,16 +240,7 @@ namespace Terminal.Gui {
 			int defaultButton = 0, Border border = null, params ustring [] buttons)
 		{
 			const int defaultWidth = 50;
-			int maxWidthLine = TextFormatter.MaxWidthLine (message);
-			if (maxWidthLine > Application.Driver.Cols) {
-				maxWidthLine = Application.Driver.Cols;
-			}
-			if (width == 0) {
-				maxWidthLine = Math.Max (maxWidthLine, defaultWidth);
-			} else {
-				maxWidthLine = width;
-			}
-			int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
+			int textWidth = TextFormatter.MaxWidth (message, width == 0 ? defaultWidth : width);
 			int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
 			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
 
@@ -270,11 +262,10 @@ namespace Terminal.Gui {
 			// Create Dialog (retain backwards compat by supporting specifying height/width)
 			Dialog d;
 			if (width == 0 & height == 0) {
-				d = new Dialog (title, buttonList.ToArray ()) {
-					Height = msgboxHeight
-				};
+				d = new Dialog (title, buttonList.ToArray ());
+				d.Height = msgboxHeight;
 			} else {
-				d = new Dialog (title, width, Math.Max (height, 4), buttonList.ToArray ());
+				d = new Dialog (title, Math.Max (width, textWidth) + 4, height, buttonList.ToArray ());
 			}
 
 			if (border != null) {
@@ -286,22 +277,19 @@ namespace Terminal.Gui {
 			}
 
 			if (message != null) {
-				var l = new Label (message) {
-					LayoutStyle = LayoutStyle.Computed,
-					TextAlignment = TextAlignment.Centered,
-					X = Pos.Center (),
-					Y = Pos.Center (),
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					AutoSize = false
-				};
+				var l = new Label (textWidth > width ? 0 : (width - 4 - textWidth) / 2, 1, message);
+				l.LayoutStyle = LayoutStyle.Computed;
+				l.TextAlignment = TextAlignment.Centered;
+				l.X = Pos.Center ();
+				l.Y = Pos.Center ();
+				l.Width = Dim.Fill (2);
+				l.Height = Dim.Fill (1);
 				d.Add (l);
 			}
 
-			if (width == 0 & height == 0) {
-				// Dynamically size Width
-				d.Width = Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth ()))); // textWidth + (left + padding + padding + right)
-			}
+			// Dynamically size Width
+			int msgboxWidth = Math.Max (defaultWidth, Math.Max (title.RuneCount + 8, Math.Max (textWidth + 4, d.GetButtonsWidth ()) + 8)); // textWidth + (left + padding + padding + right)
+			d.Width = msgboxWidth;
 
 			// Setup actions
 			Clicked = -1;

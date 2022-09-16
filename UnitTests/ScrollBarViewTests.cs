@@ -192,9 +192,9 @@ namespace Terminal.Gui.Views {
 			_hostView.Redraw (_hostView.Bounds);
 
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (_scrollBar.Size, _hostView.Lines);
+			Assert.Equal (_scrollBar.Size, _hostView.Lines + 1);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols + 1);
 		}
 
 		[Fact]
@@ -310,8 +310,8 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (25, _hostView.Bounds.Height);
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal (24, _scrollBar.Bounds.Height);
-			Assert.Equal (30, _scrollBar.Size);
-			Assert.Equal (100, _scrollBar.OtherScrollBarView.Size);
+			Assert.Equal (31, _scrollBar.Size);
+			Assert.Equal (101, _scrollBar.OtherScrollBarView.Size);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
@@ -320,8 +320,8 @@ namespace Terminal.Gui.Views {
 			_scrollBar.Position = 50;
 			Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.Bounds.Height);
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (6, _scrollBar.Position);
-			Assert.Equal (6, _hostView.Top);
+			Assert.Equal (7, _scrollBar.Position);
+			Assert.Equal (7, _hostView.Top);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
@@ -330,8 +330,8 @@ namespace Terminal.Gui.Views {
 			_scrollBar.OtherScrollBarView.Position = 150;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
-			Assert.Equal (21, _hostView.Left);
+			Assert.Equal (22, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (22, _hostView.Left);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
@@ -350,14 +350,14 @@ namespace Terminal.Gui.Views {
 			_scrollBar.Position = 50;
 			Assert.Equal (_scrollBar.Position, _scrollBar.Size - 1);
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (29, _scrollBar.Position);
-			Assert.Equal (29, _hostView.Top);
+			Assert.Equal (30, _scrollBar.Position);
+			Assert.Equal (30, _hostView.Top);
 
 			_scrollBar.OtherScrollBarView.Position = 150;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - 1);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (99, _scrollBar.OtherScrollBarView.Position);
-			Assert.Equal (99, _hostView.Left);
+			Assert.Equal (100, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (100, _hostView.Left);
 		}
 
 		[Fact]
@@ -497,7 +497,7 @@ namespace Terminal.Gui.Views {
 				};
 
 				listView.DrawContent += (e) => {
-					newScrollBarView.Size = listView.Source.Count;
+					newScrollBarView.Size = listView.Source.Count - 1;
 					Assert.Equal (newScrollBarView.Size, listView.Source.Count);
 					newScrollBarView.Position = listView.TopItem;
 					Assert.Equal (newScrollBarView.Position, listView.TopItem);
@@ -572,7 +572,7 @@ namespace Terminal.Gui.Views {
 				};
 
 				listView.DrawContent += (e) => {
-					newScrollBarView.Size = listView.Maxlength;
+					newScrollBarView.Size = listView.Maxlength - 1;
 					Assert.Equal (newScrollBarView.Size, listView.Maxlength);
 					newScrollBarView.Position = listView.LeftItem;
 					Assert.Equal (newScrollBarView.Position, listView.LeftItem);
@@ -618,9 +618,9 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, max);
 			Assert.False (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
 			Assert.Equal (0, max);
-			// They aren't visible so they aren't drawn.
-			Assert.False (sbv.Visible);
-			Assert.False (sbv.OtherScrollBarView.Visible);
+			// They are visible but are not drawn.
+			Assert.True (sbv.Visible);
+			Assert.True (sbv.OtherScrollBarView.Visible);
 			top.LayoutSubviews ();
 			// Now the host bounds is not empty.
 			Assert.True (sbv.CanScroll (10, out max, sbv.IsVertical));
@@ -628,19 +628,17 @@ namespace Terminal.Gui.Views {
 			Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
 			Assert.Equal (10, max);
 			Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
-			Assert.Equal (40, sbv.Size);
-			Assert.Equal (15, max); // 15+25=40
+			Assert.Equal (17, max); // 17+23=40
 			Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
-			Assert.Equal (100, sbv.OtherScrollBarView.Size);
-			Assert.Equal (20, max); // 20+80=100
-			Assert.False (sbv.Visible);
-			Assert.False (sbv.OtherScrollBarView.Visible);
+			Assert.Equal (22, max); // 22+78=100
+			Assert.True (sbv.Visible);
+			Assert.True (sbv.OtherScrollBarView.Visible);
 			sbv.KeepContentAlwaysInViewport = false;
 			sbv.OtherScrollBarView.KeepContentAlwaysInViewport = false;
 			Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
-			Assert.Equal (39, max);
+			Assert.Equal (40, max);
 			Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
-			Assert.Equal (99, max);
+			Assert.Equal (100, max);
 			Assert.True (sbv.Visible);
 			Assert.True (sbv.OtherScrollBarView.Visible);
 		}
@@ -802,183 +800,6 @@ namespace Terminal.Gui.Views {
 
 			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 10), pos);
-		}
-
-
-		[Fact, AutoInitShutdown]
-		public void ContentBottomRightCorner_Not_Redraw_If_Both_Size_Equal_To_Zero ()
-		{
-			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-			var label = new Label (text);
-			Application.Top.Add (label);
-
-			var sbv = new ScrollBarView (label, true, true) {
-				Size = 100,
-			};
-			sbv.OtherScrollBarView.Size = 100;
-			Application.Begin (Application.Top);
-
-			Assert.Equal (100, sbv.Size);
-			Assert.Equal (100, sbv.OtherScrollBarView.Size);
-			Assert.True (sbv.ShowScrollIndicator);
-			Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
-			Assert.True (sbv.Visible);
-			Assert.True (sbv.OtherScrollBarView.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a tes▲
-This is a tes┬
-This is a tes┴
-This is a tes░
-This is a tes▼
-◄├─┤░░░░░░░░► 
-", output);
-
-			sbv.Size = 0;
-			sbv.OtherScrollBarView.Size = 0;
-			Assert.Equal (0, sbv.Size);
-			Assert.Equal (0, sbv.OtherScrollBarView.Size);
-			Assert.False (sbv.ShowScrollIndicator);
-			Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
-			Assert.False (sbv.Visible);
-			Assert.False (sbv.OtherScrollBarView.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-", output);
-
-			sbv.Size = 50;
-			sbv.OtherScrollBarView.Size = 50;
-			Assert.Equal (50, sbv.Size);
-			Assert.Equal (50, sbv.OtherScrollBarView.Size);
-			Assert.True (sbv.ShowScrollIndicator);
-			Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
-			Assert.True (sbv.Visible);
-			Assert.True (sbv.OtherScrollBarView.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a tes▲
-This is a tes┬
-This is a tes┴
-This is a tes░
-This is a tes▼
-◄├──┤░░░░░░░► 
-", output);
-
-		}
-
-		[Fact, AutoInitShutdown]
-		public void ContentBottomRightCorner_Not_Redraw_If_One_Size_Equal_To_Zero ()
-		{
-			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-			var label = new Label (text);
-			Application.Top.Add (label);
-
-			var sbv = new ScrollBarView (label, true, false) {
-				Size = 100,
-			};
-			Application.Begin (Application.Top);
-
-			Assert.Equal (100, sbv.Size);
-			Assert.Null (sbv.OtherScrollBarView);
-			Assert.True (sbv.ShowScrollIndicator);
-			Assert.True (sbv.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a tes▲
-This is a tes┬
-This is a tes┴
-This is a tes░
-This is a tes░
-This is a tes▼
-", output);
-
-			sbv.Size = 0;
-			Assert.Equal (0, sbv.Size);
-			Assert.False (sbv.ShowScrollIndicator);
-			Assert.False (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-", output);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void ShowScrollIndicator_False_Must_Also_Set_Visible_To_False_To_Not_Respond_To_Events ()
-		{
-			var clicked = false;
-			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-			var label = new Label (text) { Width = 14, Height = 5 };
-			var btn = new Button (14, 0, "Click Me!");
-			btn.Clicked += () => clicked = true;
-			Application.Top.Add (label, btn);
-
-			var sbv = new ScrollBarView (label, true, false) {
-				Size = 5,
-			};
-			Application.Begin (Application.Top);
-
-			Assert.Equal (5, sbv.Size);
-			Assert.Null (sbv.OtherScrollBarView);
-			Assert.False (sbv.ShowScrollIndicator);
-			Assert.False (sbv.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
-This is a test             
-This is a test             
-This is a test             
-This is a test             
-", output);
-
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 15,
-					Y = 0,
-					Flags = MouseFlags.Button1Clicked
-				});
-
-			Assert.Null (Application.mouseGrabView);
-			Assert.True (clicked);
-
-			clicked = false;
-
-			sbv.Visible = true;
-			Assert.Equal (5, sbv.Size);
-			Assert.False (sbv.ShowScrollIndicator);
-			Assert.True (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
-This is a test             
-This is a test             
-This is a test             
-This is a test             
-", output);
-
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 15,
-					Y = 0,
-					Flags = MouseFlags.Button1Clicked
-				});
-
-			Assert.Null (Application.mouseGrabView);
-			Assert.True (clicked);
-			Assert.Equal (5, sbv.Size);
-			Assert.False (sbv.ShowScrollIndicator);
-			Assert.False (sbv.Visible);
 		}
 	}
 }

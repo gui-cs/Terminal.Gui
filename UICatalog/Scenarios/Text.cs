@@ -49,6 +49,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Percent (50),
 				Height = Dim.Percent (30),
+				ColorScheme = Colors.Dialog
 			};
 			textView.Text = s;
 			textView.DrawContent += TextView_DrawContent;
