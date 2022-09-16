@@ -1301,7 +1301,7 @@ namespace Terminal.Gui.Core {
 					var myi = i;
 
 					Task.Run (() => {
-						Task.Delay (100).Wait ();
+						Thread.Sleep (100);
 
 						// each thread registers lots of 1s timeouts
 						for (int j = 0; j < numberOfTimeoutsPerThread; j++) {
@@ -1318,7 +1318,7 @@ namespace Terminal.Gui.Core {
 						if (myi == 0) {
 
 							// let the timeouts run for a bit
-							Task.Delay (5000).Wait ();
+							Thread.Sleep (5000);
 
 							// then tell the application to quit
 							Application.MainLoop.Invoke (() => Application.RequestStop ());

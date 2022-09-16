@@ -656,11 +656,8 @@ namespace Terminal.Gui {
 					lastMouseOwnerView?.OnMouseLeave (me);
 				}
 				// System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-				if (mouseGrabView != null) {
-					mouseGrabView.OnMouseEvent (nme);
-					if (mouseGrabView != null) {
-						return;
-					}
+				if (mouseGrabView != null && mouseGrabView.OnMouseEvent (nme)) {
+					return;
 				}
 			}
 
