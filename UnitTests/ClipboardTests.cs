@@ -53,21 +53,23 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 		{
-			var clipText = "Trying to set the OS clipboard.";
-			if (Clipboard.IsSupported) {
-				Assert.True (Clipboard.TrySetClipboardData (clipText));
-			} else {
-				Assert.False (Clipboard.TrySetClipboardData (clipText));
-			}
+			lock (Clipboard.Contents) {
+				var clipText = "Trying to set the OS clipboard.";
+				if (Clipboard.IsSupported) {
+					Assert.True (Clipboard.TrySetClipboardData (clipText));
+				} else {
+					Assert.False (Clipboard.TrySetClipboardData (clipText));
+				}
 
-			Application.Iteration += () => Application.RequestStop ();
+				Application.Iteration += () => Application.RequestStop ();
 
-			Application.Run ();
+				Application.Run ();
 
-			if (Clipboard.IsSupported) {
-				Assert.Equal (clipText, Clipboard.Contents);
-			} else {
-				Assert.NotEqual (clipText, Clipboard.Contents);
+				if (Clipboard.IsSupported) {
+					Assert.Equal (clipText, Clipboard.Contents);
+				} else {
+					Assert.NotEqual (clipText, Clipboard.Contents);
+				}
 			}
 		}
 
