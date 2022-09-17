@@ -608,5 +608,29 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run (win);
 			Application.Shutdown ();
 		}
+
+		/// <summary>
+		/// Sometimes when using remoting tools EventKeyRecord sends 'virtual keystrokes'.
+		/// These are indicated with the wVirtualKeyCode of 231.  When we see this code
+		/// then we need to look to the unicode character (UnicodeChar) instead of the key
+		/// when telling the rest of the framework what button was pressed. For full details
+		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
+		/// </summary>
+		[Theory]
+		[InlineData('A',true,false,false,ConsoleKey.A)]
+		[InlineData('z',false,false,false,ConsoleKey.Z)]
+		public void TestVKPacket(char unicodeCharacter,bool shift, bool alt, bool control, ConsoleKey expectedRemapping)
+		{
+			var before = new ConsoleKeyInfo(unicodeCharacter,ConsoleKey.Packet,shift,alt,control);
+			var after = WindowsDriver.RemapPacketKey(before);
+
+			Assert.Equal(before.KeyChar, after.KeyChar);
+
+			// The thing we are really interested in, did we correctly convert
+			// the input ConsoleKey.Packet to the correct physical key
+			Assert.Equal(expectedRemapping,after.Key);
+
+			Assert.Equal(after.Modifiers,before.Modifiers);
+		}
 	}
 }

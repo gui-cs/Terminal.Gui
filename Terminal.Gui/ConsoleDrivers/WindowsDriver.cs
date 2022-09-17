@@ -1244,6 +1244,9 @@ namespace Terminal.Gui {
 				keyModifiers.Scrolllock = scrolllock;
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+
+			ConsoleKeyInfo = RemapPacketKey(ConsoleKeyInfo);
+
 			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
 		}
 
@@ -1756,6 +1759,40 @@ namespace Terminal.Gui {
 
 		public override void CookMouse ()
 		{
+		}
+
+
+		/// <summary>
+		/// Handles case when the 'key' providied is ConsoleKey.Packet by
+		/// returning a new <see cref="ConsoleKeyInfo"/> where key is remapped
+		/// by parsing the Unicode char data of the <see cref="ConsoleKeyInfo"/>
+		/// </summary>
+		internal static ConsoleKeyInfo RemapPacketKey (ConsoleKeyInfo original)
+		{
+			// If the key struck was virtual
+			if(original.Key == ConsoleKey.Packet)
+			{
+				// Try to parse the unicode key e.g. 'A' into a value in ConsoleKey
+				// so that other parts of the program consider it as a regular button
+				// press
+				ConsoleKey remappedkey;
+				if(Enum.TryParse<ConsoleKey>(
+					// have to turn e.g. 'a' to something parseable as
+					// an enum value (i.e. Upper it)
+					original.KeyChar.ToString().ToUpper(), 
+					out remappedkey))
+				{
+					return new ConsoleKeyInfo(
+						original.KeyChar,
+						remappedkey,
+						original.Modifiers.HasFlag(ConsoleModifiers.Shift),
+						original.Modifiers.HasFlag(ConsoleModifiers.Alt),
+						original.Modifiers.HasFlag(ConsoleModifiers.Control)
+					);
+				}
+			}
+
+			return original;
 		}
 		#endregion
 	}
