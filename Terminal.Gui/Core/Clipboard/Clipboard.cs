@@ -15,7 +15,11 @@ namespace Terminal.Gui {
 			get {
 				try {
 					if (IsSupported) {
-						return Application.Driver.Clipboard.GetClipboardData ();
+						var clip = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
+						if (clip != null) {
+							return contents = clip;
+						}
+						return clip;
 					} else {
 						return contents;
 					}

@@ -8,14 +8,16 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Contents_Gets_Sets ()
 		{
-			var clipText = "This is a clipboard unit test.";
-			Clipboard.Contents = clipText;
+			lock (Clipboard.Contents) {
+				var clipText = "This is a clipboard unit test.";
+				Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+				Application.Iteration += () => Application.RequestStop ();
 
-			Application.Run ();
+				Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents);
+				Assert.Equal (clipText, Clipboard.Contents);
+			}
 		}
 
 		[Fact]

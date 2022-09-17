@@ -666,7 +666,7 @@ namespace Terminal.Gui {
 
 			historyText.Redo ();
 
-			//if (Clipboard.Contents == null)
+			//if (ustring.IsNullOrEmpty (Clipboard.Contents))
 			//	return true;
 			//var clip = TextModel.ToRunes (Clipboard.Contents);
 			//if (clip == null)
@@ -1217,7 +1217,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly || Clipboard.Contents == null) {
+			if (ReadOnly || ustring.IsNullOrEmpty (Clipboard.Contents)) {
 				return;
 			}
 
