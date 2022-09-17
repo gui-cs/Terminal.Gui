@@ -80,8 +80,10 @@
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
       Release v1.8.0
-      * Fixes #2025 - API Docs are now generated via Github Action - View Source Works
-      * Fixes #1991 - Broken link in README
+      * Fixes #2043. Update to NStack v1.0.1
+      * Fixes #2045. TrySetClipboardData test must be enclosed with a lock.
+      * Fixes #2025. API Docs are now generated via Github Action - View Source Works
+      * Fixes #1991. Broken link in README
       * Fixes #2026. Added ClearOnVisibleFalse to flag if the view must be cleared or not.
       * Fixes #2017 and #2013. MainLoopTests.InvokeLeakTest failures
       * Fixes #2014. Application mouseGrabView is run twice if return true.
@@ -111,7 +113,7 @@
       * Fixes #1948. Get unwrapped cursor position when word wrap is enabled on TextView.
       * Ensures that the isButtonShift flag is disabled in all situations.
       * Fixes #1943. Mouse ButtonShift is not preserving the text selected.
-      
+
       Release v1.7.2
       * Fixes #1773. Base color scheme for ListView hard to read
       * Fixes #1934. WindowsDriver crash when the height is less than 1 with the VS Debugger
