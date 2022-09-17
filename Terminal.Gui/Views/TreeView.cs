@@ -907,7 +907,7 @@ namespace Terminal.Gui {
 		{
 			var map = BuildLineMap ();
 			ScrollOffsetVertical = Math.Max (0, map.Count - Bounds.Height + 1);
-			SelectedObject = map.Last ().Model;
+			SelectedObject = map.LastOrDefault ()?.Model;
 
 			SetNeedsDisplay ();
 		}

@@ -101,7 +101,8 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-			var black = Application.Driver.MakeAttribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var fore = graphView.ColorScheme.Normal.Foreground == Color.Black ? Color.White : graphView.ColorScheme.Normal.Foreground;
+			var black = Application.Driver.MakeAttribute (fore, Color.Black);
 			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
 			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
 			var red = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
@@ -138,7 +139,7 @@ namespace UICatalog.Scenarios {
 
 			graphView.AxisY.Minimum = 0;
 
-			var legend = new LegendAnnotation (new Rect (graphView.Bounds.Width - 20,0, 20, 5));
+			var legend = new LegendAnnotation (new Rect (graphView.Bounds.Width - 20, 0, 20, 5));
 			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor), "Lower Third");
 			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor), "Middle Third");
 			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor), "Upper Third");
@@ -540,26 +541,19 @@ namespace UICatalog.Scenarios {
 				var driver = Application.Driver;
 
 				int x = start.X;
-				for(int y = end.Y; y <= start.Y; y++) {
+				for (int y = end.Y; y <= start.Y; y++) {
 
 					var height = graph.ScreenToGraphSpace (x, y).Y;
 
 					if (height >= 85) {
-						driver.SetAttribute(red);
-					}
-					else
-					if (height >= 66) {
+						driver.SetAttribute (red);
+					} else if (height >= 66) {
 						driver.SetAttribute (brightred);
-					} 
-					else
-					if (height >= 45) {
+					} else if (height >= 45) {
 						driver.SetAttribute (brightyellow);
-					} 
-					else
-					if (height >= 25) {
+					} else if (height >= 25) {
 						driver.SetAttribute (brightgreen);
-					}
-					else{
+					} else {
 						driver.SetAttribute (green);
 					}
 
@@ -683,9 +677,8 @@ namespace UICatalog.Scenarios {
 		private void Margin (bool left, bool increase)
 		{
 			if (left) {
-				graphView.MarginLeft = (uint)Math.Max(0,graphView.MarginLeft + (increase ? 1 : -1));
-			}
-			else {
+				graphView.MarginLeft = (uint)Math.Max (0, graphView.MarginLeft + (increase ? 1 : -1));
+			} else {
 				graphView.MarginBottom = (uint)Math.Max (0, graphView.MarginBottom + (increase ? 1 : -1));
 			}
 
