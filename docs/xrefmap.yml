@@ -2478,6 +2478,12 @@ references:
   commentId: M:Terminal.Gui.ComboBox.#ctor(NStack.ustring)
   fullName: Terminal.Gui.ComboBox.ComboBox(NStack.ustring)
   nameWithType: ComboBox.ComboBox(ustring)
+- uid: Terminal.Gui.ComboBox.#ctor(System.Collections.IList)
+  name: ComboBox(IList)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_System_Collections_IList_
+  commentId: M:Terminal.Gui.ComboBox.#ctor(System.Collections.IList)
+  fullName: Terminal.Gui.ComboBox.ComboBox(System.Collections.IList)
+  nameWithType: ComboBox.ComboBox(IList)
 - uid: Terminal.Gui.ComboBox.#ctor(Terminal.Gui.Rect,System.Collections.IList)
   name: ComboBox(Rect, IList)
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_Terminal_Gui_Rect_System_Collections_IList_
@@ -2504,6 +2510,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ComboBox.Collapse
   nameWithType: ComboBox.Collapse
+- uid: Terminal.Gui.ComboBox.Collapsed
+  name: Collapsed
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Collapsed
+  commentId: E:Terminal.Gui.ComboBox.Collapsed
+  fullName: Terminal.Gui.ComboBox.Collapsed
+  nameWithType: ComboBox.Collapsed
 - uid: Terminal.Gui.ComboBox.ColorScheme
   name: ColorScheme
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ColorScheme
@@ -2530,6 +2542,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ComboBox.Expand
   nameWithType: ComboBox.Expand
+- uid: Terminal.Gui.ComboBox.Expanded
+  name: Expanded
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Expanded
+  commentId: E:Terminal.Gui.ComboBox.Expanded
+  fullName: Terminal.Gui.ComboBox.Expanded
+  nameWithType: ComboBox.Expanded
+- uid: Terminal.Gui.ComboBox.HideDropdownListOnClick
+  name: HideDropdownListOnClick
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_HideDropdownListOnClick
+  commentId: P:Terminal.Gui.ComboBox.HideDropdownListOnClick
+  fullName: Terminal.Gui.ComboBox.HideDropdownListOnClick
+  nameWithType: ComboBox.HideDropdownListOnClick
+- uid: Terminal.Gui.ComboBox.HideDropdownListOnClick*
+  name: HideDropdownListOnClick
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_HideDropdownListOnClick_
+  commentId: Overload:Terminal.Gui.ComboBox.HideDropdownListOnClick
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.HideDropdownListOnClick
+  nameWithType: ComboBox.HideDropdownListOnClick
 - uid: Terminal.Gui.ComboBox.IsShow
   name: IsShow
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_IsShow
@@ -2556,6 +2587,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ComboBox.MouseEvent
   nameWithType: ComboBox.MouseEvent
+- uid: Terminal.Gui.ComboBox.OnCollapsed
+  name: OnCollapsed()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnCollapsed
+  commentId: M:Terminal.Gui.ComboBox.OnCollapsed
+  fullName: Terminal.Gui.ComboBox.OnCollapsed()
+  nameWithType: ComboBox.OnCollapsed()
+- uid: Terminal.Gui.ComboBox.OnCollapsed*
+  name: OnCollapsed
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnCollapsed_
+  commentId: Overload:Terminal.Gui.ComboBox.OnCollapsed
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnCollapsed
+  nameWithType: ComboBox.OnCollapsed
 - uid: Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)
   name: OnEnter(View)
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter_Terminal_Gui_View_
@@ -2569,6 +2613,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ComboBox.OnEnter
   nameWithType: ComboBox.OnEnter
+- uid: Terminal.Gui.ComboBox.OnExpanded
+  name: OnExpanded()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnExpanded
+  commentId: M:Terminal.Gui.ComboBox.OnExpanded
+  fullName: Terminal.Gui.ComboBox.OnExpanded()
+  nameWithType: ComboBox.OnExpanded()
+- uid: Terminal.Gui.ComboBox.OnExpanded*
+  name: OnExpanded
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnExpanded_
+  commentId: Overload:Terminal.Gui.ComboBox.OnExpanded
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnExpanded
+  nameWithType: ComboBox.OnExpanded
 - uid: Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)
   name: OnLeave(View)
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnLeave_Terminal_Gui_View_
@@ -3288,6 +3345,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.CookMouse
   nameWithType: ConsoleDriver.CookMouse
+- uid: Terminal.Gui.ConsoleDriver.CreateColors(System.Boolean)
+  name: CreateColors(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CreateColors_System_Boolean_
+  commentId: M:Terminal.Gui.ConsoleDriver.CreateColors(System.Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.CreateColors(System.Boolean)
+  nameWithType: ConsoleDriver.CreateColors(Boolean)
+- uid: Terminal.Gui.ConsoleDriver.CreateColors*
+  name: CreateColors
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CreateColors_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.CreateColors
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.CreateColors
+  nameWithType: ConsoleDriver.CreateColors
 - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
   name: ConsoleDriver.DiagnosticFlags
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
@@ -3590,6 +3660,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.MakeAttribute
   nameWithType: ConsoleDriver.MakeAttribute
+- uid: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  name: MakeColor(Color, Color)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakeColor_Terminal_Gui_Color_Terminal_Gui_Color_
+  commentId: M:Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  fullName: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color, Terminal.Gui.Color)
+  nameWithType: ConsoleDriver.MakeColor(Color, Color)
+- uid: Terminal.Gui.ConsoleDriver.MakeColor*
+  name: MakeColor
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakeColor_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.MakeColor
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.MakeColor
+  nameWithType: ConsoleDriver.MakeColor
 - uid: Terminal.Gui.ConsoleDriver.MakePrintable(System.Rune)
   name: MakePrintable(Rune)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakePrintable_System_Rune_
@@ -5828,6 +5911,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FakeDriver.MakeAttribute
   nameWithType: FakeDriver.MakeAttribute
+- uid: Terminal.Gui.FakeDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  name: MakeColor(Color, Color)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_MakeColor_Terminal_Gui_Color_Terminal_Gui_Color_
+  commentId: M:Terminal.Gui.FakeDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  fullName: Terminal.Gui.FakeDriver.MakeColor(Terminal.Gui.Color, Terminal.Gui.Color)
+  nameWithType: FakeDriver.MakeColor(Color, Color)
+- uid: Terminal.Gui.FakeDriver.MakeColor*
+  name: MakeColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_MakeColor_
+  commentId: Overload:Terminal.Gui.FakeDriver.MakeColor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.MakeColor
+  nameWithType: FakeDriver.MakeColor
 - uid: Terminal.Gui.FakeDriver.Move(System.Int32,System.Int32)
   name: Move(Int32, Int32)
   href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Move_System_Int32_System_Int32_
@@ -17373,6 +17469,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.Frame
   nameWithType: TextField.Frame
+- uid: Terminal.Gui.TextField.GetNormalColor
+  name: GetNormalColor()
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_GetNormalColor
+  commentId: M:Terminal.Gui.TextField.GetNormalColor
+  fullName: Terminal.Gui.TextField.GetNormalColor()
+  nameWithType: TextField.GetNormalColor()
+- uid: Terminal.Gui.TextField.GetNormalColor*
+  name: GetNormalColor
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_GetNormalColor_
+  commentId: Overload:Terminal.Gui.TextField.GetNormalColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextField.GetNormalColor
+  nameWithType: TextField.GetNormalColor
 - uid: Terminal.Gui.TextField.HasHistoryChanges
   name: HasHistoryChanges
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_HasHistoryChanges
@@ -17819,12 +17928,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.Direction
   nameWithType: TextFormatter.Direction
-- uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect)
-  name: Draw(Rect, Attribute, Attribute, Rect)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect)
-  fullName: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect)
-  nameWithType: TextFormatter.Draw(Rect, Attribute, Attribute, Rect)
+- uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean)
+  name: Draw(Rect, Attribute, Attribute, Rect, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_Terminal_Gui_Rect_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect, System.Boolean)
+  nameWithType: TextFormatter.Draw(Rect, Attribute, Attribute, Rect, Boolean)
 - uid: Terminal.Gui.TextFormatter.Draw*
   name: Draw
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_
@@ -18102,6 +18211,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.MaxWidth
   nameWithType: TextFormatter.MaxWidth
+- uid: Terminal.Gui.TextFormatter.MaxWidthLine(NStack.ustring)
+  name: MaxWidthLine(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxWidthLine_NStack_ustring_
+  commentId: M:Terminal.Gui.TextFormatter.MaxWidthLine(NStack.ustring)
+  fullName: Terminal.Gui.TextFormatter.MaxWidthLine(NStack.ustring)
+  nameWithType: TextFormatter.MaxWidthLine(ustring)
+- uid: Terminal.Gui.TextFormatter.MaxWidthLine*
+  name: MaxWidthLine
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxWidthLine_
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxWidthLine
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.MaxWidthLine
+  nameWithType: TextFormatter.MaxWidthLine
 - uid: Terminal.Gui.TextFormatter.NeedsFormat
   name: NeedsFormat
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat
@@ -18167,6 +18289,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.Size
   nameWithType: TextFormatter.Size
+- uid: Terminal.Gui.TextFormatter.SplitNewLine(NStack.ustring)
+  name: SplitNewLine(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_SplitNewLine_NStack_ustring_
+  commentId: M:Terminal.Gui.TextFormatter.SplitNewLine(NStack.ustring)
+  fullName: Terminal.Gui.TextFormatter.SplitNewLine(NStack.ustring)
+  nameWithType: TextFormatter.SplitNewLine(ustring)
+- uid: Terminal.Gui.TextFormatter.SplitNewLine*
+  name: SplitNewLine
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_SplitNewLine_
+  commentId: Overload:Terminal.Gui.TextFormatter.SplitNewLine
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.SplitNewLine
+  nameWithType: TextFormatter.SplitNewLine
 - uid: Terminal.Gui.TextFormatter.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text
@@ -18956,60 +19091,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.CloseFile
   nameWithType: TextView.CloseFile
-- uid: Terminal.Gui.TextView.ColorNormal
-  name: ColorNormal()
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorNormal
-  commentId: M:Terminal.Gui.TextView.ColorNormal
-  fullName: Terminal.Gui.TextView.ColorNormal()
-  nameWithType: TextView.ColorNormal()
-- uid: Terminal.Gui.TextView.ColorNormal(System.Collections.Generic.List{System.Rune},System.Int32)
-  name: ColorNormal(List<Rune>, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorNormal_System_Collections_Generic_List_System_Rune__System_Int32_
-  commentId: M:Terminal.Gui.TextView.ColorNormal(System.Collections.Generic.List{System.Rune},System.Int32)
-  name.vb: ColorNormal(List(Of Rune), Int32)
-  fullName: Terminal.Gui.TextView.ColorNormal(System.Collections.Generic.List<System.Rune>, System.Int32)
-  fullName.vb: Terminal.Gui.TextView.ColorNormal(System.Collections.Generic.List(Of System.Rune), System.Int32)
-  nameWithType: TextView.ColorNormal(List<Rune>, Int32)
-  nameWithType.vb: TextView.ColorNormal(List(Of Rune), Int32)
-- uid: Terminal.Gui.TextView.ColorNormal*
-  name: ColorNormal
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorNormal_
-  commentId: Overload:Terminal.Gui.TextView.ColorNormal
-  isSpec: "True"
-  fullName: Terminal.Gui.TextView.ColorNormal
-  nameWithType: TextView.ColorNormal
-- uid: Terminal.Gui.TextView.ColorSelection(System.Collections.Generic.List{System.Rune},System.Int32)
-  name: ColorSelection(List<Rune>, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorSelection_System_Collections_Generic_List_System_Rune__System_Int32_
-  commentId: M:Terminal.Gui.TextView.ColorSelection(System.Collections.Generic.List{System.Rune},System.Int32)
-  name.vb: ColorSelection(List(Of Rune), Int32)
-  fullName: Terminal.Gui.TextView.ColorSelection(System.Collections.Generic.List<System.Rune>, System.Int32)
-  fullName.vb: Terminal.Gui.TextView.ColorSelection(System.Collections.Generic.List(Of System.Rune), System.Int32)
-  nameWithType: TextView.ColorSelection(List<Rune>, Int32)
-  nameWithType.vb: TextView.ColorSelection(List(Of Rune), Int32)
-- uid: Terminal.Gui.TextView.ColorSelection*
-  name: ColorSelection
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorSelection_
-  commentId: Overload:Terminal.Gui.TextView.ColorSelection
-  isSpec: "True"
-  fullName: Terminal.Gui.TextView.ColorSelection
-  nameWithType: TextView.ColorSelection
-- uid: Terminal.Gui.TextView.ColorUsed(System.Collections.Generic.List{System.Rune},System.Int32)
-  name: ColorUsed(List<Rune>, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorUsed_System_Collections_Generic_List_System_Rune__System_Int32_
-  commentId: M:Terminal.Gui.TextView.ColorUsed(System.Collections.Generic.List{System.Rune},System.Int32)
-  name.vb: ColorUsed(List(Of Rune), Int32)
-  fullName: Terminal.Gui.TextView.ColorUsed(System.Collections.Generic.List<System.Rune>, System.Int32)
-  fullName.vb: Terminal.Gui.TextView.ColorUsed(System.Collections.Generic.List(Of System.Rune), System.Int32)
-  nameWithType: TextView.ColorUsed(List<Rune>, Int32)
-  nameWithType.vb: TextView.ColorUsed(List(Of Rune), Int32)
-- uid: Terminal.Gui.TextView.ColorUsed*
-  name: ColorUsed
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ColorUsed_
-  commentId: Overload:Terminal.Gui.TextView.ColorUsed
-  isSpec: "True"
-  fullName: Terminal.Gui.TextView.ColorUsed
-  nameWithType: TextView.ColorUsed
 - uid: Terminal.Gui.TextView.ContextMenu
   name: ContextMenu
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ContextMenu
@@ -19211,6 +19292,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.GetCurrentLine
   nameWithType: TextView.GetCurrentLine
+- uid: Terminal.Gui.TextView.GetNormalColor
+  name: GetNormalColor()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetNormalColor
+  commentId: M:Terminal.Gui.TextView.GetNormalColor
+  fullName: Terminal.Gui.TextView.GetNormalColor()
+  nameWithType: TextView.GetNormalColor()
+- uid: Terminal.Gui.TextView.GetNormalColor*
+  name: GetNormalColor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetNormalColor_
+  commentId: Overload:Terminal.Gui.TextView.GetNormalColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.GetNormalColor
+  nameWithType: TextView.GetNormalColor
 - uid: Terminal.Gui.TextView.HasHistoryChanges
   name: HasHistoryChanges
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_HasHistoryChanges
@@ -19406,6 +19500,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.OnLeave
   nameWithType: TextView.OnLeave
+- uid: Terminal.Gui.TextView.OnUnwrappedCursorPosition(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  name: OnUnwrappedCursorPosition(Nullable<Int32>, Nullable<Int32>)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnUnwrappedCursorPosition_System_Nullable_System_Int32__System_Nullable_System_Int32__
+  commentId: M:Terminal.Gui.TextView.OnUnwrappedCursorPosition(System.Nullable{System.Int32},System.Nullable{System.Int32})
+  name.vb: OnUnwrappedCursorPosition(Nullable(Of Int32), Nullable(Of Int32))
+  fullName: Terminal.Gui.TextView.OnUnwrappedCursorPosition(System.Nullable<System.Int32>, System.Nullable<System.Int32>)
+  fullName.vb: Terminal.Gui.TextView.OnUnwrappedCursorPosition(System.Nullable(Of System.Int32), System.Nullable(Of System.Int32))
+  nameWithType: TextView.OnUnwrappedCursorPosition(Nullable<Int32>, Nullable<Int32>)
+  nameWithType.vb: TextView.OnUnwrappedCursorPosition(Nullable(Of Int32), Nullable(Of Int32))
+- uid: Terminal.Gui.TextView.OnUnwrappedCursorPosition*
+  name: OnUnwrappedCursorPosition
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnUnwrappedCursorPosition_
+  commentId: Overload:Terminal.Gui.TextView.OnUnwrappedCursorPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.OnUnwrappedCursorPosition
+  nameWithType: TextView.OnUnwrappedCursorPosition
 - uid: Terminal.Gui.TextView.Paste
   name: Paste()
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Paste
@@ -19588,6 +19698,76 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.SelectionStartRow
   nameWithType: TextView.SelectionStartRow
+- uid: Terminal.Gui.TextView.SetNormalColor
+  name: SetNormalColor()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetNormalColor
+  commentId: M:Terminal.Gui.TextView.SetNormalColor
+  fullName: Terminal.Gui.TextView.SetNormalColor()
+  nameWithType: TextView.SetNormalColor()
+- uid: Terminal.Gui.TextView.SetNormalColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name: SetNormalColor(List<Rune>, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetNormalColor_System_Collections_Generic_List_System_Rune__System_Int32_
+  commentId: M:Terminal.Gui.TextView.SetNormalColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name.vb: SetNormalColor(List(Of Rune), Int32)
+  fullName: Terminal.Gui.TextView.SetNormalColor(System.Collections.Generic.List<System.Rune>, System.Int32)
+  fullName.vb: Terminal.Gui.TextView.SetNormalColor(System.Collections.Generic.List(Of System.Rune), System.Int32)
+  nameWithType: TextView.SetNormalColor(List<Rune>, Int32)
+  nameWithType.vb: TextView.SetNormalColor(List(Of Rune), Int32)
+- uid: Terminal.Gui.TextView.SetNormalColor*
+  name: SetNormalColor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetNormalColor_
+  commentId: Overload:Terminal.Gui.TextView.SetNormalColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SetNormalColor
+  nameWithType: TextView.SetNormalColor
+- uid: Terminal.Gui.TextView.SetReadOnlyColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name: SetReadOnlyColor(List<Rune>, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetReadOnlyColor_System_Collections_Generic_List_System_Rune__System_Int32_
+  commentId: M:Terminal.Gui.TextView.SetReadOnlyColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name.vb: SetReadOnlyColor(List(Of Rune), Int32)
+  fullName: Terminal.Gui.TextView.SetReadOnlyColor(System.Collections.Generic.List<System.Rune>, System.Int32)
+  fullName.vb: Terminal.Gui.TextView.SetReadOnlyColor(System.Collections.Generic.List(Of System.Rune), System.Int32)
+  nameWithType: TextView.SetReadOnlyColor(List<Rune>, Int32)
+  nameWithType.vb: TextView.SetReadOnlyColor(List(Of Rune), Int32)
+- uid: Terminal.Gui.TextView.SetReadOnlyColor*
+  name: SetReadOnlyColor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetReadOnlyColor_
+  commentId: Overload:Terminal.Gui.TextView.SetReadOnlyColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SetReadOnlyColor
+  nameWithType: TextView.SetReadOnlyColor
+- uid: Terminal.Gui.TextView.SetSelectionColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name: SetSelectionColor(List<Rune>, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetSelectionColor_System_Collections_Generic_List_System_Rune__System_Int32_
+  commentId: M:Terminal.Gui.TextView.SetSelectionColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name.vb: SetSelectionColor(List(Of Rune), Int32)
+  fullName: Terminal.Gui.TextView.SetSelectionColor(System.Collections.Generic.List<System.Rune>, System.Int32)
+  fullName.vb: Terminal.Gui.TextView.SetSelectionColor(System.Collections.Generic.List(Of System.Rune), System.Int32)
+  nameWithType: TextView.SetSelectionColor(List<Rune>, Int32)
+  nameWithType.vb: TextView.SetSelectionColor(List(Of Rune), Int32)
+- uid: Terminal.Gui.TextView.SetSelectionColor*
+  name: SetSelectionColor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetSelectionColor_
+  commentId: Overload:Terminal.Gui.TextView.SetSelectionColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SetSelectionColor
+  nameWithType: TextView.SetSelectionColor
+- uid: Terminal.Gui.TextView.SetUsedColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name: SetUsedColor(List<Rune>, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetUsedColor_System_Collections_Generic_List_System_Rune__System_Int32_
+  commentId: M:Terminal.Gui.TextView.SetUsedColor(System.Collections.Generic.List{System.Rune},System.Int32)
+  name.vb: SetUsedColor(List(Of Rune), Int32)
+  fullName: Terminal.Gui.TextView.SetUsedColor(System.Collections.Generic.List<System.Rune>, System.Int32)
+  fullName.vb: Terminal.Gui.TextView.SetUsedColor(System.Collections.Generic.List(Of System.Rune), System.Int32)
+  nameWithType: TextView.SetUsedColor(List<Rune>, Int32)
+  nameWithType.vb: TextView.SetUsedColor(List(Of Rune), Int32)
+- uid: Terminal.Gui.TextView.SetUsedColor*
+  name: SetUsedColor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SetUsedColor_
+  commentId: Overload:Terminal.Gui.TextView.SetUsedColor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SetUsedColor
+  nameWithType: TextView.SetUsedColor
 - uid: Terminal.Gui.TextView.TabWidth
   name: TabWidth
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_TabWidth
@@ -19633,6 +19813,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.TopRow
   nameWithType: TextView.TopRow
+- uid: Terminal.Gui.TextView.UnwrappedCursorPosition
+  name: UnwrappedCursorPosition
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_UnwrappedCursorPosition
+  commentId: E:Terminal.Gui.TextView.UnwrappedCursorPosition
+  fullName: Terminal.Gui.TextView.UnwrappedCursorPosition
+  nameWithType: TextView.UnwrappedCursorPosition
 - uid: Terminal.Gui.TextView.Used
   name: Used
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Used
@@ -22322,12 +22508,15 @@ references:
   commentId: E:Terminal.Gui.View.Added
   fullName: Terminal.Gui.View.Added
   nameWithType: View.Added
-- uid: Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.Command)
-  name: AddKeyBinding(Key, Command)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_
-  commentId: M:Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.Command)
-  fullName: Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key, Terminal.Gui.Command)
-  nameWithType: View.AddKeyBinding(Key, Command)
+- uid: Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.Command[])
+  name: AddKeyBinding(Key, Command[])
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command___
+  commentId: M:Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.Command[])
+  name.vb: AddKeyBinding(Key, Command())
+  fullName: Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key, Terminal.Gui.Command[])
+  fullName.vb: Terminal.Gui.View.AddKeyBinding(Terminal.Gui.Key, Terminal.Gui.Command())
+  nameWithType: View.AddKeyBinding(Key, Command[])
+  nameWithType.vb: View.AddKeyBinding(Key, Command())
 - uid: Terminal.Gui.View.AddKeyBinding*
   name: AddKeyBinding
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_
@@ -22464,12 +22653,15 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Clear
   nameWithType: View.Clear
-- uid: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command)
-  name: ClearKeybinding(Command)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_
-  commentId: M:Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command)
-  fullName: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command)
-  nameWithType: View.ClearKeybinding(Command)
+- uid: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command[])
+  name: ClearKeybinding(Command[])
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command___
+  commentId: M:Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command[])
+  name.vb: ClearKeybinding(Command())
+  fullName: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command[])
+  fullName.vb: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Command())
+  nameWithType: View.ClearKeybinding(Command[])
+  nameWithType.vb: View.ClearKeybinding(Command())
 - uid: Terminal.Gui.View.ClearKeybinding(Terminal.Gui.Key)
   name: ClearKeybinding(Key)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_
@@ -22902,12 +23094,15 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.GetHotKeySpecifierLength
   nameWithType: View.GetHotKeySpecifierLength
-- uid: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)
-  name: GetKeyFromCommand(Command)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_
-  commentId: M:Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)
-  fullName: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command)
-  nameWithType: View.GetKeyFromCommand(Command)
+- uid: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command[])
+  name: GetKeyFromCommand(Command[])
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command___
+  commentId: M:Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command[])
+  name.vb: GetKeyFromCommand(Command())
+  fullName: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command[])
+  fullName.vb: Terminal.Gui.View.GetKeyFromCommand(Terminal.Gui.Command())
+  nameWithType: View.GetKeyFromCommand(Command[])
+  nameWithType.vb: View.GetKeyFromCommand(Command())
 - uid: Terminal.Gui.View.GetKeyFromCommand*
   name: GetKeyFromCommand
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_
@@ -29278,6 +29473,19 @@ references:
   isSpec: "True"
   fullName: Unix.Terminal.Curses.scrollok
   nameWithType: Curses.scrollok
+- uid: Unix.Terminal.Curses.set_escdelay(System.Int32)
+  name: set_escdelay(Int32)
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_set_escdelay_System_Int32_
+  commentId: M:Unix.Terminal.Curses.set_escdelay(System.Int32)
+  fullName: Unix.Terminal.Curses.set_escdelay(System.Int32)
+  nameWithType: Curses.set_escdelay(Int32)
+- uid: Unix.Terminal.Curses.set_escdelay*
+  name: set_escdelay
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_set_escdelay_
+  commentId: Overload:Unix.Terminal.Curses.set_escdelay
+  isSpec: "True"
+  fullName: Unix.Terminal.Curses.set_escdelay
+  nameWithType: Curses.set_escdelay
 - uid: Unix.Terminal.Curses.setlocale(System.Int32,System.String)
   name: setlocale(Int32, String)
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_setlocale_System_Int32_System_String_

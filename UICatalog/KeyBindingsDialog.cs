@@ -132,7 +132,7 @@ namespace UICatalog {
 				Width = Dim.Percent (50),
 				Height = Dim.Percent (100) - 1,
 			};
-			commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
+
 			Add (commandsListView);
 
 			keyLabel = new Label () {
@@ -143,7 +143,7 @@ namespace UICatalog {
 			};
 			Add (keyLabel);
 
-			var btnChange = new Button ("Change") {
+			var btnChange = new Button ("Ch_ange") {
 				X = Pos.Percent (50),
 				Y = 1,
 			};
@@ -160,6 +160,13 @@ namespace UICatalog {
 			var cancel = new Button ("Cancel");
 			cancel.Clicked += ()=>Application.RequestStop();
 			AddButton (cancel);
+
+			// Register event handler as the last thing in constructor to prevent early calls
+			// before it is even shown (e.g. OnEnter)
+			commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
+
+			// Setup to show first ListView entry
+			SetTextBoxToShowBinding (commands.First());
 		}
 
 		private void RemapKey ()

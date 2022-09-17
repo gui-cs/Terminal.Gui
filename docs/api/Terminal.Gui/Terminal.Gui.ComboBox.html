@@ -335,7 +335,7 @@ Provides a drop-down list of items the user can select from.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_InvokeKeybindings_Terminal_Gui_KeyEvent_">View.InvokeKeybindings(KeyEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command_">View.AddKeyBinding(Key, Command)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddKeyBinding_Terminal_Gui_Key_Terminal_Gui_Command___">View.AddKeyBinding(Key, Command[])</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ReplaceKeyBinding_Terminal_Gui_Key_Terminal_Gui_Key_">View.ReplaceKeyBinding(Key, Key)</a>
@@ -350,7 +350,7 @@ Provides a drop-down list of items the user can select from.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Key_">View.ClearKeybinding(Key)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command_">View.ClearKeybinding(Command)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearKeybinding_Terminal_Gui_Command___">View.ClearKeybinding(Command[])</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCommand_Terminal_Gui_Command_System_Func_System_Nullable_System_Boolean___">View.AddCommand(Command, Func&lt;Nullable&lt;Boolean&gt;&gt;)</a>
@@ -359,7 +359,7 @@ Provides a drop-down list of items the user can select from.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetSupportedCommands">View.GetSupportedCommands()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command_">View.GetKeyFromCommand(Command)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetKeyFromCommand_Terminal_Gui_Command___">View.GetKeyFromCommand(Command[])</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
@@ -534,7 +534,7 @@ Provides a drop-down list of items the user can select from.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.%23ctor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L79">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L244">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox__ctor_" data-uid="Terminal.Gui.ComboBox.#ctor*"></a>
   <h4 id="Terminal_Gui_ComboBox__ctor" data-uid="Terminal.Gui.ComboBox.#ctor">ComboBox()</h4>
@@ -551,7 +551,7 @@ Public constructor
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox__ctor_NStack_ustring_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.%23ctor(NStack.ustring)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L87">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L252">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox__ctor_" data-uid="Terminal.Gui.ComboBox.#ctor*"></a>
   <h4 id="Terminal_Gui_ComboBox__ctor_NStack_ustring_" data-uid="Terminal.Gui.ComboBox.#ctor(NStack.ustring)">ComboBox(ustring)</h4>
@@ -582,10 +582,44 @@ Public constructor
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox__ctor_System_Collections_IList_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.%23ctor(System.Collections.IList)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L279">View Source</a>
+  </span>
+  <a id="Terminal_Gui_ComboBox__ctor_" data-uid="Terminal.Gui.ComboBox.#ctor*"></a>
+  <h4 id="Terminal_Gui_ComboBox__ctor_System_Collections_IList_" data-uid="Terminal.Gui.ComboBox.#ctor(System.Collections.IList)">ComboBox(IList)</h4>
+  <div class="markdown level1 summary">
+Initialize with the source.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ComboBox(IList source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.IList</span></td>
+        <td><span class="parametername">source</span></td>
+        <td>The source.</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox__ctor_Terminal_Gui_Rect_System_Collections_IList_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.%23ctor(Terminal.Gui.Rect%2CSystem.Collections.IList)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L101">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L266">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox__ctor_" data-uid="Terminal.Gui.ComboBox.#ctor*"></a>
   <h4 id="Terminal_Gui_ComboBox__ctor_Terminal_Gui_Rect_System_Collections_IList_" data-uid="Terminal.Gui.ComboBox.#ctor(Terminal.Gui.Rect,System.Collections.IList)">ComboBox(Rect, IList)</h4>
@@ -626,7 +660,7 @@ Public constructor
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_ColorScheme.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.ColorScheme%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L213">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L393">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_ColorScheme_" data-uid="Terminal.Gui.ComboBox.ColorScheme*"></a>
   <h4 id="Terminal_Gui_ComboBox_ColorScheme" data-uid="Terminal.Gui.ComboBox.ColorScheme">ColorScheme</h4>
@@ -653,10 +687,42 @@ Public constructor
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_HideDropdownListOnClick.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.HideDropdownListOnClick%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L422">View Source</a>
+  </span>
+  <a id="Terminal_Gui_ComboBox_HideDropdownListOnClick_" data-uid="Terminal.Gui.ComboBox.HideDropdownListOnClick*"></a>
+  <h4 id="Terminal_Gui_ComboBox_HideDropdownListOnClick" data-uid="Terminal.Gui.ComboBox.HideDropdownListOnClick">HideDropdownListOnClick</h4>
+  <div class="markdown level1 summary">
+Gets or sets if the drop-down list can be hide with a button click event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HideDropdownListOnClick { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_IsShow.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.IsShow%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L210">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L390">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_IsShow_" data-uid="Terminal.Gui.ComboBox.IsShow*"></a>
   <h4 id="Terminal_Gui_ComboBox_IsShow" data-uid="Terminal.Gui.ComboBox.IsShow">IsShow</h4>
@@ -688,7 +754,7 @@ Gets the drop down list state, expanded or collapsed.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_ReadOnly.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.ReadOnly%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L227">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L407">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_ReadOnly_" data-uid="Terminal.Gui.ComboBox.ReadOnly*"></a>
   <h4 id="Terminal_Gui_ComboBox_ReadOnly" data-uid="Terminal.Gui.ComboBox.ReadOnly">ReadOnly</h4>
@@ -720,7 +786,7 @@ If set to true its not allow any changes in the text.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_SelectedItem.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.SelectedItem%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L190">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L370">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_SelectedItem_" data-uid="Terminal.Gui.ComboBox.SelectedItem*"></a>
   <h4 id="Terminal_Gui_ComboBox_SelectedItem" data-uid="Terminal.Gui.ComboBox.SelectedItem">SelectedItem</h4>
@@ -752,7 +818,7 @@ Gets the index of the currently selected item in the <a class="xref" href="Termi
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Source.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Source%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L27">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L182">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_Source_" data-uid="Terminal.Gui.ComboBox.Source*"></a>
   <h4 id="Terminal_Gui_ComboBox_Source" data-uid="Terminal.Gui.ComboBox.Source">Source</h4>
@@ -784,7 +850,7 @@ Gets or sets the <a class="xref" href="Terminal.Gui.IListDataSource.html">IListD
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Text.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Text%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L506">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L719">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_Text_" data-uid="Terminal.Gui.ComboBox.Text*"></a>
   <h4 id="Terminal_Gui_ComboBox_Text" data-uid="Terminal.Gui.ComboBox.Text">Text</h4>
@@ -818,7 +884,7 @@ The currently selected list item
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Collapse.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Collapse%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L474">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L687">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_Collapse_" data-uid="Terminal.Gui.ComboBox.Collapse*"></a>
   <h4 id="Terminal_Gui_ComboBox_Collapse" data-uid="Terminal.Gui.ComboBox.Collapse">Collapse()</h4>
@@ -851,7 +917,7 @@ if it was already collapsed and no action was taken
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Expand.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Expand%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L489">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L702">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_Expand_" data-uid="Terminal.Gui.ComboBox.Expand*"></a>
   <h4 id="Terminal_Gui_ComboBox_Expand" data-uid="Terminal.Gui.ComboBox.Expand">Expand()</h4>
@@ -884,7 +950,7 @@ if it was already expanded and no action was taken
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_MouseEvent_Terminal_Gui_MouseEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.MouseEvent(Terminal.Gui.MouseEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L240">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L428">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_MouseEvent_" data-uid="Terminal.Gui.ComboBox.MouseEvent*"></a>
   <h4 id="Terminal_Gui_ComboBox_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ComboBox.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
@@ -930,10 +996,27 @@ if it was already expanded and no action was taken
   <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnCollapsed.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnCollapsed%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L475">View Source</a>
+  </span>
+  <a id="Terminal_Gui_ComboBox_OnCollapsed_" data-uid="Terminal.Gui.ComboBox.OnCollapsed*"></a>
+  <h4 id="Terminal_Gui_ComboBox_OnCollapsed" data-uid="Terminal.Gui.ComboBox.OnCollapsed">OnCollapsed()</h4>
+  <div class="markdown level1 summary">
+Virtual method which invokes the <a class="xref" href="Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Collapsed">Collapsed</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnCollapsed()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnEnter_Terminal_Gui_View_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L278">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L481">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_OnEnter_" data-uid="Terminal.Gui.ComboBox.OnEnter*"></a>
   <h4 id="Terminal_Gui_ComboBox_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
@@ -979,10 +1062,27 @@ if it was already expanded and no action was taken
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnExpanded.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnExpanded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L467">View Source</a>
+  </span>
+  <a id="Terminal_Gui_ComboBox_OnExpanded_" data-uid="Terminal.Gui.ComboBox.OnExpanded*"></a>
+  <h4 id="Terminal_Gui_ComboBox_OnExpanded" data-uid="Terminal.Gui.ComboBox.OnExpanded">OnExpanded()</h4>
+  <div class="markdown level1 summary">
+Virtual method which invokes the <a class="xref" href="Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Expanded">Expanded</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnExpanded()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnLeave_Terminal_Gui_View_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L290">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L493">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_OnLeave_" data-uid="Terminal.Gui.ComboBox.OnLeave*"></a>
   <h4 id="Terminal_Gui_ComboBox_OnLeave_Terminal_Gui_View_" data-uid="Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)">OnLeave(View)</h4>
@@ -1031,7 +1131,7 @@ if it was already expanded and no action was taken
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnOpenSelectedItem.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnOpenSelectedItem%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L324">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L527">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_OnOpenSelectedItem_" data-uid="Terminal.Gui.ComboBox.OnOpenSelectedItem*"></a>
   <h4 id="Terminal_Gui_ComboBox_OnOpenSelectedItem" data-uid="Terminal.Gui.ComboBox.OnOpenSelectedItem">OnOpenSelectedItem()</h4>
@@ -1063,7 +1163,7 @@ Invokes the OnOpenSelectedItem event if it is defined.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OnSelectedChanged.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OnSelectedChanged%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L311">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L514">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_OnSelectedChanged_" data-uid="Terminal.Gui.ComboBox.OnSelectedChanged*"></a>
   <h4 id="Terminal_Gui_ComboBox_OnSelectedChanged" data-uid="Terminal.Gui.ComboBox.OnSelectedChanged">OnSelectedChanged()</h4>
@@ -1095,7 +1195,7 @@ Invokes the SelectedChanged event if it is defined.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L346">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L551">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_ProcessKey_" data-uid="Terminal.Gui.ComboBox.ProcessKey*"></a>
   <h4 id="Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
@@ -1144,7 +1244,7 @@ Invokes the SelectedChanged event if it is defined.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Redraw_Terminal_Gui_Rect_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L333">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L537">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_Redraw_" data-uid="Terminal.Gui.ComboBox.Redraw*"></a>
   <h4 id="Terminal_Gui_ComboBox_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
@@ -1178,7 +1278,7 @@ Invokes the SelectedChanged event if it is defined.
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_SetSource_System_Collections_IList_.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.SetSource(System.Collections.IList)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L49">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L204">View Source</a>
   </span>
   <a id="Terminal_Gui_ComboBox_SetSource_" data-uid="Terminal.Gui.ComboBox.SetSource*"></a>
   <h4 id="Terminal_Gui_ComboBox_SetSource_System_Collections_IList_" data-uid="Terminal.Gui.ComboBox.SetSource(System.Collections.IList)">SetSource(IList)</h4>
@@ -1211,10 +1311,72 @@ Sets the source of the <a class="xref" href="Terminal.Gui.ComboBox.html">ComboBo
   </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Collapsed.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Collapsed%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L227">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_ComboBox_Collapsed" data-uid="Terminal.Gui.ComboBox.Collapsed">Collapsed</h4>
+  <div class="markdown level1 summary">
+This event is raised when the drop-down list is collapsed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Collapsed</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_Expanded.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.Expanded%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L222">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_ComboBox_Expanded" data-uid="Terminal.Gui.ComboBox.Expanded">Expanded</h4>
+  <div class="markdown level1 summary">
+This event is raised when the drop-down list is expanded.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Expanded</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_OpenSelectedItem.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.OpenSelectedItem%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L67">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L232">View Source</a>
   </span>
   <h4 id="Terminal_Gui_ComboBox_OpenSelectedItem" data-uid="Terminal.Gui.ComboBox.OpenSelectedItem">OpenSelectedItem</h4>
   <div class="markdown level1 summary">
@@ -1245,7 +1407,7 @@ This event is raised when the user Double Clicks on an item or presses ENTER to 
     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox_SelectedItemChanged.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox.SelectedItemChanged%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L62">View Source</a>
+    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L217">View Source</a>
   </span>
   <h4 id="Terminal_Gui_ComboBox_SelectedItemChanged" data-uid="Terminal.Gui.ComboBox.SelectedItemChanged">SelectedItemChanged</h4>
   <div class="markdown level1 summary">
@@ -1292,7 +1454,7 @@ This event is raised when the selected item in the <a class="xref" href="Termina
                     <a href="https://github.com/gui-cs/Terminal.Gui/new/develop/apidoc/new?filename=Terminal_Gui_ComboBox.md&amp;value=---%0Auid%3A%20Terminal.Gui.ComboBox%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
                   </li>
                   <li>
-                    <a href="tig:tig/Terminal.Gui/blob/main/Terminal.Gui/Views/ComboBox.cs/#L17" class="contribution-link">View Source</a>
+                    <a href="tig:tig/gui.cs/blob/main/Terminal.Gui/Views/ComboBox.cs/#L17" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
