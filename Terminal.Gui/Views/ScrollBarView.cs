@@ -106,7 +106,7 @@ namespace Terminal.Gui {
 				OtherScrollBarView.X = OtherScrollBarView.IsVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 				OtherScrollBarView.Y = OtherScrollBarView.IsVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
 				OtherScrollBarView.Host.SuperView.Add (OtherScrollBarView);
-				OtherScrollBarView.showScrollIndicator = true;
+				OtherScrollBarView.ShowScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
 			contentBottomRightCorner = new View (" ") { Visible = host.Visible };
@@ -116,6 +116,7 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.Width = 1;
 			contentBottomRightCorner.Height = 1;
 			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			ClearOnVisibleFalse = false;
 		}
 
 		private void Host_VisibleChanged ()
@@ -188,11 +189,9 @@ namespace Terminal.Gui {
 		public int Size {
 			get => size;
 			set {
-				if (hosted || (otherScrollBarView != null && otherScrollBarView.hosted)) {
-					size = value + 1;
-				} else {
-					size = value;
-				}
+				size = value;
+				SetRelativeLayout (Bounds);
+				ShowHideScrollBars (false);
 				SetNeedsDisplay ();
 			}
 		}
@@ -220,9 +219,6 @@ namespace Terminal.Gui {
 						position = Math.Max (position + max, 0);
 					}
 					var s = GetBarsize (vertical);
-					if (position + s == size && (hosted || (otherScrollBarView != null && otherScrollBarView.hosted))) {
-						position++;
-					}
 					OnChangedPosition ();
 					SetNeedsDisplay ();
 				}
@@ -327,11 +323,13 @@ namespace Terminal.Gui {
 			ShowHideScrollBars ();
 		}
 
-		void ShowHideScrollBars ()
+		void ShowHideScrollBars (bool redraw = true)
 		{
 			if (!hosted || (hosted && !autoHideScrollBars)) {
 				if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
 					contentBottomRightCorner.Visible = false;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.contentBottomRightCorner.Visible) {
+					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
 				return;
 			}
@@ -350,24 +348,34 @@ namespace Terminal.Gui {
 			if (showBothScrollIndicator) {
 				if (contentBottomRightCorner != null) {
 					contentBottomRightCorner.Visible = true;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+					otherScrollBarView.contentBottomRightCorner.Visible = true;
 				}
 			} else if (!showScrollIndicator) {
 				if (contentBottomRightCorner != null) {
 					contentBottomRightCorner.Visible = false;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
 				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
-			} else {
+			} else if (contentBottomRightCorner != null) {
 				contentBottomRightCorner.Visible = false;
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+				otherScrollBarView.contentBottomRightCorner.Visible = false;
 			}
 			if (Host?.Visible == true && showScrollIndicator && !Visible) {
 				Visible = true;
 			}
-			if (Host?.Visible == true && otherScrollBarView != null && otherScrollBarView.showScrollIndicator
-				&& !otherScrollBarView.Visible) {
+			if (Host?.Visible == true && otherScrollBarView?.showScrollIndicator == true && !otherScrollBarView.Visible) {
 				otherScrollBarView.Visible = true;
 			}
+
+			if (!redraw) {
+				return;
+			}
+
 			if (showScrollIndicator) {
 				Redraw (Bounds);
 			}
@@ -384,12 +392,21 @@ namespace Terminal.Gui {
 				if (scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = false;
 				}
+				if (scrollBarView.Visible) {
+					scrollBarView.Visible = false;
+				}
 			} else if (barsize > 0 && barsize == scrollBarView.size && scrollBarView.OtherScrollBarView != null && pending) {
 				if (scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = false;
 				}
+				if (scrollBarView.Visible) {
+					scrollBarView.Visible = false;
+				}
 				if (scrollBarView.OtherScrollBarView != null && scrollBarView.showBothScrollIndicator) {
 					scrollBarView.OtherScrollBarView.ShowScrollIndicator = false;
+				}
+				if (scrollBarView.OtherScrollBarView.Visible) {
+					scrollBarView.OtherScrollBarView.Visible = false;
 				}
 			} else if (barsize > 0 && barsize == size && scrollBarView.OtherScrollBarView != null && !pending) {
 				pending = true;
@@ -398,9 +415,15 @@ namespace Terminal.Gui {
 					if (!scrollBarView.showBothScrollIndicator) {
 						scrollBarView.OtherScrollBarView.ShowScrollIndicator = true;
 					}
+					if (!scrollBarView.OtherScrollBarView.Visible) {
+						scrollBarView.OtherScrollBarView.Visible = true;
+					}
 				}
 				if (!scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = true;
+				}
+				if (!scrollBarView.Visible) {
+					scrollBarView.Visible = true;
 				}
 			}
 
@@ -418,7 +441,7 @@ namespace Terminal.Gui {
 			} else if (showScrollIndicator) {
 				Width = vertical ? 1 : Dim.Width (Host) - 0;
 				Height = vertical ? Dim.Height (Host) - 0 : 1;
-			} else if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
+			} else if (otherScrollBarView?.showScrollIndicator == true) {
 				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 0;
 				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 0 : 1;
 			}
@@ -432,7 +455,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			if (ColorScheme == null || Size == 0) {
+			if (ColorScheme == null || ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
+				if ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
+					ShowHideScrollBars (false);
+				}
 				return;
 			}
 
@@ -578,6 +604,8 @@ namespace Terminal.Gui {
 
 			if (contentBottomRightCorner != null && hosted && showBothScrollIndicator) {
 				contentBottomRightCorner.Redraw (contentBottomRightCorner.Bounds);
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.hosted && otherScrollBarView.showBothScrollIndicator) {
+				otherScrollBarView.contentBottomRightCorner.Redraw (otherScrollBarView.contentBottomRightCorner.Bounds);
 			}
 		}
 
