@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Tree View </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Tree View ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="tree-view">Tree View</h1>
+
+<p>TreeView is a control for navigating hierarchical objects. It comes in two forms <code>TreeView</code> and <code>TreeView&lt;T&gt;</code>.</p>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.TreeView.html">TreeView API Reference</a></p>
+<h2 id="using-treeview">Using TreeView</h2>
+<p>The basic non generic TreeView class is populated by <code>ITreeNode</code> objects. The simplest tree you can make would look something like:</p>
+<pre><code class="lang-csharp">var tree = new TreeView()
+{
+  X = 0,
+  Y = 0,
+  Width = 40,
+  Height = 20
+};
+
+var root1 = new TreeNode(&quot;Root1&quot;);
+root1.Children.Add(new TreeNode(&quot;Child1.1&quot;));
+root1.Children.Add(new TreeNode(&quot;Child1.2&quot;));
+
+var root2 = new TreeNode(&quot;Root2&quot;);
+root2.Children.Add(new TreeNode(&quot;Child2.1&quot;));
+root2.Children.Add(new TreeNode(&quot;Child2.2&quot;));
+
+tree.AddObject(root1);
+tree.AddObject(root2);
+</code></pre><p>Having to create a bunch of TreeNode objects can be a pain especially if you already have your own objects e.g. <code>House</code>, <code>Room</code> etc. There are two ways to use your own classes without having to create nodes manually. Firstly you can implement the <code>ITreeNode</code> interface:</p>
+<pre><code class="lang-csharp">// Your data class
+private class House : TreeNode {
+
+    // Your properties
+    public string Address {get;set;}
+    public List&lt;Room&gt; Rooms {get;set;}
+
+    // ITreeNode member:
+    public override IList&lt;ITreeNode&gt; Children =&gt; Rooms.Cast&lt;ITreeNode&gt;().ToList();
+
+    public override string Text { get =&gt; Address; set =&gt; Address = value; }
+}
+
+
+// Your other data class
+private class Room : TreeNode{
+
+    public string Name {get;set;}
+
+    public override string Text{get=&gt;Name;set{Name=value;}}
+}
+</code></pre><p>After implementing the interface you can add your objects directly to the tree</p>
+<pre><code class="lang-csharp">
+var myHouse = new House()
+{
+    Address = &quot;23 Nowhere Street&quot;,
+    Rooms = new List&lt;Room&gt;{
+      new Room(){Name = &quot;Ballroom&quot;},
+      new Room(){Name = &quot;Bedroom 1&quot;},
+      new Room(){Name = &quot;Bedroom 2&quot;}
+    }
+};
+
+var tree = new TreeView()
+{
+    X = 0,
+    Y = 0,
+    Width = 40,
+    Height = 20
+};
+
+tree.AddObject(myHouse);
+</code></pre><p>Alternatively you can simply tell the tree how the objects relate to one another by implementing <code>ITreeBuilder&lt;T&gt;</code>. This is a good option if you don&#39;t have control of the data objects you are working with.</p>
+<h2 id="treeviewt"><code>TreeView&lt;T&gt;</code></h2>
+<p>The generic <code>Treeview&lt;T&gt;</code> allows you to store any object hierarchy where nodes implement Type T. For example if you are working with <code>DirectoryInfo</code> and <code>FileInfo</code> objects then you could create a <code>TreeView&lt;FileSystemInfo&gt;</code>. If you don&#39;t have a shared interface/base class for all nodes you can still declare a <code>TreeView&lt;object&gt;</code>.</p>
+<p>In order to use <code>TreeView&lt;T&gt;</code> you need to tell the tree how objects relate to one another (who are children of who). To do this you must provide an <code>ITreeBuilder&lt;T&gt;</code>.</p>
+<h3 id="implementing-itreebuildert"><code>Implementing ITreeBuilder&lt;T&gt;</code></h3>
+<p>Consider a simple data model that already exists in your program:</p>
+<pre><code class="lang-csharp">private abstract class GameObject
+{
+
+}
+
+private class Army : GameObject
+{
+    public string Designation {get;set;}
+    public List&lt;Unit&gt; Units {get;set;}
+
+
+    public override string ToString ()
+    {
+        return Designation;
+    }
+}
+
+private class Unit : GameObject
+{
+    public string Name {get;set;}
+    public override string ToString ()
+    {
+        return Name;
+    }
+}
+</code></pre><p>An <code>ITreeBuilder&lt;T&gt;</code> for these classes might look like:</p>
+<pre><code class="lang-csharp">
+private class GameObjectTreeBuilder : ITreeBuilder&lt;GameObject&gt; {
+    public bool SupportsCanExpand =&gt; true;
+
+    public bool CanExpand (GameObject model)
+    {
+        return model is Army;
+    }
+
+    public IEnumerable&lt;GameObject&gt; GetChildren (GameObject model)
+    {
+        if(model is Army a)
+            return a.Units;
+
+        return Enumerable.Empty&lt;GameObject&gt;();
+    }
+}
+</code></pre><p>To use the builder in a tree you would use:</p>
+<pre><code class="lang-csharp">var army1 = new Army()
+{
+    Designation = &quot;3rd Infantry&quot;,
+    Units = new List&lt;Unit&gt;{
+        new Unit(){Name = &quot;Orc&quot;},
+        new Unit(){Name = &quot;Troll&quot;},
+        new Unit(){Name = &quot;Goblin&quot;},
+    }
+};
+
+var tree = new TreeView&lt;GameObject&gt;()
+{
+    X = 0,
+    Y = 0,
+    Width = 40,
+    Height = 20,
+    TreeBuilder = new GameObjectTreeBuilder()
+};
+
+
+tree.AddObject(army1);
+</code></pre><p>Alternatively you can use <code>DelegateTreeBuilder&lt;T&gt;</code> instead of implementing your own <code>ITreeBuilder&lt;T&gt;</code>. For example:</p>
+<pre><code class="lang-csharp">tree.TreeBuilder = new DelegateTreeBuilder&lt;GameObject&gt;(
+    (o)=&gt;o is Army a ? a.Units 
+      : Enumerable.Empty&lt;GameObject&gt;());
+</code></pre><h2 id="node-text-and-tostring">Node Text and ToString</h2>
+<p>The default behavior of TreeView is to use the <code>ToString</code> method on the objects for rendering. You can customise this by changing the <code>AspectGetter</code>. For example:</p>
+<pre><code class="lang-csharp">treeViewFiles.AspectGetter = (f)=&gt;f.FullName;
+</code></pre></article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/develop/docfx/articles/treeview.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

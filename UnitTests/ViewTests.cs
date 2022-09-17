@@ -3803,5 +3803,34 @@ e
 ", output);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void Visible_Clear_The_View_Output ()
+		{
+			var label = new Label ("Testing visibility.");
+			var win = new Window ();
+			win.Add (label);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.True (label.Visible);
+			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌────────────────────────────┐
+│Testing visibility.         │
+│                            │
+│                            │
+└────────────────────────────┘
+", output);
+
+			label.Visible = false;
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌────────────────────────────┐
+│                            │
+│                            │
+│                            │
+└────────────────────────────┘
+", output);
+		}
 	}
 }

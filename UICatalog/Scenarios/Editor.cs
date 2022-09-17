@@ -26,11 +26,11 @@ namespace UICatalog.Scenarios {
 		private string _textToReplace;
 		private bool _matchCase;
 		private bool _matchWholeWord;
-		private Window winDialog;
+		private Window _winDialog;
 		private TabView _tabView;
-		private MenuItem miForceMinimumPosToZero;
-		private bool forceMinimumPosToZero = true;
-		private readonly List<CultureInfo> cultureInfos = Application.SupportedCultures;
+		private MenuItem _miForceMinimumPosToZero;
+		private bool _forceMinimumPosToZero = true;
+		private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -59,6 +59,12 @@ namespace UICatalog.Scenarios {
 			};
 
 			CreateDemoFile (_fileName);
+
+			var siCursorPosition = new StatusItem (Key.Null, "", null);
+
+			_textView.UnwrappedCursorPosition += (e) => {
+				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
+			};
 
 			LoadFile ();
 
@@ -103,16 +109,17 @@ namespace UICatalog.Scenarios {
 					CreateVisibleChecked ()
 				}),
 				new MenuBarItem ("Conte_xtMenu", new MenuItem [] {
-					miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
-						miForceMinimumPosToZero.Checked = forceMinimumPosToZero = !forceMinimumPosToZero;
-						_textView.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
-					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
+					_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
+						_miForceMinimumPosToZero.Checked = _forceMinimumPosToZero = !_forceMinimumPosToZero;
+						_textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
 					new MenuBarItem ("_Languages", GetSupportedCultures ())
 				})
 			});
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
+				siCursorPosition,
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
@@ -168,20 +175,20 @@ namespace UICatalog.Scenarios {
 
 			Win.KeyPress += (e) => {
 				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
+				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
 					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
 				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
 					e.Handled = true;
-				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
@@ -196,9 +203,9 @@ namespace UICatalog.Scenarios {
 
 		private void DisposeWinDialog ()
 		{
-			winDialog.Dispose ();
-			Win.Remove (winDialog);
-			winDialog = null;
+			_winDialog.Dispose ();
+			Win.Remove (_winDialog);
+			_winDialog = null;
 		}
 
 		public override void Setup ()
@@ -276,7 +283,7 @@ namespace UICatalog.Scenarios {
 				Find ();
 				return;
 			} else if (replace && (string.IsNullOrEmpty (_textToFind)
-				|| (winDialog == null && string.IsNullOrEmpty (_textToReplace)))) {
+				|| (_winDialog == null && string.IsNullOrEmpty (_textToReplace)))) {
 				Replace ();
 				return;
 			}
@@ -323,7 +330,7 @@ namespace UICatalog.Scenarios {
 
 		private void ReplaceAll ()
 		{
-			if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && winDialog == null)) {
+			if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && _winDialog == null)) {
 				Replace ();
 				return;
 			}
@@ -468,7 +475,7 @@ namespace UICatalog.Scenarios {
 			List<MenuItem> supportedCultures = new List<MenuItem> ();
 			var index = -1;
 
-			foreach (var c in cultureInfos) {
+			foreach (var c in _cultureInfos) {
 				var culture = new MenuItem {
 					CheckType = MenuItemCheckStyle.Checked
 				};
@@ -714,17 +721,17 @@ namespace UICatalog.Scenarios {
 
 		private void CreateFindReplace (bool isFind = true)
 		{
-			if (winDialog != null) {
-				winDialog.SetFocus ();
+			if (_winDialog != null) {
+				_winDialog.SetFocus ();
 				return;
 			}
 
-			winDialog = new Window (isFind ? "Find" : "Replace") {
+			_winDialog = new Window (isFind ? "Find" : "Replace") {
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
 				ColorScheme = Colors.TopLevel
 			};
-			winDialog.Border.Effect3D = true;
+			_winDialog.Border.Effect3D = true;
 
 			_tabView = new TabView () {
 				X = 0,
@@ -737,15 +744,15 @@ namespace UICatalog.Scenarios {
 			var replace = ReplaceTab ();
 			_tabView.AddTab (new TabView.Tab ("Replace", replace), !isFind);
 			_tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
-			winDialog.Add (_tabView);
+			_winDialog.Add (_tabView);
 
-			Win.Add (winDialog);
+			Win.Add (_winDialog);
 
-			winDialog.Width = replace.Width + 4;
-			winDialog.Height = replace.Height + 4;
+			_winDialog.Width = replace.Width + 4;
+			_winDialog.Height = replace.Height + 4;
 
-			winDialog.SuperView.BringSubviewToFront (winDialog);
-			winDialog.SetFocus ();
+			_winDialog.SuperView.BringSubviewToFront (_winDialog);
+			_winDialog.SetFocus ();
 		}
 
 		private void SetFindText ()
