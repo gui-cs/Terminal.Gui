@@ -619,6 +619,10 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Theory]
 		[InlineData('A',true,false,false,ConsoleKey.A)]
 		[InlineData('z',false,false,false,ConsoleKey.Z)]
+		[InlineData (' ', false, false, false, ConsoleKey.Spacebar)]
+		[InlineData ('\b', false, false, false, ConsoleKey.Backspace)]
+		[InlineData ('=', false, false, false, ConsoleKey.OemPlus)]
+		[InlineData ('+', true, false, false, ConsoleKey.OemPlus)]
 		public void TestVKPacket(char unicodeCharacter,bool shift, bool alt, bool control, ConsoleKey expectedRemapping)
 		{
 			var before = new ConsoleKeyInfo(unicodeCharacter,ConsoleKey.Packet,shift,alt,control);

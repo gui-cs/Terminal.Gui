@@ -1245,7 +1245,7 @@ namespace Terminal.Gui {
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
-			ConsoleKeyInfo = RemapPacketKey(ConsoleKeyInfo);
+			ConsoleKeyInfo = RemapPacketKey (ConsoleKeyInfo);
 
 			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
 		}
@@ -1763,36 +1763,157 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Handles case when the 'key' providied is ConsoleKey.Packet by
+		/// Handles case when the 'key' providied is <see cref="ConsoleKey.Packet"/>
 		/// returning a new <see cref="ConsoleKeyInfo"/> where key is remapped
 		/// by parsing the Unicode char data of the <see cref="ConsoleKeyInfo"/>
 		/// </summary>
 		internal static ConsoleKeyInfo RemapPacketKey (ConsoleKeyInfo original)
 		{
+			if (original.Key != ConsoleKey.Packet)
+				return original;
+
 			// If the key struck was virtual
-			if(original.Key == ConsoleKey.Packet)
-			{
-				// Try to parse the unicode key e.g. 'A' into a value in ConsoleKey
-				// so that other parts of the program consider it as a regular button
-				// press
-				ConsoleKey remappedkey;
-				if(Enum.TryParse<ConsoleKey>(
-					// have to turn e.g. 'a' to something parseable as
-					// an enum value (i.e. Upper it)
-					original.KeyChar.ToString().ToUpper(), 
-					out remappedkey))
-				{
-					return new ConsoleKeyInfo(
-						original.KeyChar,
-						remappedkey,
-						original.Modifiers.HasFlag(ConsoleModifiers.Shift),
-						original.Modifiers.HasFlag(ConsoleModifiers.Alt),
-						original.Modifiers.HasFlag(ConsoleModifiers.Control)
-					);
-				}
+			// Try to parse the unicode key e.g. 'A' into a value in ConsoleKey
+			// so that other parts of the program consider it as a regular button
+			// press
+			ConsoleKey remappedkey;
+			if (TryParseConsoleKey (
+				// have to turn e.g. 'a' to something parseable as
+				// an enum value (i.e. Upper it)
+				original.KeyChar.ToString ()?.ToUpper (),
+				out remappedkey)) {
+				return new ConsoleKeyInfo (
+					original.KeyChar,
+					remappedkey,
+					original.Modifiers.HasFlag (ConsoleModifiers.Shift),
+					original.Modifiers.HasFlag (ConsoleModifiers.Alt),
+					original.Modifiers.HasFlag (ConsoleModifiers.Control)
+				);
+
 			}
 
 			return original;
+		}
+
+		private static bool TryParseConsoleKey (string c, out ConsoleKey remappedkey)
+		{
+			if (c == null || c == "\0") {
+				remappedkey = default (ConsoleKey);
+				return false;
+			}
+
+			// if it is a basic letter e.g. A-Z
+			if (Enum.TryParse (c, out remappedkey))
+				return true;
+
+			switch (c) {
+			case "\t":
+				remappedkey = ConsoleKey.Tab;
+				break;
+			case "\u001b":
+				remappedkey = ConsoleKey.Escape;
+				break;
+			case "\b":
+				remappedkey = ConsoleKey.Backspace;
+				break;
+			case "0":
+			case ")":
+				remappedkey = ConsoleKey.D0;
+				break;
+			case "1":
+			case "!":
+				remappedkey = ConsoleKey.D1;
+				break;
+			case "2":
+			case "@": //TODO: this is going to vary according ot keyboard layout, US = @ while UK = "
+				remappedkey = ConsoleKey.D2;
+				break;
+			case "3":
+			case "£": // UK layout has the pound symbol for '#'
+			case "#": // TODO: this is going to be 
+				remappedkey = ConsoleKey.D3;
+				break;
+			case "4":
+			case "$":
+				remappedkey = ConsoleKey.D4;
+				break;
+			case "5":
+			case "%":
+				remappedkey = ConsoleKey.D5;
+				break;
+			case "6":
+			case "^":
+				remappedkey = ConsoleKey.D6;
+				break;
+			case "7":
+			case "&":
+				remappedkey = ConsoleKey.D7;
+				break;
+			case "8":
+			case "*":
+				remappedkey = ConsoleKey.D8;
+				break;
+			case "9":
+			case "(":
+				remappedkey = ConsoleKey.D9;
+				break;
+			case ",":
+			case "<":
+				remappedkey = ConsoleKey.OemComma;
+				break;
+			case "-":
+			case "_":
+				remappedkey = ConsoleKey.OemMinus;
+				break;
+			case ".":
+			case ">":
+				remappedkey = ConsoleKey.OemPeriod;
+				break;
+			case "+":
+			case "=":
+				remappedkey = ConsoleKey.OemPlus;
+				break;
+			case " ":
+				remappedkey = ConsoleKey.Spacebar;
+				break;
+			case ":":
+			case ";":
+				remappedkey = ConsoleKey.Oem1;
+				break;
+			case "/":
+			case "?":
+				remappedkey = ConsoleKey.Oem2;
+				break;
+			case "~":
+			case "`":
+				remappedkey = ConsoleKey.Oem3;
+				break;
+			case "[":
+			case "{":
+				remappedkey = ConsoleKey.Oem3;
+				break;
+			case "|":
+			case "\\":
+				remappedkey = ConsoleKey.Oem5;
+				break;
+			case "}":
+			case "]":
+				remappedkey = ConsoleKey.Oem6;
+				break;
+
+			/*TODO: I'm guessing that this is not right*/
+			case "\n":
+			case "\r":
+				remappedkey = ConsoleKey.Enter;
+				break;
+
+			// do not have a 
+			default:
+				remappedkey = default (ConsoleKey);
+				return false;
+			};
+
+			return true;
 		}
 		#endregion
 	}
