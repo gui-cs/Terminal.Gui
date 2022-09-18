@@ -1318,7 +1318,7 @@ namespace Terminal.Gui.Core {
 						if (myi == 0) {
 
 							// let the timeouts run for a bit
-							Thread.Sleep (5000);
+							Thread.Sleep (10000);
 
 							// then tell the application to quit
 							Application.MainLoop.Invoke (() => Application.RequestStop ());
