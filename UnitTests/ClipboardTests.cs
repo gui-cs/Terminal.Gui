@@ -79,11 +79,12 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Contents_Gets_From_OS_Clipboard ()
 		{
-			var clipText = "This is a clipboard unit test to get clipboard from OS.";
-			var exit = false;
-			var getClipText = "";
-
 			lock (Clipboard.Contents) {
+
+				var clipText = "This is a clipboard unit test to get clipboard from OS.";
+				var exit = false;
+				var getClipText = "";
+
 				Application.Iteration += () => {
 					if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 						// using (Process clipExe = new Process {
@@ -188,12 +189,12 @@ namespace Terminal.Gui.Core {
 
 					Application.RequestStop ();
 				};
-			}
 
-			Application.Run ();
+				Application.Run ();
 
-			if (!exit) {
-				Assert.Equal (clipText, getClipText);
+				if (!exit) {
+					Assert.Equal (clipText, getClipText);
+				}
 			}
 		}
 
