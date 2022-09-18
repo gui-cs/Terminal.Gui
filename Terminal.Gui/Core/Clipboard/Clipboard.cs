@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 			get {
 				try {
 					if (IsSupported) {
-						return Application.Driver.Clipboard.GetClipboardData ();
+						return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
 					} else {
 						return contents;
 					}

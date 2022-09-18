@@ -2722,7 +2722,7 @@ namespace Terminal.Gui {
 		/// <returns>The text formatter size more the <see cref="TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetBoundsTextFormatterSize ()
 		{
-			if (TextFormatter.Text == null)
+			if (ustring.IsNullOrEmpty (TextFormatter.Text))
 				return Bounds.Size;
 
 			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
