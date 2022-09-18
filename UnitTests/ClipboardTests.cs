@@ -8,16 +8,14 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Contents_Gets_Sets ()
 		{
-			lock (Clipboard.Contents) {
-				var clipText = "This is a clipboard unit test.";
-				Clipboard.Contents = clipText;
+			var clipText = "This is a clipboard unit test.";
+			Clipboard.Contents = clipText;
 
-				Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += () => Application.RequestStop ();
 
-				Application.Run ();
+			Application.Run ();
 
-				Assert.Equal (clipText, Clipboard.Contents);
-			}
+			Assert.Equal (clipText, Clipboard.Contents);
 		}
 
 		[Fact]
@@ -55,23 +53,21 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 		{
-			lock (Clipboard.Contents) {
-				var clipText = "Trying to set the OS clipboard.";
-				if (Clipboard.IsSupported) {
-					Assert.True (Clipboard.TrySetClipboardData (clipText));
-				} else {
-					Assert.False (Clipboard.TrySetClipboardData (clipText));
-				}
+			var clipText = "Trying to set the OS clipboard.";
+			if (Clipboard.IsSupported) {
+				Assert.True (Clipboard.TrySetClipboardData (clipText));
+			} else {
+				Assert.False (Clipboard.TrySetClipboardData (clipText));
+			}
 
-				Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += () => Application.RequestStop ();
 
-				Application.Run ();
+			Application.Run ();
 
-				if (Clipboard.IsSupported) {
-					Assert.Equal (clipText, Clipboard.Contents);
-				} else {
-					Assert.NotEqual (clipText, Clipboard.Contents);
-				}
+			if (Clipboard.IsSupported) {
+				Assert.Equal (clipText, Clipboard.Contents);
+			} else {
+				Assert.NotEqual (clipText, Clipboard.Contents);
 			}
 		}
 
@@ -79,122 +75,119 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Contents_Gets_From_OS_Clipboard ()
 		{
-			lock (Clipboard.Contents) {
+			var clipText = "This is a clipboard unit test to get clipboard from OS.";
+			var exit = false;
+			var getClipText = "";
 
-				var clipText = "This is a clipboard unit test to get clipboard from OS.";
-				var exit = false;
-				var getClipText = "";
+			Application.Iteration += () => {
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					// using (Process clipExe = new Process {
+					// 	StartInfo = new ProcessStartInfo {
+					// 		RedirectStandardInput = true,
+					// 		FileName = "clip"
+					// 	}
+					// }) {
+					// 	clipExe.Start ();
+					// 	clipExe.StandardInput.Write (clipText);
+					// 	clipExe.StandardInput.Close ();
+					// 	var result = clipExe.WaitForExit (500);
+					// 	if (result) {
+					// 		clipExe.WaitForExit ();
+					// 	}
+					// }
 
-				Application.Iteration += () => {
-					if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-						// using (Process clipExe = new Process {
-						// 	StartInfo = new ProcessStartInfo {
-						// 		RedirectStandardInput = true,
-						// 		FileName = "clip"
-						// 	}
-						// }) {
-						// 	clipExe.Start ();
-						// 	clipExe.StandardInput.Write (clipText);
-						// 	clipExe.StandardInput.Close ();
-						// 	var result = clipExe.WaitForExit (500);
-						// 	if (result) {
-						// 		clipExe.WaitForExit ();
-						// 	}
-						// }
-
-						using (Process pwsh = new Process {
-							StartInfo = new ProcessStartInfo {
-								FileName = "powershell",
-								Arguments = $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
-							}
-						}) {
-							pwsh.Start ();
-							pwsh.WaitForExit ();
+					using (Process pwsh = new Process {
+						StartInfo = new ProcessStartInfo {
+							FileName = "powershell",
+							Arguments = $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
 						}
-						getClipText = Clipboard.Contents.ToString ();
+					}) {
+						pwsh.Start ();
+						pwsh.WaitForExit ();
+					}
+					getClipText = Clipboard.Contents.ToString ();
 
-					} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-						using (Process copy = new Process {
-							StartInfo = new ProcessStartInfo {
-								RedirectStandardInput = true,
-								FileName = "pbcopy"
-							}
-						}) {
-							copy.Start ();
-							copy.StandardInput.Write (clipText);
-							copy.StandardInput.Close ();
-							copy.WaitForExit ();
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					using (Process copy = new Process {
+						StartInfo = new ProcessStartInfo {
+							RedirectStandardInput = true,
+							FileName = "pbcopy"
 						}
-						getClipText = Clipboard.Contents.ToString ();
+					}) {
+						copy.Start ();
+						copy.StandardInput.Write (clipText);
+						copy.StandardInput.Close ();
+						copy.WaitForExit ();
+					}
+					getClipText = Clipboard.Contents.ToString ();
 
-					} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
-						if (Is_WSL_Platform ()) {
-							try {
-								using (Process bash = new Process {
-									StartInfo = new ProcessStartInfo {
-										FileName = "powershell.exe",
-										Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
-									}
-								}) {
-									bash.Start ();
-									bash.WaitForExit ();
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					if (Is_WSL_Platform ()) {
+						try {
+							using (Process bash = new Process {
+								StartInfo = new ProcessStartInfo {
+									FileName = "powershell.exe",
+									Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
 								}
+							}) {
+								bash.Start ();
+								bash.WaitForExit ();
+							}
 
-								//using (Process clipExe = new Process {
-								//	StartInfo = new ProcessStartInfo {
-								//		RedirectStandardInput = true,
-								//		FileName = "clip.exe"
-								//	}
-								//}) {
-								//	clipExe.Start ();
-								//	clipExe.StandardInput.Write (clipText);
-								//	clipExe.StandardInput.Close ();
-								//	clipExe.WaitForExit ();
-								//	//var result = clipExe.WaitForExit (500);
-								//	//if (result) {
-								//	//	clipExe.WaitForExit ();
-								//	//}
-								//}
-							} catch {
-								exit = true;
-							}
-							if (!exit) {
-								getClipText = Clipboard.Contents.ToString ();
-							}
-							Application.RequestStop ();
-							return;
-						}
-						if (exit = xclipExists () == false) {
-							// xclip doesn't exist then exit.
-							Application.RequestStop ();
-							return;
-						}
-
-						using (Process bash = new Process {
-							StartInfo = new ProcessStartInfo {
-								FileName = "bash",
-								Arguments = $"-c \"xclip -sel clip -i\"",
-								RedirectStandardInput = true,
-							}
-						}) {
-							bash.Start ();
-							bash.StandardInput.Write (clipText);
-							bash.StandardInput.Close ();
-							bash.WaitForExit ();
+							//using (Process clipExe = new Process {
+							//	StartInfo = new ProcessStartInfo {
+							//		RedirectStandardInput = true,
+							//		FileName = "clip.exe"
+							//	}
+							//}) {
+							//	clipExe.Start ();
+							//	clipExe.StandardInput.Write (clipText);
+							//	clipExe.StandardInput.Close ();
+							//	clipExe.WaitForExit ();
+							//	//var result = clipExe.WaitForExit (500);
+							//	//if (result) {
+							//	//	clipExe.WaitForExit ();
+							//	//}
+							//}
+						} catch {
+							exit = true;
 						}
 						if (!exit) {
 							getClipText = Clipboard.Contents.ToString ();
 						}
+						Application.RequestStop ();
+						return;
+					}
+					if (exit = xclipExists () == false) {
+						// xclip doesn't exist then exit.
+						Application.RequestStop ();
+						return;
 					}
 
-					Application.RequestStop ();
-				};
-
-				Application.Run ();
-
-				if (!exit) {
-					Assert.Equal (clipText, getClipText);
+					using (Process bash = new Process {
+						StartInfo = new ProcessStartInfo {
+							FileName = "bash",
+							Arguments = $"-c \"xclip -sel clip -i\"",
+							RedirectStandardInput = true,
+						}
+					}) {
+						bash.Start ();
+						bash.StandardInput.Write (clipText);
+						bash.StandardInput.Close ();
+						bash.WaitForExit ();
+					}
+					if (!exit) {
+						getClipText = Clipboard.Contents.ToString ();
+					}
 				}
+
+				Application.RequestStop ();
+			};
+
+			Application.Run ();
+
+			if (!exit) {
+				Assert.Equal (clipText, getClipText);
 			}
 		}
 
