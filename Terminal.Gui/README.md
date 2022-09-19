@@ -87,13 +87,15 @@ git push
 ### 5) Pull the merged `develop` from `upstream`
 
 ```powershell
-git pull upstream `develop`
+git checkout develop
+git pull upstream develop
 ```
 
 ### 6) Merge `develop` into `main`
 
 ```powershell
 git checkout main
+git pull upstream main
 git merge develop
 ```
 
