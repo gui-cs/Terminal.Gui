@@ -1900,6 +1900,10 @@ namespace Terminal.Gui {
 			case "]":
 				remappedkey = ConsoleKey.Oem6;
 				break;
+			case "\"":
+			case "'":
+				remappedkey = ConsoleKey.Oem7;
+				break;
 
 			/*TODO: I'm guessing that this is not right*/
 			case "\n":
