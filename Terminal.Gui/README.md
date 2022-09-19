@@ -124,6 +124,15 @@ https://www.nuget.org/packages/Terminal.Gui
 
 ### 12) Tweet about it
 
+### 13) Update the `develop` branch
+
+```powershell
+git checkout develop
+git pull upstream develop
+git merge main
+git push upstream develop
+```
+
 ## Nuget
 
 https://www.nuget.org/packages/Terminal.Gui
