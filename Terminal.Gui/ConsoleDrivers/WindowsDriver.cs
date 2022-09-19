@@ -1244,17 +1244,17 @@ namespace Terminal.Gui {
 				keyModifiers.Scrolllock = scrolllock;
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
-		
+
 			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
 		}
 
 		public Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 		{
 			// If keystroke is a virtual key
-			if(keyInfoEx.consoleKeyInfo.Key == ConsoleKey.Packet) {
-				
+			if (keyInfoEx.consoleKeyInfo.Key == ConsoleKey.Packet) {
+
 				// try to map the 'char' that came with it into a Key
-				if(TryRemapPacketKey(keyInfoEx.consoleKeyInfo,out var result)) {
+				if (TryRemapPacketKey (keyInfoEx.consoleKeyInfo, out var result)) {
 					return result;
 				}
 			}
@@ -1771,8 +1771,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Handles case when the 'key' providied is <see cref="ConsoleKey.Packet"/>
-		/// returning a new <see cref="ConsoleKeyInfo"/> where key is remapped
-		/// by parsing the Unicode char data of the <see cref="ConsoleKeyInfo"/>
+		/// returning a <see cref="Key"/> that reflects the unicode char that came with
+		/// the OS event.
 		/// </summary>
 		/// <exception cref="ArgumentException">Thrown if passed key was not a <see cref="ConsoleKey.Packet"/></exception>
 		internal static bool TryRemapPacketKey (ConsoleKeyInfo original, out Key result)
@@ -1781,7 +1781,7 @@ namespace Terminal.Gui {
 			var c = original.KeyChar;
 
 			if (original.Key != ConsoleKey.Packet)
-				throw new ArgumentException ("Expected a ConsoleKeyInfo with a Key of Packet",nameof(original));
+				throw new ArgumentException ("Expected a ConsoleKeyInfo with a Key of Packet", nameof (original));
 
 			if (c == '\0') {
 				return false;

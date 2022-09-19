@@ -617,20 +617,20 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
 		/// </summary>
 		[Theory]
-		[InlineData('A',true,false,false,Key.A)]
-		[InlineData('z',false,false,false, Key.z)]
+		[InlineData ('A', true, false, false, Key.A)]
+		[InlineData ('z', false, false, false, Key.z)]
 		[InlineData (' ', false, false, false, Key.Space)]
 		[InlineData ('\b', false, false, false, Key.Backspace)]
 		[InlineData ('=', false, false, false, (Key)'=')]
 		[InlineData ('+', true, false, false, (Key)'+')]
-		public void TestVKPacket(char unicodeCharacter,bool shift, bool alt, bool control, Key expectedRemapping)
+		public void TestVKPacket (char unicodeCharacter, bool shift, bool alt, bool control, Key expectedRemapping)
 		{
-			var before = new ConsoleKeyInfo(unicodeCharacter,ConsoleKey.Packet,shift,alt,control);
-			Assert.True (WindowsDriver.TryRemapPacketKey (before,out var after));
+			var before = new ConsoleKeyInfo (unicodeCharacter, ConsoleKey.Packet, shift, alt, control);
+			Assert.True (WindowsDriver.TryRemapPacketKey (before, out var after));
 
 			// The thing we are really interested in, did we correctly convert
 			// the input ConsoleKey.Packet to the correct physical key
-			Assert.Equal(expectedRemapping,after);
+			Assert.Equal (expectedRemapping, after);
 		}
 	}
 }
