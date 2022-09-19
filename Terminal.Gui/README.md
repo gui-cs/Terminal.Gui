@@ -87,13 +87,15 @@ git push
 ### 5) Pull the merged `develop` from `upstream`
 
 ```powershell
-git pull upstream `develop`
+git checkout develop
+git pull upstream develop
 ```
 
 ### 6) Merge `develop` into `main`
 
 ```powershell
 git checkout main
+git pull upstream main
 git merge develop
 ```
 
@@ -121,6 +123,15 @@ https://www.nuget.org/packages/Terminal.Gui
 ### 11) Add a new Release in Github: https://github.com/gui-cs/Terminal.Gui/releases
 
 ### 12) Tweet about it
+
+### 13) Update the `develop` branch
+
+```powershell
+git checkout develop
+git pull upstream develop
+git merge main
+git push upstream develop
+```
 
 ## Nuget
 
