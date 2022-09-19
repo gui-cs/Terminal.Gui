@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="NStack.Core" Version="1.0.1" />
+    <PackageReference Include="NStack.Core" Version="1.0.3" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
   <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
@@ -80,7 +80,7 @@
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
       Release v1.8.0
-      * Fixes #2043. Update to NStack v1.0.1
+      * Fixes #2043. Update to NStack v1.0.3
       * Fixes #2045. TrySetClipboardData test must be enclosed with a lock.
       * Fixes #2025. API Docs are now generated via Github Action - View Source Works
       * Fixes #1991. Broken link in README
