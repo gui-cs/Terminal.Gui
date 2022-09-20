@@ -46,7 +46,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf2 = new TextField ("1234567890") {
@@ -86,7 +85,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf4 = new TextField ("1234567890") {
@@ -123,7 +121,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf6 = new TextField ("1234567890") {
