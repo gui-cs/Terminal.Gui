@@ -18,7 +18,7 @@ jobs:
         dotnet-version: 6.0.100
     
     - name: Setup DocFX
-      uses: crazy-max/ghaction-chocolatey@v1
+      uses: crazy-max/ghaction-chocolatey@v2
       with:
         args: install docfx    
 
@@ -29,7 +29,7 @@ jobs:
       working-directory: docfx
       # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
-        rm ../docs -Recurse -Force
+        rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
         docfx docfx.json
       continue-on-error: false      
 

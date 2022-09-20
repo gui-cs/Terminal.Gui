@@ -203,6 +203,8 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
+
+			AddKeyBinding (Key.R | Key.CtrlMask, Command.DeleteAll);
 			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
 			currentCulture = Thread.CurrentThread.CurrentUICulture;
@@ -412,7 +414,7 @@ namespace Terminal.Gui {
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (GetNormalColor ());
 			Move (0, 0);
 
 			int p = first;
@@ -462,6 +464,12 @@ namespace Terminal.Gui {
 				CursorPosition - ScrollOffset, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		Attribute GetReadOnlyColor ()
@@ -658,7 +666,7 @@ namespace Terminal.Gui {
 
 			historyText.Redo ();
 
-			//if (Clipboard.Contents == null)
+			//if (ustring.IsNullOrEmpty (Clipboard.Contents))
 			//	return true;
 			//var clip = TextModel.ToRunes (Clipboard.Contents);
 			//if (clip == null)
@@ -1209,7 +1217,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly || Clipboard.Contents == null) {
+			if (ReadOnly || ustring.IsNullOrEmpty (Clipboard.Contents)) {
 				return;
 			}
 
