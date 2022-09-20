@@ -1783,31 +1783,15 @@ namespace Terminal.Gui {
 			if (original.Key != ConsoleKey.Packet)
 				throw new ArgumentException ("Expected a ConsoleKeyInfo with a Key of Packet", nameof (original));
 
+			// there is no unicode value passed
 			if (c == '\0') {
 				return false;
 			}
 
-			switch (c) {
-			case '\t':
-				result = original.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
-				return true;
-			case '\u001b':
-				result = Key.Esc;
-				return true;
-			case '\b':
-				result = Key.Backspace;
-				return true;
-			case '\n':
-			case '\r':
-				result = Key.Enter;
-				return true;
-
 			// do not have a explicit mapping and char is nonzero so 
 			// we can just treat the `Key` as a regular unicode entry
-			default:
-				result = (Key)c;
-				return true;
-			};
+			result = (Key)c;
+			return true;
 		}
 		#endregion
 	}

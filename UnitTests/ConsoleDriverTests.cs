@@ -619,8 +619,6 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Theory]
 		[InlineData ('A', true, false, false, Key.A)]
 		[InlineData ('z', false, false, false, Key.z)]
-		[InlineData (' ', false, false, false, Key.Space)]
-		[InlineData ('\b', false, false, false, Key.Backspace)]
 		[InlineData ('=', false, false, false, (Key)'=')]
 		[InlineData ('+', true, false, false, (Key)'+')]
 		public void TestVKPacket (char unicodeCharacter, bool shift, bool alt, bool control, Key expectedRemapping)
