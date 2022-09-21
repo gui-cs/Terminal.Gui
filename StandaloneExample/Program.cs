@@ -5,6 +5,8 @@
 	using NStack;
 	using System.Text;
 	using Rune = System.Rune;
+	using System.Runtime.InteropServices;
+	using System.Diagnostics;
 
 	static class Demo {
 		class Box10x : View {
@@ -220,6 +222,19 @@
 				Width = Dim.Fill (),
 				Height = Dim.Fill () - 1
 			};
+
+			StringBuilder aboutMessage = new StringBuilder ();
+			aboutMessage.AppendLine (@"A comprehensive sample library for");
+			aboutMessage.AppendLine (@"");
+			aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
+			aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
+			aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
+			aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
+			aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
+			aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
+			aboutMessage.AppendLine (@"");
+			aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_New", "Creates new file", NewFile),
@@ -238,6 +253,12 @@
 				miScrollViewCheck = new MenuBarItem ("ScrollView", new MenuItem [] {
 					new MenuItem ("Box10x", "", () => ScrollViewCheck()) {CheckType = MenuItemCheckStyle.Radio, Checked = true },
 					new MenuItem ("Filler", "", () => ScrollViewCheck()) {CheckType = MenuItemCheckStyle.Radio }
+				}),
+					new MenuBarItem ("_Help", new MenuItem [] {
+					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
+					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
+					new MenuItem ("_About...", "About UI Catalog",
+						() =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A)
 				})
 			});
 
@@ -260,6 +281,33 @@
 			Application.Run ();
 
 			Application.Shutdown ();
+		}
+
+		private static void OpenUrl (string url)
+		{
+			try {
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					url = url.Replace ("&", "^&");
+					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					using (var process = new Process {
+						StartInfo = new ProcessStartInfo {
+							FileName = "xdg-open",
+							Arguments = url,
+							RedirectStandardError = true,
+							RedirectStandardOutput = true,
+							CreateNoWindow = true,
+							UseShellExecute = false
+						}
+					}) {
+						process.Start ();
+					}
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					Process.Start ("open", url);
+				}
+			} catch {
+				throw;
+			}
 		}
 	}
 }
