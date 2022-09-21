@@ -79,6 +79,9 @@
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
     <Title>Terminal.Gui - Cross Platform Terminal user interface toolkit for .NET</Title>
     <PackageReleaseNotes>
+      Release v1.8.1
+      * Fixes #2053. MessageBox.Query not wrapping correctly 
+      
       Release v1.8.0
       * Fixes #2043. Update to NStack v1.0.3
       * Fixes #2045. TrySetClipboardData test must be enclosed with a lock.
