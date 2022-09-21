@@ -154,5 +154,109 @@ namespace Terminal.Gui.Views {
 
 			Application.Run ();
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MessageBox_With_A_Label_Without_Spaces ()
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					MessageBox.Query ("mywindow", new string ('f', 2000), "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Top.Redraw (Application.Top.Bounds);
+					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌ mywindow ────────────────────────────────────────────────────────────────────┐
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
+│                                   [◦ ok ◦]                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MessageBox_With_A_Label_With_Spaces ()
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					var sb = new StringBuilder ();
+					for (int i = 0; i < 1000; i++)
+						sb.Append ("ff ");
+
+					MessageBox.Query ("mywindow", sb.ToString (), "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Top.Redraw (Application.Top.Bounds);
+					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+┌ mywindow ────────────────────────────────────────────────────────────────────┐
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
+│                                   [◦ ok ◦]                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
 	}
 }
