@@ -617,25 +617,45 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
 		/// </summary>
 		[Theory]
-		[InlineData ('A', Key.A)]
-		[InlineData ('z', Key.z)]
-		[InlineData ('=', (Key)'=')]
-		[InlineData ('英', (Key)'英')]
-		[InlineData ('+', (Key)'+')]
-		public void TestVKPacket (char unicodeCharacter, Key expectedRemapping)
+		[InlineData ('A', false, false, false, Key.A)]
+		[InlineData ('A', true, false, false, Key.A)]
+		[InlineData ('A', true, true, false, Key.A | Key.AltMask)]
+		[InlineData ('A', true, true, true, Key.A | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('z', false, false, false, Key.z)]
+		[InlineData ('z', true, false, false, Key.z)]
+		[InlineData ('z', true, true, false, Key.z | Key.AltMask)]
+		[InlineData ('z', true, true, true, Key.z | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('=', false, false, false, (Key)'=')]
+		[InlineData ('=', true, false, false, (Key)'=')]
+		[InlineData ('=', true, true, false, (Key)'=' | Key.AltMask)]
+		[InlineData ('=', true, true, true, (Key)'=' | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('英', false, false, false, (Key)'英')]
+		[InlineData ('英', true, false, false, (Key)'英')]
+		[InlineData ('英', true, true, false, (Key)'英' | Key.AltMask)]
+		[InlineData ('英', true, true, true, (Key)'英' | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('+', false, false, false, (Key)'+')]
+		[InlineData ('+', true, false, false, (Key)'+')]
+		[InlineData ('+', true, true, false, (Key)'+' | Key.AltMask)]
+		[InlineData ('+', true, true, true, (Key)'+' | Key.AltMask | Key.CtrlMask)]
+		public void TestVKPacket (char unicodeCharacter,bool shift, bool alt, bool ctrl, Key expectedRemapping)
 		{
-			var before = new ConsoleKeyInfo (unicodeCharacter, ConsoleKey.Packet, false, false, false);
+			var before = new ConsoleKeyInfo (unicodeCharacter, ConsoleKey.Packet, shift, alt, ctrl);
 			Assert.True (WindowsDriver.TryRemapPacketKey (before, out var after));
 
 			// The thing we are really interested in, did we correctly convert
 			// the input ConsoleKey.Packet to the correct physical key
 			Assert.Equal (expectedRemapping, after);
 		}
-		[Fact]
-		public void TestVKPacketWithZero ()
+		
+		[Theory]
+		[InlineData (false, false, false)]
+		[InlineData (true, false, false)]
+		[InlineData (true, true, false)]
+		[InlineData (true, true, true)]
+		public void TestVKPacketWithZero (bool shift, bool alt, bool ctrl)
 		{
-			var before = new ConsoleKeyInfo ('\0', ConsoleKey.Packet, false, false, false);
-			Assert.False (WindowsDriver.TryRemapPacketKey (before, out var after),"Expected there to be no attempt to map \\0 to a Key");
+			var before = new ConsoleKeyInfo ('\0', ConsoleKey.Packet,shift,alt,ctrl);
+			Assert.False (WindowsDriver.TryRemapPacketKey (before, out var _),"Expected there to be no attempt to map \\0 to a Key");
 		}
 	}
 }

@@ -1761,8 +1761,36 @@ namespace Terminal.Gui {
 
 			// do not have a explicit mapping and char is nonzero so 
 			// we can just treat the `Key` as a regular unicode entry
-			result = (Key)c;
+			result = ApplyModifiers ((Key)c,original.Modifiers);
+
 			return true;
+		}
+
+		/// <summary>
+		/// Applies 
+		/// </summary>
+		/// <param name="c"></param>
+		/// <param name="modifiers"></param>
+		/// <returns></returns>
+		private static Key ApplyModifiers (Key c, ConsoleModifiers modifiers)
+		{
+			if(modifiers.HasFlag(ConsoleModifiers.Control)) {
+				c |= Key.CtrlMask;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Alt)) {
+				c |= Key.AltMask;
+			}
+
+			/* TODO: Why not this too? I'm a bit confused
+			         ALSO this method looks a lot like `Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)` 
+		             Maybe we should be using that instead?
+			if (modifiers.HasFlag (ConsoleModifiers.Shift)) {
+				c |= Key.ShiftMask;
+			}
+			*/
+
+			return c;
 		}
 		#endregion
 	}
