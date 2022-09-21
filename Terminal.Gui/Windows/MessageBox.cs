@@ -248,9 +248,9 @@ namespace Terminal.Gui {
 			} else {
 				maxWidthLine = width;
 			}
-			int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
+			int textWidth = Math.Min (TextFormatter.MaxWidth (message, maxWidthLine), Application.Driver.Cols);
 			int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
-			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
+			int msgboxHeight = Math.Min (Math.Max (1, textHeight) + 4, Application.Driver.Rows); // textHeight + (top + top padding + buttons + bottom)
 
 			// Create button array for Dialog
 			int count = 0;
@@ -300,7 +300,7 @@ namespace Terminal.Gui {
 
 			if (width == 0 & height == 0) {
 				// Dynamically size Width
-				d.Width = Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth ()))); // textWidth + (left + padding + padding + right)
+				d.Width = Math.Min (Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth ()))), Application.Driver.Cols); // textWidth + (left + padding + padding + right)
 			}
 
 			// Setup actions
