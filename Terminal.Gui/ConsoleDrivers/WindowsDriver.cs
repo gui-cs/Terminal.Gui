@@ -1250,15 +1250,6 @@ namespace Terminal.Gui {
 
 		public Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 		{
-			// If keystroke is a virtual key
-			if (keyInfoEx.consoleKeyInfo.Key == ConsoleKey.Packet) {
-
-				// try to map the 'char' that came with it into a Key
-				if (TryRemapPacketKey (keyInfoEx.consoleKeyInfo, out var result)) {
-					return result;
-				}
-			}
-
 			var keyInfo = keyInfoEx.consoleKeyInfo;
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
@@ -1381,10 +1372,10 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			if (CanShiftBeAdded (keyInfo))
 				keyMod = Key.ShiftMask;
 			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
 				keyMod |= Key.CtrlMask;
@@ -1392,6 +1383,20 @@ namespace Terminal.Gui {
 				keyMod |= Key.AltMask;
 
 			return keyMod != Key.Null ? keyMod | key : key;
+		}
+
+		private bool CanShiftBeAdded (ConsoleKeyInfo keyInfo)
+		{
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) == 0) {
+				return false;
+			}
+			if (keyInfo.Key == ConsoleKey.Packet) {
+				var ckiChar = keyInfo.KeyChar;
+				if (char.IsLetter (ckiChar)) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		public override void Init (Action terminalResized)
@@ -1737,60 +1742,6 @@ namespace Terminal.Gui {
 
 		public override void CookMouse ()
 		{
-		}
-
-
-		/// <summary>
-		/// Handles case when the 'key' providied is <see cref="ConsoleKey.Packet"/>
-		/// returning a <see cref="Key"/> that reflects the unicode char that came with
-		/// the OS event.
-		/// </summary>
-		/// <exception cref="ArgumentException">Thrown if passed key was not a <see cref="ConsoleKey.Packet"/></exception>
-		internal static bool TryRemapPacketKey (ConsoleKeyInfo original, out Key result)
-		{
-			result = default (Key);
-			var c = original.KeyChar;
-
-			if (original.Key != ConsoleKey.Packet)
-				throw new ArgumentException ("Expected a ConsoleKeyInfo with a Key of Packet", nameof (original));
-
-			// there is no unicode value passed
-			if (c == '\0') {
-				return false;
-			}
-
-			// do not have a explicit mapping and char is nonzero so 
-			// we can just treat the `Key` as a regular unicode entry
-			result = ApplyModifiers ((Key)c,original.Modifiers);
-
-			return true;
-		}
-
-		/// <summary>
-		/// Applies 
-		/// </summary>
-		/// <param name="c"></param>
-		/// <param name="modifiers"></param>
-		/// <returns></returns>
-		private static Key ApplyModifiers (Key c, ConsoleModifiers modifiers)
-		{
-			if(modifiers.HasFlag(ConsoleModifiers.Control)) {
-				c |= Key.CtrlMask;
-			}
-
-			if (modifiers.HasFlag (ConsoleModifiers.Alt)) {
-				c |= Key.AltMask;
-			}
-
-			/* TODO: Why not this too? I'm a bit confused
-			         ALSO this method looks a lot like `Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)` 
-		             Maybe we should be using that instead?
-			if (modifiers.HasFlag (ConsoleModifiers.Shift)) {
-				c |= Key.ShiftMask;
-			}
-			*/
-
-			return c;
 		}
 		#endregion
 	}

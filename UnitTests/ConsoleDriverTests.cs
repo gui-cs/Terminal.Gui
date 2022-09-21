@@ -610,13 +610,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 		}
 
 		/// <summary>
-		/// Sometimes when using remoting tools EventKeyRecord sends 'virtual keystrokes'.
-		/// These are indicated with the wVirtualKeyCode of 231.  When we see this code
+		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
+		/// These are indicated with the wVirtualKeyCode of 231. When we see this code
 		/// then we need to look to the unicode character (UnicodeChar) instead of the key
 		/// when telling the rest of the framework what button was pressed. For full details
 		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
 		/// </summary>
-		[Theory]
+		[Theory, AutoInitShutdown]
 		[InlineData ('A', false, false, false, Key.A)]
 		[InlineData ('A', true, false, false, Key.A)]
 		[InlineData ('A', true, true, false, Key.A | Key.AltMask)]
@@ -626,36 +626,39 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[InlineData ('z', true, true, false, Key.z | Key.AltMask)]
 		[InlineData ('z', true, true, true, Key.z | Key.AltMask | Key.CtrlMask)]
 		[InlineData ('=', false, false, false, (Key)'=')]
-		[InlineData ('=', true, false, false, (Key)'=')]
-		[InlineData ('=', true, true, false, (Key)'=' | Key.AltMask)]
-		[InlineData ('=', true, true, true, (Key)'=' | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('=', true, false, false, (Key)'=' | Key.ShiftMask)]
+		[InlineData ('=', true, true, false, (Key)'=' | Key.ShiftMask | Key.AltMask)]
+		[InlineData ('=', true, true, true, (Key)'=' | Key.ShiftMask | Key.AltMask | Key.CtrlMask)]
 		[InlineData ('英', false, false, false, (Key)'英')]
 		[InlineData ('英', true, false, false, (Key)'英')]
 		[InlineData ('英', true, true, false, (Key)'英' | Key.AltMask)]
 		[InlineData ('英', true, true, true, (Key)'英' | Key.AltMask | Key.CtrlMask)]
 		[InlineData ('+', false, false, false, (Key)'+')]
-		[InlineData ('+', true, false, false, (Key)'+')]
-		[InlineData ('+', true, true, false, (Key)'+' | Key.AltMask)]
-		[InlineData ('+', true, true, true, (Key)'+' | Key.AltMask | Key.CtrlMask)]
-		public void TestVKPacket (char unicodeCharacter,bool shift, bool alt, bool ctrl, Key expectedRemapping)
+		[InlineData ('+', true, false, false, (Key)'+' | Key.ShiftMask)]
+		[InlineData ('+', true, true, false, (Key)'+' | Key.ShiftMask | Key.AltMask)]
+		[InlineData ('+', true, true, true, (Key)'+' | Key.ShiftMask | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('0', false, false, false, Key.D0)]
+		[InlineData ('0', true, false, false, Key.D0 | Key.ShiftMask)]
+		[InlineData ('0', true, true, false, Key.D0 | Key.ShiftMask | Key.AltMask)]
+		[InlineData ('0', true, true, true, Key.D0 | Key.ShiftMask | Key.AltMask | Key.CtrlMask)]
+		[InlineData ('\0', false, false, false, (Key)'\0')]
+		[InlineData ('\0', true, false, false, (Key)'\0' | Key.ShiftMask)]
+		[InlineData ('\0', true, true, false, (Key)'\0' | Key.ShiftMask | Key.AltMask)]
+		[InlineData ('\0', true, true, true, (Key)'\0' | Key.ShiftMask | Key.AltMask | Key.CtrlMask)]
+		public void TestVKPacket (char unicodeCharacter, bool shift, bool alt, bool control, Key expectedRemapping)
 		{
-			var before = new ConsoleKeyInfo (unicodeCharacter, ConsoleKey.Packet, shift, alt, ctrl);
-			Assert.True (WindowsDriver.TryRemapPacketKey (before, out var after));
+			var before = new ConsoleKeyInfo (unicodeCharacter, ConsoleKey.Packet, shift, alt, control);
+			var top = Application.Top;
 
-			// The thing we are really interested in, did we correctly convert
-			// the input ConsoleKey.Packet to the correct physical key
-			Assert.Equal (expectedRemapping, after);
-		}
-		
-		[Theory]
-		[InlineData (false, false, false)]
-		[InlineData (true, false, false)]
-		[InlineData (true, true, false)]
-		[InlineData (true, true, true)]
-		public void TestVKPacketWithZero (bool shift, bool alt, bool ctrl)
-		{
-			var before = new ConsoleKeyInfo ('\0', ConsoleKey.Packet,shift,alt,ctrl);
-			Assert.False (WindowsDriver.TryRemapPacketKey (before, out var _),"Expected there to be no attempt to map \\0 to a Key");
+			top.KeyPress += (e) => {
+				var after = e.KeyEvent.Key;
+				Assert.Equal (before.KeyChar, (char)after);
+				Assert.Equal (expectedRemapping, after);
+			};
+
+			Application.Begin (top);
+
+			Application.Driver.SendKeys (unicodeCharacter, ConsoleKey.Packet, shift, alt, control);
 		}
 	}
 }

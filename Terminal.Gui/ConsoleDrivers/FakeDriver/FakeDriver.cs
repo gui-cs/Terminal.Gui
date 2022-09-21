@@ -360,7 +360,7 @@ namespace Terminal.Gui {
 		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			if (CanShiftBeAdded (keyInfo))
 				keyMod = Key.ShiftMask;
 			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
 				keyMod |= Key.CtrlMask;
@@ -368,6 +368,20 @@ namespace Terminal.Gui {
 				keyMod |= Key.AltMask;
 
 			return keyMod != Key.Null ? keyMod | key : key;
+		}
+
+		private bool CanShiftBeAdded (ConsoleKeyInfo keyInfo)
+		{
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) == 0) {
+				return false;
+			}
+			if (keyInfo.Key == ConsoleKey.Packet) {
+				var ckiChar = keyInfo.KeyChar;
+				if (char.IsLetter (ckiChar)) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		Action<KeyEvent> keyHandler;
