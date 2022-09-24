@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
 					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
-				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
+				if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
 			} else if (contentBottomRightCorner != null) {
@@ -638,9 +638,9 @@ namespace Terminal.Gui {
 			var pos = Position;
 
 			if (me.Flags != MouseFlags.Button1Released
-				&& (Application.mouseGrabView == null || Application.mouseGrabView != this)) {
+				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
 				Application.GrabMouse (this);
-			} else if (me.Flags == MouseFlags.Button1Released && Application.mouseGrabView != null && Application.mouseGrabView == this) {
+			} else if (me.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
 				Application.UngrabMouse ();
 				return true;
