@@ -377,7 +377,7 @@ namespace Terminal.Gui {
 			}
 			if (keyInfo.Key == ConsoleKey.Packet) {
 				var ckiChar = keyInfo.KeyChar;
-				if (char.IsLetter (ckiChar)) {
+				if (char.IsLetterOrDigit (ckiChar) || char.IsSymbol (ckiChar) || char.IsPunctuation (ckiChar)) {
 					return false;
 				}
 			}
