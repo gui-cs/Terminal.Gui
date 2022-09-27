@@ -370,12 +370,14 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
+		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyUpHandler;
 		private CursorVisibility savedCursorVisibility;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			this.keyDownHandler = keyDownHandler;
 			this.keyHandler = keyHandler;
 			this.keyUpHandler = keyUpHandler;
 
@@ -400,6 +402,7 @@ namespace Terminal.Gui {
 				keyModifiers.Ctrl = true;
 			}
 
+			keyDownHandler (new KeyEvent (map, keyModifiers));
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
 		}

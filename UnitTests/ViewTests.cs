@@ -3910,5 +3910,73 @@ This is a tes
 			Assert.True (viewCalled);
 			Assert.True (tvCalled);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void KeyDown_And_KeyUp_Events_Must_Called_Before_OnKeyDown_And_OnKeyUp ()
+		{
+			var view = new DerivedView ();
+			view.KeyDown += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (view.IsKeyDown);
+				e.Handled = true;
+			};
+			view.KeyPress += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (view.IsKeyPress);
+				e.Handled = true;
+			};
+			view.KeyUp += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (view.IsKeyUp);
+				e.Handled = true;
+			};
+
+			var iterations = -1;
+
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
+				} else if (iterations == 1) {
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Top.Add (view);
+
+			Assert.True (view.CanFocus);
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		public class DerivedView : View {
+			public DerivedView ()
+			{
+				CanFocus = true;
+			}
+
+			public bool IsKeyDown { get; set; }
+			public bool IsKeyPress { get; set; }
+			public bool IsKeyUp { get; set; }
+
+			public override bool OnKeyDown (KeyEvent keyEvent)
+			{
+				IsKeyDown = true;
+				return base.OnKeyDown (keyEvent);
+			}
+
+			public override bool ProcessKey (KeyEvent keyEvent)
+			{
+				IsKeyPress = true;
+				return base.ProcessKey (keyEvent);
+			}
+
+			public override bool OnKeyUp (KeyEvent keyEvent)
+			{
+				IsKeyUp = true;
+				return base.OnKeyUp (keyEvent);
+			}
+		}
 	}
 }
