@@ -1548,6 +1548,7 @@ namespace Terminal.Gui {
 								};
 								view.OnDrawContent (rect);
 								view.Redraw (rect);
+								view.OnDrawContentComplete (rect);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;

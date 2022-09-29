@@ -3892,5 +3892,23 @@ This is a tes
 This is a tes
 ", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawContentComplete_Event_Is_Always_Called ()
+		{
+			var viewCalled = false;
+			var tvCalled = false;
+
+			var view = new View ("View") { Width = 10, Height = 10 };
+			view.DrawContentComplete += (e) => viewCalled = true;
+			var tv = new TextView () { Y = 11, Width = 10, Height = 10 };
+			tv.DrawContentComplete += (e) => tvCalled = true;
+
+			Application.Top.Add (view, tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (viewCalled);
+			Assert.True (tvCalled);
+		}
 	}
 }
