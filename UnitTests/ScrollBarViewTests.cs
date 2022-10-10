@@ -282,8 +282,12 @@ namespace Terminal.Gui.Views {
 			AddHandlers ();
 
 			Assert.NotNull (_scrollBar.OtherScrollBarView);
-			Assert.NotEqual (_scrollBar, _scrollBar.OtherScrollBarView);
-			Assert.Equal (_scrollBar.OtherScrollBarView.OtherScrollBarView, _scrollBar);
+			Assert.NotSame (_scrollBar, _scrollBar.OtherScrollBarView);
+			Assert.False (_scrollBar == _scrollBar.OtherScrollBarView);
+			Assert.True (_scrollBar != _scrollBar.OtherScrollBarView);
+			Assert.Same (_scrollBar.OtherScrollBarView.OtherScrollBarView, _scrollBar);
+			Assert.True (_scrollBar.OtherScrollBarView.OtherScrollBarView == _scrollBar);
+			Assert.False (_scrollBar.OtherScrollBarView.OtherScrollBarView != _scrollBar);
 		}
 
 		[Fact]
