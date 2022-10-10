@@ -117,6 +117,20 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
+		public void New_CollectionInitialized ()
+		{
+			var view = new View {
+				new View {
+					new View()
+				},
+				new View()
+			};
+
+			Assert.Equal (2, view.Subviews.Count);
+			Assert.Equal (1, view.Subviews [0].Subviews.Count);
+		}
+
+		[Fact]
 		public void New_Methods_Return_False ()
 		{
 			var r = new View ();

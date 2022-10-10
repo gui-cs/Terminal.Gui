@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public partial class View : Responder, ISupportInitializeNotification {
+	public partial class View : Responder, IEnumerable, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -3039,5 +3039,7 @@ namespace Terminal.Gui {
 
 			return top;
 		}
+
+		IEnumerator IEnumerable.GetEnumerator () => Subviews.GetEnumerator ();
 	}
 }
