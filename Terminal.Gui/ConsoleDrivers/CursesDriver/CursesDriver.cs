@@ -1500,6 +1500,7 @@ namespace Terminal.Gui {
 				}
 			}) {
 				powershell.Start ();
+				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
