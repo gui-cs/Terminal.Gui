@@ -577,10 +577,7 @@ namespace Terminal.Gui {
 			host.CloseAllMenus ();
 			Application.Refresh ();
 
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+			Application.MainLoop.Invoke (() => action?.Invoke ());
 		}
 
 		public override bool OnLeave (View view)
@@ -1089,10 +1086,7 @@ namespace Terminal.Gui {
 			CloseAllMenus ();
 			Application.Refresh ();
 
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+			Application.MainLoop.Invoke (() => action?.Invoke ());
 		}
 
 		/// <summary>
@@ -1635,12 +1629,7 @@ namespace Terminal.Gui {
 				}
 				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.Shortcut != Key.Null && mi.Shortcut == (Key)key) {
 					var action = mi.Action;
-					if (action != null) {
-						Application.MainLoop.AddIdle (() => {
-							action ();
-							return false;
-						});
-					}
+					Application.MainLoop.Invoke (() => action?.Invoke ());
 					return true;
 				}
 				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {

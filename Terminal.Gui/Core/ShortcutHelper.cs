@@ -244,7 +244,8 @@ namespace Terminal.Gui {
 		public static bool FindAndOpenByShortcut (KeyEvent kb, View view = null)
 		{
 			if (view == null) {
-				return false;			}
+				return false;
+			}
 
 			var key = kb.KeyValue;
 			var keys = GetModifiersKey (kb);
@@ -252,12 +253,7 @@ namespace Terminal.Gui {
 			foreach (var v in view.Subviews) {
 				if (v.Shortcut != Key.Null && v.Shortcut == (Key)key) {
 					var action = v.ShortcutAction;
-					if (action != null) {
-						Application.MainLoop.AddIdle (() => {
-							action ();
-							return false;
-						});
-					}
+					Application.MainLoop.Invoke (() => action?.Invoke ());
 					return true;
 				}
 				if (FindAndOpenByShortcut (kb, v)) {

@@ -33,9 +33,10 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void Application_Top_EnsureVisibleBounds_To_Driver_Rows_And_Cols ()
 		{
-			var iterations = 0;
+			var iterations = -1;
 
 			Application.Iteration += () => {
+				iterations++;
 				if (iterations == 0) {
 					Assert.False (Application.Top.AutoSize);
 					Assert.Equal ("Top1", Application.Top.Text);
@@ -78,7 +79,6 @@ namespace Terminal.Gui.Core {
 
 					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, new KeyModifiers ()));
 				}
-				iterations++;
 			};
 
 			Application.Run (Top1 ());
