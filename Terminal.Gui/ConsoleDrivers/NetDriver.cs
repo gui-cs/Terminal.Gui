@@ -713,10 +713,7 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState} X: {mouseEvent.Position.X} Y: {mouseEvent.Position.Y}");
 
 			if (isButtonDoubleClicked) {
-				Application.MainLoop.AddIdle (() => {
-					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
-					return false;
-				});
+				Application.MainLoop.Invoke (async () => await ProcessButtonDoubleClickedAsync ());
 			}
 
 			if ((buttonState & MouseButtonState.Button1Pressed) != 0
@@ -782,12 +779,9 @@ namespace Terminal.Gui {
 				isButtonClicked = false;
 				isButtonDoubleClicked = true;
 				ProcessButtonDoubleClicked (mouseEvent);
-				Application.MainLoop.AddIdle (() => {
-					Task.Run (async () => {
-						await Task.Delay (600);
-						isButtonDoubleClicked = false;
-					});
-					return false;
+				Application.MainLoop.Invoke (async () => {
+					await Task.Delay (600);
+					isButtonDoubleClicked = false;
 				});
 				inputReady.Set ();
 				return;
@@ -829,12 +823,9 @@ namespace Terminal.Gui {
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 				isButtonClicked = true;
 				ProcessButtonClicked (mouseEvent);
-				Application.MainLoop.AddIdle (() => {
-					Task.Run (async () => {
-						await Task.Delay (300);
-						isButtonClicked = false;
-					});
-					return false;
+				Application.MainLoop.Invoke (async () => {
+					await Task.Delay (300);
+					isButtonClicked = false;
 				});
 				inputReady.Set ();
 				return;
@@ -852,10 +843,7 @@ namespace Terminal.Gui {
 					};
 				}
 				if ((buttonState & MouseButtonState.ReportMousePosition) == 0) {
-					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync ());
-						return false;
-					});
+					Application.MainLoop.Invoke (async () => await ProcessContinuousButtonPressedAsync ());
 				}
 			}
 
@@ -951,7 +939,7 @@ namespace Terminal.Gui {
 				if (view == null) {
 					break;
 				}
-				if (isButtonPressed && (lastMouseEvent.ButtonState & MouseButtonState.ReportMousePosition) == 0) {
+				if (isButtonPressed) {
 					inputResultQueue.Enqueue (new InputResult () {
 						EventType = EventType.Mouse,
 						MouseEvent = lastMouseEvent

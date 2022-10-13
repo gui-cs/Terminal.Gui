@@ -914,10 +914,7 @@ namespace Terminal.Gui {
 			//	$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
 
 			if (isButtonDoubleClicked || isOneFingerDoubleClicked) {
-				Application.MainLoop.AddIdle (() => {
-					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
-					return false;
-				});
+				Application.MainLoop.Invoke (async () => await ProcessButtonDoubleClickedAsync ());
 			}
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
@@ -1025,10 +1022,7 @@ namespace Terminal.Gui {
 				isButtonPressed = true;
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
-						return false;
-					});
+					Application.MainLoop.Invoke (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 				}
 
 			} else if (lastMouseButtonPressed != null && mouseEvent.EventFlags == 0
