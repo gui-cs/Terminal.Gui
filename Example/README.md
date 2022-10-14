@@ -1,5 +1,7 @@
-# demo.cs
+# Terminal.Gui C# Example
 
-This is the original Terminal.Gui sample app. Over time we will be simplifying this sample to show just the basics of creating a Terminal.Gui app in C#. 
+This example shows how to use the Terminal.Gui library to create a simple GUI application in C#.
 
-See the Sample Code section [README.md](https://github.com/gui-cs/Terminal.Gui) for a list of all samples.
+This is the same code found in the Termina.Gui README.md file.
+
+See [README.md](https://github.com/gui-cs/Terminal.Gui) for a list of all Terminal.Gui samples.
