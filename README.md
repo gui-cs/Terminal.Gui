@@ -158,7 +158,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and fork
 ## Running and Building
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
-* Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
+* Windows - Open `Terminal.sln` with Visual Studio 2022.
 
 ## Contributing
 
@@ -168,10 +168,4 @@ Debates on architecture and design can be found in Issues tagged with [design](h
 
 ## History
 
-This is an updated version of [gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that Miguel wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
-
-The original **gui.cs** was a UI toolkit in a single file and tied to curses. This version tries to be console-agnostic and instead of having a container/widget model, only uses Views (which can contain subviews) and changes the rendering model to rely on damage regions instead of burdening each view with the details.
-
-A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
-
-The most recent release notes can be found in the [Terminal.Gui.csproj](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
+See [gui-cs](https://github.com/gui-cs/) for how this project came to be.
