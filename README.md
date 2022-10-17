@@ -12,6 +12,20 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample app](docfx/images/sample.gif)
 
+
+## Quick Start
+
+Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
+
+(Press `CTRL-Q` to exit the app)
+
+```powershell
+dotnet new --install Terminal.Gui.templates
+dotnet new tui -n myproj
+cd myproj
+dotnet run
+```
+
 ## Documentation 
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
@@ -153,12 +167,14 @@ To install Terminal.Gui into a .NET Core project, use the `dotnet` CLI tool with
 dotnet add package Terminal.Gui
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
+Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
-## Running and Building
+## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
 * Windows - Open `Terminal.sln` with Visual Studio 2022.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
 
 ## Contributing
 
