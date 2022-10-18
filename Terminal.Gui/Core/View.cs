@@ -1548,6 +1548,7 @@ namespace Terminal.Gui {
 								};
 								view.OnDrawContent (rect);
 								view.Redraw (rect);
+								view.OnDrawContentComplete (rect);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -1931,8 +1932,14 @@ namespace Terminal.Gui {
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.Enabled == true && Focused?.OnKeyDown (keyEvent) == true) {
-				return true;
+			if (Focused?.Enabled == true) {
+				Focused.KeyDown?.Invoke (args);
+				if (args.Handled) {
+					return true;
+				}
+				if (Focused?.OnKeyDown (keyEvent) == true) {
+					return true;
+				}
 			}
 
 			return false;
@@ -1955,8 +1962,14 @@ namespace Terminal.Gui {
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.Enabled == true && Focused?.OnKeyUp (keyEvent) == true) {
-				return true;
+			if (Focused?.Enabled == true) {
+				Focused.KeyUp?.Invoke (args);
+				if (args.Handled) {
+					return true;
+				}
+				if (Focused?.OnKeyUp (keyEvent) == true) {
+					return true;
+				}
 			}
 
 			return false;

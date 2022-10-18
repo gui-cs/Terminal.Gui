@@ -370,12 +370,14 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
+		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyUpHandler;
 		private CursorVisibility savedCursorVisibility;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			this.keyDownHandler = keyDownHandler;
 			this.keyHandler = keyHandler;
 			this.keyUpHandler = keyUpHandler;
 
@@ -386,20 +388,25 @@ namespace Terminal.Gui {
 		void ProcessInput (ConsoleKeyInfo consoleKey)
 		{
 			keyModifiers = new KeyModifiers ();
-			var map = MapKey (consoleKey);
-			if (map == (Key)0xffffffff)
-				return;
-
-			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-				keyModifiers.Alt = true;
-			}
 			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
 				keyModifiers.Shift = true;
+			}
+			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+				keyModifiers.Alt = true;
 			}
 			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Control)) {
 				keyModifiers.Ctrl = true;
 			}
+			var map = MapKey (consoleKey);
+			if (map == (Key)0xffffffff) {
+				if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				}
+				return;
+			}
 
+			keyDownHandler (new KeyEvent (map, keyModifiers));
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
 		}
