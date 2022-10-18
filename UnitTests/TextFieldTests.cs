@@ -1209,22 +1209,22 @@ namespace Terminal.Gui.Views {
 		{
 			Application.RootMouseEvent += SuppressRightClick;
 
-			var tf = new TextField () { Width = 10};
+			var tf = new TextField () { Width = 10 };
 			int clickCounter = 0;
-			tf.MouseClick += (m) => { clickCounter++; }; 
+			tf.MouseClick += (m) => { clickCounter++; };
 
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
-			var processMouseEventMethod = typeof (Application).GetMethod ("ProcessMouseEvent",BindingFlags.Static | BindingFlags.NonPublic)
-				?? throw new Exception("Expected private method not found 'ProcessMouseEvent', this method was used for testing mouse behaviours");
+			var processMouseEventMethod = typeof (Application).GetMethod ("ProcessMouseEvent", BindingFlags.Static | BindingFlags.NonPublic)
+				?? throw new Exception ("Expected private method not found 'ProcessMouseEvent', this method was used for testing mouse behaviours");
 
 			var mouseEvent = new MouseEvent {
 				Flags = MouseFlags.Button1Clicked,
 				View = tf
 			};
 
-			processMouseEventMethod.Invoke (null,new object[] { mouseEvent });
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
 			Assert.Equal (1, clickCounter);
 
 			mouseEvent.Flags = MouseFlags.Button3Clicked;
@@ -1251,7 +1251,7 @@ namespace Terminal.Gui.Views {
 
 		private bool SuppressRightClick (MouseEvent arg)
 		{
-			if (arg.Flags.HasFlag(MouseFlags.Button3Clicked))
+			if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
 				return true;
 
 			return false;

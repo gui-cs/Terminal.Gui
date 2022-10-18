@@ -645,7 +645,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>Return true to suppress the MouseEvent event</para>
 		/// </summary>
-		public static Func<MouseEvent,bool> RootMouseEvent;
+		public static Func<MouseEvent, bool> RootMouseEvent;
 
 		/// <summary>
 		/// <para>
