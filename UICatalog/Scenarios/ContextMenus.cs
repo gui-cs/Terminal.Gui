@@ -74,9 +74,10 @@ namespace UICatalog.Scenarios {
 
 			Application.RootMouseEvent += Application_RootMouseEvent;
 
-			void Application_RootMouseEvent (MouseEvent me)
+			bool Application_RootMouseEvent (MouseEvent me)
 			{
 				mousePos = new Point (me.X, me.Y);
+				return false;
 			}
 
 			Win.WantMousePositionReports = true;

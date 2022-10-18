@@ -31,6 +31,7 @@ namespace UICatalog.Scenarios {
 				ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count}";
 				rme.Add ($"({me.X},{me.Y}) - {me.Flags} {count++}");
 				rmeList.MoveDown ();
+				return false;
 			};
 
 			// I have no idea what this was intended to show off in demo.c

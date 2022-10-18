@@ -606,9 +606,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Merely a debugging aid to see the raw mouse events
+		/// <para>
+		/// Called for new MouseEvent events before any processing is performed or
+		/// views evaluate.  Use for global mouse handling and/or debugging.
+		/// </para>
+		/// <para>Return true to suppress the MouseEvent event</para>
 		/// </summary>
-		public static Action<MouseEvent> RootMouseEvent;
+		public static Func<MouseEvent,bool> RootMouseEvent;
 
 		/// <summary>
 		/// <para>
@@ -636,7 +640,11 @@ namespace Terminal.Gui {
 			if (view != null) {
 				me.View = view;
 			}
-			RootMouseEvent?.Invoke (me);
+
+			if (RootMouseEvent?.Invoke (me) ?? false) {
+				return;
+			}
+
 			if (mouseGrabView != null) {
 				if (view == null) {
 					UngrabMouse ();

@@ -700,6 +700,7 @@ static class Demo {
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			return false;
 		};
 
 		var test = new Label (3, 18, "Se iniciará el análisis");

@@ -93,6 +93,7 @@ namespace UICatalog.Scenarios {
 					lblBackground.Text = back.ToString ();
 					viewBackground.ColorScheme.Normal = new Attribute (back, back);
 				}
+				return false;
 			};
 		}
 	}
