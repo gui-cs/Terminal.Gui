@@ -4040,5 +4040,44 @@ This is a tes
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
+
+		[Fact]
+		public void TestParamsConstructor_View ()
+		{
+			/*
+			 * Create view with subviews:
+			 * 
+			 * root
+			 * |_l1
+			 * | |_ l1_1
+			 * |_l2
+			 * |_unamed button
+			 * */
+
+			View root;
+			View l1;
+			View l1_1;
+			View l2;
+
+			root = new View (
+				l1 = new View (
+					l1_1 = new View ()
+				),
+				l2 = new View (),
+				new Button ()
+			);
+			Assert.Equal (3, root.Subviews.Count);
+
+			Assert.Same (l1, root.Subviews [0]);
+			Assert.Equal (1, root.Subviews [0].Subviews.Count);
+
+			Assert.Same (l2, root.Subviews [1]);
+			Assert.Empty (root.Subviews [1].Subviews);
+
+			Assert.Same (l1_1, root.Subviews [0].Subviews [0]);
+			Assert.Empty (root.Subviews [0].Subviews [0].Subviews);
+			
+			Assert.IsType<Button> (root.Subviews [2]);
+		}
 	}
 }

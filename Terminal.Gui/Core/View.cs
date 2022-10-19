@@ -719,6 +719,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom) { }
 
+		/// <inheritdoc cref="View()"/>
+		/// <param name="subviews">Subviews to add.  No special layout logic is implied by this overload - it is the same as calling <see cref="Add(View)"/> for each child.</param>
+		public View (params View [] subviews) : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom)
+		{
+			foreach (var sub in subviews) {
+				Add (sub);
+			}
+		}
+
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
