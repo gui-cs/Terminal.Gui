@@ -6,15 +6,13 @@
 //   - Check for NeedDisplay on the hierarchy and repaint
 //   - Layout support
 //   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
+//   - What to surface as "BackgroundColor" when clearing a window, an attribute or colors?
 //
 // Optimizations
 //   - Add rendering limitation to the exposed area
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using NStack;
 
@@ -666,7 +664,7 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/>otherwise.</returns>
 		public bool SetMinWidthHeight ()
 		{
-			if (GetMinWidthHeight (out var size)) {
+			if (GetMinWidthHeight (out Size size)) {
 				Bounds = new Rect (Bounds.Location, size);
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				return true;
