@@ -1207,7 +1207,7 @@ namespace Terminal.Gui.Views {
 		[AutoInitShutdown]
 		public void Test_RootMouseKeyEvent_Cancel ()
 		{
-			Application.RootMouseEventCancellable += SuppressRightClick;
+			Application.RootMouseEvent += SuppressRightClick;
 
 			var tf = new TextField () { Width = 10 };
 			int clickCounter = 0;
@@ -1227,15 +1227,24 @@ namespace Terminal.Gui.Views {
 			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
 			Assert.Equal (1, clickCounter);
 
-			mouseEvent.Flags = MouseFlags.Button3Clicked;
-
-			// should be ignored because of SuppressRightClick callback
+			// Get a fresh instance that represents a right click.
+			// Should be ignored because of SuppressRightClick callback
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
 			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
 			Assert.Equal (1, clickCounter);
 
-			Application.RootMouseEventCancellable -= SuppressRightClick;
+			Application.RootMouseEvent -= SuppressRightClick;
 
-			// should no longer be ignored as the callback was removed
+			// Get a fresh instance that represents a right click.
+			// Should no longer be ignored as the callback was removed
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
+
 			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
 			Assert.Equal (2, clickCounter);
 		}
@@ -1249,12 +1258,10 @@ namespace Terminal.Gui.Views {
 			return false;
 		}
 
-		private bool SuppressRightClick (MouseEvent arg)
+		private void SuppressRightClick (MouseEvent arg)
 		{
 			if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
-				return true;
-
-			return false;
+				arg.Handled = true;
 		}
 
 		[Fact, AutoInitShutdown]

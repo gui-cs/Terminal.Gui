@@ -2755,11 +2755,15 @@ namespace Terminal.Gui {
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
 			public MouseEvent MouseEvent { get; set; }
+			
 			/// <summary>
 			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
-			public bool Handled { get; set; }
+			public bool Handled { 
+				get => MouseEvent.Handled;
+				set => MouseEvent.Handled = value;
+			}
 		}
 
 		/// <inheritdoc/>

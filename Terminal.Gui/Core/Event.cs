@@ -708,7 +708,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Describes a mouse event
 	/// </summary>
-	public struct MouseEvent {
+	public class MouseEvent {
 		/// <summary>
 		/// The X (column) location for the mouse event.
 		/// </summary>
@@ -738,6 +738,12 @@ namespace Terminal.Gui {
 		/// The current view at the location for the mouse event.
 		/// </summary>
 		public View View;
+
+		/// <summary>
+		/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
+		/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+		/// </summary>
+		public bool Handled { get; set; }
 
 		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.
