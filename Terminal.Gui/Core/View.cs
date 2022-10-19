@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using NStack;
 
 namespace Terminal.Gui {
@@ -1495,16 +1496,19 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			//if (ColorScheme != null && !(this is Toplevel)) {
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
 			if (Border != null) {
 				Border.DrawContent (this);
+			} else if ((GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
+
+				Clear (ViewToScreen (bounds));
 			}
 
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text) || (this is Label && !AutoSize)) {
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -3049,6 +3053,20 @@ namespace Terminal.Gui {
 			}
 
 			return top;
+		}
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> is overridden in the <paramref name="view"/>.
+		/// </summary>
+		/// <param name="view">The view.</param>
+		/// <param name="method">The method name.</param>
+		/// <returns><see langword="true"/> if it's overridden, <see langword="false"/>otherwise.</returns>
+		public bool IsOverridden (View view, string method)
+		{
+			Type t = view.GetType ();
+			MethodInfo m = t.GetMethod (method);
+
+			return (m.DeclaringType == t || m.ReflectedType == t) && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 	}
 }
