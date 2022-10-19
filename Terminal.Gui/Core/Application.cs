@@ -639,18 +639,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>
-		/// Cancellable overload of <see cref="RootMouseEvent"/>.
-		/// </para>
-		/// <para>
-		/// Called for new MouseEvent events before any processing is performed or
-		/// views evaluate.  Use for global mouse handling and/or debugging.
-		/// </para>
-		/// <para>Return true to suppress the MouseEvent event</para>
-		/// </summary>
-		public static Func<MouseEvent, bool> RootMouseEventCancellable;
-
-		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
 		public static Action<MouseEvent> RootMouseEvent;
@@ -683,7 +671,7 @@ namespace Terminal.Gui {
 			}
 			RootMouseEvent?.Invoke (me);
 
-			if (RootMouseEventCancellable?.Invoke (me) ?? false) {
+			if (me.Handled) {
 				return;
 			}
 
