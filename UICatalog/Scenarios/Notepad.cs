@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_New", "", () => New()),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
-					new MenuItem ("_Save As", "", () => SaveAs()),
+					new MenuItem ("Save _As", "", () => SaveAs()),
 					new MenuItem ("_Close", "", () => Close()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				})
