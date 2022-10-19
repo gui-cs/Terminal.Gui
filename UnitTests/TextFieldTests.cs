@@ -1243,6 +1243,9 @@ namespace Terminal.Gui.Views {
 
 		private bool SuppressKey (KeyEvent arg)
 		{
+			if (arg.KeyValue == 'j')
+				return true;
+
 			return false;
 		}
 
