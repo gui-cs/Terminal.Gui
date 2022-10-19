@@ -2743,7 +2743,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the event arguments for <see cref="MouseEvent"/>
+		/// Specifies the event arguments for <see cref="MouseEvent"/>.  This is a higher-level construct
+		/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
+		/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 		/// </summary>
 		public class MouseEventArgs : EventArgs {
 			/// <summary>
@@ -2755,11 +2757,17 @@ namespace Terminal.Gui {
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
 			public MouseEvent MouseEvent { get; set; }
+			
 			/// <summary>
 			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
-			public bool Handled { get; set; }
+			/// <remarks>This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
+			/// backwards compatibility</remarks>
+			public bool Handled { 
+				get => MouseEvent.Handled;
+				set => MouseEvent.Handled = value;
+			}
 		}
 
 		/// <inheritdoc/>
