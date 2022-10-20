@@ -32,7 +32,11 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("Save _As", "", () => SaveAs()),
 					new MenuItem ("_Close", "", () => Close()),
 					new MenuItem ("_Quit", "", () => Quit()),
-				})
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {}),
+				new MenuBarItem ("_Help", new MenuItem [] {
+					new MenuItem ("_About", "", null)
+					})
 				});
 			Top.Add (menu);
 
