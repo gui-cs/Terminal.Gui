@@ -61,9 +61,7 @@ See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/mas
 
 ## Sample Usage in C#
 
-The following example shows basic Terminal.Gui application syntax.
-
-![Simple Usage app](docfx/images/simpleusage.png)
+The following example shows a basic Terminal.Gui application written in C#:
 
 ```csharp
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
@@ -121,6 +119,12 @@ Application.Run(win);
 // After the application exits, release and reset console for clean shutdown
 Application.Shutdown();
 ```
+
+When run the application looks as follows:
+
+![Simple Usage app](./docfx/images/Example.png)
+
+_Sample application running_
 
 ## Installing
 
