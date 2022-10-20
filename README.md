@@ -61,7 +61,7 @@ See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/mas
 
 ## Sample Usage in C#
 
-The following example shows basic Terminal.Gui application syntax:
+The following example shows a basic Terminal.Gui application written in C#:
 
 ```csharp
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
