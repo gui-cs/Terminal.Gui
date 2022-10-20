@@ -670,6 +670,11 @@ namespace Terminal.Gui {
 				me.View = view;
 			}
 			RootMouseEvent?.Invoke (me);
+
+			if (me.Handled) {
+				return;
+			}
+
 			if (mouseGrabView != null) {
 				if (view == null) {
 					UngrabMouse ();
