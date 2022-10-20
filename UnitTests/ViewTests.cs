@@ -2124,6 +2124,28 @@ Y
 		}
 
 		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Minimum_Size ()
+		{
+			var view = new View (new Rect (0, 0, 2, 2));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌┐
+└┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 2, 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void DrawFrame_With_Negative_Positions ()
 		{
 			var view = new View (new Rect (-1, 0, 8, 4));
@@ -2452,7 +2474,7 @@ Y
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.LayoutComplete += e => {
+			view.DrawContent += e => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
@@ -2500,7 +2522,7 @@ Y
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.LayoutComplete += e => {
+			view.DrawContent += e => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);

@@ -1,26 +1,15 @@
-﻿//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Pending:
-//   - Check for NeedDisplay on the hierarchy and repaint
-//   - Layout support
-//   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundColor" when clearing a window, an attribute or colors?
-//
-// Optimizations
-//   - Add rendering limitation to the exposed area
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
-	/// value from the Frame will be used, if the value is Computed, then the Frame
-	/// will be updated from the X, Y Pos objects and the Width and Height Dim objects.
+	/// Determines the LayoutStyle for a <see cref="View"/>, if Absolute, during <see cref="View.LayoutSubviews"/>, the
+	/// value from the <see cref="View.Frame"/> will be used, if the value is Computed, then <see cref="View.Frame"/>
+	/// will be updated from the X, Y <see cref="Pos"/> objects and the Width and Height <see cref="Dim"/> objects.
 	/// </summary>
 	public enum LayoutStyle {
 		/// <summary>
@@ -36,17 +25,19 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
+	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
+	/// contains zero or more nested views.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal.Gui.  Views
+	///    The View defines the base functionality for user interface elements in Terminal.Gui. Views
 	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
 	/// </para>
 	/// <para>
-	///    Views supports two layout styles: Absolute or Computed. The choice as to which layout style is used by the View 
+	///    Views supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>. 
+	///    The choice as to which layout style is used by the View 
 	///    is determined when the View is initialized. To create a View using Absolute layout, call a constructor that takes a
-	///    Rect parameter to specify the absolute position and size (the <c>View.<see cref="Frame "/></c>)/. To create a View 
+	///    Rect parameter to specify the absolute position and size (the View.<see cref="View.Frame "/>). To create a View 
 	///    using Computed layout use a constructor that does not take a Rect parameter and set the X, Y, Width and Height 
 	///    properties on the view. Both approaches use coordinates that are relative to the container they are being added to. 
 	/// </para>
@@ -59,9 +50,9 @@ namespace Terminal.Gui {
 	///    properties are Dim and Pos objects that dynamically update the position of a view.
 	///    The X and Y properties are of type <see cref="Pos"/>
 	///    and you can use either absolute positions, percentages or anchor
-	///    points.   The Width and Height properties are of type
+	///    points. The Width and Height properties are of type
 	///    <see cref="Dim"/> and can use absolute position,
-	///    percentages and anchors.  These are useful as they will take
+	///    percentages and anchors. These are useful as they will take
 	///    care of repositioning views when view's frames are resized or
 	///    if the terminal size changes.
 	/// </para>
@@ -71,17 +62,17 @@ namespace Terminal.Gui {
 	///    <see cref="Frame"/> property.
 	/// </para>
 	/// <para>
-	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method.   
+	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. 
 	///    The container of a View can be accessed with the <see cref="SuperView"/> property.
 	/// </para>
 	/// <para>
-	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. To flag the entire view
-	///    for redraw call <see cref="SetNeedsDisplay()"/>.
+	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. 
+	///    To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 	/// </para>
 	/// <para>
 	///    Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
-	///    should use for rendering.   This ensures that the views fit in the context where
-	///    they are being used, and allows for themes to be plugged in.   For example, the
+	///    should use for rendering. This ensures that the views fit in the context where
+	///    they are being used, and allows for themes to be plugged in. For example, the
 	///    default colors for windows and toplevels uses a blue background, while it uses
 	///    a white background for dialog boxes and a red background for errors.
 	/// </para>
@@ -97,16 +88,16 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///    Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that
-	///    the cursor is placed in a location that makes sense.  Unix terminals do not have
+	///    the cursor is placed in a location that makes sense. Unix terminals do not have
 	///    a way of hiding the cursor, so it can be distracting to have the cursor left at
-	///    the last focused view.   So views should make sure that they place the cursor
+	///    the last focused view. So views should make sure that they place the cursor
 	///    in a visually sensible place.
 	/// </para>
 	/// <para>
 	///    The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has
-	///    changed.   The default processing system will keep the size and dimensions
-	///    for views that use the <see cref="Terminal.Gui.LayoutStyle.Absolute"/>, and will recompute the
-	///    frames for the vies that use <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+	///    changed. The default processing system will keep the size and dimensions
+	///    for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
+	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
 	public partial class View : Responder, ISupportInitializeNotification {
@@ -332,7 +323,8 @@ namespace Terminal.Gui {
 		bool tabStop = true;
 
 		/// <summary>
-		/// This only be <c>true</c> if the <see cref="CanFocus"/> is also <c>true</c> and the focus can be avoided by setting this to <c>false</c>
+		/// This only be <see langword="true"/> if the <see cref="CanFocus"/> is also <see langword="true"/> 
+		/// and the focus can be avoided by setting this to <see langword="false"/>
 		/// </summary>
 		public bool TabStop {
 			get => tabStop;
@@ -430,7 +422,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="View"/> wants mouse position reports.
 		/// </summary>
-		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if want mouse position reports; otherwise, <see langword="false"/>.</value>
 		public virtual bool WantMousePositionReports { get; set; }
 
 		/// <summary>
@@ -517,7 +509,7 @@ namespace Terminal.Gui {
 		Pos x, y;
 
 		/// <summary>
-		/// Gets or sets the X position for the view (the column). Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The X Position.</value>
 		/// <remarks>
@@ -537,7 +529,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (the row). Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The y position (line).</value>
 		/// <remarks>
@@ -632,7 +624,7 @@ namespace Terminal.Gui {
 		/// Verifies if the minimum width or height can be sets in the view.
 		/// </summary>
 		/// <param name="size">The size.</param>
-		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/>otherwise.</returns>
+		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
 		public bool GetMinWidthHeight (out Size size)
 		{
 			size = Size.Empty;
@@ -661,7 +653,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Sets the minimum width or height if the view can be resized.
 		/// </summary>
-		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/>otherwise.</returns>
+		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
 		public bool SetMinWidthHeight ()
 		{
 			if (GetMinWidthHeight (out Size size)) {
@@ -685,7 +677,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of a <see cref="Terminal.Gui.LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
-		/// dimensions specified in the <c>frame</c> parameter. 
+		/// dimensions specified in the <see langword="frame"/> parameter. 
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		/// <remarks>
@@ -703,12 +695,12 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
-		///   The <see cref="Label"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
-		///   coordinates. The initial size (<see cref="View.Frame"/> will be 
+		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		///   coordinates. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		///   If <see cref="Height"/> is greater than one, word wrapping is provided.
 		/// </para>
 		/// <para>
 		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/>. 
@@ -723,15 +715,15 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		///   The <see cref="View"/> will be created at the given
-		///   coordinates with the given string. The size (<see cref="View.Frame"/> will be 
+		///   coordinates with the given string. The size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
 		///   No line wrapping is provided.
 		/// </para>
 		/// </remarks>
-		/// <param name="x">column to locate the Label.</param>
-		/// <param name="y">row to locate the Label.</param>
+		/// <param name="x">column to locate the View.</param>
+		/// <param name="y">row to locate the View.</param>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (int x, int y, ustring text) : this (TextFormatter.CalcRect (x, y, text), text) { }
 
@@ -741,7 +733,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		///   The <see cref="View"/> will be created at the given
-		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
@@ -762,11 +754,11 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
-		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		///   If <see cref="Height"/> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
@@ -920,7 +912,8 @@ namespace Terminal.Gui {
 		///   Adds a subview (child) to this view.
 		/// </summary>
 		/// <remarks>
-		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. 
+		/// See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
 		/// </remarks>
 		public virtual void Add (View view)
 		{
@@ -960,7 +953,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="views">Array of one or more views (can be optional parameter).</param>
 		/// <remarks>
-		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. 
+		/// See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
 		/// </remarks>
 		public void Add (params View [] views)
 		{
@@ -1132,7 +1126,7 @@ namespace Terminal.Gui {
 		/// <param name="row">View-relative row.</param>
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <c>true</c>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
@@ -1218,7 +1212,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
-		/// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
+		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1255,7 +1249,7 @@ namespace Terminal.Gui {
 		/// Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused" state.
 		/// </summary>
 		/// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
-		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
+		/// <param name="focused">If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
 		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
 		{
@@ -1272,7 +1266,7 @@ namespace Terminal.Gui {
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
-		///  if set to <c>true</c>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		///  if set to <see langword="true"/>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
 		public void Move (int col, int row, bool clipped = true)
 		{
 			if (Driver.Rows == 0) {
@@ -1354,7 +1348,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method invoked  when a subview is being added to this view.
+		/// Method invoked when a subview is being added to this view.
 		/// </summary>
 		/// <param name="view">The subview being added.</param>
 		public virtual void OnAdded (View view)
@@ -1413,7 +1407,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns the most focused view in the chain of subviews (the leaf view that has the focus).
 		/// </summary>
-		/// <value>The most focused.</value>
+		/// <value>The most focused View.</value>
 		public View MostFocused {
 			get {
 				if (Focused == null)
@@ -1484,7 +1478,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>
 		///    Overrides of <see cref="Redraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
-		///    larger than the <c>region</c> parameter.
+		///    larger than the <ref name="bounds"/> parameter, as this will cause the driver to clip the entire region.
 		/// </para>
 		/// </remarks>
 		public virtual void Redraw (Rect bounds)
@@ -1495,16 +1489,19 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			//if (ColorScheme != null && !(this is Toplevel)) {
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
 			if (Border != null) {
 				Border.DrawContent (this);
+			} else if ((GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
+
+				Clear (ViewToScreen (bounds));
 			}
 
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text) || (this is Label && !AutoSize)) {
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -1744,11 +1741,11 @@ namespace Terminal.Gui {
 		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
 		/// rebound to this one</para>
 		/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
-		/// cannot be used to switch focus to another view and perform multiple commands there)</remarks>
+		/// cannot be used to switch focus to another view and perform multiple commands there) </remarks>
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
-		/// When specifying multiple, all commands will be applied in sequence.  The bound <paramref name="key"/> strike
+		/// When specifying multiple commands, all commands will be applied in sequence. The bound <paramref name="key"/> strike
 		/// will be consumed if any took effect.</param>
 		public void AddKeyBinding (Key key, params Command [] command)
 		{
@@ -1778,18 +1775,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Checks if key combination already exist.
+		/// Checks if the key binding already exists.
 		/// </summary>
 		/// <param name="key">The key to check.</param>
-		/// <returns><c>true</c> If the key already exist, <c>false</c>otherwise.</returns>
+		/// <returns><see langword="true"/> If the key already exist, <see langword="false"/> otherwise.</returns>
 		public bool ContainsKeyBinding (Key key)
 		{
 			return KeyBindings.ContainsKey (key);
 		}
 
 		/// <summary>
-		/// Removes all bound keys from the View making including the default
-		/// key combinations such as cursor navigation, scrolling etc
+		/// Removes all bound keys from the View and resets the default bindings.
 		/// </summary>
 		public void ClearKeybindings ()
 		{
@@ -1797,7 +1793,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>
+		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>.
 		/// </summary>
 		/// <param name="key"></param>
 		public void ClearKeybinding (Key key)
@@ -1806,7 +1802,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes all key bindings that trigger the given command.  Views can have multiple different
+		/// Removes all key bindings that trigger the given command. Views can have multiple different
 		/// keys bound to the same command and this method will clear all of them.
 		/// </summary>
 		/// <param name="command"></param>
@@ -1839,7 +1835,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns all commands that are supported by this <see cref="View"/>
+		/// Returns all commands that are supported by this <see cref="View"/>.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<Command> GetSupportedCommands ()
@@ -1909,7 +1905,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a key is pressed
+		/// Invoked when a key is pressed.
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyDown;
 
@@ -1939,7 +1935,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a key is released
+		/// Invoked when a key is released.
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyUp;
 
@@ -1969,7 +1965,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
+		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, does nothing.
 		/// </summary>
 		public void EnsureFocus ()
 		{
@@ -2032,7 +2028,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Focuses the previous view.
 		/// </summary>
-		/// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if previous was focused, <see langword="false"/> otherwise.</returns>
 		public bool FocusPrev ()
 		{
 			if (!CanBeVisible (this)) {
@@ -2079,7 +2075,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Focuses the next view.
 		/// </summary>
-		/// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
 		public bool FocusNext ()
 		{
 			if (!CanBeVisible (this)) {
@@ -2443,10 +2439,10 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>.
-		/// The default is `false`. Set to `true` to turn on AutoSize. If <see cref="AutoSize"/> is `true` the <see cref="Width"/>
+		/// The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If <see cref="AutoSize"/> is <see langword="true"/> the <see cref="Width"/>
 		/// and <see cref="Height"/> will always be used if the text size is lower. If the text size is higher the bounds will
 		/// be resized to fit it.
-		/// In addition, if <see cref="ForceValidatePosDim"/> is `true` the new values of <see cref="Width"/> and
+		/// In addition, if <see cref="ForceValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
 		/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
 		/// </summary>
 		public virtual bool AutoSize {
@@ -2465,9 +2461,10 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets a flag that determines whether <see cref="Terminal.Gui.TextFormatter.Text"/> will have trailing spaces preserved
-		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
-		/// either the <see cref="Text"/> property is changed or when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is set to `true`.
-		/// The default is `false`.
+		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> 
+		/// any trailing spaces will be trimmed when either the <see cref="Text"/> property is changed or 
+		/// when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is set to <see langword="true"/>.
+		/// The default is <see langword="false"/>.
 		/// </summary>
 		public virtual bool PreserveTrailingSpaces {
 			get => TextFormatter.PreserveTrailingSpaces;
@@ -2709,7 +2706,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.
 		/// </summary>
-		/// <param name="isWidth"><c>true</c>if is the width (default)<c>false</c>if is the height.</param>
+		/// <param name="isWidth"><see langword="true"/> if is the width (default) <see langword="false"/> if is the height.</param>
 		/// <returns>The length of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.</returns>
 		public int GetHotKeySpecifierLength (bool isWidth = true)
 		{
@@ -2748,7 +2745,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the event arguments for <see cref="MouseEvent"/>.  This is a higher-level construct
+		/// Specifies the event arguments for <see cref="MouseEvent"/>. This is a higher-level construct
 		/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
 		/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 		/// </summary>
@@ -2813,7 +2810,7 @@ namespace Terminal.Gui {
 		/// Method invoked when a mouse event is generated
 		/// </summary>
 		/// <param name="mouseEvent"></param>
-		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
 			if (!Enabled) {
@@ -2983,7 +2980,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredWidth">The desired width.</param>
 		/// <param name="resultWidth">The real result width.</param>
-		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool SetWidth (int desiredWidth, out int resultWidth)
 		{
 			return CanSetWidth (desiredWidth, out resultWidth);
@@ -2994,7 +2991,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredHeight">The desired height.</param>
 		/// <param name="resultHeight">The real result height.</param>
-		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool SetHeight (int desiredHeight, out int resultHeight)
 		{
 			return CanSetHeight (desiredHeight, out resultHeight);
@@ -3004,7 +3001,7 @@ namespace Terminal.Gui {
 		/// Gets the current width based on the <see cref="Width"/> settings.
 		/// </summary>
 		/// <param name="currentWidth">The real current width.</param>
-		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentWidth (out int currentWidth)
 		{
 			SetRelativeLayout (SuperView?.frame ?? frame);
@@ -3017,7 +3014,7 @@ namespace Terminal.Gui {
 		/// Calculate the height based on the <see cref="Height"/> settings.
 		/// </summary>
 		/// <param name="currentHeight">The real current height.</param>
-		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentHeight (out int currentHeight)
 		{
 			SetRelativeLayout (SuperView?.frame ?? frame);
@@ -3049,6 +3046,20 @@ namespace Terminal.Gui {
 			}
 
 			return top;
+		}
+
+		/// <summary>
+		/// Check if the <paramref name="method"/> is overridden in the <paramref name="view"/>.
+		/// </summary>
+		/// <param name="view">The view.</param>
+		/// <param name="method">The method name.</param>
+		/// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
+		public bool IsOverridden (View view, string method)
+		{
+			Type t = view.GetType ();
+			MethodInfo m = t.GetMethod (method);
+
+			return (m.DeclaringType == t || m.ReflectedType == t) && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 	}
 }
