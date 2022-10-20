@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
+using static Terminal.Gui.Views.MenuTests;
 
 namespace Terminal.Gui.Views {
 	public class MenuTests {
@@ -1100,19 +1101,65 @@ Edit
 			Assert.True (copyAction);
 		}
 
+		// Defines the expected strings for a Menu
+		//
+		// File  Edit
+		//  New    Copy
+		public class ExpectedMenu : MenuBar {
+			FakeDriver d = ((FakeDriver)Application.Driver);
+
+			public string expectedMenuBarText => " " + Menus [0].Title.ToString () + " " + " " + Menus [1].Title.ToString () + " ";
+
+			// The expected strings when the menu is closed
+			public string expectedClosed => " " + Menus [0].Title.ToString () + " " + " " + Menus [1].Title.ToString () + "" + "\n";
+
+			// left padding for the sub menu
+			public string padding (int i) => i > 0 ? new string (' ', Menus [i].Children [0].TitleLength + 4) : "";
+
+			// Define expected menu frame
+			// "┌──────┐"
+			// "│ New  │"
+			// "└──────┘"
+			// BUGBUG: The extra 4 spaces on these should not be there
+			public string expectedTopRow (int i)		=> $"{d.ULCorner}{new String (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.URCorner}  \n";
+			public string expectedMenuItemRow (int i)	=> $"{d.VLine} {Menus [i].Children[0].Title}  {d.VLine}" + "   \n";
+			public string expectedBottomRow (int i)		=> $"{d.LLCorner}{new String (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
+
+			// The fulll expected string for an open sub menu
+			public string expectedSubMenuOpen (int i) => expectedClosed +
+					padding (i) + expectedTopRow(i) +
+					padding (i) + expectedMenuItemRow (i) +
+					padding (i) + expectedBottomRow (i);
+			
+			public ExpectedMenu (MenuBarItem [] menus) : base (menus)
+			{
+			}
+		}
+
 		[Fact, AutoInitShutdown]
 		public void HotKey_MenuBar_ProcessHotKey_Menu_ProcessKey ()
 		{
 			var newAction = false;
 			var copyAction = false;
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", () => newAction = true)
+			// Define the expected menu
+			var twoMenuItemMenu = new ExpectedMenu (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "",  null)
 				}),
-				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", () => copyAction = true)
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuItem ("Copy", "", null)
 				})
+			});
+
+			// The real menu
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[0].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[0].Children[0].Title, "",  () => newAction = true)
+				}),
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[1].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[1].Children[0].Title, "",  () => copyAction = true)
+				}),
 			});
 
 			Application.Top.Add (menu);
@@ -1123,15 +1170,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.F, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			var expected = @"
- File  Edit
-┌──────┐   
-│ New  │   
-└──────┘   
-";
-
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 0, 11, 4), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (twoMenuItemMenu.expectedSubMenuOpen(0), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.N, null)));
 			Application.MainLoop.MainIteration ();
@@ -1140,15 +1179,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.E, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit   
-       ┌───────┐
-       │ Copy  │
-       └───────┘
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 16, 4), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (twoMenuItemMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.C, null)));
 			Application.MainLoop.MainIteration ();
@@ -1158,46 +1189,23 @@ Edit
 		[Fact, AutoInitShutdown]
 		public void MenuBar_Position_And_Size_With_HotKeys_Is_The_Same_As_Without_HotKeys ()
 		{
-			var firstMenuBarText = "File";
-			var firstMenuBarItemText = "New";
-			var secondMenuBarText = "Edit";
-			var secondMenuBarItemText = "Copy";
-
-			// Define expected MenuBar
-			// " File  New "
-			var expectedMenuBarText = " " + firstMenuBarText + " " + " " + secondMenuBarText + " ";
-
-			// Define expected menu frame
-			// "┌──────┐"
-			// "│ New  │"
-			// "└──────┘"
-			var d = ((FakeDriver)Application.Driver);
-			// BUGBUG: The extra 4 spaces on these should not be there
-			var expectedFirstTopRow = $"{d.ULCorner}{new String (d.HLine.ToString () [0], firstMenuBarItemText.Length + 3)}{d.URCorner}   ";
-			var expectedFirstBottomRow = $"{d.LLCorner}{new String (d.HLine.ToString () [0], firstMenuBarItemText.Length + 3)}{d.LRCorner}   ";
-
-			var expectedSecondTopRow = $"{d.ULCorner}{new String (d.HLine.ToString () [0], secondMenuBarItemText.Length + 3)}{d.URCorner}";
-			var expectedSecondBottomRow = $"{d.LLCorner}{new String (d.HLine.ToString () [0], secondMenuBarItemText.Length + 3)}{d.LRCorner}";
-
-			var expectedClosed = " " + firstMenuBarText + " " + " " + secondMenuBarText + "" + "\n";
-
-			var expectedFirstMenuOpen = " " + firstMenuBarText + " " + " " + secondMenuBarText + "" + "\n" +
-				expectedFirstTopRow + "\n" +
-				$"{d.VLine} {firstMenuBarItemText}  {d.VLine}" + "   \n" +
-				expectedFirstBottomRow + "\n";
-
-			var expectedSecondMenuOpen = " " + firstMenuBarText + " " + " " + secondMenuBarText + "     " + "\n" +
-				new String (' ', firstMenuBarItemText.Length + 4) + expectedSecondTopRow + "\n" +
-				new String (' ', firstMenuBarItemText.Length + 4) + $"{d.VLine} {secondMenuBarItemText}  {d.VLine}" + "\n" +
-				new String (' ', firstMenuBarItemText.Length + 4) + expectedSecondBottomRow + "\n";
-
+			// Define the expected menu
+			var twoMenuItemMenu = new ExpectedMenu (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("12", "",  null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuItem ("Copy", "", null)
+				})
+			});
+			
 			// Test without HotKeys first
 			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem (firstMenuBarText, new MenuItem [] {
-					new MenuItem (firstMenuBarItemText, "", null)
+				new MenuBarItem (twoMenuItemMenu.Menus[0].Title, new MenuItem [] {
+					new MenuItem (twoMenuItemMenu.Menus[0].Children[0].Title, "", null)
 				}),
-				new MenuBarItem (secondMenuBarText, new MenuItem [] {
-					new MenuItem (secondMenuBarItemText, "", null)
+				new MenuBarItem (twoMenuItemMenu.Menus[1].Title, new MenuItem [] {
+					new MenuItem (twoMenuItemMenu.Menus[1].Children[0].Title, "", null)
 				})
 			});
 
@@ -1207,32 +1215,30 @@ Edit
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedFirstMenuOpen, output);
-			Assert.Equal (1, pos.X);
-			Assert.Equal (0, pos.Y);
-
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedSubMenuOpen (0), output);
+			
 			// Open second
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedSecondMenuOpen, output);
-
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedSubMenuOpen (1), output);
+			
 			// Close menu
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedClosed, output);
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedClosed, output);
 
 			Application.Top.Remove (menu);
 
 			// Now test WITH HotKeys
 			menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_" + firstMenuBarText, new MenuItem [] {
-					new MenuItem ("_" + firstMenuBarItemText, "", null)
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[0].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[0].Children[0].Title, "",  null)
 				}),
-				new MenuBarItem ("_" + secondMenuBarText, new MenuItem [] {
-					new MenuItem ("_" + secondMenuBarItemText, "", null)
-				})
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[1].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[1].Children[0].Title, "",  null)
+				}),
 			});
 
 			Application.Top.Add (menu);
@@ -1241,59 +1247,56 @@ Edit
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedFirstMenuOpen, output);
-			Assert.Equal (1, pos.X);
-			Assert.Equal (0, pos.Y);
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedSubMenuOpen (0), output);
 
 			// Open second
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedSecondMenuOpen, output);
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedSubMenuOpen (1), output);
 
 			// Close menu
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expectedClosed, output);
+			GraphViewTests.AssertDriverContentsAre (twoMenuItemMenu.expectedClosed, output);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void MenuBar_ButtonPressed_Open_The_Menu_ButtonPressed_Again_Close_The_Menu ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
+			// Define the expected menu
+			var twoMenuItemMenu = new ExpectedMenu (new MenuBarItem [] {
 				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
+					new MenuItem ("Open", "",  null)
 				}),
 				new MenuBarItem ("Edit", new MenuItem [] {
 					new MenuItem ("Copy", "", null)
 				})
 			});
 
+			// Test without HotKeys first
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[0].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[0].Children[0].Title, "",  null)
+				}),
+				new MenuBarItem ("_" + twoMenuItemMenu.Menus[1].Title, new MenuItem [] {
+					new MenuItem ("_" + twoMenuItemMenu.Menus[1].Children[0].Title, "",  null)
+				}),
+			});
+			
 			Application.Top.Add (menu);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			var expected = @"
- File  Edit
-┌──────┐     
-│ New  │     
-└──────┘     
-";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 0, 11, 4), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (twoMenuItemMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.False (menu.IsMenuOpen);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 0, 11, 1), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (twoMenuItemMenu.expectedClosed, output);
 		}
 
 		[Fact]
@@ -1315,16 +1318,33 @@ Edit
 		[Fact, AutoInitShutdown]
 		public void Parent_MenuItem_Stay_Focused_If_Child_MenuItem_Is_Empty_By_Mouse ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
+			// File  Edit  Format
+			//┌──────┐    ┌───────┐         
+			//│ New  │    │ Wrap  │         
+			//└──────┘    └───────┘         
+
+			// Define the expected menu
+			var threeMenuItemMenu = new ExpectedMenu (new MenuBarItem [] {
 				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
+					new MenuItem ("New", "",  null)
 				}),
-				new MenuBarItem ("Edit", new MenuItem [] {
-				}),
+				new MenuBarItem ("Edit", new MenuItem [] {}),
 				new MenuBarItem ("Format", new MenuItem [] {
 					new MenuItem ("Wrap", "", null)
 				})
 			});
+
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem (threeMenuItemMenu.Menus[0].Title, new MenuItem [] {
+					new MenuItem (threeMenuItemMenu.Menus[0].Children[0].Title, "", null)
+				}),
+				new MenuBarItem (threeMenuItemMenu.Menus[1].Title, new MenuItem [] {}),
+				new MenuBarItem (threeMenuItemMenu.Menus[2].Title, new MenuItem [] {
+					new MenuItem (threeMenuItemMenu.Menus[2].Children[0].Title, "", null)
+				})
+			});
+
+
 			var tf = new TextField () { Y = 2, Width = 10 };
 			Application.Top.Add (menu, tf);
 
@@ -1334,76 +1354,38 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			var expected = @"
- File  Edit  Format
-┌──────┐              
-│ New  │              
-└──────┘              
-";
-
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 22, 4), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit  Format
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 22, 1), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 15, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit  Format 
-              ┌───────┐
-              │ Wrap  │
-              └───────┘
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 23, 4), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedSubMenuOpen (2), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit  Format
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 22, 1), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedClosed, output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit  Format
-┌──────┐              
-│ New  │              
-└──────┘              
-";
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedSubMenuOpen (0), output);
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 22, 4), pos);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			expected = @"
- File  Edit  Format
-";
-
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 22, 1), pos);
+			GraphViewTests.AssertDriverContentsWithFrameAre (threeMenuItemMenu.expectedClosed, output);
 		}
 
 		[Fact, AutoInitShutdown]

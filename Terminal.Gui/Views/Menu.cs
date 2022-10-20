@@ -1068,6 +1068,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Menus.Length; i++) {
 				if (i == selected) {
 					pos++;
+					// BUGBUG: This if is not needed
 					if (IsMenuOpen)
 						Move (pos + 1, 0);
 					else {
