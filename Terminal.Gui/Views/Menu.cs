@@ -1024,6 +1024,8 @@ namespace Terminal.Gui {
 			isCleaning = false;
 		}
 
+		static int leftPadding = 1;
+		static int rightPadding = 1; 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -1033,7 +1035,7 @@ namespace Terminal.Gui {
 				Driver.AddRune (' ');
 
 			Move (1, 0);
-			int pos = 1;
+			int pos = 0;
 
 			for (int i = 0; i < Menus.Length; i++) {
 				var menu = Menus [i];
@@ -1050,8 +1052,8 @@ namespace Terminal.Gui {
 					hotColor = GetNormalColor ();
 					normalColor = GetNormalColor ();
 				}
-				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
-				pos += 1 + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? menu.Help.ConsoleWidth + 2 : 0) + 2;
+				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title} " : $" {menu.Title} ({menu.Help}) ", hotColor, normalColor);
+				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? menu.Help.ConsoleWidth + 3 : 0) + rightPadding;
 			}
 			PositionCursor ();
 		}
@@ -1073,7 +1075,7 @@ namespace Terminal.Gui {
 					}
 					return;
 				} else {
-					pos += 1 + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + 2;
+					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 3 : 0) + rightPadding;
 				}
 			}
 		}
