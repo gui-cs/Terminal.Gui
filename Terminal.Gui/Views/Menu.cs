@@ -1224,7 +1224,7 @@ namespace Terminal.Gui {
 				}
 
 				for (int i = 0; i < index; i++)
-					pos += 1 + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + 2;
+					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + 2;
 				openMenu = new Menu (this, Frame.X + pos, Frame.Y + 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
