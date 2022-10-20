@@ -1203,6 +1203,52 @@ namespace Terminal.Gui.Views {
 			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
 			Assert.Equal ("aj", tf.Text.ToString ());
 		}
+		[Fact]
+		[AutoInitShutdown]
+		public void Test_RootMouseKeyEvent_Cancel ()
+		{
+			Application.RootMouseEvent += SuppressRightClick;
+
+			var tf = new TextField () { Width = 10 };
+			int clickCounter = 0;
+			tf.MouseClick += (m) => { clickCounter++; };
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			var processMouseEventMethod = typeof (Application).GetMethod ("ProcessMouseEvent", BindingFlags.Static | BindingFlags.NonPublic)
+				?? throw new Exception ("Expected private method not found 'ProcessMouseEvent', this method was used for testing mouse behaviours");
+
+			var mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button1Clicked,
+				View = tf
+			};
+
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (1, clickCounter);
+
+			// Get a fresh instance that represents a right click.
+			// Should be ignored because of SuppressRightClick callback
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (1, clickCounter);
+
+			Application.RootMouseEvent -= SuppressRightClick;
+
+			// Get a fresh instance that represents a right click.
+			// Should no longer be ignored as the callback was removed
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
+
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (2, clickCounter);
+		}
+
 
 		private bool SuppressKey (KeyEvent arg)
 		{
@@ -1210,6 +1256,12 @@ namespace Terminal.Gui.Views {
 				return true;
 
 			return false;
+		}
+
+		private void SuppressRightClick (MouseEvent arg)
+		{
+			if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
+				arg.Handled = true;
 		}
 
 		[Fact, AutoInitShutdown]

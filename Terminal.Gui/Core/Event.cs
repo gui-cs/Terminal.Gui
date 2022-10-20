@@ -706,38 +706,48 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Describes a mouse event
+	/// Low-level construct that conveys the details of mouse events, such
+	/// as coordinates and button state, from ConsoleDrivers up to <see cref="Application"/> and
+	/// Views.
 	/// </summary>
-	public struct MouseEvent {
+	/// <remarks>The <see cref="Application"/> class includes the <see cref="Application.RootMouseEvent"/>
+	/// Action which takes a MouseEvent argument.</remarks>
+	public class MouseEvent {
 		/// <summary>
 		/// The X (column) location for the mouse event.
 		/// </summary>
-		public int X;
+		public int X { get; set; }
 
 		/// <summary>
 		/// The Y (column) location for the mouse event.
 		/// </summary>
-		public int Y;
+		public int Y { get; set; }
 
 		/// <summary>
 		/// Flags indicating the kind of mouse event that is being posted.
 		/// </summary>
-		public MouseFlags Flags;
+		public MouseFlags Flags { get; set; }
 
 		/// <summary>
 		/// The offset X (column) location for the mouse event.
 		/// </summary>
-		public int OfX;
+		public int OfX { get; set; }
 
 		/// <summary>
 		/// The offset Y (column) location for the mouse event.
 		/// </summary>
-		public int OfY;
+		public int OfY { get; set; }
 
 		/// <summary>
 		/// The current view at the location for the mouse event.
 		/// </summary>
-		public View View;
+		public View View { get; set; }
+
+		/// <summary>
+		/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
+		/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+		/// </summary>
+		public bool Handled { get; set; }
 
 		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.
