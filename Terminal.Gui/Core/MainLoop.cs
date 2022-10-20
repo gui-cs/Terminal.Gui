@@ -306,9 +306,12 @@ namespace Terminal.Gui {
 
 			Driver.MainIteration ();
 
+			bool runIdle = false;
 			lock (idleHandlersLock) {
-				if (idleHandlers.Count > 0)
-					RunIdle ();
+				runIdle = idleHandlers.Count > 0;
+			}
+			if (runIdle) {
+				RunIdle ();
 			}
 		}
 
