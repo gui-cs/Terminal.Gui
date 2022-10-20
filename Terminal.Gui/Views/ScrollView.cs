@@ -13,7 +13,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -217,7 +216,7 @@ namespace Terminal.Gui {
 		/// <param name="view">The view to add to the scrollview.</param>
 		public override void Add (View view)
 		{
-			if (!IsOverridden (view)) {
+			if (!IsOverridden (view, "MouseEvent")) {
 				view.MouseEnter += View_MouseEnter;
 				view.MouseLeave += View_MouseLeave;
 			}
@@ -235,14 +234,6 @@ namespace Terminal.Gui {
 		void View_MouseEnter (MouseEventArgs e)
 		{
 			Application.GrabMouse (this);
-		}
-
-		bool IsOverridden (View view)
-		{
-			Type t = view.GetType ();
-			MethodInfo m = t.GetMethod ("MouseEvent");
-
-			return (m.DeclaringType == t || m.ReflectedType == t) && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 
 		/// <summary>
@@ -515,7 +506,7 @@ namespace Terminal.Gui {
 				vertical.MouseEvent (me);
 			} else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator) {
 				horizontal.MouseEvent (me);
-			} else if (IsOverridden (me.View)) {
+			} else if (IsOverridden (me.View, "MouseEvent")) {
 				Application.UngrabMouse ();
 			}
 			return true;
