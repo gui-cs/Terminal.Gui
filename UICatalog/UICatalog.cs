@@ -318,7 +318,7 @@ namespace UICatalog {
 		{
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			var item = new MenuItem ();
-			item.Title = "_Disable/Enable Mouse";
+			item.Title = "_Disable Mouse";
 			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = Application.IsMouseDisabled;
@@ -334,7 +334,8 @@ namespace UICatalog {
 
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			var item = new MenuItem ();
-			item.Title = "Keybindings";
+			item.Title = "_Key Bindings";
+			item.Help = "Change which keys do what";
 			item.Action += () => {
 				var dlg = new KeyBindingsDialog ();
 				Application.Run (dlg);
