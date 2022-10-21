@@ -1533,5 +1533,31 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			GraphViewTests.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Key_Open_And_Close_The_MenuBar ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				})
+			});
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.False (menu.IsMenuOpen);
+
+			menu.Key = Key.F10 | Key.ShiftMask;
+			Assert.False (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.False (menu.IsMenuOpen);
+
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.False (menu.IsMenuOpen);
+		}
 	}
 }
