@@ -116,7 +116,8 @@ namespace Terminal.Gui {
 				Y = position.Y,
 				Width = 0,
 				Height = 0,
-				UseSubMenusSingleFrame = UseSubMenusSingleFrame
+				UseSubMenusSingleFrame = UseSubMenusSingleFrame,
+				Key = Key
 			};
 
 			menuBar.isContextMenuLoading = true;

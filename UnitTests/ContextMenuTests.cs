@@ -888,5 +888,19 @@ namespace Terminal.Gui.Core {
 │ SubMenu7  │────┘
 ", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Key_Open_And_Close_The_ContextMenu ()
+		{
+			var tf = new TextField ();
+			var top = Application.Top;
+			top.Add (tf);
+			Application.Begin (top);
+
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
+			Assert.True (top.Subviews [1].ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Null (tf.ContextMenu.MenuBar);
+		}
 	}
 }
