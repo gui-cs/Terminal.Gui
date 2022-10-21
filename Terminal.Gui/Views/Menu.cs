@@ -141,6 +141,12 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
+		// ┌──────────────────────────────┐
+		// │ Quit   Quit UI Catalog  Ctrl+Q │
+		// └──────────────────────────────┘
+		// ┌─────────────────┐
+		// │ ◌ TopLevel Alt+T │
+		// └─────────────────┘
 		internal int Width => 1 + TitleLength + (Help.ConsoleWidth > 0 ? Help.ConsoleWidth + 2 : 0) +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
 			(ShortcutTag.ConsoleWidth > 0 ? ShortcutTag.ConsoleWidth + 2 : 0) + 2;
@@ -459,6 +465,7 @@ namespace Terminal.Gui {
 			return GetNormalColor ();
 		}
 
+		// Draws the Menu, within the Frame
 		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (GetNormalColor ());
@@ -484,6 +491,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (Driver.HLine);
 					else if (i == 0 && p == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null)
 						Driver.AddRune (Driver.LeftArrow);
+					// TODO: Change this `- 3` to a const (is it spacesAfterTitle?)
 					else if (p == Frame.Width - 3 && barItems.SubMenu (barItems.Children [i]) != null)
 						Driver.AddRune (Driver.RightArrow);
 					else
@@ -516,6 +524,7 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
+				// Draw the item. The `2` is for the left border and the space before the text
 				ViewToScreen (2, i + 1, out int vtsCol, out _, false);
 				if (vtsCol < Driver.Cols) {
 					Move (2, i + 1);
@@ -527,6 +536,7 @@ namespace Terminal.Gui {
 							HotKeySpecifier = MenuBar.HotKeySpecifier,
 							Text = textToDraw
 						};
+						// TODO: Change this `- 3` to a const (is it spacesAfterTitle?)
 						tf.Draw (ViewToScreen (new Rect (2, i + 1, Frame.Width - 3, 1)),
 							i == current ? ColorScheme.Focus : GetNormalColor (),
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
@@ -1025,7 +1035,8 @@ namespace Terminal.Gui {
 		}
 
 		static int leftPadding = 1;
-		static int rightPadding = 1; 
+		static int rightPadding = 1;
+		static int spaceAfterTitle = 3;
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -1053,7 +1064,7 @@ namespace Terminal.Gui {
 					normalColor = GetNormalColor ();
 				}
 				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title} " : $" {menu.Title} ({menu.Help}) ", hotColor, normalColor);
-				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? menu.Help.ConsoleWidth + 3 : 0) + rightPadding;
+				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? menu.Help.ConsoleWidth + spaceAfterTitle : 0) + rightPadding;
 			}
 			PositionCursor ();
 		}
@@ -1076,7 +1087,7 @@ namespace Terminal.Gui {
 					}
 					return;
 				} else {
-					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 3 : 0) + rightPadding;
+					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + spaceAfterTitle : 0)+ rightPadding;
 				}
 			}
 		}
@@ -1211,6 +1222,7 @@ namespace Terminal.Gui {
 			int pos = 0;
 			switch (subMenu) {
 			case null:
+				// Open a submenu below a MenuBar
 				lastFocused = lastFocused ?? (SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused);
 				if (openSubMenu != null && !CloseMenu (false, true))
 					return;
@@ -1223,6 +1235,8 @@ namespace Terminal.Gui {
 					openMenu.Dispose ();
 				}
 
+				// This positions the submenu horizontally aligned with the first character of the
+				// menu it belongs to's text
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + 2;
 				openMenu = new Menu (this, Frame.X + pos, Frame.Y + 1, Menus [index]);
@@ -1237,6 +1251,7 @@ namespace Terminal.Gui {
 				openMenu.SetFocus ();
 				break;
 			default:
+				// Opens a submenu next to another submenu (openSubMenu)
 				if (openSubMenu == null)
 					openSubMenu = new List<Menu> ();
 				if (sIndex > -1) {

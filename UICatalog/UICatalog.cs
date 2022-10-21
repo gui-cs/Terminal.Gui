@@ -169,7 +169,7 @@ namespace UICatalog {
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
+					new MenuItem ("_Quit", "Quit UI Catalog", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
