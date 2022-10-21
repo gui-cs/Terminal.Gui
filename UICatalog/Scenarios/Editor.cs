@@ -116,6 +116,8 @@ namespace UICatalog.Scenarios {
 					new MenuBarItem ("_Languages", GetSupportedCultures ())
 				})
 			});
+			menu.UseSubMenusSingleFrame = true;
+
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
