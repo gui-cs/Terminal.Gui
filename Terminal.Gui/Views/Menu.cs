@@ -1073,13 +1073,9 @@ namespace Terminal.Gui {
 				Attribute hotColor, normalColor;
 				if (i == selected && IsMenuOpen) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
-					normalColor = i == selected ? ColorScheme.Focus :
-						GetNormalColor ();
-				} else if (openedByAltKey) {
+					normalColor = i == selected ? ColorScheme.Focus : GetNormalColor ();
+				} else { 
 					hotColor = ColorScheme.HotNormal;
-					normalColor = GetNormalColor ();
-				} else {
-					hotColor = GetNormalColor ();
 					normalColor = GetNormalColor ();
 				}
 				// Note Help on MenuBar is drawn with parens around it
