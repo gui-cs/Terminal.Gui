@@ -681,11 +681,13 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
+		
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
+
 		/// <summary>
 		/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
 		/// to equivalent, printable, Unicode chars.
@@ -694,21 +696,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			var controlChars = gethexaformat (c, 4);
-			if (controlChars <= 0x1F || (controlChars >= 0X7F && controlChars <= 0x9F)) {
+			var controlChars = c & 0xFFFF;
+			if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
 				return new Rune (controlChars + 0x2400);
-			} else {
-				return c;
 			}
-		}
 
-		static uint gethexaformat (uint rune, int length)
-		{
-			var hex = rune.ToString ($"x{length}");
-			var hexstr = hex.Substring (hex.Length - length, length);
-			return (uint)int.Parse (hexstr, System.Globalization.NumberStyles.HexNumber);
+			return c;
 		}
 
 		/// <summary>
