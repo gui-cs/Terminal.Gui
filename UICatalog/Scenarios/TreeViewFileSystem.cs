@@ -25,6 +25,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miFullPaths;
 		private MenuItem miLeaveLastRow;
 		private MenuItem miCustomColors;
+		private MenuItem miCursor;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -54,6 +55,7 @@ namespace UICatalog.Scenarios {
 					miFullPaths = new MenuItem ("_FullPaths", "", () => SetFullName()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miLeaveLastRow = new MenuItem ("_LeaveLastRow", "", () => SetLeaveLastRow()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 					miCustomColors = new MenuItem ("C_ustomColors", "", () => SetCustomColors()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					miCursor = new MenuItem ("Curs_or", "", () => SetCursor()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -269,6 +271,12 @@ namespace UICatalog.Scenarios {
 			miLeaveLastRow.Checked = !miLeaveLastRow.Checked;
 			treeViewFiles.Style.LeaveLastRow = miLeaveLastRow.Checked;
 		}
+		private void SetCursor()
+		{
+			miCursor.Checked = !miCursor.Checked;
+			treeViewFiles.DesiredCursorVisibility = miCursor.Checked ? CursorVisibility.Default : CursorVisibility.Invisible;
+		}
+
 		private void SetCustomColors()
 		{
 			var yellow = new ColorScheme
