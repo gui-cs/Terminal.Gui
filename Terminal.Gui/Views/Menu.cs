@@ -1,13 +1,3 @@
-//
-// Menu.cs: application menus and submenus
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// TODO:
-//   Add accelerator support, but should also support chords (Shortcut in MenuItem)
-//   Allow menus inside menus
-
 using System;
 using NStack;
 using System.Linq;
@@ -26,18 +16,19 @@ namespace Terminal.Gui {
 		NoCheck = 0b_0000_0000,
 
 		/// <summary>
-		/// The menu item will indicate checked/un-checked state (see <see cref="Checked"/>.
+		/// The menu item will indicate checked/un-checked state (see <see cref="Checked"/>).
 		/// </summary>
 		Checked = 0b_0000_0001,
 
 		/// <summary>
-		/// The menu item is part of a menu radio group (see <see cref="Checked"/> and will indicate selected state.
+		/// The menu item is part of a menu radio group (see <see cref="Checked"/>) and will indicate selected state.
 		/// </summary>
 		Radio = 0b_0000_0010,
 	};
 
 	/// <summary>
-	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
+	/// A <see cref="MenuItem"/> has title, an associated help text, and an action to execute on activation. 
+	/// MenuItems can also have a checked indicator (see <see cref="Checked"/>).
 	/// </summary>
 	public class MenuItem {
 		ustring title;
@@ -78,14 +69,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
-		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
-		/// if the Shortcut is set to "Control-N", this would be a global hotkey that would trigger as well
+		/// The HotKey is used to activate a <see cref="MenuItem"/> with they keyboard. HotKeys are defined by prefixing the <see cref="Title"/>
+		/// of a MenuItem with an underscore ('_'). 
+		/// <para>
+		/// Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is not active). 
+		/// Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
+		/// </para>
+		/// <para>
+		/// For example for a MenuBar with a "_File" MenuBarItem that contains a "_New" MenuItem, Alt-F will open the File menu.
+		/// Pressing the N key will then activate the New MenuItem.
+		/// </para>
+		/// <para>
+		/// See also <see cref="Shortcut"/> which enable global key-bindings to menu items.
+		/// </para>
 		/// </summary>
 		public Rune HotKey;
 
 		/// <summary>
-		/// This is the global setting that can be used as a global <see cref="ShortcutHelper.Shortcut"/> to invoke the action on the menu.
+		/// Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the <see cref="View"/> that is
+		/// the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this <see cref="MenuItem"/>.
+		/// <para>
+		/// The <see cref="Key"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
+		/// </para>
 		/// </summary>
 		public Key Shortcut {
 			get => shortcutHelper.Shortcut;
@@ -97,12 +102,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The keystroke combination used in the <see cref="ShortcutHelper.ShortcutTag"/> as string.
+		/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 		/// </summary>
 		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (shortcutHelper.Shortcut);
 
 		/// <summary>
-		/// Gets or sets the title.
+		/// Gets or sets the title of the menu item .
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title {
@@ -116,41 +121,46 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the help text for the menu item.
+		/// Gets or sets the help text for the menu item. The help text is drawn to the right of the <see cref="Title"/>.
 		/// </summary>
 		/// <value>The help text.</value>
 		public ustring Help { get; set; }
 
 		/// <summary>
-		/// Gets or sets the action to be invoked when the menu is triggered
+		/// Gets or sets the action to be invoked when the menu item is triggered.
 		/// </summary>
 		/// <value>Method to invoke.</value>
 		public Action Action { get; set; }
 
 		/// <summary>
-		/// Gets or sets the action to be invoked if the menu can be triggered
+		/// Gets or sets the action to be invoked to determine if the menu can be triggered. If <see cref="CanExecute"/> returns <see langword="true"/>
+		/// the menu item will be enabled. Otherwise it will be disabled. 
 		/// </summary>
-		/// <value>Function to determine if action is ready to be executed.</value>
+		/// <value>Function to determine if the action is can be executed or not.</value>
 		public Func<bool> CanExecute { get; set; }
 
 		/// <summary>
-		/// Shortcut to check if the menu item is enabled
+		/// Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around <see cref="CanExecute"/>.
 		/// </summary>
 		public bool IsEnabled ()
 		{
 			return CanExecute == null ? true : CanExecute ();
 		}
 
+		// 
 		// ┌─────────────────────────────┐
 		// │ Quit  Quit UI Catalog  Ctrl+Q │
 		// └─────────────────────────────┘
 		// ┌─────────────────┐
 		// │ ◌ TopLevel Alt+T │
 		// └─────────────────┘
-		// TODO: Repalace the `2` literals with named constants (e.g. spacesAfterHelp and spacesAfterCheck and spacesAfterShortCutTag)
-		internal int Width =>  + TitleLength + (Help.ConsoleWidth > 0 ? Help.ConsoleWidth + 2 : 0) +
-			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
-			(ShortcutTag.ConsoleWidth > 0 ? ShortcutTag.ConsoleWidth + 2 : 0) + 2;
+		// TODO: Repalace the `2` literals with named constants 
+		internal int Width => 1 + // space before Title
+			TitleLength +
+			2 + // space after Title - BUGBUG: This should be 1 
+			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) + // check glyph + space 
+			(Help.ConsoleWidth > 0 ? 2 + Help.ConsoleWidth : 0) + // Two spaces before Help
+			(ShortcutTag.ConsoleWidth > 0 ? 2 + ShortcutTag.ConsoleWidth : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
@@ -158,12 +168,12 @@ namespace Terminal.Gui {
 		public bool Checked { set; get; }
 
 		/// <summary>
-		/// Sets or gets the type selection indicator the menu item will be displayed with.
+		/// Sets or gets the <see cref="MenuItemCheckStyle"/> of a menu item where <see cref="Checked"/> is set to <see langword="true"/>.
 		/// </summary>
 		public MenuItemCheckStyle CheckType { get; set; }
 
 		/// <summary>
-		/// Gets or sets the parent for this <see cref="MenuItem"/>.
+		/// Gets the parent for this <see cref="MenuItem"/>.
 		/// </summary>
 		/// <value>The parent.</value>
 		public MenuItem Parent { get; internal set; }
@@ -174,7 +184,7 @@ namespace Terminal.Gui {
 		internal bool IsFromSubMenu { get { return Parent != null; } }
 
 		/// <summary>
-		/// Merely a debugging aid to see the interaction with main
+		/// Merely a debugging aid to see the interaction with main.
 		/// </summary>
 		public MenuItem GetMenuItem ()
 		{
@@ -182,7 +192,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Merely a debugging aid to see the interaction with main
+		/// Merely a debugging aid to see the interaction with main.
 		/// </summary>
 		public bool GetMenuBarItem ()
 		{
@@ -220,7 +230,8 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// A <see cref="MenuBarItem"/> contains <see cref="MenuBarItem"/>s or <see cref="MenuItem"/>s.
+	/// <see cref="MenuBarItem"/> is a menu item on an app's <see cref="MenuBar"/>. MenuBarItems do not support
+	/// <see cref="MenuItem.Shortcut"/>.
 	/// </summary>
 	public class MenuBarItem : MenuItem {
 		/// <summary>
@@ -296,19 +307,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		//static int GetMaxTitleLength (MenuItem [] children)
-		//{
-		//	int maxLength = 0;
-		//	foreach (var item in children) {
-		//		int len = GetMenuBarItemLength (item.Title);
-		//		if (len > maxLength)
-		//			maxLength = len;
-		//		item.IsFromSubMenu = true;
-		//	}
-
-		//	return maxLength;
-		//}
-
 		void SetChildrensParent (MenuItem [] childrens)
 		{
 			foreach (var child in childrens) {
@@ -369,12 +367,6 @@ namespace Terminal.Gui {
 				title = ustring.Empty;
 			Title = title;
 		}
-
-		///// <summary>
-		///// Gets or sets the title to display.
-		///// </summary>
-		///// <value>The title.</value>
-		//public ustring Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets an array of <see cref="MenuItem"/> objects that are the children of this <see cref="MenuBarItem"/>
@@ -485,14 +477,14 @@ namespace Terminal.Gui {
 					Move (1, i + 1);
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
-				for (int p = Bounds.X; p < Frame.Width - 2; p++) { // This - 2 is for the border?
+				for (int p = Bounds.X; p < Frame.Width - 2; p++) { // This - 2 is for the border
 					if (p < 0)
 						continue;
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else if (i == 0 && p == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null)
 						Driver.AddRune (Driver.LeftArrow);
-					// TODO: Change this `- 3` to a const (is it spacesAfterTitle?)
+					// This `- 3` is left border + right border + one row in from right
 					else if (p == Frame.Width - 3 && barItems.SubMenu (barItems.Children [i]) != null)
 						Driver.AddRune (Driver.RightArrow);
 					else
@@ -525,7 +517,6 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
-				// Draw the item. The `2` is for the left border and the space before the text
 				ViewToScreen (2, i + 1, out int vtsCol, out _, false);
 				if (vtsCol < Driver.Cols) {
 					Move (2, i + 1);
@@ -537,7 +528,7 @@ namespace Terminal.Gui {
 							HotKeySpecifier = MenuBar.HotKeySpecifier,
 							Text = textToDraw
 						};
-						// TODO: Change this `- 3` to a const (is it spacesAfterTitle?)
+						// The -3 is left/right border + one space (not sure what for)
 						tf.Draw (ViewToScreen (new Rect (2, i + 1, Frame.Width - 3, 1)),
 							i == current ? ColorScheme.Focus : GetNormalColor (),
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
@@ -846,14 +837,19 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
+	///	<para>
 	/// Provides a menu bar with drop-down and cascading menus. 
+	///	</para>
+	///	<para>
+	///	
+	///	</para>
 	/// </summary>
 	/// <remarks>
 	///	<para>
-	///	The <see cref="MenuBar"/> appears on the first row of the terminal.
+	///	The <see cref="MenuBar"/> appears on the first row of the terminal and uses the full width.
 	///	</para>
 	///	<para>
-	///	The <see cref="MenuBar"/> provides global hotkeys for the application.
+	///	The <see cref="MenuBar"/> provides global hotkeys for the application. See <see cref="MenuItem.HotKey"/>.
 	///	</para>
 	/// </remarks>
 	public class MenuBar : View {
@@ -1035,7 +1031,7 @@ namespace Terminal.Gui {
 			isCleaning = false;
 		}
 
-	    // The column where the MenuBar starts
+		// The column where the MenuBar starts
 		static int xOrigin = 0;
 		// Spaces before the Title
 		static int leftPadding = 1;
@@ -1086,15 +1082,10 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Menus.Length; i++) {
 				if (i == selected) {
 					pos++;
-					// BUGBUG: This if is not needed
-					if (IsMenuOpen)
-						Move (pos + 1, 0);
-					else {
-						Move (pos + 1, 0);
-					}
+					Move (pos + 1, 0);
 					return;
 				} else {
-					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + parensAroundHelp : 0)+ rightPadding;
+					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + parensAroundHelp : 0) + rightPadding;
 				}
 			}
 		}
