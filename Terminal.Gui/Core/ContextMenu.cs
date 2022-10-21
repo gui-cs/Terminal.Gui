@@ -110,13 +110,13 @@ namespace Terminal.Gui {
 			} else if (ForceMinimumPosToZero && position.Y < 0) {
 				position.Y = 0;
 			}
-
+			
 			menuBar = new MenuBar (new [] { MenuItems }) {
 				X = position.X,
 				Y = position.Y,
 				Width = 0,
 				Height = 0,
-				UseSubMenusSingleFrame = UseSubMenusSingleFrame // BUGBUG: This line of code does nothing
+				UseSubMenusSingleFrame = this.UseSubMenusSingleFrame 
 			};
 
 			menuBar.isContextMenuLoading = true;
