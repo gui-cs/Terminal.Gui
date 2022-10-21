@@ -592,7 +592,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                   
+ File  Edit                     
                                 
                                 
   Label: TextField              
@@ -612,7 +612,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 32, 17), pos);
+			Assert.Equal (new Rect (1, 0, 32, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -656,7 +656,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                               
+ File  Edit                                 
 ┌ Window ──────────────────────────────────┐
 │                                          │
 │                                          │
@@ -676,7 +676,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 44, 17), pos);
+			Assert.Equal (new Rect (1, 0, 44, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]

@@ -2,8 +2,24 @@
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// A context menu window derived from <see cref="MenuBar"/> containing menu items
-	/// which can be opened in any position.
+	/// ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. 
+	/// ContextMenu is analogous to <see cref="MenuBar"/> and, once activated, works like a sub-menu 
+	/// of a <see cref="MenuBarItem"/> (but can be positioned anywhere).
+	/// <para>
+	/// By default, a ContextMenu with sub-menus is displayed in a cascading manner, where each sub-menu pops out of the ContextMenu frame
+	/// (either to the right or left, depending on where the ContextMenu is relative to the edge of the screen). By setting
+	/// <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-menus are
+	/// drawn within the ContextMenu frame.
+	/// </para>
+	/// <para>
+	/// ContextMenus can be activated using the Shift-F10 key (by default; use the <see cref="Key"/> to change to another key).
+	/// </para>
+	/// <para>
+	/// Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling <see cref="Show()"/>.
+	/// </para>
+	/// <para>
+	/// ContextMenus are located using screen using screen coordinates and appear above all other Views.
+	/// </para>
 	/// </summary>
 	public sealed class ContextMenu : IDisposable {
 		private static MenuBar menuBar;
@@ -12,15 +28,15 @@ namespace Terminal.Gui {
 		private Toplevel container;
 
 		/// <summary>
-		/// Initialize a context menu with empty menu items.
+		/// Initializes a context menu with no menu items.
 		/// </summary>
 		public ContextMenu () : this (0, 0, new MenuBarItem ()) { }
 
 		/// <summary>
-		/// Initialize a context menu with menu items from a host <see cref="View"/>.
+		/// Initializes a context menu, with a <see cref="View"/> specifiying the parent/hose of the menu.
 		/// </summary>
 		/// <param name="host">The host view.</param>
-		/// <param name="menuItems">The menu items.</param>
+		/// <param name="menuItems">The menu items for the context menu.</param>
 		public ContextMenu (View host, MenuBarItem menuItems) :
 			this (host.Frame.X, host.Frame.Y, menuItems)
 		{
@@ -28,10 +44,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initialize a context menu with menu items.
+		/// Initializes a context menu with menu items at a specific screen location.
 		/// </summary>
-		/// <param name="x">The left position.</param>
-		/// <param name="y">The top position.</param>
+		/// <param name="x">The left position (screen relative).</param>
+		/// <param name="y">The top position (screen relative).</param>
 		/// <param name="menuItems">The menu items.</param>
 		public ContextMenu (int x, int y, MenuBarItem menuItems)
 		{
@@ -48,7 +64,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Disposes the all the context menu objects instances.
+		/// Disposes the context menu object.
 		/// </summary>
 		public void Dispose ()
 		{
@@ -65,7 +81,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Open the <see cref="MenuItems"/> menu items.
+		/// Shows (opens) the ContextMenu, displaying the <see cref="MenuItem"/>s it contains.
 		/// </summary>
 		public void Show ()
 		{
@@ -110,7 +126,7 @@ namespace Terminal.Gui {
 			} else if (ForceMinimumPosToZero && position.Y < 0) {
 				position.Y = 0;
 			}
-
+			
 			menuBar = new MenuBar (new [] { MenuItems }) {
 				X = position.X,
 				Y = position.Y,
@@ -139,7 +155,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Close the <see cref="MenuItems"/> menu items.
+		/// Hides (closes) the ContextMenu.
 		/// </summary>
 		public void Hide ()
 		{
@@ -158,7 +174,7 @@ namespace Terminal.Gui {
 		public event Action<MouseFlags> MouseFlagsChanged;
 
 		/// <summary>
-		/// Gets or set the menu position.
+		/// Gets or sets the menu position.
 		/// </summary>
 		public Point Position { get; set; }
 
@@ -168,7 +184,7 @@ namespace Terminal.Gui {
 		public MenuBarItem MenuItems { get; set; }
 
 		/// <summary>
-		/// The <see cref="Gui.Key"/> used to activate the context menu by keyboard.
+		/// <see cref="Gui.Key"/> specifies they keyboard key that will activate the context menu with the keyboard.
 		/// </summary>
 		public Key Key {
 			get => key;
@@ -180,7 +196,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The <see cref="Gui.MouseFlags"/> used to activate the context menu by mouse.
+		/// <see cref="Gui.MouseFlags"/> specifies the mouse action used to activate the context menu by mouse.
 		/// </summary>
 		public MouseFlags MouseFlags {
 			get => mouseFlags;
@@ -192,7 +208,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets information whether menu is showing or not.
+		/// Gets whether the ContextMenu is showing or not.
 		/// </summary>
 		public static bool IsShow { get; private set; }
 
@@ -203,8 +219,9 @@ namespace Terminal.Gui {
 		public View Host { get; set; }
 
 		/// <summary>
-		/// Gets or sets whether forces the minimum position to zero
-		/// if the left or right position are negative.
+		/// Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position 
+		/// is less than zero. The default is <see langword="true"/> which means the context menu will be forced to the right.
+		/// If set to <see langword="false"/>, the context menu will be clipped on the left if x is less than zero.
 		/// </summary>
 		public bool ForceMinimumPosToZero { get; set; } = true;
 
@@ -214,7 +231,9 @@ namespace Terminal.Gui {
 		public MenuBar MenuBar { get => menuBar; }
 
 		/// <summary>
-		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
+		/// Gets or sets if sub-menus will be displayed using a "single frame" menu style. If <see langword="true"/>, the ContextMenu
+		/// and any sub-menus that would normally cascade will be displayed within a single frame. If <see langword="false"/> (the default),
+		/// sub-menus will cascade using separate frames for each level of the menu hierarchy.
 		/// </summary>
 		public bool UseSubMenusSingleFrame { get; set; }
 	}
