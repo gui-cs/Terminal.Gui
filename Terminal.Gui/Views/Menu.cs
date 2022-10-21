@@ -1041,13 +1041,9 @@ namespace Terminal.Gui {
 				Attribute hotColor, normalColor;
 				if (i == selected && IsMenuOpen) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
-					normalColor = i == selected ? ColorScheme.Focus :
-						GetNormalColor ();
-				} else if (openedByAltKey) {
+					normalColor = i == selected ? ColorScheme.Focus : GetNormalColor ();
+				} else { 
 					hotColor = ColorScheme.HotNormal;
-					normalColor = GetNormalColor ();
-				} else {
-					hotColor = GetNormalColor ();
 					normalColor = GetNormalColor ();
 				}
 				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
