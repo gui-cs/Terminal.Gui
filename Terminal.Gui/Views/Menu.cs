@@ -630,7 +630,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			return false;
+			return host.ProcessHotKey (kb);
 		}
 
 		void RunSelected ()
@@ -904,6 +904,11 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <summary>
+		/// The <see cref="Gui.Key"/> used to activate the menu bar by keyboard.
+		/// </summary>
+		public Key Key { get; set; } = Key.F9;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
@@ -1674,7 +1679,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
-			if (kb.Key == Key.F9) {
+			if (kb.Key == Key) {
 				if (!IsMenuOpen)
 					OpenMenu ();
 				else
