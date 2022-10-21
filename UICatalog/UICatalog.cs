@@ -178,7 +178,7 @@ namespace UICatalog {
 					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
 					new MenuItem ("_About...",
 						"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
-				})
+				}),
 			});
 
 			_leftPane = new FrameView ("Categories") {

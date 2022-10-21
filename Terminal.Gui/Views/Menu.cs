@@ -141,13 +141,14 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
-		// ┌──────────────────────────────┐
-		// │ Quit   Quit UI Catalog  Ctrl+Q │
-		// └──────────────────────────────┘
+		// ┌─────────────────────────────┐
+		// │ Quit  Quit UI Catalog  Ctrl+Q │
+		// └─────────────────────────────┘
 		// ┌─────────────────┐
 		// │ ◌ TopLevel Alt+T │
 		// └─────────────────┘
-		internal int Width => 1 + TitleLength + (Help.ConsoleWidth > 0 ? Help.ConsoleWidth + 2 : 0) +
+		// TODO: Repalace the `2` literals with named constants (e.g. spacesAfterHelp and spacesAfterCheck and spacesAfterShortCutTag)
+		internal int Width =>  + TitleLength + (Help.ConsoleWidth > 0 ? Help.ConsoleWidth + 2 : 0) +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
 			(ShortcutTag.ConsoleWidth > 0 ? ShortcutTag.ConsoleWidth + 2 : 0) + 2;
 
@@ -226,7 +227,7 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="MenuBarItem"/> as a <see cref="MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
-		/// <param name="help">Help text to display.</param>
+		/// <param name="help">Help text to display. Will be displayed next to the Title surrounded by parentheses.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
 		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
 		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
@@ -397,8 +398,8 @@ namespace Terminal.Gui {
 			}
 			int minX = x;
 			int minY = y;
-			int maxW = (items.Max (z => z?.Width) ?? 0) + 2;
-			int maxH = items.Length + 2;
+			int maxW = (items.Max (z => z?.Width) ?? 0) + 2; // This 2 is frame border?
+			int maxH = items.Length + 2; // This 2 is frame border?
 			if (parent != null && x + maxW > Driver.Cols) {
 				minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
 			}
@@ -484,7 +485,7 @@ namespace Terminal.Gui {
 					Move (1, i + 1);
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
-				for (int p = Bounds.X; p < Frame.Width - 2; p++) {
+				for (int p = Bounds.X; p < Frame.Width - 2; p++) { // This - 2 is for the border?
 					if (p < 0)
 						continue;
 					if (item == null)
@@ -1034,9 +1035,14 @@ namespace Terminal.Gui {
 			isCleaning = false;
 		}
 
+	    // The column where the MenuBar starts
+		static int xOrigin = 0;
+		// Spaces before the Title
 		static int leftPadding = 1;
+		// Spaces after the Title
 		static int rightPadding = 1;
-		static int spaceAfterTitle = 3;
+		// Spaces after the submenu Title, before Help
+		static int parensAroundHelp = 3;
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -1063,8 +1069,9 @@ namespace Terminal.Gui {
 					hotColor = GetNormalColor ();
 					normalColor = GetNormalColor ();
 				}
+				// Note Help on MenuBar is drawn with parens around it
 				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title} " : $" {menu.Title} ({menu.Help}) ", hotColor, normalColor);
-				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? menu.Help.ConsoleWidth + spaceAfterTitle : 0) + rightPadding;
+				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth > 0 ? leftPadding + menu.Help.ConsoleWidth + parensAroundHelp : 0) + rightPadding;
 			}
 			PositionCursor ();
 		}
@@ -1087,7 +1094,7 @@ namespace Terminal.Gui {
 					}
 					return;
 				} else {
-					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + spaceAfterTitle : 0)+ rightPadding;
+					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + parensAroundHelp : 0)+ rightPadding;
 				}
 			}
 		}
@@ -1238,7 +1245,7 @@ namespace Terminal.Gui {
 				// This positions the submenu horizontally aligned with the first character of the
 				// menu it belongs to's text
 				for (int i = 0; i < index; i++)
-					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + 2;
+					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
 				openMenu = new Menu (this, Frame.X + pos, Frame.Y + 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
@@ -1791,10 +1798,10 @@ namespace Terminal.Gui {
 			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked || me.Flags == MouseFlags.Button1Clicked ||
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
 				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
-				int pos = 1;
+				int pos = xOrigin;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
-					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + Menus [i].Help.ConsoleWidth + 2) {
+					if (cx >= pos && cx < pos + leftPadding + Menus [i].TitleLength + Menus [i].Help.ConsoleWidth + rightPadding) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1823,7 +1830,7 @@ namespace Terminal.Gui {
 						}
 						return true;
 					}
-					pos += 1 + Menus [i].TitleLength + 2;
+					pos += leftPadding + Menus [i].TitleLength + rightPadding;
 				}
 			}
 			return false;
