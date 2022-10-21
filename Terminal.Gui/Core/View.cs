@@ -1498,7 +1498,7 @@ namespace Terminal.Gui {
 			} else if ((GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
-				Clear (ViewToScreen (bounds));
+				Clear ();
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {

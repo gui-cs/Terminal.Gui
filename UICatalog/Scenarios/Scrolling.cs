@@ -114,8 +114,12 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (label);
 
-			// BUGBUG: ScrollView only supports Absolute Positioning (#72)
-			var scrollView = new ScrollView (new Rect (2, 2, 50, 20)) {
+			// FIXED: ScrollView only supports Absolute Positioning (#72)
+			var scrollView = new ScrollView {
+				X = 2,
+				Y = 2,
+				Width = 50,
+				Height = 20,
 				ColorScheme = Colors.TopLevel,
 				ContentSize = new Size (200, 100),
 				//ContentOffset = new Point (0, 0),
