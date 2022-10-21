@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 	[Flags]
 	public enum MenuItemCheckStyle {
 		/// <summary>
-		/// The menu item will be shown normally, with no check indicator.
+		/// The menu item will be shown normally, with no check indicator. The default.
 		/// </summary>
 		NoCheck = 0b_0000_0000,
 
@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The HotKey is used to activate a <see cref="MenuItem"/> with they keyboard. HotKeys are defined by prefixing the <see cref="Title"/>
+		/// The HotKey is used to activate a <see cref="MenuItem"/> with the keyboard. HotKeys are defined by prefixing the <see cref="Title"/>
 		/// of a MenuItem with an underscore ('_'). 
 		/// <para>
 		/// Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is not active). 
@@ -134,7 +134,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets the action to be invoked to determine if the menu can be triggered. If <see cref="CanExecute"/> returns <see langword="true"/>
-		/// the menu item will be enabled. Otherwise it will be disabled. 
+		/// the menu item will be enabled. Otherwise, it will be disabled. 
 		/// </summary>
 		/// <value>Function to determine if the action is can be executed or not.</value>
 		public Func<bool> CanExecute { get; set; }
@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 		// ┌─────────────────┐
 		// │ ◌ TopLevel Alt+T │
 		// └─────────────────┘
-		// TODO: Repalace the `2` literals with named constants 
+		// TODO: Replace the `2` literals with named constants 
 		internal int Width => 1 + // space before Title
 			TitleLength +
 			2 + // space after Title - BUGBUG: This should be 1 
@@ -230,8 +230,8 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// <see cref="MenuBarItem"/> is a menu item on an app's <see cref="MenuBar"/>. MenuBarItems do not support
-	/// <see cref="MenuItem.Shortcut"/>.
+	/// <see cref="MenuBarItem"/> is a menu item on an app's <see cref="MenuBar"/>. 
+	/// MenuBarItems do not support <see cref="MenuItem.Shortcut"/>.
 	/// </summary>
 	public class MenuBarItem : MenuItem {
 		/// <summary>
@@ -834,22 +834,27 @@ namespace Terminal.Gui {
 		}
 	}
 
-
-
 	/// <summary>
 	///	<para>
-	/// Provides a menu bar with drop-down and cascading menus. 
+	/// Provides a menu bar that spans the top of a <see cref="Toplevel"/> View with drop-down and cascading menus. 
 	///	</para>
-	///	<para>
-	///	
-	///	</para>
+	/// <para>
+	/// By default, any sub-sub-menus (sub-menus of the <see cref="MenuItem"/>s added to <see cref="MenuBarItem"/>s) 
+	/// are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame
+	/// (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
+	/// <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-sub-menus are
+	/// drawn within a single frame below the MenuBar.
+	/// </para>
 	/// </summary>
 	/// <remarks>
 	///	<para>
-	///	The <see cref="MenuBar"/> appears on the first row of the terminal and uses the full width.
+	///	The <see cref="MenuBar"/> appears on the first row of the parent <see cref="Toplevel"/> View and uses the full width.
 	///	</para>
 	///	<para>
 	///	The <see cref="MenuBar"/> provides global hotkeys for the application. See <see cref="MenuItem.HotKey"/>.
+	///	</para>
+	///	<para>
+	///	See also: <see cref="ContextMenu"/>
 	///	</para>
 	/// </remarks>
 	public class MenuBar : View {
@@ -857,7 +862,7 @@ namespace Terminal.Gui {
 		internal int selectedSub;
 
 		/// <summary>
-		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this when the <see cref="MenuBar"/> is visible.
+		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this after the <see cref="MenuBar"/> is visible.
 		/// </summary>
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
@@ -880,7 +885,7 @@ namespace Terminal.Gui {
 
 		static ustring shortcutDelimiter = "+";
 		/// <summary>
-		/// Used for change the shortcut delimiter separator.
+		/// Sets or gets the shortcut delimiter separator. The default is "+".
 		/// </summary>
 		public static ustring ShortcutDelimiter {
 			get => shortcutDelimiter;
@@ -900,6 +905,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
+		/// <para>
+		/// By default any sub-sub-menus (sub-menus of the main <see cref="MenuItem"/>s) are displayed in a cascading manner, 
+		/// where each sub-sub-menu pops out of the sub-menu frame
+		/// (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
+		/// <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-sub-menus are
+		/// drawn within a single frame below the MenuBar.
+		/// </para>		
 		/// </summary>
 		public bool UseSubMenusSingleFrame {
 			get => useSubMenusSingleFrame;
@@ -1123,7 +1135,7 @@ namespace Terminal.Gui {
 		public event Action<MenuClosingEventArgs> MenuClosing;
 
 		/// <summary>
-		/// Raised when all the menu are closed.
+		/// Raised when all the menu is closed.
 		/// </summary>
 		public event Action MenuAllClosed;
 
@@ -1146,7 +1158,7 @@ namespace Terminal.Gui {
 		internal bool isMenuClosing;
 
 		/// <summary>
-		/// True if the menu is open; otherwise false.
+		/// <see langword="true"/> if the menu is open; otherwise <see langword="true"/>.
 		/// </summary>
 		public bool IsMenuOpen { get; protected set; }
 
@@ -1179,7 +1191,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Virtual method that will invoke the <see cref="MenuClosing"/>
+		/// Virtual method that will invoke the <see cref="MenuClosing"/>.
 		/// </summary>
 		/// <param name="currentMenu">The current menu to be closed.</param>
 		/// <param name="reopen">Whether the current menu will be reopen.</param>
@@ -1192,7 +1204,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Virtual method that will invoke the <see cref="MenuAllClosed"/>
+		/// Virtual method that will invoke the <see cref="MenuAllClosed"/>.
 		/// </summary>
 		public virtual void OnMenuAllClosed ()
 		{
@@ -1202,7 +1214,7 @@ namespace Terminal.Gui {
 		View lastFocused;
 
 		/// <summary>
-		/// Get the lasted focused view before open the menu.
+		/// Gets the view that was last focused before opening the menu.
 		/// </summary>
 		public View LastFocused { get; private set; }
 
@@ -1290,7 +1302,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Opens the current Menu programatically.
+		/// Opens the Menu programatically, as though the F9 key were pressed.
 		/// </summary>
 		public void OpenMenu ()
 		{
@@ -1372,7 +1384,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Closes the current Menu programatically, if open and not canceled.
+		/// Closes the Menu programmatically if open and not canceled (as though F9 were pressed).
 		/// </summary>
 		public bool CloseMenu (bool ignoreUseSubMenusSingleFrame = false)
 		{
@@ -1474,26 +1486,6 @@ namespace Terminal.Gui {
 			if (openSubMenu.Count > 0)
 				openCurrentMenu = openSubMenu.Last ();
 
-			//if (openMenu.Subviews.Count == 0)
-			//	return;
-			//if (index == 0) {
-			//	//SuperView.SetFocus (previousSubFocused);
-			//	FocusPrev ();
-			//	return;
-			//}
-
-			//for (int i = openMenu.Subviews.Count - 1; i > index; i--) {
-			//	isMenuClosing = true;
-			//	if (openMenu.Subviews.Count - 1 > 0)
-			//		SuperView.SetFocus (openMenu.Subviews [i - 1]);
-			//	else
-			//		SuperView.SetFocus (openMenu);
-			//	if (openMenu != null) {
-			//		Remove (openMenu.Subviews [i]);
-			//		openMenu.Remove (openMenu.Subviews [i]);
-			//	}
-			//	RemoveSubMenu (i);
-			//}
 			isMenuClosing = false;
 		}
 
@@ -1894,47 +1886,6 @@ namespace Terminal.Gui {
 				handled = false;
 				return false;
 			}
-			//if (me.View != this && me.Flags != MouseFlags.Button1Pressed)
-			//	return true;
-			//else if (me.View != this && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
-			//	Application.UngrabMouse ();
-			//	host.CloseAllMenus ();
-			//	return true;
-			//}
-
-
-			//if (!(me.View is MenuBar) && !(me.View is Menu) && me.Flags != MouseFlags.Button1Pressed))
-			//	return false;
-
-			//if (Application.MouseGrabView != null) {
-			//	if (me.View is MenuBar || me.View is Menu) {
-			//		me.X -= me.OfX;
-			//		me.Y -= me.OfY;
-			//		me.View.MouseEvent (me);
-			//		return true;
-			//	} else if (!(me.View is MenuBar || me.View is Menu) && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
-			//		Application.UngrabMouse ();
-			//		CloseAllMenus ();
-			//	}
-			//} else if (!isMenuClosed && selected == -1 && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
-			//	Application.GrabMouse (this);
-			//	return true;
-			//}
-
-			//if (Application.MouseGrabView != null) {
-			//	if (Application.MouseGrabView == me.View && me.View == current) {
-			//		me.X -= me.OfX;
-			//		me.Y -= me.OfY;
-			//	} else if (me.View != current && me.View is MenuBar && me.View is Menu) {
-			//		Application.UngrabMouse ();
-			//		Application.GrabMouse (me.View);
-			//	} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
-			//		Application.UngrabMouse ();
-			//		CloseMenu ();
-			//	}
-			//} else if ((!isMenuClosed && selected > -1)) {
-			//	Application.GrabMouse (current);
-			//}
 
 			handled = true;
 
@@ -1988,12 +1939,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public MenuBarItem NewMenuBarItem { get; set; }
 		/// <summary>
-		/// Flag that allows you to cancel the opening of the menu.
+		/// Flag that allows the cancellation of the event. If set to <see langword="true"/> in the
+		/// event handler, the event will be canceled. 
 		/// </summary>
 		public bool Cancel { get; set; }
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="MenuOpeningEventArgs"/>
+		/// Initializes a new instance of <see cref="MenuOpeningEventArgs"/>.
 		/// </summary>
 		/// <param name="currentMenu">The current <see cref="MenuBarItem"/> parent.</param>
 		public MenuOpeningEventArgs (MenuBarItem currentMenu)
@@ -2012,7 +1964,7 @@ namespace Terminal.Gui {
 		public MenuBarItem CurrentMenu { get; }
 
 		/// <summary>
-		/// Indicates whether the current menu will be reopen.
+		/// Indicates whether the current menu will reopen.
 		/// </summary>
 		public bool Reopen { get; }
 
@@ -2022,15 +1974,16 @@ namespace Terminal.Gui {
 		public bool IsSubMenu { get; }
 
 		/// <summary>
-		/// Flag that allows you to cancel the opening of the menu.
+		/// Flag that allows the cancellation of the event. If set to <see langword="true"/> in the
+		/// event handler, the event will be canceled. 
 		/// </summary>
 		public bool Cancel { get; set; }
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="MenuClosingEventArgs"/>
+		/// Initializes a new instance of <see cref="MenuClosingEventArgs"/>.
 		/// </summary>
 		/// <param name="currentMenu">The current <see cref="MenuBarItem"/> parent.</param>
-		/// <param name="reopen">Whether the current menu will be reopen.</param>
+		/// <param name="reopen">Whether the current menu will reopen.</param>
 		/// <param name="isSubMenu">Indicates whether it is a sub-menu.</param>
 		public MenuClosingEventArgs (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
 		{
