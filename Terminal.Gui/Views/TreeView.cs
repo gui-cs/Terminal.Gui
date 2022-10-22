@@ -219,19 +219,23 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public AspectGetterDelegate<T> AspectGetter { get; set; } = (o) => o.ToString () ?? "";
 
-		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
 
 		/// <summary>
-		/// Get / Set the wished cursor when the tree is focused
+		/// Get / Set the wished cursor when the tree is focused.
+		/// Only applies when <see cref="MultiSelect"/> is true.
+		/// Defaults to <see cref="CursorVisibility.Invisible"/>
 		/// </summary>
 		public CursorVisibility DesiredCursorVisibility {
-			get => desiredCursorVisibility;
+			get { 
+				return MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
+			}
 			set {
-				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);
-				}
-
 				desiredCursorVisibility = value;
+
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+				}
 			}
 		}
 
