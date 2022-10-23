@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 		int lastWindowHeight;
 		int largestWindowHeight;
 #if PROCESS_REQUEST
-		bool neededProcessRequest;
+				bool neededProcessRequest;
 #endif
 		public int NumberOfCSI { get; }
 
@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 					inputReady.Reset ();
 				}
 #if PROCESS_REQUEST
-				neededProcessRequest = false;
+								neededProcessRequest = false;
 #endif
 				if (inputResultQueue.Count > 0) {
 					return inputResultQueue.Dequeue ();
@@ -175,6 +175,8 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
+				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
+				Thread.Sleep (10);
 				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
 						var w = Math.Max (Console.WindowWidth, 0);
@@ -183,7 +185,8 @@ namespace Terminal.Gui {
 						return;
 					}
 				} else {
-					largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					largestWindowHeight = Console.BufferHeight;
 					if (Console.BufferWidth != consoleDriver.Cols || largestWindowHeight != consoleDriver.Rows
 						|| Console.WindowHeight != lastWindowHeight) {
 						lastWindowHeight = Console.WindowHeight;
@@ -193,7 +196,8 @@ namespace Terminal.Gui {
 					if (Console.WindowTop != consoleDriver.Top) {
 						// Top only working on Windows.
 						var winPositionEv = new WindowPositionEvent () {
-							Top = Console.WindowTop
+							Top = Console.WindowTop,
+							Left = Console.WindowLeft
 						};
 						inputResultQueue.Enqueue (new InputResult () {
 							EventType = EventType.WindowPosition,
@@ -202,10 +206,10 @@ namespace Terminal.Gui {
 						return;
 					}
 #if PROCESS_REQUEST
-					if (!neededProcessRequest) {
-						Console.Out.Write ("\x1b[6n");
-						neededProcessRequest = true;
-					}
+										if (!neededProcessRequest) {
+											Console.Out.Write ("\x1b[6n");
+											neededProcessRequest = true;
+										}
 #endif
 				}
 			}
@@ -226,7 +230,7 @@ namespace Terminal.Gui {
 		void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
 		{
 			InputResult inputResult = new InputResult {
-				EventType = EventType.key
+				EventType = EventType.Key
 			};
 			ConsoleKeyInfo newConsoleKeyInfo = consoleKeyInfo;
 			ConsoleKey key = 0;
@@ -242,7 +246,14 @@ namespace Terminal.Gui {
 				}
 				break;
 			case uint n when (n >= '\u0001' && n <= '\u001a'):
-				if (consoleKeyInfo.Key == 0) {
+				if (consoleKeyInfo.Key == 0 && consoleKeyInfo.KeyChar == '\r') {
+					key = ConsoleKey.Enter;
+					newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+						key,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+				} else if (consoleKeyInfo.Key == 0) {
 					key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
 					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
 						key,
@@ -252,13 +263,21 @@ namespace Terminal.Gui {
 				}
 				break;
 			case 27:
-			case 91:
+				//case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
-				while (Console.KeyAvailable) {
-					var result = Console.ReadKey (true);
-					Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
-					cki [cki.Length - 1] = result;
+				int delay = 0;
+				while (delay < 100) {
+					if (Console.KeyAvailable) {
+						do {
+							var result = Console.ReadKey (true);
+							Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+							cki [cki.Length - 1] = result;
+						} while (Console.KeyAvailable);
+						break;
+					}
+					Thread.Sleep (50);
+					delay += 50;
 				}
 				SplitCSI (cki, ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, ref mod);
 				return;
@@ -272,7 +291,7 @@ namespace Terminal.Gui {
 				newConsoleKeyInfo = consoleKeyInfo;
 				break;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -293,7 +312,7 @@ namespace Terminal.Gui {
 				for (int i = 0; i < cki.Length; i++) {
 					var ck = cki [i];
 					if (NumberOfCSI > 0 && nCSI - curCSI > NumberOfCSI) {
-						if (cki [i + 1].KeyChar == '\x1b' && previousKChar != '\0') {
+						if (i + 1 < cki.Length && cki [i + 1].KeyChar == '\x1b' && previousKChar != '\0') {
 							curCSI++;
 							previousKChar = '\0';
 						} else {
@@ -432,7 +451,7 @@ namespace Terminal.Gui {
 				GetMouseEvent (cki);
 				return;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -451,12 +470,14 @@ namespace Terminal.Gui {
 			string value = "";
 			for (int i = 0; i < kChar.Length; i++) {
 				var c = kChar [i];
-				if (c == '[') {
+				if (c == '\u001b' || c == '[') {
 					foundPoint++;
-				} else if (foundPoint == 1 && c != ';') {
+				} else if (foundPoint == 1 && c != ';' && c != '?') {
 					value += c.ToString ();
+				} else if (c == '?') {
+					foundPoint++;
 				} else if (c == ';') {
-					if (foundPoint == 1) {
+					if (foundPoint >= 1) {
 						point.Y = int.Parse (value) - 1;
 					}
 					value = "";
@@ -482,6 +503,8 @@ namespace Terminal.Gui {
 							return;
 						}
 						break;
+					case 'c': // CSI?1;0c ("VT101 with No Options")
+						break;
 					default:
 						throw new NotImplementedException ();
 					}
@@ -497,7 +520,8 @@ namespace Terminal.Gui {
 		bool isButtonDoubleClicked;
 		bool isButtonTripleClicked;
 		bool isProcContBtnPressedRuning;
-		bool isButtonReleased;
+		int buttonPressedCount;
+		//bool isButtonReleased;
 
 		void GetMouseEvent (ConsoleKeyInfo [] cki)
 		{
@@ -686,32 +710,81 @@ namespace Terminal.Gui {
 			mouseEvent.Position.X = point.X;
 			mouseEvent.Position.Y = point.Y;
 			mouseEvent.ButtonState = buttonState;
+			//System.Diagnostics.Debug.WriteLine ($"ButtonState: {mouseEvent.ButtonState} X: {mouseEvent.Position.X} Y: {mouseEvent.Position.Y}");
+
+			if (isButtonDoubleClicked) {
+				Application.MainLoop.AddIdle (() => {
+					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
+					return false;
+				});
+			}
 
 			if ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
 				|| (buttonState & MouseButtonState.Button3Pressed) != 0) {
+
+				if ((buttonState & MouseButtonState.ReportMousePosition) == 0) {
+					buttonPressedCount++;
+				} else {
+					buttonPressedCount = 0;
+				}
+				//System.Diagnostics.Debug.WriteLine ($"buttonPressedCount: {buttonPressedCount}");
 				isButtonPressed = true;
 			} else {
 				isButtonPressed = false;
+				buttonPressedCount = 0;
 			}
 
+			if (buttonPressedCount == 2 && !isButtonDoubleClicked
+				&& (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
+				|| lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
+				|| lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
+
+				isButtonDoubleClicked = true;
+				ProcessButtonDoubleClicked (mouseEvent);
+				inputReady.Set ();
+				return;
+			} else if (buttonPressedCount == 3 && isButtonDoubleClicked
+			       && (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
+			       || lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
+			       || lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
+
+				isButtonDoubleClicked = false;
+				isButtonTripleClicked = true;
+				buttonPressedCount = 0;
+				ProcessButtonTripleClicked (mouseEvent);
+				lastMouseEvent = mouseEvent;
+				inputReady.Set ();
+				return;
+			}
+
+			//System.Diagnostics.Debug.WriteLine ($"isButtonClicked: {isButtonClicked} isButtonDoubleClicked: {isButtonDoubleClicked} isButtonTripleClicked: {isButtonTripleClicked}");
 			if ((isButtonClicked || isButtonDoubleClicked || isButtonTripleClicked)
 				&& ((buttonState & MouseButtonState.Button1Released) != 0
 				|| (buttonState & MouseButtonState.Button2Released) != 0
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
+
+				//isButtonClicked = false;
+				//isButtonDoubleClicked = false;
 				isButtonTripleClicked = false;
+				buttonPressedCount = 0;
 				return;
 			}
 
 			if (isButtonClicked && !isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
-				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
+
+				isButtonClicked = false;
 				isButtonDoubleClicked = true;
 				ProcessButtonDoubleClicked (mouseEvent);
 				Application.MainLoop.AddIdle (() => {
 					Task.Run (async () => {
-						await Task.Delay (300);
+						await Task.Delay (600);
 						isButtonDoubleClicked = false;
 					});
 					return false;
@@ -722,29 +795,35 @@ namespace Terminal.Gui {
 			if (isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
 				|| (buttonState & MouseButtonState.Button2Pressed) != 0
-				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
+
+				isButtonDoubleClicked = false;
 				isButtonTripleClicked = true;
 				ProcessButtonTripleClicked (mouseEvent);
 				inputReady.Set ();
 				return;
 			}
 
-			if (!isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
-				&& !isButtonReleased
-				&& ((buttonState & MouseButtonState.Button1Released) == 0
-				&& (buttonState & MouseButtonState.Button2Released) == 0
-				&& (buttonState & MouseButtonState.Button3Released) == 0)) {
-				ProcessButtonReleased (lastMouseEvent);
-				inputReady.Set ();
-				return;
-			}
+			//if (!isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
+			//	&& !isButtonReleased && lastMouseEvent.ButtonState != 0
+			//	&& ((buttonState & MouseButtonState.Button1Released) == 0
+			//	&& (buttonState & MouseButtonState.Button2Released) == 0
+			//	&& (buttonState & MouseButtonState.Button3Released) == 0)) {
+			//	ProcessButtonReleased (lastMouseEvent);
+			//	inputReady.Set ();
+			//	return;
+			//}
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
 				MouseEvent = mouseEvent
 			});
 
-			if (!isButtonClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+			if (!isButtonClicked && !lastMouseEvent.ButtonState.HasFlag (MouseButtonState.ReportMousePosition)
+				&& lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Released) != 0
 				|| (buttonState & MouseButtonState.Button2Released) != 0
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
@@ -763,11 +842,21 @@ namespace Terminal.Gui {
 
 			lastMouseEvent = mouseEvent;
 			if (isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked && !isProcContBtnPressedRuning) {
-				isButtonReleased = false;
-				Application.MainLoop.AddIdle (() => {
-					ProcessContinuousButtonPressedAsync ().ConfigureAwait (false);
-					return false;
-				});
+				//isButtonReleased = false;
+				if ((buttonState & MouseButtonState.ReportMousePosition) != 0) {
+					point = new Point ();
+				} else {
+					point = new Point () {
+						X = mouseEvent.Position.X,
+						Y = mouseEvent.Position.Y
+					};
+				}
+				if ((buttonState & MouseButtonState.ReportMousePosition) == 0) {
+					Application.MainLoop.AddIdle (() => {
+						Task.Run (async () => await ProcessContinuousButtonPressedAsync ());
+						return false;
+					});
+				}
 			}
 
 			inputReady.Set ();
@@ -789,12 +878,19 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Released;
 				me.ButtonState |= MouseButtonState.Button3Clicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
 				MouseEvent = me
 			});
+		}
+
+		async Task ProcessButtonDoubleClickedAsync ()
+		{
+			await Task.Delay (300);
+			isButtonDoubleClicked = false;
+			buttonPressedCount = 0;
 		}
 
 		void ProcessButtonDoubleClicked (MouseEvent mouseEvent)
@@ -813,7 +909,7 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Pressed;
 				me.ButtonState |= MouseButtonState.Button3DoubleClicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -837,7 +933,7 @@ namespace Terminal.Gui {
 				me.ButtonState &= ~MouseButtonState.Button3Pressed;
 				me.ButtonState |= MouseButtonState.Button3TripleClicked;
 			}
-			isButtonReleased = true;
+			//isButtonReleased = true;
 
 			inputResultQueue.Enqueue (new InputResult () {
 				EventType = EventType.Mouse,
@@ -848,51 +944,49 @@ namespace Terminal.Gui {
 		async Task ProcessContinuousButtonPressedAsync ()
 		{
 			isProcContBtnPressedRuning = true;
-			Point point = new Point ();
+			await Task.Delay (200);
 			while (isButtonPressed) {
-				await Task.Delay (200);
-				var view = Application.wantContinuousButtonPressedView;
-				if (isButtonPressed && !Console.KeyAvailable
-					&& !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
-					&& (view != null || view == null && lastMouseEvent.Position != point)) {
-					point = lastMouseEvent.Position;
+				await Task.Delay (100);
+				var view = Application.WantContinuousButtonPressedView;
+				if (view == null) {
+					break;
+				}
+				if (isButtonPressed && (lastMouseEvent.ButtonState & MouseButtonState.ReportMousePosition) == 0) {
 					inputResultQueue.Enqueue (new InputResult () {
 						EventType = EventType.Mouse,
 						MouseEvent = lastMouseEvent
 					});
 					inputReady.Set ();
-				} else {
-					break;
 				}
 			}
 			isProcContBtnPressedRuning = false;
 			//isButtonPressed = false;
 		}
 
-		void ProcessButtonReleased (MouseEvent mouseEvent)
-		{
-			var me = new MouseEvent () {
-				Position = mouseEvent.Position,
-				ButtonState = mouseEvent.ButtonState
-			};
-			if ((mouseEvent.ButtonState & MouseButtonState.Button1Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button1Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button1Released;
-			} else if ((mouseEvent.ButtonState & MouseButtonState.Button2Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button2Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button2Released;
-			} else if ((mouseEvent.ButtonState & MouseButtonState.Button3Pressed) != 0) {
-				me.ButtonState &= ~(MouseButtonState.Button3Pressed | MouseButtonState.ReportMousePosition);
-				me.ButtonState |= MouseButtonState.Button3Released;
-			}
-			isButtonReleased = true;
-			lastMouseEvent = me;
+		//void ProcessButtonReleased (MouseEvent mouseEvent)
+		//{
+		//	var me = new MouseEvent () {
+		//		Position = mouseEvent.Position,
+		//		ButtonState = mouseEvent.ButtonState
+		//	};
+		//	if ((mouseEvent.ButtonState & MouseButtonState.Button1Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button1Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button1Released;
+		//	} else if ((mouseEvent.ButtonState & MouseButtonState.Button2Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button2Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button2Released;
+		//	} else if ((mouseEvent.ButtonState & MouseButtonState.Button3Pressed) != 0) {
+		//		me.ButtonState &= ~(MouseButtonState.Button3Pressed | MouseButtonState.ReportMousePosition);
+		//		me.ButtonState |= MouseButtonState.Button3Released;
+		//	}
+		//	isButtonReleased = true;
+		//	lastMouseEvent = me;
 
-			inputResultQueue.Enqueue (new InputResult () {
-				EventType = EventType.Mouse,
-				MouseEvent = me
-			});
-		}
+		//	inputResultQueue.Enqueue (new InputResult () {
+		//		EventType = EventType.Mouse,
+		//		MouseEvent = me
+		//	});
+		//}
 
 		ConsoleModifiers GetConsoleModifiers (uint keyChar)
 		{
@@ -960,6 +1054,9 @@ namespace Terminal.Gui {
 			case '1':
 				key = ConsoleKey.F10;
 				break;
+			case '2':
+				key = ConsoleKey.Insert;
+				break;
 			case '3':
 				if (length == 5) {
 					key = ConsoleKey.F11;
@@ -998,7 +1095,7 @@ namespace Terminal.Gui {
 		}
 
 		public enum EventType {
-			key = 1,
+			Key = 1,
 			Mouse = 2,
 			WindowSize = 3,
 			WindowPosition = 4
@@ -1048,6 +1145,7 @@ namespace Terminal.Gui {
 
 		public struct WindowPositionEvent {
 			public int Top;
+			public int Left;
 			public Point CursorPosition;
 		}
 
@@ -1061,15 +1159,35 @@ namespace Terminal.Gui {
 	}
 
 	internal class NetDriver : ConsoleDriver {
-		int cols, rows, top;
+		const int COLOR_BLACK = 30;
+		const int COLOR_RED = 31;
+		const int COLOR_GREEN = 32;
+		const int COLOR_YELLOW = 33;
+		const int COLOR_BLUE = 34;
+		const int COLOR_MAGENTA = 35;
+		const int COLOR_CYAN = 36;
+		const int COLOR_WHITE = 37;
+		const int COLOR_BRIGHT_BLACK = 90;
+		const int COLOR_BRIGHT_RED = 91;
+		const int COLOR_BRIGHT_GREEN = 92;
+		const int COLOR_BRIGHT_YELLOW = 93;
+		const int COLOR_BRIGHT_BLUE = 94;
+		const int COLOR_BRIGHT_MAGENTA = 95;
+		const int COLOR_BRIGHT_CYAN = 96;
+		const int COLOR_BRIGHT_WHITE = 97;
+
+		int cols, rows, left, top;
+
 		public override int Cols => cols;
 		public override int Rows => rows;
+		public override int Left => left;
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
-		public bool AlwaysSetPosition { get; set; }
+		public override IClipboard Clipboard { get; }
+		public override int [,,] Contents => contents;
 
 		int largestWindowHeight;
 
@@ -1080,7 +1198,19 @@ namespace Terminal.Gui {
 				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
 			}
-			largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+			largestWindowHeight = Console.BufferHeight;
+			if (IsWinPlatform) {
+				Clipboard = new WindowsClipboard ();
+			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				Clipboard = new MacOSXClipboard ();
+			} else {
+				if (CursesDriver.Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				} else {
+					Clipboard = new CursesClipboard ();
+				}
+			}
 		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
@@ -1091,6 +1221,7 @@ namespace Terminal.Gui {
 
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
+
 		public override void Move (int col, int row)
 		{
 			ccol = col;
@@ -1104,26 +1235,39 @@ namespace Terminal.Gui {
 			}
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			if (Clip.Contains (ccol, crow) && ccol + Math.Max (runeWidth, 1) <= Cols) {
-				contents [crow, ccol, 0] = (int)(uint)rune;
+			var validClip = IsValidContent (ccol, crow, Clip);
+
+			if (validClip) {
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+					contents [crow, ccol + 1, 2] = 1;
+
+				}
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
-				dirtyLine [crow] = true;
 
-				ccol++;
-				if (runeWidth > 1) {
-					for (int i = 1; i < runeWidth; i++) {
-						if (ccol < cols) {
-							contents [crow, ccol, 2] = 0;
-						} else {
-							break;
-						}
-						ccol++;
-					}
-				}
-			} else if (ccol > -1 && crow > -1 && ccol < cols && crow < rows) {
-				contents [crow, ccol, 2] = 1;
 				dirtyLine [crow] = true;
+			}
+
+			ccol++;
+			if (runeWidth > 1) {
+				if (validClip && ccol < Clip.Right) {
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
+				}
+				ccol++;
 			}
 
 			//if (ccol == Cols) {
@@ -1151,6 +1295,9 @@ namespace Terminal.Gui {
 			StopReportingMouseMoves ();
 			Console.ResetColor ();
 			Clear ();
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?25h");
+			Console.Out.Flush ();
 		}
 
 		void Clear ()
@@ -1160,6 +1307,11 @@ namespace Terminal.Gui {
 				Console.Out.Write ("\x1b[3J");
 				//Console.Out.Write ("\x1b[?25l");
 			}
+		}
+
+		public override Attribute MakeColor (Color foreground, Color background)
+		{
+			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
 		}
 
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -1176,56 +1328,26 @@ namespace Terminal.Gui {
 		{
 			TerminalResized = terminalResized;
 
+			//Set cursor key to application.
+			Console.Out.Write ("\x1b[?25l");
+			Console.Out.Flush ();
+
 			Console.TreatControlCAsInput = true;
 
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
-			Clear ();
 			ResizeScreen ();
 			UpdateOffScreen ();
 
 			StartReportingMouseMoves ();
 
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
+			CreateColors ();
 
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-
-			// Focused,
-			//    Selected, Hot: Yellow on Black
-			//    Selected, text: white on black
-			//    Unselected, hot: yellow on cyan
-			//    unselected, text: same as unfocused
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Cyan);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
-			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
-			Colors.Error.HotFocus = Colors.Error.HotNormal;
+			Clear ();
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			if (!HeightAsBuffer) {
 				if (Console.WindowHeight > 0) {
@@ -1266,28 +1388,29 @@ namespace Terminal.Gui {
 						$";{Rows};{Cols}w");
 				}
 			}
-
 			Clip = new Rect (0, 0, Cols, Rows);
-
-			contents = new int [Rows, Cols, 3];
-			dirtyLine = new bool [Rows];
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
-			// Can raise an exception while is still resizing.
-			try {
-				for (int row = 0; row < rows; row++) {
-					for (int c = 0; c < cols; c++) {
-						contents [row, c, 0] = ' ';
-						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-						contents [row, c, 2] = 0;
-						dirtyLine [row] = true;
-					}
-				}
-			} catch (IndexOutOfRangeException) { }
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
 
-			winChanging = false;
+			lock (contents) {
+				// Can raise an exception while is still resizing.
+				try {
+					for (int row = 0; row < rows; row++) {
+						for (int c = 0; c < cols; c++) {
+							contents [row, c, 0] = ' ';
+							contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+							contents [row, c, 2] = 0;
+							dirtyLine [row] = true;
+						}
+					}
+				} catch (IndexOutOfRangeException) { }
+			}
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -1295,37 +1418,28 @@ namespace Terminal.Gui {
 			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
 		}
 
-		int redrawColor = -1;
-		void SetColor (int color)
-		{
-			redrawColor = color;
-			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
-			if (values.Contains (color & 0xffff)) {
-				Console.BackgroundColor = (ConsoleColor)(color & 0xffff);
-			}
-			if (values.Contains ((color >> 16) & 0xffff)) {
-				Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-			}
-		}
-
 		public override void Refresh ()
 		{
 			UpdateScreen ();
+			UpdateCursor ();
 		}
+
+		int redrawAttr = -1;
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
+			if (Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
 				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
 				|| (HeightAsBuffer && Rows != largestWindowHeight)) {
 				return;
 			}
 
 			int top = Top;
+			int left = Left;
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
+			System.Text.StringBuilder output = new System.Text.StringBuilder ();
+			var lastCol = -1;
 
 			Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
@@ -1333,28 +1447,117 @@ namespace Terminal.Gui {
 					continue;
 				}
 				dirtyLine [row] = false;
-				for (int col = 0; col < cols; col++) {
-					if (contents [row, col, 2] != 1) {
-						continue;
-					}
+				output.Clear ();
+				for (int col = left; col < cols; col++) {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
-					for (; col < cols && contents [row, col, 2] == 1; col++) {
-						var color = contents [row, col, 1];
-						if (color != redrawColor) {
-							SetColor (color);
+					lastCol = -1;
+					var outputWidth = 0;
+					for (; col < cols; col++) {
+						if (contents [row, col, 2] == 0) {
+							if (output.Length > 0) {
+								//Console.CursorLeft = lastCol;
+								//Console.CursorTop = row;
+								SetVirtualCursorPosition (lastCol, row);
+								Console.Write (output);
+								output.Clear ();
+								lastCol += outputWidth;
+								outputWidth = 0;
+							} else if (lastCol == -1) {
+								lastCol = col;
+							}
+							if (lastCol + 1 < cols)
+								lastCol++;
+							continue;
 						}
-						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
-							return;
+
+						if (lastCol == -1)
+							lastCol = col;
+
+						var attr = contents [row, col, 1];
+						if (attr != redrawAttr) {
+							output.Append (WriteAttributes (attr));
 						}
-						Console.Write ((char)contents [row, col, 0]);
+						outputWidth++;
+						output.Append ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
 				}
+				if (output.Length > 0) {
+					//Console.CursorLeft = lastCol;
+					//Console.CursorTop = row;
+					SetVirtualCursorPosition (lastCol, row);
+					Console.Write (output);
+				}
 			}
-			Console.CursorVisible = true;
-			UpdateCursor ();
+		}
+
+		void SetVirtualCursorPosition (int lastCol, int row)
+		{
+			Console.Out.Write ($"\x1b[{row + 1};{lastCol + 1}H");
+			Console.Out.Flush ();
+		}
+
+		System.Text.StringBuilder WriteAttributes (int attr)
+		{
+			const string CSI = "\x1b[";
+			int bg = 0;
+			int fg = 0;
+			System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+
+			redrawAttr = attr;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains (attr & 0xffff)) {
+				bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
+			}
+			if (values.Contains ((attr >> 16) & 0xffff)) {
+				fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
+			}
+			sb.Append ($"{CSI}{bg};{fg}m");
+
+			return sb;
+		}
+
+		int MapColors (ConsoleColor color, bool isForeground = true)
+		{
+			switch (color) {
+			case ConsoleColor.Black:
+				return isForeground ? COLOR_BLACK : COLOR_BLACK + 10;
+			case ConsoleColor.DarkBlue:
+				return isForeground ? COLOR_BLUE : COLOR_BLUE + 10;
+			case ConsoleColor.DarkGreen:
+				return isForeground ? COLOR_GREEN : COLOR_GREEN + 10;
+			case ConsoleColor.DarkCyan:
+				return isForeground ? COLOR_CYAN : COLOR_CYAN + 10;
+			case ConsoleColor.DarkRed:
+				return isForeground ? COLOR_RED : COLOR_RED + 10;
+			case ConsoleColor.DarkMagenta:
+				return isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10;
+			case ConsoleColor.DarkYellow:
+				return isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10;
+			case ConsoleColor.Gray:
+				return isForeground ? COLOR_WHITE : COLOR_WHITE + 10;
+			case ConsoleColor.DarkGray:
+				return isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10;
+			case ConsoleColor.Blue:
+				return isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10;
+			case ConsoleColor.Green:
+				return isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10;
+			case ConsoleColor.Cyan:
+				return isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10;
+			case ConsoleColor.Red:
+				return isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10;
+			case ConsoleColor.Magenta:
+				return isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10;
+			case ConsoleColor.Yellow:
+				return isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10;
+			case ConsoleColor.White:
+				return isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10;
+			}
+			return 0;
 		}
 
 		bool SetCursorPosition (int col, int row)
@@ -1368,11 +1571,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private CursorVisibility? savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (!EnsureCursorVisibility ())
+				return;
+
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (ccol >= 0 && ccol <= cols && crow >= 0 && crow <= rows) {
+				if (ccol >= 0 && ccol < Console.BufferWidth && crow >= 0 && crow < Console.BufferHeight) {
 					Console.SetCursorPosition (ccol, crow);
 				}
 			} catch (System.IO.IOException) {
@@ -1396,10 +1604,10 @@ namespace Terminal.Gui {
 		{
 		}
 
-		int currentAttribute;
+		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.Value;
+			currentAttribute = c;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -1429,7 +1637,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Enter:
 				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return MapKeyModifiers (keyInfo, Key.Space);
+				return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 			case ConsoleKey.Backspace:
 				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
@@ -1494,7 +1702,7 @@ namespace Terminal.Gui {
 				return (Key)((uint)Key.F1 + delta);
 			}
 			if (keyInfo.KeyChar != 0) {
-				return (Key)((uint)keyInfo.KeyChar);
+				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 			}
 
 			return (Key)(0xffffffff);
@@ -1545,7 +1753,8 @@ namespace Terminal.Gui {
 		void ProcessInput (NetEvents.InputResult inputEvent)
 		{
 			switch (inputEvent.EventType) {
-			case NetEvents.EventType.key:
+			case NetEvents.EventType.Key:
+				keyModifiers = new KeyModifiers ();
 				var map = MapKey (inputEvent.ConsoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
@@ -1553,7 +1762,6 @@ namespace Terminal.Gui {
 				keyDownHandler (new KeyEvent (map, keyModifiers));
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
-				keyModifiers = new KeyModifiers ();
 				break;
 			case NetEvents.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
@@ -1563,36 +1771,35 @@ namespace Terminal.Gui {
 				break;
 			case NetEvents.EventType.WindowPosition:
 				var newTop = inputEvent.WindowPositionEvent.Top;
-				if (HeightAsBuffer && top != newTop) {
+				var newLeft = inputEvent.WindowPositionEvent.Left;
+				if (HeightAsBuffer && (top != newTop || left != newLeft)) {
 					top = newTop;
+					left = newLeft;
 					Refresh ();
 				}
 				break;
 			}
 		}
 
-		bool winChanging;
-
 		void ChangeWin ()
 		{
-			winChanging = true;
 			const int Min_WindowWidth = 14;
 			Size size = new Size ();
 			if (!HeightAsBuffer) {
 				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
 					Console.WindowHeight);
 				top = 0;
+				left = 0;
 			} else {
-				largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				largestWindowHeight = Console.BufferHeight;
 				size = new Size (Console.BufferWidth, largestWindowHeight);
 			}
 			cols = size.Width;
 			rows = size.Height;
 			ResizeScreen ();
 			UpdateOffScreen ();
-			if (!winChanging) {
-				TerminalResized.Invoke ();
-			}
+			TerminalResized?.Invoke ();
 		}
 
 		MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
@@ -1696,6 +1903,71 @@ namespace Terminal.Gui {
 			return currentAttribute;
 		}
 
+		/// <inheritdoc/>
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = savedCursorVisibility ?? CursorVisibility.Default;
+			return visibility == CursorVisibility.Default;
+		}
+
+
+		/// <inheritdoc/>
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			savedCursorVisibility = visibility;
+			return Console.CursorVisible = visibility == CursorVisibility.Default;
+		}
+
+		/// <inheritdoc/>
+		public override bool EnsureCursorVisibility ()
+		{
+			if (!(ccol >= 0 && crow >= 0 && ccol < Cols && crow < Rows)) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return false;
+			}
+
+			SetCursorVisibility (savedCursorVisibility ?? CursorVisibility.Default);
+			return savedCursorVisibility == CursorVisibility.Default;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			NetEvents.InputResult input = new NetEvents.InputResult ();
+			ConsoleKey ck;
+			if (char.IsLetter (keyChar)) {
+				ck = key;
+			} else {
+				ck = (ConsoleKey)'\0';
+			}
+			input.EventType = NetEvents.EventType.Key;
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, ck, shift, alt, control);
+
+			try {
+				ProcessInput (input);
+			} catch (OverflowException) { }
+		}
+
+		public override bool GetColors (int value, out Color foreground, out Color background)
+		{
+			bool hasColor = false;
+			foreground = default;
+			background = default;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains (value & 0xffff)) {
+				hasColor = true;
+				background = (Color)(ConsoleColor)(value & 0xffff);
+			}
+			if (values.Contains ((value >> 16) & 0xffff)) {
+				hasColor = true;
+				foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
+			}
+			return hasColor;
+		}
+
 		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
@@ -1711,26 +1983,6 @@ namespace Terminal.Gui {
 
 		public override void UncookMouse ()
 		{
-		}
-
-		/// <inheritdoc/>
-		public override bool GetCursorVisibility (out CursorVisibility visibility)
-		{
-			visibility = CursorVisibility.Default;
-
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override bool SetCursorVisibility (CursorVisibility visibility)
-		{
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override bool EnsureCursorVisibility ()
-		{
-			return false;
 		}
 		#endregion
 
@@ -1859,7 +2111,7 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (inputResult.Count > 0) {
+			while (inputResult.Count > 0) {
 				ProcessInput?.Invoke (inputResult.Dequeue ().Value);
 			}
 		}

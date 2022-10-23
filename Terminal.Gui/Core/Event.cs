@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The key code representing null or empty
 		/// </summary>
-		Null = 0,
+		Null = '\0',
 
 		/// <summary>
 		/// The key code for the user pressing the return key.
@@ -237,7 +237,110 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing Shift-Z
 		/// </summary>
 		Z,
-
+		/// <summary>
+		/// The key code for the user pressing A
+		/// </summary>
+		a = 97,
+		/// <summary>
+		/// The key code for the user pressing B
+		/// </summary>
+		b,
+		/// <summary>
+		/// The key code for the user pressing C
+		/// </summary>
+		c,
+		/// <summary>
+		/// The key code for the user pressing D
+		/// </summary>
+		d,
+		/// <summary>
+		/// The key code for the user pressing E
+		/// </summary>
+		e,
+		/// <summary>
+		/// The key code for the user pressing F
+		/// </summary>
+		f,
+		/// <summary>
+		/// The key code for the user pressing G
+		/// </summary>
+		g,
+		/// <summary>
+		/// The key code for the user pressing H
+		/// </summary>
+		h,
+		/// <summary>
+		/// The key code for the user pressing I
+		/// </summary>
+		i,
+		/// <summary>
+		/// The key code for the user pressing J
+		/// </summary>
+		j,
+		/// <summary>
+		/// The key code for the user pressing K
+		/// </summary>
+		k,
+		/// <summary>
+		/// The key code for the user pressing L
+		/// </summary>
+		l,
+		/// <summary>
+		/// The key code for the user pressing M
+		/// </summary>
+		m,
+		/// <summary>
+		/// The key code for the user pressing N
+		/// </summary>
+		n,
+		/// <summary>
+		/// The key code for the user pressing O
+		/// </summary>
+		o,
+		/// <summary>
+		/// The key code for the user pressing P
+		/// </summary>
+		p,
+		/// <summary>
+		/// The key code for the user pressing Q
+		/// </summary>
+		q,
+		/// <summary>
+		/// The key code for the user pressing R
+		/// </summary>
+		r,
+		/// <summary>
+		/// The key code for the user pressing S
+		/// </summary>
+		s,
+		/// <summary>
+		/// The key code for the user pressing T
+		/// </summary>
+		t,
+		/// <summary>
+		/// The key code for the user pressing U
+		/// </summary>
+		u,
+		/// <summary>
+		/// The key code for the user pressing V
+		/// </summary>
+		v,
+		/// <summary>
+		/// The key code for the user pressing W
+		/// </summary>
+		w,
+		/// <summary>
+		/// The key code for the user pressing X
+		/// </summary>
+		x,
+		/// <summary>
+		/// The key code for the user pressing Y
+		/// </summary>
+		y,
+		/// <summary>
+		/// The key code for the user pressing Z
+		/// </summary>
+		z,
 		/// <summary>
 		/// The key code for the user pressing the delete key.
 		/// </summary>
@@ -603,38 +706,48 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Describes a mouse event
+	/// Low-level construct that conveys the details of mouse events, such
+	/// as coordinates and button state, from ConsoleDrivers up to <see cref="Application"/> and
+	/// Views.
 	/// </summary>
-	public struct MouseEvent {
+	/// <remarks>The <see cref="Application"/> class includes the <see cref="Application.RootMouseEvent"/>
+	/// Action which takes a MouseEvent argument.</remarks>
+	public class MouseEvent {
 		/// <summary>
 		/// The X (column) location for the mouse event.
 		/// </summary>
-		public int X;
+		public int X { get; set; }
 
 		/// <summary>
 		/// The Y (column) location for the mouse event.
 		/// </summary>
-		public int Y;
+		public int Y { get; set; }
 
 		/// <summary>
 		/// Flags indicating the kind of mouse event that is being posted.
 		/// </summary>
-		public MouseFlags Flags;
+		public MouseFlags Flags { get; set; }
 
 		/// <summary>
 		/// The offset X (column) location for the mouse event.
 		/// </summary>
-		public int OfX;
+		public int OfX { get; set; }
 
 		/// <summary>
 		/// The offset Y (column) location for the mouse event.
 		/// </summary>
-		public int OfY;
+		public int OfY { get; set; }
 
 		/// <summary>
 		/// The current view at the location for the mouse event.
 		/// </summary>
-		public View View;
+		public View View { get; set; }
+
+		/// <summary>
+		/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
+		/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+		/// </summary>
+		public bool Handled { get; set; }
 
 		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.

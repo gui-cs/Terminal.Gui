@@ -2,6 +2,30 @@
   "profiles": {
     "UICatalog": {
       "commandName": "Project"
+    },
+    "UICatalog : -usc": {
+      "commandName": "Project",
+      "commandLineArgs": "-usc"
+    },
+    "Wizards": {
+      "commandName": "Project",
+      "commandLineArgs": "Wizards"
+    },
+    "Dialogs": {
+      "commandName": "Project",
+      "commandLineArgs": "Dialogs"
+    },
+    "Buttons": {
+      "commandName": "Project",
+      "commandLineArgs": "Buttons"
+    },
+    "WizardAsView": {
+      "commandName": "Project",
+      "commandLineArgs": "WizardAsView"
+    },
+    "Issue1719Repro": {
+      "commandName": "Project",
+      "commandLineArgs": "\"ProgressBar Styles\""
     }
   }
 }

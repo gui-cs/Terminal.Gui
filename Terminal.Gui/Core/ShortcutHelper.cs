@@ -59,15 +59,18 @@ namespace Terminal.Gui {
 		/// Get the <see cref="Shortcut"/> key as string.
 		/// </summary>
 		/// <param name="shortcut">The shortcut key.</param>
+		/// <param name="delimiter">The delimiter string.</param>
 		/// <returns></returns>
-		public static ustring GetShortcutTag (Key shortcut)
+		public static ustring GetShortcutTag (Key shortcut, ustring delimiter = null)
 		{
 			if (shortcut == Key.Null) {
 				return "";
 			}
 
 			var k = shortcut;
-			var delimiter = MenuBar.ShortcutDelimiter;
+			if (delimiter == null) {
+				delimiter = MenuBar.ShortcutDelimiter;
+			}
 			ustring tag = ustring.Empty;
 			var sCut = GetKeyToString (k, out Key knm).ToString ();
 			if (knm == Key.Unknown) {
@@ -146,7 +149,8 @@ namespace Terminal.Gui {
 		/// Allows to retrieve a <see cref="Key"/> from a <see cref="ShortcutTag"/>
 		/// </summary>
 		/// <param name="tag">The key as string.</param>
-		public static Key GetShortcutFromTag (ustring tag)
+		/// <param name="delimiter">The delimiter string.</param>
+		public static Key GetShortcutFromTag (ustring tag, ustring delimiter = null)
 		{
 			var sCut = tag;
 			if (sCut.IsEmpty) {
@@ -155,7 +159,9 @@ namespace Terminal.Gui {
 
 			Key key = Key.Null;
 			//var hasCtrl = false;
-			var delimiter = MenuBar.ShortcutDelimiter;
+			if (delimiter == null) {
+				delimiter = MenuBar.ShortcutDelimiter;
+			}
 
 			ustring [] keys = sCut.Split (delimiter);
 			for (int i = 0; i < keys.Length; i++) {

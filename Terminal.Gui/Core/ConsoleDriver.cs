@@ -105,12 +105,30 @@ namespace Terminal.Gui {
 		public Color Background { get; }
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
+		///   and trying to get the colors if defined.
+		/// </summary>
+		/// <param name="value">Value.</param>
+		public Attribute (int value)
+		{
+			Color foreground = default;
+			Color background = default;
+
+			if (Application.Driver != null) {
+				Application.Driver.GetColors (value, out foreground, out background);
+			}
+			Value = value;
+			Foreground = foreground;
+			Background = background;
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int value, Color foreground = new Color (), Color background = new Color ())
+		public Attribute (int value, Color foreground, Color background)
 		{
 			Value = value;
 			Foreground = foreground;
@@ -124,10 +142,17 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			Value = (int)foreground | ((int)background << 4);
+			Value = Make (foreground, background).Value;
 			Foreground = foreground;
 			Background = background;
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct
+		///  with the same colors for the foreground and background.
+		/// </summary>
+		/// <param name="color">The color.</param>
+		public Attribute (Color color) : this (color, color) { }
 
 		/// <summary>
 		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
@@ -613,20 +638,37 @@ namespace Terminal.Gui {
 		/// The current number of columns in the terminal.
 		/// </summary>
 		public abstract int Cols { get; }
+
 		/// <summary>
 		/// The current number of rows in the terminal.
 		/// </summary>
 		public abstract int Rows { get; }
+
+		/// <summary>
+		/// The current left in the terminal.
+		/// </summary>
+		public abstract int Left { get; }
+
 		/// <summary>
 		/// The current top in the terminal.
 		/// </summary>
 		public abstract int Top { get; }
 
 		/// <summary>
+		/// Get the operation system clipboard.
+		/// </summary>
+		public abstract IClipboard Clipboard { get; }
+
+		/// <summary>
 		/// If false height is measured by the window height and thus no scrolling.
 		/// If true then height is measured by the buffer height, enabling scrolling.
 		/// </summary>
 		public abstract bool HeightAsBuffer { get; set; }
+
+		/// <summary>
+		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public virtual int [,,] Contents { get; }
 
 		/// <summary>
 		/// Initializes the driver
@@ -639,11 +681,13 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
+		
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
+
 		/// <summary>
 		/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
 		/// to equivalent, printable, Unicode chars.
@@ -652,14 +696,25 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			if (c <= 0x1F || (c >= 0x80 && c <= 0x9F)) {
+			var controlChars = c & 0xFFFF;
+			if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (c + 0x2400);
-			} else {
-				return c;
+				return new Rune (controlChars + 0x2400);
 			}
+
+			return c;
 		}
+
+		/// <summary>
+		/// Ensures that the column and line are in a valid range from the size of the driver.
+		/// </summary>
+		/// <param name="col">The column.</param>
+		/// <param name="row">The row.</param>
+		/// <param name="clip">The clip.</param>
+		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
+		public bool IsValidContent (int col, int row, Rect clip) =>
+			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
 
 		/// <summary>
 		/// Adds the specified
@@ -712,6 +767,16 @@ namespace Terminal.Gui {
 		public abstract void End ();
 
 		/// <summary>
+		/// Resizes the clip area when the screen is resized.
+		/// </summary>
+		public abstract void ResizeScreen ();
+
+		/// <summary>
+		/// Reset and recreate the contents and the driver buffer.
+		/// </summary>
+		public abstract void UpdateOffScreen ();
+
+		/// <summary>
 		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
 		/// </summary>
 		public abstract void UpdateScreen ();
@@ -740,6 +805,25 @@ namespace Terminal.Gui {
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
 		/// <summary>
+		/// Gets the foreground and background colors based on the value.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="foreground">The foreground.</param>
+		/// <param name="background">The background.</param>
+		/// <returns></returns>
+		public abstract bool GetColors (int value, out Color foreground, out Color background);
+
+		/// <summary>
+		/// Allows sending keys without typing on a keyboard.
+		/// </summary>
+		/// <param name="keyChar">The character key.</param>
+		/// <param name="key">The key.</param>
+		/// <param name="shift">If shift key is sending.</param>
+		/// <param name="alt">If alt key is sending.</param>
+		/// <param name="control">If control key is sending.</param>
+		public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control);
+
+		/// <summary>
 		/// Set the handler when the terminal is resized.
 		/// </summary>
 		/// <param name="terminalResized"></param>
@@ -765,7 +849,8 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
 				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
 				AddRune (' ');
-				var str = title.RuneCount >= width ? title [0, width - 2] : title;
+				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
+					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
 				AddStr (str);
 				AddRune (' ');
 			}
@@ -781,12 +866,12 @@ namespace Terminal.Gui {
 			/// </summary>
 			Off = 0b_0000_0000,
 			/// <summary>
-			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will draw a 
+			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
 			FrameRuler = 0b_0000_0001,
 			/// <summary>
-			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will use
+			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will use
 			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
 			/// </summary>
 			FramePadding = 0b_0000_0010,
@@ -807,7 +892,9 @@ namespace Terminal.Gui {
 		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
 		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
-		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)
+		/// <param name="borderContent">The <see cref="Border"/> to be used if defined.</param>
+		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
+			int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)
 		{
 			char clearChar = ' ';
 			char leftChar = clearChar;
@@ -844,15 +931,46 @@ namespace Terminal.Gui {
 			// ftop is location of top frame line
 			int ftop = region.Y + paddingTop - 1;
 
-			// fbottom is locaiton of bottom frame line
+			// fbottom is location of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			Rune hLine = border ? HLine : clearChar;
-			Rune vLine = border ? VLine : clearChar;
-			Rune uRCorner = border ? URCorner : clearChar;
-			Rune uLCorner = border ? ULCorner : clearChar;
-			Rune lLCorner = border ? LLCorner : clearChar;
-			Rune lRCorner = border ? LRCorner : clearChar;
+			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+
+			Rune hLine = default, vLine = default,
+				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
+
+			if (border) {
+				switch (borderStyle) {
+				case BorderStyle.None:
+					break;
+				case BorderStyle.Single:
+					hLine = HLine;
+					vLine = VLine;
+					uRCorner = URCorner;
+					uLCorner = ULCorner;
+					lLCorner = LLCorner;
+					lRCorner = LRCorner;
+					break;
+				case BorderStyle.Double:
+					hLine = HDLine;
+					vLine = VDLine;
+					uRCorner = URDCorner;
+					uLCorner = ULDCorner;
+					lLCorner = LLDCorner;
+					lRCorner = LRDCorner;
+					break;
+				case BorderStyle.Rounded:
+					hLine = HRLine;
+					vLine = VRLine;
+					uRCorner = URRCorner;
+					uLCorner = ULRCorner;
+					lLCorner = LLRCorner;
+					lRCorner = LRRCorner;
+					break;
+				}
+			} else {
+				hLine = vLine = uRCorner = uLCorner = lLCorner = lRCorner = clearChar;
+			}
 
 			// Outside top
 			if (paddingTop > 1) {
@@ -963,7 +1081,7 @@ namespace Terminal.Gui {
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/>.</remarks>
 		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
 		/// A padding value of 0 means there is actually a one cell border.
 		/// </remarks>
@@ -1133,14 +1251,74 @@ namespace Terminal.Gui {
 		public Rune RightBracket = ']';
 
 		/// <summary>
-		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// Blocks Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OnMeterSegment = '\u258c';
+		public Rune BlocksMeterSegment = '\u258c';
 
 		/// <summary>
-		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OffMeterSegement = ' ';
+		public Rune ContinuousMeterSegment = '\u2588';
+
+		/// <summary>
+		/// Horizontal double line character.
+		/// </summary>
+		public Rune HDLine = '\u2550';
+
+		/// <summary>
+		/// Vertical double line character.
+		/// </summary>
+		public Rune VDLine = '\u2551';
+
+		/// <summary>
+		/// Upper left double corner
+		/// </summary>
+		public Rune ULDCorner = '\u2554';
+
+		/// <summary>
+		/// Lower left double corner
+		/// </summary>
+		public Rune LLDCorner = '\u255a';
+
+		/// <summary>
+		/// Upper right double corner
+		/// </summary>
+		public Rune URDCorner = '\u2557';
+
+		/// <summary>
+		/// Lower right double corner
+		/// </summary>
+		public Rune LRDCorner = '\u255d';
+
+		/// <summary>
+		/// Horizontal line character for rounded corners.
+		/// </summary>
+		public Rune HRLine = '\u2500';
+
+		/// <summary>
+		/// Vertical line character for rounded corners.
+		/// </summary>
+		public Rune VRLine = '\u2502';
+
+		/// <summary>
+		/// Upper left rounded corner
+		/// </summary>
+		public Rune ULRCorner = '\u256d';
+
+		/// <summary>
+		/// Lower left rounded corner
+		/// </summary>
+		public Rune LLRCorner = '\u2570';
+
+		/// <summary>
+		/// Upper right rounded corner
+		/// </summary>
+		public Rune URRCorner = '\u256e';
+
+		/// <summary>
+		/// Lower right rounded corner
+		/// </summary>
+		public Rune LRRCorner = '\u256f';
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
@@ -1155,5 +1333,60 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The current attribute.</returns>
 		public abstract Attribute GetAttribute ();
+
+		/// <summary>
+		/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.
+		/// </summary>
+		/// <param name="foreground">The foreground color.</param>
+		/// <param name="background">The background color.</param>
+		/// <returns>The attribute for the foreground and background colors.</returns>
+		public abstract Attribute MakeColor (Color foreground, Color background);
+
+		/// <summary>
+		/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
+		/// </summary>
+		/// <param name="hasColors">Flag indicating if colors are supported.</param>
+		public void CreateColors (bool hasColors = true)
+		{
+			Colors.TopLevel = new ColorScheme ();
+			Colors.Base = new ColorScheme ();
+			Colors.Dialog = new ColorScheme ();
+			Colors.Menu = new ColorScheme ();
+			Colors.Error = new ColorScheme ();
+
+			if (!hasColors) {
+				return;
+			}
+
+			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
+			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
+			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
+			Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
+			Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
+
+			Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
+			Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
+			Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
+			Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
+			Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
+
+			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
+			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
+			Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
+			Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
+			Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
+			Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
+			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
+			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
+			Colors.Error.HotFocus = MakeColor (Color.BrightRed, Color.Gray);
+			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+		}
 	}
 }

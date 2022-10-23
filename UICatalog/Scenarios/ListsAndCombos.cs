@@ -7,8 +7,8 @@ using NStack;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
-	[ScenarioCategory ("Controls")]
-	class ListsAndCombos : Scenario {
+	[ScenarioCategory ("Controls"), ScenarioCategory ("ListView"), ScenarioCategory ("ComboBox")]
+	public class ListsAndCombos : Scenario {
 
 		public override void Setup ()
 		{
@@ -80,7 +80,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = items[comboBox.SelectedItem];
+			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = text.Value.ToString ();
 			Win.Add (lbComboBox, comboBox);
 
 			var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);

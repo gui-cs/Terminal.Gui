@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Layout")]
-	class Buttons : Scenario {
+	public class Buttons : Scenario {
 		public override void Setup ()
 		{
 			// Add a label & text field so we can demo IsDefault
@@ -103,8 +103,13 @@ namespace UICatalog {
 				ColorScheme = Colors.Error
 			};
 			Win.Add (removeButton);
-			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeButton.Clicked += () => Win.Remove (removeButton);
+			// This in interesting test case because `moveBtn` and below are laid out relative to this one!
+			removeButton.Clicked += () => {
+				// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+				//Win.Remove (removeButton);
+
+				removeButton.Visible = false;
+			};
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,

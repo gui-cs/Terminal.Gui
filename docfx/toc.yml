@@ -7,4 +7,4 @@
 # - name: UI Catalog API
 #   href: api/UICatalog/
 - name: Source
-  href: https://github.com/migueldeicaza/gui.cs
+  href: https://github.com/gui-cs/Terminal.Gui

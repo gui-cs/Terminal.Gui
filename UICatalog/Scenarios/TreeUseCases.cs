@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Tree View", Description: "Simple tree view examples")]
-	[ScenarioCategory ("Controls")]
-	class TreeUseCases : Scenario {
+	[ScenarioMetadata (Name: "Tree View", Description: "Simple tree view examples.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
+	public class TreeUseCases : Scenario {
 
 		View currentTree;
 
@@ -74,6 +75,7 @@ namespace UICatalog.Scenarios {
 
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 
@@ -147,6 +149,7 @@ namespace UICatalog.Scenarios {
 
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 
@@ -179,6 +182,7 @@ namespace UICatalog.Scenarios {
 		{
 			if (currentTree != null) {
 				Win.Remove (currentTree);
+				currentTree.Dispose ();
 			}
 
 

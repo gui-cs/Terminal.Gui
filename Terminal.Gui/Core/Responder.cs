@@ -58,6 +58,16 @@ namespace Terminal.Gui {
 		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
 		public virtual bool HasFocus { get; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.
+		/// </summary>
+		public virtual bool Enabled { get; set; } = true;
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.
+		/// </summary>
+		public virtual bool Visible { get; set; } = true;
+
 		// Key handling
 		/// <summary>
 		///   This method can be overwritten by view that
@@ -210,6 +220,21 @@ namespace Terminal.Gui {
 		{
 			return false;
 		}
+
+		/// <summary>
+		/// Method invoked when the <see cref="CanFocus"/> property from a view is changed.
+		/// </summary>
+		public virtual void OnCanFocusChanged () { }
+
+		/// <summary>
+		/// Method invoked when the <see cref="Enabled"/> property from a view is changed.
+		/// </summary>
+		public virtual void OnEnabledChanged () { }
+
+		/// <summary>
+		/// Method invoked when the <see cref="Visible"/> property from a view is changed.
+		/// </summary>
+		public virtual void OnVisibleChanged () { }
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

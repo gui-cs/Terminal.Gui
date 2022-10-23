@@ -51,8 +51,12 @@ namespace Unix.Terminal {
 		public const int COLOR_MAGENTA = unchecked((int)0x5);
 		public const int COLOR_CYAN = unchecked((int)0x6);
 		public const int COLOR_WHITE = unchecked((int)0x7);
+		public const int COLOR_GRAY = unchecked((int)0x8);
 		public const int KEY_CODE_YES = unchecked((int)0x100);
 		public const int KEY_CODE_SEQ = unchecked((int)0x5b);
+		public const int ERR = unchecked((int)0xffffffff);
+		public const int TIOCGWINSZ  = unchecked((int)0x5413);
+		public const int TIOCGWINSZ_MAC  = unchecked((int)0x40087468);
 
 		[Flags]
 		public enum Event : long {
@@ -93,7 +97,6 @@ namespace Unix.Terminal {
 		public const int DownEnd = unchecked((int)0x0);
 		public const int Home = unchecked((int)0x0);
 #endif
-		public const int ERR = unchecked((int)0xffffffff);
 		public const int KeyBackspace = unchecked((int)0x107);
 		public const int KeyUp = unchecked((int)0x103);
 		public const int KeyDown = unchecked((int)0x102);

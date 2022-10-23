@@ -1,9 +1,9 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
 	[ScenarioCategory ("Controls")]
-	class MyScenario : Scenario {
+	public class MyScenario : Scenario {
 		public override void Setup ()
 		{
 			// Put your scenario code here, e.g.

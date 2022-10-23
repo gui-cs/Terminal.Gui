@@ -1,12 +1,11 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
-
-	class Scrolling : Scenario {
+	[ScenarioCategory ("ScrollView")]
+	public class Scrolling : Scenario {
 
 		class Box10x : View {
 			int w = 40;
@@ -129,7 +128,9 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
-				ColorScheme = Colors.Error
+				Height = 2,
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
 			const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
@@ -139,16 +140,18 @@ namespace UICatalog {
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.Error,
+				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
 
-			void Top_Loaded()  {
+			void Top_Loaded ()
+			{
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 				Top.Loaded -= Top_Loaded;
-			};
+			}
 			Top.Loaded += Top_Loaded;
 
 			var pressMeButton = new Button ("Press me!") {
@@ -204,8 +207,8 @@ namespace UICatalog {
 			scrollView.Add (anchorButton);
 
 			var hCheckBox = new CheckBox ("Horizontal Scrollbar", scrollView.ShowHorizontalScrollIndicator) {
-				X = Pos.X(scrollView),
-				Y = Pos.Bottom(scrollView) + 1,
+				X = Pos.X (scrollView),
+				Y = Pos.Bottom (scrollView) + 1,
 			};
 			Win.Add (hCheckBox);
 
@@ -273,7 +276,7 @@ namespace UICatalog {
 
 			int count = 0;
 			var mousePos = new Label ("Mouse: ");
-			mousePos.X = Pos.Right(scrollView) + 1;
+			mousePos.X = Pos.Right (scrollView) + 1;
 			mousePos.Y = Pos.AnchorEnd (1);
 			mousePos.Width = 50;
 			Application.RootMouseEvent += delegate (MouseEvent me) {

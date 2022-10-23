@@ -9,6 +9,7 @@ namespace ReactiveExample {
 			RxApp.MainThreadScheduler = TerminalScheduler.Default;
 			RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
 			Application.Run (new LoginView (new LoginViewModel ()));
+			Application.Shutdown ();
 		}
 	}
 }

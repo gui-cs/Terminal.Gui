@@ -7,72 +7,6 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A single tab in a <see cref="TabView"/>
-	/// </summary>
-	public class Tab {
-		private ustring text;
-
-		/// <summary>
-		/// The text to display in a <see cref="TabView"/>
-		/// </summary>
-		/// <value></value>
-		public ustring Text { get => text ?? "Unamed"; set => text = value; }
-
-		/// <summary>
-		/// The control to display when the tab is selected
-		/// </summary>
-		/// <value></value>
-		public View View { get; set; }
-
-		/// <summary>
-		/// Creates a new unamed tab with no controls inside
-		/// </summary>
-		public Tab ()
-		{
-
-		}
-
-		/// <summary>
-		/// Creates a new tab with the given text hosting a view
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="view"></param>
-		public Tab (string text, View view)
-		{
-			this.Text = text;
-			this.View = view;
-		}
-	}
-
-	/// <summary>
-	/// Describes render stylistic selections of a <see cref="TabView"/>
-	/// </summary>
-	public class TabStyle {
-
-		/// <summary>
-		/// True to show the top lip of tabs.  False to directly begin with tab text during 
-		/// rendering.  When true header line occupies 3 rows, when false only 2.
-		/// Defaults to true.
-		/// 
-		/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
-		///  bottommost line of the control</para>
-		/// </summary> 
-		public bool ShowTopLine { get; set; } = true;
-
-
-		/// <summary>
-		/// True to show a solid box around the edge of the control.  Defaults to true.
-		/// </summary>
-		public bool ShowBorder { get; set; } = true;
-
-		/// <summary>
-		/// True to render tabs at the bottom of the view instead of the top
-		/// </summary>
-		public bool TabsOnBottom { get; set; } = false;
-
-	}
-
-	/// <summary>
 	/// Control that hosts multiple sub views, presenting a single one at once
 	/// </summary>
 	public class TabView : View {
@@ -164,7 +98,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Initialzies a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		public TabView () : base ()
 		{
@@ -176,6 +110,19 @@ namespace Terminal.Gui {
 
 			base.Add (tabsBar);
 			base.Add (contentView);
+
+			// Things this view knows how to do
+			AddCommand (Command.Left, () => { SwitchTabBy (-1); return true; });
+			AddCommand (Command.Right, () => { SwitchTabBy (1); return true; });
+			AddCommand (Command.LeftHome, () => { SelectedTab = Tabs.FirstOrDefault (); return true; });
+			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
+
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorLeft, Command.Left);
+			AddKeyBinding (Key.CursorRight, Command.Right);
+			AddKeyBinding (Key.Home, Command.LeftHome);
+			AddKeyBinding (Key.End, Command.RightEnd);
 		}
 
 		/// <summary>
@@ -231,21 +178,24 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 
 			if (Style.ShowBorder) {
 
-				// How muc space do we need to leave at the bottom to show the tabs
+				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, bounds.Width,
-			       bounds.Height - spaceAtBottom - startAtY), 0, true);
+			       Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
 			}
 
 			if (Tabs.Any ()) {
 				tabsBar.Redraw (tabsBar.Bounds);
+				contentView.SetNeedsDisplay ();
+				var savedClip = contentView.ClipToBounds ();
 				contentView.Redraw (contentView.Bounds);
+				Driver.Clip = savedClip;
 			}
 		}
 
@@ -281,21 +231,9 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (HasFocus && CanFocus && Focused == tabsBar) {
-				switch (keyEvent.Key) {
-
-				case Key.CursorLeft:
-					SwitchTabBy (-1);
-					return true;
-				case Key.CursorRight:
-					SwitchTabBy (1);
-					return true;
-				case Key.Home:
-					SelectedTab = Tabs.FirstOrDefault ();
-					return true;
-				case Key.End:
-					SelectedTab = Tabs.LastOrDefault ();
-					return true;
-				}
+				var result = InvokeKeybindings (keyEvent);
+				if (result != null)
+					return (bool)result;
 			}
 
 			return base.ProcessKey (keyEvent);
@@ -402,7 +340,17 @@ namespace Terminal.Gui {
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
 
 				string text = tab.Text.ToString ();
-				var maxWidth = MaxTabTextWidth;
+
+				// The maximum number of characters to use for the tab name as specified
+				// by the user (MaxTabTextWidth).  But not more than the width of the view
+				// or we won't even be able to render a single tab!
+				var maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
+
+				// if tab view is width <= 3 don't render any tabs
+				if (maxWidth == 0) {
+					yield return new TabToRender (i, tab, string.Empty, Equals (SelectedTab, tab), 0);
+					break;
+				}
 
 				if (tabTextWidth > maxWidth) {
 					text = tab.Text.ToString ().Substring (0, (int)maxWidth);
@@ -466,7 +414,7 @@ namespace Terminal.Gui {
 
 			// if the currently selected tab is no longer a member of Tabs
 			if (SelectedTab == null || !Tabs.Contains (SelectedTab)) {
-				// select the tab closest to the one that disapeared
+				// select the tab closest to the one that disappeared
 				var toSelect = Math.Max (idx - 1, 0);
 
 				if (toSelect < Tabs.Count) {
@@ -480,6 +428,8 @@ namespace Terminal.Gui {
 			EnsureSelectedTabIsVisible ();
 			SetNeedsDisplay ();
 		}
+
+		#region Nested Types
 
 		private class TabToRender {
 			public int X { get; set; }
@@ -549,7 +499,7 @@ namespace Terminal.Gui {
 
 				var tabLocations = host.CalculateViewport (bounds).ToArray ();
 				var width = bounds.Width;
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.SetAttribute (GetNormalColor ());
 
 				if (host.Style.ShowTopLine) {
 					RenderOverline (tabLocations, width);
@@ -558,7 +508,7 @@ namespace Terminal.Gui {
 				RenderTabLine (tabLocations, width);
 
 				RenderUnderline (tabLocations, width);
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.SetAttribute (GetNormalColor ());
 
 
 			}
@@ -652,7 +602,7 @@ namespace Terminal.Gui {
 
 
 					Driver.AddStr (toRender.TextToRender);
-					Driver.SetAttribute (ColorScheme.Normal);
+					Driver.SetAttribute (GetNormalColor ());
 
 					if (toRender.IsSelected) {
 						Driver.AddRune (Driver.VLine);
@@ -709,7 +659,7 @@ namespace Terminal.Gui {
 					Driver.AddRune (Driver.LeftArrow);
 				}
 
-				// if there are mmore tabs to the right not visible
+				// if there are more tabs to the right not visible
 				if (ShouldDrawRightScrollIndicator (tabLocations)) {
 					Move (width - 1, y);
 
@@ -736,7 +686,7 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
-				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && 
+				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 					return false;
@@ -808,32 +758,100 @@ namespace Terminal.Gui {
 				return tabs.LastOrDefault (t => x >= t.X && x < t.X + t.Width)?.Tab;
 			}
 		}
-	}
 
-	/// <summary>
-	/// Describes a change in <see cref="TabView.SelectedTab"/>
-	/// </summary>
-	public class TabChangedEventArgs : EventArgs {
 
 		/// <summary>
-		/// The previously selected tab. May be null
+		/// A single tab in a <see cref="TabView"/>
 		/// </summary>
-		public Tab OldTab { get; }
+		public class Tab {
+			private ustring text;
 
-		/// <summary>
-		/// The currently selected tab. May be null
-		/// </summary>
-		public Tab NewTab { get; }
+			/// <summary>
+			/// The text to display in a <see cref="TabView"/>
+			/// </summary>
+			/// <value></value>
+			public ustring Text { get => text ?? "Unamed"; set => text = value; }
 
-		/// <summary>
-		/// Documents a tab change
-		/// </summary>
-		/// <param name="oldTab"></param>
-		/// <param name="newTab"></param>
-		public TabChangedEventArgs (Tab oldTab, Tab newTab)
-		{
-			OldTab = oldTab;
-			NewTab = newTab;
+			/// <summary>
+			/// The control to display when the tab is selected
+			/// </summary>
+			/// <value></value>
+			public View View { get; set; }
+
+			/// <summary>
+			/// Creates a new unamed tab with no controls inside
+			/// </summary>
+			public Tab ()
+			{
+
+			}
+
+			/// <summary>
+			/// Creates a new tab with the given text hosting a view
+			/// </summary>
+			/// <param name="text"></param>
+			/// <param name="view"></param>
+			public Tab (string text, View view)
+			{
+				this.Text = text;
+				this.View = view;
+			}
 		}
+
+		/// <summary>
+		/// Describes render stylistic selections of a <see cref="TabView"/>
+		/// </summary>
+		public class TabStyle {
+
+			/// <summary>
+			/// True to show the top lip of tabs.  False to directly begin with tab text during 
+			/// rendering.  When true header line occupies 3 rows, when false only 2.
+			/// Defaults to true.
+			/// 
+			/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
+			///  bottommost line of the control</para>
+			/// </summary> 
+			public bool ShowTopLine { get; set; } = true;
+
+
+			/// <summary>
+			/// True to show a solid box around the edge of the control.  Defaults to true.
+			/// </summary>
+			public bool ShowBorder { get; set; } = true;
+
+			/// <summary>
+			/// True to render tabs at the bottom of the view instead of the top
+			/// </summary>
+			public bool TabsOnBottom { get; set; } = false;
+
+		}
+
+		/// <summary>
+		/// Describes a change in <see cref="TabView.SelectedTab"/>
+		/// </summary>
+		public class TabChangedEventArgs : EventArgs {
+
+			/// <summary>
+			/// The previously selected tab. May be null
+			/// </summary>
+			public Tab OldTab { get; }
+
+			/// <summary>
+			/// The currently selected tab. May be null
+			/// </summary>
+			public Tab NewTab { get; }
+
+			/// <summary>
+			/// Documents a tab change
+			/// </summary>
+			/// <param name="oldTab"></param>
+			/// <param name="newTab"></param>
+			public TabChangedEventArgs (Tab oldTab, Tab newTab)
+			{
+				OldTab = oldTab;
+				NewTab = newTab;
+			}
+		}
+		#endregion
 	}
 }

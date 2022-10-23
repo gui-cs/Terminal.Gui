@@ -59,23 +59,38 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
+			keyResult = null;
+			waitForProbe.Set ();
+
+			if (CheckTimers (wait, out var waitTimeout)) {
+				return true;
+			}
+
+			keyReady.WaitOne (waitTimeout);
+			return keyResult.HasValue;
+		}
+
+		bool CheckTimers (bool wait, out int waitTimeout)
+		{
 			long now = DateTime.UtcNow.Ticks;
 
-			int waitTimeout;
 			if (mainLoop.timeouts.Count > 0) {
 				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (waitTimeout < 0)
 					return true;
-			} else
+			} else {
 				waitTimeout = -1;
+			}
 
 			if (!wait)
 				waitTimeout = 0;
 
-			keyResult = null;
-			waitForProbe.Set ();
-			keyReady.WaitOne (waitTimeout);
-			return keyResult.HasValue;
+			int ic;
+			lock (mainLoop.idleHandlers) {
+				ic = mainLoop.idleHandlers.Count;
+			}
+
+			return ic > 0;
 		}
 
 		void IMainLoopDriver.MainIteration ()

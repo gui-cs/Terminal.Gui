@@ -5,12 +5,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView")]
-	[ScenarioCategory ("Controls")]
-	class ClassExplorer : Scenario {
+	[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
+	public class ClassExplorer : Scenario {
 		private TreeView<object> treeView;
 		private TextView textView;
 		private MenuItem miShowPrivate;

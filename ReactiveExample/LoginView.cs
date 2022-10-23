@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using NStack;
 using ReactiveUI;
 using Terminal.Gui;
+using ReactiveMarbles.ObservableEvents;
 
 namespace ReactiveExample {
 	public class LoginView : Window, IViewFor<LoginViewModel> {

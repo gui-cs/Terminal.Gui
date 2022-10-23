@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.Data;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 using System.Linq;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using NStack;
+using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Csv Editor", Description: "Open and edit simple CSV files")]
+	[ScenarioMetadata (Name: "Csv Editor", Description: "Open and edit simple CSV files using the TableView class.")]
+	[ScenarioCategory ("TableView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Text and Formatting")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Files and IO")]
 	public class CsvEditor : Scenario 
 	{
 		TableView tableView;
@@ -23,7 +27,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miLeft;
 		private MenuItem miRight;
 		private MenuItem miCentered;
-		private Label selectedCellLabel;
+		private TextField selectedCellLabel;
 
 		public override void Setup ()
 		{
@@ -39,12 +43,14 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
+			var fileMenu = new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Open CSV", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
-					new MenuItem ("_Quit", "", () => Quit()),
-				}),
+					new MenuItem ("_Quit", "Quits The App", () => Quit()),
+				});
+			//fileMenu.Help = "Help";
+			var menu = new MenuBar (new MenuBarItem [] {
+				fileMenu,
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_New Column", "", () => AddColumn()),
 					new MenuItem ("_New Row", "", () => AddRow()),
@@ -75,14 +81,14 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tableView);
 
-			selectedCellLabel = new Label(){
+			selectedCellLabel = new TextField(){
 				X = 0,
 				Y = Pos.Bottom(tableView),
 				Text = "0,0",
 				Width = Dim.Fill(),
-				TextAlignment = TextAlignment.Right
-				
+				TextAlignment = TextAlignment.Right				
 			};
+			selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
 
 			Win.Add(selectedCellLabel);
 
@@ -93,10 +99,26 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar();
 		}
 
-
-		private void OnSelectedCellChanged (SelectedCellChangedEventArgs e)
+		private void SelectedCellLabel_TextChanged (ustring last)
 		{
-			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
+			// if user is in the text control and editing the selected cell
+			if (!selectedCellLabel.HasFocus)
+				return;
+			
+			// change selected cell to the one the user has typed into the box
+			var match = Regex.Match (selectedCellLabel.Text.ToString(), "^(\\d+),(\\d+)$");
+			if(match.Success) {
+
+				tableView.SelectedColumn = int.Parse (match.Groups [1].Value);
+				tableView.SelectedRow = int.Parse (match.Groups [2].Value);
+			}
+		}
+
+		private void OnSelectedCellChanged (TableView.SelectedCellChangedEventArgs e)
+		{
+			// only update the text box if the user is not manually editing it
+			if (!selectedCellLabel.HasFocus)
+				selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 			
 			if(tableView.Table == null || tableView.SelectedColumn == -1)
 				return;
@@ -504,7 +526,7 @@ namespace UICatalog.Scenarios {
 			enteredText = okPressed? tf.Text.ToString() : null;
 			return okPressed;
 		}
-		private void EditCurrentCell (CellActivatedEventArgs e)
+		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
 		{
 			if(e.Table == null)
 				return;

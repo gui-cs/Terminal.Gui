@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void SetSource (IList source)
 		{
-			if (source == null)
+			if (source == null && (Source == null || !(Source is ListWrapper)))
 				Source = null;
 			else {
 				Source = MakeWrapper (source);
@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		public Task SetSourceAsync (IList source)
 		{
 			return Task.Factory.StartNew (() => {
-				if (source == null)
+				if (source == null && (Source == null || !(Source is ListWrapper)))
 					Source = null;
 				else
 					Source = MakeWrapper (source);
@@ -186,7 +186,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If set to true allows more than one item to be selected. If false only allow one item selected.
 		/// </summary>
-		public bool AllowsMultipleSelection { get => allowsMultipleSelection;
+		public bool AllowsMultipleSelection {
+			get => allowsMultipleSelection;
 			set {
 				allowsMultipleSelection = value;
 				if (Source != null && !allowsMultipleSelection) {
@@ -316,6 +317,38 @@ namespace Terminal.Gui {
 		{
 			Source = source;
 			CanFocus = true;
+
+			// Things this view knows how to do
+			AddCommand (Command.LineUp, () => MoveUp ());
+			AddCommand (Command.LineDown, () => MoveDown ());
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
+			AddCommand (Command.PageUp, () => MovePageUp ());
+			AddCommand (Command.PageDown, () => MovePageDown ());
+			AddCommand (Command.TopHome, () => MoveHome ());
+			AddCommand (Command.BottomEnd, () => MoveEnd ());
+			AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
+
+			// Default keybindings for all ListViews
+			AddKeyBinding (Key.CursorUp,Command.LineUp);
+			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
+
+			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+
+			AddKeyBinding(Key.PageUp,Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.Home, Command.TopHome);
+
+			AddKeyBinding (Key.End, Command.BottomEnd);
+
+			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+
+			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		///<inheritdoc/>
@@ -333,7 +366,9 @@ namespace Terminal.Gui {
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
 
-				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : (isSelected ? ColorScheme.HotNormal : ColorScheme.Normal);
+				var newcolor = focused ? (isSelected ? ColorScheme.Focus : GetNormalColor ())
+						       : (isSelected ? ColorScheme.HotNormal : GetNormalColor ());
+
 				if (newcolor != current) {
 					Driver.SetAttribute (newcolor);
 					current = newcolor;
@@ -344,6 +379,12 @@ namespace Terminal.Gui {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
+					var rowEventArgs = new ListViewRowEventArgs (item);
+					OnRowRender (rowEventArgs);
+					if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+						current = (Attribute)rowEventArgs.RowAttribute;
+						Driver.SetAttribute (current);
+					}
 					if (allowsMarking) {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
@@ -363,46 +404,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewItemEventArgs> OpenSelectedItem;
 
+		/// <summary>
+		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
+		/// </summary>
+		public event Action<ListViewRowEventArgs> RowRender;
+
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (source == null)
 				return base.ProcessKey (kb);
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-			case Key.P | Key.CtrlMask:
-				return MoveUp ();
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			case Key.CursorDown:
-			case Key.N | Key.CtrlMask:
-				return MoveDown ();
-
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return MovePageDown ();
-
-			case Key.PageUp:
-				return MovePageUp ();
-
-			case Key.Space:
-				if (MarkUnmarkRow ())
-					return true;
-				else
-					break;
-
-			case Key.Enter:
-				OnOpenSelectedItem ();
-				break;
-
-			case Key.End:
-				return MoveEnd ();
-
-			case Key.Home:
-				return MoveHome ();
-
-			}
-			return base.ProcessKey (kb);
+			return false;
 		}
 
 		/// <summary>
@@ -465,7 +482,7 @@ namespace Terminal.Gui {
 		public virtual bool MovePageDown ()
 		{
 			var n = (selected + Frame.Height);
-			if (n > source.Count)
+			if (n >= source.Count)
 				n = source.Count - 1;
 			if (n != selected) {
 				selected = n;
@@ -504,11 +521,16 @@ namespace Terminal.Gui {
 					top++;
 				} else if (selected < top) {
 					top = selected;
+				} else if (selected < top) {
+					top = selected;
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected == 0) {
 				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			} else if (selected >= top + Frame.Height) {
+				top = source.Count - Frame.Height;
 				SetNeedsDisplay ();
 			}
 
@@ -544,6 +566,9 @@ namespace Terminal.Gui {
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
+			} else if (selected < top) {
+				top = selected;
+				SetNeedsDisplay ();
 			}
 			return true;
 		}
@@ -554,9 +579,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			if (selected != source.Count - 1) {
+			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
-				top = selected;
+				if (top + selected > Frame.Height - 1) {
+					top = selected;
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -584,40 +611,44 @@ namespace Terminal.Gui {
 		/// Scrolls the view down.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll down.</param>
-		public virtual void ScrollDown (int lines)
+		public virtual bool ScrollDown (int lines)
 		{
 			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
 		/// <param name="lines">Number of lines to scroll up.</param>
-		public virtual void ScrollUp (int lines)
+		public virtual bool ScrollUp (int lines)
 		{
 			top = Math.Max (top - lines, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view right.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll right.</param>
-		public virtual void ScrollRight (int cols)
+		public virtual bool ScrollRight (int cols)
 		{
 			left = Math.Max (Math.Min (left + cols, Maxlength - 1), 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		/// <summary>
 		/// Scrolls the view left.
 		/// </summary>
 		/// <param name="cols">Number of columns to scroll left.</param>
-		public virtual void ScrollLeft (int cols)
+		public virtual bool ScrollLeft (int cols)
 		{
 			left = Math.Max (left - cols, 0);
 			SetNeedsDisplay ();
+			return true;
 		}
 
 		int lastSelectedItem = -1;
@@ -647,11 +678,24 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnOpenSelectedItem ()
 		{
-			if (source.Count <= selected || selected < 0) return false;
+			if (source.Count <= selected || selected < 0 || OpenSelectedItem == null) {
+				return false;
+			}
+
 			var value = source.ToList () [selected];
+
 			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
 
 			return true;
+		}
+
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="RowRender"/>.
+		/// </summary>
+		/// <param name="rowEventArgs"></param>
+		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
+		{
+			RowRender?.Invoke (rowEventArgs);
 		}
 
 		///<inheritdoc/>
@@ -662,7 +706,6 @@ namespace Terminal.Gui {
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
 				OnSelectedChanged ();
-				return true;
 			}
 
 			return base.OnEnter (view);
@@ -673,10 +716,9 @@ namespace Terminal.Gui {
 		{
 			if (lastSelectedItem > -1) {
 				lastSelectedItem = -1;
-				return true;
 			}
 
-			return false;
+			return base.OnLeave (view);
 		}
 
 		void EnsuresVisibilitySelectedItem ()
@@ -685,7 +727,7 @@ namespace Terminal.Gui {
 			if (selected < top) {
 				top = selected;
 			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
-				top = Math.Max (selected - Frame.Height + 2, 0);
+				top = Math.Max (selected - Frame.Height + 1, 0);
 			}
 		}
 
@@ -785,7 +827,7 @@ namespace Terminal.Gui {
 
 		int GetMaxLengthItem ()
 		{
-			if (src?.Count == 0) {
+			if (src == null || src?.Count == 0) {
 				return 0;
 			}
 
@@ -841,7 +883,7 @@ namespace Terminal.Gui {
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
 			container.Move (col, line);
-			var t = src [item];
+			var t = src? [item];
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
@@ -910,6 +952,30 @@ namespace Terminal.Gui {
 		{
 			Item = item;
 			Value = value;
+		}
+	}
+
+	/// <summary>
+	/// <see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.
+	/// </summary>
+	public class ListViewRowEventArgs : EventArgs {
+		/// <summary>
+		/// The current row being rendered.
+		/// </summary>
+		public int Row { get; }
+		/// <summary>
+		/// The <see cref="Attribute"/> used by current row or
+		/// null to maintain the current attribute.
+		/// </summary>
+		public Attribute? RowAttribute { get; set; }
+
+		/// <summary>
+		/// Initializes with the current row.
+		/// </summary>
+		/// <param name="row"></param>
+		public ListViewRowEventArgs (int row)
+		{
+			Row = row;
 		}
 	}
 }

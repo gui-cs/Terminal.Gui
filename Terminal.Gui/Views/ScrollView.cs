@@ -13,7 +13,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -39,7 +38,7 @@ namespace Terminal.Gui {
 		/// <param name="frame"></param>
 		public ScrollView (Rect frame) : base (frame)
 		{
-			Init (frame);
+			Initialize (frame);
 		}
 
 
@@ -48,10 +47,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ScrollView () : base ()
 		{
-			Init (new Rect (0, 0, 0, 0));
+			Initialize (Rect.Empty);
 		}
 
-		void Init (Rect frame)
+		void Initialize (Rect frame)
 		{
 			contentView = new View (frame);
 			vertical = new ScrollBarView (1, 0, isVertical: true) {
@@ -74,6 +73,8 @@ namespace Terminal.Gui {
 				ContentOffset = new Point (horizontal.Position, ContentOffset.Y);
 			};
 			horizontal.Host = this;
+			vertical.OtherScrollBarView = horizontal;
+			horizontal.OtherScrollBarView = vertical;
 			base.Add (contentView);
 			CanFocus = true;
 
@@ -81,6 +82,39 @@ namespace Terminal.Gui {
 			MouseLeave += View_MouseLeave;
 			contentView.MouseEnter += View_MouseEnter;
 			contentView.MouseLeave += View_MouseLeave;
+
+			// Things this view knows how to do
+			AddCommand (Command.ScrollUp, () => ScrollUp (1));
+			AddCommand (Command.ScrollDown, () => ScrollDown (1));
+			AddCommand (Command.ScrollLeft, () => ScrollLeft (1));
+			AddCommand (Command.ScrollRight, () => ScrollRight (1));
+			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
+			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
+			AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
+			AddCommand (Command.PageRight, () => ScrollRight (Bounds.Width));
+			AddCommand (Command.TopHome, () => ScrollUp (contentSize.Height));
+			AddCommand (Command.BottomEnd, () => ScrollDown (contentSize.Height));
+			AddCommand (Command.LeftHome, () => ScrollLeft (contentSize.Width));
+			AddCommand (Command.RightEnd, () => ScrollRight (contentSize.Width));
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
+			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
+			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
+			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
+
+			AddKeyBinding (Key.PageUp, Command.PageUp);
+			AddKeyBinding ((Key)'v' | Key.AltMask, Command.PageUp);
+
+			AddKeyBinding (Key.PageDown, Command.PageDown);
+			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+
+			AddKeyBinding (Key.PageUp | Key.CtrlMask, Command.PageLeft);
+			AddKeyBinding (Key.PageDown | Key.CtrlMask, Command.PageRight);
+			AddKeyBinding (Key.Home, Command.TopHome);
+			AddKeyBinding (Key.End, Command.BottomEnd);
+			AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
+			AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
 		}
 
 		Size contentSize;
@@ -182,7 +216,7 @@ namespace Terminal.Gui {
 		/// <param name="view">The view to add to the scrollview.</param>
 		public override void Add (View view)
 		{
-			if (!IsOverridden (view)) {
+			if (!IsOverridden (view, "MouseEvent")) {
 				view.MouseEnter += View_MouseEnter;
 				view.MouseLeave += View_MouseLeave;
 			}
@@ -192,7 +226,7 @@ namespace Terminal.Gui {
 
 		void View_MouseLeave (MouseEventArgs e)
 		{
-			if (Application.mouseGrabView != null && Application.mouseGrabView != vertical && Application.mouseGrabView != horizontal) {
+			if (Application.MouseGrabView != null && Application.MouseGrabView != vertical && Application.MouseGrabView != horizontal) {
 				Application.UngrabMouse ();
 			}
 		}
@@ -200,14 +234,6 @@ namespace Terminal.Gui {
 		void View_MouseEnter (MouseEventArgs e)
 		{
 			Application.GrabMouse (this);
-		}
-
-		bool IsOverridden (View view)
-		{
-			Type t = view.GetType ();
-			MethodInfo m = t.GetMethod ("MouseEvent");
-
-			return m.DeclaringType == t && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 
 		/// <summary>
@@ -250,7 +276,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// /// Gets or sets the visibility for the vertical scroll indicator.
+		/// Gets or sets the visibility for the vertical scroll indicator.
 		/// </summary>
 		/// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
 		public bool ShowVerticalScrollIndicator {
@@ -281,7 +307,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 			SetViewsNeedsDisplay ();
 			Clear ();
 
@@ -308,7 +334,7 @@ namespace Terminal.Gui {
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		void ShowHideScrollBars ()
@@ -451,33 +477,10 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (kb))
 				return true;
 
-			switch (kb.Key) {
-			case Key.CursorUp:
-				return ScrollUp (1);
-			case (Key)'v' | Key.AltMask:
-			case Key.PageUp:
-				return ScrollUp (Bounds.Height);
+			var result = InvokeKeybindings (kb);
+			if (result != null)
+				return (bool)result;
 
-			case Key.V | Key.CtrlMask:
-			case Key.PageDown:
-				return ScrollDown (Bounds.Height);
-
-			case Key.CursorDown:
-				return ScrollDown (1);
-
-			case Key.CursorLeft:
-				return ScrollLeft (1);
-
-			case Key.CursorRight:
-				return ScrollRight (1);
-
-			case Key.Home:
-				return ScrollUp (contentSize.Height);
-
-			case Key.End:
-				return ScrollDown (contentSize.Height);
-
-			}
 			return false;
 		}
 
@@ -503,9 +506,8 @@ namespace Terminal.Gui {
 				vertical.MouseEvent (me);
 			} else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator) {
 				horizontal.MouseEvent (me);
-			} else if (IsOverridden (me.View)) {
+			} else if (IsOverridden (me.View, "MouseEvent")) {
 				Application.UngrabMouse ();
-				return false;
 			}
 			return true;
 		}
