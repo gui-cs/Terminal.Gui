@@ -439,7 +439,7 @@ namespace Terminal.Gui {
 			if (!kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock) {
 				if (navigator == null) {
 					// BUGBUG: If items change this needs to be recreated.
-					navigator = new SearchCollectionNavigator (source.ToList().Cast<string>());
+					navigator = new SearchCollectionNavigator (source.ToList ().Cast<object> ());
 				}
 				SelectedItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
 				EnsuresVisibilitySelectedItem ();

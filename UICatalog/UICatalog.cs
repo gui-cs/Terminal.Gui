@@ -53,7 +53,7 @@ namespace UICatalog {
 		private static List<string> _categories;
 		private static ListView _categoryListView;
 		private static FrameView _rightPane;
-		private static List<Type> _scenarios;
+		private static List<Scenario> _scenarios;
 		private static ListView _scenarioListView;
 		private static StatusBar _statusBar;
 		private static StatusItem _capslock;
@@ -75,15 +75,15 @@ namespace UICatalog {
 			if (Debugger.IsAttached)
 				CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-			_scenarios = Scenario.GetDerivedClasses<Scenario> ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
+			_scenarios = Scenario.GetScenarios ();
 
 			if (args.Length > 0 && args.Contains ("-usc")) {
 				_useSystemConsole = true;
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
 			if (args.Length > 0) {
-				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
-				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
+				var item = _scenarios.FindIndex (s => s.GetName ().Equals (args [0], StringComparison.OrdinalIgnoreCase));
+				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
 				_runningScenario.Init (Application.Top, _baseColorScheme);
@@ -218,7 +218,7 @@ namespace UICatalog {
 			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortcutTag})";
 			_rightPane.ShortcutAction = () => _rightPane.SetFocus ();
 
-			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t).Length).FirstOrDefault ()).Length;
+			_nameColumnWidth = _scenarios.OrderByDescending (s => s.GetName ().Length).FirstOrDefault ().GetName().Length;
 
 			_scenarioListView = new ListView () {
 				X = 0,
@@ -462,42 +462,6 @@ namespace UICatalog {
 					break;
 				}
 			}
-
-			//MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
-			//{
-			//	var mi = new MenuItem ();
-			//	mi.Title = menuItem;
-			//	mi.Shortcut = Key.AltMask + index.ToString () [0];
-			//	index++;
-			//	mi.CheckType |= MenuItemCheckStyle.Checked;
-			//	mi.Checked = checkFunction ();
-			//	mi.Action = () => {
-			//		action?.Invoke ();
-			//		mi.Title = menuItem;
-			//		mi.Checked = checkFunction ();
-			//	};
-			//	return mi;
-			//}
-
-			//return new MenuItem [] {
-			//	CheckedMenuMenuItem ("Use _System Console",
-			//		() => {
-			//			_useSystemConsole = !_useSystemConsole;
-			//		},
-			//		() => _useSystemConsole),
-			//	CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
-			//		() => {
-			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-			//			_top.SetNeedsDisplay ();
-			//		},
-			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
-			//	CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
-			//		() => {
-			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-			//			_top.SetNeedsDisplay ();
-			//		},
-			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
-			//};
 		}
 
 		static void SetColorScheme ()
@@ -533,8 +497,8 @@ namespace UICatalog {
 		{
 			if (_runningScenario is null) {
 				_scenarioListViewItem = _scenarioListView.SelectedItem;
-				var source = _scenarioListView.Source as ScenarioListDataSource;
-				_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
+				// Create new instance of scenario (even though Scenarios contains instnaces)
+				_runningScenario = (Scenario)Activator.CreateInstance (_scenarioListView.Source.ToList() [_scenarioListView.SelectedItem].GetType());
 				Application.RequestStop ();
 			}
 		}
@@ -542,7 +506,7 @@ namespace UICatalog {
 		internal class ScenarioListDataSource : IListDataSource {
 			private readonly int len;
 
-			public List<Type> Scenarios { get; set; }
+			public List<Scenario> Scenarios { get; set; }
 
 			public bool IsMarked (int item) => false;
 
@@ -550,7 +514,7 @@ namespace UICatalog {
 
 			public int Length => len;
 
-			public ScenarioListDataSource (List<Type> itemList)
+			public ScenarioListDataSource (List<Scenario> itemList)
 			{
 				Scenarios = itemList;
 				len = GetMaxLengthItem ();
@@ -560,8 +524,8 @@ namespace UICatalog {
 			{
 				container.Move (col, line);
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
-				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width, start);
+				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [item].GetName());
+				RenderUstr (driver, $"{s}  {Scenarios [item].GetDescription()}", col, line, width, start);
 			}
 
 			public void SetMark (int item, bool value)
@@ -576,14 +540,13 @@ namespace UICatalog {
 
 				int maxLength = 0;
 				for (int i = 0; i < Scenarios.Count; i++) {
-					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [i]));
-					var sc = $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [i])}";
+					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [i].GetName());
+					var sc = $"{s}  {Scenarios [i].GetDescription()}";
 					var l = sc.Length;
 					if (l > maxLength) {
 						maxLength = l;
 					}
 				}
-
 				return maxLength;
 			}
 
@@ -661,15 +624,15 @@ namespace UICatalog {
 			}
 			_categoryListViewItem = _categoryListView.SelectedItem;
 			var item = _categories [_categoryListViewItem];
-			List<Type> newlist;
+			List<Scenario> newlist;
 			if (_categoryListViewItem == 0) {
 				// First category is "All"
 				newlist = _scenarios;
 
 			} else {
-				newlist = _scenarios.Where (t => Scenario.ScenarioCategory.GetCategories (t).Contains (item)).ToList ();
+				newlist = _scenarios.Where (s => s.GetCategories ().Contains (item)).ToList ();
 			}
-			_scenarioListView.Source = new ScenarioListDataSource (newlist);
+			_scenarioListView.SetSource(newlist.ToList());
 			_scenarioListView.SelectedItem = _scenarioListViewItem;
 
 		}

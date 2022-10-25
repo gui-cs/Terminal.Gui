@@ -12,14 +12,14 @@ namespace Terminal.Gui {
 		DateTime lastKeystroke = DateTime.MinValue;
 		const int TypingDelay = 250;
 		public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
-		private IEnumerable<string> Collection { get => _collection; set => _collection = value; }
+		private IEnumerable<object> Collection { get => _collection; set => _collection = value; }
 
-		private IEnumerable<string> _collection;
+		private IEnumerable<object> _collection;
 
-		public SearchCollectionNavigator (IEnumerable<string> collection) { _collection = collection; }
+		public SearchCollectionNavigator (IEnumerable<object> collection) { _collection = collection; }
 
 
-		public int CalculateNewIndex (IEnumerable<string> collection, int currentIndex, char keyStruck)
+		public int CalculateNewIndex (IEnumerable<object> collection, int currentIndex, char keyStruck)
 		{
 			// if user presses a key
 			if (true) {//char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck) || char.IsSymbol(keyStruck)) {
@@ -85,7 +85,7 @@ namespace Terminal.Gui {
 			return CalculateNewIndex (Collection, currentIndex, keyStruck);
 		}
 
-		private int GetNextIndexMatching (IEnumerable<string> collection, int currentIndex, string search, bool preferNotToMoveToNewIndexes = false)
+		private int GetNextIndexMatching (IEnumerable<object> collection, int currentIndex, string search, bool preferNotToMoveToNewIndexes = false)
 		{
 			if (string.IsNullOrEmpty (search)) {
 				return -1;
@@ -93,7 +93,7 @@ namespace Terminal.Gui {
 
 			// find indexes of items that start with the search text
 			int [] matchingIndexes = collection.Select ((item, idx) => (item, idx))
-				  .Where (k => k.Item1?.StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false)
+				  .Where (k => k.item?.ToString().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false)
 				  .Select (k => k.idx)
 				  .ToArray ();
 
