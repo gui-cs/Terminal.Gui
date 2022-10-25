@@ -1182,10 +1182,22 @@ namespace Terminal.Gui {
 			}
 
 			var isVertical = IsVerticalDirection (textDirection);
+			var savedClip = Application.Driver?.Clip;
+			var maxBounds = bounds;
+			if (Application.Driver != null) {
+				Application.Driver.Clip = maxBounds = containerBounds == default
+					? bounds
+					: new Rect (Math.Max (containerBounds.X, bounds.X),
+					Math.Max (containerBounds.Y, bounds.Y),
+					Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
+					Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
+			}
 
 			for (int line = 0; line < linesFormated.Count; line++) {
 				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
+				if ((isVertical && line > maxBounds.Left + maxBounds.Width - bounds.X) || (!isVertical && line > maxBounds.Top + maxBounds.Height - bounds.Y))
+					break;
 
 				var runes = lines [line].ToRunes ();
 
@@ -1262,15 +1274,6 @@ namespace Terminal.Gui {
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start;
-				var savedClip = Application.Driver?.Clip;
-				if (Application.Driver != null) {
-					Application.Driver.Clip = containerBounds == default
-						? bounds
-						: new Rect (Math.Max (containerBounds.X, bounds.X),
-						Math.Max (containerBounds.Y, bounds.Y),
-						Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
-						Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
-				}
 
 				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
 					if (!fillRemaining && idx < 0) {
@@ -1279,6 +1282,9 @@ namespace Terminal.Gui {
 					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
+					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+						break;
+
 					var rune = (Rune)' ';
 					if (isVertical) {
 						Application.Driver?.Move (x, current);
@@ -1313,9 +1319,9 @@ namespace Terminal.Gui {
 						break;
 					}
 				}
-				if (Application.Driver != null)
-					Application.Driver.Clip = (Rect)savedClip;
 			}
+			if (Application.Driver != null)
+				Application.Driver.Clip = (Rect)savedClip;
 		}
 	}
 }
