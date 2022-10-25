@@ -26,6 +26,10 @@
     "Issue1719Repro": {
       "commandName": "Project",
       "commandLineArgs": "\"ProgressBar Styles\""
+    },
+    "SearchCollectionNavTester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Search Collection Nav\""
     }
   }
 }

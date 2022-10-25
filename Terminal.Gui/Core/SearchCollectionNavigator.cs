@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Terminal.Gui {
@@ -11,11 +12,17 @@ namespace Terminal.Gui {
 		DateTime lastKeystroke = DateTime.MinValue;
 		const int TypingDelay = 250;
 		public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
+		private IEnumerable<string> Collection { get => _collection; set => _collection = value; }
 
-		public int CalculateNewIndex (string [] collection, int currentIndex, char keyStruck)
+		private IEnumerable<string> _collection;
+
+		public SearchCollectionNavigator (IEnumerable<string> collection) { _collection = collection; }
+
+
+		public int CalculateNewIndex (IEnumerable<string> collection, int currentIndex, char keyStruck)
 		{
-			// if user presses a letter key
-			if (char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck)) {
+			// if user presses a key
+			if (true) {//char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck) || char.IsSymbol(keyStruck)) {
 
 				// maybe user pressed 'd' and now presses 'd' again.
 				// a candidate search is things that begin with "dd"
@@ -73,7 +80,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private int GetNextIndexMatching (string [] collection, int currentIndex, string search, bool preferNotToMoveToNewIndexes = false)
+		public int CalculateNewIndex (int currentIndex, char keyStruck)
+		{
+			return CalculateNewIndex (Collection, currentIndex, keyStruck);
+		}
+
+		private int GetNextIndexMatching (IEnumerable<string> collection, int currentIndex, string search, bool preferNotToMoveToNewIndexes = false)
 		{
 			if (string.IsNullOrEmpty (search)) {
 				return -1;

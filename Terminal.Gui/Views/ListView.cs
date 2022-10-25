@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
@@ -179,6 +180,12 @@ namespace Terminal.Gui {
 			get => allowsMarking;
 			set {
 				allowsMarking = value;
+				if (allowsMarking) {
+					AddKeyBinding (Key.Space, Command.ToggleChecked);
+				} else {
+					ClearKeybinding (Key.Space);
+				}
+
 				SetNeedsDisplay ();
 			}
 		}
@@ -353,8 +360,6 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.End, Command.BottomEnd);
 
 			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
-
-			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		///<inheritdoc/>
@@ -416,39 +421,30 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewRowEventArgs> RowRender;
 
-		private string search { get; set; }
+		private SearchCollectionNavigator navigator;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (source == null)
+			if (source == null) {
 				return base.ProcessKey (kb);
+			}
 
 			var result = InvokeKeybindings (kb);
-			if (result != null)
+			if (result != null) {
 				return (bool)result;
+			}
 
 			// Enable user to find & select an item by typing text
-			if (source is IListDataSourceSearchable && 
-				!(kb.IsCapslock && kb.IsCtrl && kb.IsAlt && kb.IsScrolllock && kb.IsNumlock && kb.IsCapslock)) {
-				if (kb.KeyValue >= 32 && kb.KeyValue < 127) {
-					if (searchTimer == null) {
-						searchTimer = new System.Timers.Timer (500);
-						searchTimer.Elapsed += (o, e) => {
-							searchTimer.Stop ();
-							searchTimer = null;
-							search = "";
-						};
-						searchTimer.Start ();
-					}
-					search += (char)kb.KeyValue;
-					var found = ((IListDataSourceSearchable)source).StartsWith (search);
-					if (found != -1) {
-						SelectedItem = found;
-						SetNeedsDisplay ();
-					}
-					return true;
+			if (!kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock) {
+				if (navigator == null) {
+					// BUGBUG: If items change this needs to be recreated.
+					navigator = new SearchCollectionNavigator (source.ToList().Cast<string>());
 				}
+				SelectedItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
+				EnsuresVisibilitySelectedItem ();
+				SetNeedsDisplay ();
+				return true;
 			}
 
 			return false;
