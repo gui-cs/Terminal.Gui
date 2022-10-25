@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If set to <see langword="true"/>  more than one item can be selected. If <see langword="false"/> selecting
+		/// If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting
 		/// an item will cause all others to be un-selected. The default is <see langword="false"/>.
 		/// </summary>
 		public bool AllowsMultipleSelection {
@@ -206,6 +206,7 @@ namespace Terminal.Gui {
 						}
 					}
 				}
+				SetNeedsDisplay ();
 			}
 		}
 
