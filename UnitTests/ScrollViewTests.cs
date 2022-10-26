@@ -228,6 +228,8 @@ namespace Terminal.Gui.Views {
 			Application.Top.Add (sv);
 			Application.Begin (Application.Top);
 
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
@@ -242,6 +244,40 @@ namespace Terminal.Gui.Views {
          ░
          ▼
 ◄├┤░░░░░► 
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50),
+				ContentOffset = new Point (25, 25)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (-25, sv.ContentOffset.X);
+			Assert.Equal (-25, sv.ContentOffset.Y);
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ░
+         ░
+         ░
+         ┬
+         │
+         ┴
+         ░
+         ▼
+◄░░░├─┤░► 
 ", output);
 		}
 	}
