@@ -1133,8 +1133,8 @@ Edit
 			string padding (int i)
 			{
 				int n = 0;
-				while (i > 0){
-					n += Menus [i-1].TitleLength + 2;
+				while (i > 0) {
+					n += Menus [i - 1].TitleLength + 2;
 					i--;
 				}
 				return new string (' ', n);
@@ -1153,12 +1153,12 @@ Edit
 			public string expectedBottomRow (int i) => $"{d.LLCorner}{new String (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
 
 			// The fulll expected string for an open sub menu
-			public string expectedSubMenuOpen (int i) => ClosedMenuText + 
+			public string expectedSubMenuOpen (int i) => ClosedMenuText +
 				(Menus [i].Children.Length > 0 ?
 					padding (i) + expectedTopRow (i) +
 					padding (i) + expectedMenuItemRow (i) +
-					padding (i) + expectedBottomRow (i) 
-				: 
+					padding (i) + expectedBottomRow (i)
+				:
 				"");
 
 			public ExpectedMenuBar (MenuBarItem [] menus) : base (menus)
@@ -1481,14 +1481,14 @@ Edit
 
 			MenuBarItem [] items = new MenuBarItem [expectedMenu.Menus.Length];
 			for (var i = 0; i < expectedMenu.Menus.Length; i++) {
-				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0 
+				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
 					? new MenuItem [] {
 						new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null),
-					} 
+					}
 					: Array.Empty<MenuItem> ());
 			}
 			var menu = new MenuBar (items);
-			
+
 			var tf = new TextField () { Y = 2, Width = 10 };
 			Application.Top.Add (menu, tf);
 
@@ -1498,7 +1498,7 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen(0), output);
+			GraphViewTests.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Right - Edit has no sub menu; this tests that no sub menu shows
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
@@ -1558,6 +1558,83 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Disabled_MenuItem_Is_Never_Selected ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Menu", new MenuItem [] {
+					new MenuItem ("Enabled 1", "", null),
+					new MenuItem ("Disabled", "", null, () => false),
+					null,
+					new MenuItem ("Enabled 2", "", null)
+				})
+			});
+
+			var top = Application.Top;
+			top.Add (menu);
+			Application.Begin (top);
+
+			var attributes = new Attribute [] {
+				// 0
+				menu.ColorScheme.Normal,
+				// 1
+				menu.ColorScheme.Focus,
+				// 2
+				menu.ColorScheme.Disabled
+			};
+
+			GraphViewTests.AssertDriverColorsAre (@"
+00000000000000", attributes);
+
+			Assert.True (menu.MouseEvent (new MouseEvent {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed,
+				View = menu
+			}));
+			top.Redraw (top.Bounds);
+			GraphViewTests.AssertDriverColorsAre (@"
+11111100000000
+00000000000000
+01111111111110
+02222222222220
+00000000000000
+00000000000000
+00000000000000", attributes);
+
+			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
+				X = 0,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked,
+				View = top.Subviews [1]
+			}));
+			top.Subviews [1].Redraw (top.Bounds);
+			GraphViewTests.AssertDriverColorsAre (@"
+11111100000000
+00000000000000
+01111111111110
+02222222222220
+00000000000000
+00000000000000
+00000000000000", attributes);
+
+			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
+				X = 0,
+				Y = 2,
+				Flags = MouseFlags.ReportMousePosition,
+				View = top.Subviews [1]
+			}));
+			top.Subviews [1].Redraw (top.Bounds);
+			GraphViewTests.AssertDriverColorsAre (@"
+11111100000000
+00000000000000
+01111111111110
+02222222222220
+00000000000000
+00000000000000
+00000000000000", attributes);
 		}
 	}
 }
