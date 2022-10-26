@@ -215,5 +215,34 @@ namespace Terminal.Gui.Views {
 ◄├─────┤► 
 ", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ┬
+         ┴
+         ░
+         ░
+         ░
+         ░
+         ░
+         ▼
+◄├┤░░░░░► 
+", output);
+		}
 	}
 }
