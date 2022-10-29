@@ -57,7 +57,9 @@ namespace UICatalog {
 		private static StatusItem _numlock;
 		private static StatusItem _scrolllock;
 
+		// If set, holds the scenario the user selected
 		private static Scenario _selectedScenario = null;
+		
 		private static bool _useSystemConsole = false;
 		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		private static bool _heightAsBuffer = false;
@@ -139,10 +141,6 @@ namespace UICatalog {
 				Responder.Instances.Clear ();
 #endif
 			}
-
-			// This call to Application.Shutdown brackets the Application.Init call
-			// for the main UI Catalog app (in SelectScenario()).
-			//Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
 			// This proves that when the user exited the UI Catalog app
@@ -291,12 +289,9 @@ namespace UICatalog {
 			_categoryListView.SelectedItem = _cachedCategoryIndex;
 			_scenarioListView.SelectedItem = _cachedScenarioIndex;
 
-			// Run UI Catalog UI. When it exits, if _runningScenario is != null then
+			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Run (Application.Top);
-
-			// BUGBUG: Shouldn't Application.Shutdown() be called here? Why is it currently
-			// outside of the SelectScenario() loop?
 			Application.Shutdown ();
 
 			return _selectedScenario;
@@ -304,7 +299,7 @@ namespace UICatalog {
 
 
 		/// <summary>
-		/// Launches the selected scenario, setting the global _runningScenario
+		/// Launches the selected scenario, setting the global _selectedScenario
 		/// </summary>
 		/// <param name="e"></param>
 		private static void _scenarioListView_OpenSelectedItem (EventArgs e)
@@ -504,12 +499,6 @@ namespace UICatalog {
 			return menuItems.ToArray ();
 		}
 
-		/// <summary>
-		/// When Scenarios are running we need to override the behavior of the Menu 
-		/// and Statusbar to enable Scenarios that use those (or related key input)
-		/// to not be impacted. Same as for tabs.
-		/// </summary>
-		/// <param name="ke"></param>
 		private static void KeyDownHandler (View.KeyEventEventArgs a)
 		{
 			if (a.KeyEvent.IsCapslock) {
