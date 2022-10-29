@@ -442,10 +442,13 @@ namespace Terminal.Gui {
 					// BUGBUG: If items change this needs to be recreated.
 					navigator = new SearchCollectionNavigator (source.ToList ().Cast<object> ());
 				}
-				SelectedItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
-				EnsuresVisibilitySelectedItem ();
-				SetNeedsDisplay ();
-				return true;
+				var newItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
+				if (newItem != SelectedItem) {
+					SelectedItem = newItem;
+					EnsuresVisibilitySelectedItem ();
+					SetNeedsDisplay ();
+					return true;
+				}
 			}
 
 			return false;
@@ -741,7 +744,7 @@ namespace Terminal.Gui {
 
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
-				OnSelectedChanged ();
+				//OnSelectedChanged ();
 			}
 
 			return base.OnEnter (view);

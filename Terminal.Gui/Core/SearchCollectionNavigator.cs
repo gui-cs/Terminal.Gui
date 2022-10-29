@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 		public int CalculateNewIndex (IEnumerable<object> collection, int currentIndex, char keyStruck)
 		{
 			// if user presses a key
-			if (true) {//char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck) || char.IsSymbol(keyStruck)) {
+			if (!char.IsControl(keyStruck)) {//char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck) || char.IsSymbol(keyStruck)) {
 
 				// maybe user pressed 'd' and now presses 'd' again.
 				// a candidate search is things that begin with "dd"
