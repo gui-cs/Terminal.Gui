@@ -164,7 +164,7 @@ namespace Terminal.Gui.Core {
 └──────────────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]
@@ -211,7 +211,7 @@ namespace Terminal.Gui.Core {
 └──────────────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]
@@ -274,7 +274,7 @@ namespace Terminal.Gui.Core {
  F1 Help                                                                        
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]
@@ -337,7 +337,7 @@ namespace Terminal.Gui.Core {
  F1 Help                                                                        
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]

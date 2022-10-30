@@ -1973,7 +1973,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is
 the    
 first  
@@ -2000,7 +2000,7 @@ line.
 
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 aaaa
 ", output);
 
@@ -2008,35 +2008,35 @@ aaaa
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 aaa
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 aa
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 a
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
-			GraphViewTests.AssertDriverContentsAre (@"
+			TestHelpers.AssertDriverContentsAre (@"
 
 ", output);
 		}
@@ -2055,7 +2055,7 @@ a
 			Application.Top.Add (tv);
 
 			tv.Redraw (tv.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is  
 the first
 line.    
@@ -2069,7 +2069,7 @@ line.
 			tv.CursorPosition = new Point (6, 2);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			tv.Redraw (tv.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is  
 the first
 line.    
@@ -5953,7 +5953,7 @@ line.
 			Assert.False (tv.WordWrap);
 			Assert.Equal (Point.Empty, tv.CursorPosition);
 			Assert.Equal (Point.Empty, cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -5963,7 +5963,7 @@ This is the second line.
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -5972,7 +5972,7 @@ This is the second line.
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -5991,7 +5991,7 @@ line.
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -6010,7 +6010,7 @@ line.
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (1, 3), tv.CursorPosition);
 			Assert.Equal (new Point (13, 0), cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -6029,7 +6029,7 @@ line.
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -6061,7 +6061,7 @@ line.
 
 			Assert.False (tv.WordWrap);
 			Assert.Equal (Point.Empty, tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -6071,7 +6071,7 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6081,14 +6081,14 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6118,7 +6118,7 @@ This is the second line.
 
 			Assert.True (tv.WordWrap);
 			Assert.Equal (Point.Empty, tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -6128,7 +6128,7 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6138,14 +6138,14 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6174,7 +6174,7 @@ This is the second line.
 
 			Assert.False (tv.WordWrap);
 			Assert.Equal (Point.Empty, tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -6184,7 +6184,7 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6194,14 +6194,14 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6231,7 +6231,7 @@ This is the second line.
 
 			Assert.True (tv.WordWrap);
 			Assert.Equal (Point.Empty, tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ", output);
@@ -6241,7 +6241,7 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6251,14 +6251,14 @@ This is the second line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ", output);
@@ -6295,7 +6295,7 @@ This is the second line.
 			((FakeDriver)Application.Driver).SetBufferSize (15, 15);
 			Application.Refresh ();
 			//this passes
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (
 			@"
 ┌─────────────┐
 │             │
@@ -6321,7 +6321,7 @@ This is the second line.
 			tv.InsertText ("\naaa\nbbb");
 			Application.Refresh ();
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (
+			TestHelpers.AssertDriverContentsWithFrameAre (
 			@"
 ┌─────────────┐
 │             │
@@ -6365,7 +6365,7 @@ This is the second line.
 			Application.Refresh ();
 
 			//this passes
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (
 			@"
 ┌─────────────┐
 │             │
@@ -6391,7 +6391,7 @@ This is the second line.
 			tv.InsertText ("\r\naaa\r\nbbb");
 			Application.Refresh ();
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (
+			TestHelpers.AssertDriverContentsWithFrameAre (
 			@"
 ┌─────────────┐
 │             │

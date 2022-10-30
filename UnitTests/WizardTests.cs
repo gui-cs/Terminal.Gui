@@ -127,7 +127,7 @@ namespace Terminal.Gui.Views {
 
 			var wizard = new Wizard (title) { Width = width, Height = height };
 			Application.End (Application.Begin (wizard));
-			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -164,7 +164,7 @@ namespace Terminal.Gui.Views {
 			var runstate = Application.Begin (wizard);
 			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 			Application.End (runstate);
 		}
 
@@ -231,7 +231,7 @@ namespace Terminal.Gui.Views {
 			wizard.AddStep (new Wizard.WizardStep ("ABCD"));
 
 			Application.End (Application.Begin (wizard));
-			GraphViewTests.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 		}
 
 		[Fact, AutoInitShutdown]

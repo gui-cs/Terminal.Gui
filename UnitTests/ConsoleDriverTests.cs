@@ -551,7 +551,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 10), pos);
 		}
 
@@ -581,7 +581,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 └──────────────────┘
 ";
 
-					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
 					Assert.True (dlg.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
@@ -598,7 +598,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 └──────────────────┘
 ";
 
-					pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
 					win.RequestStop ();
