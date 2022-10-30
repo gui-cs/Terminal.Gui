@@ -608,6 +608,7 @@ namespace Terminal.Gui {
 
 					if (newIndex != -1) {
 						SelectedObject = map.ElementAt (newIndex).Model;
+						EnsureVisible (selectedObject);
 						SetNeedsDisplay ();
 					}
 
