@@ -129,5 +129,17 @@ namespace Terminal.Gui {
 			lastKeystroke = DateTime.MinValue;
 
 		}
+
+		/// <summary>
+		/// Returns true if <paramref name="kb"/> is a searchable key
+		/// (e.g. letters, numbers etc) that is valid to pass to to this
+		/// class for search filtering
+		/// </summary>
+		/// <param name="kb"></param>
+		/// <returns></returns>
+		public static bool IsCompatibleKey (KeyEvent kb)
+		{
+			return !kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
+		}
 	}
 }

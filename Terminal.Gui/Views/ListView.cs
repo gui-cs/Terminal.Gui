@@ -438,7 +438,7 @@ namespace Terminal.Gui {
 			}
 
 			// Enable user to find & select an item by typing text
-			if (!kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock) {
+			if (SearchCollectionNavigator.IsCompatibleKey(kb)) {
 				if (navigator == null) {
 					navigator = new SearchCollectionNavigator (source.ToList ().Cast<object> ());
 				}

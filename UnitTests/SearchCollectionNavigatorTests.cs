@@ -3,25 +3,41 @@ using Xunit;
 
 namespace Terminal.Gui.Core {
 	public class SearchCollectionNavigatorTests {
+		static string [] simpleStrings = new string []{
+    "appricot", // 0
+    "arm",      // 1
+    "bat",      // 2
+    "batman",   // 3
+    "candle"    // 4
+  };
+		[Fact]
+		public void TestSearchCollectionNavigator_ShouldAcceptNegativeOne ()
+		{
+			var n = new SearchCollectionNavigator (simpleStrings);
+			
+			// Expect that index of -1 (i.e. no selection) should work correctly
+			// and select the first entry of the letter 'b'
+			Assert.Equal (2, n.CalculateNewIndex (-1, 'b'));
+		}
+		[Fact]
+		public void TestSearchCollectionNavigator_OutOfBoundsShouldBeIgnored()
+		{
+			var n = new SearchCollectionNavigator (simpleStrings);
+
+			// Expect saying that index 500 is the current selection should not cause
+			// error and just be ignored (treated as no selection)
+			Assert.Equal (2, n.CalculateNewIndex (500, 'b'));
+		}
 
 		[Fact]
 		public void TestSearchCollectionNavigator_Cycling ()
 		{
-			var strings = new string []{
-    "appricot",
-    "arm",
-    "bat",
-    "batman",
-    "candle"
-  };
-
-			var n = new SearchCollectionNavigator (strings);
+			var n = new SearchCollectionNavigator (simpleStrings);
 			Assert.Equal (2, n.CalculateNewIndex ( 0, 'b'));
 			Assert.Equal (3, n.CalculateNewIndex ( 2, 'b'));
 
 			// if 4 (candle) is selected it should loop back to bat
 			Assert.Equal (2, n.CalculateNewIndex ( 4, 'b'));
-
 		}
 
 
