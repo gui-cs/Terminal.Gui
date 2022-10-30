@@ -29,7 +29,7 @@ namespace Terminal.Gui.Views {
 
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
                ┌ Title ─────────────────────────────────────────┐
                │                    Message                     │
                │                                                │
@@ -71,7 +71,7 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
          ┌ About UI Catalog ──────────────────────────────────────────┐
          │             A comprehensive sample library for             │
          │                                                            │
@@ -110,7 +110,7 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                     ┌─────┐
                                     │Messa│
                                     │ ge  │
@@ -140,7 +140,7 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                   ┌ Title ──┐
                                   │ Message │
                                   │         │
@@ -170,7 +170,7 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
@@ -224,7 +224,7 @@ namespace Terminal.Gui.Views {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
-					GraphViewTests.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │

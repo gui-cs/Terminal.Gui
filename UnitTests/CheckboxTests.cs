@@ -84,7 +84,7 @@ namespace Terminal.Gui.Views {
 √ Test
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 6, 1), pos);
 		}
 
@@ -123,7 +123,7 @@ namespace Terminal.Gui.Views {
 ";
 
 			// Positive test
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			// Also Positive test
@@ -139,7 +139,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
@@ -153,7 +153,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.AutoSize = false;
@@ -169,7 +169,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Width = 19;
@@ -186,7 +186,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.AutoSize = true;
@@ -200,7 +200,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -240,7 +240,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
@@ -253,7 +253,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -294,7 +294,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
@@ -307,7 +307,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -364,7 +364,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 6), pos);
 
 			checkBox1.Checked = true;
@@ -383,7 +383,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 6), pos);
 		}
 
@@ -424,7 +424,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			checkBox.Checked = true;
@@ -437,7 +437,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -470,7 +470,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (checkBox.AutoSize);
 			checkBox.Text = "Check this out 你 changed";
@@ -484,7 +484,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -516,7 +516,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (checkBox.AutoSize);
 			checkBox.Text = "Check this out 你 changed";
@@ -530,7 +530,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 	}
 }

@@ -257,7 +257,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐      
 │12│13    
 │  └─────┐
@@ -268,7 +268,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
    ┌──┐   
  12│13│   
 ┌──┘  └──┐
@@ -282,7 +282,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───────┐ 
 │1234567│ 
 │       └►
@@ -293,7 +293,7 @@ namespace Terminal.Gui.Views {
 			tv.SelectedTab = tab2;
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐      
 │13│      
 ◄  └─────┐
@@ -307,7 +307,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───────┐ 
 │abcdefg│ 
 ◄       └┐
@@ -333,7 +333,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │12│13    
 │  └─────┐
 │hi      │
@@ -345,7 +345,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
  12│13│   
 ┌──┘  └──┐
 │hi2     │
@@ -360,7 +360,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │1234567│ 
 │       └►
 │hi      │
@@ -371,7 +371,7 @@ namespace Terminal.Gui.Views {
 			tv.SelectedTab = tab2;
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │13│      
 ◄  └─────┐
 │hi2     │
@@ -385,7 +385,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │abcdefg│ 
 ◄       └┐
 │hi2     │
@@ -403,7 +403,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐ 
 │T│ 
 │ └►
@@ -423,7 +423,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │T│ 
 │ └►
 │hi│
@@ -441,7 +441,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌┐ 
 ││ 
 │└►
@@ -461,7 +461,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ││ 
 │└►
 │h│
@@ -487,7 +487,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │  ┌─────┘
@@ -501,7 +501,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │       ┌►
@@ -512,7 +512,7 @@ namespace Terminal.Gui.Views {
 			tv.SelectedTab = tab2;
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 ◄  ┌─────┘
@@ -526,7 +526,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 ◄       ┌┘
@@ -552,7 +552,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │        │
@@ -564,7 +564,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
@@ -579,7 +579,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │        │
@@ -590,7 +590,7 @@ namespace Terminal.Gui.Views {
 			tv.SelectedTab = tab2;
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
@@ -604,7 +604,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
@@ -624,7 +624,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐
 │hi│
 │ ┌►
@@ -644,7 +644,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐
 │hi│
 │  │
@@ -664,7 +664,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐
 │h│
 │┌►
@@ -684,7 +684,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐
 │h│
 │ │
@@ -706,7 +706,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────┐              
 │Tab0│              
 │    └─────────────►
@@ -717,7 +717,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────┐    
 │Les Misérables│    
 ◄              └───┐
@@ -741,7 +741,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi                │
 │    ┌─────────────►
@@ -752,7 +752,7 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi2               │
 ◄              ┌───┘
