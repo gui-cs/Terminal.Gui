@@ -384,6 +384,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyUpHandler;
 		private CursorVisibility savedCursorVisibility;
