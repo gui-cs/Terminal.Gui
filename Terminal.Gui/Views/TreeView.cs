@@ -594,7 +594,7 @@ namespace Terminal.Gui {
 					// SearchCollectionNavigator then we need a new one to reflect the new exposed
 					// tree state
 					if (cachedLineMap == null || searchCollectionNavigator == null) {
-						 map = BuildLineMap ();
+						map = BuildLineMap ();
 						searchCollectionNavigator = new SearchCollectionNavigator (map.Select (b => AspectGetter (b.Model)).ToArray ());
 					}
 					else {
@@ -606,13 +606,12 @@ namespace Terminal.Gui {
 					var current = map.IndexOf (b => b.Model == SelectedObject);
 					var newIndex = searchCollectionNavigator.CalculateNewIndex (current, (char)keyEvent.KeyValue);
 
-					if (newIndex != -1) {
+					if (newIndex != current) {
 						SelectedObject = map.ElementAt (newIndex).Model;
 						EnsureVisible (selectedObject);
 						SetNeedsDisplay ();
+						return true;
 					}
-
-					return true;
 				}
 
 			} finally {

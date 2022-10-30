@@ -150,9 +150,9 @@ namespace UICatalog.Scenarios {
 			Top.Add (label);
 
 			_treeView = new TreeView () {
-				X = Pos.Right (_listView) + 2,
+				X = Pos.Right (_listView) + 1,
 				Y = Pos.Bottom (label),
-				Width = Dim.Percent (50) - 1,
+				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				ColorScheme = Colors.TopLevel
 			};
@@ -210,11 +210,12 @@ namespace UICatalog.Scenarios {
 			
 			items.Sort (StringComparer.OrdinalIgnoreCase);
 			var root = new TreeNode ("Alpha examples");
-			root.Children = items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode>().ToList ();
-			_treeView.AddObject (root);
+			//root.Children = items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode>().ToList ();
+			//_treeView.AddObject (root);
 			root = new TreeNode ("Non-Alpha examples");
 			root.Children = items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
 			_treeView.AddObject (root);
+			_treeView.ExpandAll ();
 		}
 		private void Quit ()
 		{
