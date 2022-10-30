@@ -169,7 +169,7 @@ namespace UICatalog {
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
+					new MenuItem ("_Quit", "Quit UI Catalog", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
@@ -178,7 +178,7 @@ namespace UICatalog {
 					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
 					new MenuItem ("_About...",
 						"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
-				})
+				}),
 			});
 
 			_leftPane = new FrameView ("Categories") {
@@ -318,7 +318,7 @@ namespace UICatalog {
 		{
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			var item = new MenuItem ();
-			item.Title = "_Disable/Enable Mouse";
+			item.Title = "_Disable Mouse";
 			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = Application.IsMouseDisabled;
@@ -334,7 +334,8 @@ namespace UICatalog {
 
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			var item = new MenuItem ();
-			item.Title = "Keybindings";
+			item.Title = "_Key Bindings";
+			item.Help = "Change which keys do what";
 			item.Action += () => {
 				var dlg = new KeyBindingsDialog ();
 				Application.Run (dlg);

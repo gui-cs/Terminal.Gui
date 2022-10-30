@@ -256,6 +256,22 @@ namespace Terminal.Gui {
 			currentAttribute = c;
 		}
 
+		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+		{
+			if (consoleKeyInfo.Key != ConsoleKey.Packet) {
+				return consoleKeyInfo;
+			}
+
+			var mod = consoleKeyInfo.Modifiers;
+			var shift = (mod & ConsoleModifiers.Shift) != 0;
+			var alt = (mod & ConsoleModifiers.Alt) != 0;
+			var control = (mod & ConsoleModifiers.Control) != 0;
+
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+
+			return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
+		}
+
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
 			switch (keyInfo.Key) {
@@ -263,6 +279,8 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			case ConsoleKey.Clear:
+				return MapKeyModifiers (keyInfo, Key.Clear);
 			case ConsoleKey.Home:
 				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
@@ -289,6 +307,8 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.DeleteChar);
 			case ConsoleKey.Insert:
 				return MapKeyModifiers (keyInfo, Key.InsertChar);
+			case ConsoleKey.PrintScreen:
+				return MapKeyModifiers (keyInfo, Key.PrintScreen);
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -318,6 +338,9 @@ namespace Terminal.Gui {
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
 				}
+				if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0) {
 						return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.A + delta));
@@ -335,8 +358,13 @@ namespace Terminal.Gui {
 				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
 					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
 				}
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+				if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
 					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				}
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+					}
 				}
 				return (Key)((uint)keyInfo.KeyChar);
 			}
@@ -384,12 +412,14 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyUpHandler;
 		private CursorVisibility savedCursorVisibility;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			this.keyDownHandler = keyDownHandler;
 			this.keyHandler = keyHandler;
 			this.keyUpHandler = keyUpHandler;
 
@@ -399,21 +429,29 @@ namespace Terminal.Gui {
 
 		void ProcessInput (ConsoleKeyInfo consoleKey)
 		{
-			keyModifiers = new KeyModifiers ();
-			var map = MapKey (consoleKey);
-			if (map == (Key)0xffffffff)
-				return;
-
-			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-				keyModifiers.Alt = true;
+			if (consoleKey.Key == ConsoleKey.Packet) {
+				consoleKey = FromVKPacketToKConsoleKeyInfo (consoleKey);
 			}
+			keyModifiers = new KeyModifiers ();
 			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
 				keyModifiers.Shift = true;
+			}
+			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+				keyModifiers.Alt = true;
 			}
 			if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Control)) {
 				keyModifiers.Ctrl = true;
 			}
+			var map = MapKey (consoleKey);
+			if (map == (Key)0xffffffff) {
+				if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				}
+				return;
+			}
 
+			keyDownHandler (new KeyEvent (map, keyModifiers));
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
 		}

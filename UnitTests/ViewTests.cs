@@ -2124,6 +2124,28 @@ Y
 		}
 
 		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Minimum_Size ()
+		{
+			var view = new View (new Rect (0, 0, 2, 2));
+
+			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+
+			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
+			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
+
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			var expected = @"
+┌┐
+└┘
+";
+
+			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 2, 2), pos);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void DrawFrame_With_Negative_Positions ()
 		{
 			var view = new View (new Rect (-1, 0, 8, 4));
@@ -2452,7 +2474,7 @@ Y
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.LayoutComplete += e => {
+			view.DrawContent += e => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
@@ -2500,7 +2522,7 @@ Y
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.LayoutComplete += e => {
+			view.DrawContent += e => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
@@ -3891,6 +3913,154 @@ This is a tes
 This is a tes
 This is a tes
 ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawContentComplete_Event_Is_Always_Called ()
+		{
+			var viewCalled = false;
+			var tvCalled = false;
+
+			var view = new View ("View") { Width = 10, Height = 10 };
+			view.DrawContentComplete += (e) => viewCalled = true;
+			var tv = new TextView () { Y = 11, Width = 10, Height = 10 };
+			tv.DrawContentComplete += (e) => tvCalled = true;
+
+			Application.Top.Add (view, tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (viewCalled);
+			Assert.True (tvCalled);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void KeyDown_And_KeyUp_Events_Must_Called_Before_OnKeyDown_And_OnKeyUp ()
+		{
+			var keyDown = false;
+			var keyPress = false;
+			var keyUp = false;
+
+			var view = new DerivedView ();
+			view.KeyDown += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (keyDown);
+				Assert.False (view.IsKeyDown);
+				e.Handled = true;
+				keyDown = true;
+			};
+			view.KeyPress += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (keyPress);
+				Assert.False (view.IsKeyPress);
+				e.Handled = true;
+				keyPress = true;
+			};
+			view.KeyUp += (e) => {
+				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.False (keyUp);
+				Assert.False (view.IsKeyUp);
+				e.Handled = true;
+				keyUp = true;
+			};
+
+			Application.Top.Add (view);
+
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Assert.True (view.CanFocus);
+
+			Application.Run ();
+			Application.Shutdown ();
+
+			Assert.True (keyDown);
+			Assert.True (keyPress);
+			Assert.True (keyUp);
+			Assert.False (view.IsKeyDown);
+			Assert.False (view.IsKeyPress);
+			Assert.False (view.IsKeyUp);
+		}
+
+		public class DerivedView : View {
+			public DerivedView ()
+			{
+				CanFocus = true;
+			}
+
+			public bool IsKeyDown { get; set; }
+			public bool IsKeyPress { get; set; }
+			public bool IsKeyUp { get; set; }
+
+			public override bool OnKeyDown (KeyEvent keyEvent)
+			{
+				IsKeyDown = true;
+				return true;
+			}
+
+			public override bool ProcessKey (KeyEvent keyEvent)
+			{
+				IsKeyPress = true;
+				return true;
+			}
+
+			public override bool OnKeyUp (KeyEvent keyEvent)
+			{
+				IsKeyUp = true;
+				return true;
+			}
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, false)]
+		[InlineData (true, true, false)]
+		[InlineData (true, true, true)]
+		public void KeyDown_And_KeyUp_Events_With_Only_Key_Modifiers (bool shift, bool alt, bool control)
+		{
+			var keyDown = false;
+			var keyPress = false;
+			var keyUp = false;
+
+			var view = new DerivedView ();
+			view.KeyDown += (e) => {
+				Assert.Equal (-1, e.KeyEvent.KeyValue);
+				Assert.Equal (shift, e.KeyEvent.IsShift);
+				Assert.Equal (alt, e.KeyEvent.IsAlt);
+				Assert.Equal (control, e.KeyEvent.IsCtrl);
+				Assert.False (keyDown);
+				Assert.False (view.IsKeyDown);
+				keyDown = true;
+			};
+			view.KeyPress += (e) => {
+				keyPress = true;
+			};
+			view.KeyUp += (e) => {
+				Assert.Equal (-1, e.KeyEvent.KeyValue);
+				Assert.Equal (shift, e.KeyEvent.IsShift);
+				Assert.Equal (alt, e.KeyEvent.IsAlt);
+				Assert.Equal (control, e.KeyEvent.IsCtrl);
+				Assert.False (keyUp);
+				Assert.False (view.IsKeyUp);
+				keyUp = true;
+			};
+
+			Application.Top.Add (view);
+
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', shift, alt, control));
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Assert.True (view.CanFocus);
+
+			Application.Run ();
+			Application.Shutdown ();
+
+			Assert.True (keyDown);
+			Assert.False (keyPress);
+			Assert.True (keyUp);
+			Assert.True (view.IsKeyDown);
+			Assert.False (view.IsKeyPress);
+			Assert.True (view.IsKeyUp);
 		}
 	}
 }

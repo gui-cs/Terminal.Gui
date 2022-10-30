@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Initialzies a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		public TabView () : base ()
 		{
@@ -182,7 +182,7 @@ namespace Terminal.Gui {
 
 			if (Style.ShowBorder) {
 
-				// How muc space do we need to leave at the bottom to show the tabs
+				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
@@ -347,8 +347,10 @@ namespace Terminal.Gui {
 				var maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
 
 				// if tab view is width <= 3 don't render any tabs
-				if (maxWidth == 0)
-					yield break;
+				if (maxWidth == 0) {
+					yield return new TabToRender (i, tab, string.Empty, Equals (SelectedTab, tab), 0);
+					break;
+				}
 
 				if (tabTextWidth > maxWidth) {
 					text = tab.Text.ToString ().Substring (0, (int)maxWidth);
@@ -412,7 +414,7 @@ namespace Terminal.Gui {
 
 			// if the currently selected tab is no longer a member of Tabs
 			if (SelectedTab == null || !Tabs.Contains (SelectedTab)) {
-				// select the tab closest to the one that disapeared
+				// select the tab closest to the one that disappeared
 				var toSelect = Math.Max (idx - 1, 0);
 
 				if (toSelect < Tabs.Count) {
@@ -657,7 +659,7 @@ namespace Terminal.Gui {
 					Driver.AddRune (Driver.LeftArrow);
 				}
 
-				// if there are mmore tabs to the right not visible
+				// if there are more tabs to the right not visible
 				if (ShouldDrawRightScrollIndicator (tabLocations)) {
 					Move (width - 1, y);
 

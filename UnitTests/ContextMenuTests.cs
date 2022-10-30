@@ -519,38 +519,38 @@ namespace Terminal.Gui.Core {
 
 			Application.Top.Add (menu);
 
-			Assert.Null (Application.mouseGrabView);
+			Assert.Null (Application.MouseGrabView);
 
 			cm.Show ();
 			Assert.True (ContextMenu.IsShow);
-			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.False (ContextMenu.IsShow);
-			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
 
 			cm.Show ();
 			Assert.True (ContextMenu.IsShow);
-			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
 			Assert.False (menu.OnKeyDown (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.OnKeyUp (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
 			Assert.False (ContextMenu.IsShow);
-			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
 
 			cm.Show ();
 			Assert.True (ContextMenu.IsShow);
-			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
 			Assert.False (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (ContextMenu.IsShow);
-			Assert.Equal (cm.MenuBar, Application.mouseGrabView);
+			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
 			Assert.False (ContextMenu.IsShow);
-			Assert.Equal (menu, Application.mouseGrabView);
+			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
 		}
 
@@ -592,7 +592,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                   
+ File  Edit                     
                                 
                                 
   Label: TextField              
@@ -612,7 +612,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 32, 17), pos);
+			Assert.Equal (new Rect (1, 0, 32, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -656,7 +656,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                               
+ File  Edit                                 
 ┌ Window ──────────────────────────────────┐
 │                                          │
 │                                          │
@@ -676,7 +676,7 @@ namespace Terminal.Gui.Core {
 ";
 
 			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 44, 17), pos);
+			Assert.Equal (new Rect (1, 0, 44, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -887,6 +887,20 @@ namespace Terminal.Gui.Core {
 │ SubMenu6  │    │
 │ SubMenu7  │────┘
 ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Key_Open_And_Close_The_ContextMenu ()
+		{
+			var tf = new TextField ();
+			var top = Application.Top;
+			top.Add (tf);
+			Application.Begin (top);
+
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
+			Assert.True (top.Subviews [1].ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 	}
 }

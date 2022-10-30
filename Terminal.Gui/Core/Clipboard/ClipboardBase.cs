@@ -92,7 +92,8 @@ namespace Terminal.Gui {
 			try {
 				SetClipboardDataImpl (text);
 				return true;
-			} catch (Exception) {
+			} catch (Exception ex) {
+				System.Diagnostics.Debug.WriteLine ($"TrySetClipboardData: {ex.Message}");
 				return false;
 			}
 		}
