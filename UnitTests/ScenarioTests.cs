@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui {
+namespace UICatalog {
 	public class ScenarioTests {
 		readonly ITestOutputHelper output;
 
