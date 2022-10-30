@@ -8,11 +8,9 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Search Collection Nav", Description: "Demonstrates & tests SearchCollectionNavigator.")]
 	[ScenarioCategory ("Controls"), ScenarioCategory ("ListView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Text")]
 	public class SearchCollectionNavigatorTester : Scenario {
-		TabView tabView;
-
-		private int numbeOfNewTabs = 1;
-
 		// Don't create a Window, just return the top-level view
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -55,6 +53,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill ()
 			};
 			Top.Add (vsep);
+			CreateTreeView ();
 
 		}
 
@@ -136,7 +135,7 @@ namespace UICatalog.Scenarios {
 			_listView.SetSource (items);
 		}
 
-		TreeView<string> _treeView = null;
+		TreeView _treeView = null;
 
 		private void CreateTreeView ()
 		{
@@ -150,7 +149,7 @@ namespace UICatalog.Scenarios {
 			};
 			Top.Add (label);
 
-			_treeView = new TreeView<string> () {
+			_treeView = new TreeView () {
 				X = Pos.Right (_listView) + 2,
 				Y = Pos.Bottom (label),
 				Width = Dim.Percent (50) - 1,
@@ -159,7 +158,8 @@ namespace UICatalog.Scenarios {
 			};
 			Top.Add (_treeView);
 
-			System.Collections.Generic.List<string> items = new string [] {                         "a",
+			System.Collections.Generic.List<string> items = new string [] {                         
+				"a",
 				"b",
 				"bb",
 				"c",
@@ -207,8 +207,14 @@ namespace UICatalog.Scenarios {
 				"quit",
 				"quitter"
 			}.ToList<string> ();
+			
 			items.Sort (StringComparer.OrdinalIgnoreCase);
-			_treeView.AddObjects (items);
+			var root = new TreeNode ("Alpha examples");
+			root.Children = items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode>().ToList ();
+			_treeView.AddObject (root);
+			root = new TreeNode ("Non-Alpha examples");
+			root.Children = items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
+			_treeView.AddObject (root);
 		}
 		private void Quit ()
 		{
