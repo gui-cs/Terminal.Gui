@@ -126,6 +126,7 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
+				navigator = null;
 				top = 0;
 				selected = 0;
 				lastSelectedItem = -1;
@@ -439,7 +440,6 @@ namespace Terminal.Gui {
 			// Enable user to find & select an item by typing text
 			if (!kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock) {
 				if (navigator == null) {
-					// BUGBUG: If items change this needs to be recreated.
 					navigator = new SearchCollectionNavigator (source.ToList ().Cast<object> ());
 				}
 				var newItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
@@ -744,7 +744,7 @@ namespace Terminal.Gui {
 
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
-				//OnSelectedChanged ();
+				OnSelectedChanged ();
 			}
 
 			return base.OnEnter (view);
