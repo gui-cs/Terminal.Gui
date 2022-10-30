@@ -140,12 +140,12 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
 
-		
+
 		/// <summary>
 		/// Delegate for multi colored tree views.  Return the <see cref="ColorScheme"/> to use
 		/// for each passed object or null to use the default.
 		/// </summary>
-		public Func<T,ColorScheme> ColorGetter {get;set;}
+		public Func<T, ColorScheme> ColorGetter { get; set; }
 
 		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
@@ -220,6 +220,7 @@ namespace Terminal.Gui {
 		public AspectGetterDelegate<T> AspectGetter { get; set; } = (o) => o.ToString () ?? "";
 
 		CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
+		private SearchCollectionNavigator searchCollectionNavigator;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the tree is focused.
@@ -227,7 +228,7 @@ namespace Terminal.Gui {
 		/// Defaults to <see cref="CursorVisibility.Invisible"/>
 		/// </summary>
 		public CursorVisibility DesiredCursorVisibility {
-			get { 
+			get {
 				return MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
 			}
 			set {
@@ -576,19 +577,43 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			// if it is a single character pressed without any control keys
-			if (keyEvent.KeyValue > 0 && keyEvent.KeyValue < 0xFFFF) {
+			try {
 
-				if (char.IsLetterOrDigit ((char)keyEvent.KeyValue) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl) {
-					AdjustSelectionToNextItemBeginningWith ((char)keyEvent.KeyValue);
+				// First of all deal with any registered keybindings
+				var result = InvokeKeybindings (keyEvent);
+				if (result != null) {
+					return (bool)result;
+				}
+
+				// If not a keybinding, is the key a searchable key press?
+				if (SearchCollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
+
+					IReadOnlyCollection<Branch<T>> map;
+
+					// If there has been a call to InvalidateMap since the last time we allocated a 
+					// SearchCollectionNavigator then we need a new one to reflect the new exposed
+					// tree state
+					if (cachedLineMap == null || searchCollectionNavigator == null) {
+						 map = BuildLineMap ();
+						searchCollectionNavigator = new SearchCollectionNavigator (map.Select (b => AspectGetter (b.Model)).ToArray ());
+					}
+					else {
+						// we still need the map, handily its the cached one which means super fast access
+						map = BuildLineMap ();
+					}
+					
+					// Find the current selected object within the tree
+					var current = map.IndexOf (b => b.Model == SelectedObject);
+					var newIndex = searchCollectionNavigator.CalculateNewIndex (current, (char)keyEvent.KeyValue);
+
+					if (newIndex != -1) {
+						SelectedObject = map.ElementAt (newIndex).Model;
+						SetNeedsDisplay ();
+					}
+
 					return true;
 				}
-			}
 
-			try {
-				var result = InvokeKeybindings (keyEvent);
-				if (result != null)
-					return (bool)result;
 			} finally {
 
 				PositionCursor ();
@@ -626,7 +651,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="toFind"></param>
 		/// <returns></returns>
-		public int? GetObjectRow(T toFind)
+		public int? GetObjectRow (T toFind)
 		{
 			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
 
