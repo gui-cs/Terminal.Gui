@@ -196,13 +196,13 @@ namespace Terminal.Gui.Views {
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.False (sv.ShowHorizontalScrollIndicator);
 			Assert.False (sv.ShowVerticalScrollIndicator);
-			GraphViewTests.AssertDriverContentsWithFrameAre ("", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
 			sv.AutoHideScrollBars = false;
 			sv.ShowHorizontalScrollIndicator = true;
 			sv.ShowVerticalScrollIndicator = true;
 			sv.Redraw (sv.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ┬
          │
@@ -233,7 +233,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ┬
          ┴
@@ -267,7 +267,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ░
          ░

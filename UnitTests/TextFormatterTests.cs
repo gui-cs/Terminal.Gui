@@ -2190,7 +2190,7 @@ namespace Terminal.Gui.Core {
 └───┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
@@ -2229,7 +2229,7 @@ namespace Terminal.Gui.Core {
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
@@ -2270,7 +2270,7 @@ namespace Terminal.Gui.Core {
 └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
@@ -2310,7 +2310,7 @@ namespace Terminal.Gui.Core {
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
@@ -3059,7 +3059,7 @@ namespace Terminal.Gui.Core {
 Demo Simple Rune
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 16, 1), pos);
 		}
 
@@ -3096,7 +3096,7 @@ n
 e
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 1, 16), pos);
 		}
 
@@ -3114,7 +3114,7 @@ e
 デモエムポンズ
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 14, 1), pos);
 		}
 
@@ -3140,7 +3140,7 @@ e
 ズ
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 2, 7), pos);
 		}
 
@@ -3169,7 +3169,7 @@ e
 ズ
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 2, 7), pos);
 		}
 
@@ -3208,7 +3208,7 @@ e
 └────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 		}
 
@@ -3263,7 +3263,7 @@ e
 └───────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
 		}
 
@@ -3302,7 +3302,7 @@ e
 └─────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 		}
 
@@ -3361,7 +3361,7 @@ e
 └───────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 		}
 
@@ -3385,7 +3385,7 @@ e
 
 			tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This view needs to be cleared before rewritten.                        
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       
@@ -3400,7 +3400,7 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
 			tf2.Text = "This TextFormatter (tf2) is rewritten.";
 			tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This view is rewritten.                                                
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 
@@ -3502,7 +3502,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3520,7 +3520,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3555,7 +3555,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3574,7 +3574,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3610,7 +3610,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3629,7 +3629,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3666,7 +3666,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3685,7 +3685,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3720,7 +3720,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3739,7 +3739,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3775,7 +3775,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
 			text = "0123456789";
@@ -3794,7 +3794,7 @@ This TextFormatter (tf2) is rewritten.
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 4), pos);
 		}
 
@@ -3837,7 +3837,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 
 			text = "0123456789";
@@ -3862,7 +3862,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
 
@@ -3904,7 +3904,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 
 			text = "0123456789";
@@ -3929,7 +3929,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
 
@@ -3972,7 +3972,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 
 			text = "0123456789";
@@ -3997,7 +3997,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
 
@@ -4039,7 +4039,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 
 			text = "0123456789";
@@ -4064,7 +4064,7 @@ This TextFormatter (tf2) is rewritten.
 └──┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 4, 10), pos);
 		}
 

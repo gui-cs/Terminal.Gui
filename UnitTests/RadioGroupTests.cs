@@ -99,7 +99,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			rg.DisplayMode = DisplayModeLayout.Horizontal;
@@ -120,7 +120,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 			rg.HorizontalSpace = 4;
@@ -140,7 +140,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
