@@ -7,7 +7,6 @@ namespace UICatalog.Scenarios {
 	public class BordersComparisons : Scenario {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
-			top.Dispose ();
 			Application.Init ();
 
 			top = Application.Top;

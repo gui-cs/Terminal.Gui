@@ -11,19 +11,9 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 
 			Top.ColorScheme = Colors.Base;
-			//Win = new TopLevel($"CTRL-Q to Close - Scenario: {GetName ()}") {
-			//	X = 0,
-			//	Y = 0,
-			//	Width = Dim.Fill (),
-			//	Height = Dim.Fill ()
-			//};
-			//Top.Add (Win);
 		}
 
 		public override void Setup ()
