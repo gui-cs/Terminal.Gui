@@ -29,7 +29,13 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class ScrollView : View {
-		View contentView = null;
+		private class ContentView : View {
+			public ContentView (Rect frame) : base (frame)
+			{
+			}
+		}
+
+		ContentView contentView;
 		ScrollBarView vertical, horizontal;
 
 		/// <summary>
@@ -52,7 +58,7 @@ namespace Terminal.Gui {
 
 		void Initialize (Rect frame)
 		{
-			contentView = new View (frame);
+			contentView = new ContentView (frame);
 			vertical = new ScrollBarView (1, 0, isVertical: true) {
 				X = Pos.AnchorEnd (1),
 				Y = 0,
@@ -177,6 +183,12 @@ namespace Terminal.Gui {
 			set {
 				if (autoHideScrollBars != value) {
 					autoHideScrollBars = value;
+					if (Subviews.Contains (vertical)) {
+						vertical.AutoHideScrollBars = value;
+					}
+					if (Subviews.Contains (horizontal)) {
+						horizontal.AutoHideScrollBars = value;
+					}
 					SetNeedsDisplay ();
 				}
 			}
@@ -251,6 +263,8 @@ namespace Terminal.Gui {
 				SetNeedsLayout ();
 				if (value) {
 					base.Add (horizontal);
+					horizontal.ShowScrollIndicator = value;
+					horizontal.AutoHideScrollBars = autoHideScrollBars;
 					horizontal.OtherScrollBarView = vertical;
 					horizontal.OtherScrollBarView.ShowScrollIndicator = value;
 					horizontal.MouseEnter += View_MouseEnter;
@@ -290,6 +304,8 @@ namespace Terminal.Gui {
 				SetNeedsLayout ();
 				if (value) {
 					base.Add (vertical);
+					vertical.ShowScrollIndicator = value;
+					vertical.AutoHideScrollBars = autoHideScrollBars;
 					vertical.OtherScrollBarView = horizontal;
 					vertical.OtherScrollBarView.ShowScrollIndicator = value;
 					vertical.MouseEnter += View_MouseEnter;
@@ -322,10 +338,12 @@ namespace Terminal.Gui {
 				ShowHideScrollBars ();
 			} else {
 				if (ShowVerticalScrollIndicator) {
+					vertical.SetRelativeLayout (Bounds);
 					vertical.Redraw (vertical.Bounds);
 				}
 
 				if (ShowHorizontalScrollIndicator) {
+					horizontal.SetRelativeLayout (Bounds);
 					horizontal.Redraw (horizontal.Bounds);
 				}
 			}

@@ -1002,7 +1002,7 @@ namespace Terminal.Gui.Core {
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
 					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
 					if (count < 20) {
@@ -1148,7 +1148,7 @@ namespace Terminal.Gui.Core {
 			field.KeyDown += (k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-					var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expecteds [count], output);
+					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
 					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
 					if (count > 0) {
