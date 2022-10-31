@@ -2173,7 +2173,7 @@ namespace Terminal.Gui {
 
 			var r = new Rect (actX, actY, actW, actH);
 			if (Frame != r) {
-				Frame = new Rect (actX, actY, actW, actH);
+				Frame = r;
 				if (!SetMinWidthHeight ())
 					TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
