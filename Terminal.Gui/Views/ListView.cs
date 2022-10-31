@@ -691,7 +691,6 @@ namespace Terminal.Gui {
 
 		int lastSelectedItem = -1;
 		private bool allowsMultipleSelection = true;
-		private System.Timers.Timer searchTimer;
 
 		/// <summary>
 		/// Invokes the <see cref="SelectedItemChanged"/> event if it is defined.

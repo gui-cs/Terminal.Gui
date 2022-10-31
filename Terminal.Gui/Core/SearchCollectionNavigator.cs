@@ -140,8 +140,8 @@ namespace Terminal.Gui {
 		public static bool IsCompatibleKey (KeyEvent kb)
 		{
 			// For some reason, at least on Windows/Windows Terminal, `$` is coming through with `IsAlt == true`
-			//return !kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
-			return !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
+			return !kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
+			//return !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
 		}
 	}
 }

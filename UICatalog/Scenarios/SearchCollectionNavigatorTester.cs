@@ -19,6 +19,59 @@ namespace UICatalog.Scenarios {
 			Top.ColorScheme = Colors.Base;
 		}
 
+		System.Collections.Generic.List<string> _items = new string [] {
+				"a",
+				"b",
+				"bb",
+				"c",
+				"ccc",
+				"ccc",
+				"cccc",
+				"ddd",
+				"dddd",
+				"dddd",
+				"ddddd",
+				"dddddd",
+				"ddddddd",
+				"this",
+				"this is a test",
+				"this was a test",
+				"this and",
+				"that and that",
+				"the",
+				"think",
+				"thunk",
+				"thunks",
+				"zip",
+				"zap",
+				"zoo",
+				"@jack",
+				"@sign",
+				"@at",
+				"@ateme",
+				"n@",
+				"n@brown",
+				".net",
+				"$100.00",
+				"$101.00",
+				"$101.10",
+				"$101.11",
+				"$200.00",
+				"$210.99",
+				"$$",
+				"appricot",
+				"arm",
+				"丗丙业丞",
+				"丗丙丛",
+				"text",
+				"egg",
+				"candle",
+				" <- space",
+				"q",
+				"quit",
+				"quitter"
+			}.ToList<string> ();
+
 		public override void Setup ()
 		{
 			var allowMarking = new MenuItem ("Allow _Marking", "", null) {
@@ -45,6 +98,8 @@ namespace UICatalog.Scenarios {
 			});
 
 			Top.Add (menu);
+
+			_items.Sort (StringComparer.OrdinalIgnoreCase);
 
 			CreateListView ();
 			var vsep = new LineView (Terminal.Gui.Graphs.Orientation.Vertical) {
@@ -81,58 +136,8 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel
 			};
 			Top.Add (_listView);
-
-			System.Collections.Generic.List<string> items = new string [] {
-				"a",
-				"b",
-				"bb",
-				"c",
-				"ccc",
-				"ccc",
-				"cccc",
-				"ddd",
-				"dddd",
-				"dddd",
-				"ddddd",
-				"dddddd",
-				"ddddddd",
-				"this",
-				"this is a test",
-				"this was a test",
-				"this and",
-				"that and that",
-				"the",
-				"think",
-				"thunk",
-				"thunks",
-				"zip",
-				"zap",
-				"zoo",
-				"@jack",
-				"@sign",
-				"@at",
-				"@ateme",
-				"n@",
-				"n@brown",
-				".net",
-				"$100.00",
-				"$101.00",
-				"$101.10",
-				"$101.11",
-				"appricot",
-				"arm",
-				"丗丙业丞",
-				"丗丙丛",
-				"text",
-				"egg",
-				"candle",
-				" <- space",
-				"q",
-				"quit",
-				"quitter"
-			}.ToList<string> ();
-			items.Sort (StringComparer.OrdinalIgnoreCase);
-			_listView.SetSource (items);
+			
+			_listView.SetSource (_items);
 		}
 
 		TreeView _treeView = null;
@@ -157,63 +162,12 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel
 			};
 			Top.Add (_treeView);
-
-			System.Collections.Generic.List<string> items = new string [] {                         
-				"a",
-				"b",
-				"bb",
-				"c",
-				"ccc",
-				"ccc",
-				"cccc",
-				"ddd",
-				"dddd",
-				"dddd",
-				"ddddd",
-				"dddddd",
-				"ddddddd",
-				"this",
-				"this is a test",
-				"this was a test",
-				"this and",
-				"that and that",
-				"the",
-				"think",
-				"thunk",
-				"thunks",
-				"zip",
-				"zap",
-				"zoo",
-				"@jack",
-				"@sign",
-				"@at",
-				"@ateme",
-				"n@",
-				"n@brown",
-				".net",
-				"$100.00",
-				"$101.00",
-				"$101.10",
-				"$101.11",
-				"appricot",
-				"arm",
-				"丗丙业丞",
-				"丗丙丛",
-				"text",
-				"egg",
-				"candle",
-				" <- space",
-				"q",
-				"quit",
-				"quitter"
-			}.ToList<string> ();
 			
-			items.Sort (StringComparer.OrdinalIgnoreCase);
 			var root = new TreeNode ("Alpha examples");
 			//root.Children = items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode>().ToList ();
 			//_treeView.AddObject (root);
 			root = new TreeNode ("Non-Alpha examples");
-			root.Children = items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
+			root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
 			_treeView.AddObject (root);
 			_treeView.ExpandAll ();
 		}
