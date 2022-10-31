@@ -27,9 +27,23 @@
       "commandName": "Project",
       "commandLineArgs": "\"ProgressBar Styles\""
     },
-    "SearchCollectionNavTester": {
+    "VkeyPacketSimulator": {
       "commandName": "Project",
-      "commandLineArgs": "\"Search Collection Nav\""
+      "commandLineArgs": "VkeyPacketSimulator"
+    },
+    "WSL2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll"
+    },
+    "WSL2 : -usc": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll -usc"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
     }
   }
 }
