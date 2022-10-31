@@ -43,12 +43,14 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
+			var fileMenu = new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Open CSV", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
-					new MenuItem ("_Quit", "", () => Quit()),
-				}),
+					new MenuItem ("_Quit", "Quits The App", () => Quit()),
+				});
+			//fileMenu.Help = "Help";
+			var menu = new MenuBar (new MenuBarItem [] {
+				fileMenu,
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_New Column", "", () => AddColumn()),
 					new MenuItem ("_New Row", "", () => AddRow()),

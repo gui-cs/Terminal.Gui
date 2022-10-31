@@ -29,7 +29,7 @@ namespace Terminal.Gui.Views {
 			var expected = @"
 [  ]
 ";
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Application.End (rs);
 			btn = new Button ("ARGS", true) { Text = "Test" };
@@ -47,7 +47,7 @@ namespace Terminal.Gui.Views {
 			expected = @"
 [◦ Test ◦]
 ";
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Application.End (rs);
 			btn = new Button (3, 4, "Test", true);
@@ -65,7 +65,7 @@ namespace Terminal.Gui.Views {
 			expected = @"
    [◦ Test ◦]
 ";
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Application.End (rs);
 		}
@@ -235,7 +235,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -273,7 +273,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
@@ -310,7 +310,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -342,7 +342,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (btn.AutoSize);
 			btn.Text = "Say Hello 你 changed";
@@ -356,7 +356,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -389,7 +389,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (btn.AutoSize);
 			btn.Text = "Say Hello 你 changed";
@@ -403,7 +403,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -520,7 +520,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -550,7 +550,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -582,7 +582,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 	}
 }

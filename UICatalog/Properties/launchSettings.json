@@ -27,6 +27,10 @@
       "commandName": "Project",
       "commandLineArgs": "\"ProgressBar Styles\""
     },
+    "VkeyPacketSimulator": {
+      "commandName": "Project",
+      "commandLineArgs": "VkeyPacketSimulator"
+    },
     "WSL2": {
       "commandName": "Executable",
       "executablePath": "wsl",

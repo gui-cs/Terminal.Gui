@@ -247,7 +247,7 @@ namespace Terminal.Gui.Views {
 			Application.Refresh ();
 
 			Assert.Equal (0, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -264,7 +264,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.ScrollDown (10));
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (0, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -281,7 +281,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveDown ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (1, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line1     │
 │Line2     │
@@ -298,7 +298,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveEnd ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (19, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line19    │
 │          │
@@ -315,7 +315,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.ScrollUp (20));
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (19, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -332,7 +332,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveDown ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (19, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -349,7 +349,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.ScrollUp (20));
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (19, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -366,7 +366,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveDown ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (19, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -383,7 +383,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveHome ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (0, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -400,7 +400,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.ScrollDown (20));
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (0, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line19    │
 │          │
@@ -417,7 +417,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (lv.MoveUp ());
 			lv.Redraw (lv.Bounds);
 			Assert.Equal (0, lv.SelectedItem);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────┐
 │Line0     │
 │Line1     │

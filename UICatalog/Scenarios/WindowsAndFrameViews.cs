@@ -10,10 +10,7 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 		}
 
 		public override void RequestStop ()
