@@ -73,14 +73,11 @@ namespace UICatalog {
 		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init(Toplevel top, ColorScheme colorScheme)
+		public virtual void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 
 			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
@@ -177,7 +174,14 @@ namespace UICatalog {
 		/// <returns>list of category names</returns>
 		public List<string> GetCategories () => ScenarioCategory.GetCategories (this.GetType ());
 
-		public override string ToString () => $"{GetName (),-30}{GetDescription ()}";
+		private static int _maxScenarioNameLen = 30;
+
+		/// <summary>
+		/// Gets the Scenario Name + Description with the Description padded
+		/// based on the longest known Scenario name.
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString () => $"{GetName ().PadRight(_maxScenarioNameLen)}{GetDescription ()}";
 
 		/// <summary>
 		/// Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...). 
@@ -232,12 +236,14 @@ namespace UICatalog {
 		/// Returns an instance of each <see cref="Scenario"/> defined in the project. 
 		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
 		/// </summary>
-		public static List<Type> GetDerivedClasses<T> ()
+		public static List<Scenario> GetScenarios ()
 		{
-			List<Type> objects = new List<Type> ();
-			foreach (Type type in typeof (T).Assembly.GetTypes ()
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (T)))) {
-				objects.Add (type);
+			List<Scenario> objects = new List<Scenario> ();
+			foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
+			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
+				var scenario = (Scenario)Activator.CreateInstance (type);
+				objects.Add (scenario);
+				_maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
 			}
 			return objects;
 		}

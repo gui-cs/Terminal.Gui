@@ -737,7 +737,7 @@ namespace Terminal.Gui.Views {
 └───────────────────────────────────────────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 45, 20), pos);
 
 			textView.WordWrap = true;
@@ -774,7 +774,7 @@ namespace Terminal.Gui.Views {
 └────────────────────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 26, 20), pos);
 
 			((FakeDriver)Application.Driver).SetBufferSize (10, 10);
@@ -800,7 +800,7 @@ namespace Terminal.Gui.Views {
 └────────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 10), pos);
 		}
 
@@ -824,7 +824,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (sbv.Visible);
 			Assert.True (sbv.OtherScrollBarView.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬
 This is a tes┴
@@ -842,7 +842,7 @@ This is a tes▼
 			Assert.False (sbv.Visible);
 			Assert.False (sbv.OtherScrollBarView.Visible);
 			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test
 This is a test
 This is a test
@@ -860,7 +860,7 @@ This is a test
 			Assert.True (sbv.Visible);
 			Assert.True (sbv.OtherScrollBarView.Visible);
 			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬
 This is a tes┴
@@ -887,7 +887,7 @@ This is a tes▼
 			Assert.Null (sbv.OtherScrollBarView);
 			Assert.True (sbv.ShowScrollIndicator);
 			Assert.True (sbv.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬
 This is a tes┴
@@ -901,7 +901,7 @@ This is a tes▼
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
 			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test
 This is a test
 This is a test
@@ -930,7 +930,7 @@ This is a test
 			Assert.Null (sbv.OtherScrollBarView);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test[ Click Me! ]
 This is a test             
 This is a test             
@@ -957,7 +957,7 @@ This is a test
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.True (sbv.Visible);
 			Application.Top.Redraw (Application.Top.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test[ Click Me! ]
 This is a test             
 This is a test             
