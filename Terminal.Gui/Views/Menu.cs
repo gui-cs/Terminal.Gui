@@ -758,6 +758,7 @@ namespace Terminal.Gui {
 					return true;
 				var item = barItems.Children [meY];
 				if (item == null || !item.IsEnabled ()) disabled = true;
+				if (disabled) return true;
 				current = meY;
 				if (item != null && !disabled)
 					RunSelected ();
@@ -1074,7 +1075,7 @@ namespace Terminal.Gui {
 				if (i == selected && IsMenuOpen) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : GetNormalColor ();
-				} else { 
+				} else {
 					hotColor = ColorScheme.HotNormal;
 					normalColor = GetNormalColor ();
 				}
