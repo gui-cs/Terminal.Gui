@@ -78,9 +78,24 @@ namespace Terminal.Gui {
 		Null = '\0',
 
 		/// <summary>
+		/// Backspace key.
+		/// </summary>
+		Backspace = 8,
+
+		/// <summary>
+		/// The key code for the user pressing the tab key (forwards tab key).
+		/// </summary>
+		Tab = 9,
+
+		/// <summary>
 		/// The key code for the user pressing the return key.
 		/// </summary>
 		Enter = '\n',
+
+		/// <summary>
+		/// The key code for the user pressing the clear key.
+		/// </summary>
+		Clear = 12,
 
 		/// <summary>
 		/// The key code for the user pressing the escape key
@@ -364,14 +379,9 @@ namespace Terminal.Gui {
 		CtrlMask = 0x40000000,
 
 		/// <summary>
-		/// Backspace key.
-		/// </summary>
-		Backspace = 0x100000,
-
-		/// <summary>
 		/// Cursor up key
 		/// </summary>
-		CursorUp,
+		CursorUp = 0x100000,
 		/// <summary>
 		/// Cursor down key.
 		/// </summary>
@@ -393,21 +403,33 @@ namespace Terminal.Gui {
 		/// </summary>
 		PageDown,
 		/// <summary>
-		/// Home key
+		/// Home key.
 		/// </summary>
 		Home,
 		/// <summary>
-		/// End key
+		/// End key.
 		/// </summary>
 		End,
+
 		/// <summary>
-		/// Delete character key
-		/// </summary>
-		DeleteChar,
-		/// <summary>
-		/// Insert character key
+		/// Insert character key.
 		/// </summary>
 		InsertChar,
+
+		/// <summary>
+		/// Delete character key.
+		/// </summary>
+		DeleteChar,
+
+		/// <summary>
+		/// Shift-tab key (backwards tab key).
+		/// </summary>
+		BackTab,
+
+		/// <summary>
+		/// Print screen character key.
+		/// </summary>
+		PrintScreen,
 
 		/// <summary>
 		/// F1 key.
@@ -457,15 +479,54 @@ namespace Terminal.Gui {
 		/// F12 key.
 		/// </summary>
 		F12,
-
 		/// <summary>
-		/// The key code for the user pressing the tab key (forwards tab key).
+		/// F13 key.
 		/// </summary>
-		Tab,
+		F13,
 		/// <summary>
-		/// Shift-tab key (backwards tab key).
+		/// F14 key.
 		/// </summary>
-		BackTab,
+		F14,
+		/// <summary>
+		/// F15 key.
+		/// </summary>
+		F15,
+		/// <summary>
+		/// F16 key.
+		/// </summary>
+		F16,
+		/// <summary>
+		/// F17 key.
+		/// </summary>
+		F17,
+		/// <summary>
+		/// F18 key.
+		/// </summary>
+		F18,
+		/// <summary>
+		/// F19 key.
+		/// </summary>
+		F19,
+		/// <summary>
+		/// F20 key.
+		/// </summary>
+		F20,
+		/// <summary>
+		/// F21 key.
+		/// </summary>
+		F21,
+		/// <summary>
+		/// F22 key.
+		/// </summary>
+		F22,
+		/// <summary>
+		/// F23 key.
+		/// </summary>
+		F23,
+		/// <summary>
+		/// F24 key.
+		/// </summary>
+		F24,
 
 		/// <summary>
 		/// A key with an unknown mapping was raised.
@@ -480,7 +541,7 @@ namespace Terminal.Gui {
 		KeyModifiers keyModifiers;
 
 		/// <summary>
-		/// Symb olid definition for the key.
+		/// Symbolic definition for the key.
 		/// </summary>
 		public Key Key;
 
@@ -573,7 +634,7 @@ namespace Terminal.Gui {
 				msg += "Scrolllock-";
 			}
 
-			msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+			msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
 
 			return msg;
 		}
