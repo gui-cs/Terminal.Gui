@@ -348,7 +348,7 @@ namespace Terminal.Gui {
 				}
 				if (base.CanFocus != value) {
 					base.CanFocus = value;
-					
+
 					switch (value) {
 					case false when tabIndex > -1:
 						TabIndex = -1;
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 						SuperView.CanFocus = true;
 						break;
 					}
-					
+
 					if (value && tabIndex == -1) {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
@@ -881,10 +881,10 @@ namespace Terminal.Gui {
 				NeedDisplay = new Rect (x, y, w, h);
 			}
 			container?.SetChildNeedsDisplay ();
-			
+
 			if (subviews == null)
 				return;
-			
+
 			foreach (var view in subviews)
 				if (view.Frame.IntersectsWith (region)) {
 					var childRegion = Rect.Intersect (view.Frame, region);
@@ -1132,7 +1132,7 @@ namespace Terminal.Gui {
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
 			rcol = col + frame.X;
-			
+
 			var curContainer = container;
 			while (curContainer != null) {
 				rrow += curContainer.frame.Y;
@@ -1303,7 +1303,7 @@ namespace Terminal.Gui {
 		}
 
 		bool hasFocus;
-		
+
 		/// <inheritdoc/>
 		public override bool HasFocus => hasFocus;
 
@@ -1694,7 +1694,7 @@ namespace Terminal.Gui {
 				if (args.Handled)
 					return true;
 			}
-			
+
 			return Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true;
 		}
 
@@ -1870,7 +1870,7 @@ namespace Terminal.Gui {
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
-			
+
 			foreach (var view in subviews)
 				if (view.Enabled && view.ProcessHotKey (keyEvent))
 					return true;
@@ -1897,7 +1897,7 @@ namespace Terminal.Gui {
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
-			
+
 			foreach (var view in subviews)
 				if (view.Enabled && view.ProcessColdKey (keyEvent))
 					return true;
@@ -2043,7 +2043,7 @@ namespace Terminal.Gui {
 				FocusLast ();
 				return focused != null;
 			}
-			
+
 			var focusedIdx = -1;
 			for (var i = tabIndexes.Count; i > 0;) {
 				i--;
@@ -2153,20 +2153,8 @@ namespace Terminal.Gui {
 				actX = x.Anchor (hostFrame.Width - actW);
 			} else {
 				actX = x?.Anchor (hostFrame.Width) ?? 0;
-				
-				switch (width) {
-				case null:
-					actW = AutoSize ? s.Width : hostFrame.Width;
-					break;
-				case Dim.DimFactor factor when !factor.IsFromRemaining ():
-					actW = width.Anchor (hostFrame.Width);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-					break;
-				default:
-					actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-					break;
-				}
+
+				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
 			}
 
 			if (y is Pos.PosCenter) {
@@ -2179,28 +2167,76 @@ namespace Terminal.Gui {
 				actY = y.Anchor (hostFrame.Height - actH);
 			} else {
 				actY = y?.Anchor (hostFrame.Height) ?? 0;
-				
-				switch (height) {
-				case null:
-					actH = AutoSize ? s.Height : hostFrame.Height;
-					break;
-				case Dim.DimFactor factor when !factor.IsFromRemaining ():
-					actH = height.Anchor (hostFrame.Height);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
-					break;
-				default:
-					actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
-					break;
-				}
+
+				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
 			}
-			
+
 			var r = new Rect (actX, actY, actW, actH);
 			if (Frame != r) {
 				Frame = new Rect (actX, actY, actW, actH);
 				if (!SetMinWidthHeight ())
 					TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
+		}
+
+		private int CalculateActualWidth (Dim width, Rect hostFrame, int actX, Size s)
+		{
+			int actW;
+			switch (width) {
+			case null:
+				actW = AutoSize ? s.Width : hostFrame.Width;
+				break;
+			case Dim.DimCombine combine:
+				int leftActW = CalculateActualWidth (combine.left, hostFrame, actX, s);
+				int rightActW = CalculateActualWidth (combine.right, hostFrame, actX, s);
+				if (combine.add) {
+					actW = leftActW + rightActW;
+				} else {
+					actW = leftActW - rightActW;
+				}
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actW = width.Anchor (hostFrame.Width);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			default:
+				actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			}
+
+			return actW;
+		}
+
+		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
+		{
+			int actH;
+			switch (height) {
+			case null:
+				actH = AutoSize ? s.Height : hostFrame.Height;
+				break;
+			case Dim.DimCombine combine:
+				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
+				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
+				if (combine.add) {
+					actH = leftActH + rightActH;
+				} else {
+					actH = leftActH - rightActH;
+				}
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actH = height.Anchor (hostFrame.Height);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			default:
+				actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			}
+
+			return actH;
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
@@ -2326,7 +2362,6 @@ namespace Terminal.Gui {
 			{
 				switch (pos) {
 				case Pos.PosView pv:
-				{
 					if (pv.Target != this) {
 						nEdges.Add ((pv.Target, from));
 					}
@@ -2334,15 +2369,12 @@ namespace Terminal.Gui {
 						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
-				}
 				case Pos.PosCombine pc:
-				{
 					foreach (var v in from.InternalSubviews) {
 						CollectPos (pc.left, from, ref nNodes, ref nEdges);
 						CollectPos (pc.right, from, ref nNodes, ref nEdges);
 					}
 					break;
-				}
 				}
 			}
 
@@ -2350,7 +2382,6 @@ namespace Terminal.Gui {
 			{
 				switch (dim) {
 				case Dim.DimView dv:
-				{
 					if (dv.Target != this) {
 						nEdges.Add ((dv.Target, from));
 					}
@@ -2358,15 +2389,12 @@ namespace Terminal.Gui {
 						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
-				}
 				case Dim.DimCombine dc:
-				{
 					foreach (var v in from.InternalSubviews) {
 						CollectDim (dc.left, from, ref nNodes, ref nEdges);
 						CollectDim (dc.right, from, ref nNodes, ref nEdges);
 					}
 					break;
-				}
 				}
 			}
 
@@ -2759,14 +2787,14 @@ namespace Terminal.Gui {
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
 			public MouseEvent MouseEvent { get; set; }
-			
+
 			/// <summary>
 			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
 			/// <remarks>This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
 			/// backwards compatibility</remarks>
-			public bool Handled { 
+			public bool Handled {
 				get => MouseEvent.Handled;
 				set => MouseEvent.Handled = value;
 			}
@@ -2785,7 +2813,7 @@ namespace Terminal.Gui {
 
 			var args = new MouseEventArgs (mouseEvent);
 			MouseEnter?.Invoke (args);
-			
+
 			return args.Handled || base.OnMouseEnter (mouseEvent);
 		}
 
@@ -2802,7 +2830,7 @@ namespace Terminal.Gui {
 
 			var args = new MouseEventArgs (mouseEvent);
 			MouseLeave?.Invoke (args);
-			
+
 			return args.Handled || base.OnMouseLeave (mouseEvent);
 		}
 
@@ -2956,7 +2984,6 @@ namespace Terminal.Gui {
 				canSetHeight = !ForceValidatePosDim;
 				break;
 			case Dim.DimFactor factor:
-			{
 				// Tries to get the SuperView height otherwise the view height.
 				var sh = SuperView != null ? SuperView.Frame.Height : h;
 				if (factor.IsFromRemaining ()) {
@@ -2965,7 +2992,6 @@ namespace Terminal.Gui {
 				h = Height.Anchor (sh);
 				canSetHeight = !ForceValidatePosDim;
 				break;
-			}
 			default:
 				canSetHeight = true;
 				break;
