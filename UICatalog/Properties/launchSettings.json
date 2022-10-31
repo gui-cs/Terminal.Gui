@@ -26,6 +26,24 @@
     "Issue1719Repro": {
       "commandName": "Project",
       "commandLineArgs": "\"ProgressBar Styles\""
+    },
+    "VkeyPacketSimulator": {
+      "commandName": "Project",
+      "commandLineArgs": "VkeyPacketSimulator"
+    },
+    "WSL2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll"
+    },
+    "WSL2 : -usc": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll -usc"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
     }
   }
 }
