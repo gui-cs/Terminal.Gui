@@ -232,10 +232,11 @@ namespace Terminal.Gui {
 				return MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
 			}
 			set {
-				desiredCursorVisibility = value;
-
-				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+				if (desiredCursorVisibility != value) {
+					desiredCursorVisibility = value;
+					if (HasFocus) {
+						Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+					}
 				}
 			}
 		}
