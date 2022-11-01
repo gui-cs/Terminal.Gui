@@ -89,10 +89,9 @@ namespace Terminal.Gui.Trees {
 		public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
 		{
 			// true if the current line of the tree is the selected one and control has focus
-			bool isSelected = tree.IsSelected (Model) && tree.HasFocus;
-			Attribute lineColor = isSelected ? colorScheme.Focus : colorScheme.Normal;
-
-			driver.SetAttribute (lineColor);
+			bool isSelected = tree.IsSelected (Model);// && tree.HasFocus;
+			Attribute textColor = isSelected ? (tree.HasFocus ? colorScheme.HotFocus : colorScheme.HotNormal) : colorScheme.Normal ;
+			Attribute symbolColor = colorScheme.Normal;
 
 			// Everything on line before the expansion run and branch text
 			Rune [] prefix = GetLinePrefix (driver).ToArray ();
@@ -104,7 +103,8 @@ namespace Terminal.Gui.Trees {
 			// if we have scrolled to the right then bits of the prefix will have dispeared off the screen
 			int toSkip = tree.ScrollOffsetHorizontal;
 
-			// Draw the line prefix (all paralell lanes or whitespace and an expand/collapse/leaf symbol)
+			driver.SetAttribute (symbolColor);
+			// Draw the line prefix (all parallel lanes or whitespace and an expand/collapse/leaf symbol)
 			foreach (Rune r in prefix) {
 
 				if (toSkip > 0) {
@@ -117,12 +117,12 @@ namespace Terminal.Gui.Trees {
 
 			// pick color for expanded symbol
 			if (tree.Style.ColorExpandSymbol || tree.Style.InvertExpandSymbolColors) {
-				Attribute color;
+				Attribute color = symbolColor;
 
 				if (tree.Style.ColorExpandSymbol) {
 					color = isSelected ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal;
 				} else {
-					color = lineColor;
+					color = symbolColor;
 				}
 
 				if (tree.Style.InvertExpandSymbolColors) {
@@ -162,7 +162,7 @@ namespace Terminal.Gui.Trees {
 
 			// default behaviour is for model to use the color scheme
 			// of the tree view
-			var modelColor = lineColor;
+			var modelColor = textColor;
 
 			// if custom color delegate invoke it
 			if(tree.ColorGetter != null)
@@ -179,13 +179,11 @@ namespace Terminal.Gui.Trees {
 
 			driver.SetAttribute (modelColor);
 			driver.AddStr (lineBody);
-			driver.SetAttribute (lineColor);
+			driver.SetAttribute (colorScheme.Normal);
 
 			if (availableWidth > 0) {
 				driver.AddStr (new string (' ', availableWidth));
 			}
-
-			driver.SetAttribute (colorScheme.Normal);
 		}
 
 		/// <summary>
