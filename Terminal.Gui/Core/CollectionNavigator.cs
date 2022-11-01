@@ -12,7 +12,7 @@ namespace Terminal.Gui {
 	/// the search string is cleared and the next item is found that starts with the last keystroke.
 	/// </para>
 	/// <para>
-	/// If the user pauses keystrokes for a short time (250ms), the search string is cleared.
+	/// If the user pauses keystrokes for a short time (see <see cref="TypingDelay"/>), the search string is cleared.
 	/// </para>
 	/// </summary>
 	public class CollectionNavigator {
@@ -28,7 +28,11 @@ namespace Terminal.Gui {
 		public CollectionNavigator (IEnumerable<object> collection) => Collection = collection;
 
 		DateTime lastKeystroke = DateTime.Now;
-		internal int TypingDelay { get; set; } = 250;
+		/// <summary>
+		/// Gets or sets the number of milliseconds to delay before clearing the search string. The delay is
+		/// reset on each call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
+		/// </summary>
+		public int TypingDelay { get; set; } = 500;
 
 		/// <summary>
 		/// The compararer function to use when searching the collection.
@@ -67,7 +71,7 @@ namespace Terminal.Gui {
 		private string _searchString = "";
 		/// <summary>
 		/// Gets the current search string. This includes the set of keystrokes that have been pressed
-		/// since the last unsuccessful match or after a 250ms delay. Useful for debugging.
+		/// since the last unsuccessful match or after <see cref="TypingDelay"/>) milliseconds. Useful for debugging.
 		/// </summary>
 		public string SearchString {
 			get => _searchString;
