@@ -593,7 +593,7 @@ namespace Terminal.Gui {
 
 		internal class DimCombine : Dim {
 			internal Dim left, right;
-			bool add;
+			internal bool add;
 			public DimCombine (bool add, Dim left, Dim right)
 			{
 				this.left = left;
