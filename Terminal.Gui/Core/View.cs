@@ -2157,19 +2157,7 @@ namespace Terminal.Gui {
 			} else {
 				actX = x?.Anchor (hostFrame.Width) ?? 0;
 
-				switch (width) {
-				case null:
-					actW = AutoSize ? s.Width : hostFrame.Width;
-					break;
-				case Dim.DimFactor factor when !factor.IsFromRemaining ():
-					actW = width.Anchor (hostFrame.Width);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-					break;
-				default:
-					actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-					break;
-				}
+				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
 			}
 
 			if (y is Pos.PosCenter) {
@@ -2183,27 +2171,75 @@ namespace Terminal.Gui {
 			} else {
 				actY = y?.Anchor (hostFrame.Height) ?? 0;
 
-				switch (height) {
-				case null:
-					actH = AutoSize ? s.Height : hostFrame.Height;
-					break;
-				case Dim.DimFactor factor when !factor.IsFromRemaining ():
-					actH = height.Anchor (hostFrame.Height);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
-					break;
-				default:
-					actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
-					break;
-				}
+				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
 			}
 
 			var r = new Rect (actX, actY, actW, actH);
 			if (Frame != r) {
-				Frame = new Rect (actX, actY, actW, actH);
+				Frame = r;
 				if (!SetMinWidthHeight ())
 					TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
+		}
+
+		private int CalculateActualWidth (Dim width, Rect hostFrame, int actX, Size s)
+		{
+			int actW;
+			switch (width) {
+			case null:
+				actW = AutoSize ? s.Width : hostFrame.Width;
+				break;
+			case Dim.DimCombine combine:
+				int leftActW = CalculateActualWidth (combine.left, hostFrame, actX, s);
+				int rightActW = CalculateActualWidth (combine.right, hostFrame, actX, s);
+				if (combine.add) {
+					actW = leftActW + rightActW;
+				} else {
+					actW = leftActW - rightActW;
+				}
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actW = width.Anchor (hostFrame.Width);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			default:
+				actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			}
+
+			return actW;
+		}
+
+		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
+		{
+			int actH;
+			switch (height) {
+			case null:
+				actH = AutoSize ? s.Height : hostFrame.Height;
+				break;
+			case Dim.DimCombine combine:
+				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
+				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
+				if (combine.add) {
+					actH = leftActH + rightActH;
+				} else {
+					actH = leftActH - rightActH;
+				}
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actH = height.Anchor (hostFrame.Height);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			default:
+				actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			}
+
+			return actH;
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
@@ -2328,44 +2364,40 @@ namespace Terminal.Gui {
 			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
 				switch (pos) {
-				case Pos.PosView pv: {
-						if (pv.Target != this) {
-							nEdges.Add ((pv.Target, from));
-						}
-						foreach (var v in from.InternalSubviews) {
-							CollectAll (v, ref nNodes, ref nEdges);
-						}
-						return;
+				case Pos.PosView pv:
+					if (pv.Target != this) {
+						nEdges.Add ((pv.Target, from));
 					}
-				case Pos.PosCombine pc: {
-						foreach (var v in from.InternalSubviews) {
-							CollectPos (pc.left, from, ref nNodes, ref nEdges);
-							CollectPos (pc.right, from, ref nNodes, ref nEdges);
-						}
-						break;
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
 					}
+					return;
+				case Pos.PosCombine pc:
+					foreach (var v in from.InternalSubviews) {
+						CollectPos (pc.left, from, ref nNodes, ref nEdges);
+						CollectPos (pc.right, from, ref nNodes, ref nEdges);
+					}
+					break;
 				}
 			}
 
 			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
 				switch (dim) {
-				case Dim.DimView dv: {
-						if (dv.Target != this) {
-							nEdges.Add ((dv.Target, from));
-						}
-						foreach (var v in from.InternalSubviews) {
-							CollectAll (v, ref nNodes, ref nEdges);
-						}
-						return;
+				case Dim.DimView dv:
+					if (dv.Target != this) {
+						nEdges.Add ((dv.Target, from));
 					}
-				case Dim.DimCombine dc: {
-						foreach (var v in from.InternalSubviews) {
-							CollectDim (dc.left, from, ref nNodes, ref nEdges);
-							CollectDim (dc.right, from, ref nNodes, ref nEdges);
-						}
-						break;
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
 					}
+					return;
+				case Dim.DimCombine dc:
+					foreach (var v in from.InternalSubviews) {
+						CollectDim (dc.left, from, ref nNodes, ref nEdges);
+						CollectDim (dc.right, from, ref nNodes, ref nEdges);
+					}
+					break;
 				}
 			}
 
@@ -2954,16 +2986,15 @@ namespace Terminal.Gui {
 				h = Height.Anchor (h);
 				canSetHeight = !ForceValidatePosDim;
 				break;
-			case Dim.DimFactor factor: {
-					// Tries to get the SuperView height otherwise the view height.
-					var sh = SuperView != null ? SuperView.Frame.Height : h;
-					if (factor.IsFromRemaining ()) {
-						sh -= Frame.Y;
-					}
-					h = Height.Anchor (sh);
-					canSetHeight = !ForceValidatePosDim;
-					break;
+			case Dim.DimFactor factor:
+				// Tries to get the SuperView height otherwise the view height.
+				var sh = SuperView != null ? SuperView.Frame.Height : h;
+				if (factor.IsFromRemaining ()) {
+					sh -= Frame.Y;
 				}
+				h = Height.Anchor (sh);
+				canSetHeight = !ForceValidatePosDim;
+				break;
 			default:
 				canSetHeight = true;
 				break;
