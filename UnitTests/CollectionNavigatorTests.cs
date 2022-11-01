@@ -42,29 +42,6 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (2, n.GetNextMatchingItem (4, 'b'));
 		}
 
-
-		[Fact]
-		public void ToSearchText ()
-		{
-			var strings = new string []{
-			    "appricot",
-			    "arm",
-			    "bat",
-			    "batman",
-			    "bbfish",
-			    "candle"
-			  };
-
-			int current = 0;
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (2, current = n.GetNextMatchingItem (current, 'b')); // match bat
-			Assert.Equal (4, current = n.GetNextMatchingItem (current, 'b')); // match bbfish
-
-			// another 'b' means searching for "bbb" which does not exist
-			// so we go back to looking for "b" as a fresh key strike
-			Assert.Equal (2, current = n.GetNextMatchingItem (current, 'b')); // match bat
-		}
-
 		[Fact]
 		public void FullText ()
 		{
@@ -79,16 +56,21 @@ namespace Terminal.Gui.Core {
 			  };
 
 			var n = new CollectionNavigator (strings);
-			Assert.Equal (2, n.GetNextMatchingItem (0, 't'));
+			int current = 0;
+			Assert.Equal (strings.IndexOf ("ta"), current = n.GetNextMatchingItem (current, 't'));
 
 			// should match "te" in "text"
-			Assert.Equal (4, n.GetNextMatchingItem (2, 'e'));
+			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'e'));
 
 			// still matches text
-			Assert.Equal (4, n.GetNextMatchingItem (4, 'x'));
+			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'x'));
 
-			// nothing starts texa so it jumps to a for appricot
-			Assert.Equal (0, n.GetNextMatchingItem (4, 'a'));
+			// nothing starts texa so it should NOT jump to appricot
+			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'a'));
+
+			Thread.Sleep (n.TypingDelay + 100);
+			// nothing starts "texa". Since were past timedelay we DO jump to appricot
+			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
 		}
 
 		[Fact]
@@ -106,20 +88,25 @@ namespace Terminal.Gui.Core {
 			  };
 
 			var n = new CollectionNavigator (strings);
-			Assert.Equal (3, n.GetNextMatchingItem (0, '丗'));
+			int current = 0;
+			Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丗'));
 
 			// 丗丙业丞 is as good a match as 丗丙丛
 			// so when doing multi character searches we should
 			// prefer to stay on the same index unless we invalidate
 			// our typed text
-			Assert.Equal (3, n.GetNextMatchingItem (3, '丙'));
+			Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丙'));
 
 			// No longer matches 丗丙业丞 and now only matches 丗丙丛
 			// so we should move to the new match
-			Assert.Equal (4, n.GetNextMatchingItem (3, '丛'));
+			Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, '丛'));
 
-			// nothing starts "丗丙丛a" so it jumps to a for appricot
-			Assert.Equal (0, n.GetNextMatchingItem (4, 'a'));
+			// nothing starts "丗丙丛a". Since were still in the timedelay we do not jump to appricot
+			Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, 'a'));
+
+			Thread.Sleep (n.TypingDelay + 100);
+			// nothing starts "丗丙丛a". Since were past timedelay we DO jump to appricot
+			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
 		}
 
 		[Fact]
@@ -161,10 +148,6 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 'e')); // match bates hotel
 			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 's')); // match bates hotel
 			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, ' ')); // match bates hotel
-
-			// another 'b' means searching for "bates b" which does not exist
-			// so we go back to looking for "b" as a fresh key strike
-			Assert.Equal (strings.IndexOf<string> ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
 		}
 
 		[Fact]
@@ -198,11 +181,13 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '.'));
 			Assert.Equal ("$101.", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
+			// stay on the same item becuase still in timedelay
+			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal ("$101.", n.SearchString);
 
+			Thread.Sleep (n.TypingDelay + 100);
 			// another '$' means searching for "$" again
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '$'));
 			Assert.Equal ("$", n.SearchString);
 
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
@@ -233,6 +218,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("$$", n.SearchString);
 
 			// Delay 
+			Thread.Sleep (n.TypingDelay + 10);
 			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
 			Assert.Equal ("a", n.SearchString);
 
