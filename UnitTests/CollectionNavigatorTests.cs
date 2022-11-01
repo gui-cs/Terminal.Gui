@@ -266,7 +266,8 @@ namespace Terminal.Gui.Core {
 			    "can",
 			    "candle",
 			    "candy",
-			    "yellow"
+			    "yellow",
+				"zebra"
 			  };
 			int current = 0;
 			var n = new CollectionNavigator (strings);
@@ -298,8 +299,8 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("ca", n.SearchString);
 			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
 			Assert.Equal ("can", n.SearchString);
-			Assert.Equal (strings.IndexOf ("candle"), current = n.GetNextMatchingItem (current, 'z'));
-			Assert.Equal ("cand", n.SearchString);
+			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'z')); // Shouldn't move
+			Assert.Equal ("can", n.SearchString); // Shouldn't change
 		}
 
 		[Fact]
