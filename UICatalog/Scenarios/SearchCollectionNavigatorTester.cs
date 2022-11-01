@@ -7,9 +7,11 @@ using Terminal.Gui.Trees;
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Search Collection Nav", Description: "Demonstrates & tests SearchCollectionNavigator.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("ListView")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("Text")]
+	[ScenarioCategory ("Controls"), 
+		ScenarioCategory ("ListView"), 
+		ScenarioCategory ("TreeView"), 
+		ScenarioCategory ("Text and Formatting"),
+		ScenarioCategory ("Mouse and Keyboard")]
 	public class SearchCollectionNavigatorTester : Scenario {
 
 		// Don't create a Window, just return the top-level view
