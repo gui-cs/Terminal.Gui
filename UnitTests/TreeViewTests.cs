@@ -748,7 +748,7 @@ namespace Terminal.Gui.Views {
 			tv.ColorScheme = new ColorScheme ();
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (
+			TestHelpers.AssertDriverContentsAre (
 @"├-normal
 │ ├─pink
 │ └─normal
@@ -766,7 +766,7 @@ namespace Terminal.Gui.Views {
 			tv.Redraw (tv.Bounds);
 
 
-			GraphViewTests.AssertDriverContentsAre (
+			TestHelpers.AssertDriverContentsAre (
 @"├+normal
 └─pink
 ", output);
@@ -797,7 +797,7 @@ namespace Terminal.Gui.Views {
 			tv.ColorScheme = new ColorScheme ();
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (
+			TestHelpers.AssertDriverContentsAre (
 @"├-normal
 │ ├─pink
 │ └─normal
@@ -814,7 +814,7 @@ namespace Terminal.Gui.Views {
 			tv.Redraw (tv.Bounds);
 
 
-			GraphViewTests.AssertDriverContentsAre (
+			TestHelpers.AssertDriverContentsAre (
 @"├+normal
 └─pink
 ", output);
@@ -830,7 +830,7 @@ namespace Terminal.Gui.Views {
 			tv.Redraw (tv.Bounds);
 
 
-			GraphViewTests.AssertDriverContentsAre (
+			TestHelpers.AssertDriverContentsAre (
 @"└─pink
 ", output);
 			Assert.Equal (-1, tv.GetObjectRow (n1));
@@ -839,74 +839,98 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, tv.GetObjectRow (n2));
 		}
 		[Fact, AutoInitShutdown]
-		public void TestTreeViewColor()
+		public void TestTreeViewColor ()
 		{
-			var tv = new TreeView{Width = 20,Height = 10};
+			var tv = new TreeView { Width = 20, Height = 10 };
 
-			var n1 = new TreeNode("normal");
-			var n1_1 = new TreeNode("pink");
-			var n1_2 = new TreeNode("normal");
-			n1.Children.Add(n1_1);
-			n1.Children.Add(n1_2);
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
 
-			var n2 = new TreeNode("pink");
-			tv.AddObject(n1);
-			tv.AddObject(n2);
-			tv.Expand(n1);
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
 
-			var pink = new Attribute(Color.Magenta,Color.Black);
-			var hotpink = new Attribute(Color.BrightMagenta,Color.Black);
+			var pink = new Attribute (Color.Magenta, Color.Black);
+			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
-			tv.ColorScheme = new ColorScheme();
-			tv.Redraw(tv.Bounds);
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
 
 			// Normal drawing of the tree view
-			GraphViewTests.AssertDriverContentsAre(
+			TestHelpers.AssertDriverContentsAre(
 @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
-",output);
+", output);
 			// Should all be the same color
-			GraphViewTests.AssertDriverColorsAre(
+			TestHelpers.AssertDriverColorsAre(
 @"00000000
 00000000
 0000000000
 000000
 ",
-				new []{tv.ColorScheme.Normal,pink});
+				new [] { tv.ColorScheme.Normal, pink });
 
 			// create a new color scheme
-			var pinkScheme = new ColorScheme
-			{
+			var pinkScheme = new ColorScheme {
 				Normal = pink,
 				Focus = hotpink
 			};
 
 			// and a delegate that uses the pink color scheme 
 			// for nodes "pink"
-			tv.ColorGetter = (n)=> n.Text.Equals("pink") ? pinkScheme : null;
+			tv.ColorGetter = (n) => n.Text.Equals ("pink") ? pinkScheme : null;
 
 			// redraw now that the custom color
 			// delegate is registered
-			tv.Redraw(tv.Bounds);
-	
+			tv.Redraw (tv.Bounds);
+
 			// Same text
-			GraphViewTests.AssertDriverContentsAre(
+			TestHelpers.AssertDriverContentsAre(
 @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
-",output);
+", output);
 			// but now the item (only not lines) appear
 			// in pink when they are the word "pink"
-			GraphViewTests.AssertDriverColorsAre(
+			TestHelpers.AssertDriverColorsAre(
 @"00000000
 00001111
 0000000000
 001111
 ",
-				new []{tv.ColorScheme.Normal,pink});
+				new [] { tv.ColorScheme.Normal, pink });
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DesiredCursorVisibility_MultiSelect ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (tv.MultiSelect);
+			Assert.True (tv.HasFocus);
+			Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+
+			tv.SelectAll ();
+			tv.DesiredCursorVisibility = CursorVisibility.Default;
+			Application.Refresh ();
+			Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+			Assert.Equal (CursorVisibility.Default, visibility);
 		}
 
 		/// <summary>

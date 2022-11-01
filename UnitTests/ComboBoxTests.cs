@@ -144,7 +144,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			Application.Begin (Application.Top);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 One      ▼
 One       
 ", output);
@@ -154,7 +154,7 @@ One
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 			Application.Begin (Application.Top);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Two      ▼
 Two       
 ", output);
@@ -164,7 +164,7 @@ Two
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			Application.Begin (Application.Top);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Three    ▼
 Three     
 ", output);
@@ -809,7 +809,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
      ▼
 One   
 Two   
@@ -824,7 +824,7 @@ Three ", output);
 				cb.Subviews [1].GetNormalColor ()
 			};
 
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 00000
 22222
@@ -836,7 +836,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 22222
 00000
@@ -848,7 +848,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 22222
 22222
@@ -866,7 +866,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 22222
 22222
@@ -878,7 +878,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 22222
 00000
@@ -890,7 +890,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Redraw (cb.Bounds);
-			GraphViewTests.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverColorsAre (@"
 000000
 00000
 22222

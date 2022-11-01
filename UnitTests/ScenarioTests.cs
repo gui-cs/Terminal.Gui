@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui {
+namespace UICatalog {
 	public class ScenarioTests {
 		readonly ITestOutputHelper output;
 
@@ -49,19 +49,18 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Run_All_Scenarios ()
 		{
-			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
-			Assert.NotEmpty (scenarioClasses);
+			List<Scenario> scenarios = Scenario.GetScenarios ();
+			Assert.NotEmpty (scenarios);
 
-			foreach (var scenarioClass in scenarioClasses) {
+			foreach (var scenario in scenarios) {
 
-				output.WriteLine ($"Running Scenario '{scenarioClass.Name}'");
+				output.WriteLine ($"Running Scenario '{scenario}'");
 
 				Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
 					Application.RequestStop ();
 					return false;
 				};
 
-				var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 				// Close after a short period of time
@@ -83,11 +82,11 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Run_Generic ()
 		{
-			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
-			Assert.NotEmpty (scenarioClasses);
+			List<Scenario> scenarios = Scenario.GetScenarios ();
+			Assert.NotEmpty (scenarios);
 
-			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Generic", StringComparison.OrdinalIgnoreCase));
-			var scenarioClass = scenarioClasses [item];
+			var item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+			var generic = scenarios [item];
 			// Setup some fake keypresses 
 			// Passing empty string will cause just a ctrl-q to be fired
 			int stackSize = CreateInput ("");
@@ -116,13 +115,12 @@ namespace Terminal.Gui {
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
-			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
-			scenario.Init (Application.Top, Colors.Base);
-			scenario.Setup ();
+			generic.Init (Application.Top, Colors.Base);
+			generic.Setup ();
 			// There is no need to call Application.Begin because Init already creates the Application.Top
 			// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
 			//var rs = Application.Begin (Application.Top);
-			scenario.Run ();
+			generic.Run ();
 
 			//Application.End (rs);
 

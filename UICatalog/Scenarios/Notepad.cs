@@ -14,11 +14,7 @@ namespace UICatalog.Scenarios {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
-
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 			Top.ColorScheme = Colors.Base;
 		}
 

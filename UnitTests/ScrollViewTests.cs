@@ -4,9 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ScrollViewTests {
+		readonly ITestOutputHelper output;
+
+		public ScrollViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
@@ -172,6 +180,105 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
 			Assert.False (sv.ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.False (sv.ShowHorizontalScrollIndicator);
+			Assert.False (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			sv.AutoHideScrollBars = false;
+			sv.ShowHorizontalScrollIndicator = true;
+			sv.ShowVerticalScrollIndicator = true;
+			sv.Redraw (sv.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ┬
+         │
+         │
+         │
+         │
+         │
+         ┴
+         ▼
+◄├─────┤► 
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ┬
+         ┴
+         ░
+         ░
+         ░
+         ░
+         ░
+         ▼
+◄├┤░░░░░► 
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50),
+				ContentOffset = new Point (25, 25)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (-25, sv.ContentOffset.X);
+			Assert.Equal (-25, sv.ContentOffset.Y);
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ░
+         ░
+         ░
+         ┬
+         │
+         ┴
+         ░
+         ▼
+◄░░░├─┤░► 
+", output);
 		}
 	}
 }

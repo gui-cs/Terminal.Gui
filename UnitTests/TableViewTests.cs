@@ -459,7 +459,7 @@ namespace Terminal.Gui.Views {
 ├─┼──────┤
 │1│2     │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -482,7 +482,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┼────┤
 │1│2│    │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -506,7 +506,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -670,7 +670,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			string expectedColors = @"
@@ -680,7 +680,7 @@ namespace Terminal.Gui.Views {
 01000
 ";
 			
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -714,7 +714,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			string expectedColors = @"
@@ -727,7 +727,7 @@ namespace Terminal.Gui.Views {
 			var invertHotFocus = new Attribute(tv.ColorScheme.HotFocus.Background,tv.ColorScheme.HotFocus.Foreground);
 			var invertHotNormal = new Attribute(tv.ColorScheme.HotNormal.Background,tv.ColorScheme.HotNormal.Foreground);
 
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -771,7 +771,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			string expectedColors = @"
@@ -781,7 +781,7 @@ namespace Terminal.Gui.Views {
 21222
 ";
 			
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -803,7 +803,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│5│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			expectedColors = @"
@@ -816,7 +816,7 @@ namespace Terminal.Gui.Views {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// rowHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,
 				// 1
@@ -864,7 +864,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			string expectedColors = @"
@@ -874,7 +874,7 @@ namespace Terminal.Gui.Views {
 01020
 ";
 			
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -896,7 +896,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│5│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			expectedColors = @"
@@ -909,7 +909,7 @@ namespace Terminal.Gui.Views {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// cellHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -1005,7 +1005,7 @@ namespace Terminal.Gui.Views {
 │A│B│C│
 │1│2│3│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Scroll right
@@ -1026,7 +1026,7 @@ namespace Terminal.Gui.Views {
 │B│C│D│
 │2│3│4│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Shutdown must be called to safely clean up Application if Init has been called
@@ -1070,7 +1070,7 @@ namespace Terminal.Gui.Views {
 │A│B│C│
 │1│2│3│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Scroll right
@@ -1091,7 +1091,7 @@ namespace Terminal.Gui.Views {
 │D│E│F│
 │4│5│6│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Shutdown must be called to safely clean up Application if Init has been called
@@ -1135,7 +1135,7 @@ namespace Terminal.Gui.Views {
 │1│2                    │
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// get a style for the long column
 			var style = tableView.Style.GetOrCreateColumnStyle(dt.Columns[2]);
@@ -1152,7 +1152,7 @@ namespace Terminal.Gui.Views {
 │1│2│aaaaaaaaaa         │
 │1│2│aaa                │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// revert the style change
 			style.MaxWidth = TableView.DefaultMaxCellWidth;
@@ -1172,7 +1172,7 @@ namespace Terminal.Gui.Views {
 │1│2│aaaaaaaaaaaaa...   │
 │1│2│aaa                │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// revert style change
 			style.RepresentationGetter = null;
@@ -1197,7 +1197,7 @@ namespace Terminal.Gui.Views {
 │1│2│aaaaaaaaaaaaaaaaaaa│
 │1│2│aaa                │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Now test making the width too small for the MinAcceptableWidth
 			// the Column won't fit so should not be rendered
@@ -1214,7 +1214,7 @@ namespace Terminal.Gui.Views {
 │1│2    │
 
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// setting width to 10 leaves just enough space for the column to
 			// meet MinAcceptableWidth of 5.  Column width includes terminator line
@@ -1228,7 +1228,7 @@ namespace Terminal.Gui.Views {
 │1│2│aaaa│
 │1│2│aaa │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			Application.Shutdown ();
 		}
@@ -1274,7 +1274,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┼─►
 │1│2│3│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Scroll right
@@ -1291,7 +1291,7 @@ namespace Terminal.Gui.Views {
 ◄─┼─┼─►
 │2│3│4│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
 			// Scroll right twice more (to end of columns)
@@ -1306,7 +1306,7 @@ namespace Terminal.Gui.Views {
 ◄─┼─┼─┤
 │4│5│6│";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();

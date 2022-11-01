@@ -113,7 +113,7 @@ namespace Terminal.Gui.Views {
 ^O Open {Application.Driver.VLine} ^Q Quit
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			sb = new StatusBar (new StatusItem [] {
 				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-O~ Open", null),
@@ -125,7 +125,7 @@ namespace Terminal.Gui.Views {
 CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact]
