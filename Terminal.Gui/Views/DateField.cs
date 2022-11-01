@@ -5,10 +5,10 @@
 //
 // Licensed under the MIT license
 //
+using NStack;
 using System;
 using System.Globalization;
 using System.Linq;
-using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -25,6 +25,7 @@ namespace Terminal.Gui {
 		string sepChar;
 		string longFormat;
 		string shortFormat;
+		bool isJalaali;
 
 		int fieldLen => isShort ? shortFieldLen : longFieldLen;
 		string format => isShort ? shortFormat : longFormat;
@@ -47,9 +48,14 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="date">Initial date contents.</param>
 		/// <param name="isShort">If true, shows only two digits for the year.</param>
-		public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "")
+		/// <param name="isJalaali">If true, parse will convert jalaali input fo georgian date</param>
+		public DateField (int x, int y, DateTime date, bool isShort = false, bool isJalaali = false) : base (x, y, isShort ? 10 : 12, "")
 		{
+
+			this.isShort = isShort;
+			this.isJalaali = isJalaali;
 			Initialize (date, isShort);
+
 		}
 
 		/// <summary>
@@ -61,9 +67,15 @@ namespace Terminal.Gui {
 		///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="date"></param>
-		public DateField (DateTime date) : base ("")
+		/// <param name="isJalaali"></param>
+		public DateField (DateTime date, bool isJalaali = false) : base ("")
 		{
-			Width = fieldLen + 2;
+
+			this.isJalaali = isJalaali;
+			if (!isJalaali)
+				this.isShort = true;
+			Width = FieldLen + 2;
+
 			Initialize (date);
 		}
 
@@ -71,9 +83,12 @@ namespace Terminal.Gui {
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
-			shortFormat = GetShortFormat (longFormat);
+			longFormat = isJalaali ? $" yyyy{sepChar}MM{sepChar}dd" : GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
+			shortFormat = isJalaali ? $" yy{sepChar}MM{sepChar}dd" : GetShortFormat (longFormat);
+			CursorPosition = 1;
+
 			this.isShort = isShort;
+
 			Date = date;
 			CursorPosition = 1;
 			TextChanged += DateField_Changed;
@@ -109,8 +124,10 @@ namespace Terminal.Gui {
 		void DateField_Changed (ustring e)
 		{
 			try {
+
 				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
 					Text = e;
+
 			} catch (Exception) {
 				Text = e;
 			}
@@ -155,13 +172,22 @@ namespace Terminal.Gui {
 
 				var oldData = date;
 				date = value;
-				this.Text = value.ToString (format);
-				var args = new DateTimeEventArgs<DateTime> (oldData, value, format);
+
+				if (isJalaali) {
+
+					this.Text = ToJalaaliString (Format, date);
+				} else {
+					this.Text = value.ToString (Format);
+				}
+				var args = new DateTimeEventArgs<DateTime> (oldData, value, Format);
+
 				if (oldData != value) {
 					OnDateChanged (args);
 				}
 			}
 		}
+
+
 
 		/// <summary>
 		/// Get or set the date format for the widget.
@@ -236,7 +262,27 @@ namespace Terminal.Gui {
 				vals [idx] = day.ToString ();
 			} else
 				day = Int32.Parse (vals [idx].ToString ());
-			string d = GetDate (month, day, year, frm);
+			DateTime result;
+			if (isJalaali) {
+				try {
+					PersianCalendar pc = new PersianCalendar ();
+					if (year < 10) {
+						year += 1400;
+					}
+					result = pc.ToDateTime (year, month, day, 12, 0, 0, 0);
+					year = result.Year;
+					month = result.Month;
+					day = result.Day;
+				} catch {
+					return false;
+				}
+			} else {
+				string d = GetDate (month, day, year, frm);
+
+				if (!DateTime.TryParseExact (d, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out result) ||
+					!isValidDate)
+					return false;
+			}
 
 			if (!DateTime.TryParseExact (d, format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
 				!isValidDate)
@@ -420,6 +466,28 @@ namespace Terminal.Gui {
 		{
 			DateChanged?.Invoke (args);
 		}
+
+		string ToJalaaliString (string format, DateTime date)
+		{
+			if (string.IsNullOrEmpty (format)) format = " yyyy/MM/dd";
+			PersianCalendar pc = new PersianCalendar ();
+
+
+			var year = pc.GetYear (date);
+			var month = pc.GetMonth (date);
+			var day = pc.GetDayOfMonth (date);
+
+
+			format = format.Replace ("yyyy", year.ToString (CultureInfo.InvariantCulture));
+			format = format.Replace ("yy", (year % 100).ToString ("00", CultureInfo.InvariantCulture));
+			format = format.Replace ("MM", month.ToString ("00", CultureInfo.InvariantCulture));
+			format = format.Replace ("M", month.ToString (CultureInfo.InvariantCulture));
+			format = format.Replace ("dd", day.ToString ("00", CultureInfo.InvariantCulture));
+			format = format.Replace ("d", day.ToString (CultureInfo.InvariantCulture));
+
+			return format;
+		}
+
 	}
 
 	/// <summary>

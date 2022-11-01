@@ -95,7 +95,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (hexView) + 1,
 				Width = 20,
 				//ColorScheme = Colors.Dialog,
-				IsShortFormat = false
+				IsShortFormat = false,
+			
 			};
 			Win.Add (dateField);
 
@@ -110,6 +111,7 @@ namespace UICatalog.Scenarios {
 			dateField.TextChanged += (prev) => {
 				labelMirroringDateField.Text = dateField.Text;
 			};
+			
 
 			_timeField = new TimeField (DateTime.Now.TimeOfDay) {
 				X = Pos.Right (labelMirroringDateField) + 5,
