@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 					candidateState.Length > 1);
 
 				if (idxCandidate != -1) {
-					// found "dd" so candidate state is accepted
+					// found "dd" so candidate searchstring is accepted
 					lastKeystroke = DateTime.Now;
 					SearchString = candidateState;
 					return idxCandidate;
@@ -134,7 +134,7 @@ namespace Terminal.Gui {
 				// if no changes to current state manifested
 				if (idxCandidate == currentIndex || idxCandidate == -1) {
 					// clear history and treat as a fresh letter
-					ClearState ();
+					ClearSearchString ();
 					
 					// match on the fresh letter alone
 					SearchString = new string (keyStruck, 1);
@@ -147,7 +147,7 @@ namespace Terminal.Gui {
 
 			} else {
 				// clear state because keypress was a control char
-				ClearState ();
+				ClearSearchString ();
 
 				// control char indicates no selection
 				return -1;
@@ -155,7 +155,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> 
+		/// Gets the index of the next item in the collection that matches <paramref name="search"/>. 
 		/// </summary>
 		/// <param name="currentIndex">The index in the collection to start the search from.</param>
 		/// <param name="search">The search string to use.</param>
@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 		/// e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If <see langword="false"/> (the default), 
 		/// the next matching item will be returned, even if it is above in the collection.</param>
 		/// </param>
-		/// <returns></returns>
+		/// <returns>The index of the next matching item or <see langword="-1"/> if no match was found.</returns>
 		internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false)
 		{
 			if (string.IsNullOrEmpty (search)) {
@@ -211,7 +211,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void ClearState ()
+		private void ClearSearchString ()
 		{
 			SearchString = "";
 			lastKeystroke = DateTime.Now;
