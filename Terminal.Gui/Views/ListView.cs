@@ -110,7 +110,7 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
-				Navigator.Collection = source?.ToList ()?.Cast<object> ();
+				KeystrokeNavigator.Collection = source?.ToList ()?.Cast<object> ();
 				top = 0;
 				selected = 0;
 				lastSelectedItem = -1;
@@ -383,7 +383,7 @@ namespace Terminal.Gui {
 						Driver.SetAttribute (current);
 					}
 					if (allowsMarking) {
-						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : 
+						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) :
 							(AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
 					}
@@ -408,9 +408,10 @@ namespace Terminal.Gui {
 		public event Action<ListViewRowEventArgs> RowRender;
 
 		/// <summary>
-		/// Gets the <see cref="SearchCollectionNavigator"/> that is used to navigate the <see cref="ListView"/> when searching.
+		/// Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as
+		/// the user types.
 		/// </summary>
-		public SearchCollectionNavigator Navigator { get; private set; } = new SearchCollectionNavigator ();
+		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -423,10 +424,10 @@ namespace Terminal.Gui {
 			if (result != null) {
 				return (bool)result;
 			}
-			
+
 			// Enable user to find & select an item by typing text
-			if (SearchCollectionNavigator.IsCompatibleKey(kb)) {
-				var newItem = Navigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
+			if (CollectionNavigator.IsCompatibleKey (kb)) {
+				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
 				if (newItem is int && newItem != -1) {
 					SelectedItem = (int)newItem;
 					EnsuresVisibilitySelectedItem ();
@@ -840,13 +841,13 @@ namespace Terminal.Gui {
 			if (src == null || src?.Count == 0) {
 				return 0;
 			}
-
+			
 			int maxLength = 0;
 			for (int i = 0; i < src.Count; i++) {
 				var t = src [i];
 				int l;
 				if (t is ustring u) {
-					l = u.RuneCount;
+					l = TextFormatter.GetTextWidth (u);
 				} else if (t is string s) {
 					l = s.Length;
 				} else {
@@ -863,18 +864,10 @@ namespace Terminal.Gui {
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 		{
-			int byteLen = ustr.Length;
-			int used = 0;
-			for (int i = start; i < byteLen;) {
-				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
-				var count = Rune.ColumnWidth (rune);
-				if (used + count > width)
-					break;
-				driver.AddRune (rune);
-				used += count;
-				i += size;
-			}
-			for (; used < width; used++) {
+			var u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
+			driver.AddStr (u);
+			width -= TextFormatter.GetTextWidth (u);
+			while (width-- > 0) {
 				driver.AddRune (' ');
 			}
 		}
@@ -924,7 +917,7 @@ namespace Terminal.Gui {
 			if (src == null || src?.Count == 0) {
 				return -1;
 			}
-			
+
 			for (int i = 0; i < src.Count; i++) {
 				var t = src [i];
 				if (t is ustring u) {
@@ -932,7 +925,7 @@ namespace Terminal.Gui {
 						return i;
 					}
 				} else if (t is string s) {
-					if (s.ToUpperInvariant().StartsWith (search.ToUpperInvariant())) {
+					if (s.ToUpperInvariant ().StartsWith (search.ToUpperInvariant ())) {
 						return i;
 					}
 				}

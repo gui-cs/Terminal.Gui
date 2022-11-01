@@ -45,7 +45,7 @@
       "commandName": "WSL2",
       "distributionName": ""
     },
-    "SearchCollectionNavigatorTester": {
+    "CollectionNavigatorTester": {
       "commandName": "Project",
       "commandLineArgs": "\"Search Collection Nav\""
     }

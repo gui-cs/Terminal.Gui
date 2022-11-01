@@ -6,13 +6,13 @@ using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Search Collection Nav", Description: "Demonstrates & tests SearchCollectionNavigator.")]
-	[ScenarioCategory ("Controls"), 
-		ScenarioCategory ("ListView"), 
-		ScenarioCategory ("TreeView"), 
+	[ScenarioMetadata (Name: "Collection Navigator", Description: "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator).")]
+	[ScenarioCategory ("Controls"),
+		ScenarioCategory ("ListView"),
+		ScenarioCategory ("TreeView"),
 		ScenarioCategory ("Text and Formatting"),
 		ScenarioCategory ("Mouse and Keyboard")]
-	public class SearchCollectionNavigatorTester : Scenario {
+	public class CollectionNavigatorTester : Scenario {
 
 		// Don't create a Window, just return the top-level view
 		public override void Init (Toplevel top, ColorScheme colorScheme)
@@ -70,6 +70,9 @@ namespace UICatalog.Scenarios {
 				"egg",
 				"candle",
 				" <- space",
+				"\t<- tab",
+				"\n<- newline",
+				"\r<- formfeed",
 				"q",
 				"quit",
 				"quitter"
@@ -141,7 +144,7 @@ namespace UICatalog.Scenarios {
 
 			_listView.SetSource (_items);
 
-			_listView.Navigator.SearchStringChanged += (state) => {
+			_listView.KeystrokeNavigator.SearchStringChanged += (state) => {
 				label.Text = $"ListView: {state.SearchString}";
 			};
 		}
@@ -169,16 +172,16 @@ namespace UICatalog.Scenarios {
 			};
 			Top.Add (_treeView);
 
-			var root = new TreeNode ("Alpha examples");
+			var root = new TreeNode ("IsLetterOrDigit examples");
 			root.Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
 			_treeView.AddObject (root);
-			root = new TreeNode ("Non-Alpha examples");
+			root = new TreeNode ("Non-IsLetterOrDigit examples");
 			root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
 			_treeView.AddObject (root);
 			_treeView.ExpandAll ();
 			_treeView.GoToFirst ();
 
-			_treeView.Navigator.SearchStringChanged += (state) => {
+			_treeView.KeystrokeNavigator.SearchStringChanged += (state) => {
 				label.Text = $"TreeView: {state.SearchString}";
 			};
 		}

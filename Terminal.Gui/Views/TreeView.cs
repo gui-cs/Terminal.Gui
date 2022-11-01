@@ -547,7 +547,7 @@ namespace Terminal.Gui {
 			cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
 			
 			// Update the collection used for search-typing
-			Navigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
+			KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
 			return cachedLineMap;
 		}
 
@@ -565,10 +565,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the <see cref="SearchCollectionNavigator"/> that is used to navigate the <see cref="TreeView"/> 
-		/// when searching with the keyboard.
+		/// Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as
+		/// the user types.
 		/// </summary>
-		public SearchCollectionNavigator Navigator { get; private set; } = new SearchCollectionNavigator ();
+		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -585,7 +585,7 @@ namespace Terminal.Gui {
 				}
 
 				// If not a keybinding, is the key a searchable key press?
-				if (SearchCollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
+				if (CollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
 					IReadOnlyCollection<Branch<T>> map;
 
 					// If there has been a call to InvalidateMap since the last time
@@ -594,7 +594,7 @@ namespace Terminal.Gui {
 
 					// Find the current selected object within the tree
 					var current = map.IndexOf (b => b.Model == SelectedObject);
-					var newIndex = Navigator?.GetNextMatchingItem (current, (char)keyEvent.KeyValue);
+					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent.KeyValue);
 
 					if (newIndex is int && newIndex != -1) {
 						SelectedObject = map.ElementAt ((int)newIndex).Model;

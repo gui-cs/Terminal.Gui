@@ -15,17 +15,17 @@ namespace Terminal.Gui {
 	/// If the user pauses keystrokes for a short time (250ms), the search string is cleared.
 	/// </para>
 	/// </summary>
-	public class SearchCollectionNavigator {
+	public class CollectionNavigator {
 		/// <summary>
-		/// Constructs a new SearchCollectionNavigator.
+		/// Constructs a new CollectionNavigator.
 		/// </summary>
-		public SearchCollectionNavigator () { }
+		public CollectionNavigator () { }
 
 		/// <summary>
-		/// Constructs a new SearchCollectionNavigator for the given collection.
+		/// Constructs a new CollectionNavigator for the given collection.
 		/// </summary>
 		/// <param name="collection"></param>
-		public SearchCollectionNavigator (IEnumerable<object> collection) => Collection = collection;
+		public CollectionNavigator (IEnumerable<object> collection) => Collection = collection;
 
 		DateTime lastKeystroke = DateTime.Now;
 		internal int TypingDelay { get; set; } = 250;
@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		public IEnumerable<object> Collection { get; set; }
 
 		/// <summary>
-		/// Event arguments for the <see cref="SearchCollectionNavigator.SearchStringChanged"/> event.
+		/// Event arguments for the <see cref="CollectionNavigator.SearchStringChanged"/> event.
 		/// </summary>
 		public class KeystrokeNavigatorEventArgs {
 			/// <summary>
@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 		/// <param name="minimizeMovement">Set to <see langword="true"/> to stop the search on the first match
 		/// if there are multiple matches for <paramref name="search"/>.
 		/// e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If <see langword="false"/> (the default), 
-		/// the next matching item will be returned, even if it is above in the collection.</param>
+		/// the next matching item will be returned, even if it is above in the collection.
 		/// </param>
 		/// <returns>The index of the next matching item or <see langword="-1"/> if no match was found.</returns>
 		internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false)

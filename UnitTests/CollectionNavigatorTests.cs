@@ -2,7 +2,7 @@
 using Xunit;
 
 namespace Terminal.Gui.Core {
-	public class SearchCollectionNavigatorTests {
+	public class CollectionNavigatorTests {
 		static string [] simpleStrings = new string []{
 		    "appricot", // 0
 		    "arm",      // 1
@@ -14,7 +14,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void ShouldAcceptNegativeOne ()
 		{
-			var n = new SearchCollectionNavigator (simpleStrings);
+			var n = new CollectionNavigator (simpleStrings);
 
 			// Expect that index of -1 (i.e. no selection) should work correctly
 			// and select the first entry of the letter 'b'
@@ -23,7 +23,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void OutOfBoundsShouldBeIgnored ()
 		{
-			var n = new SearchCollectionNavigator (simpleStrings);
+			var n = new CollectionNavigator (simpleStrings);
 
 			// Expect saying that index 500 is the current selection should not cause
 			// error and just be ignored (treated as no selection)
@@ -33,7 +33,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Cycling ()
 		{
-			var n = new SearchCollectionNavigator (simpleStrings);
+			var n = new CollectionNavigator (simpleStrings);
 			Assert.Equal (2, n.GetNextMatchingItem (0, 'b'));
 			Assert.Equal (3, n.GetNextMatchingItem (2, 'b'));
 
@@ -55,7 +55,7 @@ namespace Terminal.Gui.Core {
 			  };
 
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (2, current = n.GetNextMatchingItem (current, 'b')); // match bat
 			Assert.Equal (4, current = n.GetNextMatchingItem (current, 'b')); // match bbfish
 
@@ -77,7 +77,7 @@ namespace Terminal.Gui.Core {
 			    "candle"
 			  };
 
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (2, n.GetNextMatchingItem (0, 't'));
 
 			// should match "te" in "text"
@@ -104,7 +104,7 @@ namespace Terminal.Gui.Core {
 			    "candle"
 			  };
 
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (3, n.GetNextMatchingItem (0, '丗'));
 
 			// 丗丙业丞 is as good a match as 丗丙丛
@@ -135,7 +135,7 @@ namespace Terminal.Gui.Core {
 			    "candle"
 			  };
 
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
 			Assert.Equal (3, n.GetNextMatchingItem (3, 'b'));
 			Assert.Equal (4, n.GetNextMatchingItem (3, 'b'));
@@ -153,7 +153,7 @@ namespace Terminal.Gui.Core {
 			    "candle"
 			  };
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
 			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
 			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
@@ -178,7 +178,7 @@ namespace Terminal.Gui.Core {
 			    "appricot"
 			  };
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
 			Assert.Equal ("a", n.SearchString);
 
@@ -221,7 +221,7 @@ namespace Terminal.Gui.Core {
 			    "appricot"
 			  };
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 
 			// No delay
 			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
@@ -271,7 +271,7 @@ namespace Terminal.Gui.Core {
 				"cart",
 			};
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", false));
 			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", false));
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", false)); // back to top
@@ -317,7 +317,7 @@ namespace Terminal.Gui.Core {
 				"cart",
 			};
 			int current = 0;
-			var n = new SearchCollectionNavigator (strings);
+			var n = new CollectionNavigator (strings);
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", true));
 			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true)); // back to top
