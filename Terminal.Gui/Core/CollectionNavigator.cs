@@ -135,6 +135,14 @@ namespace Terminal.Gui {
 				lastKeystroke = DateTime.Now;
 				idxCandidate = GetNextMatchingItem (currentIndex, candidateState);
 
+				//// if a match wasn't found, the user typed a 'wrong' key in their search ("can" + 'z'
+				//// instead of "can" + 'd').
+				//if (SearchString.Length > 1 && idxCandidate == -1) {
+				//	// ignore it since we're still within the typing delay
+				//	// don't add it to SearchString either
+				//	return currentIndex;
+				//}
+
 				// if no changes to current state manifested
 				if (idxCandidate == currentIndex || idxCandidate == -1) {
 					// clear history and treat as a fresh letter

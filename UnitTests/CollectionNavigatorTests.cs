@@ -282,6 +282,7 @@ namespace Terminal.Gui.Core {
 			// This would only apply for 2+ character searches where theres been a successful 2+ character match right before.
 
 			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal ("a", n.SearchString);
 			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
 			Assert.Equal ("c", n.SearchString);
 			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
@@ -292,7 +293,9 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("cand", n.SearchString);
 
 			// Same as above, but with a 'wrong' key (z)
+			Thread.Sleep (n.TypingDelay + 10);
 			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal ("a", n.SearchString);
 			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
 			Assert.Equal ("c", n.SearchString);
 			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
