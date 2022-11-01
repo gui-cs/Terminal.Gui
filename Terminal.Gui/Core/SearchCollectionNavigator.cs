@@ -4,25 +4,100 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Changes the index in a collection based on keys pressed
-	/// and the current state
+	/// Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. 
+	/// The <see cref="SearchString"/> is used to find the next item in the collection that matches the search string
+	/// when <see cref="GetNextMatchingItem(int, char)"/> is called.
+	/// <para>
+	/// If the user types keystrokes that can't be found in the collection, 
+	/// the search string is cleared and the next item is found that starts with the last keystroke.
+	/// </para>
+	/// <para>
+	/// If the user pauses keystrokes for a short time (250ms), the search string is cleared.
+	/// </para>
 	/// </summary>
-	class SearchCollectionNavigator {
-		string state = "";
-		DateTime lastKeystroke = DateTime.MinValue;
-		const int TypingDelay = 250;
+	public class SearchCollectionNavigator {
+		/// <summary>
+		/// Constructs a new SearchCollectionNavigator.
+		/// </summary>
+		public SearchCollectionNavigator () { }
+
+		/// <summary>
+		/// Constructs a new SearchCollectionNavigator for the given collection.
+		/// </summary>
+		/// <param name="collection"></param>
+		public SearchCollectionNavigator (IEnumerable<object> collection) => Collection = collection;
+
+		DateTime lastKeystroke = DateTime.Now;
+		internal int TypingDelay { get; set; } = 250;
+
+		/// <summary>
+		/// The compararer function to use when searching the collection.
+		/// </summary>
 		public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
-		private IEnumerable<object> Collection { get => _collection; set => _collection = value; }
 
-		private IEnumerable<object> _collection;
+		/// <summary>
+		/// The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.
+		/// </summary>
+		public IEnumerable<object> Collection { get; set; }
 
-		public SearchCollectionNavigator (IEnumerable<object> collection) { _collection = collection; }
+		/// <summary>
+		/// Event arguments for the <see cref="SearchCollectionNavigator.SearchStringChanged"/> event.
+		/// </summary>
+		public class KeystrokeNavigatorEventArgs {
+			/// <summary>
+			/// he current <see cref="SearchString"/>.
+			/// </summary>
+			public string SearchString { get; }
 
+			/// <summary>
+			/// Initializes a new instance of <see cref="KeystrokeNavigatorEventArgs"/>
+			/// </summary>
+			/// <param name="searchString">The current <see cref="SearchString"/>.</param>
+			public KeystrokeNavigatorEventArgs (string searchString)
+			{
+				SearchString = searchString;
+			}
+		}
 
-		public int CalculateNewIndex (IEnumerable<object> collection, int currentIndex, char keyStruck)
+		/// <summary>
+		/// This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.
+		/// </summary>
+		public event Action<KeystrokeNavigatorEventArgs> SearchStringChanged;
+
+		private string _searchString = "";
+		/// <summary>
+		/// Gets the current search string. This includes the set of keystrokes that have been pressed
+		/// since the last unsuccessful match or after a 250ms delay. Useful for debugging.
+		/// </summary>
+		public string SearchString {
+			get => _searchString;
+			private set {
+				_searchString = value;
+				OnSearchStringChanged (new KeystrokeNavigatorEventArgs (value));
+			}
+		}
+
+		/// <summary>
+		/// Invoked when the <see cref="SearchString"/> changes. Useful for debugging. Invokes the <see cref="SearchStringChanged"/> event.
+		/// </summary>
+		/// <param name="e"></param>
+		public virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e)
 		{
-			// if user presses a key
-			if (!char.IsControl(keyStruck)) {//char.IsLetterOrDigit (keyStruck) || char.IsPunctuation (keyStruck) || char.IsSymbol(keyStruck)) {
+			SearchStringChanged?.Invoke (e);
+		}
+
+		/// <summary>
+		/// Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> plus the provided character (typically
+		/// from a key press).
+		/// </summary>
+		/// <param name="currentIndex">The index in the collection to start the search from.</param>
+		/// <param name="keyStruck">The character of the key the user pressed.</param>
+		/// <returns>The index of the item that matches what the user has typed. 
+		/// Returns <see langword="-1"/> if no item in the collection matched.</returns>
+		public int GetNextMatchingItem (int currentIndex, char keyStruck)
+		{
+			AssertCollectionIsNotNull ();
+			if (!char.IsControl (keyStruck)) {
 
 				// maybe user pressed 'd' and now presses 'd' again.
 				// a candidate search is things that begin with "dd"
@@ -31,40 +106,39 @@ namespace Terminal.Gui {
 				string candidateState = "";
 
 				// is it a second or third (etc) keystroke within a short time
-				if (state.Length > 0 && DateTime.Now - lastKeystroke < TimeSpan.FromMilliseconds (TypingDelay)) {
+				if (SearchString.Length > 0 && DateTime.Now - lastKeystroke < TimeSpan.FromMilliseconds (TypingDelay)) {
 					// "dd" is a candidate
-					candidateState = state + keyStruck;
+					candidateState = SearchString + keyStruck;
 				} else {
 					// its a fresh keystroke after some time
 					// or its first ever key press
-					state = new string (keyStruck, 1);
+					SearchString = new string (keyStruck, 1);
 				}
 
-				var idxCandidate = GetNextIndexMatching (collection, currentIndex, candidateState,
+				var idxCandidate = GetNextMatchingItem (currentIndex, candidateState,
 					// prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
 					candidateState.Length > 1);
 
 				if (idxCandidate != -1) {
 					// found "dd" so candidate state is accepted
 					lastKeystroke = DateTime.Now;
-					state = candidateState;
+					SearchString = candidateState;
 					return idxCandidate;
 				}
 
-
-				// nothing matches "dd" so discard it as a candidate
-				// and just cycle "d" instead
+				//// nothing matches "dd" so discard it as a candidate
+				//// and just cycle "d" instead
 				lastKeystroke = DateTime.Now;
-				idxCandidate = GetNextIndexMatching (collection, currentIndex, state);
+				idxCandidate = GetNextMatchingItem (currentIndex, candidateState);
 
 				// if no changes to current state manifested
 				if (idxCandidate == currentIndex || idxCandidate == -1) {
 					// clear history and treat as a fresh letter
 					ClearState ();
-
+					
 					// match on the fresh letter alone
-					state = new string (keyStruck, 1);
-					idxCandidate = GetNextIndexMatching (collection, currentIndex, state);
+					SearchString = new string (keyStruck, 1);
+					idxCandidate = GetNextMatchingItem (currentIndex, SearchString);
 					return idxCandidate == -1 ? currentIndex : idxCandidate;
 				}
 
@@ -72,28 +146,35 @@ namespace Terminal.Gui {
 				return idxCandidate;
 
 			} else {
-				// clear state because keypress was non letter
+				// clear state because keypress was a control char
 				ClearState ();
 
-				// no change in index for non letter keystrokes
-				return currentIndex;
+				// control char indicates no selection
+				return -1;
 			}
 		}
 
-		public int CalculateNewIndex (int currentIndex, char keyStruck)
-		{
-			return CalculateNewIndex (Collection, currentIndex, keyStruck);
-		}
-
-		private int GetNextIndexMatching (IEnumerable<object> collection, int currentIndex, string search, bool preferNotToMoveToNewIndexes = false)
+		/// <summary>
+		/// Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> 
+		/// </summary>
+		/// <param name="currentIndex">The index in the collection to start the search from.</param>
+		/// <param name="search">The search string to use.</param>
+		/// <param name="minimizeMovement">Set to <see langword="true"/> to stop the search on the first match
+		/// if there are multiple matches for <paramref name="search"/>.
+		/// e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If <see langword="false"/> (the default), 
+		/// the next matching item will be returned, even if it is above in the collection.</param>
+		/// </param>
+		/// <returns></returns>
+		internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false)
 		{
 			if (string.IsNullOrEmpty (search)) {
 				return -1;
 			}
+			AssertCollectionIsNotNull ();
 
 			// find indexes of items that start with the search text
-			int [] matchingIndexes = collection.Select ((item, idx) => (item, idx))
-				  .Where (k => k.item?.ToString().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false)
+			int [] matchingIndexes = Collection.Select ((item, idx) => (item, idx))
+				  .Where (k => k.item?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false)
 				  .Select (k => k.idx)
 				  .ToArray ();
 
@@ -109,7 +190,7 @@ namespace Terminal.Gui {
 				} else {
 
 					// the current index is part of the matching collection
-					if (preferNotToMoveToNewIndexes) {
+					if (minimizeMovement) {
 						// if we would rather not jump around (e.g. user is typing lots of text to get this match)
 						return matchingIndexes [currentlySelected];
 					}
@@ -123,25 +204,29 @@ namespace Terminal.Gui {
 			return -1;
 		}
 
+		private void AssertCollectionIsNotNull ()
+		{
+			if (Collection == null) {
+				throw new InvalidOperationException ("Collection is null");
+			}
+		}
+
 		private void ClearState ()
 		{
-			state = "";
-			lastKeystroke = DateTime.MinValue;
-
+			SearchString = "";
+			lastKeystroke = DateTime.Now;
 		}
 
 		/// <summary>
 		/// Returns true if <paramref name="kb"/> is a searchable key
 		/// (e.g. letters, numbers etc) that is valid to pass to to this
-		/// class for search filtering
+		/// class for search filtering.
 		/// </summary>
 		/// <param name="kb"></param>
 		/// <returns></returns>
 		public static bool IsCompatibleKey (KeyEvent kb)
 		{
-			// For some reason, at least on Windows/Windows Terminal, `$` is coming through with `IsAlt == true`
 			return !kb.IsAlt && !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
-			//return !kb.IsCapslock && !kb.IsCtrl && !kb.IsScrolllock && !kb.IsNumlock;
 		}
 	}
 }

@@ -60,21 +60,6 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Implement <see cref="IListDataSourceSearchable"/> to provide custom rendering for a <see cref="ListView"/> that 
-	/// supports searching for items.
-	/// </summary>
-	public interface IListDataSourceSearchable : IListDataSource {
-			/// <summary>
-			/// Finds the first item that starts with the specified search string. Used by the default implementation
-			/// to support typing the first characters of an item to find it and move the selection to i.
-			/// </summary>
-			/// <param name="search">Text to search for.</param>
-			/// <returns>The index of the first <see cref="ListView"/> item that starts with <paramref name="search"/>. 
-			/// Returns <see langword="-1"/> if <paramref name="search"/> was not found.</returns>
-			int StartsWith (string search);
-	}
-
-	/// <summary>
 	/// ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an action.
 	/// </summary>
 	/// <remarks>
@@ -87,7 +72,7 @@ namespace Terminal.Gui {
 	///   By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
 	///   <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>,
 	///   and other collections). Alternatively, an object that implements <see cref="IListDataSource"/>
-	///   or <see cref="IListDataSourceSearchable"/> can be provided giving full control of what is rendered.
+	///   can be provided giving full control of what is rendered.
 	/// </para>
 	/// <para>
 	///   <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
@@ -105,8 +90,7 @@ namespace Terminal.Gui {
 	///   marking style set <see cref="AllowsMarking"/> to false and implement custom rendering.
 	/// </para>
 	/// <para>
-	///   By default or if <see cref="Source"/> is set to an object that implements
-	///   <see cref="IListDataSourceSearchable"/>, searching the ListView with the keyboard is supported. Users type the
+	///   Searching the ListView with the keyboard is supported. Users type the
 	///   first characters of an item, and the first item that starts with what the user types will be selected.
 	/// </para>
 	/// </remarks>
@@ -126,7 +110,7 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
-				navigator = null;
+				Navigator.Collection = source?.ToList ()?.Cast<object> ();
 				top = 0;
 				selected = 0;
 				lastSelectedItem = -1;
@@ -423,7 +407,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<ListViewRowEventArgs> RowRender;
 
-		private SearchCollectionNavigator navigator;
+		/// <summary>
+		/// Gets the <see cref="SearchCollectionNavigator"/> that is used to navigate the <see cref="ListView"/> when searching.
+		/// </summary>
+		public SearchCollectionNavigator Navigator { get; private set; } = new SearchCollectionNavigator ();
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -436,15 +423,12 @@ namespace Terminal.Gui {
 			if (result != null) {
 				return (bool)result;
 			}
-
+			
 			// Enable user to find & select an item by typing text
 			if (SearchCollectionNavigator.IsCompatibleKey(kb)) {
-				if (navigator == null) {
-					navigator = new SearchCollectionNavigator (source.ToList ().Cast<object> ());
-				}
-				var newItem = navigator.CalculateNewIndex (SelectedItem, (char)kb.KeyValue);
-				if (newItem != SelectedItem) {
-					SelectedItem = newItem;
+				var newItem = Navigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
+				if (newItem is int && newItem != -1) {
+					SelectedItem = (int)newItem;
 					EnsuresVisibilitySelectedItem ();
 					SetNeedsDisplay ();
 					return true;
@@ -829,7 +813,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <inheritdoc/>
-	public class ListWrapper : IListDataSourceSearchable {
+	public class ListWrapper : IListDataSource {
 		IList src;
 		BitArray marks;
 		int count, len;

@@ -11,6 +11,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
 	[ScenarioCategory ("Controls"), ScenarioCategory ("Text")]
 	public class SearchCollectionNavigatorTester : Scenario {
+
 		// Don't create a Window, just return the top-level view
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -94,7 +95,7 @@ namespace UICatalog.Scenarios {
 					null,
 					new MenuItem ("_Quit", "", () => Quit(), null, null, Key.Q | Key.CtrlMask),
 				}),
-				new MenuBarItem("_Quit", "CTRL-Q", () => Quit())
+				new MenuBarItem("_Quit", "CTRL-Q", () => Quit()),
 			});
 
 			Top.Add (menu);
@@ -109,7 +110,6 @@ namespace UICatalog.Scenarios {
 			};
 			Top.Add (vsep);
 			CreateTreeView ();
-
 		}
 
 		ListView _listView = null;
@@ -128,7 +128,7 @@ namespace UICatalog.Scenarios {
 
 			_listView = new ListView () {
 				X = 0,
-				Y = Pos.Bottom(label), 
+				Y = Pos.Bottom (label),
 				Width = Dim.Percent (50) - 1,
 				Height = Dim.Fill (),
 				AllowsMarking = false,
@@ -136,8 +136,12 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel
 			};
 			Top.Add (_listView);
-			
+
 			_listView.SetSource (_items);
+
+			_listView.Navigator.SearchStringChanged += (state) => {
+				label.Text = $"ListView: {state.SearchString}";
+			};
 		}
 
 		TreeView _treeView = null;
@@ -147,7 +151,7 @@ namespace UICatalog.Scenarios {
 			var label = new Label () {
 				Text = "TreeView",
 				TextAlignment = TextAlignment.Centered,
-				X = Pos.Right(_listView) + 2,
+				X = Pos.Right (_listView) + 2,
 				Y = 1, // for menu
 				Width = Dim.Percent (50),
 				Height = 1,
@@ -162,15 +166,21 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel
 			};
 			Top.Add (_treeView);
-			
+
 			var root = new TreeNode ("Alpha examples");
-			//root.Children = items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode>().ToList ();
-			//_treeView.AddObject (root);
+			root.Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
+			_treeView.AddObject (root);
 			root = new TreeNode ("Non-Alpha examples");
 			root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
 			_treeView.AddObject (root);
 			_treeView.ExpandAll ();
+			_treeView.GoToFirst ();
+
+			_treeView.Navigator.SearchStringChanged += (state) => {
+				label.Text = $"TreeView: {state.SearchString}";
+			};
 		}
+
 		private void Quit ()
 		{
 			Application.RequestStop ();
