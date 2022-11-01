@@ -51,7 +51,7 @@ namespace UICatalog.Scenarios {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top != null ? top : Application.Top != null ? top : Application.Top;
+			Top = top != null ? top : Application.Top;
 			
 			Win = new TestWindow ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
