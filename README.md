@@ -12,6 +12,20 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample app](docfx/images/sample.gif)
 
+
+## Quick Start
+
+Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
+
+(Press `CTRL-Q` to exit the app)
+
+```powershell
+dotnet new --install Terminal.Gui.templates
+dotnet new tui -n myproj
+cd myproj
+dotnet run
+```
+
 ## Documentation 
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
@@ -36,111 +50,81 @@ descriptors. Most classes are safe for threading.
 ## Showcase & Examples
 
 * **[UI Catalog](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
-* **[Reactive Example](https://github.com/gui-cs/Terminal.Gui/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
-* **[Example (aka `demo.cs`)](https://github.com/gui-cs/Terminal.Gui/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the simple demo.
-* **[Standalone Example](https://github.com/gui-cs/Terminal.Gui/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
+* **[C# Example](https://github.com/gui-cs/Terminal.Gui/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the C# Example.
 * **[F# Example](https://github.com/gui-cs/Terminal.Gui/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
-* **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)** - `OCGV` sends the output from a command to  an interactive table. 
+* **[Reactive Example](https://github.com/gui-cs/Terminal.Gui/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
+* **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools)** - `OCGV` sends the output from a command to  an interactive table. 
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F# and Gui.cs
 * **[TerminalGuiDesigner](https://github.com/tznind/TerminalGuiDesigner)** - Cross platform view designer for building Terminal.Gui applications.
 
 See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html) provides insight into core concepts.
 
-## Sample Usage
-(This code uses C# 9.0 [Top-level statements](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-9#top-level-statements).) 
+## Sample Usage in C#
+
+The following example shows a basic Terminal.Gui application written in C#:
+
 ```csharp
+// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
+
 using Terminal.Gui;
-using NStack;
 
+// Initialize the console
 Application.Init();
-var top = Application.Top;
 
-// Creates the top-level window to show
-var win = new Window("MyApp")
+// Creates the top-level window with border and title
+var win = new Window("Example App (Ctrl+Q to quit)");
+
+// Create input components and labels
+
+var usernameLabel = new Label("Username:");
+var usernameText = new TextField("")
 {
-	X = 0,
-	Y = 1, // Leave one row for the toplevel menu
+    // Position text field adjacent to label
+    X = Pos.Right(usernameLabel) + 1,
 
-	// By using Dim.Fill(), it will automatically resize without manual intervention
-	Width = Dim.Fill(),
-	Height = Dim.Fill()
+    // Fill remaining horizontal space with a margin of 1
+    Width = Dim.Fill(1),
 };
 
-top.Add(win);
-
-// Creates a menubar, the item "New" has a help menu.
-var menu = new MenuBar(new MenuBarItem[] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "Creates new file", null),
-				new MenuItem ("_Close", "",null),
-				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
-			}),
-			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
-			})
-		});
-top.Add(menu);
-
-static bool Quit()
+var passwordLabel = new Label(0,2,"Password:");
+var passwordText = new TextField("")
 {
-	var n = MessageBox.Query(50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
-	return n == 0;
-}
-
-var login = new Label("Login: ") { X = 3, Y = 2 };
-var password = new Label("Password: ")
-{
-	X = Pos.Left(login),
-	Y = Pos.Top(login) + 1
-};
-var loginText = new TextField("")
-{
-	X = Pos.Right(password),
-	Y = Pos.Top(login),
-	Width = 40
-};
-var passText = new TextField("")
-{
-	Secret = true,
-	X = Pos.Left(loginText),
-	Y = Pos.Top(password),
-	Width = Dim.Width(loginText)
+    Secret = true,
+    // align with the text box above
+    X = Pos.Left(usernameText),
+    Y = 2,
+    Width = Dim.Fill(1),
 };
 
-// Add some controls, 
+// Create login button
+var btnLogin = new Button("Login")
+{
+    Y = 4,
+    // center the login button horizontally
+    X = Pos.Center(),
+    IsDefault = true,
+};
+
+// When login button is clicked display a message popup
+btnLogin.Clicked += () => MessageBox.Query("Logging In", "Login Successful", "Ok");
+
+// Add all the views to the window
 win.Add(
-	// The ones with my favorite layout system, Computed
-	login, password, loginText, passText,
-
-	// The ones laid out like an australopithecus, with Absolute positions:
-	new CheckBox(3, 6, "Remember me"),
-	new RadioGroup(3, 8, new ustring[] { "_Personal", "_Company" }, 0),
-	new Button(3, 14, "Ok"),
-	new Button(10, 14, "Cancel"),
-	new Label(3, 18, "Press F9 or ESC plus 9 to activate the menubar")
+    usernameLabel, usernameText, passwordLabel, passwordText,btnLogin
 );
 
-Application.Run();
+// Show the application
+Application.Run(win);
+
+// After the application exits, release and reset console for clean shutdown
 Application.Shutdown();
 ```
 
-The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://gui-cs.github.io/Terminal.Gui/articles/overview.html#layout)**.
+When run the application looks as follows:
 
-Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
+![Simple Usage app](./docfx/images/Example.png)
 
-```csharp
-using Terminal.Gui;
-
-class Demo {
-	static void Main ()
-	{
-		Application.Run<App> ();
-		Application.Shutdown ();
-	}
-}
-```
+_Sample application running_
 
 ## Installing
 
@@ -154,12 +138,14 @@ To install Terminal.Gui into a .NET Core project, use the `dotnet` CLI tool with
 dotnet add package Terminal.Gui
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
+Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
-## Running and Building
+## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
-* Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
+* Windows - Open `Terminal.sln` with Visual Studio 2022.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
 
 ## Contributing
 
@@ -169,10 +155,4 @@ Debates on architecture and design can be found in Issues tagged with [design](h
 
 ## History
 
-This is an updated version of [gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that Miguel wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
-
-The original **gui.cs** was a UI toolkit in a single file and tied to curses. This version tries to be console-agnostic and instead of having a container/widget model, only uses Views (which can contain subviews) and changes the rendering model to rely on damage regions instead of burdening each view with the details.
-
-A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
-
-The most recent release notes can be found in the [Terminal.Gui.csproj](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
+See [gui-cs](https://github.com/gui-cs/) for how this project came to be.

@@ -617,7 +617,7 @@ namespace Terminal.Gui {
 			return keyModifiers;
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+		void ProcessInput ()
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -787,6 +787,8 @@ namespace Terminal.Gui {
 		}
 
 		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyDownHandler;
+		Action<KeyEvent> keyUpHandler;
 		Action<MouseEvent> mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -794,12 +796,14 @@ namespace Terminal.Gui {
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.keyHandler = keyHandler;
+			this.keyDownHandler = keyDownHandler;
+			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as UnixMainLoop;
 
 			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
+				ProcessInput ();
 				return true;
 			});
 
@@ -1128,26 +1132,48 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
 		{
-			Key k;
+			Key key;
 
-			if ((shift || alt || control)
-				&& keyChar - (int)Key.Space >= (uint)Key.A && keyChar - (int)Key.Space <= (uint)Key.Z) {
-				k = (Key)(keyChar - (uint)Key.Space);
+			if (consoleKey == ConsoleKey.Packet) {
+				ConsoleModifiers mod = new ConsoleModifiers ();
+				if (shift) {
+					mod |= ConsoleModifiers.Shift;
+				}
+				if (alt) {
+					mod |= ConsoleModifiers.Alt;
+				}
+				if (control) {
+					mod |= ConsoleModifiers.Control;
+				}
+				var kchar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyChar, mod, out uint ckey, out _);
+				key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)ckey, out bool mappable);
+				if (mappable) {
+					key = (Key)kchar;
+				}
 			} else {
-				k = (Key)keyChar;
+				key = (Key)keyChar;
 			}
+
+			KeyModifiers km = new KeyModifiers ();
 			if (shift) {
-				k |= Key.ShiftMask;
+				if (keyChar == 0) {
+					key |= Key.ShiftMask;
+				}
+				km.Shift = shift;
 			}
 			if (alt) {
-				k |= Key.AltMask;
+				key |= Key.AltMask;
+				km.Alt = alt;
 			}
 			if (control) {
-				k |= Key.CtrlMask;
+				key |= Key.CtrlMask;
+				km.Ctrl = control;
 			}
-			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			keyDownHandler (new KeyEvent (key, km));
+			keyHandler (new KeyEvent (key, km));
+			keyUpHandler (new KeyEvent (key, km));
 		}
 
 		public override bool GetColors (int value, out Color foreground, out Color background)
@@ -1500,6 +1526,7 @@ namespace Terminal.Gui {
 				}
 			}) {
 				powershell.Start ();
+				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}

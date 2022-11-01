@@ -35,10 +35,7 @@ namespace UICatalog.Scenarios {
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
@@ -116,6 +113,7 @@ namespace UICatalog.Scenarios {
 					new MenuBarItem ("_Languages", GetSupportedCultures ())
 				})
 			});
+
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {

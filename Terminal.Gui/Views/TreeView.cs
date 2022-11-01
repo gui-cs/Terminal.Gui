@@ -140,12 +140,12 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
 
-		
+
 		/// <summary>
 		/// Delegate for multi colored tree views.  Return the <see cref="ColorScheme"/> to use
 		/// for each passed object or null to use the default.
 		/// </summary>
-		public Func<T,ColorScheme> ColorGetter {get;set;}
+		public Func<T, ColorScheme> ColorGetter { get; set; }
 
 		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
@@ -219,19 +219,24 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public AspectGetterDelegate<T> AspectGetter { get; set; } = (o) => o.ToString () ?? "";
 
-		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
 
 		/// <summary>
-		/// Get / Set the wished cursor when the tree is focused
+		/// Get / Set the wished cursor when the tree is focused.
+		/// Only applies when <see cref="MultiSelect"/> is true.
+		/// Defaults to <see cref="CursorVisibility.Invisible"/>
 		/// </summary>
 		public CursorVisibility DesiredCursorVisibility {
-			get => desiredCursorVisibility;
+			get {
+				return MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
+			}
 			set {
-				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);
+				if (desiredCursorVisibility != value) {
+					desiredCursorVisibility = value;
+					if (HasFocus) {
+						Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+					}
 				}
-
-				desiredCursorVisibility = value;
 			}
 		}
 
@@ -622,7 +627,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="toFind"></param>
 		/// <returns></returns>
-		public int? GetObjectRow(T toFind)
+		public int? GetObjectRow (T toFind)
 		{
 			var idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
 

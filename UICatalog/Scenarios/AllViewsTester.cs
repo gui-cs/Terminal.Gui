@@ -44,10 +44,7 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			Top = top != null ? top : Application.Top;
 
 			//Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 			//	X = 0,

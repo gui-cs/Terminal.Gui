@@ -242,7 +242,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestThinTabView_WithLongNames ()
+		public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
 		{
 			var tv = GetTabView (out var tab1, out var tab2, false);
 			tv.Width = 10;
@@ -257,23 +257,34 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"
-┌──┐
-│12│13
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──┐      
+│12│13    
 │  └─────┐
 │hi      │
 └────────┘", output);
 
+			tv.SelectedTab = tab2;
 
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   ┌──┐   
+ 12│13│   
+┌──┘  └──┐
+│hi2     │
+└────────┘", output);
+
+			tv.SelectedTab = tab1;
 			// Test first tab name too long
 			tab1.Text = "12345678910";
 			tab2.Text = "13";
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"
-┌───────┐
-│1234567│
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───────┐ 
+│1234567│ 
 │       └►
 │hi      │
 └────────┘", output);
@@ -282,9 +293,9 @@ namespace Terminal.Gui.Views {
 			tv.SelectedTab = tab2;
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"   
-┌──┐
-│13│
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──┐      
+│13│      
 ◄  └─────┐
 │hi2     │
 └────────┘", output);
@@ -296,16 +307,94 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"     
-┌───────┐
-│abcdefg│
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───────┐ 
+│abcdefg│ 
 ◄       └┐
 │hi2     │
 └────────┘", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestTabView_Width4 ()
+		public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+			tv.Width = 10;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false };
+			tv.ApplyStyleChanges ();
+
+			// Ensures that the tab bar subview gets the bounds of the parent TabView
+			tv.LayoutSubviews ();
+
+			// Test two tab names that fit 
+			tab1.Text = "12";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│12│13    
+│  └─────┐
+│hi      │
+│        │
+└────────┘", output);
+
+
+			tv.SelectedTab = tab2;
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 12│13│   
+┌──┘  └──┐
+│hi2     │
+│        │
+└────────┘", output);
+
+			tv.SelectedTab = tab1;
+
+			// Test first tab name too long
+			tab1.Text = "12345678910";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│1234567│ 
+│       └►
+│hi      │
+│        │
+└────────┘", output);
+
+			//switch to tab2
+			tv.SelectedTab = tab2;
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│13│      
+◄  └─────┐
+│hi2     │
+│        │
+└────────┘", output);
+
+
+			// now make both tabs too long
+			tab1.Text = "12345678910";
+			tab2.Text = "abcdefghijklmnopq";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│abcdefg│ 
+◄       └┐
+│hi2     │
+│        │
+└────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
 		{
 			var tv = GetTabView (out _, out _, false);
 			tv.Width = 4;
@@ -314,16 +403,36 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"
-┌─┐
-│T│
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌─┐ 
+│T│ 
 │ └►
 │hi│
 └──┘", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestTabView_Width3 ()
+		public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 4;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│T│ 
+│ └►
+│hi│
+│  │
+└──┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
 		{
 			var tv = GetTabView (out _, out _, false);
 			tv.Width = 3;
@@ -332,10 +441,323 @@ namespace Terminal.Gui.Views {
 
 			tv.Redraw (tv.Bounds);
 
-			GraphViewTests.AssertDriverContentsAre (@"
-┌─┐
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌┐ 
+││ 
+│└►
 │h│
 └─┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 3;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+││ 
+│└►
+│h│
+│ │
+└─┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+			tv.Width = 10;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+
+			// Ensures that the tab bar subview gets the bounds of the parent TabView
+			tv.LayoutSubviews ();
+
+			// Test two tab names that fit 
+			tab1.Text = "12";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi      │
+│  ┌─────┘
+│12│13    
+└──┘      ", output);
+
+
+			// Test first tab name too long
+			tab1.Text = "12345678910";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi      │
+│       ┌►
+│1234567│ 
+└───────┘ ", output);
+
+			//switch to tab2
+			tv.SelectedTab = tab2;
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi2     │
+◄  ┌─────┘
+│13│      
+└──┘      ", output);
+
+
+			// now make both tabs too long
+			tab1.Text = "12345678910";
+			tab2.Text = "abcdefghijklmnopq";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi2     │
+◄       ┌┘
+│abcdefg│ 
+└───────┘ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+			tv.Width = 10;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false, TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+
+			// Ensures that the tab bar subview gets the bounds of the parent TabView
+			tv.LayoutSubviews ();
+
+			// Test two tab names that fit 
+			tab1.Text = "12";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi      │
+│        │
+│  ┌─────┘
+│12│13    ", output);
+
+
+			tv.SelectedTab = tab2;
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi2     │
+│        │
+└──┐  ┌──┘
+ 12│13│   ", output);
+
+			tv.SelectedTab = tab1;
+
+			// Test first tab name too long
+			tab1.Text = "12345678910";
+			tab2.Text = "13";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi      │
+│        │
+│       ┌►
+│1234567│ ", output);
+
+			//switch to tab2
+			tv.SelectedTab = tab2;
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi2     │
+│        │
+◄  ┌─────┘
+│13│      ", output);
+
+
+			// now make both tabs too long
+			tab1.Text = "12345678910";
+			tab2.Text = "abcdefghijklmnopq";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│hi2     │
+│        │
+◄       ┌┘
+│abcdefg│ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 4;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──┐
+│hi│
+│ ┌►
+│T│ 
+└─┘ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 4;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false, TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──┐
+│hi│
+│  │
+│ ┌►
+│T│ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 3;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌─┐
+│h│
+│┌►
+││ 
+└┘ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
+		{
+			var tv = GetTabView (out _, out _, false);
+			tv.Width = 3;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { ShowTopLine = false, TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌─┐
+│h│
+│ │
+│┌►
+││ ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+			tv.Width = 20;
+			tv.Height = 5;
+
+			tv.LayoutSubviews ();
+
+			tab1.Text = "Tab0";
+			tab2.Text = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────┐              
+│Tab0│              
+│    └─────────────►
+│hi                │
+└──────────────────┘", output);
+
+			tv.SelectedTab = tab2;
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────┐    
+│Les Misérables│    
+◄              └───┐
+│hi2               │
+└──────────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+			tv.Width = 20;
+			tv.Height = 5;
+			tv.Style = new TabView.TabStyle { TabsOnBottom = true };
+			tv.ApplyStyleChanges ();
+
+			tv.LayoutSubviews ();
+
+			tab1.Text = "Tab0";
+			tab2.Text = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│hi                │
+│    ┌─────────────►
+│Tab0│              
+└────┘              ", output);
+
+			tv.SelectedTab = tab2;
+
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│hi2               │
+◄              ┌───┘
+│Les Misérables│    
+└──────────────┘    ", output);
 		}
 
 		private void InitFakeDriver ()

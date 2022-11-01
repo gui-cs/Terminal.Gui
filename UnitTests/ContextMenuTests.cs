@@ -72,7 +72,7 @@ namespace Terminal.Gui.Core {
           └──────┘
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			cm.Hide ();
 			Assert.False (ContextMenu.IsShow);
@@ -81,7 +81,7 @@ namespace Terminal.Gui.Core {
 
 			expected = "";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact]
@@ -105,7 +105,7 @@ namespace Terminal.Gui.Core {
           └──────┘
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			cm.Position = new Point (5, 10);
 
@@ -119,7 +119,7 @@ namespace Terminal.Gui.Core {
      └──────┘
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -144,7 +144,7 @@ namespace Terminal.Gui.Core {
           └──────┘
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			cm.MenuItems = new MenuBarItem (new MenuItem [] {
 				new MenuItem ("First", "", null),
@@ -164,7 +164,7 @@ namespace Terminal.Gui.Core {
           └─────────┘
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 		}
 
@@ -271,7 +271,7 @@ namespace Terminal.Gui.Core {
                                                                         └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (72, 21, 80, 4), pos);
 
 			cm.Hide ();
@@ -312,7 +312,7 @@ namespace Terminal.Gui.Core {
                                                                       View    
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (70, 20, 78, 5), pos);
 
 			cm.Hide ();
@@ -347,7 +347,7 @@ namespace Terminal.Gui.Core {
           └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (10, 5, 18, 5), pos);
 
 			cm.Hide ();
@@ -370,7 +370,7 @@ namespace Terminal.Gui.Core {
      └──────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (5, 10, 13, 7), pos);
 
 			cm.Hide ();
@@ -401,7 +401,7 @@ namespace Terminal.Gui.Core {
 └────
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 1, 5, 4), pos);
 
 			cm.Hide ();
@@ -431,7 +431,7 @@ namespace Terminal.Gui.Core {
 │ Two  │
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 8, 3), pos);
 
 			cm.Hide ();
@@ -484,7 +484,7 @@ namespace Terminal.Gui.Core {
 └──────┘
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 1, 8, 4), pos);
 
 			cm.ForceMinimumPosToZero = false;
@@ -498,7 +498,7 @@ namespace Terminal.Gui.Core {
 ──────┘
 ";
 
-			pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 7, 3), pos);
 		}
 
@@ -592,7 +592,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                   
+ File  Edit                     
                                 
                                 
   Label: TextField              
@@ -611,8 +611,8 @@ namespace Terminal.Gui.Core {
  F1 Help │ ^Q Quit              
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 32, 17), pos);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 0, 32, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -656,7 +656,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
-  File   Edit                               
+ File  Edit                                 
 ┌ Window ──────────────────────────────────┐
 │                                          │
 │                                          │
@@ -675,8 +675,8 @@ namespace Terminal.Gui.Core {
  F1 Help │ ^Q Quit                          
 ";
 
-			var pos = GraphViewTests.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (2, 0, 44, 17), pos);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 0, 44, 17), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -707,7 +707,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (new Point (-1, -2), cm.Position);
 			var top = Application.Top;
 			Application.Begin (top);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │ One    │
 │ Two    │
@@ -726,7 +726,7 @@ namespace Terminal.Gui.Core {
 			}));
 			Application.Refresh ();
 			Assert.Equal (new Point (-1, -2), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐             
 │ One    │             
 │ Two    │             
@@ -747,7 +747,7 @@ namespace Terminal.Gui.Core {
 			cm.Show ();
 			Application.Refresh ();
 			Assert.Equal (new Point (41, -2), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                               ┌────────┐
                               │ One    │
                               │ Two    │
@@ -766,7 +766,7 @@ namespace Terminal.Gui.Core {
 			}));
 			Application.Refresh ();
 			Assert.Equal (new Point (41, -2), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                               ┌────────┐
                               │ One    │
                               │ Two    │
@@ -786,7 +786,7 @@ namespace Terminal.Gui.Core {
 			cm.Show ();
 			Application.Refresh ();
 			Assert.Equal (new Point (41, 9), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                               ┌────────┐
                               │ One    │
                               │ Two    │
@@ -805,7 +805,7 @@ namespace Terminal.Gui.Core {
 			}));
 			Application.Refresh ();
 			Assert.Equal (new Point (41, 9), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                               ┌────────┐
                  ┌───────────┐│ One    │
                  │ SubMenu1  ││ Two    │
@@ -822,7 +822,7 @@ namespace Terminal.Gui.Core {
 			cm.Show ();
 			Application.Refresh ();
 			Assert.Equal (new Point (41, 22), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                               ┌────────┐
                               │ One    │
                               │ Two    │
@@ -841,7 +841,7 @@ namespace Terminal.Gui.Core {
 			}));
 			Application.Refresh ();
 			Assert.Equal (new Point (41, 22), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
                  ┌───────────┐          
                  │ SubMenu1  │┌────────┐
                  │ SubMenu2  ││ One    │
@@ -858,7 +858,7 @@ namespace Terminal.Gui.Core {
 			cm.Show ();
 			Application.Refresh ();
 			Assert.Equal (new Point (19, 10), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
         ┌────────┐
         │ One    │
         │ Two    │
@@ -877,7 +877,7 @@ namespace Terminal.Gui.Core {
 			}));
 			Application.Refresh ();
 			Assert.Equal (new Point (19, 10), cm.Position);
-			GraphViewTests.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───────────┐────┐
 │ SubMenu1  │    │
 │ SubMenu2  │    │
@@ -887,6 +887,20 @@ namespace Terminal.Gui.Core {
 │ SubMenu6  │    │
 │ SubMenu7  │────┘
 ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Key_Open_And_Close_The_ContextMenu ()
+		{
+			var tf = new TextField ();
+			var top = Application.Top;
+			top.Add (tf);
+			Application.Begin (top);
+
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
+			Assert.True (top.Subviews [1].ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 	}
 }
