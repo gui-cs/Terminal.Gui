@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Xunit;
 
 namespace Terminal.Gui.Core {
@@ -254,6 +255,51 @@ namespace Terminal.Gui.Core {
 			Thread.Sleep (n.TypingDelay + 10);
 			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '2')); // Shouldn't move
 			Assert.Equal ("2", n.SearchString);
+		}
+
+		[Fact]
+		public void MutliKeySearchPlusWrongKeyStays ()
+		{
+			var strings = new string []{
+				"a",
+			    "c",
+			    "can",
+			    "candle",
+			    "candy",
+			    "yellow"
+			  };
+			int current = 0;
+			var n = new CollectionNavigator (strings);
+
+			// https://github.com/gui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
+			// One thing that it currently does that is different from Explorer is that as soon as you hit a wrong key then it jumps to that index.
+			// So if you type cand then z it jumps you to something beginning with z. In the same situation Windows Explorer beeps (not the best!)
+			// but remains on candle.
+			// We might be able to update the behaviour so that a 'wrong' keypress (z) within 500ms of a 'right' keypress ("can" + 'd') is
+			// simply ignored (possibly ending the search process though). That would give a short delay for user to realise the thing
+			// they typed doesn't exist and then start a new search (which would be possible 500ms after the last 'good' keypress).
+			// This would only apply for 2+ character searches where theres been a successful 2+ character match right before.
+
+			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
+			Assert.Equal ("c", n.SearchString);
+			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal ("ca", n.SearchString);
+			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
+			Assert.Equal ("can", n.SearchString);
+			Assert.Equal (strings.IndexOf ("candle"), current = n.GetNextMatchingItem (current, 'd'));
+			Assert.Equal ("cand", n.SearchString);
+
+			// Same as above, but with a 'wrong' key (z)
+			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
+			Assert.Equal ("c", n.SearchString);
+			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
+			Assert.Equal ("ca", n.SearchString);
+			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
+			Assert.Equal ("can", n.SearchString);
+			Assert.Equal (strings.IndexOf ("candle"), current = n.GetNextMatchingItem (current, 'z'));
+			Assert.Equal ("cand", n.SearchString);
 		}
 
 		[Fact]
