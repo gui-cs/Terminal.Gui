@@ -4062,5 +4062,23 @@ This is a tes
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void IsOverridden_False_IfNotOverriden ()
+		{
+			var view = new DerivedView () { Text = "Derived View does not override MouseEvent or Redraw", Width = 10, Height = 10 };
+			
+			Assert.False (View.IsOverridden (view, "MouseEvent"));
+			Assert.False (View.IsOverridden (view, "Redraw"));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsOverridden_True_IfOverriden ()
+		{
+			var view = new ScrollBarView () { Text = "ScrollBarView overrides both MouseEvent and Redraw", Width = 10, Height = 10 };
+
+			Assert.True (View.IsOverridden (view, "MouseEvent"));
+			Assert.True (View.IsOverridden (view, "Redraw"));
+		}
 	}
 }
