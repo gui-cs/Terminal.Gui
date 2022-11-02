@@ -415,7 +415,7 @@ namespace Terminal.Gui.Trees {
 		/// Expands the current branch and all children branches.
 		/// </summary>
 		internal void ExpandAll ()
-		{
+			{
 			Expand ();
 
 			if (ChildBranches != null) {
