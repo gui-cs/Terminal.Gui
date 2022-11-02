@@ -689,10 +689,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ScrollDown ()
 		{
-			if (ScrollOffsetVertical <= ContentHeight - 2) {
-				ScrollOffsetVertical++;
-				SetNeedsDisplay ();
-			}
+			ScrollOffsetVertical++;
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -700,10 +698,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ScrollUp ()
 		{
-			if (scrollOffsetVertical > 0) {
-				ScrollOffsetVertical--;
-				SetNeedsDisplay ();
-			}
+			ScrollOffsetVertical--;
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
