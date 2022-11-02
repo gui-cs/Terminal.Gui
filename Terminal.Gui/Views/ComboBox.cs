@@ -484,7 +484,7 @@ namespace Terminal.Gui {
 				search.SetFocus ();
 			}
 
-			search.CursorPosition = search.Text.RuneCount;
+			search.CursorPosition = search.Text.ConsoleWidth;
 
 			return base.OnEnter (view);
 		}
