@@ -89,8 +89,8 @@ namespace Terminal.Gui.Trees {
 		public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
 		{
 			// true if the current line of the tree is the selected one and control has focus
-			bool isSelected = tree.IsSelected (Model) && tree.HasFocus;
-			Attribute lineColor = isSelected ? colorScheme.Focus : colorScheme.Normal;
+			bool isSelected = tree.IsSelected (Model);// && tree.HasFocus;
+			Attribute lineColor = isSelected ? (tree.HasFocus ? colorScheme.HotFocus : colorScheme.HotNormal) : colorScheme.Normal ;
 
 			driver.SetAttribute (lineColor);
 
@@ -418,7 +418,7 @@ namespace Terminal.Gui.Trees {
 		/// Expands the current branch and all children branches
 		/// </summary>
 		internal void ExpandAll ()
-		{
+			{
 			Expand ();
 
 			if (ChildBranches != null) {

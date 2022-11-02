@@ -151,7 +151,7 @@ namespace Terminal.Gui.Views {
 
 			public IList ToList ()
 			{
-				throw new NotImplementedException ();
+				return new List<string> () { "One", "Two", "Three" };
 			}
 		}
 

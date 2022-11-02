@@ -23,13 +23,17 @@
       "commandName": "Project",
       "commandLineArgs": "WizardAsView"
     },
-    "Issue1719Repro": {
-      "commandName": "Project",
-      "commandLineArgs": "\"ProgressBar Styles\""
-    },
     "VkeyPacketSimulator": {
       "commandName": "Project",
       "commandLineArgs": "VkeyPacketSimulator"
+    },
+    "CollectionNavigatorTester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Search Collection Nav\""
+    },
+    "Charmap": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Character Map\""
     },
     "WSL2": {
       "commandName": "Executable",
@@ -44,10 +48,6 @@
     "WSL": {
       "commandName": "WSL2",
       "distributionName": ""
-    },
-    "Charmap": {
-      "commandName": "Project",
-      "commandLineArgs": "\"Character Map\""
     }
   }
 }
