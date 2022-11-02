@@ -303,12 +303,6 @@ namespace Terminal.Gui {
 			if (Border.DrawMarginFrame)
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
 			Driver.SetAttribute (GetNormalColor ());
-
-			// Checks if there are any SuperView view which intersect with this window.
-			if (SuperView != null) {
-				SuperView.SetNeedsLayout ();
-				SuperView.SetNeedsDisplay ();
-			}
 		}
 
 		/// <inheritdoc/>

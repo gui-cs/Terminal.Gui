@@ -1500,11 +1500,16 @@ namespace Terminal.Gui {
 			crow = row;
 		}
 
+		int GetOutputBufferPosition ()
+		{
+			return crow * Cols + ccol;
+		}
+
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var position = crow * Cols + ccol;
+			var position = GetOutputBufferPosition ();
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
@@ -1518,7 +1523,7 @@ namespace Terminal.Gui {
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
 					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
-					var prevPosition = crow * Cols + ccol + 1;
+					var prevPosition = GetOutputBufferPosition () + 1;
 					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 
@@ -1539,7 +1544,7 @@ namespace Terminal.Gui {
 			ccol++;
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					position = crow * Cols + ccol;
+					position = GetOutputBufferPosition ();
 					OutputBuffer [position].Attributes = (ushort)currentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
