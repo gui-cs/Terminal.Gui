@@ -462,7 +462,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+			Driver.SetAttribute (GetNormalColor ());
 
 			if ((vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
 				return;
@@ -613,13 +613,13 @@ namespace Terminal.Gui {
 		int posBarOffset;
 
 		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent mouseEvent)
+		public override bool MouseEvent (MouseEvent me)
 		{
-			if (mouseEvent.Flags != MouseFlags.Button1Pressed && mouseEvent.Flags != MouseFlags.Button1DoubleClicked &&
-				!mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
-				mouseEvent.Flags != MouseFlags.Button1Released && mouseEvent.Flags != MouseFlags.WheeledDown &&
-				mouseEvent.Flags != MouseFlags.WheeledUp && mouseEvent.Flags != MouseFlags.WheeledRight &&
-				mouseEvent.Flags != MouseFlags.WheeledLeft && mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
+			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1DoubleClicked &&
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
+				me.Flags != MouseFlags.Button1Released && me.Flags != MouseFlags.WheeledDown &&
+				me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight &&
+				me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.Button1TripleClicked) {
 				return false;
 			}
 
@@ -630,24 +630,24 @@ namespace Terminal.Gui {
 				Host.SetFocus ();
 			}
 
-			int location = vertical ? mouseEvent.Y : mouseEvent.X;
+			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
 			int posTopLeftTee = vertical ? posTopTee + 1 : posLeftTee + 1;
 			int posBottomRightTee = vertical ? posBottomTee + 1 : posRightTee + 1;
 			barsize -= 2;
 			var pos = Position;
 
-			if (mouseEvent.Flags != MouseFlags.Button1Released
+			if (me.Flags != MouseFlags.Button1Released
 				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
 				Application.GrabMouse (this);
-			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
+			} else if (me.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
 				Application.UngrabMouse ();
 				return true;
 			}
-			if (showScrollIndicator && (mouseEvent.Flags == MouseFlags.WheeledDown || mouseEvent.Flags == MouseFlags.WheeledUp ||
-				mouseEvent.Flags == MouseFlags.WheeledRight || mouseEvent.Flags == MouseFlags.WheeledLeft)) {
-				return Host.MouseEvent (mouseEvent);
+			if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
+				me.Flags == MouseFlags.WheeledRight || me.Flags == MouseFlags.WheeledLeft)) {
+				return Host.MouseEvent (me);
 			}
 
 			if (location == 0) {
@@ -668,7 +668,7 @@ namespace Terminal.Gui {
 				//}
 
 				if (lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee
-				&& mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+				&& me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 					if (lastLocation == -1) {
 						lastLocation = location;
 						posBarOffset = keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;

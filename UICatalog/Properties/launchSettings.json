@@ -44,10 +44,6 @@
     "WSL": {
       "commandName": "WSL2",
       "distributionName": ""
-    },
-    "Charmap": {
-      "commandName": "Project",
-      "commandLineArgs": "\"Character Map\""
     }
   }
 }

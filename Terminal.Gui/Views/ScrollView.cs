@@ -32,7 +32,6 @@ namespace Terminal.Gui {
 		private class ContentView : View {
 			public ContentView (Rect frame) : base (frame)
 			{
-				CanFocus = true;
 			}
 		}
 
@@ -326,7 +325,7 @@ namespace Terminal.Gui {
 		{
 			Driver.SetAttribute (GetNormalColor ());
 			SetViewsNeedsDisplay ();
-			//Clear ();
+			Clear ();
 
 			var savedClip = ClipToBounds ();
 			OnDrawContent (new Rect (ContentOffset,
@@ -508,7 +507,7 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
 				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
-//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
 			}
