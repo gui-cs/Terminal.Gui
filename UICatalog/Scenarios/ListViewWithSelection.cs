@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			_scenarios = Scenario.GetScenarios ().OrderBy (s => s.GetName ()).ToList ();
+			_scenarios = Scenario.GetScenarios ();
 
 			_customRenderCB = new CheckBox ("Use custom rendering") {
 				X = 0,

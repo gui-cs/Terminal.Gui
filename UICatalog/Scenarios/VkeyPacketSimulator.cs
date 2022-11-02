@@ -6,7 +6,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "VkeyPacketSimulator", Description: "Simulates the Virtual Key Packet")]
-	[ScenarioCategory ("Keys")]
+	[ScenarioCategory ("Mouse and Keyboard")]
 	public class VkeyPacketSimulator : Scenario {
 		List<int> _keyboardStrokes = new List<int> ();
 		bool _outputStarted = false;

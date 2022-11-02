@@ -233,7 +233,7 @@ namespace UICatalog {
 		}
 
 		/// <summary>
-		/// Returns an instance of each <see cref="Scenario"/> defined in the project. 
+		/// Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by <see cref="ScenarioMetadata.Name"/>.
 		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
 		/// </summary>
 		public static List<Scenario> GetScenarios ()
@@ -245,7 +245,7 @@ namespace UICatalog {
 				objects.Add (scenario);
 				_maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
 			}
-			return objects;
+			return objects.OrderBy (s => s.GetName ()).ToList ();
 		}
 
 		protected virtual void Dispose (bool disposing)

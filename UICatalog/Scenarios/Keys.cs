@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 			Top = top != null ? top : Application.Top;
-
+			
 			Win = new TestWindow ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
