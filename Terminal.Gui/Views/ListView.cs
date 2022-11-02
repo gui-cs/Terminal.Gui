@@ -728,6 +728,7 @@ namespace Terminal.Gui {
 
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
+				OnSelectedChanged ();
 			}
 
 			return base.OnEnter (view);
