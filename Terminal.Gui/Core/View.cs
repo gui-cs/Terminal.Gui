@@ -3080,7 +3080,7 @@ namespace Terminal.Gui {
 		/// <param name="view">The view.</param>
 		/// <param name="method">The method name.</param>
 		/// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
-		public bool IsOverridden (View view, string method)
+		public static bool IsOverridden (View view, string method)
 		{
 			MethodInfo m = view.GetType ().GetMethod (method,
 				BindingFlags.Instance
