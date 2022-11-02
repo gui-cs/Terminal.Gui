@@ -42,7 +42,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miShowLines = new MenuItem ("_ShowLines", "", () => ShowLines()){
+					miShowLines = new MenuItem ("_ShowBranchLines", "", () => ShowLines()){
 					Checked = true, CheckType = MenuItemCheckStyle.Checked
 						},
 					null /*separator*/,
