@@ -4062,5 +4062,29 @@ This is a tes
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void IsOverridden_False_IfNotOverriden ()
+		{
+			var view = new DerivedView () { Text = "DerivedView does not override MouseEvent", Width = 10, Height = 10 };
+
+			Assert.False (View.IsOverridden (view, "MouseEvent"));
+
+			var view2 = new Button () { Text = "Button does not overrides OnKeyDown", Width = 10, Height = 10 };
+
+			Assert.False (View.IsOverridden (view2, "OnKeyDown"));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsOverridden_True_IfOverriden ()
+		{
+			var view = new Button () { Text = "Button overrides MouseEvent", Width = 10, Height = 10 };
+
+			Assert.True (View.IsOverridden (view, "MouseEvent"));
+
+			var view2 = new DerivedView () { Text = "DerivedView overrides OnKeyDown", Width = 10, Height = 10 };
+
+			Assert.True (View.IsOverridden (view2, "OnKeyDown"));
+		}
 	}
 }
