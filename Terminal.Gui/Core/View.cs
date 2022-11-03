@@ -1495,14 +1495,17 @@ namespace Terminal.Gui {
 
 			if (Border != null) {
 				Border.DrawContent (this);
-			} else if ((GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
+				(GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
-				Clear (ViewToScreen (bounds));
+				Clear ();
+				SetChildNeedsDisplay ();
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear ();
+				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
