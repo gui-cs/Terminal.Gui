@@ -83,7 +83,7 @@ namespace Terminal.Gui.Core {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void DrawContent_With_Child_Border ()
+		public void DrawContent_With_Child_Border_With_Height_Greater_Than_One ()
 		{
 			var top = Application.Top;
 			var driver = (FakeDriver)Application.Driver;
@@ -101,7 +101,8 @@ namespace Terminal.Gui.Core {
 					Effect3DOffset = new Point (2, -3)
 				},
 				ColorScheme = Colors.TopLevel,
-				Text = "This is a test"
+				Text = "This is a test",
+				Height = 2
 			};
 			label.Border.Child = label;
 			top.Add (label);

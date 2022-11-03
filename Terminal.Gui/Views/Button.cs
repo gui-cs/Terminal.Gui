@@ -158,6 +158,26 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private bool useEffect3DAnimation;
+
+		/// <summary>
+		/// Gets or sets if the button will have a <see cref="Border.effect3D"/> with animation.
+		/// </summary>
+		public bool UseEffect3DAnimation {
+			get => useEffect3DAnimation;
+			set {
+				useEffect3DAnimation = value;
+				if (value && Border == null) {
+					Border = new Border {
+						Effect3D = true,
+						Effect3DBrush = new Attribute (Color.Black, Color.Black)
+					};
+				} else if (!value && Border != null) {
+					Border.Effect3D = false;
+				}
+			}
+		}
+
 		/// <inheritdoc/>
 		protected override void UpdateTextFormatterText ()
 		{
@@ -231,7 +251,27 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnClicked ()
 		{
-			Clicked?.Invoke ();
+			if (UseEffect3DAnimation) {
+				Border.Effect3D = false;
+				var x = X;
+				if (Border.Effect3DOffset.X > 0) {
+					X += 1;
+				} else {
+					X -= 1;
+				}
+				SetNeedsDisplay ();
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (m) => {
+					Border.Effect3D = true;
+					Application.MainLoop.Invoke (() => {
+						X = x;
+						SetNeedsDisplay ();
+					});
+					Clicked?.Invoke ();
+					return false;
+				});
+			} else {
+				Clicked?.Invoke ();
+			}
 		}
 
 		/// <summary>

@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 
 		private View child;
 		private bool usePanelFrame;
+		private bool useEffect3DAnimation;
 
 		/// <summary>
 		/// Initializes a panel with a null child.
@@ -41,6 +42,61 @@ namespace Terminal.Gui {
 			Child = child;
 			if (child != null) {
 				Visible = child.Visible;
+			}
+		}
+
+		/// <summary>
+		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
+		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
+		/// </summary>
+		/// <remarks>
+		///   Client code can hook up to this event, it is
+		///   raised when the button is activated either with
+		///   the mouse or the keyboard.
+		/// </remarks>
+		public event Action Clicked;
+
+		/// <summary>
+		/// Gets or sets if the button will have a <see cref="Border.effect3D"/> with animation.
+		/// </summary>
+		public bool UseEffect3DAnimation {
+			get => useEffect3DAnimation;
+			set {
+				useEffect3DAnimation = value;
+				if (value && Child != null) {
+					Child.MouseClick += Child_MouseClick;
+					Child.KeyPress += Child_KeyPress;
+				} else if (!value && Child != null) {
+					Child.MouseClick -= Child_MouseClick;
+					Child.KeyPress -= Child_KeyPress;
+				}
+			}
+		}
+
+		private void Child_KeyPress (KeyEventEventArgs obj)
+		{
+			if (obj.KeyEvent.Key == Key.Enter || obj.KeyEvent.Key == Key.Space) {
+				if (!HasFocus) {
+					SetFocus ();
+				}
+				OnClicked ();
+				obj.Handled = true;
+			}
+		}
+
+		private void Child_MouseClick (MouseEventArgs obj)
+		{
+			if (obj.MouseEvent.Flags == MouseFlags.Button1Clicked) {
+				if (!HasFocus && SuperView != null) {
+					if (!SuperView.HasFocus) {
+						SuperView.SetFocus ();
+					}
+					SetFocus ();
+					SetNeedsDisplay ();
+				}
+
+				OnClicked ();
+				obj.Handled = true;
 			}
 		}
 
@@ -245,6 +301,32 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			if (UseEffect3DAnimation) {
+				Border.Effect3D = false;
+				var x = X;
+				if (Border.Effect3DOffset.X > 0) {
+					X += 1;
+				} else {
+					X -= 1;
+				}
+				SetNeedsDisplay ();
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (m) => {
+					Border.Effect3D = true;
+					Application.MainLoop.Invoke (() => {
+						X = x;
+						SetNeedsDisplay ();
+					});
+					Clicked?.Invoke ();
+					return false;
+				});
+			}
 		}
 	}
 }
