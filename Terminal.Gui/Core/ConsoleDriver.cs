@@ -683,7 +683,7 @@ namespace Terminal.Gui {
 		public abstract void Move (int col, int row);
 		
 		/// <summary>
-		/// Adds the specified rune to the display at the current cursor position
+		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
@@ -717,10 +717,11 @@ namespace Terminal.Gui {
 			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
 
 		/// <summary>
-		/// Adds the specified
+		/// Adds the <paramref name="str"/> to the display at the cursor position.
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
+
 		/// <summary>
 		/// Prepare the driver and set the key and mouse events handlers.
 		/// </summary>
