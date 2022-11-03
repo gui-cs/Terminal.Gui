@@ -90,7 +90,8 @@ namespace Terminal.Gui.Trees {
 		{
 			// true if the current line of the tree is the selected one and control has focus
 			bool isSelected = tree.IsSelected (Model);
-			Attribute textColor = isSelected ? (tree.HasFocus ? colorScheme.HotFocus : colorScheme.HotNormal) : colorScheme.Normal;
+
+			Attribute textColor = isSelected ? (tree.HasFocus ? colorScheme.Focus : colorScheme.HotNormal) : colorScheme.Normal;
 			Attribute symbolColor = tree.Style.HighlightModelTextOnly ? colorScheme.Normal : textColor;
 
 			// Everything on line before the expansion run and branch text
