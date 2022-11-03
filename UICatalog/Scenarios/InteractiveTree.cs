@@ -20,14 +20,14 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
 				})
 				});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			treeView = new TreeView () {
 				X = 0,
@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.T, "~^T~ Add Root", () => AddRootNode()),
 				new StatusItem(Key.CtrlMask | Key.R, "~^R~ Rename Node", () => RenameNode()),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 		}
 

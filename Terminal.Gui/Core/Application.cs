@@ -223,19 +223,28 @@ namespace Terminal.Gui {
 		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
 
 		/// <summary>
-		/// Notify that a new <see cref="RunState"/> token was created,
-		/// used if <see cref="ExitRunLoopAfterFirstIteration"/> is true.
+		/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
+		/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
 		/// </summary>
+		/// <remarks>
+		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
+		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		/// </remarks>
 		public static event Action<RunState> NotifyNewRunState;
 
 		/// <summary>
-		/// Notify that a existent <see cref="RunState"/> token is stopping,
-		/// used if <see cref="ExitRunLoopAfterFirstIteration"/> is true.
+		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
 		/// </summary>
+		/// <remarks>
+		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
+		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		/// </remarks>
 		public static event Action<Toplevel> NotifyStopRunState;
 
 		/// <summary>
-		///   This event is raised on each iteration of the <see cref="MainLoop"/> 
+		///   This event is raised on each iteration of the <see cref="MainLoop"/>. 
 		/// </summary>
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
@@ -315,8 +324,10 @@ namespace Terminal.Gui {
 		/// returned) to ensure resources are cleaned up and terminal settings restored.
 		/// </para>
 		/// <para>
-		/// The <see cref="Run{T}(Func{Exception, bool})"/> function combines <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
-		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool})"/> without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
+		/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> function 
+		/// combines <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
+		/// without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
 		/// </para>
 		/// <remarks>
 		/// Note, due to Issue #520, if Init is called and <see cref="Begin(Toplevel)"/> is not called, the <see cref="Toplevel"/>
@@ -326,7 +337,7 @@ namespace Terminal.Gui {
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
 		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver);
+		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver, resetState: true);
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
@@ -341,12 +352,16 @@ namespace Terminal.Gui {
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
 		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
+		/// <param name="resetState">If <see langword="true"/> (default) all <see cref="Application"/> state will be reset. 
+		/// Set to <see langword="false"/> to not reset the state (for when this function is called via 
+		/// <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> when <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>
+		/// has not already been called. f</param>
+		internal static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool resetState = true)
 		{
 			if (_initialized && driver == null) return;
 
 			if (_initialized) {
-				throw new InvalidOperationException ("Init must be bracketed by Shutdown");
+				throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
 			}
 
 			// Used only for start debugging on Unix.
@@ -358,7 +373,9 @@ namespace Terminal.Gui {
 			//#endif
 
 			// Reset all class variables (Application is a singleton).
-			ResetState ();
+			if (resetState) {
+				ResetState ();
+			}
 
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
@@ -366,9 +383,6 @@ namespace Terminal.Gui {
 					throw new ArgumentNullException ("mainLoopDriver cannot be null if driver is provided.");
 				}
 				Driver = driver;
-				Driver.Init (TerminalResized);
-				MainLoop = new MainLoop (mainLoopDriver);
-				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			}
 
 			if (Driver == null) {
@@ -383,10 +397,12 @@ namespace Terminal.Gui {
 					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
-				Driver.Init (TerminalResized);
-				MainLoop = new MainLoop (mainLoopDriver);
-				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			}
+			MainLoop = new MainLoop (mainLoopDriver);
+
+			Driver.Init (TerminalResized);
+			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
+
 			Top = topLevelFactory ();
 			Current = Top;
 			supportedCultures = GetSupportedCultures ();
@@ -395,7 +411,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Captures the execution state for the provided <see cref="Toplevel"/>  view.
+		/// Captures the execution state for the provided <see cref="Toplevel"/> view.
 		/// </summary>
 		public class RunState : IDisposable {
 			/// <summary>
@@ -411,31 +427,61 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Toplevel Toplevel { get; internal set; }
 
+#if DEBUG_IDISPOSABLE
 			/// <summary>
-			/// Releases alTop = l resource used by the <see cref="Application.RunState"/> object.
+			/// For debug purposes to verify objects are being disposed properly
 			/// </summary>
-			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="Application.RunState"/>. The
+			public bool WasDisposed = false;
+			/// <summary>
+			/// For debug purposes to verify objects are being disposed properly
+			/// </summary>
+			public int DisposedCount = 0;
+			/// <summary>
+			/// For debug purposes
+			/// </summary>
+			public static List<RunState> Instances = new List<RunState> ();
+			/// <summary>
+			/// For debug purposes
+			/// </summary>
+			public RunState ()
+			{
+				Instances.Add (this);
+			}
+#endif
+
+			/// <summary>
+			/// Releases all resource used by the <see cref="Application.RunState"/> object.
+			/// </summary>
+			/// <remarks>
+			/// Call <see cref="Dispose()"/> when you are finished using the <see cref="Application.RunState"/>. 
+			/// </remarks>
+			/// <remarks>
 			/// <see cref="Dispose()"/> method leaves the <see cref="Application.RunState"/> in an unusable state. After
 			/// calling <see cref="Dispose()"/>, you must release all references to the
 			/// <see cref="Application.RunState"/> so the garbage collector can reclaim the memory that the
-			/// <see cref="Application.RunState"/> was occupying.</remarks>
+			/// <see cref="Application.RunState"/> was occupying.
+			/// </remarks>
 			public void Dispose ()
 			{
 				Dispose (true);
 				GC.SuppressFinalize (this);
+#if DEBUG_IDISPOSABLE
+				WasDisposed = true;
+#endif
 			}
 
 			/// <summary>
-			/// Dispose the specified disposing.
+			/// Releases all resource used by the <see cref="Application.RunState"/> object.
 			/// </summary>
-			/// <returns>The dispose.</returns>
-			/// <param name="disposing">If set to <c>true</c> disposing.</param>
+			/// <param name="disposing">If set to <see langword="true"/> we are disposing and should dispose held objects.</param>
 			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null && disposing) {
-					End (Toplevel);
-					Toplevel.Dispose ();
-					Toplevel = null;
+					throw new InvalidOperationException ("You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
+					// BUGBUG: It's insidious that we call EndFirstTopLevel here so I moved it to End.
+					//EndFirstTopLevel (Toplevel);
+					//Toplevel.Dispose ();
+					//Toplevel = null;
 				}
 			}
 		}
@@ -841,7 +887,6 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-
 			Init ();
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
@@ -913,6 +958,7 @@ namespace Terminal.Gui {
 				Driver.Refresh ();
 			}
 
+			NotifyNewRunState?.Invoke (rs);
 			return rs;
 		}
 
@@ -930,6 +976,42 @@ namespace Terminal.Gui {
 			} else {
 				runState.Toplevel.OnUnloaded ();
 			}
+
+			// End the RunState.Toplevel 
+			// First, take it off the toplevel Stack
+			if (toplevels.Count > 0) {
+				if (toplevels.Peek () != runState.Toplevel) {
+					// If there the top of the stack is not the RunState.Toplevel then
+					// this call to End is not balanced with the call to Begin that started the RunState
+					throw new ArgumentException ("End must be balanced with calls to Begin");
+				}
+				toplevels.Pop ();
+			}
+
+			// Notify that it is closing
+			runState.Toplevel?.OnClosed (runState.Toplevel);
+
+			// If there is a MdiTop that is not the RunState.Toplevel then runstate.TopLevel 
+			// is a child of MidTop and we should notify the MdiTop that it is closing
+			if (MdiTop != null && !(runState.Toplevel).Modal && runState.Toplevel != MdiTop) {
+				MdiTop.OnChildClosed (runState.Toplevel);
+			}
+
+			// Set Current and Top to the next TopLevel on the stack
+			if (toplevels.Count == 0) {
+				Current = null;
+			} else {
+				Current = toplevels.Peek ();
+				if (toplevels.Count == 1 && Current == MdiTop) {
+					MdiTop.OnAllChildClosed ();
+				} else {
+					SetCurrentAsTop ();
+				}
+				Refresh ();
+			}
+
+			runState.Toplevel?.Dispose ();
+			runState.Toplevel = null;
 			runState.Dispose ();
 		}
 
@@ -937,7 +1019,7 @@ namespace Terminal.Gui {
 		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
 		/// </summary>
 		/// <remarks>
-		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> or <see cref="Run{T}(Func{Exception, bool})"/>
+		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
 		/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
 		/// </remarks>
 		public static void Shutdown ()
@@ -1014,40 +1096,17 @@ namespace Terminal.Gui {
 			Driver.Refresh ();
 		}
 
-		internal static void End (View view)
-		{
-			if (toplevels.Peek () != view)
-				throw new ArgumentException ("The view that you end with must be balanced");
-			toplevels.Pop ();
 
-			(view as Toplevel)?.OnClosed ((Toplevel)view);
-
-			if (MdiTop != null && !((Toplevel)view).Modal && view != MdiTop) {
-				MdiTop.OnChildClosed (view as Toplevel);
-			}
-
-			if (toplevels.Count == 0) {
-				Current = null;
-			} else {
-				Current = toplevels.Peek ();
-				if (toplevels.Count == 1 && Current == MdiTop) {
-					MdiTop.OnAllChildClosed ();
-				} else {
-					SetCurrentAsTop ();
-				}
-				Refresh ();
-			}
-		}
 
 		/// <summary>
-		///   Building block API: Runs the main loop for the created dialog.
+		///   Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
 		/// </summary>
 		/// <remarks>
-		///   Use the wait parameter to control whether this is a
-		///   blocking or non-blocking call.
+		///   Use the <paramref name="wait"/> parameter to control whether this is a blocking or non-blocking call.
 		/// </remarks>
-		/// <param name="state">The state returned by the Begin method.</param>
-		/// <param name="wait">By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</param>
+		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		/// <param name="wait">By default this is <see langword="true"/> which will execute the runloop waiting for events, 
+		/// if set to <see langword="false"/>, a single iteration will execute.</param>
 		public static void RunLoop (RunState state, bool wait = true)
 		{
 			if (state == null)
@@ -1057,8 +1116,9 @@ namespace Terminal.Gui {
 
 			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
-				if (ExitRunLoopAfterFirstIteration && !firstIteration)
+				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
 					return;
+				}
 				RunMainLoopIteration (ref state, wait, ref firstIteration);
 			}
 		}
@@ -1186,17 +1246,21 @@ namespace Terminal.Gui {
 		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 		/// <para>
 		/// If <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has not arleady been called, this function will
-		/// call <see cref="Init(Func{Toplevel}, ConsoleDriver, IMainLoopDriver)"/>.
+		/// call <see cref="Init(Func{Toplevel}, ConsoleDriver, IMainLoopDriver, bool)"/>.
 		/// </para>
 		/// <para>
-		/// <see cref="Shutdown"/> must be called when the application is closing (typically after <see cref="Run{T}(Func{Exception, bool})"/> has 
+		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
 		/// returned) to ensure resources are cleaned up and terminal settings restored.
 		/// </para>
 		/// </summary>
 		/// <remarks>
 		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
 		/// </remarks>
-		public static void Run<T> (Func<Exception, bool> errorHandler = null) where T : Toplevel, new()
+		/// <param name="errorHandler"></param>
+		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
+		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
+		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
+		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) where T : Toplevel, new()
 		{
 			if (_initialized && Driver != null) {
 				var top = new T ();
@@ -1207,9 +1271,11 @@ namespace Terminal.Gui {
 				if (type != typeof (Toplevel)) {
 					throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
 				}
+				// Run() will eventually cause Application.Top to be set, via Begin() and SetCurrentAsTop()
 				Run (top, errorHandler);
 			} else {
-				Init (() => new T ());
+				// Note in this case, we don't verify the type of the Toplevel created by new T(). 
+				Init (() => new T (), Driver == null ? driver : Driver, Driver == null ? mainLoopDriver : null, resetState: false);
 				Run (Top, errorHandler);
 			}
 		}
@@ -1255,13 +1321,12 @@ namespace Terminal.Gui {
 #endif
 				resume = false;
 				var runToken = Begin (view);
+				// If ExitRunLoopAfterFirstIteration is true then the user must dispose of the runToken
+				// by using NotifyStopRunState event.
 				RunLoop (runToken);
-				if (!ExitRunLoopAfterFirstIteration)
+				if (!ExitRunLoopAfterFirstIteration) {
 					End (runToken);
-				else
-					// If ExitRunLoopAfterFirstIteration is true then the user must deal his disposing when it ends
-					// by using NotifyStopRunState event.
-					NotifyNewRunState?.Invoke (runToken);
+				}
 #if !DEBUG
 				}
 				catch (Exception error)
@@ -1354,8 +1419,9 @@ namespace Terminal.Gui {
 
 		static void OnNotifyStopRunState (Toplevel top)
 		{
-			if (ExitRunLoopAfterFirstIteration)
+			if (ExitRunLoopAfterFirstIteration) {
 				NotifyStopRunState?.Invoke (top);
+			}
 		}
 
 		/// <summary>

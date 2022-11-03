@@ -156,9 +156,9 @@ namespace UICatalog.Scenarios {
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
 				+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2 + Dim.Height (ckbEffect3D);
-				Top.Loaded -= Top_Loaded;
+				Application.Top.Loaded -= Top_Loaded;
 			}
-			Top.Loaded += Top_Loaded;
+			Application.Top.Loaded += Top_Loaded;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),

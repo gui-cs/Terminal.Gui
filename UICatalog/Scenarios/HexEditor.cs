@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 					miAllowEdits = new MenuItem ("_AllowEdits", "", () => ToggleAllowEdits ()){Checked = _hexView.AllowEdits, CheckType = MenuItemCheckStyle.Checked}
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
@@ -61,7 +61,7 @@ namespace UICatalog.Scenarios {
 				siPositionChanged = new StatusItem(Key.Null,
 					$"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X} Line length: {_hexView.BytesPerLine}", () => {})
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 		}
 
 		private void _hexView_PositionChanged (HexView.HexViewEventArgs obj)

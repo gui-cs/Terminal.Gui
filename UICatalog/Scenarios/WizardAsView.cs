@@ -10,10 +10,8 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Wizards")]
 	public class WizardAsView : Scenario {
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
-			Top = Application.Top;
-
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Restart Configuration...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to reset the Wizard and start over?", "Ok", "Cancel")),
@@ -21,7 +19,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Shutdown Server...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to cancel setup and shutdown?", "Ok", "Cancel")),
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			// No need for a Title because the border is disabled
 			var wizard = new Wizard () {
@@ -93,8 +91,8 @@ namespace UICatalog.Scenarios {
 			wizard.AddStep (lastStep);
 			lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-			Top.Add (wizard);
-			Application.Run (Top);
+			Application.Top.Add (wizard);
+			Application.Run (Application.Top);
 		}
 
 		public override void Run ()

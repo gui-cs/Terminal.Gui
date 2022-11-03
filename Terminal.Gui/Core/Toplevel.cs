@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begin loaded.
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
@@ -77,13 +77,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
-		/// <see cref="Application.End(View)"/>.
+		/// <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> ChildClosed;
 
 		/// <summary>
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
-		/// by <see cref="Application.End(View)"/>.
+		/// by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action AllChildClosed;
 
@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 		public event Action<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
-		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(View)"/>.
+		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> Closed;
 

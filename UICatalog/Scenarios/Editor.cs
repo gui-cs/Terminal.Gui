@@ -32,11 +32,10 @@ namespace UICatalog.Scenarios {
 		private bool _forceMinimumPosToZero = true;
 		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
 			_cultureInfos = Application.SupportedCultures;
-			Top = top != null ? top : Application.Top;
 
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
@@ -45,7 +44,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 
 			_textView = new TextView () {
 				X = 0,
@@ -115,7 +114,7 @@ namespace UICatalog.Scenarios {
 				})
 			});
 
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				siCursorPosition,
@@ -125,7 +124,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
@@ -197,7 +196,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Application.Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()

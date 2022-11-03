@@ -156,9 +156,9 @@ namespace UICatalog.Scenarios {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 					"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
-				Top.Loaded -= Top_Loaded;
+				Application.Top.Loaded -= Top_Loaded;
 			}
-			Top.Loaded += Top_Loaded;
+			Application.Top.Loaded += Top_Loaded;
 
 			var pressMeButton = new Button ("Press me!") {
 				X = 3,
@@ -313,9 +313,9 @@ namespace UICatalog.Scenarios {
 			void Top_Unloaded ()
 			{
 				pulsing = false;
-				Top.Unloaded -= Top_Unloaded;
+				Application.Top.Unloaded -= Top_Unloaded;
 			}
-			Top.Unloaded += Top_Unloaded;
+			Application.Top.Unloaded += Top_Unloaded;
 		}
 	}
 }

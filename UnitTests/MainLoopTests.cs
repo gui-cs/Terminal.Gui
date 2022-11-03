@@ -591,5 +591,57 @@ namespace Terminal.Gui.Core {
 
 			Assert.Equal ((numIncrements * numPasses), tbCounter);
 		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestAddManyTimeouts ()
+		{
+			int delegatesRun = 0;
+			int numberOfThreads = 100;
+			int numberOfTimeoutsPerThread = 100;
+
+
+			lock (Application.Top) {
+				// start lots of threads
+				for (int i = 0; i < numberOfThreads; i++) {
+
+					var myi = i;
+
+					Task.Run (() => {
+						Thread.Sleep (100);
+
+						// each thread registers lots of 1s timeouts
+						for (int j = 0; j < numberOfTimeoutsPerThread; j++) {
+
+							Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1), (s) => {
+
+								// each timeout delegate increments delegatesRun count by 1 every second
+								Interlocked.Increment (ref delegatesRun);
+								return true;
+							});
+						}
+
+						// if this is the first Thread created
+						if (myi == 0) {
+
+							// let the timeouts run for a bit
+							Thread.Sleep (10000);
+
+							// then tell the application to quit
+							Application.MainLoop.Invoke (() => Application.RequestStop ());
+						}
+					});
+				}
+
+				// blocks here until the RequestStop is processed at the end of the test
+				Application.Run ();
+
+				// undershoot a bit to be on the safe side.  The 5000 ms wait allows the timeouts to run
+				// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
+				// so the final number of delegatesRun might vary by computer.  So for this assert we say
+				// that it should have run at least 2 seconds worth of delegates
+				Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
+			}
+		}
 	}
 }
