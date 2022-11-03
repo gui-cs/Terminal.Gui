@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,13 +32,23 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (80, Application.Driver.Cols);
 			Assert.Equal (25, Application.Driver.Rows);
 
+			// Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
+			// So we need to dispose it manually
+			Application.Top.Dispose ();
+
 			Application.Shutdown ();
 
 			// Verify state is back to initial
 			Pre_Init_State ();
-
+			
+			// Validate there are no outstanding Responder-based instances 
+			// after a scenario was selected to run. This proves the main UI Catalog
+			// 'app' closed cleanly.
+			foreach (var inst in Responder.Instances) {
+				Assert.True (inst.WasDisposed);
+			}
 		}
-
+		
 		void Pre_Init_State ()
 		{
 			Assert.Null (Application.Driver);
@@ -91,9 +102,9 @@ namespace Terminal.Gui.Core {
 		{
 			Application.Shutdown ();
 		}
-
+		
 		[Fact]
-		public void Begin_End_Cleana_Up ()
+		public void Begin_End_Cleans_Up ()
 		{
 			// Setup Mock driver
 			Init ();
