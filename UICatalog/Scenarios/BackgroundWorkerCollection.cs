@@ -22,9 +22,9 @@ namespace UICatalog.Scenarios {
 			// BUGBUG: work around Issue #520: Ensuring the `Toplevel` created by `Init` gets Disposed...
 			// For Scenarios that want to use `Applciation.Run<T>` to create a new Toplevel: 
 			// Override `Run` and call `Application.Top.Dispose` before calling `Application.Run<T>`.
-			if (Application.Top != null) {
-				Application.Top.Dispose ();
-			}
+			//if (Application.Top != null) {
+			//	Application.Top.Dispose ();
+			//}
 
 			Application.Run<MdiMain> ();
 		}

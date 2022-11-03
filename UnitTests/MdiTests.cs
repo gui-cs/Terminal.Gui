@@ -17,7 +17,44 @@ namespace Terminal.Gui.Core {
 			Application.RunState.Instances.Clear ();
 #endif
 		}
-		
+
+
+		[Fact]
+		public void Dispose_Toplevel_IsMdiContainer_False_With_Begin_End ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = new Toplevel ();
+			var rs = Application.Begin (top);
+			Application.End (rs);
+
+			Application.Shutdown ();
+
+			Assert.Equal (2, Responder.Instances.Count);
+			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
+			// Change this to True once fixed.
+			Assert.False (Responder.Instances [0].WasDisposed);
+			Assert.True(Responder.Instances [1].WasDisposed);
+		}
+
+		[Fact]
+		public void Dispose_Toplevel_IsMdiContainer_True_With_Begin ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var mdi = new Toplevel { IsMdiContainer = true };
+			var rs = Application.Begin (mdi);
+			Application.End (rs);
+
+			Application.Shutdown ();
+
+			Assert.Equal (2, Responder.Instances.Count);
+			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
+			// Change this to True once fixed.
+			Assert.False (Responder.Instances [0].WasDisposed);
+			Assert.True (Responder.Instances [1].WasDisposed);
+		}
+
 		[Fact, AutoInitShutdown]
 		public void Application_RequestStop_With_Params_On_A_Not_MdiContainer_Always_Use_Application_Current ()
 		{

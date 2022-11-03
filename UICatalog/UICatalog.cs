@@ -90,19 +90,37 @@ namespace UICatalog {
 			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
 			Scenario scenario;
-			while ((scenario = SelectScenario ()) != null) {
+			while ((scenario = RunUICatalogTopLevel ()) != null) {
 				VerifyObjectsWereDisposed ();
 				scenario.Init (_colorScheme);
 				scenario.Setup ();
 				scenario.Run ();
 
 				// This call to Application.Shutdown brackets the Application.Init call
-				// made by Scenario.Init()
+				// made by Scenario.Init() above
 				Application.Shutdown ();
 
 				VerifyObjectsWereDisposed ();
 			}
 			VerifyObjectsWereDisposed ();
+		}
+
+		/// <summary>
+		/// Shows the UI Catalog selection UI. When the user selects a Scenario to run, the
+		/// UI Catalog main app UI is killed and the Scenario is run as though it were Application.Top. 
+		/// When the Scenario exits, this function exits.
+		/// </summary>
+		/// <returns></returns>
+		static Scenario RunUICatalogTopLevel ()
+		{
+			Application.UseSystemConsole = _useSystemConsole;
+
+			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
+			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
+			Application.Run<UICatalogTopLevel> ();
+			Application.Shutdown ();
+
+			return _selectedScenario;
 		}
 
 		static List<Scenario> _scenarios;
@@ -531,25 +549,6 @@ namespace UICatalog {
 			}
 			Application.RunState.Instances.Clear ();
 #endif
-		}
-
-		/// <summary>
-		/// Shows the UI Catalog selection UI. When the user selects a Scenario to run, the
-		/// UI Catalog main app UI is killed and the Scenario is run as though it were Application.Top. 
-		/// When the Scenario exits, this function exits.
-		/// </summary>
-		/// <returns></returns>
-		static Scenario SelectScenario ()
-		{
-			Application.UseSystemConsole = _useSystemConsole;
-			//var top = new UICatalogTopLevel ();
-
-			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
-			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
-			Application.Run<UICatalogTopLevel> ();
-			Application.Shutdown ();
-
-			return _selectedScenario;
 		}
 
 		static void OpenUrl (string url)
