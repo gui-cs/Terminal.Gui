@@ -887,7 +887,9 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-			Init ();
+			// Fixes #520 - Begin should be decoupled from Init
+			//Init ();
+			
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
 				initializableNotification.BeginInit ();
@@ -898,6 +900,13 @@ namespace Terminal.Gui {
 			}
 
 			lock (toplevels) {
+				// If Top was already initialized with Init, and Begin has never been called
+				// Top was not added to the toplevels Stack. It will thus never get disposed.
+				// Clean it up here (fixes #520).
+				if (Top != null && toplevel != Top && !toplevels.Contains(Top)) {
+					Top.Dispose ();
+					Top = null;
+				}
 				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
 					var id = (toplevels.Count + count).ToString ();
@@ -919,7 +928,8 @@ namespace Terminal.Gui {
 					throw new ArgumentException ("There are duplicates toplevels Id's");
 				}
 			}
-			if (toplevel.IsMdiContainer) {
+			// Fix $520 - Set Top = toplevel if Top == null
+			if (Top == null || toplevel.IsMdiContainer) {
 				Top = toplevel;
 			}
 
@@ -1043,7 +1053,11 @@ namespace Terminal.Gui {
 			}
 			toplevels.Clear ();
 			Current = null;
+			// Fix #520: Dispose Top
+			Top?.Dispose ();
 			Top = null;
+
+			// BUGBUG: MdiTop is not cleared here, but it should be?
 
 			MainLoop = null;
 			Driver?.End ();

@@ -95,10 +95,8 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 
 			Assert.Single (Responder.Instances);
-			foreach (var inst in Responder.Instances) {
-				// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
-				Assert.False (inst.WasDisposed);
-			}
+			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
+			Assert.True (Responder.Instances [0].WasDisposed);
 		}
 
 		[Fact]
