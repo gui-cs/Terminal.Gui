@@ -578,9 +578,9 @@ namespace Terminal.Gui.Core {
 			TextField tf = new ();
 			Application.Top.Add (tf);
 
-			const int numPasses = 10;
-			const int numIncrements = 10000;
-			const int pollMs = 20000;
+			const int numPasses = 5;
+			const int numIncrements = 5000;
+			const int pollMs = 10000;
 
 			var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 

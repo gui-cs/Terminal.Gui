@@ -64,7 +64,7 @@ namespace UICatalog {
 				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 				// Close after a short period of time
-				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (200), closeCallback);
+				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
 
 				scenario.Init (Application.Top, Colors.Base);
 				scenario.Setup ();
