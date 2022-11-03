@@ -30,11 +30,12 @@ namespace UICatalog.Scenarios {
 		private TabView _tabView;
 		private MenuItem _miForceMinimumPosToZero;
 		private bool _forceMinimumPosToZero = true;
-		private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
+		private List<CultureInfo> _cultureInfos;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
+			_cultureInfos = Application.SupportedCultures;
 			Top = top != null ? top : Application.Top;
 
 			Win = new Window (_fileName ?? "Untitled") {

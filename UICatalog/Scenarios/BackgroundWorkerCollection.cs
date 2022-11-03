@@ -12,22 +12,14 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
 	public class BackgroundWorkerCollection : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
-		{
-			//Application.Init ();
-		}
-
 		public override void Run ()
 		{
-			// For Scenarios that want to use `Applciation.Run<T>` to create a new Toplevel, there are two choices:
-
-			// 1) Override `Scenario.Init` and do nothing in it.
-			// The call to `Application.Run<MdiMain>` in `Run` implies an `Application.Init()` call.
-			//
-			// 2) Just override `Run` but call `Application.Top.Dispose` then `Application.Shutdown ()`. This
-			// works around bug #520, ensuring the `Toplevel` created by `Init` gets Disposed.
-			//Application.Top.Dispose ();
-			//Application.Shutdown ();
+			// BUGBUG: work around Issue #520: Ensuring the `Toplevel` created by `Init` gets Disposed...
+			// For Scenarios that want to use `Applciation.Run<T>` to create a new Toplevel: 
+			// Override `Run` and call `Application.Top.Dispose` before calling `Application.Run<T>`.
+			if (Application.Top != null) {
+				Application.Top.Dispose ();
+			}
 
 			Application.Run<MdiMain> ();
 		}
