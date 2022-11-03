@@ -816,7 +816,7 @@ namespace Terminal.Gui {
 		{
 			if (toplevel == null) {
 				throw new ArgumentNullException (nameof (toplevel));
-			} else if (toplevel.IsMdiContainer && MdiTop != null) {
+			} else if (toplevel.IsMdiContainer && MdiTop != toplevel && MdiTop != null) {
 				throw new InvalidOperationException ("Only one Mdi Container is allowed.");
 			}
 
@@ -1153,7 +1153,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
+		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
+		/// <para>
+		/// If <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has not arleady been called, this function will
+		/// call <see cref="Init(Func{Toplevel}, ConsoleDriver, IMainLoopDriver)"/>.
+		/// </para>
 		/// </summary>
 		public static void Run<T> (Func<Exception, bool> errorHandler = null) where T : Toplevel, new()
 		{
