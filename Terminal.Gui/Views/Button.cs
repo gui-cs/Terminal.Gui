@@ -248,8 +248,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.Button1TripleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();
