@@ -11,9 +11,6 @@
     <InformationalVersion>1.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NStack.Core" Version="1.0.3" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 </Project>
