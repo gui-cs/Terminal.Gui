@@ -12,6 +12,7 @@ namespace UICatalog.Scenarios {
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
+			Application.Init ();
 			Top = Application.Top;
 
 			var menu = new MenuBar (new MenuBarItem [] {
