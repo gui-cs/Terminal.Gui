@@ -74,6 +74,8 @@ git commit -m "Release v2.3.4"
 git push
 ```
 
+Go to the link printed by `git push` and fill out the Pull Request.
+
 ### 3) On github.com, verify the build action worked on your fork, then merge the PR
 
 ### 4) Pull the merged `develop` from `upstream`
