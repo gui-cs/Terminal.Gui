@@ -70,10 +70,6 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (80, Application.Driver.Cols);
 			Assert.Equal (25, Application.Driver.Rows);
 
-			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
-			// So we need to dispose it manually
-			//Application.Top.Dispose ();
-
 			Application.Shutdown ();
 
 			// Verify state is back to initial
@@ -95,7 +91,6 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 
 			Assert.Single (Responder.Instances);
-			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
 			Assert.True (Responder.Instances [0].WasDisposed);
 		}
 

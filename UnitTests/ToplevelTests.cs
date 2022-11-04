@@ -425,8 +425,8 @@ namespace Terminal.Gui.Core {
 		}
 
 		// This test broke with fix to #520
-		//[Fact]
-		//[AutoInitShutdown]
+		[Fact]
+		[AutoInitShutdown]
 		public void KeyBindings_Command_With_MdiTop ()
 		{
 			var top = Application.Top;

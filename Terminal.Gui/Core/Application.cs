@@ -329,11 +329,6 @@ namespace Terminal.Gui {
 		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
 		/// without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
 		/// </para>
-		/// <remarks>
-		/// Note, due to Issue #520, if Init is called and <see cref="Begin(Toplevel)"/> is not called, the <see cref="Toplevel"/>
-		/// created by this function will NOT be Disposed when <see cref="Shutdown"/> is called. Call Dispose() on <see cref="Application.Top"/> 
-		/// before calling <see cref="Shutdown"/> if <see cref="Begin(Toplevel)"/> (and <see cref="End(RunState)"/>) has not been called.
-		/// </remarks>
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
 		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
@@ -887,8 +882,6 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-			// Fixes #520 - Begin should be decoupled from Init
-			//Init ();
 			
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
@@ -902,7 +895,7 @@ namespace Terminal.Gui {
 			lock (toplevels) {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the toplevels Stack. It will thus never get disposed.
-				// Clean it up here (fixes #520).
+				// Clean it up here:
 				if (Top != null && toplevel != Top && !toplevels.Contains(Top)) {
 					Top.Dispose ();
 					Top = null;
@@ -1052,7 +1045,6 @@ namespace Terminal.Gui {
 			}
 			toplevels.Clear ();
 			Current = null;
-			// Fixes #520: Dispose Top
 			Top?.Dispose ();
 			Top = null;
 

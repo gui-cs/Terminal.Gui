@@ -31,10 +31,8 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 
 			Assert.Equal (2, Responder.Instances.Count);
-			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
-			// Change this to True once fixed.
 			Assert.True (Responder.Instances [0].WasDisposed);
-			Assert.True(Responder.Instances [1].WasDisposed);
+			Assert.True (Responder.Instances [1].WasDisposed);
 		}
 
 		[Fact]
@@ -49,8 +47,6 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 
 			Assert.Equal (2, Responder.Instances.Count);
-			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
-			// Change this to True once fixed.
 			Assert.True (Responder.Instances [0].WasDisposed);
 			Assert.True (Responder.Instances [1].WasDisposed);
 		}
