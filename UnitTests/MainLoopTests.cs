@@ -592,56 +592,175 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ((numIncrements * numPasses), tbCounter);
 		}
 
+		private static int total;
+		private static Button btn;
+		private static string clickMe;
+		private static string cancel;
+		private static string pewPew;
+		private static int zero;
+		private static int one;
+		private static int two;
+		private static int three;
+		private static int four;
+		private static bool taskCompleted;
 
-		[Fact, AutoInitShutdown]
-		public void TestAddManyTimeouts ()
+		[Theory, AutoInitShutdown]
+		[MemberData (nameof (TestAddIdle))]
+		public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (Action action, string pclickMe, string pcancel, string ppewPew, int pzero, int pone, int ptwo, int pthree, int pfour)
 		{
-			int delegatesRun = 0;
-			int numberOfThreads = 100;
-			int numberOfTimeoutsPerThread = 100;
+			total = 0;
+			btn = null;
+			clickMe = pclickMe;
+			cancel = pcancel;
+			pewPew = ppewPew;
+			zero = pzero;
+			one = pone;
+			two = ptwo;
+			three = pthree;
+			four = pfour;
+			taskCompleted = false;
 
+			var btnLaunch = new Button ("Open Window");
 
-			lock (Application.Top) {
-				// start lots of threads
-				for (int i = 0; i < numberOfThreads; i++) {
+			btnLaunch.Clicked += () => action ();
 
-					var myi = i;
+			Application.Top.Add (btnLaunch);
 
-					Task.Run (() => {
-						Thread.Sleep (100);
+			var iterations = -1;
 
-						// each thread registers lots of 1s timeouts
-						for (int j = 0; j < numberOfTimeoutsPerThread; j++) {
-
-							Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1), (s) => {
-
-								// each timeout delegate increments delegatesRun count by 1 every second
-								Interlocked.Increment (ref delegatesRun);
-								return true;
-							});
-						}
-
-						// if this is the first Thread created
-						if (myi == 0) {
-
-							// let the timeouts run for a bit
-							Thread.Sleep (10000);
-
-							// then tell the application to quit
-							Application.MainLoop.Invoke (() => Application.RequestStop ());
-						}
-					});
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.Null (btn);
+					Assert.Equal (zero, total);
+					Assert.True (btnLaunch.ProcessKey (new KeyEvent (Key.Enter, null)));
+					if (btn == null) {
+						Assert.Null (btn);
+						Assert.Equal (zero, total);
+					} else {
+						Assert.Equal (clickMe, btn.Text);
+						Assert.Equal (four, total);
+					}
+				} else if (iterations == 1) {
+					Assert.Equal (clickMe, btn.Text);
+					Assert.Equal (zero, total);
+					Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
+					Assert.Equal (cancel, btn.Text);
+					Assert.Equal (one, total);
+				} else if (taskCompleted) {
+					Application.RequestStop ();
 				}
+			};
 
-				// blocks here until the RequestStop is processed at the end of the test
-				Application.Run ();
+			Application.Run ();
 
-				// undershoot a bit to be on the safe side.  The 5000 ms wait allows the timeouts to run
-				// a lot but all those timeout delegates could end up going slowly on a slow machine perhaps
-				// so the final number of delegatesRun might vary by computer.  So for this assert we say
-				// that it should have run at least 2 seconds worth of delegates
-				Assert.True (delegatesRun >= numberOfThreads * numberOfTimeoutsPerThread * 2);
+			Assert.True (taskCompleted);
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (four, total);
+		}
+
+		public static IEnumerable<object []> TestAddIdle {
+			get {
+				// Goes fine
+				Action a1 = StartWindow;
+				yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+
+				// Also goes fine
+				Action a2 = () => Application.MainLoop.Invoke (StartWindow);
+				yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
 			}
+		}
+
+		private static void StartWindow ()
+		{
+			var startWindow = new Window {
+				Modal = true
+			};
+
+			btn = new Button {
+				Text = "Click Me"
+			};
+
+			btn.Clicked += RunAsyncTest;
+
+			var totalbtn = new Button () {
+				X = Pos.Right (btn),
+				Text = "total"
+			};
+
+			totalbtn.Clicked += () => {
+				MessageBox.Query ("Count", $"Count is {total}", "Ok");
+			};
+
+			startWindow.Add (btn);
+			startWindow.Add (totalbtn);
+
+			Application.Run (startWindow);
+
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (four, total);
+
+			Application.RequestStop ();
+		}
+
+		private static async void RunAsyncTest ()
+		{
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (zero, total);
+
+			btn.Text = "Cancel";
+			Interlocked.Increment (ref total);
+			btn.SetNeedsDisplay ();
+
+			await Task.Run (() => {
+				try {
+					Assert.Equal (cancel, btn.Text);
+					Assert.Equal (one, total);
+
+					RunSql ();
+				} finally {
+					SetReadyToRun ();
+				}
+			}).ContinueWith (async (s, e) => {
+
+				await Task.Delay (1000);
+				Assert.Equal (clickMe, btn.Text);
+				Assert.Equal (three, total);
+
+				Interlocked.Increment (ref total);
+
+				Assert.Equal (clickMe, btn.Text);
+				Assert.Equal (four, total);
+
+				taskCompleted = true;
+
+			}, TaskScheduler.FromCurrentSynchronizationContext ());
+		}
+
+		private static void RunSql ()
+		{
+			Thread.Sleep (100);
+			Assert.Equal (cancel, btn.Text);
+			Assert.Equal (one, total);
+
+			Application.MainLoop.Invoke (() => {
+				btn.Text = "Pew Pew";
+				Interlocked.Increment (ref total);
+				btn.SetNeedsDisplay ();
+			});
+		}
+
+		private static void SetReadyToRun ()
+		{
+			Thread.Sleep (100);
+			Assert.Equal (pewPew, btn.Text);
+			Assert.Equal (two, total);
+
+			Application.MainLoop.Invoke (() => {
+				btn.Text = "Click Me";
+				Interlocked.Increment (ref total);
+				btn.SetNeedsDisplay ();
+			});
 		}
 	}
 }

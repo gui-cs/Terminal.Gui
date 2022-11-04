@@ -12,6 +12,9 @@ namespace UICatalog.Scenarios {
 
 		public override void Init (ColorScheme colorScheme)
 		{
+			Application.Init ();
+			Top = Application.Top;
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Restart Configuration...", "", () => MessageBox.Query ("Wizaard", "Are you sure you want to reset the Wizard and start over?", "Ok", "Cancel")),

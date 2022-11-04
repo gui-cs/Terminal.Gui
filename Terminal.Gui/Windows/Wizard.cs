@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 			public event Action<TitleEventArgs> TitleChanged;
 
 			// The contentView works like the ContentView in FrameView.
-			private View contentView = new View ();
+			private View contentView = new View () { Data = "WizardContentView" };
 
 			/// <summary>
 			/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty
