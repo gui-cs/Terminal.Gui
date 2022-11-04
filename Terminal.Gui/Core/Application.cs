@@ -1046,14 +1046,13 @@ namespace Terminal.Gui {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
-			// TODO: Some of this state is actually related to Begin/End (not Init/Shutdown) and should be moved to `RunState` (#520)
 			foreach (var t in toplevels) {
 				t.Running = false;
 				t.Dispose ();
 			}
 			toplevels.Clear ();
 			Current = null;
-			// Fix #520: Dispose Top
+			// Fixes #520: Dispose Top
 			Top?.Dispose ();
 			Top = null;
 

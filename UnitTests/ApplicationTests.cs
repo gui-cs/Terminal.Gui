@@ -72,7 +72,7 @@ namespace Terminal.Gui.Core {
 
 			// BUGBUG: Because of #520, the Toplevel created by Application.Init is not disposed by Shutdown
 			// So we need to dispose it manually
-			Application.Top.Dispose ();
+			//Application.Top.Dispose ();
 
 			Application.Shutdown ();
 
