@@ -493,6 +493,12 @@ namespace Terminal.Gui {
 
 			}
 
+			public override bool OnEnter (View view)
+			{
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+				return base.OnEnter (view);
+			}
+
 			public override void Redraw (Rect bounds)
 			{
 				base.Redraw (bounds);
