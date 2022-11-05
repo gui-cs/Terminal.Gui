@@ -121,7 +121,11 @@ namespace Terminal.Gui.Trees {
 				Attribute color = symbolColor;
 
 				if (tree.Style.ColorExpandSymbol) {
-					color = isSelected ? (tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal : tree.ColorScheme.HotFocus) : tree.ColorScheme.HotNormal;
+					if (isSelected) {
+						color = tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal : (tree.HasFocus ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal);
+					} else {
+						color = tree.ColorScheme.HotNormal;
+					}
 				} else {
 					color = symbolColor;
 				}
@@ -416,7 +420,7 @@ namespace Terminal.Gui.Trees {
 		/// Expands the current branch and all children branches.
 		/// </summary>
 		internal void ExpandAll ()
-			{
+		{
 			Expand ();
 
 			if (ChildBranches != null) {

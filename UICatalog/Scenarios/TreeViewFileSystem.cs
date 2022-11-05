@@ -78,14 +78,13 @@ namespace UICatalog.Scenarios {
 			};
 
 			detailsFrame = new DetailsFrame () {
-				X = Pos.Right (treeViewFiles) + 1,
+				X = Pos.Right (treeViewFiles),
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
 
 			Win.Add (detailsFrame);
-			treeViewFiles.ObjectActivated += TreeViewFiles_ObjectActivated;
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
 			treeViewFiles.KeyPress += TreeViewFiles_KeyPress;
 			treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
@@ -160,23 +159,12 @@ namespace UICatalog.Scenarios {
 
 		class DetailsFrame : FrameView {
 			private FileSystemInfo fileInfo;
-			TextView details = new TextView () {
-				X = 1,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = Colors.Base,
-				WordWrap = true,
-				ReadOnly = true
-			};
 
 			public DetailsFrame ()
 			{
 				Title = "Details";
-				ColorScheme = Colors.Dialog;
 				Visible = true;
 				CanFocus = true;				
-				Add (details);
 			}
 
 			public FileSystemInfo FileInfo {
@@ -186,20 +174,20 @@ namespace UICatalog.Scenarios {
 					if (fileInfo is FileInfo f) {
 						Title = $"File: {f.Name}";
 						sb = new System.Text.StringBuilder ();
-						sb.AppendLine ($"Path: {f.DirectoryName}");
-						sb.AppendLine ($"Size: {f.Length:N0} bytes");
-						sb.AppendLine ($"Modified: {f.LastWriteTime}");
-						sb.AppendLine ($"Created: {f.CreationTime}");
+						sb.AppendLine ($"Path:\n {f.FullName}\n");
+						sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
+						sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
+						sb.AppendLine ($"Created:\n {f.CreationTime}");
 					}
 
 					if (fileInfo is DirectoryInfo dir) {
 						Title = $"Directory: {dir.Name}";
 						sb = new System.Text.StringBuilder ();
-						sb.AppendLine ($"Path: {dir?.FullName}");
-						sb.AppendLine ($"Modified: {dir.LastWriteTime}");
-						sb.AppendLine ($"Created: {dir.CreationTime}");
+						sb.AppendLine ($"Path:\n {dir?.FullName}\n");
+						sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
+						sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
 					}
-					details.Text = sb.ToString ();
+					Text = sb.ToString ();
 				}
 			}
 		}
@@ -207,25 +195,6 @@ namespace UICatalog.Scenarios {
 		private void ShowPropertiesOf (FileSystemInfo fileSystemInfo)
 		{
 			detailsFrame.FileInfo = fileSystemInfo;
-			//if (fileSystemInfo is FileInfo f) {
-			//	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-			//	sb.AppendLine ($"Path:{f.DirectoryName}");
-			//	sb.AppendLine ($"Size:{f.Length:N0} bytes");
-			//	sb.AppendLine ($"Modified:{f.LastWriteTime}");
-			//	sb.AppendLine ($"Created:{f.CreationTime}");
-
-			//	MessageBox.Query (f.Name, sb.ToString (), "Close");
-			//}
-
-			//if (fileSystemInfo is DirectoryInfo dir) {
-
-			//	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-			//	sb.AppendLine ($"Path:{dir.Parent?.FullName}");
-			//	sb.AppendLine ($"Modified:{dir.LastWriteTime}");
-			//	sb.AppendLine ($"Created:{dir.CreationTime}");
-
-			//	MessageBox.Query (dir.Name, sb.ToString (), "Close");
-			//}
 		}
 
 		private void SetupScrollBar ()
@@ -276,11 +245,6 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.AspectGetter = FileSystemAspectGetter;
 
 			treeViewFiles.AddObjects (DriveInfo.GetDrives ().Select (d => d.RootDirectory));
-		}
-
-		private void TreeViewFiles_ObjectActivated (ObjectActivatedEventArgs<FileSystemInfo> obj)
-		{
-			ShowPropertiesOf (obj.ActivatedObject);
 		}
 
 		private void ShowLines ()
