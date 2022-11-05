@@ -325,6 +325,7 @@ namespace Terminal.Gui {
 		private Point effect3DOffset = new Point (1, 1);
 		private Attribute? effect3DBrush;
 		private ustring title = ustring.Empty;
+		private bool useHalfEffect3D;
 
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
@@ -473,6 +474,17 @@ namespace Terminal.Gui {
 			get => effect3DBrush;
 			set {
 				effect3DBrush = value;
+				OnBorderChanged ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets if half <see cref="effect3D"/> is used.
+		/// </summary>
+		public bool UseHalfEffect3D {
+			get => useHalfEffect3D;
+			set {
+				useHalfEffect3D = value;
 				OnBorderChanged ();
 			}
 		}
@@ -726,7 +738,7 @@ namespace Terminal.Gui {
 
 		private void DrawChildEffect3D (Rect frame, int drawMarginFrame, Thickness sumThickness, Point effect3DOffset, ConsoleDriver driver)
 		{
-			if (Effect3D && frame.Height > 1) {
+			if (Effect3D && !UseHalfEffect3D) {
 				driver.SetAttribute (GetEffect3DBrush ());
 
 				// Draw the upper Effect3D
@@ -768,7 +780,7 @@ namespace Terminal.Gui {
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
-			} else if (Effect3D && frame.Height == 1) {
+			} else if (Effect3D && UseHalfEffect3D && frame.Height == 1) {
 
 				var effect3DBrush = GetEffect3DBrush ();
 				var halfEffect3DOffset = GetHalfEffect3DOffset (effect3DOffset);
@@ -807,6 +819,62 @@ namespace Terminal.Gui {
 							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
 						} else {
 							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						}
+					}
+				}
+
+				// Draw the lower Effect3D
+				for (int r = frame.Bottom + drawMarginFrame + sumThickness.Bottom;
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + halfEffect3DOffset.Y, driver.Rows); r++) {
+					for (int c = frame.X - drawMarginFrame - sumThickness.Left + halfEffect3DOffset.X;
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+					}
+				}
+			} else if (Effect3D && UseHalfEffect3D && frame.Height > 1) {
+
+				var effect3DBrush = GetEffect3DBrush ();
+				var halfEffect3DOffset = GetHalfEffect3DOffset (effect3DOffset);
+
+				// Draw the upper Effect3D
+				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + halfEffect3DOffset.Y;
+					r >= 0 && r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
+					for (int c = frame.X - drawMarginFrame - sumThickness.Left + halfEffect3DOffset.X;
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+					}
+				}
+
+				// Draw the left Effect3D
+				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + (halfEffect3DOffset.Y >= 0 ? halfEffect3DOffset.Y : 0);
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom, driver.Rows); r++) {
+					for (int c = frame.X - drawMarginFrame - sumThickness.Left + halfEffect3DOffset.X;
+						c >= 0 && c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
+
+						if (halfEffect3DOffset.Y < 0 && r == frame.Bottom + halfEffect3DOffset.Y) {
+							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+						} else if (halfEffect3DOffset.Y > 0 && r == frame.Bottom) {
+							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						} else {
+							AddHalfRuneAt (driver, c, r, '▏', effect3DBrush);
+						}
+					}
+				}
+
+				// Draw the right Effect3D
+				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + (halfEffect3DOffset.Y >= 0 ? halfEffect3DOffset.Y : 0);
+					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom, driver.Rows); r++) {
+					for (int c = frame.Right + drawMarginFrame + sumThickness.Right;
+						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						if (halfEffect3DOffset.Y < 0 && r == frame.Bottom + halfEffect3DOffset.Y) {
+							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+						} else if (halfEffect3DOffset.Y > 0 && r == frame.Bottom) {
+							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						} else {
+							AddHalfRuneAt (driver, c, r, '▏', effect3DBrush);
 						}
 					}
 				}
@@ -939,7 +1007,7 @@ namespace Terminal.Gui {
 
 		private void DrawParentEffect3D (Rect frame, Point effect3DOffset, ConsoleDriver driver)
 		{
-			if (Effect3D && frame.Height > 1) {
+			if (Effect3D && !UseHalfEffect3D) {
 				driver.SetAttribute (GetEffect3DBrush ());
 
 				// Draw the upper Effect3D
@@ -981,7 +1049,7 @@ namespace Terminal.Gui {
 						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
 					}
 				}
-			} else if (Effect3D && frame.Height == 1) {
+			} else if (Effect3D && UseHalfEffect3D && frame.Height == 1) {
 
 				var effect3DBrush = GetEffect3DBrush ();
 				var halfEffect3DOffset = GetHalfEffect3DOffset (effect3DOffset);
@@ -1020,6 +1088,62 @@ namespace Terminal.Gui {
 							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
 						} else {
 							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						}
+					}
+				}
+
+				// Draw the lower Effect3D
+				for (int r = frame.Bottom;
+					r < Math.Min (frame.Bottom + halfEffect3DOffset.Y, driver.Rows); r++) {
+					for (int c = Math.Max (frame.X + halfEffect3DOffset.X, 0);
+						c < Math.Min (frame.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+					}
+				}
+			} else if (Effect3D && UseHalfEffect3D && frame.Height > 1) {
+
+				var effect3DBrush = GetEffect3DBrush ();
+				var halfEffect3DOffset = GetHalfEffect3DOffset (effect3DOffset);
+
+				// Draw the upper Effect3D
+				for (int r = Math.Max (frame.Y + halfEffect3DOffset.Y, 0);
+					r < frame.Y; r++) {
+					for (int c = Math.Max (frame.X + halfEffect3DOffset.X, 0);
+						c < Math.Min (frame.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+					}
+				}
+
+				// Draw the left Effect3D
+				for (int r = Math.Max (frame.Y + (halfEffect3DOffset.Y >= 0 ? halfEffect3DOffset.Y : 0), 0);
+					r < Math.Min (frame.Bottom + (halfEffect3DOffset.Y >= 0 ? 0 : halfEffect3DOffset.Y), driver.Rows); r++) {
+					for (int c = Math.Max (frame.X + halfEffect3DOffset.X, 0);
+						c < frame.X; c++) {
+
+						if (halfEffect3DOffset.Y < 0 && r == frame.Bottom + halfEffect3DOffset.Y) {
+							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+						} else if (halfEffect3DOffset.Y > 0 && r == frame.Bottom) {
+							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						} else {
+							AddHalfRuneAt (driver, c, r, '▏', effect3DBrush);
+						}
+					}
+				}
+
+				// Draw the right Effect3D
+				for (int r = Math.Max (frame.Y + (halfEffect3DOffset.Y >= 0 ? halfEffect3DOffset.Y : 0), 0);
+					r < Math.Min (frame.Bottom + (halfEffect3DOffset.Y >= 0 ? 0 : halfEffect3DOffset.Y), driver.Rows); r++) {
+					for (int c = frame.Right;
+						c < Math.Min (frame.Right + halfEffect3DOffset.X, driver.Cols); c++) {
+
+						if (halfEffect3DOffset.Y < 0 && r == frame.Bottom + halfEffect3DOffset.Y) {
+							AddHalfRuneAt (driver, c, r, '▄', effect3DBrush);
+						} else if (halfEffect3DOffset.Y > 0 && r == frame.Bottom) {
+							AddHalfRuneAt (driver, c, r, '▀', effect3DBrush);
+						} else {
+							AddHalfRuneAt (driver, c, r, '▏', effect3DBrush);
 						}
 					}
 				}
