@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
@@ -28,6 +29,8 @@ namespace UICatalog.Scenarios {
 		private MenuItem miCustomColors;
 		private MenuItem miCursor;
 		private MenuItem miMultiSelect;
+
+		private DetailsFrame detailsFrame;
 
 		public override void Setup ()
 		{
@@ -70,13 +73,22 @@ namespace UICatalog.Scenarios {
 			treeViewFiles = new TreeView<FileSystemInfo> () {
 				X = 0,
 				Y = 0,
+				Width = Dim.Percent (50),
+				Height = Dim.Fill (),
+			};
+
+			detailsFrame = new DetailsFrame () {
+				X = Pos.Right (treeViewFiles) + 1,
+				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
 
+			Win.Add (detailsFrame);
 			treeViewFiles.ObjectActivated += TreeViewFiles_ObjectActivated;
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
 			treeViewFiles.KeyPress += TreeViewFiles_KeyPress;
+			treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
 			SetupFileTree ();
 
@@ -85,6 +97,14 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.Expand ();
 
 			SetupScrollBar ();
+
+			treeViewFiles.SetFocus ();
+
+		}
+
+		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<FileSystemInfo> e)
+		{
+			ShowPropertiesOf (e.NewValue);
 		}
 
 		private void TreeViewFiles_KeyPress (View.KeyEventEventArgs obj)
@@ -138,27 +158,74 @@ namespace UICatalog.Scenarios {
 			Application.MainLoop.Invoke (menu.Show);
 		}
 
+		class DetailsFrame : FrameView {
+			private FileSystemInfo fileInfo;
+			TextView details = new TextView () {
+				X = 1,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				ColorScheme = Colors.Base,
+				WordWrap = true,
+				ReadOnly = true
+			};
+
+			public DetailsFrame ()
+			{
+				Title = "Details";
+				ColorScheme = Colors.Dialog;
+				Visible = true;
+				CanFocus = true;				
+				Add (details);
+			}
+
+			public FileSystemInfo FileInfo {
+				get => fileInfo; set {
+					fileInfo = value;
+					System.Text.StringBuilder sb = null;
+					if (fileInfo is FileInfo f) {
+						Title = $"File: {f.Name}";
+						sb = new System.Text.StringBuilder ();
+						sb.AppendLine ($"Path: {f.DirectoryName}");
+						sb.AppendLine ($"Size: {f.Length:N0} bytes");
+						sb.AppendLine ($"Modified: {f.LastWriteTime}");
+						sb.AppendLine ($"Created: {f.CreationTime}");
+					}
+
+					if (fileInfo is DirectoryInfo dir) {
+						Title = $"Directory: {dir.Name}";
+						sb = new System.Text.StringBuilder ();
+						sb.AppendLine ($"Path: {dir?.FullName}");
+						sb.AppendLine ($"Modified: {dir.LastWriteTime}");
+						sb.AppendLine ($"Created: {dir.CreationTime}");
+					}
+					details.Text = sb.ToString ();
+				}
+			}
+		}
+
 		private void ShowPropertiesOf (FileSystemInfo fileSystemInfo)
 		{
-			if (fileSystemInfo is FileInfo f) {
-				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-				sb.AppendLine ($"Path:{f.DirectoryName}");
-				sb.AppendLine ($"Size:{f.Length:N0} bytes");
-				sb.AppendLine ($"Modified:{f.LastWriteTime}");
-				sb.AppendLine ($"Created:{f.CreationTime}");
+			detailsFrame.FileInfo = fileSystemInfo;
+			//if (fileSystemInfo is FileInfo f) {
+			//	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+			//	sb.AppendLine ($"Path:{f.DirectoryName}");
+			//	sb.AppendLine ($"Size:{f.Length:N0} bytes");
+			//	sb.AppendLine ($"Modified:{f.LastWriteTime}");
+			//	sb.AppendLine ($"Created:{f.CreationTime}");
 
-				MessageBox.Query (f.Name, sb.ToString (), "Close");
-			}
+			//	MessageBox.Query (f.Name, sb.ToString (), "Close");
+			//}
 
-			if (fileSystemInfo is DirectoryInfo dir) {
+			//if (fileSystemInfo is DirectoryInfo dir) {
 
-				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
-				sb.AppendLine ($"Path:{dir.Parent?.FullName}");
-				sb.AppendLine ($"Modified:{dir.LastWriteTime}");
-				sb.AppendLine ($"Created:{dir.CreationTime}");
+			//	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+			//	sb.AppendLine ($"Path:{dir.Parent?.FullName}");
+			//	sb.AppendLine ($"Modified:{dir.LastWriteTime}");
+			//	sb.AppendLine ($"Created:{dir.CreationTime}");
 
-				MessageBox.Query (dir.Name, sb.ToString (), "Close");
-			}
+			//	MessageBox.Query (dir.Name, sb.ToString (), "Close");
+			//}
 		}
 
 		private void SetupScrollBar ()

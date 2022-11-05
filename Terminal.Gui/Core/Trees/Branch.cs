@@ -121,7 +121,7 @@ namespace Terminal.Gui.Trees {
 				Attribute color = symbolColor;
 
 				if (tree.Style.ColorExpandSymbol) {
-					color = isSelected ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal;
+					color = isSelected ? (tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal : tree.ColorScheme.HotFocus) : tree.ColorScheme.HotNormal;
 				} else {
 					color = symbolColor;
 				}
