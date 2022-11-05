@@ -232,7 +232,7 @@ namespace Terminal.Gui.Core {
 		#region RunTests
 
 		[Fact]
-		public void Run_T_InitWithDriver_Throws_with_TopLevel ()
+		public void Run_T_After_InitWithDriver_with_TopLevel_Throws ()
 		{
 			// Setup Mock driver
 			Init ();
@@ -248,7 +248,23 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Run_T_InitWithDriver_Works_with_TestTopLevel ()
+		public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Throws ()
+		{
+			// Setup Mock driver
+			Init ();
+
+			// Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
+			Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (errorHandler: null, new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
+
+			Shutdown ();
+
+			Assert.Null (Application.Top);
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		[Fact]
+		public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
 		{
 			// Setup Mock driver
 			Init ();
@@ -285,7 +301,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Run_T_NoInit_Works_WithFakeDriver ()
+		public void Run_T_NoInit_WithDriver_DoesNotThrow ()
 		{
 			Application.Iteration = () => {
 				Application.RequestStop ();
