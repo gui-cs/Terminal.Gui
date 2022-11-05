@@ -257,7 +257,7 @@ namespace Terminal.Gui.Core {
 				Application.RequestStop ();
 			};
 			
-			// Run<TestToplevel> when already initialized with a Driver will work
+			// Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
 			Application.Run<TestToplevel> (errorHandler: null);
 
 			Shutdown ();
@@ -268,15 +268,14 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Run_T_NoInit_ThrowsInDefaultDriver ()
+		public void Run_T_NoInit_Throws ()
 		{
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
 
-			// Note that Init has NOT been called and we're passing no driver
-			// The platform-default driver will be selected and it will barf
-			Assert.ThrowsAny<Exception> (() => Application.Run<TestToplevel> (errorHandler: null, driver: null, mainLoopDriver: null));
+			// Init has NOT been called and we're passing no driver to Run<TestToplevel>. This is an error.
+			Assert.Throws<ArgumentException> (() => Application.Run<TestToplevel> (errorHandler: null, driver: null, mainLoopDriver: null));
 
 			Shutdown ();
 
@@ -292,8 +291,7 @@ namespace Terminal.Gui.Core {
 				Application.RequestStop ();
 			};
 
-			// Note that Init has NOT been called and we're passing no driver
-			// The platform-default driver will be selected and it will barf
+			// Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
 			Application.Run<TestToplevel> (errorHandler: null, new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			Shutdown ();

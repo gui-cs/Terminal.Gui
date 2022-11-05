@@ -1279,6 +1279,9 @@ namespace Terminal.Gui {
 				// Run() will eventually cause Application.Top to be set, via Begin() and SetCurrentAsTop()
 				Run (top, errorHandler);
 			} else {
+				if (!_initialized && driver == null) {
+					throw new ArgumentException ("Init has not been called; a valid driver and mainloop must be provided");
+				}
 				// Note in this case, we don't verify the type of the Toplevel created by new T(). 
 				Init (() => new T (), Driver == null ? driver : Driver, Driver == null ? mainLoopDriver : null, resetState: false);
 				Run (Top, errorHandler);
