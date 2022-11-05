@@ -12,17 +12,14 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
 	public class BackgroundWorkerCollection : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
-			Application.Top.Dispose ();
-
-			Application.Run<MdiMain> ();
-
-			Application.Top.Dispose ();
+			// Do not call Init as Application.Run<T> will do it
 		}
 
 		public override void Run ()
 		{
+			Application.Run<MdiMain> ();
 		}
 
 		class MdiMain : Toplevel {

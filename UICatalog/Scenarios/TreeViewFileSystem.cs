@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -60,12 +60,12 @@ namespace UICatalog.Scenarios {
 					miMultiSelect = new MenuItem ("_MultiSelect", "", () => SetMultiSelect()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			var lblFiles = new Label ("File Tree:") {
 				X = 0,
