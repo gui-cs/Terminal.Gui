@@ -424,7 +424,6 @@ namespace Terminal.Gui.Core {
 			Assert.True (top.Focused.ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
 		}
 
-		// This test broke with fix to #520
 		[Fact]
 		[AutoInitShutdown]
 		public void KeyBindings_Command_With_MdiTop ()
@@ -432,6 +431,7 @@ namespace Terminal.Gui.Core {
 			var top = Application.Top;
 			Assert.Null (Application.MdiTop);
 			top.IsMdiContainer = true;
+			Application.Begin (top);
 			Assert.Equal (Application.Top, Application.MdiTop);
 
 			var isRunning = true;
@@ -465,23 +465,20 @@ namespace Terminal.Gui.Core {
 			Assert.False (top.IsCurrentTop);
 			Assert.Equal (win1, Application.Current);
 			Assert.True (win1.IsCurrentTop);
-			// Fixes #520 - this broke:
-			//Assert.True (win1.IsMdiChild);
+			Assert.True (win1.IsMdiChild);
 			Assert.Null (top.Focused);
 			Assert.Null (top.MostFocused);
 			Assert.Equal (win1.Subviews [0], win1.Focused);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			// Fixes #520 - this broke:
-			//Assert.True (win1.IsMdiChild);
-			//Assert.Single (Application.MdiChildes);
+			Assert.True (win1.IsMdiChild);
+			Assert.Single (Application.MdiChildes);
 			Application.Begin (win2);
 			Assert.Equal (new Rect (0, 0, 40, 25), win2.Frame);
 			Assert.NotEqual (top, Application.Current);
 			Assert.False (top.IsCurrentTop);
 			Assert.Equal (win2, Application.Current);
 			Assert.True (win2.IsCurrentTop);
-			// Fixes #520 - this broke:
-			//Assert.True (win2.IsMdiChild);
+			Assert.True (win2.IsMdiChild);
 			Assert.Null (top.Focused);
 			Assert.Null (top.MostFocused);
 			Assert.Equal (win2.Subviews [0], win2.Focused);
