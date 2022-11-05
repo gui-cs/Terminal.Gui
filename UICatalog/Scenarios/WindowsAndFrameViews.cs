@@ -6,13 +6,6 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, and FrameViews.")]
 	[ScenarioCategory ("Layout")]
 	public class WindowsAndFrameViews : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
-		{
-			Application.Init ();
-
-			Top = top != null ? top : Application.Top;
-		}
-
 		public override void RequestStop ()
 		{
 			base.RequestStop ();
@@ -67,7 +60,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (1),
 				ColorScheme = Colors.Error
 			});
-			Top.Add (Win);
+			Application.Top.Add (Win);
 			listWin.Add (Win);
 
 			for (var i = 0; i < 3; i++) {
@@ -114,10 +107,9 @@ namespace UICatalog.Scenarios {
 				});
 				win.Add (frameView);
 
-				Top.Add (win);
+				Application.Top.Add (win);
 				listWin.Add (win);
 			}
-
 
 			FrameView frame = null;
 			frame = new FrameView ($"This is a FrameView") {
@@ -176,7 +168,7 @@ namespace UICatalog.Scenarios {
 
 			frame.Add (subFrameViewofFV);
 
-			Top.Add (frame);
+			Application.Top.Add (frame);
 			listWin.Add (frame);
 		}
 	}

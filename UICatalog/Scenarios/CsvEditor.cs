@@ -34,7 +34,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			this.tableView = new TableView () {
 				X = 0,
@@ -70,14 +70,14 @@ namespace UICatalog.Scenarios {
 					miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat()),
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.O, "~^O~ Open", () => Open()),
 				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			Win.Add (tableView);
 

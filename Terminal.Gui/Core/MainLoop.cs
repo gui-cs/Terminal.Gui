@@ -94,8 +94,8 @@ namespace Terminal.Gui {
 		public IMainLoopDriver Driver { get; }
 
 		/// <summary>
-		/// Invoked when a new timeout is added to be used on the case
-		/// if <see cref="Application.ExitRunLoopAfterFirstIteration"/> is true,
+		/// Invoked when a new timeout is added. To be used in the case
+		/// when <see cref="Application.ExitRunLoopAfterFirstIteration"/> is <see langword="true"/>.
 		/// </summary>
 		public event Action<long> TimeoutAdded;
 

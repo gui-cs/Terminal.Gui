@@ -34,7 +34,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill ();
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 					miCursor = new MenuItem ("Curs_or (MultiSelect only)", "", () => SetCursor()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			treeViewFiles = new TreeView<FileSystemInfo> () {
 				X = 0,

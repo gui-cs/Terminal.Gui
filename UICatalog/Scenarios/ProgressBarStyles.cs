@@ -131,7 +131,7 @@ namespace UICatalog.Scenarios {
 				Application.MainLoop.Driver.Wakeup ();
 			}, null, 0, 300);
 
-			Top.Unloaded += Top_Unloaded;
+			Application.Top.Unloaded += Top_Unloaded;
 
 			void Top_Unloaded ()
 			{
@@ -143,7 +143,7 @@ namespace UICatalog.Scenarios {
 					_pulseTimer.Dispose ();
 					_pulseTimer = null;
 				}
-				Top.Unloaded -= Top_Unloaded;
+				Application.Top.Unloaded -= Top_Unloaded;
 			}
 		}
 	}

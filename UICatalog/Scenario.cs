@@ -48,12 +48,7 @@ namespace UICatalog {
 		private bool _disposedValue;
 
 		/// <summary>
-		/// The Top level for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
-		/// </summary>
-		public Toplevel Top { get; set; }
-
-		/// <summary>
-		/// The Window for the <see cref="Scenario"/>. This should be set within the <see cref="Terminal.Gui.Application.Top"/> in most cases.
+		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
 		/// </summary>
 		public Window Win { get; set; }
 
@@ -63,21 +58,20 @@ namespace UICatalog {
 		/// the Scenario picker UI.
 		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
 		/// </summary>
-		/// <param name="top">The Toplevel created by the UI Catalog host.</param>
 		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
 		/// <para>
-		/// The base implementation calls <see cref="Application.Init"/>, sets <see cref="Top"/> to the passed in <see cref="Toplevel"/>, creates a <see cref="Window"/> for <see cref="Win"/> and adds it to <see cref="Top"/>.
+		/// The base implementation calls <see cref="Application.Init"/> and creates a <see cref="Window"/> for <see cref="Win"/> 
+		/// and adds it to <see cref="Application.Top"/>.
 		/// </para>
 		/// <para>
-		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating any views or calling other Terminal.Gui APIs.
+		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> 
+		/// before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init (Toplevel top, ColorScheme colorScheme)
+		public virtual void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-
-			Top = top != null ? top : Application.Top;
 
 			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
@@ -86,7 +80,7 @@ namespace UICatalog {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 		}
 
 		/// <summary>
@@ -201,7 +195,7 @@ namespace UICatalog {
 		public virtual void Run ()
 		{
 			// Must explicit call Application.Shutdown method to shutdown.
-			Application.Run (Top);
+			Application.Run (Application.Top);
 		}
 
 		/// <summary>
