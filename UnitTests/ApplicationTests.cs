@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -100,7 +101,7 @@ namespace Terminal.Gui.Core {
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			Toplevel topLevel = null;
-			Assert.Throws<InvalidOperationException> (() => Application.Init (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
+			Assert.Throws<InvalidOperationException> (() => Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
 			Shutdown ();
 
 			Assert.Null (Application.Top);
@@ -109,7 +110,7 @@ namespace Terminal.Gui.Core {
 
 			// Now try the other way
 			topLevel = null;
-			Application.Init (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
 			Shutdown ();
@@ -118,7 +119,7 @@ namespace Terminal.Gui.Core {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 		}
-	
+
 
 		class TestToplevel : Toplevel {
 			public TestToplevel ()
@@ -131,7 +132,7 @@ namespace Terminal.Gui.Core {
 		public void Init_Begin_End_Cleans_Up ()
 		{
 			Init ();
-			
+
 			// Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
 			// if we don't stop
 			Application.Iteration = () => {
@@ -145,7 +146,7 @@ namespace Terminal.Gui.Core {
 			};
 			Application.NotifyNewRunState += NewRunStateFn;
 
-			Toplevel topLevel = new Toplevel();
+			Toplevel topLevel = new Toplevel ();
 			var rs = Application.Begin (topLevel);
 			Assert.NotNull (rs);
 			Assert.NotNull (runstate);
@@ -181,7 +182,7 @@ namespace Terminal.Gui.Core {
 			// NOTE: Run<T>, when called after Init has been called behaves differently than
 			// when called if Init has not been called.
 			Toplevel topLevel = null;
-			Application.Init (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			Application.RunState runstate = null;
 			Action<Application.RunState> NewRunStateFn = (rs) => {
@@ -272,9 +273,9 @@ namespace Terminal.Gui.Core {
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
-			
+
 			// Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
-			Application.Run<TestToplevel> (errorHandler: null);
+			Application.Run<TestToplevel> ();
 
 			Shutdown ();
 
@@ -284,14 +285,59 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Run_T_NoInit_Throws ()
+		public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 		{
+			Application.ForceFakeConsole = true;
+
+			Application.Init (null, null);
+			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
 
-			// Init has NOT been called and we're passing no driver to Run<TestToplevel>. This is an error.
-			Assert.Throws<ArgumentException> (() => Application.Run<TestToplevel> (errorHandler: null, driver: null, mainLoopDriver: null));
+			// Init has been called without selecting a driver and we're passing no driver to Run<TestTopLevel>. Bad
+			Application.Run<TestToplevel> ();
+
+			Shutdown ();
+
+			Assert.Null (Application.Top);
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		[Fact]
+		public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
+		{
+			Init ();
+			
+			Application.Driver = null;
+
+			Application.Iteration = () => {
+				Application.RequestStop ();
+			};
+
+			// Init has been called, but Driver has been set to null. Bad.
+			Assert.Throws<InvalidOperationException> (() => Application.Run<TestToplevel> ());
+
+			Shutdown ();
+
+			Assert.Null (Application.Top);
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		[Fact]
+		public void Run_T_NoInit_DoesNotThrow ()
+		{
+			Application.ForceFakeConsole = true; 
+			
+			Application.Iteration = () => {
+				Application.RequestStop ();
+			};
+
+			Application.Run<TestToplevel> ();
+			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
 			Shutdown ();
 
@@ -379,6 +425,9 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 			Assert.Equal (3, count);
 		}
+
+		// TODO: Add tests for Run that test errorHandler
+		
 		#endregion
 
 		#region ShutdownTests
@@ -407,7 +456,7 @@ namespace Terminal.Gui.Core {
 			Assert.Null (SynchronizationContext.Current);
 		}
 		#endregion
-		
+
 		[Fact]
 		[AutoInitShutdown]
 		public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
