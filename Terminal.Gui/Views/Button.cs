@@ -289,7 +289,8 @@ namespace Terminal.Gui {
 				if (CanFocus && Enabled) {
 					if (UseEffect3DAnimation) {
 						Border.Effect3D = true;
-						Application.MainLoop.Invoke (() => SetNeedsDisplay ());
+						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
 					if (me.View == this) {
 						OnClicked ();
