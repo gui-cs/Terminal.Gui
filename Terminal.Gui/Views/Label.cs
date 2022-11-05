@@ -85,6 +85,27 @@ namespace Terminal.Gui {
 		//	}
 		//}
 
+		private bool useEffect3DAnimation;
+
+		/// <summary>
+		/// Gets or sets if the button will have a <see cref="Border.effect3D"/> with animation.
+		/// </summary>
+		public bool UseEffect3DAnimation {
+			get => useEffect3DAnimation;
+			set {
+				useEffect3DAnimation = value;
+				if (value && Border == null) {
+					Border = new Border {
+						Effect3D = true,
+						UseHalfEffect3D = true,
+						Effect3DBrush = new Attribute (Color.Black, Color.Black)
+					};
+				} else if (!value && Border != null) {
+					Border.Effect3D = false;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>
@@ -98,7 +119,7 @@ namespace Terminal.Gui {
 			if (MouseEvent (mouseEvent))
 				return true;
 
-			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+			if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
 				if (!HasFocus && SuperView != null) {
 					if (!SuperView.HasFocus) {
 						SuperView.SetFocus ();
@@ -107,7 +128,24 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				OnClicked ();
+				if (UseEffect3DAnimation) {
+					Border.Effect3D = false;
+					SetNeedsDisplay ();
+					Application.GrabMouse (this);
+				}
+
+				return true;
+			} else if (mouseEvent.Flags == MouseFlags.Button1Released) {
+				if (CanFocus && Enabled) {
+					if (UseEffect3DAnimation) {
+						Border.Effect3D = true;
+						Application.MainLoop.Invoke (() => SetNeedsDisplay ());
+					}
+					if (mouseEvent.View == this) {
+						OnClicked ();
+					}
+					Application.UngrabMouse ();
+				}
 				return true;
 			}
 			return false;

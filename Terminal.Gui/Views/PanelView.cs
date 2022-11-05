@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 
 		private void Child_MouseClick (MouseEventArgs obj)
 		{
-			if (obj.MouseEvent.Flags == MouseFlags.Button1Clicked) {
+			if (obj.MouseEvent.Flags == MouseFlags.Button1Pressed) {
 				if (!HasFocus && SuperView != null) {
 					if (!SuperView.HasFocus) {
 						SuperView.SetFocus ();
@@ -95,7 +95,23 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				OnClicked ();
+				if (UseEffect3DAnimation) {
+					Border.Effect3D = false;
+					SetNeedsDisplay ();
+					Application.GrabMouse (Child);
+				}
+				obj.Handled = true;
+			} else if (obj.MouseEvent.Flags == MouseFlags.Button1Released) {
+				if (CanFocus && Enabled) {
+					if (UseEffect3DAnimation) {
+						Border.Effect3D = true;
+						Application.MainLoop.Invoke (() => SetNeedsDisplay ());
+					}
+					if (obj.MouseEvent.View == this) {
+						OnClicked ();
+					}
+					Application.UngrabMouse ();
+				}
 				obj.Handled = true;
 			}
 		}

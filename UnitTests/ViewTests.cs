@@ -1679,7 +1679,7 @@ Y
 
 			view.ProcessKey (new KeyEvent (Key.Enter, null));
 			Assert.True (wasClicked);
-			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released, View = view });
 			Assert.False (wasClicked);
 			Assert.True (view.Enabled);
 			Assert.True (view.CanFocus);
@@ -1715,7 +1715,7 @@ Y
 
 				button.ProcessKey (new KeyEvent (Key.Enter, null));
 				Assert.True (wasClicked);
-				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released, View = button });
 				Assert.False (wasClicked);
 				Assert.True (button.Enabled);
 				Assert.True (button.CanFocus);
@@ -1727,7 +1727,7 @@ Y
 				win.Enabled = false;
 				button.ProcessKey (new KeyEvent (Key.Enter, null));
 				Assert.False (wasClicked);
-				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released, View = button });
 				Assert.False (wasClicked);
 				Assert.False (button.Enabled);
 				Assert.True (button.CanFocus);

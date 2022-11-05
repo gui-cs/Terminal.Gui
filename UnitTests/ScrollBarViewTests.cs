@@ -944,7 +944,7 @@ This is a test
 				new MouseEvent () {
 					X = 15,
 					Y = 0,
-					Flags = MouseFlags.Button1Clicked
+					Flags = MouseFlags.Button1Released
 				});
 
 			Assert.Null (Application.MouseGrabView);
@@ -971,7 +971,7 @@ This is a test
 				new MouseEvent () {
 					X = 15,
 					Y = 0,
-					Flags = MouseFlags.Button1Clicked
+					Flags = MouseFlags.Button1Released
 				});
 
 			Assert.Null (Application.MouseGrabView);

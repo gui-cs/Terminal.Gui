@@ -170,6 +170,7 @@ namespace Terminal.Gui {
 				if (value && Border == null) {
 					Border = new Border {
 						Effect3D = true,
+						UseHalfEffect3D = true,
 						Effect3DBrush = new Attribute (Color.Black, Color.Black)
 					};
 				} else if (!value && Border != null) {
@@ -251,27 +252,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnClicked ()
 		{
-			if (UseEffect3DAnimation) {
-				Border.Effect3D = false;
-				var x = X;
-				if (Border.Effect3DOffset.X > 0) {
-					X += 1;
-				} else {
-					X -= 1;
-				}
-				SetNeedsDisplay ();
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (m) => {
-					Border.Effect3D = true;
-					Application.MainLoop.Invoke (() => {
-						X = x;
-						SetNeedsDisplay ();
-					});
-					Clicked?.Invoke ();
-					return false;
-				});
-			} else {
-				Clicked?.Invoke ();
-			}
+			Clicked?.Invoke ();
 		}
 
 		/// <summary>
@@ -288,16 +269,33 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags == MouseFlags.Button1Clicked) {
+			if (me.Flags == MouseFlags.Button1Pressed) {
 				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();
-						SetNeedsDisplay ();
-						Redraw (Bounds);
+						if (!UseEffect3DAnimation) {
+							SetNeedsDisplay ();
+							Redraw (Bounds);
+						}
 					}
-					OnClicked ();
+					if (UseEffect3DAnimation) {
+						Border.Effect3D = false;
+						SetNeedsDisplay ();
+						Application.GrabMouse (this);
+					}
 				}
-
+				return true;
+			} else if (me.Flags == MouseFlags.Button1Released) {
+				if (CanFocus && Enabled) {
+					if (UseEffect3DAnimation) {
+						Border.Effect3D = true;
+						Application.MainLoop.Invoke (() => SetNeedsDisplay ());
+					}
+					if (me.View == this) {
+						OnClicked ();
+					}
+					Application.UngrabMouse ();
+				}
 				return true;
 			}
 			return false;
