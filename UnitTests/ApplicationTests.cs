@@ -287,21 +287,17 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 		{
-			var p = Environment.OSVersion.Platform;
-			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-				Assert.Throws<InvalidOperationException> (() => Application.Init (null, null));
-			} else {
-				Application.Init (null, null);
-				Assert.Equal (typeof (CursesDriver), Application.Driver.GetType ());
-				Application.Shutdown ();
-			}
+			Application.ForceFakeConsole = true;
+
+			Application.Init (null, null);
+			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
 
 			// Init has been called without selecting a driver and we're passing no driver to Run<TestTopLevel>. Bad
-			Assert.Throws<ArgumentException> (() => Application.Run<TestToplevel> ());
+			Application.Run<TestToplevel> ();
 
 			Shutdown ();
 
@@ -332,14 +328,16 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Run_T_NoInit_Throws ()
+		public void Run_T_NoInit_DoesNotThrow ()
 		{
+			Application.ForceFakeConsole = true; 
+			
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
 
-			// Init has NOT been called and we're passing no driver to Run<TestToplevel>. This is an error.
-			Assert.Throws<ArgumentException> (() => Application.Run<TestToplevel> (errorHandler: null, driver: null, mainLoopDriver: null));
+			Application.Run<TestToplevel> ();
+			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
 			Shutdown ();
 

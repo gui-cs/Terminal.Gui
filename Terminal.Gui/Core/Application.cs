@@ -309,6 +309,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static bool UseSystemConsole;
 
+		// For Unit testing - ignores UseSystemConsole
+		internal static bool ForceFakeConsole;
+
 		/// <summary>
 		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
 		/// </summary>
@@ -385,7 +388,11 @@ namespace Terminal.Gui {
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				if (UseSystemConsole) {
+				if (ForceFakeConsole) {
+					// For Unit Testing only
+					Driver = new FakeDriver ();
+					mainLoopDriver = new FakeMainLoop (() => FakeConsole.ReadKey (true));
+				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
 					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -1262,7 +1269,7 @@ namespace Terminal.Gui {
 		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 		/// <para>
-		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialze the 
+		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialze the application.
 		/// </para>
 		/// <para>
 		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -1298,12 +1305,7 @@ namespace Terminal.Gui {
 				}
 			} else {
 				// Init() has NOT been called.
-				if (driver != null) {
-					// Caller has provided a driver so call Init with it (but set calledViaRunT to true so we don't reset Application state).
-					InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
-				} else {
-					throw new ArgumentException ("A Driver must be specified when calling Run<T>() when Init() has not been called.");
-				}
+				InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
 				Run (Top, errorHandler);
 			}
 		}
