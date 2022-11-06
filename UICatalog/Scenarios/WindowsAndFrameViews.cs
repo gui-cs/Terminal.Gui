@@ -24,6 +24,7 @@ namespace UICatalog.Scenarios {
 			//Ignore the Win that UI Catalog created and create a new one
 			Application.Top.Remove (Win);
 			Win?.Dispose ();
+
 			Win = new Window ($"{listWin.Count} - Scenario: {GetName ()}", padding) {
 				X = Pos.Center (),
 				Y = 1,
@@ -175,6 +176,8 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (frame);
 			listWin.Add (frame);
+
+			Application.Top.ColorScheme = Colors.Base;
 		}
 	}
 }
