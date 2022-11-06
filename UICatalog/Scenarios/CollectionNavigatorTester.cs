@@ -15,11 +15,10 @@ namespace UICatalog.Scenarios {
 	public class CollectionNavigatorTester : Scenario {
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top != null ? top : Application.Top;
-			Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.Base;
 		}
 
 		System.Collections.Generic.List<string> _items = new string [] {
@@ -103,7 +102,7 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem("_Quit", "CTRL-Q", () => Quit()),
 			});
 
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			_items.Sort (StringComparer.OrdinalIgnoreCase);
 
@@ -113,7 +112,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Height = Dim.Fill ()
 			};
-			Top.Add (vsep);
+			Application.Top.Add (vsep);
 			CreateTreeView ();
 		}
 
@@ -129,7 +128,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (50),
 				Height = 1,
 			};
-			Top.Add (label);
+			Application.Top.Add (label);
 
 			_listView = new ListView () {
 				X = 0,
@@ -138,9 +137,8 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				AllowsMarking = false,
 				AllowsMultipleSelection = false,
-				ColorScheme = Colors.TopLevel
 			};
-			Top.Add (_listView);
+			Application.Top.Add (_listView);
 
 			_listView.SetSource (_items);
 
@@ -158,19 +156,19 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_listView) + 2,
 				Y = 1, // for menu
-				Width = Dim.Percent (50),
+				Width = Dim.Percent	 (50),
 				Height = 1,
 			};
-			Top.Add (label);
+			Application.Top.Add (label);
 
 			_treeView = new TreeView () {
 				X = Pos.Right (_listView) + 1,
 				Y = Pos.Bottom (label),
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = Colors.TopLevel
+				Height = Dim.Fill ()
 			};
-			Top.Add (_treeView);
+			_treeView.Style.HighlightModelTextOnly = true;
+			Application.Top.Add (_treeView);
 
 			var root = new TreeNode ("IsLetterOrDigit examples");
 			root.Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();

@@ -1496,7 +1496,7 @@ namespace Terminal.Gui {
 			if (Border != null) {
 				Border.DrawContent (this);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
-				(GetType ().IsPublic || GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
 				Clear ();

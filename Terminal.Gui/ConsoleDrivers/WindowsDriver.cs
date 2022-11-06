@@ -1451,16 +1451,20 @@ namespace Terminal.Gui {
 		{
 			TerminalResized = terminalResized;
 
-			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-			cols = winSize.Width;
-			rows = winSize.Height;
+			try {
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				cols = winSize.Width;
+				rows = winSize.Height;
 
-			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
-			ResizeScreen ();
-			UpdateOffScreen ();
+				ResizeScreen ();
+				UpdateOffScreen ();
 
-			CreateColors ();
+				CreateColors ();
+			} catch (Win32Exception e) {
+				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
+			}
 		}
 
 		public override void ResizeScreen ()
