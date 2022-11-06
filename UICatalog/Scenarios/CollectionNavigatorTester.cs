@@ -137,7 +137,6 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				AllowsMarking = false,
 				AllowsMultipleSelection = false,
-				ColorScheme = Colors.TopLevel
 			};
 			Application.Top.Add (_listView);
 
@@ -157,7 +156,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_listView) + 2,
 				Y = 1, // for menu
-				Width = Dim.Percent (50),
+				Width = Dim.Percent	 (50),
 				Height = 1,
 			};
 			Application.Top.Add (label);
@@ -166,9 +165,9 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (_listView) + 1,
 				Y = Pos.Bottom (label),
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = Colors.TopLevel
+				Height = Dim.Fill ()
 			};
+			_treeView.Style.HighlightModelTextOnly = true;
 			Application.Top.Add (_treeView);
 
 			var root = new TreeNode ("IsLetterOrDigit examples");
