@@ -24,7 +24,6 @@ namespace UICatalog.Scenarios {
 			//Ignore the Win that UI Catalog created and create a new one
 			Application.Top.Remove (Win);
 			Win?.Dispose ();
-			Win.Height = 10;
 			Win = new Window ($"{listWin.Count} - Scenario: {GetName ()}", padding) {
 				X = Pos.Center (),
 				Y = 1,
