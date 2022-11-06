@@ -1386,7 +1386,7 @@ namespace Terminal.Gui {
 			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
 			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
 			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-			Colors.Error.HotFocus = MakeColor (Color.BrightRed, Color.Gray);
+			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
 			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
 		}
 	}
