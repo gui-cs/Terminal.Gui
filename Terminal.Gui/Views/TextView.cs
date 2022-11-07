@@ -33,6 +33,7 @@ using System.Text;
 using System.Threading;
 using NStack;
 using Terminal.Gui.Resources;
+using static Terminal.Gui.Graphs.PathAnnotation;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -742,6 +743,7 @@ namespace Terminal.Gui {
 			historyTextItems.Clear ();
 			idxHistoryText = -1;
 			originalText = text;
+			OnChangeText (null);
 		}
 
 		public bool IsDirty (ustring text)
@@ -1172,9 +1174,23 @@ namespace Terminal.Gui {
 		CultureInfo currentCulture;
 
 		/// <summary>
-		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
+		/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explictly
+		/// set, not as the user types. To be notified as the user changes the contents of the TextView
+		/// see <see cref="IsDirty"/>.
+		/// </remarks>
 		public event Action TextChanged;
+
+		/// <summary>
+		///   Raised when the contents of the <see cref="TextView"/> are changed. 
+		/// </summary>
+		/// <remarks>
+		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
+		/// otherwise changes the contents of the <see cref="TextView"/>.
+		/// </remarks>
+		public Action<ContentsChangedEventArgs> ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
@@ -1187,16 +1203,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-#if false
-		/// <summary>
-		///   Changed event, raised when the text has clicked.
-		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the text in the entry changes.
-		/// </remarks>
-		public Action Changed;
-#endif
 		/// <summary>
 		///   Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
@@ -1404,48 +1410,56 @@ namespace Terminal.Gui {
 
 		private void Model_LinesLoaded ()
 		{
-			historyText.Clear (Text);
+			// This call is not needed. Model_LinesLoaded gets invoked when
+			// model.LoadString (value) is called. LoadString is called from one place
+			// (Text.set) and historyText.Clear() is called immediately after.
+			// If this call happens, HistoryText_ChangeText will get called multiple times
+			// when Text is set, which is wrong.
+			//historyText.Clear (Text);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
 			SetWrapModel ();
 
-			var startLine = obj.CursorPosition.Y;
+			if (obj != null) {
+				var startLine = obj.CursorPosition.Y;
 
-			if (obj.RemovedOnAdded != null) {
-				int offset;
-				if (obj.IsUndoing) {
-					offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
-				} else {
-					offset = obj.RemovedOnAdded.Lines.Count - 1;
-				}
-				for (int i = 0; i < offset; i++) {
-					if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
-						model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+				if (obj.RemovedOnAdded != null) {
+					int offset;
+					if (obj.IsUndoing) {
+						offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
 					} else {
-						break;
+						offset = obj.RemovedOnAdded.Lines.Count - 1;
+					}
+					for (int i = 0; i < offset; i++) {
+						if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
+							model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+						} else {
+							break;
+						}
 					}
 				}
-			}
 
-			for (int i = 0; i < obj.Lines.Count; i++) {
-				if (i == 0) {
-					model.ReplaceLine (startLine, obj.Lines [i]);
-				} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
-						|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
-					model.AddLine (startLine, obj.Lines [i]);
-				} else if (Lines > obj.CursorPosition.Y + 1) {
-					model.RemoveLine (obj.CursorPosition.Y + 1);
+				for (int i = 0; i < obj.Lines.Count; i++) {
+					if (i == 0) {
+						model.ReplaceLine (startLine, obj.Lines [i]);
+					} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
+							|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+						model.AddLine (startLine, obj.Lines [i]);
+					} else if (Lines > obj.CursorPosition.Y + 1) {
+						model.RemoveLine (obj.CursorPosition.Y + 1);
+					}
+					startLine++;
 				}
-				startLine++;
-			}
 
-			CursorPosition = obj.FinalCursorPosition;
+				CursorPosition = obj.FinalCursorPosition;
+			}
 
 			UpdateWrapModel ();
-
+			
 			Adjust ();
+			OnContentsChanged ();
 		}
 
 		void TextView_Initialized (object sender, EventArgs e)
@@ -1454,6 +1468,7 @@ namespace Terminal.Gui {
 
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			OnContentsChanged ();
 		}
 
 		void Top_AlternateBackwardKeyChanged (Key obj)
@@ -1483,6 +1498,8 @@ namespace Terminal.Gui {
 		///   Sets or gets the text in the <see cref="TextView"/>.
 		/// </summary>
 		/// <remarks>
+		/// The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however,
+		/// that Text is not set by <see cref="TextView"/> as the user types.
 		/// </remarks>
 		public override ustring Text {
 			get {
@@ -1845,6 +1862,7 @@ namespace Terminal.Gui {
 				UpdateWrapModel ();
 				SetNeedsDisplay ();
 				Adjust ();
+				OnContentsChanged ();
 			}
 			return res;
 		}
@@ -1859,6 +1877,7 @@ namespace Terminal.Gui {
 			model.LoadStream (stream);
 			ResetPosition ();
 			SetNeedsDisplay ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -2504,6 +2523,12 @@ namespace Terminal.Gui {
 
 				InsertText (new KeyEvent () { Key = key });
 			}
+
+			if (NeedDisplay.IsEmpty) {
+				PositionCursor ();
+			} else {
+				Adjust ();
+			}
 		}
 
 		void Insert (Rune rune)
@@ -2521,6 +2546,7 @@ namespace Terminal.Gui {
 			if (!wrapNeeded) {
 				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
 			}
+
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
@@ -2583,6 +2609,8 @@ namespace Terminal.Gui {
 				}
 
 				UpdateWrapModel ();
+
+				OnContentsChanged ();
 
 				return;
 			}
@@ -2688,6 +2716,42 @@ namespace Terminal.Gui {
 			}
 
 			OnUnwrappedCursorPosition ();
+		}
+
+		/// <summary>
+		/// Event arguments for events for when the contents of the TextView change. E.g. the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public class ContentsChangedEventArgs : EventArgs {
+			/// <summary>
+			/// Creates a new <see cref="ContentsChanged"/> instance.
+			/// </summary>
+			/// <param name="currentRow">Contains the row where the change occurred.</param>
+			/// <param name="currentColumn">Contains the column where the change occured.</param>
+			public ContentsChangedEventArgs (int currentRow, int currentColumn)
+			{
+				Row = currentRow;
+				Col = currentColumn;
+			}
+
+			/// <summary>
+			/// 
+			/// Contains the row where the change occurred.
+			/// </summary>
+			public int Row { get; private set; }
+
+			/// <summary>
+			/// Contains the column where the change occurred.
+			/// </summary>
+			public int Col { get; private set; }
+		}
+
+		/// <summary>
+		/// Called when the contents of the TextView change. E.g. when the user types text or deletes text. Raises
+		/// the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public virtual void OnContentsChanged ()
+		{
+			ContentsChanged?.Invoke (new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 		}
 
 		(int width, int height) OffSetBackground ()
@@ -3178,6 +3242,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 			return true;
 		}
 
@@ -3674,6 +3739,7 @@ namespace Terminal.Gui {
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
+			OnContentsChanged ();
 
 			return true;
 		}
@@ -3883,6 +3949,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 			selecting = false;
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -3913,6 +3980,7 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+				OnContentsChanged ();
 			} else {
 				if (selecting) {
 					ClearRegion ();
@@ -4422,6 +4490,7 @@ namespace Terminal.Gui {
 			historyText?.Clear (Text);
 		}
 	}
+
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting
