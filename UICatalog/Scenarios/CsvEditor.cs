@@ -373,7 +373,7 @@ namespace UICatalog.Scenarios {
 			}
 			using var writer = new CsvWriter (
 				new StreamWriter (File.OpenWrite (currentFile)),
-				CultureInfo.CurrentCulture);
+				CultureInfo.InvariantCulture);
 
 			foreach (var col in tableView.Table.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
 				writer.WriteField (col);
@@ -408,7 +408,7 @@ namespace UICatalog.Scenarios {
 			int lineNumber = 0;
 			currentFile = null;
 
-			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.CurrentCulture);
+			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
 
 			try {
 				var dt = new DataTable ();
