@@ -142,15 +142,15 @@ namespace Terminal.Gui.Views {
 			Dialog dlg = null;
 			Button button1, button2;
 
-			//// Default (Center)
-			//button1 = new Button (btn1Text);
-			//button2 = new Button (btn2Text);
-			//(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, button1, button2);
-			//button1.Visible = false;
-			//Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
-			//buttonRow = $@"{d.VLine}         {btn2} {d.VLine}";
-			//DriverAsserts.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
-			//Application.End (runstate);
+			// Default (Center)
+			button1 = new Button (btn1Text);
+			button2 = new Button (btn2Text);
+			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, button1, button2);
+			button1.Visible = false;
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			buttonRow = $@"{d.VLine}         {btn2} {d.VLine}";
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
 
 			// Justify
 			Assert.Equal (width, buttonRow.Length);
@@ -163,19 +163,26 @@ namespace Terminal.Gui.Views {
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
 			Application.End (runstate);
 
-			//// Right
-			//buttonRow = $@"{d.VLine}  {btn1} {btn2}{d.VLine}";
-			//Assert.Equal (width, buttonRow.Length);
-			//(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text));
-			//DriverAsserts.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
-			//Application.End (runstate);
+			// Right
+			Assert.Equal (width, buttonRow.Length);
+			button1 = new Button (btn1Text);
+			button2 = new Button (btn2Text);
+			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, button1, button2);
+			button1.Visible = false;
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
 
-			//// Left
-			//buttonRow = $@"{d.VLine}{btn1} {btn2}  {d.VLine}";
-			//Assert.Equal (width, buttonRow.Length);
-			//(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text));
-			//DriverAsserts.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
-			//Application.End (runstate);
+			// Left
+			Assert.Equal (width, buttonRow.Length);
+			button1 = new Button (btn1Text);
+			button2 = new Button (btn2Text);
+			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, button1, button2);
+			button1.Visible = false;
+			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			buttonRow = $@"{d.VLine}        {btn2}  {d.VLine}";
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
 		}
 
 		[Fact]
