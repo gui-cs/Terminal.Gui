@@ -300,7 +300,7 @@ namespace Terminal.Gui {
 
 			if (width == 0 & height == 0) {
 				// Dynamically size Width
-				d.Width = Math.Min (Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth ()))), Application.Driver.Cols); // textWidth + (left + padding + padding + right)
+				d.Width = Math.Min (Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth () + d.buttons.Count + 2))), Application.Driver.Cols); // textWidth + (left + padding + padding + right)
 			}
 
 			// Setup actions

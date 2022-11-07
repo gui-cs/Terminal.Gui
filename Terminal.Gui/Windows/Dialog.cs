@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
 	public class Dialog : Window {
-		List<Button> buttons = new List<Button> ();
+		internal List<Button> buttons = new List<Button> ();
 		const int padding = 0;
 
 		/// <summary>
