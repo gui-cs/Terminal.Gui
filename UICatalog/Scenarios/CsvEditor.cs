@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using NStack;
 using System.Text.RegularExpressions;
+using CsvHelper;
 
 namespace UICatalog.Scenarios {
 
@@ -394,34 +395,40 @@ namespace UICatalog.Scenarios {
 				Open(ofd.FilePath.ToString());
 			}
 		}
-		
-		private void Open(string filename)
+
+		private void Open (string filename)
 		{
-			
+
 			int lineNumber = 0;
 			currentFile = null;
 
-			try {
-				var dt = new DataTable();
-				var lines = File.ReadAllLines(filename);
-			
-				foreach(var h in lines[0].Split(',')){
-					dt.Columns.Add(h);
-				}
-				
+			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.CurrentCulture);
 
-				foreach(var line in lines.Skip(1)) {
-					lineNumber++;
-					dt.Rows.Add(line.Split(','));
+			try {
+				var dt = new DataTable ();
+				reader.Read ();
+
+				if (reader.ReadHeader ()) {
+					foreach (var h in reader.HeaderRecord) {
+						dt.Columns.Add (h);
+					}
 				}
-				
+
+				while (reader.Read ()) {
+					lineNumber++;
+
+					var newRow = dt.Rows.Add ();
+					for (int i = 0; i < dt.Columns.Count; i++) {
+						newRow [i] = reader [i];
+					}
+				}
+
 				tableView.Table = dt;
-				
-				// Only set the current filename if we succesfully loaded the entire file
+
+				// Only set the current filename if we successfully loaded the entire file
 				currentFile = filename;
-			}
-			catch(Exception ex) {
-				MessageBox.ErrorQuery("Open Failed",$"Error on line {lineNumber}{Environment.NewLine}{ex.Message}","Ok");
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
 			}
 		}
 		private void SetupScrollBar ()
