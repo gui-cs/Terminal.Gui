@@ -365,22 +365,28 @@ namespace UICatalog.Scenarios {
 				
 		}
 
-		private void Save()
+		private void Save ()
 		{
-			if(tableView.Table == null || string.IsNullOrWhiteSpace(currentFile)) {
-				MessageBox.ErrorQuery("No file loaded","No file is currently loaded","Ok");
+			if (tableView.Table == null || string.IsNullOrWhiteSpace (currentFile)) {
+				MessageBox.ErrorQuery ("No file loaded", "No file is currently loaded", "Ok");
 				return;
 			}
+			using var writer = new CsvWriter (
+				new StreamWriter (File.OpenWrite (currentFile)),
+				CultureInfo.CurrentCulture);
 
-			var sb = new StringBuilder();
-
-			sb.AppendLine(string.Join(",",tableView.Table.Columns.Cast<DataColumn>().Select(c=>c.ColumnName)));
-
-			foreach(DataRow row in tableView.Table.Rows) {
-				sb.AppendLine(string.Join(",",row.ItemArray));
+			foreach (var col in tableView.Table.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
+				writer.WriteField (col);
 			}
-			
-			File.WriteAllText(currentFile,sb.ToString());
+
+			writer.NextRecord ();
+
+			foreach (DataRow row in tableView.Table.Rows) {
+				foreach (var item in row.ItemArray) {
+					writer.WriteField (item);
+				}
+				writer.NextRecord ();
+			}
 		}
 
 		private void Open()
