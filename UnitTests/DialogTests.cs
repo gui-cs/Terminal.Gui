@@ -290,6 +290,61 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
+		public void ButtonAlignment_Four_On_Smaller_Width ()
+		{
+			Application.RunState runstate = null;
+
+			var d = ((FakeDriver)Application.Driver);
+
+			var title = "1234";
+
+			// E.g "|[ yes ][ no ][ maybe ][ never ]|"
+			var btn1Text = "yes";
+			var btn1 = $"{d.LeftBracket} {btn1Text} {d.RightBracket}";
+			var btn2Text = "no";
+			var btn2 = $"{d.LeftBracket} {btn2Text} {d.RightBracket}";
+			var btn3Text = "maybe";
+			var btn3 = $"{d.LeftBracket} {btn3Text} {d.RightBracket}";
+			var btn4Text = "never";
+			var btn4 = $"{d.LeftBracket} {btn4Text} {d.RightBracket}";
+
+			var buttonRow = $"{d.VLine} {btn1} {btn2} {btn3} {btn4} {d.VLine}";
+			var width = buttonRow.Length;
+			var topRow = "34 ───────────────────────────";
+			var bottomRow = "──────────────────────────────";
+			d.SetBufferSize (30, 3);
+
+			// Default - Center
+			buttonRow = $"yes ] {btn2} {btn3} [ never";
+			Assert.NotEqual (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
+
+			// Justify
+			buttonRow = $"es ] {btn2}  {btn3}  [ neve";
+			Assert.NotEqual (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
+
+			// Right
+			buttonRow = $" yes ] {btn2} {btn3} [ neve";
+			Assert.NotEqual (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
+
+			// Left
+			buttonRow = $"es ] {btn2} {btn3} [ never ";
+			Assert.NotEqual (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
 		public void ButtonAlignment_Four_Wider ()
 		{
 			Application.RunState runstate = null;
