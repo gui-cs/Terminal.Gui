@@ -109,7 +109,7 @@ namespace UICatalog.Scenarios {
 			ColorScheme = Colors.Dialog;
 			CanFocus = true;
 
-			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16);
+			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16 + 1);
 			ShowVerticalScrollIndicator = true;
 			ShowHorizontalScrollIndicator = false;
 			LayoutComplete += (args) => {
@@ -128,6 +128,8 @@ namespace UICatalog.Scenarios {
 			AddCommand (Command.ScrollDown, () => { ScrollDown (1); return true; });
 			AddCommand (Command.ScrollLeft, () => { ScrollLeft (1); return true; });
 			AddCommand (Command.ScrollRight, () => { ScrollRight (1); return true; });
+			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height - 1));
+			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height - 1));
 		}
 
 		private void CharMap_DrawContent (Rect viewport)
