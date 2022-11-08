@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -24,6 +25,7 @@ namespace Terminal.Gui.Views {
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
 
+			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
 				if (_textView != null) {
@@ -34,7 +36,6 @@ namespace Terminal.Gui.Views {
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)
-				var txt = "TAB to jump between text fields.";
 				var buff = new byte [txt.Length];
 				for (int i = 0; i < txt.Length; i++) {
 					buff [i] = (byte)txt [i];
@@ -1393,6 +1394,22 @@ namespace Terminal.Gui.Views {
 
 			_textView.Text = "changing";
 			Assert.Equal ("changed", _textView.Text);
+		}
+
+		[Fact]
+		[InitShutdown]
+		public void TextChanged_Event_NoFires_OnTyping ()
+		{
+			var eventcount = 0;
+			_textView.TextChanged += () => {
+				eventcount++;
+			};
+
+			_textView.Text = "ay";
+			Assert.Equal (1, eventcount);
+			_textView.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
+			Assert.Equal (1, eventcount);
+			Assert.Equal ("Yay", _textView.Text.ToString ());
 		}
 
 		[Fact]
@@ -6408,6 +6425,352 @@ This is the second line.
 │             │
 │             │
 └─────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentsChanged_Event_NoFires_On_CursorPosition ()
+		{
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+			};
+
+			var eventcount = 0;
+			Assert.Null (tv.ContentsChanged);
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+			};
+
+			tv.CursorPosition = new Point (0, 0);
+
+			Assert.Equal (0, eventcount);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentsChanged_Event_Fires_On_InsertText ()
+		{
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+			};
+			tv.CursorPosition = new Point (0, 0);
+
+			var eventcount = 0;
+
+			Assert.Null (tv.ContentsChanged);
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+			};
+
+
+			tv.InsertText ("a");
+			Assert.Equal (1, eventcount);
+
+			tv.CursorPosition = new Point (0, 0);
+			tv.InsertText ("bcd");
+			Assert.Equal (4, eventcount);
+			
+			tv.InsertText ("e");
+			Assert.Equal (5, eventcount);
+
+			tv.InsertText ("\n");
+			Assert.Equal (6, eventcount);
+
+			tv.InsertText ("1234");
+			Assert.Equal (10, eventcount);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentsChanged_Event_Fires_On_Init ()
+		{
+			Application.Iteration += () => {
+				Application.RequestStop ();
+			};
+
+			var expectedRow = 0;
+			var expectedCol = 0;
+			var eventcount = 0;
+
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				ContentsChanged = (e) => {
+					eventcount++;
+					Assert.Equal (expectedRow, e.Row);
+					Assert.Equal (expectedCol, e.Col);
+				}
+			};
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+			Assert.Equal (1, eventcount);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentsChanged_Event_Fires_On_Set_Text ()
+		{
+			Application.Iteration += () => {
+				Application.RequestStop ();
+			};
+			var eventcount = 0;
+
+			var expectedRow = 0;
+			var expectedCol = 0;
+
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				// you'd think col would be 3, but it's 0 because TextView sets
+				// row/col = 0 when you set Text
+				Text = "abc",
+				ContentsChanged = (e) => {
+					eventcount++;
+					Assert.Equal (expectedRow, e.Row);
+					Assert.Equal (expectedCol, e.Col);
+				}
+			};
+			Assert.Equal ("abc", tv.Text);
+
+			Application.Top.Add (tv);
+			var rs = Application.Begin (Application.Top);
+			Assert.Equal (1, eventcount); // for Initialize
+
+			expectedCol = 0;
+			tv.Text = "defg";
+			Assert.Equal (2, eventcount); // for set Text = "defg"
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentsChanged_Event_Fires_On_Typing ()
+		{
+			Application.Iteration += () => {
+				Application.RequestStop ();
+			};
+			var eventcount = 0;
+
+			var expectedRow = 0;
+			var expectedCol = 0;
+
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				ContentsChanged = (e) => {
+					eventcount++;
+					Assert.Equal (expectedRow, e.Row);
+					Assert.Equal (expectedCol, e.Col);
+				}
+			};
+
+			Application.Top.Add (tv);
+			var rs = Application.Begin (Application.Top);
+			Assert.Equal (1, eventcount); // for Initialize
+
+			expectedCol = 0;
+			tv.Text = "ay";
+			Assert.Equal (2, eventcount);
+
+			expectedCol = 1;
+			tv.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
+			Assert.Equal (3, eventcount);
+			Assert.Equal ("Yay", tv.Text.ToString ());
+		}
+
+		[Fact, InitShutdown]
+		public void ContentsChanged_Event_Fires_Using_Kill_Delete_Tests ()
+		{
+			var eventcount = 0;
+
+			_textView.ContentsChanged = (e) => {
+				eventcount++;
+			};
+
+			var expectedEventCount = 1;
+			Kill_Delete_WordForward ();
+			Assert.Equal (expectedEventCount, eventcount); // for Initialize
+
+			expectedEventCount += 1;
+			Kill_Delete_WordBackward ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 1;
+			Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 1;
+			Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ();
+			Assert.Equal (expectedEventCount, eventcount);
+		}
+
+
+		[Fact, InitShutdown]
+		public void ContentsChanged_Event_Fires_Using_Copy_Or_Cut_Tests ()
+		{
+			var eventcount = 0;
+
+			_textView.ContentsChanged = (e) => {
+				eventcount++;
+			};
+
+			var expectedEventCount = 1;
+
+			// reset
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 3;
+			Copy_Or_Cut_And_Paste_With_No_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// reset
+			expectedEventCount += 1;
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 3;
+			Copy_Or_Cut_And_Paste_With_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// reset
+			expectedEventCount += 1;
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 1;
+			Copy_Or_Cut_Not_Null_If_Has_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// reset
+			expectedEventCount += 1;
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 1;
+			Copy_Or_Cut_Null_If_No_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// reset
+			expectedEventCount += 1;
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 4;
+			Copy_Without_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+			
+			// reset
+			expectedEventCount += 1;
+			_textView.Text = InitShutdown.txt;
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount += 4;
+			Copy_Without_Selection ();
+			Assert.Equal (expectedEventCount, eventcount);
+		}
+
+		[Fact, InitShutdown]
+		public void ContentsChanged_Event_Fires_On_Undo_Redo ()
+		{
+			var eventcount = 0;
+			var expectedEventCount = 0;
+
+			_textView.ContentsChanged = (e) => {
+				eventcount++;
+			};
+
+			expectedEventCount++;
+			_textView.Text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			Assert.Equal (expectedEventCount, eventcount);
+
+			expectedEventCount++;
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// Undo
+			expectedEventCount++;
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// Redo
+			expectedEventCount++;
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// Undo
+			expectedEventCount++;
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (expectedEventCount, eventcount);
+
+			// Redo
+			expectedEventCount++;
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (expectedEventCount, eventcount);
+		}
+
+		[Fact]
+		public void ContentsChanged_Event_Fires_ClearHistoryChanges ()
+		{
+			var eventcount = 0;
+
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				Text = text,
+				ContentsChanged = (e) => {
+					eventcount++;
+				}
+			};
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (4, tv.Lines);
+
+			var expectedEventCount = 1; // for ENTER key
+			Assert.Equal (expectedEventCount, eventcount);
+			
+			tv.ClearHistoryChanges ();
+			expectedEventCount = 2;
+			Assert.Equal (expectedEventCount, eventcount);
+		}
+
+		[Fact]
+		public void ContentsChanged_Event_Fires_LoadStream ()
+		{
+			var eventcount = 0;
+
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				ContentsChanged = (e) => {
+					eventcount++;
+				}
+			};
+
+			var text = "This is the first line.\r\nThis is the second line.\r\n";
+			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+			
+			Assert.Equal (1, eventcount);
+		}
+
+		[Fact]
+		public void ContentsChanged_Event_Fires_LoadFile ()
+		{
+			var eventcount = 0;
+
+			var tv = new TextView {
+				Width = 50,
+				Height = 10,
+				ContentsChanged = (e) => {
+					eventcount++;
+				}
+			};
+			var fileName = "textview.txt";
+			System.IO.File.WriteAllText (fileName, "This is the first line.\r\nThis is the second line.\r\n") ;
+
+			tv.LoadFile (fileName);
+			Assert.Equal (1, eventcount);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
 	}
 }

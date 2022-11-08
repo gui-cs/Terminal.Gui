@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 			if (allowedFileTypes == null)
 				return true;
 			foreach (var ft in allowedFileTypes)
-				if (fsi.Name.EndsWith (ft) || ft == ".*")
+				if (fsi.Name.EndsWith (ft, StringComparison.InvariantCultureIgnoreCase) || ft == ".*")
 					return true;
 			return false;
 		}
