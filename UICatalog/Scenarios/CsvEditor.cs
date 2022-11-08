@@ -433,6 +433,8 @@ namespace UICatalog.Scenarios {
 
 				// Only set the current filename if we successfully loaded the entire file
 				currentFile = filename;
+				Win.Title = $"{this.GetName ()} - {Path.GetFileName(currentFile)}";
+
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
 			}
