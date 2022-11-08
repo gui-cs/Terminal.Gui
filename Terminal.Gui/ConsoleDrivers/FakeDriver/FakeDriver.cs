@@ -26,7 +26,29 @@ namespace Terminal.Gui {
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
-		public override IClipboard Clipboard { get; }
+		private IClipboard clipboard = null;
+		public override IClipboard Clipboard {
+			get {
+				if (clipboard == null) {
+					if (usingFakeClipboard) {
+						clipboard = new FakeClipboard ();
+					} else {
+						if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+							clipboard = new WindowsClipboard ();
+						} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+							clipboard = new MacOSXClipboard ();
+						} else {
+							if (CursesDriver.Is_WSL_Platform ()) {
+								clipboard = new WSLClipboard ();
+							} else {
+								clipboard = new CursesClipboard ();
+							}
+						}
+					}
+				}
+				return clipboard;
+			}
+		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -56,24 +78,11 @@ namespace Terminal.Gui {
 		//}
 
 		static bool sync = false;
+		static public bool usingFakeClipboard;
 
 		public FakeDriver (bool useFakeClipboard = true)
 		{
-			if (useFakeClipboard) {
-				Clipboard = new FakeClipboard ();
-			} else {
-				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					Clipboard = new WindowsClipboard ();
-				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					Clipboard = new MacOSXClipboard ();
-				} else {
-					if (CursesDriver.Is_WSL_Platform ()) {
-						Clipboard = new WSLClipboard ();
-					} else {
-						Clipboard = new CursesClipboard ();
-					}
-				}
-			}
+			usingFakeClipboard = useFakeClipboard;
 		}
 
 		bool needMove;

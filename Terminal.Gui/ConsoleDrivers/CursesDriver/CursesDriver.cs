@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -957,8 +958,8 @@ namespace Terminal.Gui {
 			if (new CursesClipboard ().IsSupported) {
 				return false;
 			}
-			var result = BashRunner.Run ("uname -a", runCurses: false);
-			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+			var (exitCode, result) = BashRunner.Run ("uname -a", runCurses: false);
+			if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
 			return false;
@@ -1270,8 +1271,8 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			try {
-				var result = BashRunner.Run ("which xclip", runCurses: false);
-				return result.FileExists ();
+				var (exitCode, result) = BashRunner.Run ("which xclip", runCurses: false);
+				return (exitCode == 0 && result.FileExists ());
 			} catch (Exception) {
 				// Permissions issue.
 				return false;
@@ -1283,11 +1284,14 @@ namespace Terminal.Gui {
 			var tempFileName = System.IO.Path.GetTempFileName ();
 			try {
 				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
-				BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
-				return System.IO.File.ReadAllText (tempFileName);
+				var (exitCode, result) = BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
+				if (exitCode == 0) {
+					return System.IO.File.ReadAllText (tempFileName);
+				}
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
@@ -1306,69 +1310,51 @@ namespace Terminal.Gui {
 	}
 
 	static class BashRunner {
-		public static string Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
+		public static (int exitCode, string result) Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
 		{
 			var arguments = $"-c \"{commandLine}\"";
 
-			if (output) {
-				var errorBuilder = new System.Text.StringBuilder ();
-				var outputBuilder = new System.Text.StringBuilder ();
+			var errorBuilder = new System.Text.StringBuilder ();
+			var outputBuilder = new System.Text.StringBuilder ();
 
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardOutput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false,
-					}
-				}) {
-					process.Start ();
-					process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
-					process.BeginOutputReadLine ();
-					process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
-					process.BeginErrorReadLine ();
-					if (!process.DoubleWaitForExit ()) {
-						var timeoutError = $@"Process timed out. Command line: bash {arguments}.
+			using (var process = new System.Diagnostics.Process {
+				StartInfo = new System.Diagnostics.ProcessStartInfo {
+					FileName = "bash",
+					Arguments = arguments,
+					RedirectStandardInput = true,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					UseShellExecute = false,
+					CreateNoWindow = false,
+				}
+			}) {
+				process.Start ();
+				if (output) {
+					process.StandardInput.Write (inputText);
+				}
+				process.StandardInput.Close ();
+				process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
+				process.BeginOutputReadLine ();
+				process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
+				process.BeginErrorReadLine ();
+				if (!process.DoubleWaitForExit ()) {
+					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {arguments}.
 							Output: {outputBuilder}
 							Error: {errorBuilder}";
-						throw new Exception (timeoutError);
-					}
-					if (process.ExitCode == 0) {
-						if (runCurses && Application.Driver is CursesDriver) {
-							Curses.raw ();
-							Curses.noecho ();
-						}
-						return outputBuilder.ToString ();
-					}
-
-					var error = $@"Could not execute process. Command line: bash {arguments}.
-						Output: {outputBuilder}
-						Error: {errorBuilder}";
-					throw new Exception (error);
+					throw new TimeoutException (timeoutError);
 				}
-			} else {
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardInput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false
-					}
-				}) {
-					process.Start ();
-					process.StandardInput.Write (inputText);
-					process.StandardInput.Close ();
-					process.WaitForExit ();
+				if (process.ExitCode == 0) {
 					if (runCurses && Application.Driver is CursesDriver) {
 						Curses.raw ();
 						Curses.noecho ();
 					}
-					return inputText;
+					return (process.ExitCode, outputBuilder.ToString ().TrimEnd ());
 				}
+
+				var error = $@"Could not execute process. ExitCode: {process.ExitCode}, Command line: {process.StartInfo.FileName} {arguments}.
+						Output: {outputBuilder}
+						Error: {errorBuilder}";
+				return (process.ExitCode, error);
 			}
 		}
 
@@ -1413,11 +1399,11 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which pbcopy");
+			var (exitCode, result) = BashRunner.Run ("which pbcopy");
 			if (!result.FileExists ()) {
 				return false;
 			}
-			result = BashRunner.Run ("which pbpaste");
+			(exitCode, result) = BashRunner.Run ("which pbpaste");
 			return result.FileExists ();
 		}
 
@@ -1469,43 +1455,44 @@ namespace Terminal.Gui {
 
 		public override bool IsSupported { get; }
 
+		private string powershellCommand = string.Empty;
+
 		bool CheckSupport ()
 		{
-			try {
-				var result = BashRunner.Run ("which powershell.exe");
-				return result.FileExists ();
-			} catch (System.Exception) {
-				return false;
-			}
+			if (string.IsNullOrEmpty (powershellCommand)) {
+				var (exitCode, result) = BashRunner.Run ("which pwsh");
+				if (exitCode > 0) {
+					(exitCode, result) = BashRunner.Run ("which powershell");
+				}
 
-			//var result = BashRunner.Run ("which powershell.exe");
-			//if (!result.FileExists ()) {
-			//	return false;
-			//}
-			//result = BashRunner.Run ("which clip.exe");
-			//return result.FileExists ();
+				if (exitCode == 0) {
+					powershellCommand = result;
+				}
+			}
+			return !string.IsNullOrEmpty (powershellCommand);
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
+			if (!IsSupported) return string.Empty;
 			using (var powershell = new System.Diagnostics.Process {
 				StartInfo = new System.Diagnostics.ProcessStartInfo {
 					RedirectStandardOutput = true,
-					FileName = "powershell.exe",
+					FileName = powershellCommand,
 					Arguments = "-noprofile -command \"Get-Clipboard\"",
 					UseShellExecute = false,
 					CreateNoWindow = true
 				}
 			}) {
 				powershell.Start ();
-				var result = powershell.StandardOutput.ReadToEnd ();
-				powershell.StandardOutput.Close ();
 				if (!powershell.DoubleWaitForExit ()) {
 					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
 							Error: {powershell.StandardError.ReadToEnd ()}";
 					throw new Exception (timeoutError);
 				}
+				var result = powershell.StandardOutput.ReadToEnd ();
+				powershell.StandardOutput.Close ();
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
@@ -1519,9 +1506,14 @@ namespace Terminal.Gui {
 
 		protected override void SetClipboardDataImpl (string text)
 		{
+			if (!IsSupported) return;
+
 			using (var powershell = new System.Diagnostics.Process {
 				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					FileName = "powershell.exe",
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true,
+					FileName = powershellCommand,
 					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
 				}
 			}) {

@@ -651,15 +651,5 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
-		public void FileDialog_FileSystemWatcher ()
-		{
-			for (int i = 0; i < 256; i++) {
-				var fd = new FileDialog ();
-				fd.Ready += () => Application.RequestStop ();
-				Application.Run (fd);
-			}
-		}
 	}
 }

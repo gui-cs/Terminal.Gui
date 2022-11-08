@@ -513,5 +513,16 @@ namespace Terminal.Gui.Views {
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{buttonRow}\n{bottomRow}", output);
 			Application.End (runstate);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void FileDialog_FileSystemWatcher ()
+		{
+			for (int i = 0; i < 256; i++) {
+				var fd = new FileDialog ();
+				fd.Ready += () => Application.RequestStop ();
+				Application.Run (fd);
+			}
+		}
 	}
 }

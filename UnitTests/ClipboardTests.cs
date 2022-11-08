@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Xunit;
 using Xunit.Abstractions;
@@ -68,111 +69,78 @@ namespace Terminal.Gui.ConsoleDrivers {
 			}
 		}
 
+		private static string RunClipboardProcess (string cmd, string args, string writeText = null)
+		{
+			string output = string.Empty;
+
+			using (Process process = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = cmd,
+					Arguments = args,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true
+				}
+			}) {
+				process.Start ();
+				if (string.IsNullOrEmpty (writeText)) {
+					process.StandardInput.Write (writeText);
+					process.StandardInput.Close ();
+				}
+				process.WaitForExit ();
+
+				if (process.ExitCode > 0) {
+					var error = $@"RunClipboardProcess failed. Command line: {cmd} {args}.
+										Output: {process.StandardOutput.ReadToEnd ()}
+										Error: {process.StandardError.ReadToEnd ()}";
+					throw new InvalidOperationException (error);
+				}
+				output = process.StandardOutput.ReadToEnd ().TrimEnd ();
+				process.StandardOutput.Close ();
+			}
+			return output;
+		}
+
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Gets_From_OS_Clipboard ()
 		{
 			var clipText = "This is a clipboard unit test to get clipboard from OS.";
-			var exit = false;
+			var failed = false;
 			var getClipText = "";
 
 			Application.Iteration += () => {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					// using (Process clipExe = new Process {
-					// 	StartInfo = new ProcessStartInfo {
-					// 		RedirectStandardInput = true,
-					// 		FileName = "clip"
-					// 	}
-					// }) {
-					// 	clipExe.Start ();
-					// 	clipExe.StandardInput.Write (clipText);
-					// 	clipExe.StandardInput.Close ();
-					// 	var result = clipExe.WaitForExit (500);
-					// 	if (result) {
-					// 		clipExe.WaitForExit ();
-					// 	}
-					// }
-
-					using (Process pwsh = new Process {
-						StartInfo = new ProcessStartInfo {
-							FileName = "powershell",
-							Arguments = $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
-						}
-					}) {
-						pwsh.Start ();
-						pwsh.WaitForExit ();
-					}
+					RunClipboardProcess ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					using (Process copy = new Process {
-						StartInfo = new ProcessStartInfo {
-							RedirectStandardInput = true,
-							FileName = "pbcopy"
-						}
-					}) {
-						copy.Start ();
-						copy.StandardInput.Write (clipText);
-						copy.StandardInput.Close ();
-						copy.WaitForExit ();
-					}
+					RunClipboardProcess ("pbcopy", string.Empty, clipText);
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {
-							using (Process bash = new Process {
-								StartInfo = new ProcessStartInfo {
-									FileName = "powershell.exe",
-									Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\""
-								}
-							}) {
-								bash.Start ();
-								bash.WaitForExit ();
-							}
-
-							//using (Process clipExe = new Process {
-							//	StartInfo = new ProcessStartInfo {
-							//		RedirectStandardInput = true,
-							//		FileName = "clip.exe"
-							//	}
-							//}) {
-							//	clipExe.Start ();
-							//	clipExe.StandardInput.Write (clipText);
-							//	clipExe.StandardInput.Close ();
-							//	clipExe.WaitForExit ();
-							//	//var result = clipExe.WaitForExit (500);
-							//	//if (result) {
-							//	//	clipExe.WaitForExit ();
-							//	//}
-							//}
+							RunClipboardProcess ("pwsh", $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
 						} catch {
-							exit = true;
+							failed = true;
 						}
-						if (!exit) {
+						if (!failed) {
 							getClipText = Clipboard.Contents.ToString ();
 						}
 						Application.RequestStop ();
 						return;
 					}
-					if (exit = xclipExists () == false) {
+
+					if (failed = xclipExists () == false) {
 						// xclip doesn't exist then exit.
 						Application.RequestStop ();
 						return;
 					}
 
-					using (Process bash = new Process {
-						StartInfo = new ProcessStartInfo {
-							FileName = "bash",
-							Arguments = $"-c \"xclip -sel clip -i\"",
-							RedirectStandardInput = true,
-						}
-					}) {
-						bash.Start ();
-						bash.StandardInput.Write (clipText);
-						bash.StandardInput.Close ();
-						bash.WaitForExit ();
-					}
-					if (!exit) {
+					// If we get here, powershell didn't work and xclip exists...
+					RunClipboardProcess ("bash", $"-c \"xclip -sel clip -i\"", clipText);
+
+					if (!failed) {
 						getClipText = Clipboard.Contents.ToString ();
 					}
 				}
@@ -182,83 +150,44 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Run ();
 
-			if (!exit) {
+			if (!failed) {
 				Assert.Equal (clipText, getClipText);
 			}
 		}
+
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Sets_The_OS_Clipboard ()
 		{
 			var clipText = "This is a clipboard unit test to set the OS clipboard.";
 			var clipReadText = "";
-			var exit = false;
+			var failed = false;
 
 			Application.Iteration += () => {
 				Clipboard.Contents = clipText;
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					using (Process pwsh = new Process {
-						StartInfo = new ProcessStartInfo {
-							RedirectStandardOutput = true,
-							FileName = "powershell.exe",
-							Arguments = "-noprofile -command \"Get-Clipboard\""
-						}
-					}) {
-						pwsh.Start ();
-						clipReadText = pwsh.StandardOutput.ReadToEnd ().TrimEnd ();
-						pwsh.StandardOutput.Close ();
-						pwsh.WaitForExit ();
-					}
+					clipReadText = RunClipboardProcess ("pwsh", "-noprofile -command \"Get-Clipboard\"");
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					using (Process paste = new Process {
-						StartInfo = new ProcessStartInfo {
-							RedirectStandardOutput = true,
-							FileName = "pbpaste"
-						}
-					}) {
-						paste.Start ();
-						clipReadText = paste.StandardOutput.ReadToEnd ();
-						paste.StandardOutput.Close ();
-						paste.WaitForExit ();
-					}
+					clipReadText = RunClipboardProcess ("pbpaste", "");
+
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {
-							using (Process bash = new Process {
-								StartInfo = new ProcessStartInfo {
-									RedirectStandardOutput = true,
-									FileName = "powershell.exe",
-									Arguments = "-noprofile -command \"Get-Clipboard\""
-								}
-							}) {
-								bash.Start ();
-								clipReadText = bash.StandardOutput.ReadToEnd ();
-								bash.StandardOutput.Close ();
-								bash.WaitForExit ();
-							}
+							clipReadText = RunClipboardProcess ("/opt/microsoft/powershell/7/pwsh", "-noprofile -command \"Get-Clipboard\"");
 						} catch {
-							exit = true;
+							failed = true;
 						}
 						Application.RequestStop ();
 					}
-					if (exit = xclipExists () == false) {
+					if (failed = xclipExists () == false) {
 						// xclip doesn't exist then exit.
 						Application.RequestStop ();
+						return;
 					}
 
-					using (Process bash = new Process {
-						StartInfo = new ProcessStartInfo {
-							RedirectStandardOutput = true,
-							FileName = "bash",
-							Arguments = $"-c \"xclip -sel clip -o\""
-						}
-					}) {
-						bash.Start ();
-						clipReadText = bash.StandardOutput.ReadToEnd ();
-						bash.StandardOutput.Close ();
-						bash.WaitForExit ();
-					}
+					clipReadText = RunClipboardProcess ("bash", $"-c \"xclip -sel clip -o\"");
 				}
 
 				Application.RequestStop ();
@@ -266,7 +195,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Run ();
 
-			if (!exit) {
+			if (!failed) {
 				Assert.Equal (clipText, clipReadText);
 			}
 
@@ -274,44 +203,15 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		bool Is_WSL_Platform ()
 		{
-			using (Process bash = new Process {
-				StartInfo = new ProcessStartInfo {
-					FileName = "bash",
-					Arguments = $"-c \"uname -a\"",
-					RedirectStandardOutput = true,
-				}
-			}) {
-				bash.Start ();
-				var result = bash.StandardOutput.ReadToEnd ();
-				var isWSL = false;
-				if (result.Contains ("microsoft") && result.Contains ("WSL")) {
-					isWSL = true;
-				}
-				bash.StandardOutput.Close ();
-				bash.WaitForExit ();
-				return isWSL;
-			}
+			var result = RunClipboardProcess ("bash", $"-c \"uname -a\"");
+			return result.Contains ("microsoft") && result.Contains ("WSL");
 		}
 
 		bool xclipExists ()
 		{
 			try {
-				using (Process bash = new Process {
-					StartInfo = new ProcessStartInfo {
-						FileName = "bash",
-						Arguments = $"-c \"which xclip\"",
-						RedirectStandardOutput = true,
-					}
-				}) {
-					bash.Start ();
-					bool exist = bash.StandardOutput.ReadToEnd ().TrimEnd () != "";
-					bash.StandardOutput.Close ();
-					bash.WaitForExit ();
-					if (exist) {
-						return true;
-					}
-				}
-				return false;
+				var result = RunClipboardProcess ("bash", $"-c \"which xclip\"");
+				return result.TrimEnd () != "";
 			} catch (System.Exception) {
 				return false;
 			}
