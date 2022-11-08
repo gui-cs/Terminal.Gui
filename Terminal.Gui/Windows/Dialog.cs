@@ -164,7 +164,11 @@ namespace Terminal.Gui {
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					shiftLeft += button.Frame.Width + (i == buttons.Count - 1 ? 0 : 1);
-					button.X = Pos.AnchorEnd (shiftLeft);
+					if (shiftLeft > -1) {
+						button.X = Pos.AnchorEnd (shiftLeft);
+					} else {
+						button.X = Frame.Width - shiftLeft;
+					}
 					button.Y = Pos.AnchorEnd (1);
 				}
 				break;
