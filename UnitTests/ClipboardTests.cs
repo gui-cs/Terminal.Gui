@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.ConsoleDrivers {
 	public class ClipboardTests {
 		[Fact]
 		public void Contents_Gets_Sets ()
