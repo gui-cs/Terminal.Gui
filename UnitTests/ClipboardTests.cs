@@ -120,7 +120,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {
-							RunClipboardProcess ("pwsh", $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+							// This runs the WINDOWS version of powershell.exe via WSL.
+							RunClipboardProcess ("powershell.exe", $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
 						} catch {
 							failed = true;
 						}

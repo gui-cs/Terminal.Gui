@@ -1260,6 +1260,13 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux.
+	///  This implementation uses the xclip command to access the clipboard.
+	/// </summary>	
+	/// <remarks>
+	/// If xclip is not installed, this implementation will not work.
+	/// </remarks>
 	class CursesClipboard : ClipboardBase {
 		public CursesClipboard ()
 		{
@@ -1373,6 +1380,12 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	///  A clipboard implementation for MacOSX. 
+	///  This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
+	///  The existance of the Mac pbcopy and pbpaste commands 
+	///  is used to determine if copy/paste is supported.
+	/// </summary>	
 	class MacOSXClipboard : ClipboardBase {
 		IntPtr nsString = objc_getClass ("NSString");
 		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
@@ -1447,6 +1460,12 @@ namespace Terminal.Gui {
 		static extern IntPtr sel_registerName (string selectorName);
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux, when running under WSL. 
+	///  This implementation uses the Windows clipboard to store the data, and uses Windows'
+	///  powershell.exe (launched via WSL interop services) to set/get the Windows
+	///  clipboard. 
+	/// </summary>
 	class WSLClipboard : ClipboardBase {
 		public WSLClipboard ()
 		{
@@ -1460,9 +1479,10 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			if (string.IsNullOrEmpty (powershellCommand)) {
-				var (exitCode, result) = BashRunner.Run ("which pwsh");
+				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
+				var (exitCode, result) = BashRunner.Run ("which pwsh.exe");
 				if (exitCode > 0) {
-					(exitCode, result) = BashRunner.Run ("which powershell");
+					(exitCode, result) = BashRunner.Run ("which powershell.exe");
 				}
 
 				if (exitCode == 0) {
@@ -1536,18 +1556,6 @@ namespace Terminal.Gui {
 					Curses.noecho ();
 				}
 			}
-
-			//using (var clipExe = new System.Diagnostics.Process {
-			//	StartInfo = new System.Diagnostics.ProcessStartInfo {
-			//		FileName = "clip.exe",
-			//		RedirectStandardInput = true
-			//	}
-			//}) {
-			//	clipExe.Start ();
-			//	clipExe.StandardInput.Write (text);
-			//	clipExe.StandardInput.Close ();
-			//	clipExe.WaitForExit ();
-			//}
 		}
 	}
 }
