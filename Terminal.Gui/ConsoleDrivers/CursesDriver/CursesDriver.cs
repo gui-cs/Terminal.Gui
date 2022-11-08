@@ -1528,10 +1528,16 @@ namespace Terminal.Gui {
 				powershell.Start ();
 				powershell.WaitForExit ();
 				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
+					var timeoutError = $@"Process timed out. Command line: {powershell.StartInfo.FileName} {powershell.StartInfo.Arguments}.
 							Output: {powershell.StandardOutput.ReadToEnd ()}
 							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
+					throw new TimeoutException (timeoutError);
+				}
+				if (powershell.ExitCode > 0) {
+					var setClipboardError = $@"Set-Clipboard failed. Command line: {powershell.StartInfo.FileName} {powershell.StartInfo.Arguments}.
+							Output: {powershell.StandardOutput.ReadToEnd ()}
+							Error: {powershell.StandardError.ReadToEnd ()}";
+					throw new System.InvalidOperationException (setClipboardError);
 				}
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();

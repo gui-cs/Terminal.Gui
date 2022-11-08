@@ -10,31 +10,48 @@ using Rune = System.Rune;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Diagnostics;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
-// automatically call Application.Init before called and Application.Shutdown after
+// automatically call Application.Init at start of the test and Application.Shutdown after the
+// test exits. 
 // 
 // This is necessary because a) Application is a singleton and Init/Shutdown must be called
-// as a pair, and b) all unit test functions should be atomic.
+// as a pair, and b) all unit test functions should be atomic..
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
+	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true, bool useFakeClipboard = true)
+	{
+		this.AutoInit = autoInit;
+		this.AutoShutdown = autoShutdown;
+		this.UseFakeClipboard = useFakeClipboard;
+	}
+
 	static bool _init = false;
+
+	public bool AutoInit { get; }
+	public bool AutoShutdown { get; }
+	public bool UseFakeClipboard { get; }
+
 	public override void Before (MethodInfo methodUnderTest)
 	{
-		if (_init) {
-			throw new InvalidOperationException ("After did not run.");
+		if (AutoShutdown && _init) {
+			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
 		}
-
-		Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-		_init = true;
+		if (AutoInit) {
+			Application.Init (new FakeDriver (useFakeClipboard: UseFakeClipboard), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			_init = true;
+		}
 	}
 
 	public override void After (MethodInfo methodUnderTest)
 	{
-		Application.Shutdown ();
-		_init = false;
+		if (AutoShutdown) {
+			Application.Shutdown ();
+			_init = false;
+		}
 	}
 }
 
