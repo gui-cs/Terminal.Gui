@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 				// Justify Buttons
 				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - 2) / (buttons.Count - 1));
+				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - (Border.DrawMarginFrame ? 2 : 0)) / (buttons.Count - 1));
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					if (i == buttons.Count - 1) {
