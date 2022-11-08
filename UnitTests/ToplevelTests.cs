@@ -431,6 +431,7 @@ namespace Terminal.Gui.Core {
 			var top = Application.Top;
 			Assert.Null (Application.MdiTop);
 			top.IsMdiContainer = true;
+			Application.Begin (top);
 			Assert.Equal (Application.Top, Application.MdiTop);
 
 			var isRunning = true;
@@ -469,6 +470,7 @@ namespace Terminal.Gui.Core {
 			Assert.Null (top.MostFocused);
 			Assert.Equal (win1.Subviews [0], win1.Focused);
 			Assert.Equal (tf1W1, win1.MostFocused);
+			Assert.True (win1.IsMdiChild);
 			Assert.Single (Application.MdiChildes);
 			Application.Begin (win2);
 			Assert.Equal (new Rect (0, 0, 40, 25), win2.Frame);

@@ -64,12 +64,18 @@ namespace UICatalog {
 				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 				// Close after a short period of time
-				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (200), closeCallback);
+				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
 
-				scenario.Init (Application.Top, Colors.Base);
+				scenario.Init (Colors.Base);
 				scenario.Setup ();
 				scenario.Run ();
 				Application.Shutdown ();
+#if DEBUG_IDISPOSABLE
+				foreach (var inst in Responder.Instances) {
+					Assert.True (inst.WasDisposed);
+				}
+				Responder.Instances.Clear ();
+#endif
 			}
 #if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {
@@ -115,7 +121,7 @@ namespace UICatalog {
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
-			generic.Init (Application.Top, Colors.Base);
+			generic.Init (Colors.Base);
 			generic.Setup ();
 			// There is no need to call Application.Begin because Init already creates the Application.Top
 			// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.

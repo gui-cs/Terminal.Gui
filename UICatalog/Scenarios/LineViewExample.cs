@@ -17,14 +17,14 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_Quit", "", () => Quit()),
 			})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 
 			Win.Add (new Label ("Regular Line") { Y = 0 });
@@ -94,7 +94,7 @@ namespace UICatalog.Scenarios {
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit())
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 		}
 

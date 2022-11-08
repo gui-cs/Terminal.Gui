@@ -48,6 +48,14 @@
     "WSL": {
       "commandName": "WSL2",
       "distributionName": ""
+    },
+    "All Views Tester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"All Views Tester\""
+    },
+    "Windows & FrameViews": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Windows & FrameViews\""
     }
   }
 }
