@@ -57,17 +57,21 @@ namespace Terminal.Gui {
 
 		static bool sync = false;
 
-		public FakeDriver ()
+		public FakeDriver (bool useFakeClipboard = true)
 		{
-			if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-				Clipboard = new WindowsClipboard ();
-			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				Clipboard = new MacOSXClipboard ();
+			if (useFakeClipboard) {
+				Clipboard = new FakeClipboard ();
 			} else {
-				if (CursesDriver.Is_WSL_Platform ()) {
-					Clipboard = new WSLClipboard ();
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					Clipboard = new WindowsClipboard ();
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					Clipboard = new MacOSXClipboard ();
 				} else {
-					Clipboard = new CursesClipboard ();
+					if (CursesDriver.Is_WSL_Platform ()) {
+						Clipboard = new WSLClipboard ();
+					} else {
+						Clipboard = new CursesClipboard ();
+					}
 				}
 			}
 		}
@@ -641,6 +645,23 @@ namespace Terminal.Gui {
 		}
 
 		#endregion
+		
+		public class FakeClipboard : ClipboardBase {
+			public override bool IsSupported => true;
+
+			string contents = string.Empty;
+
+			protected override string GetClipboardDataImpl ()
+			{
+				return contents;
+			}
+
+			protected override void SetClipboardDataImpl (string text)
+			{
+				contents = text;
+			}
+		}
+
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 }
