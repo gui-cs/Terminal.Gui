@@ -720,7 +720,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 				yield return new object [] { '!', true, false, false, '1', 2, (Key)'!' | Key.ShiftMask, '1', 2 };
 				yield return new object [] { '1', true, true, false, '1', 2, Key.D1 | Key.ShiftMask | Key.AltMask, '1', 2 };
 				yield return new object [] { '1', true, true, true, '1', 2, Key.D1 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '1', 2 };
-				yield return new object [] { '1', false, true, true, '1', 2, Key.D1 | Key.AltMask | Key.CtrlMask, '1', 2 };
+				//yield return new object [] { '1', false, true, true, '1', 2, Key.D1 | Key.AltMask | Key.CtrlMask, '1', 2 };
 				yield return new object [] { '1', false, true, true, '1', 2, Key.D1 | Key.AltMask | Key.CtrlMask, '1', 2 };
 				yield return new object [] { '2', false, false, false, '2', 3, Key.D2, '2', 3 };
 				yield return new object [] { '"', true, false, false, '2', 3, (Key)'"' | Key.ShiftMask, '2', 3 };
