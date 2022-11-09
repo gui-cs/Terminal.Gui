@@ -959,7 +959,7 @@ namespace Terminal.Gui {
 				// If xclip is installed on Linux under WSL, this will return true.
 				return false;
 			}
-			var (exitCode, result) = ClipboardProcessRunner.Bash ("uname -a", runCurses: false);
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("uname -a");
 			if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
@@ -1280,7 +1280,7 @@ namespace Terminal.Gui {
 		bool CheckSupport ()
 		{
 			try {
-				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", runCurses: false);
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip");
 				if (exitCode == 0 && result.FileExists ()) {
 					xclipPath = result;
 					return true;
