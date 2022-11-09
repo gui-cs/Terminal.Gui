@@ -20,14 +20,15 @@ jobs:
         dotnet-version: 6.0.100
 
     - name: Install dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
+        sudo apt-get install xclip
 
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
     - name: Test
       run: |
-        apt install xclip
         xclip -version
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
