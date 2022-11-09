@@ -845,7 +845,9 @@ namespace Terminal.Gui {
 				cmbAllowedTypes.SetSource (value);
 				cmbAllowedTypes.SelectedItem = selected > -1 ? selected : 0;
 				SetComboBoxHeight (value?.ToList ());
-				dirListView.AllowedFileTypes = value [cmbAllowedTypes.SelectedItem].Split (';');
+				dirListView.AllowedFileTypes = value != null
+					? value [cmbAllowedTypes.SelectedItem].Split (';')
+					: null;
 			}
 		}
 
