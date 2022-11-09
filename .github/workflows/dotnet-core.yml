@@ -27,6 +27,7 @@ jobs:
 
     - name: Test
       run: |
+        apt install xclip
         xclip -version
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
