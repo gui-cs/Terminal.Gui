@@ -1294,13 +1294,15 @@ namespace Terminal.Gui {
 		protected override string GetClipboardDataImpl ()
 		{
 			var tempFileName = System.IO.Path.GetTempFileName ();
+			var xclipargs = "-selection clipboard -o";
+
 			try {
-				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} -selection clipboard -o > {tempFileName}");
+				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs} > {tempFileName}");
 				if (exitCode == 0) {
 					return System.IO.File.ReadAllText (tempFileName);
 				}
 			} catch (Exception e) {
-				throw new NotSupportedException ($"{xclipPath} -selection clipboard -o failed.", e);
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs}\" failed.", e);
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
@@ -1309,22 +1311,23 @@ namespace Terminal.Gui {
 
 		protected override void SetClipboardDataImpl (string text)
 		{
+			var xclipargs = "-selection clipboard -i";
 			try {
-				ClipboardProcessRunner.Bash ($"{xclipPath} - selection clipboard -i", false, text);
+				ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text);
 			} catch (Exception e) {
-				throw new NotSupportedException ($"{xclipPath} -selection clipboard -o failed", e);
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs} < {text}\" failed", e);
 			}
 		}
 	}
 
 	internal static class ClipboardProcessRunner {
-		public static (int exitCode, string result) Bash (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
+		public static (int exitCode, string result) Bash (string commandLine, string inputText = "")
 		{
 			var arguments = $"-c \"{commandLine}\"";
 			var (exitCode, result) = Process ("bash", arguments, inputText);
 
 			if (exitCode == 0) {
-				if (runCurses && Application.Driver is CursesDriver) {
+				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
