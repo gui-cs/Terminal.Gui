@@ -91,16 +91,16 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void Contents_Gets_From_OS_Clipboard ()
+		public void Contents_Copies_From_OS_Clipboard ()
 		{
-			var clipText = "This is a clipboard unit test to get clipboard from OS.";
+			var clipText = "The Contents_Copies_From_OS_Clipboard unit test pasted this to the OS clipboard.";
 			var failed = false;
 			var getClipText = "";
 
 			Application.Iteration += () => {
 				int exitCode = 0;
 				string result = "";
-				output.WriteLine ($"Setting OS clipboard to: {clipText}...");
+				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
@@ -121,7 +121,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 						} catch {
 							failed = true;
 						}
+
 						if (!failed) {
+							// If we set the OS clipboard via Powershell, then getting Contents should return the same text.
 							getClipText = Clipboard.Contents.ToString ();
 							output.WriteLine ($"  WSL: Clipboard.Contents: {getClipText}");
 						}
@@ -157,9 +159,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void Contents_Sets_The_OS_Clipboard ()
+		public void Contents_Pastes_To_OS_Clipboard ()
 		{
-			var clipText = "This is a clipboard unit test to set the OS clipboard.";
+			var clipText = "The Contents_Pastes_To_OS_Clipboard unit test pasted this via Clipboard.Contents.";
 			var clipReadText = "";
 			var failed = false;
 
