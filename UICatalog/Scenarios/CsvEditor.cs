@@ -385,8 +385,9 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open (does not support newlines, escaping etc)");
-			ofd.AllowedFileTypes = new string [] { ".csv" };
+			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open (does not support newlines, escaping etc)") {
+				AllowedFileTypes = new string [] { ".csv" }
+			};
 
 			Application.Run (ofd);
 
