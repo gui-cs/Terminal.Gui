@@ -1296,10 +1296,14 @@ namespace Terminal.Gui {
 		{
 			var tempFileName = System.IO.Path.GetTempFileName ();
 			var xclipargs = "-selection clipboard -o";
-			
+
 			try {
 				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
 				if (exitCode == 0) {
+					if (Application.Driver is CursesDriver) {
+						Curses.raw ();
+						Curses.noecho ();
+					}
 					return System.IO.File.ReadAllText (tempFileName);
 				}
 			} catch (Exception e) {
@@ -1314,7 +1318,11 @@ namespace Terminal.Gui {
 		{
 			var xclipargs = "-selection clipboard -i";
 			try {
-				ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text, waitForOutput: false);
+				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text, waitForOutput: false);
+				if (exitCode == 0 && Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
 			} catch (Exception e) {
 				throw new NotSupportedException ($"\"{xclipPath} {xclipargs} < {text}\" failed", e);
 			}
@@ -1327,12 +1335,6 @@ namespace Terminal.Gui {
 			var arguments = $"-c \"{commandLine}\"";
 			var (exitCode, result) = Process ("bash", arguments, inputText, waitForOutput);
 
-			if (exitCode == 0) {
-				if (Application.Driver is CursesDriver) {
-					Curses.raw ();
-					Curses.noecho ();
-				}
-			}
 			return (exitCode, result.TrimEnd ());
 		}
 
@@ -1371,7 +1373,12 @@ namespace Terminal.Gui {
 					output = $@"Process failed to run. Command line: {cmd} {arguments}.
 										Output: {output}
 										Error: {process.StandardError.ReadToEnd ()}";
-				} 
+				}
+				if (Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
+
 				return (process.ExitCode, output);
 			}
 		}
@@ -1514,7 +1521,7 @@ namespace Terminal.Gui {
 			if (!IsSupported) {
 				return string.Empty;
 			}
-			
+
 			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, "-noprofile -command \"Get-Clipboard\"");
 			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
