@@ -1350,16 +1350,17 @@ namespace Terminal.Gui {
 					CreateNoWindow = true,
 				}
 			}) {
+				var eventHandled = new TaskCompletionSource<bool> ();
 				process.Start ();
 				if (!string.IsNullOrEmpty (input)) {
 					process.StandardInput.Write (input);
 					process.StandardInput.Close ();
 				}
 
-				process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
-				process.BeginOutputReadLine ();
-				process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
-				process.BeginErrorReadLine ();
+				//process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
+				//process.BeginOutputReadLine ();
+				//process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
+				//process.BeginErrorReadLine ();
 
 				if (!process.WaitForExit (5000)) {
 					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.
@@ -1370,10 +1371,10 @@ namespace Terminal.Gui {
 
 				if (process.ExitCode > 0) {
 					output = $@"Process failed to run. Command line: {cmd} {arguments}.
-										Output: {outputBuilder}
-										Error: {errorBuilder}";
+										Output: {process.StandardOutput.ReadToEnd()}
+										Error: {process.StandardOutput.ReadToEnd ()}";
 				} else {
-					output = outputBuilder.ToString ().TrimEnd ();
+					output = process.StandardOutput.ReadToEnd ().TrimEnd ();
 				}
 				return (process.ExitCode, output);
 			}
@@ -1482,12 +1483,17 @@ namespace Terminal.Gui {
 	///  clipboard. 
 	/// </summary>
 	class WSLClipboard : ClipboardBase {
+		bool isSupported = false;
 		public WSLClipboard ()
 		{
-			IsSupported = CheckSupport ();
+			isSupported = CheckSupport ();
 		}
 
-		public override bool IsSupported { get; }
+		public override bool IsSupported { 
+			get { 
+				return isSupported = CheckSupport ();  
+			}
+		}
 
 		private string powershellPath = string.Empty;
 

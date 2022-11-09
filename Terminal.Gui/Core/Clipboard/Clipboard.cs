@@ -32,30 +32,32 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static ustring Contents {
 			get {
-				try {
-					if (IsSupported) {
-						return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
-					} else {
-						return contents;
-					}
-				} catch (Exception) {
-					return contents;
-				}
+				return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
+				//try {
+				//	if (IsSupported) {
+				//		return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
+				//	} else {
+				//		return ustring.Make ("Clipboard not supported"); // contents;
+				//	}
+				//} catch (Exception) {
+				//	return contents;
+				//}
 			}
 			set {
-				try {
-					if (IsSupported) {
-						if (value == null) {
-							value = string.Empty;
-						}
-						Application.Driver.Clipboard.SetClipboardData (value.ToString ());
-					}
-					contents = value;
-				} catch (NotSupportedException e) {
-					throw e;
-				} catch (Exception) {
-					contents = value;
-				}
+				Application.Driver.Clipboard.SetClipboardData (value.ToString ());
+				//try {
+				//	if (IsSupported) {
+				//		if (value == null) {
+				//			value = string.Empty;
+				//		}
+				//		Application.Driver.Clipboard.SetClipboardData (value.ToString ());
+				//	}
+				//	contents = value;
+				//} catch (NotSupportedException e) {
+				//	throw e;
+				//} catch (Exception) {
+				//	contents = value;
+				//}
 			}
 		}
 

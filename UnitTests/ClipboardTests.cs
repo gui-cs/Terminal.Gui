@@ -6,7 +6,13 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ConsoleDrivers {
 	public class ClipboardTests {
+		readonly ITestOutputHelper output;
 
+		public ClipboardTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+		
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Gets_Sets ()
 		{
@@ -78,40 +84,51 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var getClipText = "";
 
 			Application.Iteration += () => {
+				int exitCode = 0;
+				string result = "";
+				output.WriteLine ($"Setting OS clipboard to: {clipText}...");
+				
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {output}");
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					ClipboardProcessRunner.Process ("pbcopy", string.Empty, clipText);
+					(exitCode, result) = ClipboardProcessRunner.Process ("pbcopy", string.Empty, clipText);
+					output.WriteLine ($"  OSX: pbcopy: exitCode = {exitCode}, result = {result}");
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
 						try {
 							// This runs the WINDOWS version of powershell.exe via WSL.
-							ClipboardProcessRunner.Process ("powershell.exe", $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+							(exitCode, result) = ClipboardProcessRunner.Process ("powershell.exe", $"-noprofile -command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+							output.WriteLine ($"  WSL: powershell.exe Set-Clipboard: exitCode = {exitCode}, result = {result}");
 						} catch {
 							failed = true;
 						}
 						if (!failed) {
 							getClipText = Clipboard.Contents.ToString ();
+							output.WriteLine ($"  WSL: Clipboard.Contents: {getClipText}");
 						}
 						Application.RequestStop ();
 						return;
 					}
 
 					if (failed = xclipExists () == false) {
-						// xclip doesn't exist then exit.
+						// if xclip doesn't exist then exit.
+						output.WriteLine ($"  WSL: no xclip found.");
 						Application.RequestStop ();
 						return;
 					}
 
 					// If we get here, powershell didn't work and xclip exists...
-					ClipboardProcessRunner.Process ("bash", $"-c \"xclip -sel clip -i\"", clipText);
+					(exitCode, result) = ClipboardProcessRunner.Process ("bash", $"-c \"xclip -sel clip -i\"", clipText);
+					output.WriteLine ($"  Linux: bash xclip -sel clip -i: exitCode = {exitCode}, result = {result}");
 
 					if (!failed) {
 						getClipText = Clipboard.Contents.ToString ();
+						output.WriteLine ($"  Linux via xclip: Clipboard.Contents: {getClipText}");
 					}
 				}
 
@@ -136,16 +153,21 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Iteration += () => {
 				Clipboard.Contents = clipText;
 
+				int exitCode = 0;
+				output.WriteLine ($"Getting OS clipboard...");
+
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					(_, clipReadText) = ClipboardProcessRunner.Process ("pwsh", "-noprofile -command \"Get-Clipboard\"");
+					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("pwsh", "-noprofile -command \"Get-Clipboard\"");
+					output.WriteLine ($"  Windows: pwsh Get-Clipboard: exitCode = {exitCode}, result = {clipReadText}");
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					(_, clipReadText) = ClipboardProcessRunner.Process ("pbpaste", "");
+					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("pbpaste", "");
+					output.WriteLine ($"  OSX: pbpaste: exitCode = {exitCode}, result = {clipReadText}");
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
-					var exitCode = 0;
 					if (Is_WSL_Platform ()) {
 						(exitCode, clipReadText) = ClipboardProcessRunner.Process ("powershell.exe", "-noprofile -command \"Get-Clipboard\"");
+						output.WriteLine ($"  WSL: powershell.exe Get-Clipboard: exitCode = {exitCode}, result = {clipReadText}");
 						if (exitCode == 0) {
 							Application.RequestStop ();
 							return;
@@ -160,6 +182,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 					}
 
 					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("bash", $"-c \"xclip -sel clip -o\"");
+					output.WriteLine ($"  Linux: bash xclip -sel clip -o: exitCode = {exitCode}, result = {clipReadText}");
 					Assert.Equal (0, exitCode);
 				}
 
