@@ -12,7 +12,21 @@ namespace Terminal.Gui.ConsoleDrivers {
 		{
 			this.output = output;
 		}
-		
+
+		[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardThrowsNotSupportedException: true)]
+		public void IClipboard_GetClipBoardData_Throws_NotSupportedException ()
+		{
+			IClipboard iclip = Application.Driver.Clipboard;
+			Assert.Throws<NotSupportedException> (() => iclip.GetClipboardData ());
+		}
+
+		[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardThrowsNotSupportedException: true)]
+		public void IClipboard_SetClipBoardData_Throws_NotSupportedException ()
+		{
+			IClipboard iclip = Application.Driver.Clipboard;
+			Assert.Throws<NotSupportedException> (() => iclip.SetClipboardData ("foo"));
+		}
+
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Gets_Sets ()
 		{
@@ -87,7 +101,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 				int exitCode = 0;
 				string result = "";
 				output.WriteLine ($"Setting OS clipboard to: {clipText}...");
-				
+
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
 					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {output}");
@@ -141,7 +155,6 @@ namespace Terminal.Gui.ConsoleDrivers {
 				Assert.Equal (clipText, getClipText);
 			}
 		}
-
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Sets_The_OS_Clipboard ()

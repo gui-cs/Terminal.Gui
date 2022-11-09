@@ -23,8 +23,8 @@ namespace Terminal.Gui {
 		{
 			try {
 				return GetClipboardDataImpl ();
-			} catch (Exception ex) {
-				throw new NotSupportedException ("Failed to read clipboard.", ex);
+			} catch (NotSupportedException ex) {
+				throw new NotSupportedException ("Failed to copy from the OS clipboard.", ex);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		{
 			try {
 				SetClipboardDataImpl (text);
-			} catch (Exception ex) {
+			} catch (NotSupportedException ex) {
 				throw new NotSupportedException ("Failed to paste to the OS clipboard.", ex);
 			}
 		}
@@ -75,7 +75,8 @@ namespace Terminal.Gui {
 					result = GetClipboardDataImpl ();
 				}
 				return true;
-			} catch (Exception) {
+			} catch (NotSupportedException ex) {
+				System.Diagnostics.Debug.WriteLine ($"TryGetClipboardData: {ex.Message}");
 				result = null;
 				return false;
 			}
@@ -96,7 +97,7 @@ namespace Terminal.Gui {
 			try {
 				SetClipboardDataImpl (text);
 				return true;
-			} catch (Exception ex) {
+			} catch (NotSupportedException ex) {
 				System.Diagnostics.Debug.WriteLine ($"TrySetClipboardData: {ex.Message}");
 				return false;
 			}

@@ -28,7 +28,7 @@ namespace Terminal.Gui {
 		static ustring contents;
 
 		/// <summary>
-		/// Get or sets the operation system clipboard, otherwise the contents field.
+		/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
 		/// </summary>
 		public static ustring Contents {
 			get {
@@ -65,8 +65,6 @@ namespace Terminal.Gui {
 		/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.
 		/// </summary>
 		/// <remarks>
-		/// The first time IsSupported is called, it will spawn a process (e.g. "bash xclip" or "powershell.exe"
-		/// to determine if the clipboard is supported byt the OS platform. This is a one-time cost.
 		/// </remarks>
 		public static bool IsSupported { get => Application.Driver.Clipboard.IsSupported; }
 

@@ -22,11 +22,12 @@ using System.Diagnostics;
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
-	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true, bool useFakeClipboard = true)
+	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true, bool useFakeClipboard = true, bool fakeClipboardThrowsNotSupportedException = false)
 	{
 		this.AutoInit = autoInit;
 		this.AutoShutdown = autoShutdown;
 		this.UseFakeClipboard = useFakeClipboard;
+		this.FakeClipboardThrowsNotSupportedException = fakeClipboardThrowsNotSupportedException;
 	}
 
 	static bool _init = false;
@@ -34,6 +35,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	public bool AutoInit { get; }
 	public bool AutoShutdown { get; }
 	public bool UseFakeClipboard { get; }
+	public bool FakeClipboardThrowsNotSupportedException { get; }
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
@@ -41,7 +43,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
 		}
 		if (AutoInit) {
-			Application.Init (new FakeDriver (useFakeClipboard: UseFakeClipboard), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver (useFakeClipboard: UseFakeClipboard, fakeClipboardThrows: FakeClipboardThrowsNotSupportedException), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			_init = true;
 		}
 	}

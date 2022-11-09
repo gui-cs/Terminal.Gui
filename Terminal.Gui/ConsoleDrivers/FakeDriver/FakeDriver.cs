@@ -58,12 +58,12 @@ namespace Terminal.Gui {
 
 		static bool sync = false;
 		static public bool usingFakeClipboard;
-
-		public FakeDriver (bool useFakeClipboard = true)
+		
+		public FakeDriver (bool useFakeClipboard = true, bool fakeClipboardThrows = false)
 		{
 			usingFakeClipboard = useFakeClipboard;
 			if (usingFakeClipboard) {
-				clipboard = new FakeClipboard ();
+				clipboard = new FakeClipboard (fakeClipboardThrows);
 			} else {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					clipboard = new WindowsClipboard ();
@@ -651,16 +651,30 @@ namespace Terminal.Gui {
 
 		public class FakeClipboard : ClipboardBase {
 			public override bool IsSupported => true;
+			public Exception FakeException = null;
 
 			string contents = string.Empty;
 
+			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false)
+			{
+				if (fakeClipboardThrowsNotSupportedException) {
+					FakeException = new NotSupportedException ("Fake clipboard exception");
+				}
+			}
+
 			protected override string GetClipboardDataImpl ()
 			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
 				return contents;
 			}
 
 			protected override void SetClipboardDataImpl (string text)
 			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
 				contents = text;
 			}
 		}

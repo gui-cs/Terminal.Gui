@@ -518,7 +518,7 @@ namespace Terminal.Gui.Views {
 		[AutoInitShutdown]
 		public void FileDialog_FileSystemWatcher ()
 		{
-			for (int i = 0; i < 256; i++) {
+			for (int i = 0; i < 8; i++) {
 				var fd = new FileDialog ();
 				fd.Ready += () => Application.RequestStop ();
 				Application.Run (fd);
