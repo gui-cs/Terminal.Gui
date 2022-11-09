@@ -956,9 +956,10 @@ namespace Terminal.Gui {
 		public static bool Is_WSL_Platform ()
 		{
 			if (new CursesClipboard ().IsSupported) {
+				// If xclip is installed on Linux under WSL, this will return true.
 				return false;
 			}
-			var (exitCode, result) = BashRunner.Run ("uname -a", runCurses: false);
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("uname -a", runCurses: false);
 			if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
@@ -1273,28 +1274,33 @@ namespace Terminal.Gui {
 			IsSupported = CheckSupport ();
 		}
 
+		string xclipPath = string.Empty;
 		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
 		{
 			try {
-				var (exitCode, result) = BashRunner.Run ("which xclip", runCurses: false);
-				return (exitCode == 0 && result.FileExists ());
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", runCurses: false);
+				if (exitCode == 0 && result.FileExists ()) {
+					xclipPath = result;
+					return true;
+				}
 			} catch (Exception) {
 				// Permissions issue.
-				return false;
 			}
+			return false;
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
 			var tempFileName = System.IO.Path.GetTempFileName ();
 			try {
-				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
-				var (exitCode, result) = BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
+				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} -selection clipboard -o > {tempFileName}");
 				if (exitCode == 0) {
 					return System.IO.File.ReadAllText (tempFileName);
 				}
+			} catch (Exception e) {
+				throw new NotSupportedException ($"{xclipPath} -selection clipboard -o failed.", e);
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
@@ -1303,65 +1309,73 @@ namespace Terminal.Gui {
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			// var tempFileName = System.IO.Path.GetTempFileName ();
-			// System.IO.File.WriteAllText (tempFileName, text);
-			// try {
-			// 	// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
-			// 	BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
-			// } finally {
-			// 	System.IO.File.Delete (tempFileName);
-			// }
-
-			BashRunner.Run ("xclip -selection clipboard -i", false, text);
+			try {
+				ClipboardProcessRunner.Bash ($"{xclipPath} - selection clipboard -i", false, text);
+			} catch (Exception e) {
+				throw new NotSupportedException ($"{xclipPath} -selection clipboard -o failed", e);
+			}
 		}
 	}
 
-	static class BashRunner {
-		public static (int exitCode, string result) Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
+	internal static class ClipboardProcessRunner {
+		public static (int exitCode, string result) Bash (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
 		{
 			var arguments = $"-c \"{commandLine}\"";
+			var (exitCode, result) = Process ("bash", arguments, inputText);
 
+			if (exitCode == 0) {
+				if (runCurses && Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
+			}
+			return (exitCode, result.TrimEnd ());
+		}
+
+		public static (int exitCode, string result) Process (string cmd, string arguments, string input = null)
+		{
 			var errorBuilder = new System.Text.StringBuilder ();
 			var outputBuilder = new System.Text.StringBuilder ();
 
-			using (var process = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					FileName = "bash",
+			var output = string.Empty;
+
+			using (Process process = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = cmd,
 					Arguments = arguments,
-					RedirectStandardInput = true,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
+					RedirectStandardInput = true,
 					UseShellExecute = false,
-					CreateNoWindow = false,
+					CreateNoWindow = true,
 				}
 			}) {
 				process.Start ();
-				if (output) {
-					process.StandardInput.Write (inputText);
+				if (!string.IsNullOrEmpty (input)) {
+					process.StandardInput.Write (input);
+					process.StandardInput.Close ();
 				}
-				process.StandardInput.Close ();
+
 				process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
 				process.BeginOutputReadLine ();
 				process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
 				process.BeginErrorReadLine ();
-				if (!process.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {arguments}.
+
+				if (!process.WaitForExit (5000)) {
+					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.
 							Output: {outputBuilder}
 							Error: {errorBuilder}";
 					throw new TimeoutException (timeoutError);
 				}
-				if (process.ExitCode == 0) {
-					if (runCurses && Application.Driver is CursesDriver) {
-						Curses.raw ();
-						Curses.noecho ();
-					}
-					return (process.ExitCode, outputBuilder.ToString ().TrimEnd ());
-				}
 
-				var error = $@"Could not execute process. ExitCode: {process.ExitCode}, Command line: {process.StartInfo.FileName} {arguments}.
-						Output: {outputBuilder}
-						Error: {errorBuilder}";
-				return (process.ExitCode, error);
+				if (process.ExitCode > 0) {
+					output = $@"Process failed to run. Command line: {cmd} {arguments}.
+										Output: {outputBuilder}
+										Error: {errorBuilder}";
+				} else {
+					output = outputBuilder.ToString ().TrimEnd ();
+				}
+				return (process.ExitCode, output);
 			}
 		}
 
@@ -1379,6 +1393,7 @@ namespace Terminal.Gui {
 			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
 		}
 	}
+
 
 	/// <summary>
 	///  A clipboard implementation for MacOSX. 
@@ -1412,12 +1427,12 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var (exitCode, result) = BashRunner.Run ("which pbcopy");
-			if (!result.FileExists ()) {
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("which pbcopy");
+			if (exitCode != 0 || !result.FileExists ()) {
 				return false;
 			}
-			(exitCode, result) = BashRunner.Run ("which pbpaste");
-			return result.FileExists ();
+			(exitCode, result) = ClipboardProcessRunner.Bash ("which pbpaste");
+			return exitCode == 0 && result.FileExists ();
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1474,83 +1489,45 @@ namespace Terminal.Gui {
 
 		public override bool IsSupported { get; }
 
-		private string powershellCommand = string.Empty;
+		private string powershellPath = string.Empty;
 
 		bool CheckSupport ()
 		{
-			if (string.IsNullOrEmpty (powershellCommand)) {
+			if (string.IsNullOrEmpty (powershellPath)) {
 				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
-				var (exitCode, result) = BashRunner.Run ("which pwsh.exe");
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which pwsh.exe");
 				if (exitCode > 0) {
-					(exitCode, result) = BashRunner.Run ("which powershell.exe");
+					(exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe");
 				}
 
 				if (exitCode == 0) {
-					powershellCommand = result;
+					powershellPath = result;
 				}
 			}
-			return !string.IsNullOrEmpty (powershellCommand);
+			return !string.IsNullOrEmpty (powershellPath);
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
-			if (!IsSupported) return string.Empty;
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					RedirectStandardOutput = true,
-					FileName = powershellCommand,
-					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = false,
-					CreateNoWindow = true
-				}
-			}) {
-				powershell.Start ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
-				}
-				var result = powershell.StandardOutput.ReadToEnd ();
-				powershell.StandardOutput.Close ();
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, "-noprofile -command \"Get-Clipboard\"");
+			if (exitCode == 0) { 
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
-				if (result.EndsWith ("\r\n")) {
-					result = result.Substring (0, result.Length - 2);
+
+				if (output.EndsWith ("\r\n")) {
+					output = output.Substring (0, output.Length - 2);
 				}
-				return result;
+				return output;
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			if (!IsSupported) return;
-
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					RedirectStandardOutput = true,
-					RedirectStandardError = true,
-					RedirectStandardInput = true,
-					FileName = powershellCommand,
-					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
-				}
-			}) {
-				powershell.Start ();
-				powershell.WaitForExit ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: {powershell.StartInfo.FileName} {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new TimeoutException (timeoutError);
-				}
-				if (powershell.ExitCode > 0) {
-					var setClipboardError = $@"Set-Clipboard failed. Command line: {powershell.StartInfo.FileName} {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new System.InvalidOperationException (setClipboardError);
-				}
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();

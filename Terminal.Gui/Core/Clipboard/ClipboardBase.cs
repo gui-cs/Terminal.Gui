@@ -15,9 +15,10 @@ namespace Terminal.Gui {
 		public abstract bool IsSupported { get; }
 
 		/// <summary>
-		/// Get the operation system clipboard.
+		/// Returns the contents of the OS clipboard if possible.
 		/// </summary>
-		/// <exception cref="NotSupportedException">Thrown if it was not possible to read the clipboard contents</exception>
+		/// <returns>The contents of the OS clipboard if successful.</returns>
+		/// <exception cref="NotSupportedException">Thrown if it was not possible to copy from the OS clipboard.</exception>
 		public string GetClipboardData ()
 		{
 			try {
@@ -28,35 +29,38 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the operation system clipboard.
+		/// Returns the contents of the OS clipboard if possible. Implemented by <see cref="ConsoleDriver"/>-specific subclasses.
 		/// </summary>
+		/// <returns>The contents of the OS clipboard if successful.</returns>
+		/// <exception cref="NotSupportedException">Thrown if it was not possible to copy from the OS clipboard.</exception>
 		protected abstract string GetClipboardDataImpl ();
 
 		/// <summary>
-		/// Sets the operation system clipboard.
+		/// Pastes the <paramref name="text"/> to the OS clipboard if possible.
 		/// </summary>
-		/// <param name="text"></param>
-		/// <exception cref="NotSupportedException">Thrown if it was not possible to set the clipboard contents</exception>
+		/// <param name="text">The text to paste to the OS clipboard.</param>
+		/// <exception cref="NotSupportedException">Thrown if it was not possible to paste to the OS clipboard.</exception>
 		public void SetClipboardData (string text)
 		{
 			try {
 				SetClipboardDataImpl (text);
 			} catch (Exception ex) {
-				throw new NotSupportedException ("Failed to write to clipboard.", ex);
+				throw new NotSupportedException ("Failed to paste to the OS clipboard.", ex);
 			}
 		}
 
 		/// <summary>
-		/// Sets the operation system clipboard.
+		/// Pastes the <paramref name="text"/> to the OS clipboard if possible. Implemented by <see cref="ConsoleDriver"/>-specific subclasses.
 		/// </summary>
-		/// <param name="text"></param>
+		/// <param name="text">The text to paste to the OS clipboard.</param>
+		/// <exception cref="NotSupportedException">Thrown if it was not possible to paste to the OS clipboard.</exception>
 		protected abstract void SetClipboardDataImpl (string text);
 
 		/// <summary>
-		/// Gets the operation system clipboard if possible.
+		/// Copies the contents of the OS clipboard to <paramref name="result"/> if possible.
 		/// </summary>
-		/// <param name="result">Clipboard contents read</param>
-		/// <returns>true if it was possible to read the OS clipboard.</returns>
+		/// <param name="result">The contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
+		/// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
 		public bool TryGetClipboardData (out string result)
 		{
 			// Don't even try to read because environment is not set up.
@@ -78,10 +82,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the operation system clipboard if possible.
+		/// Pastes the <paramref name="text"/> to the OS clipboard if possible.
 		/// </summary>
-		/// <param name="text"></param>
-		/// <returns>True if the clipboard content was set successfully</returns>
+		/// <param name="text">The text to paste to the OS clipboard.</param>
+		/// <returns><see langword="true"/> the OS clipboard was set, <see langword="false"/> otherwise.</returns>
 		public bool TrySetClipboardData (string text)
 		{
 			// Don't even try to set because environment is not set up

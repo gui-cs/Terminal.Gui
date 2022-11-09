@@ -27,28 +27,7 @@ namespace Terminal.Gui {
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
 		private IClipboard clipboard = null;
-		public override IClipboard Clipboard {
-			get {
-				if (clipboard == null) {
-					if (usingFakeClipboard) {
-						clipboard = new FakeClipboard ();
-					} else {
-						if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-							clipboard = new WindowsClipboard ();
-						} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-							clipboard = new MacOSXClipboard ();
-						} else {
-							if (CursesDriver.Is_WSL_Platform ()) {
-								clipboard = new WSLClipboard ();
-							} else {
-								clipboard = new CursesClipboard ();
-							}
-						}
-					}
-				}
-				return clipboard;
-			}
-		}
+		public override IClipboard Clipboard => clipboard;
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -83,6 +62,21 @@ namespace Terminal.Gui {
 		public FakeDriver (bool useFakeClipboard = true)
 		{
 			usingFakeClipboard = useFakeClipboard;
+			if (usingFakeClipboard) {
+				clipboard = new FakeClipboard ();
+			} else {
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					clipboard = new WindowsClipboard ();
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					clipboard = new MacOSXClipboard ();
+				} else {
+					if (CursesDriver.Is_WSL_Platform ()) {
+						clipboard = new WSLClipboard ();
+					} else {
+						clipboard = new CursesClipboard ();
+					}
+				}
+			}
 		}
 
 		bool needMove;
@@ -654,7 +648,7 @@ namespace Terminal.Gui {
 		}
 
 		#endregion
-		
+
 		public class FakeClipboard : ClipboardBase {
 			public override bool IsSupported => true;
 
