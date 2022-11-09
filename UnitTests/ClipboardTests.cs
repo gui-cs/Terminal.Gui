@@ -93,6 +93,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Copies_From_OS_Clipboard ()
 		{
+			if (!Clipboard.IsSupported) {
+				output.WriteLine ($"The Clipboard not supported on this platform.");
+				return;
+			}
+
 			var clipText = "The Contents_Copies_From_OS_Clipboard unit test pasted this to the OS clipboard.";
 			var failed = false;
 			var getClipText = "";
@@ -161,6 +166,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Pastes_To_OS_Clipboard ()
 		{
+			if (!Clipboard.IsSupported) {
+				output.WriteLine ($"The Clipboard not supported on this platform.");
+				return;
+			}
+
 			var clipText = "The Contents_Pastes_To_OS_Clipboard unit test pasted this via Clipboard.Contents.";
 			var clipReadText = "";
 			var failed = false;
