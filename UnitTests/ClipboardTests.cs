@@ -30,13 +30,18 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Gets_Sets ()
 		{
-			var clipText = "This is a clipboard unit test.";
+			if (!Clipboard.IsSupported) {
+				output.WriteLine ($"The Clipboard not supported on this platform.");
+				return;
+			}
+			
+			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents);
+			Assert.Equal (clipText, Clipboard.Contents.ToString());
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -52,7 +57,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void TryGetClipboardData_Gets_From_OS_Clipboard ()
 		{
-			var clipText = "Trying to get from the OS clipboard.";
+			var clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
 			Application.Iteration += () => Application.RequestStop ();
@@ -71,7 +76,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 		{
-			var clipText = "Trying to set the OS clipboard.";
+			var clipText = "The TrySetClipboardData_Sets_The_OS_Clipboard unit test pasted this to the OS clipboard.";
 			if (Clipboard.IsSupported) {
 				Assert.True (Clipboard.TrySetClipboardData (clipText));
 			} else {
