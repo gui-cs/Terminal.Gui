@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 			var line = new List<byte> ();
 			var wasNewLine = false;
 			while ((v = buff.ReadByte ()) != -1) {
-				if (v == 13) {
+				if ((!AllowsNullTerminated && v == '\0') || v == 13) {
 					continue;
 				}
 				if (v == 10) {
@@ -141,6 +141,11 @@ namespace Terminal.Gui {
 		/// The number of text lines in the model
 		/// </summary>
 		public int Count => lines.Count;
+
+		/// <summary>
+		/// Gets or sets if null terminated in a buffer array is considered as part of the <see cref="lines"/>.
+		/// </summary>
+		public bool AllowsNullTerminated { get; set; }
 
 		/// <summary>
 		/// Returns the specified line as a List of Rune
@@ -1165,7 +1170,7 @@ namespace Terminal.Gui {
 		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
 		/// otherwise changes the contents of the <see cref="TextView"/>.
 		/// </remarks>
-		public Action<ContentsChangedEventArgs> ContentsChanged;
+		public event Action<ContentsChangedEventArgs> ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
@@ -1432,7 +1437,7 @@ namespace Terminal.Gui {
 			}
 
 			UpdateWrapModel ();
-			
+
 			Adjust ();
 			OnContentsChanged ();
 		}
@@ -1794,6 +1799,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ContextMenu ContextMenu { get; private set; }
 
+		/// <summary>
+		/// Gets or sets if null terminated in a buffer array is considered as part of the <see cref="Text"/>.
+		/// </summary>
+		public bool AllowsNullTerminated {
+			get => model.AllowsNullTerminated;
+			set => model.AllowsNullTerminated = value;
+		}
+
 		int GetSelectedLength ()
 		{
 			return SelectedText.Length;
@@ -1830,6 +1843,7 @@ namespace Terminal.Gui {
 			try {
 				SetWrapModel ();
 				res = model.LoadFile (path);
+				historyText.Clear (Text);
 				ResetPosition ();
 			} catch (Exception) {
 				throw;
@@ -1837,7 +1851,6 @@ namespace Terminal.Gui {
 				UpdateWrapModel ();
 				SetNeedsDisplay ();
 				Adjust ();
-				OnContentsChanged ();
 			}
 			return res;
 		}
@@ -1850,9 +1863,9 @@ namespace Terminal.Gui {
 		public void LoadStream (Stream stream)
 		{
 			model.LoadStream (stream);
+			historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
-			OnContentsChanged ();
 		}
 
 		/// <summary>
