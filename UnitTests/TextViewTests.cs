@@ -942,26 +942,26 @@ namespace Terminal.Gui.Views {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
-					Assert.Equal ("This is the first line.", Clipboard.Contents);
+					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ("This is the first line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the second line.", _textView.Text);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
+					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
+					Assert.Equal ("", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents.ToString ());
 
 					// Paste
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
 					break;
 				default:
 					iterationsFinished = true;
@@ -986,26 +986,26 @@ namespace Terminal.Gui.Views {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
-					Assert.Equal ($"This is the second line.", Clipboard.Contents);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString());
+					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (23, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the first line.", _textView.Text);
-					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
+					Assert.Equal ("This is the first line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents.ToString ());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text);
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
+					Assert.Equal ("", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents.ToString ());
 
 					// Paste inverted
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text.ToString ());
 					break;
 				default:
 					iterationsFinished = true;

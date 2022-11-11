@@ -1366,7 +1366,7 @@ namespace Terminal.Gui {
 				}
 
 				if (waitForOutput && process.StandardOutput.Peek () != -1) {
-					output = process.StandardOutput.ReadToEnd ().TrimEnd ();
+					output = process.StandardOutput.ReadToEnd ();
 				}
 
 				if (process.ExitCode > 0) {

@@ -168,7 +168,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
-					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {output}");
+					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {result}");
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
@@ -276,7 +276,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run ();
 
 			if (!failed) {
-				Assert.Equal (clipText, clipReadText);
+				Assert.Equal (clipText, clipReadText); // TrimEnd?
 			}
 
 		}
