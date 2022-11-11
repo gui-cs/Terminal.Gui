@@ -116,6 +116,7 @@ namespace Terminal.Gui {
 
 		void Watcher_Error (object sender, ErrorEventArgs e)
 		{
+			Debug.WriteLine ($"Watcher error: {e.GetException ()}");
 			Application.MainLoop.Invoke (() => Reload ());
 		}
 
