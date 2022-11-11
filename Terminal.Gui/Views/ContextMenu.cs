@@ -52,7 +52,10 @@ namespace Terminal.Gui {
 		public ContextMenu (int x, int y, MenuBarItem menuItems)
 		{
 			if (IsShow) {
-				Hide ();
+				if (menuBar.SuperView != null) {
+					Hide ();
+				}
+				IsShow = false;
 			}
 			MenuItems = menuItems;
 			Position = new Point (x, y);
@@ -126,7 +129,7 @@ namespace Terminal.Gui {
 			} else if (ForceMinimumPosToZero && position.Y < 0) {
 				position.Y = 0;
 			}
-			
+
 			menuBar = new MenuBar (new [] { MenuItems }) {
 				X = position.X,
 				Y = position.Y,
