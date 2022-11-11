@@ -773,8 +773,7 @@ namespace Terminal.Gui {
 
 			if (mouseGrabView != null) {
 				if (view == null) {
-					UngrabMouse ();
-					return;
+					view = mouseGrabView;
 				}
 
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
@@ -789,7 +788,7 @@ namespace Terminal.Gui {
 				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame)) {
 					lastMouseOwnerView?.OnMouseLeave (me);
 				}
-				// System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (mouseGrabView?.OnMouseEvent (nme) == true) {
 					return;
 				}
