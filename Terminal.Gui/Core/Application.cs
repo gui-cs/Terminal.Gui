@@ -414,7 +414,7 @@ namespace Terminal.Gui {
 				// In this case, we want to throw a more specific exception.
 				throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 			}
-			
+
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 
 			Top = topLevelFactory ();
@@ -757,8 +757,7 @@ namespace Terminal.Gui {
 
 			if (mouseGrabView != null) {
 				if (view == null) {
-					UngrabMouse ();
-					return;
+					view = mouseGrabView;
 				}
 
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
@@ -773,7 +772,7 @@ namespace Terminal.Gui {
 				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame)) {
 					lastMouseOwnerView?.OnMouseLeave (me);
 				}
-				// System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (mouseGrabView?.OnMouseEvent (nme) == true) {
 					return;
 				}
@@ -901,7 +900,7 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-			
+
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
 				initializableNotification.BeginInit ();
@@ -915,7 +914,7 @@ namespace Terminal.Gui {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && toplevel != Top && !toplevels.Contains(Top)) {
+				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
 				}
