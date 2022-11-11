@@ -83,6 +83,7 @@ namespace Terminal.Gui {
 				case DirectoryNotFoundException _:
 				case ArgumentException _:
 					dirInfo = null;
+					watcher?.Dispose ();
 					watcher = null;
 					infos.Clear ();
 					valid = true;
@@ -104,7 +105,15 @@ namespace Terminal.Gui {
 		{
 			if (!_disposedValue) {
 				if (disposing) {
+					if (watcher != null) {
+						watcher.Changed -= Watcher_Changed;
+						watcher.Created -= Watcher_Changed;
+						watcher.Deleted -= Watcher_Changed;
+						watcher.Renamed -= Watcher_Changed;
+						watcher.Error -= Watcher_Error;
+					}
 					watcher?.Dispose ();
+					watcher = null;
 				}
 
 				_disposedValue = true;
