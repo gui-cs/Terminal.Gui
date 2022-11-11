@@ -36,7 +36,7 @@ namespace Terminal.Gui {
 					if (IsSupported) {
 						return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
 					} else {
-						return ustring.Make ("Clipboard not supported"); // contents;
+						return contents;
 					}
 				} catch (Exception) {
 					return contents;
