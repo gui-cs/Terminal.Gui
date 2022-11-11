@@ -343,7 +343,7 @@ namespace UICatalog.Scenarios {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
-				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
+				//System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
 

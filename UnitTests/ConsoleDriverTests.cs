@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terminal.Gui.Views;
 using Xunit;
@@ -18,10 +19,14 @@ namespace Terminal.Gui.ConsoleDrivers {
 			this.output = output;
 		}
 
-		[Fact]
-		public void Init_Inits ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		//[InlineData (typeof (NetDriver))]
+		//[InlineData (typeof (CursesDriver))]
+		//[InlineData (typeof (WindowsDriver))]
+		public void Init_Inits (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			driver.Init (() => { });
 
@@ -37,10 +42,14 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void End_Cleans_Up ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		//[InlineData (typeof (NetDriver))]
+		//[InlineData (typeof (CursesDriver))]
+		//[InlineData (typeof (WindowsDriver))]
+		public void End_Cleans_Up (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			driver.Init (() => { });
 
@@ -63,10 +72,14 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void SetColors_Changes_Colors ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		//[InlineData (typeof (NetDriver))]
+		//[InlineData (typeof (CursesDriver))]
+		//[InlineData (typeof (WindowsDriver))]
+		public void SetColors_Changes_Colors (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			driver.Init (() => { });
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
@@ -87,10 +100,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses (Type driverType)
 		{
-			Application.Init (new FakeDriver ());
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			Application.Init (driver);
 
 			var top = Application.Top;
 			var view = new View ();
@@ -117,10 +132,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void FakeDriver_MockKeyPresses ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void FakeDriver_MockKeyPresses (Type driverType)
 		{
-			Application.Init (new FakeDriver ());
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			Application.Init (driver);
 
 			var text = "MockKeyPresses";
 			var mKeys = new Stack<ConsoleKeyInfo> ();
@@ -159,10 +176,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void SendKeys_Test ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void SendKeys_Test (Type driverType)
 		{
-			Application.Init (new FakeDriver ());
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			Application.Init (driver);
 
 			var top = Application.Top;
 			var view = new View ();
@@ -256,10 +275,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void TerminalResized_Simulation ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void TerminalResized_Simulation (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			var wasTerminalResized = false;
 			Application.Resized = (e) => {
@@ -297,10 +317,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			Assert.False (Application.HeightAsBuffer);
@@ -314,10 +335,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
@@ -330,10 +352,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
@@ -369,10 +392,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
@@ -385,10 +409,11 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight ()
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight (Type driverType)
 		{
-			var driver = new FakeDriver ();
+			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
