@@ -58,7 +58,7 @@ namespace Terminal.Gui.Core {
 
 		void Init ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (SynchronizationContext.Current);

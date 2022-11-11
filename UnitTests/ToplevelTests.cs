@@ -588,7 +588,7 @@ namespace Terminal.Gui.Core {
 
 			var win = new Window ();
 			win.Add (view);
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 			var top = Application.Top;
 			top.Add (win);
 

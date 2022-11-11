@@ -37,7 +37,7 @@ namespace Terminal.Gui.Views {
 			Assert.Null (sb.Y);
 
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			sb = new StatusBar ();
 

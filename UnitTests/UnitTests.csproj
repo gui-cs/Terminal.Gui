@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <!-- https://stackoverflow.com/questions/294216/why-does-c-sharp-forbid-generic-attribute-types -->
+    <!-- for AutoInitShutdown attribute -->
+    <LangVersion>Preview</LangVersion>
     <IsPackable>false</IsPackable>
     <UseDataCollector />
     <!-- Version numbers are automatically updated by gitversion when a release is released -->

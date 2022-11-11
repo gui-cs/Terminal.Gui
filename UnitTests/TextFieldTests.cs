@@ -15,7 +15,7 @@ namespace Terminal.Gui.Views {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				//                                                    1         2         3 
 				//                                          01234567890123456789012345678901=32 (Length)

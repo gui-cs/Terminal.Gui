@@ -22,7 +22,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Dispose_Toplevel_IsMdiContainer_False_With_Begin_End ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = new Toplevel ();
 			var rs = Application.Begin (top);
@@ -38,7 +38,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Dispose_Toplevel_IsMdiContainer_True_With_Begin ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var mdi = new Toplevel { IsMdiContainer = true };
 			var rs = Application.Begin (mdi);

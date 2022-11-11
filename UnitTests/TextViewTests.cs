@@ -32,7 +32,7 @@ namespace Terminal.Gui.Views {
 					throw new InvalidOperationException ("After did not run.");
 				}
 
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)

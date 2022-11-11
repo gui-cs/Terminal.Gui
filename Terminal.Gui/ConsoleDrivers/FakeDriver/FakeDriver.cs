@@ -6,10 +6,12 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using NStack;
+
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
@@ -19,6 +21,26 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FakeDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+		public class Behaviors {
+			public bool UseFakeClipboard { get; internal set; }
+			public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+			public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
+
+			public Behaviors (bool useFakeClipboard = false, bool fakeClipboardAlwaysThrowsNotSupportedException = false, bool fakeClipboardIsSupportedAlwaysTrue = false)
+			{
+				UseFakeClipboard = useFakeClipboard;
+				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
+				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+				
+				// double check usage is correct
+				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
+				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
+			}
+		}
+
+		public static FakeDriver.Behaviors FakeBehaviors = new FakeDriver.Behaviors ();
+
 		int cols, rows, left, top;
 		public override int Cols => cols;
 		public override int Rows => rows;
@@ -58,12 +80,11 @@ namespace Terminal.Gui {
 
 		static bool sync = false;
 		static public bool usingFakeClipboard;
-		
-		public FakeDriver (bool useFakeClipboard = true, bool fakeClipboardThrows = false)
+
+		public FakeDriver ()
 		{
-			usingFakeClipboard = useFakeClipboard;
-			if (usingFakeClipboard) {
-				clipboard = new FakeClipboard (fakeClipboardThrows);
+			if (FakeBehaviors.UseFakeClipboard) {
+				clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 			} else {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					clipboard = new WindowsClipboard ();
@@ -650,13 +671,17 @@ namespace Terminal.Gui {
 		#endregion
 
 		public class FakeClipboard : ClipboardBase {
-			public override bool IsSupported => true;
 			public Exception FakeException = null;
 
 			string contents = string.Empty;
 
-			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false)
+			bool isSupportedAlwaysFalse = false;
+
+			public override bool IsSupported => !isSupportedAlwaysFalse;
+
+			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false, bool isSupportedAlwaysFalse = false)
 			{
+				this.isSupportedAlwaysFalse = isSupportedAlwaysFalse;
 				if (fakeClipboardThrowsNotSupportedException) {
 					FakeException = new NotSupportedException ("Fake clipboard exception");
 				}

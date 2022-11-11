@@ -375,14 +375,14 @@ namespace Terminal.Gui {
 				ResetState ();
 			}
 
-			// FakeDriver (for UnitTests)
+			// For UnitTests
 			if (driver != null) {
-				if (mainLoopDriver == null) {
-					throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
-				}
-				if (!(driver is FakeDriver)) {
-					throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
-				}
+				//if (mainLoopDriver == null) {
+				//	throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
+				//}
+				//if (!(driver is FakeDriver)) {
+				//	throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
+				//}
 				Driver = driver;
 			}
 
@@ -391,18 +391,34 @@ namespace Terminal.Gui {
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-					mainLoopDriver = new FakeMainLoop (() => FakeConsole.ReadKey (true));
 				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
-					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
-					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
-					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
+				if (Driver == null) {
+					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+				}
 			}
+
+			if (mainLoopDriver == null) {
+				// TODO: Move this logic into ConsoleDriver
+				if (Driver is FakeDriver) {
+					mainLoopDriver = new FakeMainLoop (Driver);
+				} else if (Driver is NetDriver) {
+					mainLoopDriver = new NetMainLoop (Driver);
+				} else if (Driver is WindowsDriver) {
+					mainLoopDriver = new WindowsMainLoop (Driver);
+				} else if (Driver is CursesDriver) {
+					mainLoopDriver = new UnixMainLoop (Driver);
+				}
+				if (mainLoopDriver == null) {
+					throw new InvalidOperationException ("Init could not determine the MainLoopDriver to use.");
+				}
+			}
+
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
@@ -414,7 +430,7 @@ namespace Terminal.Gui {
 				// In this case, we want to throw a more specific exception.
 				throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 			}
-			
+
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 
 			Top = topLevelFactory ();
@@ -901,7 +917,7 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-			
+
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
 				initializableNotification.BeginInit ();
@@ -915,7 +931,7 @@ namespace Terminal.Gui {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && toplevel != Top && !toplevels.Contains(Top)) {
+				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
 				}

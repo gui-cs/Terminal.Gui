@@ -22,7 +22,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Init_Inits ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			Assert.Equal (80, Console.BufferWidth);
@@ -41,7 +41,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void End_Cleans_Up ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			FakeConsole.ForegroundColor = ConsoleColor.Red;
@@ -67,7 +67,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void SetColors_Changes_Colors ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
@@ -90,7 +90,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 			var view = new View ();
@@ -120,7 +120,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void FakeDriver_MockKeyPresses ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var text = "MockKeyPresses";
 			var mKeys = new Stack<ConsoleKeyInfo> ();
@@ -162,7 +162,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void SendKeys_Test ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 			var view = new View ();
@@ -260,7 +260,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void TerminalResized_Simulation ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			var wasTerminalResized = false;
 			Application.Resized = (e) => {
 				wasTerminalResized = true;
@@ -301,7 +301,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			Assert.False (Application.HeightAsBuffer);
 			Assert.Equal (0, Console.WindowLeft);
@@ -318,7 +318,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
 			Assert.True (Application.HeightAsBuffer);
@@ -334,7 +334,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
 			Assert.True (Application.HeightAsBuffer);
@@ -373,7 +373,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
 			Assert.True (Application.HeightAsBuffer);
@@ -389,7 +389,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			Application.HeightAsBuffer = true;
 			Assert.True (Application.HeightAsBuffer);

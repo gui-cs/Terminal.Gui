@@ -2968,7 +2968,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Draw_Horizontal_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 
@@ -3008,7 +3008,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 

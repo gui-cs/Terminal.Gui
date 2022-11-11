@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views {
 		[Fact]
 		public void AllViews_Tests_All_Constructors ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			foreach (var type in GetAllViewClassesCollection ()) {
 				Assert.True (Constructors_FullTest (type));
@@ -127,7 +127,7 @@ namespace Terminal.Gui.Views {
 		public void AllViews_Enter_Leave_Events ()
 		{
 			foreach (var type in GetAllViewClassesCollection ()) {
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 				var vType = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));

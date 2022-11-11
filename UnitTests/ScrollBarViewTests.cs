@@ -30,7 +30,7 @@ namespace Terminal.Gui.Views {
 					throw new InvalidOperationException ("After did not run.");
 				}
 
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 
@@ -457,7 +457,7 @@ namespace Terminal.Gui.Views {
 		public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_True_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 		{
 			var exception = Record.Exception (() => {
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 
@@ -527,7 +527,7 @@ namespace Terminal.Gui.Views {
 		public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 		{
 			var exception = Record.Exception (() => {
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 

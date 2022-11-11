@@ -21,21 +21,43 @@ using System.Diagnostics;
 // as a pair, and b) all unit test functions should be atomic..
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+	// This defines the default behavior for the AutoInitShutdown attribute.
 
-	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true, bool useFakeClipboard = true, bool fakeClipboardThrowsNotSupportedException = false)
+	/// <summary>
+	/// Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and
+	/// Application.Shutdown are automatically called Before/After a test runs.
+	/// </summary>
+	/// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
+	/// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
+	/// <param name="consoleDriverType">Determins which ConsoleDriver (FakeDriver, WindowsDriver, 
+	/// CursesDriver, NetDriver) will be used when Appliation.Init is called. If null FakeDriver will be used.
+	/// Only valid if <paramref name="autoInit"/> is true.</param>
+	/// <param name="useFakeClipboard">If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. 
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// <param name="fakeClipboardAlwaysThrowsNotSupportedException">Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
+		Type consoleDriverType = null, 
+		bool useFakeClipboard = false, 
+		bool fakeClipboardAlwaysThrowsNotSupportedException = false, 
+		bool fakeClipboardIsSupportedAlwaysTrue = false)
 	{
-		this.AutoInit = autoInit;
-		this.AutoShutdown = autoShutdown;
-		this.UseFakeClipboard = useFakeClipboard;
-		this.FakeClipboardThrowsNotSupportedException = fakeClipboardThrowsNotSupportedException;
+		//Assert.True (autoInit == false && consoleDriverType == null);
+
+		AutoInit = autoInit;
+		AutoShutdown = autoShutdown;
+		DriverType = consoleDriverType ?? typeof (FakeDriver);
+		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
+		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
+		FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
 	}
 
 	static bool _init = false;
-
-	public bool AutoInit { get; }
-	public bool AutoShutdown { get; }
-	public bool UseFakeClipboard { get; }
-	public bool FakeClipboardThrowsNotSupportedException { get; }
+	bool AutoInit { get; }
+	bool AutoShutdown { get;  }
+	Type DriverType;
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
@@ -43,7 +65,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
 		}
 		if (AutoInit) {
-			Application.Init (new FakeDriver (useFakeClipboard: UseFakeClipboard, fakeClipboardThrows: FakeClipboardThrowsNotSupportedException), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init ((ConsoleDriver)Activator.CreateInstance (DriverType));
 			_init = true;
 		}
 	}

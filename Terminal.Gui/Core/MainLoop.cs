@@ -102,7 +102,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		///  Creates a new Mainloop. 
 		/// </summary>
-		/// <param name="driver">Should match the <see cref="ConsoleDriver"/> (one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
+		/// <param name="driver">Should match the <see cref="ConsoleDriver"/> 
+		/// (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
 		{
 			Driver = driver;
