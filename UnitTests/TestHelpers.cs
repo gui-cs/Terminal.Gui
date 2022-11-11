@@ -59,6 +59,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
+		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoShutdown && _init) {
 			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
 		}
@@ -70,6 +71,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 	public override void After (MethodInfo methodUnderTest)
 	{
+		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoShutdown) {
 			Application.Shutdown ();
 			_init = false;

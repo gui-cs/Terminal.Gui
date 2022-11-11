@@ -11,11 +11,11 @@ namespace Terminal.Gui.Views {
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
 		// as a pair, and b) all unit test functions should be atomic.
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+		public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				Application.Init (new FakeDriver ());
+				base.Before (methodUnderTest);
 
 				//                                                    1         2         3 
 				//                                          01234567890123456789012345678901=32 (Length)
@@ -25,14 +25,14 @@ namespace Terminal.Gui.Views {
 			public override void After (MethodInfo methodUnderTest)
 			{
 				TextFieldTests._textField = null;
-				Application.Shutdown ();
+				base.After (methodUnderTest);
 			}
 		}
 
 		private static TextField _textField;
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
 		{
 			_textField.SelectedStart = 2;
@@ -46,7 +46,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_With_Value_Less_Than_Minus_One_Changes_To_Minus_One ()
 		{
 			_textField.SelectedStart = -2;
@@ -56,7 +56,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 2;
@@ -67,7 +67,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -79,7 +79,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
 		{
 			_textField.SelectedStart = 19;
@@ -90,7 +90,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textField.CursorPosition = -1;
@@ -100,7 +100,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -110,7 +110,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -161,7 +161,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -212,7 +212,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -264,7 +264,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -316,7 +316,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -356,7 +356,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -390,7 +390,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -474,7 +474,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -558,7 +558,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Null_If_No_Selection ()
 		{
 			_textField.SelectedStart = -1;
@@ -569,7 +569,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -581,7 +581,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -598,7 +598,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_No_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -619,7 +619,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut__Not_Allowed_If_Secret_Is_True ()
 		{
 			_textField.Secret = true;
@@ -637,7 +637,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Paste_Always_Clear_The_SelectedText ()
 		{
 			_textField.SelectedStart = 20;
@@ -649,7 +649,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextChanging_Event ()
 		{
 			bool cancel = true;
@@ -669,7 +669,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextChanged_Event ()
 		{
 			_textField.TextChanged += (e) => {
@@ -681,7 +681,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Used_Is_True_By_Default ()
 		{
 			_textField.CursorPosition = 10;
@@ -697,7 +697,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Used_Is_False ()
 		{
 			_textField.Used = false;
@@ -785,7 +785,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Text_Replaces_Tabs_With_Empty_String ()
 		{
 			_textField.Text = "\t\tTAB to jump between text fields.";
@@ -797,7 +797,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextField_SpaceHandling ()
 		{
 			var tf = new TextField () {
@@ -825,7 +825,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CanFocus_False_Wont_Focus_With_Mouse ()
 		{
 			var top = Application.Top;
