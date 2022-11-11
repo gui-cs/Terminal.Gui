@@ -21,8 +21,6 @@ using System.Diagnostics;
 // as a pair, and b) all unit test functions should be atomic..
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
-	// This defines the default behavior for the AutoInitShutdown attribute.
-
 	/// <summary>
 	/// Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and
 	/// Application.Shutdown are automatically called Before/After a test runs.
@@ -80,8 +78,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 }
 
 class TestHelpers {
-
-
 #pragma warning disable xUnit1013 // Public method should be marked as test
 	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output)
 	{

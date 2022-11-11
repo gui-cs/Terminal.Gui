@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 		public class Behaviors {
+
 			public bool UseFakeClipboard { get; internal set; }
 			public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
 			public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
@@ -39,7 +40,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public static FakeDriver.Behaviors FakeBehaviors = new FakeDriver.Behaviors ();
+		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
 		int cols, rows, left, top;
 		public override int Cols => cols;
@@ -79,7 +80,6 @@ namespace Terminal.Gui {
 		//}
 
 		static bool sync = false;
-		static public bool usingFakeClipboard;
 
 		public FakeDriver ()
 		{
