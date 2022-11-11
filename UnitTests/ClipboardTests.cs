@@ -52,20 +52,20 @@ namespace Terminal.Gui.ConsoleDrivers {
 				output.WriteLine ($"The Clipboard not supported on this platform.");
 				return;
 			}
-			
+
 			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents.ToString());
+			Assert.Equal (clipText, Clipboard.Contents.ToString ());
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Gets_Sets_When_IsSupportedFalse ()
 		{
-	
+
 			if (!Clipboard.IsSupported) {
 				output.WriteLine ($"The Clipboard not supported on this platform.");
 				return;
@@ -79,7 +79,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Assert.Equal (clipText, Clipboard.Contents.ToString ());
 		}
-		
+
 		[Fact, AutoInitShutdown (useFakeClipboard: true)]
 		public void Contents_Fake_Gets_Sets_When_IsSupportedFalse ()
 		{
@@ -276,7 +276,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Run ();
 
 			if (!failed) {
-				Assert.Equal (clipText, clipReadText); // TrimEnd?
+				Assert.Equal (clipText, clipReadText.TrimEnd ());
 			}
 
 		}
