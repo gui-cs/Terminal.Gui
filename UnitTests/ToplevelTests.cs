@@ -1,8 +1,16 @@
 ﻿using System;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Core {
 	public class ToplevelTests {
+		readonly ITestOutputHelper output;
+
+		public ToplevelTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		[AutoInitShutdown]
 		public void Constructor_Default ()
@@ -660,6 +668,162 @@ namespace Terminal.Gui.Core {
 				fd.Ready += () => Application.RequestStop ();
 				Application.Run (fd);
 			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Mouse_Drag ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File", new MenuItem [] {
+					new MenuItem("New", "", null)
+				})
+			});
+
+			var sbar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.N, "~CTRL-N~ New", null)
+			});
+
+			var win = new Window ("Window");
+			var top = Application.Top;
+			top.Add (menu, sbar, win);
+
+			var iterations = -1;
+
+			Application.Iteration = () => {
+				iterations++;
+				if (iterations == 0) {
+					((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+					MessageBox.Query ("About", "Hello Word", "Ok");
+
+				} else if (iterations == 1) {
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File                                   
+┌ Window ──────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│       ┌ About ───────────────┐       │
+│       │      Hello Word      │       │
+│       │                      │       │
+│       │       [◦ Ok ◦]       │       │
+│       └──────────────────────┘       │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+ CTRL-N New                             ", output);
+
+				} else if (iterations == 2) {
+					Assert.Null (Application.MouseGrabView);
+					// Grab the mouse
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 8,
+							Y = 5,
+							Flags = MouseFlags.Button1Pressed
+						});
+
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					Assert.Equal (new Rect (8, 5, 24, 5), Application.MouseGrabView.Frame);
+
+				} else if (iterations == 3) {
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					// Grab to left
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 7,
+							Y = 5,
+							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+						});
+
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					Assert.Equal (new Rect (7, 5, 24, 5), Application.MouseGrabView.Frame);
+
+				} else if (iterations == 4) {
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File                                   
+┌ Window ──────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│      ┌ About ───────────────┐        │
+│      │      Hello Word      │        │
+│      │                      │        │
+│      │       [◦ Ok ◦]       │        │
+│      └──────────────────────┘        │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+ CTRL-N New                             ", output);
+
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+				} else if (iterations == 5) {
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					// Grab to top
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 7,
+							Y = 4,
+							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+						});
+
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					Assert.Equal (new Rect (7, 4, 24, 5), Application.MouseGrabView.Frame);
+
+				} else if (iterations == 6) {
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File                                   
+┌ Window ──────────────────────────────┐
+│                                      │
+│                                      │
+│      ┌ About ───────────────┐        │
+│      │      Hello Word      │        │
+│      │                      │        │
+│      │       [◦ Ok ◦]       │        │
+│      └──────────────────────┘        │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+ CTRL-N New                             ", output);
+
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					Assert.Equal (new Rect (7, 4, 24, 5), Application.MouseGrabView.Frame);
+
+				} else if (iterations == 7) {
+					Assert.Equal (Application.Current, Application.MouseGrabView);
+					// Ungrab the mouse
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 7,
+							Y = 4,
+							Flags = MouseFlags.Button1Released
+						});
+
+					Assert.Null (Application.MouseGrabView);
+
+				} else if (iterations == 8) {
+					Application.RequestStop ();
+				} else if (iterations == 9) {
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
 		}
 	}
 }
