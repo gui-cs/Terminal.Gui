@@ -775,6 +775,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
+
 			int nx, ny;
 			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
 				|| mouseEvent.Flags == MouseFlags.Button2Pressed
@@ -809,32 +811,27 @@ namespace Terminal.Gui {
 						SuperView.SetNeedsDisplay ();
 					}
 					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - start.Y : Frame.Y - start.Y),
 						out nx, out ny, out _, out _);
 
 					dragPosition = new Point (nx, ny);
-					LayoutSubviews ();
-					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
-					if (X == null || X is Pos.PosAbsolute) {
-						X = nx;
-					}
-					if (Y == null || Y is Pos.PosAbsolute) {
-						Y = ny;
-					}
-					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
+					X = nx;
+					Y = ny;
+					//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
 
 					SetNeedsDisplay ();
 					return true;
 				}
 			}
 
-			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
+			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				Application.UngrabMouse ();
 				Driver.UncookMouse ();
 				dragPosition = null;
 			}
 
-			//System.Diagnostics.Debug.WriteLine (mouseEvent.ToString ());
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
+			//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
 			return false;
 		}
 

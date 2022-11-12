@@ -238,7 +238,10 @@ namespace Terminal.Gui {
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,
 			int defaultButton = 0, Border border = null, params ustring [] buttons)
 		{
-			const int defaultWidth = 50;
+			int defaultWidth = 50;
+			if (defaultWidth > Application.Driver.Cols / 2) {
+				defaultWidth = (int)(Application.Driver.Cols * 0.60f);
+			}
 			int maxWidthLine = TextFormatter.MaxWidthLine (message);
 			if (maxWidthLine > Application.Driver.Cols) {
 				maxWidthLine = Application.Driver.Cols;

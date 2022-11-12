@@ -905,7 +905,7 @@ namespace Terminal.Gui.Core {
 							Flags = MouseFlags.ReportMousePosition
 						});
 
-					Assert.Null (Application.MouseGrabView);
+					Assert.Equal (sv, Application.MouseGrabView);
 
 					ReflectionTools.InvokePrivate (
 						typeof (Application),

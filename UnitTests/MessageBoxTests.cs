@@ -30,11 +30,11 @@ namespace Terminal.Gui.Views {
 				} else if (iterations == 1) {
 					Application.Top.Redraw (Application.Top.Bounds);
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-               ┌ Title ─────────────────────────────────────────┐
-               │                    Message                     │
-               │                                                │
-               │                                                │
-               └────────────────────────────────────────────────┘
+                ┌ Title ───────────────────────────────────────┐
+                │                   Message                    │
+                │                                              │
+                │                                              │
+                └──────────────────────────────────────────────┘
 ", output);
 
 					Application.RequestStop ();
