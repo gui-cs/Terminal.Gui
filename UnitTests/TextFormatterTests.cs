@@ -4137,5 +4137,20 @@ This TextFormatter (tf2) is rewritten.
 			text = $"First Line 界\nSecond Line 界\nThird Line 界\n";
 			Assert.Equal (14, TextFormatter.MaxWidthLine (text));
 		}
+
+		[Fact]
+		public void Ustring_Array_Is_Not_Equal_ToRunes_Array ()
+		{
+			ustring us = "New Test 你";
+			Assert.Equal (10, us.RuneCount);
+			Assert.NotEqual (20320, us [9]);
+			Assert.Equal (228, us [9]);
+			Assert.Equal ("ä", ((Rune)us [9]).ToString ());
+
+			var usToRunes = us.ToRunes ();
+			Assert.Equal (10, usToRunes.Length);
+			Assert.Equal (20320, (int)usToRunes [9]);
+			Assert.Equal ("你", ((Rune)usToRunes [9]).ToString ());
+		}
 	}
 }
