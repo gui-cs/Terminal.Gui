@@ -280,15 +280,16 @@ namespace Terminal.Gui {
 			//var borderLength = Border.DrawMarginFrame ? 1 : 0;
 
 			// FIXED: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
-			if (!NeedDisplay.IsEmpty) {
+			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
+				contentView.SetNeedsDisplay ();
 			}
 			var savedClip = contentView.ClipToBounds ();
 
 			// Redraw our contentView
 			// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
-			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
+			contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearLayoutNeeded ();

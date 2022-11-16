@@ -690,6 +690,7 @@ namespace Terminal.Gui {
 				}
 			} while (barItems.Children [current] == null || disabled);
 			SetNeedsDisplay ();
+			SetParentSetNeedsDisplay ();
 			if (!host.UseSubMenusSingleFrame)
 				host.OnMenuOpened ();
 			return true;
@@ -737,9 +738,22 @@ namespace Terminal.Gui {
 				}
 			} while (barItems.Children [current] == null || disabled);
 			SetNeedsDisplay ();
+			SetParentSetNeedsDisplay ();
 			if (!host.UseSubMenusSingleFrame)
 				host.OnMenuOpened ();
 			return true;
+		}
+
+		private void SetParentSetNeedsDisplay ()
+		{
+			if (host.openSubMenu != null) {
+				foreach (var menu in host.openSubMenu) {
+					menu.SetNeedsDisplay ();
+				}
+			}
+
+			host?.openMenu.SetNeedsDisplay ();
+			host.SetNeedsDisplay ();
 		}
 
 		public override bool MouseEvent (MouseEvent me)
@@ -778,6 +792,7 @@ namespace Terminal.Gui {
 					current = me.Y - 1;
 				if (host.UseSubMenusSingleFrame || !CheckSubMenu ()) {
 					SetNeedsDisplay ();
+					SetParentSetNeedsDisplay ();
 					return true;
 				}
 				host.OnMenuOpened ();
@@ -806,6 +821,7 @@ namespace Terminal.Gui {
 				return host.CloseMenu (false, true);
 			} else {
 				SetNeedsDisplay ();
+				SetParentSetNeedsDisplay ();
 			}
 			return true;
 		}
@@ -1587,7 +1603,7 @@ namespace Terminal.Gui {
 					var subMenu = openCurrentMenu.current > -1 && openCurrentMenu.barItems.Children.Length > 0
 						? openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current])
 						: null;
-					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
+					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count - 1 == selectedSub) && subMenu == null) {
 						if (openSubMenu != null && !CloseMenu (false, true))
 							return;
 						NextMenu (false, ignoreUseSubMenusSingleFrame);
