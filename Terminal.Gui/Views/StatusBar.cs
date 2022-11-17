@@ -64,8 +64,6 @@ namespace Terminal.Gui {
 	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
-		bool disposedValue;
-
 		/// <summary>
 		/// The items that compose the <see cref="StatusBar"/>
 		/// </summary>
