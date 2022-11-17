@@ -87,39 +87,9 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
 			X = 0;
+			Y = Pos.AnchorEnd (1);
 			Width = Dim.Fill ();
 			Height = 1;
-
-			Initialized += StatusBar_Initialized;
-			Application.Resized += Application_Resized ();
-		}
-
-		private void StatusBar_Initialized (object sender, EventArgs e)
-		{
-			if (SuperView.Frame == Rect.Empty) {
-				((Toplevel)SuperView).Loaded += StatusBar_Loaded;
-			} else {
-				Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
-			}
-		}
-
-		private void StatusBar_Loaded ()
-		{
-			Y = Math.Max (SuperView.Frame.Height - (Visible ? 1 : 0), 0);
-			((Toplevel)SuperView).Loaded -= StatusBar_Loaded;
-		}
-
-		private Action<Application.ResizedEventArgs> Application_Resized ()
-		{
-			return delegate {
-				X = 0;
-				Height = 1;
-				if (SuperView != null || SuperView is Toplevel) {
-					if (Frame.Y != SuperView.Frame.Height - (Visible ? 1 : 0)) {
-						Y = SuperView.Frame.Height - (Visible ? 1 : 0);
-					}
-				}
-			};
 		}
 
 		static ustring shortcutDelimiter = "-";
@@ -145,12 +115,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			//if (Frame.Y != Driver.Rows - 1) {
-			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
-			//	Y = Driver.Rows - 1;
-			//	SetNeedsDisplay ();
-			//}
-
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 			for (int i = 0; i < Frame.Width; i++)
@@ -226,17 +190,6 @@ namespace Terminal.Gui {
 				action ();
 				return false;
 			});
-		}
-
-		/// <inheritdoc/>
-		protected override void Dispose (bool disposing)
-		{
-			if (!disposedValue) {
-				if (disposing) {
-					Application.Resized -= Application_Resized ();
-				}
-				disposedValue = true;
-			}
 		}
 
 		///<inheritdoc/>
