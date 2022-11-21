@@ -1321,8 +1321,9 @@ namespace Terminal.Gui {
 
 			// Remove focus down the chain of subviews if focus is removed
 			if (!value && focused != null) {
-				focused.OnLeave (view);
-				focused.SetHasFocus (false, view);
+				var f = focused;
+				f.OnLeave (view);
+				f.SetHasFocus (false, view);
 				focused = null;
 			}
 		}
