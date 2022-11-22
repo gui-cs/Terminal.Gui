@@ -856,7 +856,7 @@ namespace Terminal.Gui {
 			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
 			int modelCol = 0;
 
-			for (int i = firstLine; i <= line; i++) {
+			for (int i = firstLine; i <= Math.Min (line, wrappedModelLines.Count - 1); i++) {
 				var wLine = wrappedModelLines [i];
 
 				if (i < line) {
