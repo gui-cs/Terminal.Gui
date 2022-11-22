@@ -130,6 +130,50 @@ namespace UICatalog.Scenarios {
 				Focus = Win.ColorScheme.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.Red,Color.BrightBlue)
 			};
+
+			// if user clicks the mouse in TableView
+			tableView.MouseClick += e => {
+
+				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+
+				if (clickedCol != null) {
+
+					// work out new sort order
+					var sort = tableView.Table.DefaultView.Sort;
+					bool isAsc;
+
+					if(sort?.EndsWith("ASC") ?? false) {
+						sort = $"{clickedCol.ColumnName} DESC";
+						isAsc = false;
+					} else {
+						sort = $"{clickedCol.ColumnName} ASC";
+						isAsc = true;
+					}
+					
+					// set a sort order
+					tableView.Table.DefaultView.Sort = sort;
+					
+					// copy the rows from the view
+					var sortedCopy = tableView.Table.DefaultView.ToTable ();
+					tableView.Table.Rows.Clear ();
+					foreach(DataRow r in sortedCopy.Rows) {
+						tableView.Table.ImportRow (r);
+					}
+
+					foreach(DataColumn col in tableView.Table.Columns) {
+
+						// remove any lingering sort indicator
+						col.ColumnName = col.ColumnName.TrimEnd ('▼', '▲');
+
+						// add a new one if this the one that is being sorted
+						if (col == clickedCol) {
+							col.ColumnName += isAsc ? '▲': '▼';
+						}
+					}
+
+					tableView.Update ();
+				}
+			};
 		}
 
 
