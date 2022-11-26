@@ -47,6 +47,38 @@ namespace UICatalog {
 	class UICatalogApp {
 		static void Main (string [] args)
 		{
+
+			Application.Init ();
+
+			var win = new Window ();
+			var mb = new MenuBar (new []{new MenuBarItem(
+				new []{
+					new MenuItem("Click Me","",()=>{ })
+					
+				}){
+				Title = "File (F9)"}
+			});
+			win.Add (mb);
+
+			var txt = new TextView {
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				AllowsTab = false,
+				WordWrap = true,
+			};
+
+			win.Add (txt);
+			Random r = new Random ();
+			Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1),
+				(m) => {
+					Application.MainLoop.Invoke (() =>
+						txt.Text = new string ((char)r.Next (255), 999)
+					);
+					return true;
+				});
+			Application.Run (win);
+
 			Console.OutputEncoding = Encoding.Default;
 
 			if (Debugger.IsAttached) {

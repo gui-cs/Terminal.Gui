@@ -1098,6 +1098,69 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		private TableView GetABCDEFTableView (out DataTable dt)
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visible
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = false;
+
+			dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.Table = dt;
+
+			return tableView;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_IsNotRendered()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│A│C│D│
+│1│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			// Expect the cursor navigation to skip over the invisible column(s)
+			Assert.Equal(2,tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			// Expect the cursor navigation backwards to skip over invisible column too
+			Assert.Equal (0, tableView.SelectedColumn);
+		}
+
 		[Fact]
 		public void LongColumnTest ()
 		{

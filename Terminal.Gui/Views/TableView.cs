@@ -705,6 +705,12 @@ namespace Terminal.Gui {
 		/// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
 		public void SetSelection (int col, int row, bool extendExistingSelection)
 		{
+			// if we are trying to increase the column index then
+			// we are moving right otherwise we are moving left
+			bool lookRight = col > selectedColumn;
+
+			col = GetNearestVisibleColumn (col, lookRight);
+
 			if (!MultiSelect || !extendExistingSelection)
 				MultiSelectedRegions.Clear ();
 
@@ -1137,7 +1143,56 @@ namespace Terminal.Gui {
 
 				MultiSelectedRegions.Push (region);
 			}
+		}
 
+		/// <summary>
+		/// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.visible"/> is false for
+		/// the indexed <see cref="DataColumn"/>.  If so then the index returned is nudged to the nearest visible
+		/// column.
+		/// </summary>
+		/// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
+		/// <param name="columnIndex">The input column index.</param>
+		/// <param name="lookRight">When nudging invisible selections look right first.</param>
+		private int GetNearestVisibleColumn (int columnIndex, bool lookRight)
+		{
+			// if the column index provided is out of bounds
+			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+				return columnIndex;
+			}
+
+			// get the column visibility by index (if no style visible is true)
+			bool [] columnVisibility = Table.Columns.Cast<DataColumn> ()
+				.Select (c => this.Style.GetColumnStyleIfAny (c)?.Visible ?? true)
+				.ToArray();
+
+			// column is visible
+			if (columnVisibility [columnIndex]) {
+				return columnIndex;
+			}
+
+			int increment = lookRight ? 1 : -1;
+
+			// move in that direction
+			for (int i = columnIndex; i >=0 && i < columnVisibility.Length; i += increment) {
+				// if we find a visible column
+				if(columnVisibility [i]) 
+				{
+					return i;
+				}
+			}
+
+			// now look other way
+			increment = -increment;
+
+			for (int i = columnIndex; i >= 0 && i < columnVisibility.Length; i += increment) {
+				// if we find a visible column
+				if (columnVisibility [i]) {
+					return i;
+				}
+			}
+
+			// nothing seems to be visible so just return input index
+			return columnIndex;
 		}
 
 		/// <summary>
@@ -1241,6 +1296,12 @@ namespace Terminal.Gui {
 				int startingIdxForCurrentHeader = usedSpace;
 				var colStyle = Style.GetColumnStyleIfAny (col);
 				int colWidth;
+
+				// if column is not being rendered
+				if(colStyle?.Visible == false) {
+					// do not add it to the returned columns
+					continue;
+				}
 
 				// is there enough space for this column (and it's data)?
 				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
@@ -1397,6 +1458,7 @@ namespace Terminal.Gui {
 			/// Return null for the default
 			/// </summary>
 			public CellColorGetterDelegate ColorGetter;
+			private bool visible = true;
 
 			/// <summary>
 			/// Defines the format for values e.g. "yyyy-MM-dd" for dates
@@ -1426,6 +1488,15 @@ namespace Terminal.Gui {
 			/// Enables flexible sizing of this column based on available screen space to render into.
 			/// </summary>
 			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
+
+			/// <summary>
+			/// Gets or Sets a value indicating whether the column should be visible to the user.
+			/// This affects both whether it is rendered and whether it can be selected. Defaults to
+			/// true.
+			/// </summary>
+			/// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
+			public bool Visible { get => MaxWidth >= 0 && visible; set => visible = value; }
+
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
