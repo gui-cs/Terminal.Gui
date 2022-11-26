@@ -427,6 +427,36 @@ namespace Terminal.Gui {
 
 		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
 		{
+			/*
+			 *  First lets work out if we should be rendering scroll indicators
+			 */
+
+			// are there are visible columns to the left that have been pushed
+			// off the screen due to horizontal scrolling?
+			bool moreColumnsToLeft = ColumnOffset > 0;
+
+			// if we moved left would we find a new column (or are they all invisible?)
+			if(!TryGetNearestVisibleColumn (ColumnOffset-1, false, false, out _)) {
+				moreColumnsToLeft = false;
+			}
+
+			// are there visible columns to the right that have not yet been reached?
+			// lets find out, what is the column index of the last column we are rendering
+			int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
+			
+			// are there more valid indexes?
+			bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns.Count;
+
+			// if we went right from the last column would we find a new visible column?
+			if(!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _)) {
+				// no we would not
+				moreColumnsToRight = false;
+			}
+
+			/*
+			 *  Now lets draw the line itself
+			 */
+
 			// Renders a line below the table headers (when visible) like:
 			// ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
 
@@ -436,7 +466,7 @@ namespace Terminal.Gui {
 				// whole way but update to instead draw a header indicator
 				// or scroll arrow etc
 				var rune = Driver.HLine;
-
+				
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
 						// for first character render line
@@ -445,7 +475,7 @@ namespace Terminal.Gui {
 						// unless we have horizontally scrolled along
 						// in which case render an arrow, to indicate user
 						// can scroll left
-						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
+						if(Style.ShowHorizontalScrollIndicators && moreColumnsToLeft)
 						{
 							rune = Driver.LeftArrow;
 							scrollLeftPoint = new Point(c,row);
@@ -465,8 +495,7 @@ namespace Terminal.Gui {
 						// unless there is more of the table we could horizontally
 						// scroll along to see. In which case render an arrow,
 						// to indicate user can scroll right
-						if(Style.ShowHorizontalScrollIndicators &&
-							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
+						if(Style.ShowHorizontalScrollIndicators && moreColumnsToRight)
 						{
 							rune = Driver.RightArrow;
 							scrollRightPoint = new Point(c,row);
@@ -709,7 +738,7 @@ namespace Terminal.Gui {
 			// we are moving right otherwise we are moving left
 			bool lookRight = col > selectedColumn;
 
-			col = GetNearestVisibleColumn (col, lookRight);
+			col = GetNearestVisibleColumn (col, lookRight, true);
 
 			if (!MultiSelect || !extendExistingSelection)
 				MultiSelectedRegions.Clear ();
@@ -1146,18 +1175,35 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.visible"/> is false for
+		/// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for
 		/// the indexed <see cref="DataColumn"/>.  If so then the index returned is nudged to the nearest visible
 		/// column.
 		/// </summary>
 		/// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
 		/// <param name="columnIndex">The input column index.</param>
-		/// <param name="lookRight">When nudging invisible selections look right first.</param>
-		private int GetNearestVisibleColumn (int columnIndex, bool lookRight)
+		/// <param name="lookRight">When nudging invisible selections look right first.
+		/// <see langword="true"/> to look right, <see langword="false"/> to look left.</param>
+		/// <param name="allowBumpingInOppositeDirection">If we cannot find anything visible when
+		/// looking in direction of <paramref name="lookRight"/> then should we look in the opposite
+		/// direction instead? Use true if you want to push a selection to a valid index no matter what.
+		/// Use false if you are primarily interested in learning about directional column visibility.</param>
+		private int GetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection)
+		{
+			if(TryGetNearestVisibleColumn(columnIndex,lookRight,allowBumpingInOppositeDirection, out var answer))
+			{
+				return answer;
+			}
+
+			return columnIndex;
+		}
+
+		private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
 		{
 			// if the column index provided is out of bounds
 			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
-				return columnIndex;
+
+				idx = columnIndex;
+				return false;
 			}
 
 			// get the column visibility by index (if no style visible is true)
@@ -1167,7 +1213,8 @@ namespace Terminal.Gui {
 
 			// column is visible
 			if (columnVisibility [columnIndex]) {
-				return columnIndex;
+				idx = columnIndex;
+				return true;
 			}
 
 			int increment = lookRight ? 1 : -1;
@@ -1177,22 +1224,33 @@ namespace Terminal.Gui {
 				// if we find a visible column
 				if(columnVisibility [i]) 
 				{
-					return i;
+					idx = i;
+					return true;
 				}
 			}
 
+			// Caller only wants to look in one direction and we did not find any
+			// visible columns in that direction
+			if(!allowBumpingInOppositeDirection) {
+				idx = columnIndex;
+				return false;
+			}
+
+			// Caller will let us look in the other direction so
 			// now look other way
 			increment = -increment;
 
 			for (int i = columnIndex; i >= 0 && i < columnVisibility.Length; i += increment) {
 				// if we find a visible column
 				if (columnVisibility [i]) {
-					return i;
+					idx = i;
+					return true;
 				}
 			}
 
 			// nothing seems to be visible so just return input index
-			return columnIndex;
+			idx = columnIndex;
+			return false;
 		}
 
 		/// <summary>

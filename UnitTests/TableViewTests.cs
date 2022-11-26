@@ -1141,7 +1141,103 @@ namespace Terminal.Gui.Views {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
-		
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_IsNotRendered ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│B│C│D│
+├─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because DEF are of screen
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if DEF are invisible we shouldn't be showing the indicator
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│A│B│C│
+├─┼─┼─┤
+│1│2│3│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.ColumnOffset = 1;
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because A,E and F are of screen
+			string expected =
+				@"
+│B│C│D│
+◄─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if E and F are invisible so we shouldn't show right
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+◄─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// now also A is invisible so we cannot scroll in either direction
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+├─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
 		[Fact, AutoInitShutdown]
 		public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
 		{
