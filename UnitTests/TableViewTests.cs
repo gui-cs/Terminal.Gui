@@ -1257,6 +1257,59 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, tableView.SelectedColumn);
 		}
 
+		[InlineData(true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1(bool useHome)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			Assert.Equal (0, tableView.SelectedColumn);
+
+			// column 0 is invisible so this method should move to 1
+			tableView.EnsureValidSelection();
+			Assert.Equal (1, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = useHome ? Key.Home : Key.CursorLeft 
+			});
+
+			// Expect the cursor to stay at 1
+			Assert.Equal (1, tableView.SelectedColumn);
+		}
+
+		[InlineData (true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+						
+			// select D 
+			tableView.SelectedColumn = 3;
+			Assert.Equal (3, tableView.SelectedColumn);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			// column D is invisible so this method should move to 2 (C)
+			tableView.EnsureValidSelection ();
+			Assert.Equal (2, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent {
+				Key = useEnd ? Key.End : Key.CursorRight
+			});
+
+			// Expect the cursor to stay at 2
+			Assert.Equal (2, tableView.SelectedColumn);
+		}
+
+
 		[Fact]
 		public void LongColumnTest ()
 		{

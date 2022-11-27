@@ -1144,6 +1144,9 @@ namespace Terminal.Gui {
 			SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns.Count - 1), 0);
 			SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows.Count - 1), 0);
 
+			// If SelectedColumn is invisible move it to a visible one
+			SelectedColumn = GetNearestVisibleColumn (SelectedColumn, lookRight: true, true);
+
 			var oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
 
 			MultiSelectedRegions.Clear ();
