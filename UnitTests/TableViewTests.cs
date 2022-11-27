@@ -1162,6 +1162,36 @@ namespace Terminal.Gui.Views {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["C"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+
+			// expect nothing to be rendered when all columns are invisible
+			string expected =
+				@"
+";
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// expect behavior to match when Table is null
+			tableView.Table = null;
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
 		{

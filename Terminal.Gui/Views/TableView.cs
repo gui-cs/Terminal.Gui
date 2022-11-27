@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = Table == null ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
+			set => columnOffset = TableIsNullOrInvisible() ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
 		}
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int RowOffset {
 			get => rowOffset;
-			set => rowOffset = Table == null ? 0 : Math.Max (0, Math.Min (Table.Rows.Count - 1, value));
+			set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows.Count - 1, value));
 		}
 
 		/// <summary>
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 				var oldValue = selectedColumn;
 
 				//try to prevent this being set to an out of bounds column
-				selectedColumn = Table == null ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+				selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
 
 				if (oldValue != selectedColumn)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, oldValue, SelectedColumn, SelectedRow, SelectedRow));
@@ -146,7 +146,7 @@ namespace Terminal.Gui {
 
 				var oldValue = selectedRow;
 
-				selectedRow = Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+				selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
 
 				if (oldValue != selectedRow)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, SelectedColumn, SelectedColumn, oldValue, selectedRow));
@@ -315,7 +315,7 @@ namespace Terminal.Gui {
 				var rowToRender = RowOffset + (line - headerLinesConsumed);
 
 				//if we have run off the end of the table
-				if (Table == null || rowToRender >= Table.Rows.Count || rowToRender < 0)
+				if (TableIsNullOrInvisible () || rowToRender >= Table.Rows.Count || rowToRender < 0)
 					continue;
 
 				RenderRow (line, rowToRender, columnsToRender);
@@ -712,7 +712,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();
 				return false;
 			}
@@ -839,7 +839,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SelectAll ()
 		{
-			if (Table == null || !MultiSelect || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible() || !MultiSelect || Table.Rows.Count == 0)
 				return;
 
 			MultiSelectedRegions.Clear ();
@@ -855,7 +855,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
-			if (Table == null || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
 				yield break;
 
 			EnsureValidSelection ();
@@ -939,7 +939,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				base.PositionCursor ();
 				return;
 			}
@@ -962,7 +962,7 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (TableIsNullOrInvisible ()) {
 				return false;
 			}
 
@@ -1040,7 +1040,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (TableIsNullOrInvisible ())
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1071,7 +1071,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (TableIsNullOrInvisible ())
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1100,7 +1100,7 @@ namespace Terminal.Gui {
 		/// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void Update ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				SetNeedsDisplay ();
 				return;
 			}
@@ -1119,7 +1119,7 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureValidScrollOffsets ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				return;
 			}
 
@@ -1134,7 +1134,7 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureValidSelection ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible()) {
 
 				// Table doesn't exist, we should probably clear those selections
 				MultiSelectedRegions.Clear ();
@@ -1175,6 +1175,21 @@ namespace Terminal.Gui {
 
 				MultiSelectedRegions.Push (region);
 			}
+		}
+
+		/// <summary>
+		/// Returns true if the <see cref="Table"/> is not set or all the
+		/// <see cref="DataColumn"/> in the <see cref="Table"/> have an explicit
+		/// <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/>
+		/// <see langword="false"/>.
+		/// </summary>
+		/// <returns></returns>
+		private bool TableIsNullOrInvisible ()
+		{
+			return Table == null ||
+				Table.Columns.Count <= 0 ||
+				Table.Columns.Cast<DataColumn> ().All (
+				c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false);
 		}
 
 		/// <summary>
@@ -1333,7 +1348,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (TableIsNullOrInvisible ())
 				yield break;
 
 			int usedSpace = 0;
@@ -1411,7 +1426,7 @@ namespace Terminal.Gui {
 
 		private bool ShouldRenderHeaders ()
 		{
-			if (Table == null || Table.Columns.Count == 0)
+			if (TableIsNullOrInvisible ())
 				return false;
 
 			return Style.AlwaysShowHeaders || rowOffset == 0;
