@@ -1370,6 +1370,25 @@ namespace Terminal.Gui.Views {
 			Assert.DoesNotContain(new Point(1,0),tableView.GetAllSelectedCells ());
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight | Key.ShiftMask });
+
+			// Selection should extend from A to C but skip B
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+		}
 
 		[Fact]
 		public void LongColumnTest ()
