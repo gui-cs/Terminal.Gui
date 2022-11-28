@@ -1339,6 +1339,37 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (2, tableView.SelectedColumn);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelected ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// user has rectangular selection 
+			tableView.MultiSelectedRegions.Push (
+				new TableView.TableSelection(
+					new Point(0,0),
+					new Rect(0, 0, 3, 1))
+				);
+
+			Assert.Equal (3, tableView.GetAllSelectedCells ().Count());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.True (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			// it should not be included in the selection
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain(new Point(1,0),tableView.GetAllSelectedCells ());
+		}
+
 
 		[Fact]
 		public void LongColumnTest ()

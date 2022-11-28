@@ -915,13 +915,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>)
+		/// <para>
+		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>).
+		/// </para>
+		/// <remarks>Returns <see langword="false"/> if <see cref="ColumnStyle.Visible"/> is <see langword="false"/>.</remarks>
 		/// </summary>
 		/// <param name="col"></param>
 		/// <param name="row"></param>
 		/// <returns></returns>
 		public bool IsSelected (int col, int row)
 		{
+			if(!IsColumnVisible(col)) {
+				return false;
+			}	
+
 			// Cell is also selected if in any multi selection region
 			if (MultiSelect && MultiSelectedRegions.Any (r => r.Rect.Contains (col, row)))
 				return true;
@@ -932,6 +939,22 @@ namespace Terminal.Gui {
 
 			return row == SelectedRow &&
 					(col == SelectedColumn || FullRowSelect);
+		}
+
+		/// <summary>
+		/// Returns true if the given <paramref name="columnIndex"/> indexes a visible
+		/// column otherwise false.  Returns false for indexes that are out of bounds.
+		/// </summary>
+		/// <param name="columnIndex"></param>
+		/// <returns></returns>
+		private bool IsColumnVisible (int columnIndex)
+		{
+			// if the column index provided is out of bounds
+			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+				return false;
+			}
+
+			return this.Style.GetColumnStyleIfAny (Table.Columns [columnIndex])?.Visible ?? true;
 		}
 
 		/// <summary>
