@@ -8,7 +8,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Labels As Buttons", Description: "Illustrates that Button is really just a Label++")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("POC")]
+	[ScenarioCategory ("Proof of Concept")]
 	public class LabelsAsLabels : Scenario {
 		public override void Setup ()
 		{
@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (colorLabelsLabel);
 
-			//With this method there is no need to call Top.Ready += () => Top.Redraw (Top.Bounds);
+			//With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
 			var x = Pos.Right (colorLabelsLabel) + 2;
 			foreach (var colorScheme in Colors.ColorSchemes) {
 				var colorLabel = new Label ($"{colorScheme.Key}") {
@@ -73,7 +73,7 @@ namespace UICatalog.Scenarios {
 				Win.Add (colorLabel);
 				x += colorLabel.Text.Length + 2;
 			}
-			Top.Ready += () => Top.Redraw (Top.Bounds);
+			Application.Top.Ready += () => Application.Top.Redraw (Application.Top.Bounds);
 
 			Label Label;
 			Win.Add (Label = new Label ("A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?") {
@@ -90,6 +90,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (Label) + 1,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				TextAlignment = TextAlignment.Centered,
+				VerticalTextAlignment = VerticalTextAlignment.Middle
 			});
 			Label.Clicked += () => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -159,6 +161,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtn.Clicked += () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -190,6 +193,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
+				AutoSize = false
 			};
 			sizeBtnA.Clicked += () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
@@ -302,7 +306,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Top.Ready += () => radioGroup.Refresh ();
+			Application.Top.Ready += () => radioGroup.Refresh ();
 		}
 	}
 }

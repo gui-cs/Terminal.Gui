@@ -10,13 +10,12 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
-	[ScenarioCategory ("Dynamic")]
+	[ScenarioCategory ("Top Level Windows")]
 	public class DynamicStatusBar : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = Application.Top;
-			Top.Add (new DynamicStatusBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicStatusBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
 		}
 
 		public class DynamicStatusItemList {
@@ -383,7 +382,6 @@ namespace UICatalog.Scenarios {
 				Add (_lblAction);
 
 				_txtAction = new TextView () {
-					ColorScheme = Colors.Dialog,
 					X = Pos.Left (_txtTitle),
 					Y = Pos.Top (_lblAction),
 					Width = Dim.Fill (),

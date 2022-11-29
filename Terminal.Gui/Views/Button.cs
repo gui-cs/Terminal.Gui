@@ -31,8 +31,11 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Button : View {
-		ustring text;
 		bool is_default;
+		Rune _leftBracket;
+		Rune _rightBracket;
+		Rune _leftDefault;
+		Rune _rightDefault;
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -92,14 +95,10 @@ namespace Terminal.Gui {
 			Initialize (text, is_default);
 		}
 
-		Rune _leftBracket;
-		Rune _rightBracket;
-		Rune _leftDefault;
-		Rune _rightDefault;
-
 		void Initialize (ustring text, bool is_default)
 		{
 			TextAlignment = TextAlignment.Centered;
+			VerticalTextAlignment = VerticalTextAlignment.Middle;
 
 			HotKeySpecifier = new Rune ('_');
 
@@ -109,11 +108,11 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
+			AutoSize = true;
 			this.is_default = is_default;
-			this.text = text ?? string.Empty;
-			Update ();
-
-			HotKeyChanged += Button_HotKeyChanged;
+			Text = text ?? string.Empty;
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
@@ -126,31 +125,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Button_HotKeyChanged (Key obj)
-		{
-			if (HotKey != Key.Null) {
-				if (ContainsKeyBinding (obj)) {
-					ReplaceKeyBinding (Key.Space | obj, Key.Space | HotKey);
-				} else {
-					AddKeyBinding (Key.Space | HotKey, Command.Accept);
-				}
-			}
-		}
-
-		/// <summary>
-		///   The text displayed by this <see cref="Button"/>.
-		/// </summary>
-		public new ustring Text {
-			get {
-				return text;
-			}
-
-			set {
-				text = value;
-				Update ();
-			}
-		}
-
 		/// <summary>
 		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 		/// </summary>
@@ -159,39 +133,38 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
-				Update ();
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
-		internal void Update ()
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => base.HotKey;
+			set {
+				if (base.HotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					if (base.HotKey != Key.Null && ContainsKeyBinding (Key.Space | base.HotKey)) {
+						if (v == Key.Null) {
+							ClearKeybinding (Key.Space | base.HotKey);
+						} else {
+							ReplaceKeyBinding (Key.Space | base.HotKey, Key.Space | v);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v, Command.Accept);
+					}
+					base.HotKey = TextFormatter.HotKey = v;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		protected override void UpdateTextFormatterText ()
 		{
 			if (IsDefault)
-				base.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + Text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			GetCurrentWidth (out int cWidth);
-			var canSetWidth = SetWidth (w, out int rWidth);
-			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
-				Width = rWidth;
-				w = rWidth;
-			} else if (!canSetWidth || !AutoSize) {
-				w = cWidth;
-			}
-			var layout = LayoutStyle;
-			bool layoutChanged = false;
-			if (!(Height is Dim.DimAbsolute)) {
-				// The height is always equal to 1 and must be Dim.DimAbsolute.
-				layoutChanged = true;
-				LayoutStyle = LayoutStyle.Absolute;
-			}
-			Height = 1;
-			if (layoutChanged) {
-				LayoutStyle = layout;
-			}
-			Frame = new Rect (Frame.Location, new Size (w, 1));
-			SetNeedsDisplay ();
+				TextFormatter.Text = ustring.Make (_leftBracket) + " " + Text + " " + ustring.Make (_rightBracket);
 		}
 
 		///<inheritdoc/>
@@ -275,12 +248,12 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.Button1TripleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
 					OnClicked ();
 				}
@@ -293,9 +266,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			if (HotKey == Key.Unknown && text != "") {
-				for (int i = 0; i < base.Text.RuneCount; i++) {
-					if (base.Text [i] == text [0]) {
+			if (HotKey == Key.Unknown && Text != "") {
+				for (int i = 0; i < TextFormatter.Text.RuneCount; i++) {
+					if (TextFormatter.Text [i] == Text [0]) {
 						Move (i, 0);
 						return;
 					}

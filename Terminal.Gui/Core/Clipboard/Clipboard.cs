@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 			get {
 				try {
 					if (IsSupported) {
-						return Application.Driver.Clipboard.GetClipboardData ();
+						return contents = ustring.Make (Application.Driver.Clipboard.GetClipboardData ());
 					} else {
 						return contents;
 					}
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.
 		/// </summary>
-		public static bool IsSupported { get; } = Application.Driver.Clipboard.IsSupported;
+		public static bool IsSupported { get => Application.Driver.Clipboard.IsSupported; }
 
 		/// <summary>
 		/// Gets the operation system clipboard if possible.

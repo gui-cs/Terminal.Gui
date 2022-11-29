@@ -5,7 +5,8 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders with/without PanelView", Description: "Demonstrate with/without PanelView borders manipulation.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class Borders : Scenario {
 		public override void Setup ()
 		{
@@ -29,14 +30,16 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Panel"
 				},
+				ColorScheme = Colors.TopLevel
 			};
 			smartPanel.Add (new Label () { // Or smartPanel.Child = 
 				X = 0,
 				Y = 0,
-				Width = 24,
-				Height = 13,
+				//Width = 24, commenting because now setting the size disable auto-size
+				//Height = 13,
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwith a \nPanelView",
 				TextAlignment = TextAlignment.Centered
@@ -78,7 +81,8 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Label"
 				},
 				ColorScheme = Colors.TopLevel,
 				Text = "This is a test\nwithout a \nPanelView",

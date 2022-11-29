@@ -7,8 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using NStack;
+using Terminal.Gui.Resources;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -24,6 +27,7 @@ namespace Terminal.Gui {
 		int selectedStart = -1; // -1 represents there is no text selection.
 		ustring selectedText;
 		HistoryText historyText = new HistoryText ();
+		CultureInfo currentCulture;
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
@@ -96,6 +100,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+			savedCursorVisibility = desiredCursorVisibility;
 
 			historyText.ChangeText += HistoryText_ChangeText;
 
@@ -128,6 +133,9 @@ namespace Terminal.Gui {
 			AddCommand (Command.Copy, () => { Copy (); return true; });
 			AddCommand (Command.Cut, () => { Cut (); return true; });
 			AddCommand (Command.Paste, () => { Paste (); return true; });
+			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
+			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
+			AddCommand (Command.Accept, () => { ShowContextMenu (); return true; });
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
@@ -194,6 +202,35 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
+			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
+
+			AddKeyBinding (Key.R | Key.CtrlMask, Command.DeleteAll);
+			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+
+			currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+			ContextMenu = new ContextMenu (this, BuildContextMenuBarItem ());
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
+			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private MenuBarItem BuildContextMenuBarItem ()
+		{
+			return new MenuBarItem (new MenuItem [] {
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				});
+		}
+
+		private void ContextMenu_KeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (obj, ContextMenu.Key);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
@@ -212,9 +249,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
-			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
+			if (Application.MouseGrabView != null && Application.MouseGrabView == this)
 				Application.UngrabMouse ();
-			//if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
+			//if (SelectedLength != 0 && !(Application.MouseGrabView is MenuBar))
 			//	ClearAllSelection ();
 
 			return base.OnLeave (view);
@@ -321,6 +358,11 @@ namespace Terminal.Gui {
 		public bool HasHistoryChanges => historyText.HasHistoryChanges;
 
 		/// <summary>
+		/// Get the <see cref="ContextMenu"/> for this view.
+		/// </summary>
+		public ContextMenu ContextMenu { get; private set; }
+
+		/// <summary>
 		///   Sets the cursor position.
 		/// </summary>
 		public override void PositionCursor ()
@@ -332,7 +374,38 @@ namespace Terminal.Gui {
 				var cols = Rune.ColumnWidth (text [idx]);
 				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
-			Move (col, 0);
+			var pos = point - first + Math.Min (Frame.X, 0);
+			var offB = OffSetBackground ();
+			var containerFrame = SuperView?.ViewToScreen (SuperView.Bounds) ?? default;
+			var thisFrame = ViewToScreen (Bounds);
+			if (pos > -1 && col >= pos && pos < Frame.Width + offB
+				&& containerFrame.IntersectsWith (thisFrame)) {
+				RestoreCursorVisibility ();
+				Move (col, 0);
+			} else {
+				HideCursorVisibility ();
+				if (pos < 0) {
+					Move (pos, 0, false);
+				} else {
+					Move (pos - offB, 0, false);
+				}
+			}
+		}
+
+		CursorVisibility savedCursorVisibility;
+
+		void HideCursorVisibility ()
+		{
+			if (desiredCursorVisibility != CursorVisibility.Invisible) {
+				DesiredCursorVisibility = CursorVisibility.Invisible;
+			}
+		}
+
+		void RestoreCursorVisibility ()
+		{
+			if (desiredCursorVisibility != savedCursorVisibility) {
+				DesiredCursorVisibility = savedCursorVisibility;
+			}
 		}
 
 		///<inheritdoc/>
@@ -341,7 +414,7 @@ namespace Terminal.Gui {
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (GetNormalColor ());
 			Move (0, 0);
 
 			int p = first;
@@ -393,6 +466,12 @@ namespace Terminal.Gui {
 			Autocomplete.RenderOverlay (renderAt);
 		}
 
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+		}
+
 		Attribute GetReadOnlyColor ()
 		{
 			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
@@ -403,6 +482,9 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
+			if (!IsAdded)
+				return;
+
 			int offB = OffSetBackground ();
 			if (point < first) {
 				first = point;
@@ -500,8 +582,9 @@ namespace Terminal.Gui {
 		{
 			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 
+			List<Rune> newText = text;
 			if (length > 0) {
-				DeleteSelectedText ();
+				newText = DeleteSelectedText ();
 				oldCursorPos = point;
 			}
 			if (!useOldCursorPos) {
@@ -510,16 +593,16 @@ namespace Terminal.Gui {
 			var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
 			if (Used) {
 				point++;
-				if (point == text.Count + 1) {
-					SetText (text.Concat (kbstr).ToList ());
+				if (point == newText.Count + 1) {
+					SetText (newText.Concat (kbstr).ToList ());
 				} else {
-					if (oldCursorPos > text.Count) {
-						oldCursorPos = text.Count;
+					if (oldCursorPos > newText.Count) {
+						oldCursorPos = newText.Count;
 					}
-					SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
+					SetText (newText.GetRange (0, oldCursorPos).Concat (kbstr).Concat (newText.GetRange (oldCursorPos, Math.Min (newText.Count - oldCursorPos, newText.Count))));
 				}
 			} else {
-				SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (Math.Min (oldCursorPos + 1, text.Count), Math.Max (text.Count - oldCursorPos - 1, 0))));
+				SetText (newText.GetRange (0, oldCursorPos).Concat (kbstr).Concat (newText.GetRange (Math.Min (oldCursorPos + 1, newText.Count), Math.Max (newText.Count - oldCursorPos - 1, 0))));
 				point++;
 			}
 			Adjust ();
@@ -583,7 +666,7 @@ namespace Terminal.Gui {
 
 			historyText.Redo ();
 
-			//if (Clipboard.Contents == null)
+			//if (ustring.IsNullOrEmpty (Clipboard.Contents))
 			//	return true;
 			//var clip = TextModel.ToRunes (Clipboard.Contents);
 			//if (clip == null)
@@ -747,7 +830,9 @@ namespace Terminal.Gui {
 				}
 				Adjust ();
 			} else {
-				DeleteSelectedText ();
+				var newText = DeleteSelectedText ();
+				Text = ustring.Make (newText);
+				Adjust ();
 			}
 		}
 
@@ -768,7 +853,9 @@ namespace Terminal.Gui {
 				SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
 				Adjust ();
 			} else {
-				DeleteSelectedText ();
+				var newText = DeleteSelectedText ();
+				Text = ustring.Make (newText);
+				Adjust ();
 			}
 		}
 
@@ -854,6 +941,46 @@ namespace Terminal.Gui {
 			return -1;
 		}
 
+		void ShowContextMenu ()
+		{
+			if (currentCulture != Thread.CurrentThread.CurrentUICulture) {
+
+				currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+				ContextMenu.MenuItems = BuildContextMenuBarItem ();
+			}
+			ContextMenu.Show ();
+		}
+
+		/// <summary>
+		/// Selects all text.
+		/// </summary>
+		public void SelectAll ()
+		{
+			if (text.Count == 0) {
+				return;
+			}
+
+			selectedStart = 0;
+			MoveEndExtend ();
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Deletes all text.
+		/// </summary>
+		public void DeleteAll ()
+		{
+			if (text.Count == 0) {
+				return;
+			}
+
+			selectedStart = 0;
+			MoveEndExtend ();
+			DeleteCharLeft ();
+			SetNeedsDisplay ();
+		}
+
 		/// <summary>
 		/// Start position of the selected text.
 		/// </summary>
@@ -893,12 +1020,16 @@ namespace Terminal.Gui {
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
 				!ev.Flags.HasFlag (MouseFlags.Button1Released) && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
+				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked) && !ev.Flags.HasFlag (ContextMenu.MouseFlags)) {
 				return false;
 			}
 
 			if (!CanFocus) {
 				return true;
+			}
+
+			if (!HasFocus && ev.Flags != MouseFlags.ReportMousePosition) {
+				SetFocus ();
 			}
 
 			// Give autocomplete first opportunity to respond to mouse clicks
@@ -918,7 +1049,7 @@ namespace Terminal.Gui {
 				int x = PositionCursor (ev);
 				isButtonReleased = false;
 				PrepareSelection (x);
-				if (Application.mouseGrabView == null) {
+				if (Application.MouseGrabView == null) {
 					Application.GrabMouse (this);
 				}
 			} else if (ev.Flags == MouseFlags.Button1Released) {
@@ -949,6 +1080,8 @@ namespace Terminal.Gui {
 				PositionCursor (0);
 				ClearAllSelection ();
 				PrepareSelection (0, text.Count);
+			} else if (ev.Flags == ContextMenu.MouseFlags) {
+				ShowContextMenu ();
 			}
 
 			SetNeedsDisplay ();
@@ -1059,10 +1192,12 @@ namespace Terminal.Gui {
 				return;
 
 			Clipboard.Contents = SelectedText;
-			DeleteSelectedText ();
+			var newText = DeleteSelectedText ();
+			Text = ustring.Make (newText);
+			Adjust ();
 		}
 
-		void DeleteSelectedText ()
+		List<Rune> DeleteSelectedText ()
 		{
 			ustring actualText = Text;
 			SetSelectedStartSelectedLength ();
@@ -1070,11 +1205,11 @@ namespace Terminal.Gui {
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			Text = actualText [0, len] +
+			var newText = actualText [0, len] +
 				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
-			point = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
-			Adjust ();
+			point = selStart >= newText.RuneCount ? newText.RuneCount : selStart;
+			return newText.ToRuneList ();
 		}
 
 		/// <summary>
@@ -1082,7 +1217,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly || Clipboard.Contents == null) {
+			if (ReadOnly || ustring.IsNullOrEmpty (Clipboard.Contents)) {
 				return;
 			}
 

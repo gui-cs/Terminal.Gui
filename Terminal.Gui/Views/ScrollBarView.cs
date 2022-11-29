@@ -106,7 +106,7 @@ namespace Terminal.Gui {
 				OtherScrollBarView.X = OtherScrollBarView.IsVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 				OtherScrollBarView.Y = OtherScrollBarView.IsVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
 				OtherScrollBarView.Host.SuperView.Add (OtherScrollBarView);
-				OtherScrollBarView.showScrollIndicator = true;
+				OtherScrollBarView.ShowScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
 			contentBottomRightCorner = new View (" ") { Visible = host.Visible };
@@ -116,6 +116,7 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.Width = 1;
 			contentBottomRightCorner.Height = 1;
 			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			ClearOnVisibleFalse = false;
 		}
 
 		private void Host_VisibleChanged ()
@@ -188,11 +189,9 @@ namespace Terminal.Gui {
 		public int Size {
 			get => size;
 			set {
-				if (hosted || (otherScrollBarView != null && otherScrollBarView.hosted)) {
-					size = value + 1;
-				} else {
-					size = value;
-				}
+				size = value;
+				SetRelativeLayout (Bounds);
+				ShowHideScrollBars (false);
 				SetNeedsDisplay ();
 			}
 		}
@@ -220,9 +219,6 @@ namespace Terminal.Gui {
 						position = Math.Max (position + max, 0);
 					}
 					var s = GetBarsize (vertical);
-					if (position + s == size && (hosted || (otherScrollBarView != null && otherScrollBarView.hosted))) {
-						position++;
-					}
 					OnChangedPosition ();
 					SetNeedsDisplay ();
 				}
@@ -327,11 +323,13 @@ namespace Terminal.Gui {
 			ShowHideScrollBars ();
 		}
 
-		void ShowHideScrollBars ()
+		void ShowHideScrollBars (bool redraw = true)
 		{
 			if (!hosted || (hosted && !autoHideScrollBars)) {
 				if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
 					contentBottomRightCorner.Visible = false;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.contentBottomRightCorner.Visible) {
+					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
 				return;
 			}
@@ -350,24 +348,34 @@ namespace Terminal.Gui {
 			if (showBothScrollIndicator) {
 				if (contentBottomRightCorner != null) {
 					contentBottomRightCorner.Visible = true;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+					otherScrollBarView.contentBottomRightCorner.Visible = true;
 				}
 			} else if (!showScrollIndicator) {
 				if (contentBottomRightCorner != null) {
 					contentBottomRightCorner.Visible = false;
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
-				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
+				if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
-			} else {
+			} else if (contentBottomRightCorner != null) {
 				contentBottomRightCorner.Visible = false;
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+				otherScrollBarView.contentBottomRightCorner.Visible = false;
 			}
 			if (Host?.Visible == true && showScrollIndicator && !Visible) {
 				Visible = true;
 			}
-			if (Host?.Visible == true && otherScrollBarView != null && otherScrollBarView.showScrollIndicator
-				&& !otherScrollBarView.Visible) {
+			if (Host?.Visible == true && otherScrollBarView?.showScrollIndicator == true && !otherScrollBarView.Visible) {
 				otherScrollBarView.Visible = true;
 			}
+
+			if (!redraw) {
+				return;
+			}
+
 			if (showScrollIndicator) {
 				Redraw (Bounds);
 			}
@@ -380,16 +388,25 @@ namespace Terminal.Gui {
 		{
 			int barsize = scrollBarView.vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
-			if (barsize == 0 || barsize > scrollBarView.size) {
+			if (barsize == 0 || barsize >= scrollBarView.size) {
 				if (scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = false;
+				}
+				if (scrollBarView.Visible) {
+					scrollBarView.Visible = false;
 				}
 			} else if (barsize > 0 && barsize == scrollBarView.size && scrollBarView.OtherScrollBarView != null && pending) {
 				if (scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = false;
 				}
+				if (scrollBarView.Visible) {
+					scrollBarView.Visible = false;
+				}
 				if (scrollBarView.OtherScrollBarView != null && scrollBarView.showBothScrollIndicator) {
 					scrollBarView.OtherScrollBarView.ShowScrollIndicator = false;
+				}
+				if (scrollBarView.OtherScrollBarView.Visible) {
+					scrollBarView.OtherScrollBarView.Visible = false;
 				}
 			} else if (barsize > 0 && barsize == size && scrollBarView.OtherScrollBarView != null && !pending) {
 				pending = true;
@@ -398,9 +415,15 @@ namespace Terminal.Gui {
 					if (!scrollBarView.showBothScrollIndicator) {
 						scrollBarView.OtherScrollBarView.ShowScrollIndicator = true;
 					}
+					if (!scrollBarView.OtherScrollBarView.Visible) {
+						scrollBarView.OtherScrollBarView.Visible = true;
+					}
 				}
 				if (!scrollBarView.showScrollIndicator) {
 					scrollBarView.ShowScrollIndicator = true;
+				}
+				if (!scrollBarView.Visible) {
+					scrollBarView.Visible = true;
 				}
 			}
 
@@ -418,7 +441,7 @@ namespace Terminal.Gui {
 			} else if (showScrollIndicator) {
 				Width = vertical ? 1 : Dim.Width (Host) - 0;
 				Height = vertical ? Dim.Height (Host) - 0 : 1;
-			} else if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
+			} else if (otherScrollBarView?.showScrollIndicator == true) {
 				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 0;
 				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 0 : 1;
 			}
@@ -432,11 +455,14 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			if (ColorScheme == null || Size == 0) {
+			if (ColorScheme == null || ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
+				if ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
+					ShowHideScrollBars (false);
+				}
 				return;
 			}
 
-			Driver.SetAttribute (GetNormalColor ());
+			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
 			if ((vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
 				return;
@@ -578,6 +604,8 @@ namespace Terminal.Gui {
 
 			if (contentBottomRightCorner != null && hosted && showBothScrollIndicator) {
 				contentBottomRightCorner.Redraw (contentBottomRightCorner.Bounds);
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.hosted && otherScrollBarView.showBothScrollIndicator) {
+				otherScrollBarView.contentBottomRightCorner.Redraw (otherScrollBarView.contentBottomRightCorner.Bounds);
 			}
 		}
 
@@ -585,13 +613,13 @@ namespace Terminal.Gui {
 		int posBarOffset;
 
 		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent me)
+		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
-			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1DoubleClicked &&
-				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
-				me.Flags != MouseFlags.Button1Released && me.Flags != MouseFlags.WheeledDown &&
-				me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight &&
-				me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.Button1TripleClicked) {
+			if (mouseEvent.Flags != MouseFlags.Button1Pressed && mouseEvent.Flags != MouseFlags.Button1DoubleClicked &&
+				!mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
+				mouseEvent.Flags != MouseFlags.Button1Released && mouseEvent.Flags != MouseFlags.WheeledDown &&
+				mouseEvent.Flags != MouseFlags.WheeledUp && mouseEvent.Flags != MouseFlags.WheeledRight &&
+				mouseEvent.Flags != MouseFlags.WheeledLeft && mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
 				return false;
 			}
 
@@ -602,24 +630,24 @@ namespace Terminal.Gui {
 				Host.SetFocus ();
 			}
 
-			int location = vertical ? me.Y : me.X;
+			int location = vertical ? mouseEvent.Y : mouseEvent.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
 			int posTopLeftTee = vertical ? posTopTee + 1 : posLeftTee + 1;
 			int posBottomRightTee = vertical ? posBottomTee + 1 : posRightTee + 1;
 			barsize -= 2;
 			var pos = Position;
 
-			if (me.Flags != MouseFlags.Button1Released
-				&& (Application.mouseGrabView == null || Application.mouseGrabView != this)) {
+			if (mouseEvent.Flags != MouseFlags.Button1Released
+				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
 				Application.GrabMouse (this);
-			} else if (me.Flags == MouseFlags.Button1Released && Application.mouseGrabView != null && Application.mouseGrabView == this) {
+			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
 				Application.UngrabMouse ();
 				return true;
 			}
-			if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
-				me.Flags == MouseFlags.WheeledRight || me.Flags == MouseFlags.WheeledLeft)) {
-				return Host.MouseEvent (me);
+			if (showScrollIndicator && (mouseEvent.Flags == MouseFlags.WheeledDown || mouseEvent.Flags == MouseFlags.WheeledUp ||
+				mouseEvent.Flags == MouseFlags.WheeledRight || mouseEvent.Flags == MouseFlags.WheeledLeft)) {
+				return Host.MouseEvent (mouseEvent);
 			}
 
 			if (location == 0) {
@@ -640,7 +668,7 @@ namespace Terminal.Gui {
 				//}
 
 				if (lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee
-				&& me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+				&& mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 					if (lastLocation == -1) {
 						lastLocation = location;
 						posBarOffset = keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;

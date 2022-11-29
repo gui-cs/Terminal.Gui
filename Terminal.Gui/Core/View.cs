@@ -1,28 +1,15 @@
-﻿//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Pending:
-//   - Check for NeedDisplay on the hierarchy and repaint
-//   - Layout support
-//   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
-//
-// Optimizations
-//   - Add rendering limitation to the exposed area
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
-	/// value from the Frame will be used, if the value is Computed, then the Frame
-	/// will be updated from the X, Y Pos objects and the Width and Height Dim objects.
+	/// Determines the LayoutStyle for a <see cref="View"/>, if Absolute, during <see cref="View.LayoutSubviews"/>, the
+	/// value from the <see cref="View.Frame"/> will be used, if the value is Computed, then <see cref="View.Frame"/>
+	/// will be updated from the X, Y <see cref="Pos"/> objects and the Width and Height <see cref="Dim"/> objects.
 	/// </summary>
 	public enum LayoutStyle {
 		/// <summary>
@@ -38,17 +25,19 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
+	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
+	/// contains zero or more nested views.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal.Gui.  Views
+	///    The View defines the base functionality for user interface elements in Terminal.Gui. Views
 	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
 	/// </para>
 	/// <para>
-	///    Views supports two layout styles: Absolute or Computed. The choice as to which layout style is used by the View 
+	///    Views supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>. 
+	///    The choice as to which layout style is used by the View 
 	///    is determined when the View is initialized. To create a View using Absolute layout, call a constructor that takes a
-	///    Rect parameter to specify the absolute position and size (the <c>View.<see cref="Frame "/></c>)/. To create a View 
+	///    Rect parameter to specify the absolute position and size (the View.<see cref="View.Frame "/>). To create a View 
 	///    using Computed layout use a constructor that does not take a Rect parameter and set the X, Y, Width and Height 
 	///    properties on the view. Both approaches use coordinates that are relative to the container they are being added to. 
 	/// </para>
@@ -61,9 +50,9 @@ namespace Terminal.Gui {
 	///    properties are Dim and Pos objects that dynamically update the position of a view.
 	///    The X and Y properties are of type <see cref="Pos"/>
 	///    and you can use either absolute positions, percentages or anchor
-	///    points.   The Width and Height properties are of type
+	///    points. The Width and Height properties are of type
 	///    <see cref="Dim"/> and can use absolute position,
-	///    percentages and anchors.  These are useful as they will take
+	///    percentages and anchors. These are useful as they will take
 	///    care of repositioning views when view's frames are resized or
 	///    if the terminal size changes.
 	/// </para>
@@ -73,17 +62,17 @@ namespace Terminal.Gui {
 	///    <see cref="Frame"/> property.
 	/// </para>
 	/// <para>
-	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method.   
+	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. 
 	///    The container of a View can be accessed with the <see cref="SuperView"/> property.
 	/// </para>
 	/// <para>
-	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. To flag the entire view
-	///    for redraw call <see cref="SetNeedsDisplay()"/>.
+	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. 
+	///    To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 	/// </para>
 	/// <para>
 	///    Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
-	///    should use for rendering.   This ensures that the views fit in the context where
-	///    they are being used, and allows for themes to be plugged in.   For example, the
+	///    should use for rendering. This ensures that the views fit in the context where
+	///    they are being used, and allows for themes to be plugged in. For example, the
 	///    default colors for windows and toplevels uses a blue background, while it uses
 	///    a white background for dialog boxes and a red background for errors.
 	/// </para>
@@ -99,14 +88,14 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///    Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that
-	///    the cursor is placed in a location that makes sense.  Unix terminals do not have
+	///    the cursor is placed in a location that makes sense. Unix terminals do not have
 	///    a way of hiding the cursor, so it can be distracting to have the cursor left at
-	///    the last focused view.   So views should make sure that they place the cursor
+	///    the last focused view. So views should make sure that they place the cursor
 	///    in a visually sensible place.
 	/// </para>
 	/// <para>
 	///    The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has
-	///    changed.   The default processing system will keep the size and dimensions
+	///    changed. The default processing system will keep the size and dimensions
 	///    for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
@@ -123,8 +112,6 @@ namespace Terminal.Gui {
 		View focused = null;
 		Direction focusDirection;
 		bool autoSize;
-
-		TextFormatter textFormatter;
 
 		ShortcutHelper shortcutHelper;
 
@@ -183,15 +170,30 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<Key> HotKeyChanged;
 
+		Key hotKey = Key.Null;
+
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
-		public Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
+		public virtual Key HotKey {
+			get => hotKey;
+			set {
+				if (hotKey != value) {
+					hotKey = TextFormatter.HotKey = (value == Key.Unknown ? Key.Null : value);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
-		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
+		public virtual Rune HotKeySpecifier {
+			get => TextFormatter.HotKeySpecifier;
+			set {
+				TextFormatter.HotKeySpecifier = value;
+				SetHotKey ();
+			}
+		}
 
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
@@ -235,9 +237,9 @@ namespace Terminal.Gui {
 		/// Points to the current driver in use by the view, it is a convenience property
 		/// for simplifying the development of new views.
 		/// </summary>
-		public static ConsoleDriver Driver { get { return Application.Driver; } }
+		public static ConsoleDriver Driver => Application.Driver;
 
-		static IList<View> empty = new List<View> (0).AsReadOnly ();
+		static readonly IList<View> empty = new List<View> (0).AsReadOnly ();
 
 		// This is null, and allocated on demand.
 		List<View> subviews;
@@ -246,7 +248,7 @@ namespace Terminal.Gui {
 		/// This returns a list of the subviews contained by this view.
 		/// </summary>
 		/// <value>The subviews.</value>
-		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
+		public IList<View> Subviews => subviews?.AsReadOnly () ?? empty;
 
 		// Internally, we use InternalSubviews rather than subviews, as we do not expect us
 		// to make the same mistakes our users make when they poke at the Subviews.
@@ -258,14 +260,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Configurable keybindings supported by the control
 		/// </summary>
-		private Dictionary<Key, Command> KeyBindings { get; set; } = new Dictionary<Key, Command> ();
+		private Dictionary<Key, Command []> KeyBindings { get; set; } = new Dictionary<Key, Command []> ();
 		private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 		/// <summary>
 		/// This returns a tab index list of the subviews contained by this view.
 		/// </summary>
 		/// <value>The tabIndexes.</value>
-		public IList<View> TabIndexes => tabIndexes == null ? empty : tabIndexes.AsReadOnly ();
+		public IList<View> TabIndexes => tabIndexes?.AsReadOnly () ?? empty;
 
 		int tabIndex = -1;
 
@@ -296,7 +298,7 @@ namespace Terminal.Gui {
 
 		int GetTabIndex (int idx)
 		{
-			int i = 0;
+			var i = 0;
 			foreach (var v in SuperView.tabIndexes) {
 				if (v.tabIndex == -1 || v == this) {
 					continue;
@@ -308,7 +310,7 @@ namespace Terminal.Gui {
 
 		void SetTabIndex ()
 		{
-			int i = 0;
+			var i = 0;
 			foreach (var v in SuperView.tabIndexes) {
 				if (v.tabIndex == -1) {
 					continue;
@@ -321,10 +323,11 @@ namespace Terminal.Gui {
 		bool tabStop = true;
 
 		/// <summary>
-		/// This only be <c>true</c> if the <see cref="CanFocus"/> is also <c>true</c> and the focus can be avoided by setting this to <c>false</c>
+		/// This only be <see langword="true"/> if the <see cref="CanFocus"/> is also <see langword="true"/> 
+		/// and the focus can be avoided by setting this to <see langword="false"/>
 		/// </summary>
 		public bool TabStop {
-			get { return tabStop; }
+			get => tabStop;
 			set {
 				if (tabStop == value) {
 					return;
@@ -345,12 +348,16 @@ namespace Terminal.Gui {
 				}
 				if (base.CanFocus != value) {
 					base.CanFocus = value;
-					if (!value && tabIndex > -1) {
+
+					switch (value) {
+					case false when tabIndex > -1:
 						TabIndex = -1;
+						break;
+					case true when SuperView?.CanFocus == false && addingView:
+						SuperView.CanFocus = true;
+						break;
 					}
-					if (value && SuperView?.CanFocus == false && addingView) {
-						SuperView.CanFocus = value;
-					}
+
 					if (value && tabIndex == -1) {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
@@ -362,7 +369,7 @@ namespace Terminal.Gui {
 					if (!value && HasFocus) {
 						SetHasFocus (false, this);
 						SuperView?.EnsureFocus ();
-						if (SuperView != null && SuperView?.Focused == null) {
+						if (SuperView != null && SuperView.Focused == null) {
 							SuperView.FocusNext ();
 							if (SuperView.Focused == null) {
 								Application.Current.FocusNext ();
@@ -376,7 +383,7 @@ namespace Terminal.Gui {
 								if (!value) {
 									view.oldCanFocus = view.CanFocus;
 									view.oldTabIndex = view.tabIndex;
-									view.CanFocus = value;
+									view.CanFocus = false;
 									view.tabIndex = -1;
 								} else {
 									if (addingView) {
@@ -410,22 +417,18 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns a value indicating if this View is currently on Top (Active)
 		/// </summary>
-		public bool IsCurrentTop {
-			get {
-				return Application.Current == this;
-			}
-		}
+		public bool IsCurrentTop => Application.Current == this;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="View"/> wants mouse position reports.
 		/// </summary>
-		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
-		public virtual bool WantMousePositionReports { get; set; } = false;
+		/// <value><see langword="true"/> if want mouse position reports; otherwise, <see langword="false"/>.</value>
+		public virtual bool WantMousePositionReports { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.
 		/// </summary>
-		public virtual bool WantContinuousButtonPressed { get; set; } = false;
+		public virtual bool WantContinuousButtonPressed { get; set; }
 
 		/// <summary>
 		/// Gets or sets the frame for the view. The frame is relative to the view's container (<see cref="SuperView"/>).
@@ -433,7 +436,7 @@ namespace Terminal.Gui {
 		/// <value>The frame.</value>
 		/// <remarks>
 		/// <para>
-		///    Change the Frame when using the <see cref="LayoutStyle.Absolute"/> layout style to move or resize views. 
+		///    Change the Frame when using the <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout style to move or resize views. 
 		/// </para>
 		/// <para>
 		///    Altering the Frame of a view will trigger the redrawing of the
@@ -447,8 +450,8 @@ namespace Terminal.Gui {
 					SuperView.SetNeedsDisplay (frame);
 					SuperView.SetNeedsDisplay (value);
 				}
-				frame = value;
-
+				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
 			}
@@ -467,8 +470,10 @@ namespace Terminal.Gui {
 		LayoutStyle layoutStyle;
 
 		/// <summary>
-		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to <see cref="LayoutStyle.Absolute"/>, 
-		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using
+		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to
+		/// <see cref="Terminal.Gui.LayoutStyle.Absolute"/>, 
+		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		/// the <see cref="Frame"/> is updated using
 		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
 		/// <value>The layout style.</value>
@@ -498,121 +503,171 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Rect Bounds {
 			get => new Rect (Point.Empty, Frame.Size);
-			set {
-				Frame = new Rect (frame.Location, value.Size);
-			}
+			set => Frame = new Rect (frame.Location, value.Size);
 		}
 
 		Pos x, y;
 
 		/// <summary>
-		/// Gets or sets the X position for the view (the column). Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The X Position.</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos X {
 			get => x;
 			set {
-				if (!ValidatePosDim (x, value)) {
+				if (ForceValidatePosDim && !ValidatePosDim (x, value)) {
 					throw new ArgumentException ();
 				}
 
 				x = value;
-				SetNeedsLayout ();
-				if (x is Pos.PosAbsolute) {
-					frame = new Rect (x.Anchor (0), frame.Y, frame.Width, frame.Height);
-				}
-				textFormatter.Size = frame.Size;
-				SetNeedsDisplay (frame);
+
+				ProcessResizeView ();
 			}
 		}
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (the row). Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The y position (line).</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos Y {
 			get => y;
 			set {
-				if (!ValidatePosDim (y, value)) {
+				if (ForceValidatePosDim && !ValidatePosDim (y, value)) {
 					throw new ArgumentException ();
 				}
 
 				y = value;
-				SetNeedsLayout ();
-				if (y is Pos.PosAbsolute) {
-					frame = new Rect (frame.X, y.Anchor (0), frame.Width, frame.Height);
-				}
-				textFormatter.Size = frame.Size;
-				SetNeedsDisplay (frame);
+
+				ProcessResizeView ();
 			}
 		}
-
 		Dim width, height;
 
 		/// <summary>
-		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The width.</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Dim Width {
 			get => width;
 			set {
-				if (!ValidatePosDim (width, value)) {
-					throw new ArgumentException ();
+				if (ForceValidatePosDim && !ValidatePosDim (width, value)) {
+					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Width));
 				}
 
 				width = value;
-				SetNeedsLayout ();
-				if (width is Dim.DimAbsolute) {
-					frame = new Rect (frame.X, frame.Y, width.Anchor (0), frame.Height);
+
+				if (ForceValidatePosDim) {
+					var isValidNewAutSize = autoSize && IsValidAutoSizeWidth (width);
+
+					if (IsAdded && autoSize && !isValidNewAutSize) {
+						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
+					}
 				}
-				textFormatter.Size = frame.Size;
-				SetNeedsDisplay (frame);
+				ProcessResizeView ();
 			}
 		}
 
 		/// <summary>
-		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The height.</value>
-		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
 			get => height;
 			set {
-				if (!ValidatePosDim (height, value)) {
-					throw new ArgumentException ();
+				if (ForceValidatePosDim && !ValidatePosDim (height, value)) {
+					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Height));
 				}
 
 				height = value;
-				SetNeedsLayout ();
-				if (height is Dim.DimAbsolute) {
-					frame = new Rect (frame.X, frame.Y, frame.Width, height.Anchor (0));
+
+				if (ForceValidatePosDim) {
+					var isValidNewAutSize = autoSize && IsValidAutoSizeHeight (height);
+
+					if (IsAdded && autoSize && !isValidNewAutSize) {
+						throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
+					}
 				}
-				textFormatter.Size = frame.Size;
-				SetNeedsDisplay (frame);
+				ProcessResizeView ();
 			}
 		}
 
-		bool ValidatePosDim (object oldvalue, object newValue)
+		/// <summary>
+		/// Forces validation with <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout
+		///  to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// </summary>
+		public bool ForceValidatePosDim { get; set; }
+
+		bool ValidatePosDim (object oldValue, object newValue)
 		{
-			if (!IsInitialized || layoutStyle == LayoutStyle.Absolute || oldvalue == null || oldvalue.GetType () == newValue.GetType () || this is Toplevel) {
+			if (!IsInitialized || layoutStyle == LayoutStyle.Absolute || oldValue == null || oldValue.GetType () == newValue.GetType () || this is Toplevel) {
 				return true;
 			}
 			if (layoutStyle == LayoutStyle.Computed) {
-				if (oldvalue.GetType () != newValue.GetType () && !(newValue is Pos.PosAbsolute || newValue is Dim.DimAbsolute)) {
+				if (oldValue.GetType () != newValue.GetType () && !(newValue is Pos.PosAbsolute || newValue is Dim.DimAbsolute)) {
 					return true;
 				}
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Verifies if the minimum width or height can be sets in the view.
+		/// </summary>
+		/// <param name="size">The size.</param>
+		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
+		public bool GetMinWidthHeight (out Size size)
+		{
+			size = Size.Empty;
+
+			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+				case true:
+					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
+					if (frame.Width < colWidth && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute
+						&& Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth))) {
+						size = new Size (colWidth, Bounds.Height);
+						return true;
+					}
+					break;
+				default:
+					if (frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0))) {
+						size = new Size (Bounds.Width, 1);
+						return true;
+					}
+					break;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Sets the minimum width or height if the view can be resized.
+		/// </summary>
+		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
+		public bool SetMinWidthHeight ()
+		{
+			if (GetMinWidthHeight (out Size size)) {
+				Bounds = new Rect (Bounds.Location, size);
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
+		/// </summary>
+		public TextFormatter TextFormatter { get; set; }
 
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
@@ -621,13 +676,13 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of a <see cref="LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
-		/// dimensions specified in the <c>frame</c> parameter. 
+		/// Initializes a new instance of a <see cref="Terminal.Gui.LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
+		/// dimensions specified in the <see langword="frame"/> parameter. 
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		/// <remarks>
-		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use <see cref="View()"/> to 
-		/// initialize a View with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
+		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Absolute"/>.
+		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/> 
 		/// </remarks>
 		public View (Rect frame)
 		{
@@ -635,50 +690,50 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
-		///   The <see cref="Label"/> will be created using <see cref="LayoutStyle.Computed"/>
-		///   coordinates. The initial size (<see cref="View.Frame"/> will be 
+		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		///   coordinates. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		///   If <see cref="Height"/> is greater than one, word wrapping is provided.
 		/// </para>
 		/// <para>
-		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/>. 
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
 		/// </para>
 		/// </remarks>
 		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom) { }
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
 		///   The <see cref="View"/> will be created at the given
-		///   coordinates with the given string. The size (<see cref="View.Frame"/> will be 
+		///   coordinates with the given string. The size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
 		///   No line wrapping is provided.
 		/// </para>
 		/// </remarks>
-		/// <param name="x">column to locate the Label.</param>
-		/// <param name="y">row to locate the Label.</param>
+		/// <param name="x">column to locate the View.</param>
+		/// <param name="y">row to locate the View.</param>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (int x, int y, ustring text) : this (TextFormatter.CalcRect (x, y, text), text) { }
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
 		///   The <see cref="View"/> will be created at the given
-		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
@@ -694,16 +749,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		///   The <see cref="View"/> will be created using <see cref="LayoutStyle.Computed"/>
-		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		///   If <see cref="Height"/> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
@@ -715,10 +770,10 @@ namespace Terminal.Gui {
 		}
 
 		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
-			TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
+		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-			textFormatter = new TextFormatter ();
-			textFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
+			TextFormatter = new TextFormatter ();
+			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
 			if (Border != null) {
@@ -730,23 +785,50 @@ namespace Terminal.Gui {
 			TabStop = false;
 			LayoutStyle = layoutStyle;
 			// BUGBUG: CalcRect doesn't account for line wrapping
-			Rect r;
-			if (rect.IsEmpty) {
-				r = TextFormatter.CalcRect (0, 0, text, direction);
-			} else {
-				r = rect;
-			}
-			x = Pos.At (r.X);
-			y = Pos.At (r.Y);
-			Width = r.Width;
-			Height = r.Height;
 
+			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			Frame = r;
 
 			Text = text;
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 		}
 
-		private void TextFormatter_HotKeyChanged (Key obj)
+		/// <summary>
+		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
+		///  different format than the default.
+		/// </summary>
+		protected virtual void UpdateTextFormatterText ()
+		{
+			TextFormatter.Text = text;
+		}
+
+		/// <summary>
+		/// Can be overridden if the view resize behavior is
+		///  different than the default.
+		/// </summary>
+		protected virtual void ProcessResizeView ()
+		{
+			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
+			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
+
+			if (AutoSize) {
+				var s = GetAutoSize ();
+				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
+				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
+				frame = new Rect (new Point (actX, actY), new Size (w, h));
+			} else {
+				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
+				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
+				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				SetMinWidthHeight ();
+			}
+			TextFormatter.Size = GetBoundsTextFormatterSize ();
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
+		}
+
+		void TextFormatter_HotKeyChanged (Key obj)
 		{
 			HotKeyChanged?.Invoke (obj);
 		}
@@ -772,7 +854,7 @@ namespace Terminal.Gui {
 			foreach (var view in Subviews) {
 				view.SetNeedsLayout ();
 			}
-			textFormatter.NeedsFormat = true;
+			TextFormatter.NeedsFormat = true;
 		}
 
 		/// <summary>
@@ -798,10 +880,11 @@ namespace Terminal.Gui {
 				var h = Math.Max (NeedDisplay.Height, region.Height);
 				NeedDisplay = new Rect (x, y, w, h);
 			}
-			if (container != null)
-				container.SetChildNeedsDisplay ();
+			container?.SetChildNeedsDisplay ();
+
 			if (subviews == null)
 				return;
+
 			foreach (var view in subviews)
 				if (view.Frame.IntersectsWith (region)) {
 					var childRegion = Rect.Intersect (view.Frame, region);
@@ -823,13 +906,14 @@ namespace Terminal.Gui {
 				container.SetChildNeedsDisplay ();
 		}
 
-		internal bool addingView = false;
+		internal bool addingView;
 
 		/// <summary>
 		///   Adds a subview (child) to this view.
 		/// </summary>
 		/// <remarks>
-		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. 
+		/// See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
 		/// </remarks>
 		public virtual void Add (View view)
 		{
@@ -869,7 +953,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="views">Array of one or more views (can be optional parameter).</param>
 		/// <remarks>
-		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. 
+		/// See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
 		/// </remarks>
 		public void Add (params View [] views)
 		{
@@ -1010,9 +1095,9 @@ namespace Terminal.Gui {
 		{
 			var h = Frame.Height;
 			var w = Frame.Width;
-			for (int line = 0; line < h; line++) {
+			for (var line = 0; line < h; line++) {
 				Move (0, line);
-				for (int col = 0; col < w; col++)
+				for (var col = 0; col < w; col++)
 					Driver.AddRune (' ');
 			}
 		}
@@ -1027,9 +1112,9 @@ namespace Terminal.Gui {
 		{
 			var h = regionScreen.Height;
 			var w = regionScreen.Width;
-			for (int line = regionScreen.Y; line < regionScreen.Y + h; line++) {
+			for (var line = regionScreen.Y; line < regionScreen.Y + h; line++) {
 				Driver.Move (regionScreen.X, line);
-				for (int col = 0; col < w; col++)
+				for (var col = 0; col < w; col++)
 					Driver.AddRune (' ');
 			}
 		}
@@ -1041,17 +1126,18 @@ namespace Terminal.Gui {
 		/// <param name="row">View-relative row.</param>
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <c>true</c>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
 			rcol = col + frame.X;
-			var ccontainer = container;
-			while (ccontainer != null) {
-				rrow += ccontainer.frame.Y;
-				rcol += ccontainer.frame.X;
-				ccontainer = ccontainer.container;
+
+			var curContainer = container;
+			while (curContainer != null) {
+				rrow += curContainer.frame.Y;
+				rcol += curContainer.frame.X;
+				curContainer = curContainer.container;
 			}
 
 			// The following ensures that the cursor is always in the screen boundaries.
@@ -1126,7 +1212,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
-		/// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
+		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1163,7 +1249,7 @@ namespace Terminal.Gui {
 		/// Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused" state.
 		/// </summary>
 		/// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
-		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
+		/// <param name="focused">If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
 		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
 		{
@@ -1179,14 +1265,16 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
-		public void Move (int col, int row)
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
+		///  if set to <see langword="true"/>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		public void Move (int col, int row, bool clipped = true)
 		{
 			if (Driver.Rows == 0) {
 				return;
 			}
 
-			ViewToScreen (col, row, out var rcol, out var rrow);
-			Driver.Move (rcol, rrow);
+			ViewToScreen (col, row, out var rCol, out var rRow, clipped);
+			Driver.Move (rCol, rRow);
 		}
 
 		/// <summary>
@@ -1207,7 +1295,7 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			} else {
 				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
-					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.CursorPosition, 0);
+					Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
 				} else {
 					Move (frame.X, frame.Y);
 				}
@@ -1215,12 +1303,9 @@ namespace Terminal.Gui {
 		}
 
 		bool hasFocus;
+
 		/// <inheritdoc/>
-		public override bool HasFocus {
-			get {
-				return hasFocus;
-			}
-		}
+		public override bool HasFocus => hasFocus;
 
 		void SetHasFocus (bool value, View view, bool force = false)
 		{
@@ -1263,11 +1348,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method invoked  when a subview is being added to this view.
+		/// Method invoked when a subview is being added to this view.
 		/// </summary>
 		/// <param name="view">The subview being added.</param>
 		public virtual void OnAdded (View view)
 		{
+			view.IsAdded = true;
+			view.x = view.x ?? view.frame.X;
+			view.y = view.y ?? view.frame.Y;
+			view.width = view.width ?? view.frame.Width;
+			view.height = view.height ?? view.frame.Height;
+
 			view.Added?.Invoke (this);
 		}
 
@@ -1277,13 +1368,14 @@ namespace Terminal.Gui {
 		/// <param name="view">The subview being removed.</param>
 		public virtual void OnRemoved (View view)
 		{
+			view.IsAdded = false;
 			view.Removed?.Invoke (this);
 		}
 
 		/// <inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			FocusEventArgs args = new FocusEventArgs (view);
+			var args = new FocusEventArgs (view);
 			Enter?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1296,7 +1388,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnLeave (View view)
 		{
-			FocusEventArgs args = new FocusEventArgs (view);
+			var args = new FocusEventArgs (view);
 			Leave?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1315,7 +1407,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns the most focused view in the chain of subviews (the leaf view that has the focus).
 		/// </summary>
-		/// <value>The most focused.</value>
+		/// <value>The most focused View.</value>
 		public View MostFocused {
 			get {
 				if (Focused == null)
@@ -1386,7 +1478,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>
 		///    Overrides of <see cref="Redraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
-		///    larger than the <c>region</c> parameter.
+		///    larger than the <ref name="bounds"/> parameter, as this will cause the driver to clip the entire region.
 		/// </para>
 		/// </remarks>
 		public virtual void Redraw (Rect bounds)
@@ -1397,23 +1489,35 @@ namespace Terminal.Gui {
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			//if (ColorScheme != null && !(this is Toplevel)) {
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
 			if (Border != null) {
 				Border.DrawContent (this);
+			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
+				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
+
+				Clear ();
+				SetChildNeedsDisplay ();
 			}
 
-			if (!ustring.IsNullOrEmpty (Text) || (this is Label && !AutoSize)) {
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear ();
+				SetChildNeedsDisplay ();
 				// Draw any Text
-				if (textFormatter != null) {
-					textFormatter.NeedsFormat = true;
+				if (TextFormatter != null) {
+					TextFormatter.NeedsFormat = true;
 				}
-				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-					HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
+				var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+				containerBounds.X = Math.Max (containerBounds.X, Driver.Clip.X);
+				containerBounds.Y = Math.Max (containerBounds.Y, Driver.Clip.Y);
+				containerBounds.Width = Math.Min (containerBounds.Width, Driver.Clip.Width);
+				containerBounds.Height = Math.Min (containerBounds.Height, Driver.Clip.Height);
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+				    containerBounds);
 			}
 
 			// Invoke DrawContentEvent
@@ -1437,6 +1541,7 @@ namespace Terminal.Gui {
 								};
 								view.OnDrawContent (rect);
 								view.Redraw (rect);
+								view.OnDrawContentComplete (rect);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -1583,7 +1688,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1592,10 +1697,8 @@ namespace Terminal.Gui {
 				if (args.Handled)
 					return true;
 			}
-			if (Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true)
-				return true;
 
-			return false;
+			return Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true;
 		}
 
 		/// <summary>
@@ -1605,17 +1708,32 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">The key event passed.</param>
 		protected bool? InvokeKeybindings (KeyEvent keyEvent)
 		{
+			bool? toReturn = null;
+
 			if (KeyBindings.ContainsKey (keyEvent.Key)) {
-				var command = KeyBindings [keyEvent.Key];
 
-				if (!CommandImplementations.ContainsKey (command)) {
-					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+				foreach (var command in KeyBindings [keyEvent.Key]) {
+
+					if (!CommandImplementations.ContainsKey (command)) {
+						throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+					}
+
+					// each command has its own return value
+					var thisReturn = CommandImplementations [command] ();
+
+					// if we haven't got anything yet, the current command result should be used
+					if (toReturn == null) {
+						toReturn = thisReturn;
+					}
+
+					// if ever see a true then that's what we will return
+					if (thisReturn ?? false) {
+						toReturn = true;
+					}
 				}
-
-				return CommandImplementations [command] ();
 			}
 
-			return null;
+			return toReturn;
 		}
 
 
@@ -1625,11 +1743,19 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>If the key is already bound to a different <see cref="Command"/> it will be
 		/// rebound to this one</para>
+		/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
+		/// cannot be used to switch focus to another view and perform multiple commands there) </remarks>
 		/// </summary>
 		/// <param name="key"></param>
-		/// <param name="command"></param>
-		public void AddKeyBinding (Key key, Command command)
+		/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
+		/// When specifying multiple commands, all commands will be applied in sequence. The bound <paramref name="key"/> strike
+		/// will be consumed if any took effect.</param>
+		public void AddKeyBinding (Key key, params Command [] command)
 		{
+			if (command.Length == 0) {
+				throw new ArgumentException ("At least one command must be specified", nameof (command));
+			}
+
 			if (KeyBindings.ContainsKey (key)) {
 				KeyBindings [key] = command;
 			} else {
@@ -1645,25 +1771,24 @@ namespace Terminal.Gui {
 		protected void ReplaceKeyBinding (Key fromKey, Key toKey)
 		{
 			if (KeyBindings.ContainsKey (fromKey)) {
-				Command value = KeyBindings [fromKey];
+				var value = KeyBindings [fromKey];
 				KeyBindings.Remove (fromKey);
 				KeyBindings [toKey] = value;
 			}
 		}
 
 		/// <summary>
-		/// Checks if key combination already exist.
+		/// Checks if the key binding already exists.
 		/// </summary>
 		/// <param name="key">The key to check.</param>
-		/// <returns><c>true</c> If the key already exist, <c>false</c>otherwise.</returns>
+		/// <returns><see langword="true"/> If the key already exist, <see langword="false"/> otherwise.</returns>
 		public bool ContainsKeyBinding (Key key)
 		{
 			return KeyBindings.ContainsKey (key);
 		}
 
 		/// <summary>
-		/// Removes all bound keys from the View making including the default
-		/// key combinations such as cursor navigation, scrolling etc
+		/// Removes all bound keys from the View and resets the default bindings.
 		/// </summary>
 		public void ClearKeybindings ()
 		{
@@ -1671,7 +1796,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>
+		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>.
 		/// </summary>
 		/// <param name="key"></param>
 		public void ClearKeybinding (Key key)
@@ -1680,16 +1805,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes all key bindings that trigger the given command.  Views can have multiple different
+		/// Removes all key bindings that trigger the given command. Views can have multiple different
 		/// keys bound to the same command and this method will clear all of them.
 		/// </summary>
 		/// <param name="command"></param>
-		public void ClearKeybinding (Command command)
+		public void ClearKeybinding (params Command [] command)
 		{
-			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value == command).ToArray ()) {
+			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);
 			}
-
 		}
 
 		/// <summary>
@@ -1714,12 +1838,22 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns all commands that are supported by this <see cref="View"/>
+		/// Returns all commands that are supported by this <see cref="View"/>.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<Command> GetSupportedCommands ()
 		{
 			return CommandImplementations.Keys;
+		}
+
+		/// <summary>
+		/// Gets the key used by a command.
+		/// </summary>
+		/// <param name="command">The command to search.</param>
+		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
+		public Key GetKeyFromCommand (params Command [] command)
+		{
+			return KeyBindings.First (kb => kb.Value.SequenceEqual (command)).Key;
 		}
 
 		/// <inheritdoc/>
@@ -1729,7 +1863,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventEventArgs (keyEvent);
 			if (MostFocused?.Enabled == true) {
 				MostFocused?.KeyPress?.Invoke (args);
 				if (args.Handled)
@@ -1739,6 +1873,7 @@ namespace Terminal.Gui {
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
+
 			foreach (var view in subviews)
 				if (view.Enabled && view.ProcessHotKey (keyEvent))
 					return true;
@@ -1752,7 +1887,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1765,6 +1900,7 @@ namespace Terminal.Gui {
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
+
 			foreach (var view in subviews)
 				if (view.Enabled && view.ProcessColdKey (keyEvent))
 					return true;
@@ -1772,7 +1908,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a key is pressed
+		/// Invoked when a key is pressed.
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyDown;
 
@@ -1783,20 +1919,26 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventEventArgs (keyEvent);
 			KeyDown?.Invoke (args);
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.Enabled == true && Focused?.OnKeyDown (keyEvent) == true) {
-				return true;
+			if (Focused?.Enabled == true) {
+				Focused.KeyDown?.Invoke (args);
+				if (args.Handled) {
+					return true;
+				}
+				if (Focused?.OnKeyDown (keyEvent) == true) {
+					return true;
+				}
 			}
 
 			return false;
 		}
 
 		/// <summary>
-		/// Invoked when a key is released
+		/// Invoked when a key is released.
 		/// </summary>
 		public event Action<KeyEventEventArgs> KeyUp;
 
@@ -1807,20 +1949,26 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventEventArgs (keyEvent);
 			KeyUp?.Invoke (args);
 			if (args.Handled) {
 				return true;
 			}
-			if (Focused?.Enabled == true && Focused?.OnKeyUp (keyEvent) == true) {
-				return true;
+			if (Focused?.Enabled == true) {
+				Focused.KeyUp?.Invoke (args);
+				if (args.Handled) {
+					return true;
+				}
+				if (Focused?.OnKeyUp (keyEvent) == true) {
+					return true;
+				}
 			}
 
 			return false;
 		}
 
 		/// <summary>
-		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
+		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, does nothing.
 		/// </summary>
 		public void EnsureFocus ()
 		{
@@ -1869,10 +2017,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			for (int i = tabIndexes.Count; i > 0;) {
+			for (var i = tabIndexes.Count; i > 0;) {
 				i--;
 
-				View v = tabIndexes [i];
+				var v = tabIndexes [i];
 				if (v.CanFocus && v.tabStop && v.Visible && v.Enabled) {
 					SetFocus (v);
 					return;
@@ -1883,7 +2031,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Focuses the previous view.
 		/// </summary>
-		/// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if previous was focused, <see langword="false"/> otherwise.</returns>
 		public bool FocusPrev ()
 		{
 			if (!CanBeVisible (this)) {
@@ -1898,21 +2046,22 @@ namespace Terminal.Gui {
 				FocusLast ();
 				return focused != null;
 			}
-			int focused_idx = -1;
-			for (int i = tabIndexes.Count; i > 0;) {
+
+			var focusedIdx = -1;
+			for (var i = tabIndexes.Count; i > 0;) {
 				i--;
-				View w = tabIndexes [i];
+				var w = tabIndexes [i];
 
 				if (w.HasFocus) {
 					if (w.FocusPrev ())
 						return true;
-					focused_idx = i;
+					focusedIdx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible && w.Enabled) {
+				if (w.CanFocus && focusedIdx != -1 && w.tabStop && w.Visible && w.Enabled) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop && w.Visible && w.Enabled)
+					if (w.CanFocus && w.tabStop && w.Visible && w.Enabled)
 						w.FocusLast ();
 
 					SetFocus (w);
@@ -1929,7 +2078,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Focuses the next view.
 		/// </summary>
-		/// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
 		public bool FocusNext ()
 		{
 			if (!CanBeVisible (this)) {
@@ -1944,21 +2093,21 @@ namespace Terminal.Gui {
 				FocusFirst ();
 				return focused != null;
 			}
-			int n = tabIndexes.Count;
-			int focused_idx = -1;
-			for (int i = 0; i < n; i++) {
-				View w = tabIndexes [i];
+			var n = tabIndexes.Count;
+			var focusedIdx = -1;
+			for (var i = 0; i < n; i++) {
+				var w = tabIndexes [i];
 
 				if (w.HasFocus) {
 					if (w.FocusNext ())
 						return true;
-					focused_idx = i;
+					focusedIdx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible && w.Enabled) {
+				if (w.CanFocus && focusedIdx != -1 && w.tabStop && w.Visible && w.Enabled) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop && w.Visible && w.Enabled)
+					if (w.CanFocus && w.tabStop && w.Visible && w.Enabled)
 						w.FocusFirst ();
 
 					SetFocus (w);
@@ -1975,14 +2124,10 @@ namespace Terminal.Gui {
 		View GetMostFocused (View view)
 		{
 			if (view == null) {
-				return view;
+				return null;
 			}
 
-			if (view.focused != null) {
-				return GetMostFocused (view.focused);
-			} else {
-				return view;
-			}
+			return view.focused != null ? GetMostFocused (view.focused) : view;
 		}
 
 		/// <summary>
@@ -1994,63 +2139,121 @@ namespace Terminal.Gui {
 		/// </remarks>
 		internal void SetRelativeLayout (Rect hostFrame)
 		{
-			int w, h, _x, _y;
+			int actW, actH, actX, actY;
+			var s = Size.Empty;
+
+			if (AutoSize) {
+				s = GetAutoSize ();
+			}
 
 			if (x is Pos.PosCenter) {
-				if (width == null)
-					w = hostFrame.Width;
-				else
-					w = width.Anchor (hostFrame.Width);
-				_x = x.Anchor (hostFrame.Width - w);
+				if (width == null) {
+					actW = AutoSize ? s.Width : hostFrame.Width;
+				} else {
+					actW = width.Anchor (hostFrame.Width);
+					actW = AutoSize && s.Width > actW ? s.Width : actW;
+				}
+				actX = x.Anchor (hostFrame.Width - actW);
 			} else {
-				if (x == null)
-					_x = 0;
-				else
-					_x = x.Anchor (hostFrame.Width);
-				if (width == null)
-					w = hostFrame.Width;
-				else if (width is Dim.DimFactor && !((Dim.DimFactor)width).IsFromRemaining ())
-					w = width.Anchor (hostFrame.Width);
-				else
-					w = Math.Max (width.Anchor (hostFrame.Width - _x), 0);
+				actX = x?.Anchor (hostFrame.Width) ?? 0;
+
+				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
 			}
 
 			if (y is Pos.PosCenter) {
-				if (height == null)
-					h = hostFrame.Height;
-				else
-					h = height.Anchor (hostFrame.Height);
-				_y = y.Anchor (hostFrame.Height - h);
+				if (height == null) {
+					actH = AutoSize ? s.Height : hostFrame.Height;
+				} else {
+					actH = height.Anchor (hostFrame.Height);
+					actH = AutoSize && s.Height > actH ? s.Height : actH;
+				}
+				actY = y.Anchor (hostFrame.Height - actH);
 			} else {
-				if (y == null)
-					_y = 0;
-				else
-					_y = y.Anchor (hostFrame.Height);
-				if (height == null)
-					h = hostFrame.Height;
-				else if (height is Dim.DimFactor && !((Dim.DimFactor)height).IsFromRemaining ())
-					h = height.Anchor (hostFrame.Height);
-				else
-					h = Math.Max (height.Anchor (hostFrame.Height - _y), 0);
+				actY = y?.Anchor (hostFrame.Height) ?? 0;
+
+				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
 			}
-			var r = new Rect (_x, _y, w, h);
+
+			var r = new Rect (actX, actY, actW, actH);
 			if (Frame != r) {
-				Frame = new Rect (_x, _y, w, h);
+				Frame = r;
+				if (!SetMinWidthHeight ())
+					TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
 		}
 
+		private int CalculateActualWidth (Dim width, Rect hostFrame, int actX, Size s)
+		{
+			int actW;
+			switch (width) {
+			case null:
+				actW = AutoSize ? s.Width : hostFrame.Width;
+				break;
+			case Dim.DimCombine combine:
+				int leftActW = CalculateActualWidth (combine.left, hostFrame, actX, s);
+				int rightActW = CalculateActualWidth (combine.right, hostFrame, actX, s);
+				if (combine.add) {
+					actW = leftActW + rightActW;
+				} else {
+					actW = leftActW - rightActW;
+				}
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actW = width.Anchor (hostFrame.Width);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			default:
+				actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
+				actW = AutoSize && s.Width > actW ? s.Width : actW;
+				break;
+			}
+
+			return actW;
+		}
+
+		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
+		{
+			int actH;
+			switch (height) {
+			case null:
+				actH = AutoSize ? s.Height : hostFrame.Height;
+				break;
+			case Dim.DimCombine combine:
+				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
+				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
+				if (combine.add) {
+					actH = leftActH + rightActH;
+				} else {
+					actH = leftActH - rightActH;
+				}
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			case Dim.DimFactor factor when !factor.IsFromRemaining ():
+				actH = height.Anchor (hostFrame.Height);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			default:
+				actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
+				actH = AutoSize && s.Height > actH ? s.Height : actH;
+				break;
+			}
+
+			return actH;
+		}
+
 		// https://en.wikipedia.org/wiki/Topological_sorting
-		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View From, View To)> edges)
+		List<View> TopologicalSort (IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
 		{
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
+			var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
 
-			while (S.Any ()) {
+			while (noEdgeNodes.Any ()) {
 				//  remove a node n from S
-				var n = S.First ();
-				S.Remove (n);
+				var n = noEdgeNodes.First ();
+				noEdgeNodes.Remove (n);
 
 				// add n to tail of L
 				if (n != this?.SuperView)
@@ -2066,13 +2269,13 @@ namespace Terminal.Gui {
 					// if m has no other incoming edges then
 					if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
 						// insert m into S
-						S.Add (m);
+						noEdgeNodes.Add (m);
 					}
 				}
 			}
 
 			if (edges.Any ()) {
-				var (from, to) = edges.First ();
+				(var from, var to) = edges.First ();
 				if (from != Application.Top) {
 					if (!ReferenceEquals (from, to)) {
 						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
@@ -2097,7 +2300,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// Fired after the View's <see cref="LayoutSubviews"/> method has completed. 
 		/// </summary>
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
@@ -2113,7 +2316,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// Fired after the View's <see cref="LayoutSubviews"/> method has completed. 
 		/// </summary>
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
@@ -2148,10 +2351,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Rect oldBounds = Bounds;
+			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			textFormatter.Size = Bounds.Size;
+			TextFormatter.Size = GetBoundsTextFormatterSize ();
 
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -2160,7 +2363,8 @@ namespace Terminal.Gui {
 
 			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
-				if (pos is Pos.PosView pv) {
+				switch (pos) {
+				case Pos.PosView pv:
 					if (pv.Target != this) {
 						nEdges.Add ((pv.Target, from));
 					}
@@ -2168,18 +2372,19 @@ namespace Terminal.Gui {
 						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
-				}
-				if (pos is Pos.PosCombine pc) {
+				case Pos.PosCombine pc:
 					foreach (var v in from.InternalSubviews) {
 						CollectPos (pc.left, from, ref nNodes, ref nEdges);
 						CollectPos (pc.right, from, ref nNodes, ref nEdges);
 					}
+					break;
 				}
 			}
 
 			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
-				if (dim is Dim.DimView dv) {
+				switch (dim) {
+				case Dim.DimView dv:
 					if (dv.Target != this) {
 						nEdges.Add ((dv.Target, from));
 					}
@@ -2187,12 +2392,12 @@ namespace Terminal.Gui {
 						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
-				}
-				if (dim is Dim.DimCombine dc) {
+				case Dim.DimCombine dc:
 					foreach (var v in from.InternalSubviews) {
 						CollectDim (dc.left, from, ref nNodes, ref nEdges);
 						CollectDim (dc.right, from, ref nNodes, ref nEdges);
 					}
+					break;
 				}
 			}
 
@@ -2224,7 +2429,7 @@ namespace Terminal.Gui {
 			}
 
 			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
-				&& ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+			    && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
 				SetRelativeLayout (SuperView.Frame);
 			}
 
@@ -2232,6 +2437,8 @@ namespace Terminal.Gui {
 
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
+
+		ustring text;
 
 		/// <summary>
 		///   The text displayed by the <see cref="View"/>.
@@ -2252,38 +2459,50 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual ustring Text {
-			get => textFormatter.Text;
+			get => text;
 			set {
-				textFormatter.Text = value;
-				var prevSize = frame.Size;
-				var canResize = ResizeView (autoSize);
-				if (canResize && textFormatter.Size != Bounds.Size) {
-					Bounds = new Rect (new Point (Bounds.X, Bounds.Y), textFormatter.Size);
-				} else if (!canResize && textFormatter.Size != Bounds.Size) {
-					textFormatter.Size = Bounds.Size;
-				}
-				SetNeedsLayout ();
-				SetNeedsDisplay (new Rect (new Point (0, 0),
-					new Size (Math.Max (frame.Width, prevSize.Width), Math.Max (frame.Height, prevSize.Height))));
+				text = value;
+				SetHotKey ();
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
 		/// <summary>
-		/// Used by <see cref="Text"/> to resize the view's <see cref="Bounds"/> with the <see cref="TextFormatter.Size"/>.
-		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="Width"/> and <see cref="Height"/> are null or
-		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
-		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>.
+		/// The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If <see cref="AutoSize"/> is <see langword="true"/> the <see cref="Width"/>
+		/// and <see cref="Height"/> will always be used if the text size is lower. If the text size is higher the bounds will
+		/// be resized to fit it.
+		/// In addition, if <see cref="ForceValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
+		/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
 		/// </summary>
 		public virtual bool AutoSize {
 			get => autoSize;
 			set {
 				var v = ResizeView (value);
-				textFormatter.AutoSize = v;
+				TextFormatter.AutoSize = v;
 				if (autoSize != v) {
 					autoSize = v;
-					textFormatter.NeedsFormat = true;
-					SetNeedsLayout ();
-					SetNeedsDisplay ();
+					TextFormatter.NeedsFormat = true;
+					UpdateTextFormatterText ();
+					ProcessResizeView ();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a flag that determines whether <see cref="Terminal.Gui.TextFormatter.Text"/> will have trailing spaces preserved
+		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> 
+		/// any trailing spaces will be trimmed when either the <see cref="Text"/> property is changed or 
+		/// when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is set to <see langword="true"/>.
+		/// The default is <see langword="false"/>.
+		/// </summary>
+		public virtual bool PreserveTrailingSpaces {
+			get => TextFormatter.PreserveTrailingSpaces;
+			set {
+				if (TextFormatter.PreserveTrailingSpaces != value) {
+					TextFormatter.PreserveTrailingSpaces = value;
+					TextFormatter.NeedsFormat = true;
 				}
 			}
 		}
@@ -2293,21 +2512,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextAlignment TextAlignment {
-			get => textFormatter.Alignment;
+			get => TextFormatter.Alignment;
 			set {
-				textFormatter.Alignment = value;
-				SetNeedsDisplay ();
+				TextFormatter.Alignment = value;
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 
 		/// <summary>
-		/// Gets or sets how the View's <see cref="Text"/> is aligned verticaly when drawn. Changing this property will redisplay the <see cref="View"/>.
+		/// Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will redisplay the <see cref="View"/>.
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual VerticalTextAlignment VerticalTextAlignment {
-			get => textFormatter.VerticalAlignment;
+			get => TextFormatter.VerticalAlignment;
 			set {
-				textFormatter.VerticalAlignment = value;
+				TextFormatter.VerticalAlignment = value;
 				SetNeedsDisplay ();
 			}
 		}
@@ -2317,17 +2537,26 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextDirection TextDirection {
-			get => textFormatter.Direction;
+			get => TextFormatter.Direction;
 			set {
-				if (textFormatter.Direction != value) {
-					textFormatter.Direction = value;
-					if (IsInitialized && AutoSize) {
-						ResizeView (true);
-					} else if (IsInitialized) {
-						var b = new Rect (Bounds.X, Bounds.Y, Bounds.Height, Bounds.Width);
-						SetWidthHeight (b);
+				if (TextFormatter.Direction != value) {
+					var isValidOldAutSize = autoSize && IsValidAutoSize (out var _);
+					var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
+					    != TextFormatter.IsHorizontalDirection (value);
+
+					TextFormatter.Direction = value;
+					UpdateTextFormatterText ();
+
+					if ((!ForceValidatePosDim && directionChanged && AutoSize)
+					    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutSize)) {
+						ProcessResizeView ();
+					} else if (directionChanged && IsAdded) {
+						SetWidthHeight (Bounds.Size);
+						SetMinWidthHeight ();
+					} else {
+						SetMinWidthHeight ();
 					}
-					textFormatter.Size = Bounds.Size;
+					TextFormatter.Size = GetBoundsTextFormatterSize ();
 					SetNeedsDisplay ();
 				}
 			}
@@ -2338,6 +2567,11 @@ namespace Terminal.Gui {
 		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
 		/// </summary>
 		public virtual bool IsInitialized { get; set; }
+
+		/// <summary>
+		/// Gets information if the view was already added to the <see cref="SuperView"/>.
+		/// </summary>
+		public bool IsAdded { get; private set; }
 
 		bool oldEnabled;
 
@@ -2357,7 +2591,7 @@ namespace Terminal.Gui {
 						foreach (var view in subviews) {
 							if (!value) {
 								view.oldEnabled = view.Enabled;
-								view.Enabled = value;
+								view.Enabled = false;
 							} else {
 								view.Enabled = view.oldEnabled;
 								view.addingView = false;
@@ -2368,14 +2602,24 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.
+		/// </summary>
+		public bool ClearOnVisibleFalse { get; set; } = true;
+
 		/// <inheritdoc/>>
 		public override bool Visible {
 			get => base.Visible;
 			set {
 				if (base.Visible != value) {
 					base.Visible = value;
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
+					if (!value) {
+						if (HasFocus) {
+							SetHasFocus (false, this);
+						}
+						if (ClearOnVisibleFalse) {
+							Clear ();
+						}
 					}
 					OnVisibleChanged ();
 					SetNeedsDisplay ();
@@ -2405,32 +2649,38 @@ namespace Terminal.Gui {
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
+		void SetHotKey ()
+		{
+			TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out var hk);
+			if (hotKey != hk) {
+				HotKey = hk;
+			}
+		}
+
 		bool ResizeView (bool autoSize)
 		{
 			if (!autoSize) {
 				return false;
 			}
 
-			var aSize = autoSize;
-			Rect nBounds = TextFormatter.CalcRect (Bounds.X, Bounds.Y, Text, textFormatter.Direction);
-			if (textFormatter.Size != nBounds.Size) {
-				textFormatter.Size = nBounds.Size;
+			var aSize = true;
+			var nBoundsSize = GetAutoSize ();
+			if (nBoundsSize != Bounds.Size) {
+				if (ForceValidatePosDim) {
+					aSize = SetWidthHeight (nBoundsSize);
+				} else {
+					Bounds = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
+				}
 			}
-			if ((textFormatter.Size != Bounds.Size || textFormatter.Size != nBounds.Size)
-				&& (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
-				|| autoSize && Bounds.Width != nBounds.Width))
-				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
-				|| autoSize && Bounds.Height != nBounds.Height)))) {
-				aSize = SetWidthHeight (nBounds);
-			}
+			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			return aSize;
 		}
 
-		bool SetWidthHeight (Rect nBounds)
+		bool SetWidthHeight (Size nBounds)
 		{
-			bool aSize = false;
-			var canSizeW = SetWidth (nBounds.Width, out int rW);
-			var canSizeH = SetHeight (nBounds.Height, out int rH);
+			var aSize = false;
+			var canSizeW = SetWidth (nBounds.Width - GetHotKeySpecifierLength (), out var rW);
+			var canSizeH = SetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out var rH);
 			if (canSizeW) {
 				aSize = true;
 				width = rW;
@@ -2441,14 +2691,94 @@ namespace Terminal.Gui {
 			}
 			if (aSize) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
-				textFormatter.Size = Bounds.Size;
+				TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
 
 			return aSize;
 		}
 
 		/// <summary>
-		/// Specifies the event arguments for <see cref="MouseEvent"/>
+		/// Gets the size to fit all text if <see cref="AutoSize"/> is true.
+		/// </summary>
+		/// <returns>The <see cref="Size"/></returns>
+		public Size GetAutoSize ()
+		{
+			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
+			return new Size (rect.Size.Width - GetHotKeySpecifierLength (),
+			    rect.Size.Height - GetHotKeySpecifierLength (false));
+		}
+
+		bool IsValidAutoSize (out Size autoSize)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
+			    rect.Size.Height - GetHotKeySpecifierLength (false));
+			return !(ForceValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
+			    || frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+			    || frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+		}
+
+		bool IsValidAutoSizeWidth (Dim width)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var dimValue = width.Anchor (0);
+			return !(ForceValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
+			    - GetHotKeySpecifierLength ());
+		}
+
+		bool IsValidAutoSizeHeight (Dim height)
+		{
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var dimValue = height.Anchor (0);
+			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
+			    - GetHotKeySpecifierLength (false));
+		}
+
+		/// <summary>
+		/// Get the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.
+		/// </summary>
+		/// <param name="isWidth"><see langword="true"/> if is the width (default) <see langword="false"/> if is the height.</param>
+		/// <returns>The length of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.</returns>
+		public int GetHotKeySpecifierLength (bool isWidth = true)
+		{
+			if (isWidth) {
+				return TextFormatter.IsHorizontalDirection (TextDirection) &&
+				    TextFormatter.Text?.Contains (HotKeySpecifier) == true
+				    ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0;
+			} else {
+				return TextFormatter.IsVerticalDirection (TextDirection) &&
+				    TextFormatter.Text?.Contains (HotKeySpecifier) == true
+				    ? Math.Max (Rune.ColumnWidth (HotKeySpecifier), 0) : 0;
+			}
+		}
+
+		/// <summary>
+		/// Gets the bounds size from a <see cref="Terminal.Gui.TextFormatter.Size"/>.
+		/// </summary>
+		/// <returns>The bounds size minus the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
+		public Size GetTextFormatterBoundsSize ()
+		{
+			return new Size (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+			    TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
+		}
+
+		/// <summary>
+		/// Gets the text formatter size from a <see cref="Bounds"/> size.
+		/// </summary>
+		/// <returns>The text formatter size more the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
+		public Size GetBoundsTextFormatterSize ()
+		{
+			if (ustring.IsNullOrEmpty (TextFormatter.Text))
+				return Bounds.Size;
+
+			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
+			    frame.Size.Height + GetHotKeySpecifierLength (false));
+		}
+
+		/// <summary>
+		/// Specifies the event arguments for <see cref="MouseEvent"/>. This is a higher-level construct
+		/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
+		/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 		/// </summary>
 		public class MouseEventArgs : EventArgs {
 			/// <summary>
@@ -2460,11 +2790,17 @@ namespace Terminal.Gui {
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
 			public MouseEvent MouseEvent { get; set; }
+
 			/// <summary>
 			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
-			public bool Handled { get; set; }
+			/// <remarks>This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
+			/// backwards compatibility</remarks>
+			public bool Handled {
+				get => MouseEvent.Handled;
+				set => MouseEvent.Handled = value;
+			}
 		}
 
 		/// <inheritdoc/>
@@ -2478,14 +2814,10 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			MouseEnter?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (base.OnMouseEnter (mouseEvent))
-				return true;
 
-			return false;
+			return args.Handled || base.OnMouseEnter (mouseEvent);
 		}
 
 		/// <inheritdoc/>
@@ -2499,21 +2831,17 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			MouseLeave?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (base.OnMouseLeave (mouseEvent))
-				return true;
 
-			return false;
+			return args.Handled || base.OnMouseLeave (mouseEvent);
 		}
 
 		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>
 		/// <param name="mouseEvent"></param>
-		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
 			if (!Enabled) {
@@ -2524,7 +2852,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
@@ -2566,8 +2894,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
-			for (int i = InternalSubviews.Count - 1; i >= 0; i--) {
-				View subview = InternalSubviews [i];
+			for (var i = InternalSubviews.Count - 1; i >= 0; i--) {
+				var subview = InternalSubviews [i];
 				Remove (subview);
 				subview.Dispose ();
 			}
@@ -2624,12 +2952,12 @@ namespace Terminal.Gui {
 
 		bool CanSetWidth (int desiredWidth, out int resultWidth)
 		{
-			int w = desiredWidth;
+			var w = desiredWidth;
 			bool canSetWidth;
 			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
 				w = Width.Anchor (w);
-				canSetWidth = false;
+				canSetWidth = !ForceValidatePosDim;
 			} else if (Width is Dim.DimFactor factor) {
 				// Tries to get the SuperView width otherwise the view width.
 				var sw = SuperView != null ? SuperView.Frame.Width : w;
@@ -2637,7 +2965,7 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
-				canSetWidth = false;
+				canSetWidth = !ForceValidatePosDim;
 			} else {
 				canSetWidth = true;
 			}
@@ -2648,22 +2976,28 @@ namespace Terminal.Gui {
 
 		bool CanSetHeight (int desiredHeight, out int resultHeight)
 		{
-			int h = desiredHeight;
+			var h = desiredHeight;
 			bool canSetHeight;
-			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
+			switch (Height) {
+			case Dim.DimCombine _:
+			case Dim.DimView _:
+			case Dim.DimFill _:
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
-				canSetHeight = false;
-			} else if (Height is Dim.DimFactor factor) {
+				canSetHeight = !ForceValidatePosDim;
+				break;
+			case Dim.DimFactor factor:
 				// Tries to get the SuperView height otherwise the view height.
 				var sh = SuperView != null ? SuperView.Frame.Height : h;
 				if (factor.IsFromRemaining ()) {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
-				canSetHeight = false;
-			} else {
+				canSetHeight = !ForceValidatePosDim;
+				break;
+			default:
 				canSetHeight = true;
+				break;
 			}
 			resultHeight = h;
 
@@ -2675,7 +3009,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredWidth">The desired width.</param>
 		/// <param name="resultWidth">The real result width.</param>
-		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool SetWidth (int desiredWidth, out int resultWidth)
 		{
 			return CanSetWidth (desiredWidth, out resultWidth);
@@ -2686,7 +3020,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredHeight">The desired height.</param>
 		/// <param name="resultHeight">The real result height.</param>
-		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool SetHeight (int desiredHeight, out int resultHeight)
 		{
 			return CanSetHeight (desiredHeight, out resultHeight);
@@ -2696,11 +3030,11 @@ namespace Terminal.Gui {
 		/// Gets the current width based on the <see cref="Width"/> settings.
 		/// </summary>
 		/// <param name="currentWidth">The real current width.</param>
-		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentWidth (out int currentWidth)
 		{
-			SetRelativeLayout (SuperView == null ? Frame : SuperView.Frame);
-			currentWidth = Frame.Width;
+			SetRelativeLayout (SuperView?.frame ?? frame);
+			currentWidth = frame.Width;
 
 			return CanSetWidth (0, out _);
 		}
@@ -2709,11 +3043,11 @@ namespace Terminal.Gui {
 		/// Calculate the height based on the <see cref="Height"/> settings.
 		/// </summary>
 		/// <param name="currentHeight">The real current height.</param>
-		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentHeight (out int currentHeight)
 		{
-			SetRelativeLayout (SuperView == null ? Frame : SuperView.Frame);
-			currentHeight = Frame.Height;
+			SetRelativeLayout (SuperView?.frame ?? frame);
+			currentHeight = frame.Height;
 
 			return CanSetHeight (0, out _);
 		}
@@ -2721,9 +3055,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
 		/// </summary>
-		/// <returns><see cref="ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
-		/// or <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/></returns>
-		public Attribute GetNormalColor ()
+		/// <returns><see cref="Terminal.Gui.ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// If it's overridden can return other values.</returns>
+		public virtual Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
@@ -2736,9 +3071,7 @@ namespace Terminal.Gui {
 		{
 			View top = Application.Top;
 			for (var v = this?.SuperView; v != null; v = v.SuperView) {
-				if (v != null) {
-					top = v;
-				}
+				top = v;
 			}
 
 			return top;

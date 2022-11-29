@@ -4,8 +4,9 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Borders on Window", Description: "Demonstrate Window borders manipulation.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioMetadata (Name: "Borders on Window", Description: "Demonstrates Window borders manipulation.")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class BordersOnWindow : Scenario {
 		public override void Setup ()
 		{
@@ -29,7 +30,8 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
+					Effect3D = effect3D,
+					Title = "Window"
 				},
 				ColorScheme = Colors.TopLevel
 			};
@@ -54,7 +56,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			smartView.Add (tf1, button, label, tf2, tv);

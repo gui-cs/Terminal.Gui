@@ -7,6 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
+using System.Reflection;
 
 namespace Terminal.Gui.Views {
 
@@ -73,6 +74,23 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tableView.RowOffset);
 			Assert.Equal (1, tableView.ColumnOffset);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Redraw_EmptyTable ()
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = new ColorScheme();
+			tableView.Bounds = new Rect (0, 0, 25, 10);
+
+			// Set a table with 1 column
+			tableView.Table = BuildTable (1, 50);
+			tableView.Redraw(tableView.Bounds);
+
+			tableView.Table.Columns.Remove(tableView.Table.Columns[0]);
+			tableView.Redraw(tableView.Bounds);
+		}
+
 
 		[Fact]
 		public void SelectedCellChanged_NotFiredForSameValue ()
@@ -256,12 +274,14 @@ namespace Terminal.Gui.Views {
 			tableView.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ()));
 
 			// window height is 5 rows 2 are header so page down should give 3 new rows
-			Assert.Equal (3, tableView.RowOffset);
+			Assert.Equal (3, tableView.SelectedRow);
+			Assert.Equal (1, tableView.RowOffset);
 
 			// header is no longer visible so page down should give 5 new rows
 			tableView.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ()));
 
-			Assert.Equal (8, tableView.RowOffset);
+			Assert.Equal (8, tableView.SelectedRow);
+			Assert.Equal (4, tableView.RowOffset);
 		}
 
 		[Fact]
@@ -439,7 +459,7 @@ namespace Terminal.Gui.Views {
 ├─┼──────┤
 │1│2     │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -462,7 +482,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┼────┤
 │1│2│    │
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -486,7 +506,7 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -531,22 +551,116 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		public void TableView_ColorsTest_ColorGetter ()
+		public void TableViewMultiSelect_CannotFallOffLeft()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 1;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single().Rect);
+
+			// this next shift left should be ignored because we are already at the bounds
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
+		}
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffRight()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 0;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next shift right should be ignored because we are already at the right bounds
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
+
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
+		}
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffBottom ()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 0;
+			tv.SelectedRow = 0;
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next moves should be ignored because we already selected the whole table
+			tv.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (1, tv.SelectedRow);
+
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void TableViewMultiSelect_CannotFallOffTop()
+		{
+			var tv = SetUpMiniTable ();
+			tv.Table.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+
+			tv.MultiSelect = true;
+			tv.SelectedColumn = 1;
+			tv.SelectedRow = 1;
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+
+			// this next moves should be ignored because we already selected the whole table
+			tv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (0, tv.SelectedRow);
+
+			Application.Shutdown ();
+		}
+
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorTests_FocusedOrNot (bool focused)
 		{
 			var tv = SetUpMiniTable ();
 
-			tv.Style.ExpandLastColumn = false;
-			tv.Style.InvertSelectedCellFirstCharacter = true;
-
 			// width exactly matches the max col widths
 			tv.Bounds = new Rect (0, 0, 5, 4);
-			
-			// Create a style for column B
-			var bStyle = tv.Style.GetOrCreateColumnStyle (tv.Table.Columns ["B"]);
 
-			// when B is 2 use the custom highlight colour
-			ColorScheme cellHighlight = new ColorScheme () { Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray) };
-			bStyle.ColorGetter = (a) => Convert.ToInt32(a.CellValue) == 2 ? cellHighlight : null;
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
 			tv.Redraw (tv.Bounds);
 
@@ -556,7 +670,202 @@ namespace Terminal.Gui.Views {
 ├─┼─┤
 │1│2│
 ";
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			string expectedColors = @"
+00000
+00000
+00000
+01000
+";
+			
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal});
+
+			Application.Shutdown();
+		}
+
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorTests_InvertSelectedCellFirstCharacter (bool focused)
+		{
+			var tv = SetUpMiniTable ();
+			tv.Style.InvertSelectedCellFirstCharacter = true;
+
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 4);
+
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			string expectedColors = @"
+00000
+00000
+00000
+01000
+";
+			
+			var invertHotFocus = new Attribute(tv.ColorScheme.HotFocus.Background,tv.ColorScheme.HotFocus.Foreground);
+			var invertHotNormal = new Attribute(tv.ColorScheme.HotNormal.Background,tv.ColorScheme.HotNormal.Foreground);
+
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused ?  invertHotFocus : invertHotNormal});
+			
+			Application.Shutdown();
+		}
+
+
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorsTest_RowColorGetter (bool focused)
+		{
+			var tv = SetUpMiniTable ();
+
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 4);
+
+			var rowHighlight = new ColorScheme () {
+				Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray),
+				HotNormal = Attribute.Make (Color.Green, Color.Blue),
+				HotFocus = Attribute.Make (Color.BrightYellow, Color.White),
+				Focus = Attribute.Make (Color.Cyan, Color.Magenta),
+			};
+
+			// when B is 2 use the custom highlight colour for the row
+			tv.Style.RowColorGetter += (e)=>Convert.ToInt32(e.Table.Rows[e.RowIndex][1]) == 2 ? rowHighlight : null;
+
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			string expectedColors = @"
+00000
+00000
+00000
+21222
+";
+			
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused ? rowHighlight.HotFocus : rowHighlight.HotNormal,
+				// 2
+				rowHighlight.Normal});
+
+
+			// change the value in the table so that
+			// it no longer matches the RowColorGetter
+			// delegate conditional ( which checks for
+			// the value 2)
+			tv.Table.Rows[0][1] = 5;
+
+			tv.Redraw (tv.Bounds);
+			expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│5│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			expectedColors = @"
+00000
+00000
+00000
+01000
+";
+
+			// now we only see 2 colors used (the selected cell color and Normal
+			// rowHighlight should no longer be used because the delegate returned null
+			// (now that the cell value is 5 - which does not match the conditional)
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,
+				// 1
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Theory]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorsTest_ColorGetter (bool focused)
+		{
+			var tv = SetUpMiniTable ();
+
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 4);
+
+			// Create a style for column B
+			var bStyle = tv.Style.GetOrCreateColumnStyle (tv.Table.Columns ["B"]);
+
+			// when B is 2 use the custom highlight colour
+			var cellHighlight = new ColorScheme () {
+				Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray),
+				HotNormal = Attribute.Make (Color.Green, Color.Blue),
+				HotFocus = Attribute.Make (Color.BrightYellow, Color.White),
+				Focus = Attribute.Make (Color.Cyan, Color.Magenta),
+			};
+
+			bStyle.ColorGetter = (a) => Convert.ToInt32(a.CellValue) == 2 ? cellHighlight : null;
+
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
 
 			string expectedColors = @"
 00000
@@ -564,15 +873,48 @@ namespace Terminal.Gui.Views {
 00000
 01020
 ";
-			var invertedNormalColor = Application.Driver.MakeAttribute (tv.ColorScheme.Normal.Background, tv.ColorScheme.Normal.Foreground);
-
-			GraphViewTests.AssertDriverColorsAre (expectedColors, new Attribute [] {
+			
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				invertedNormalColor,				
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal,
 				// 2
 				cellHighlight.Normal});
+
+
+			// change the value in the table so that
+			// it no longer matches the ColorGetter
+			// delegate conditional ( which checks for
+			// the value 2)
+			tv.Table.Rows[0][1] = 5;
+
+			tv.Redraw (tv.Bounds);
+			expected = @"
+┌─┬─┐
+│A│B│
+├─┼─┤
+│1│5│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			expectedColors = @"
+00000
+00000
+00000
+01000
+";
+
+			// now we only see 2 colors used (the selected cell color and Normal
+			// cellHighlight should no longer be used because the delegate returned null
+			// (now that the cell value is 5 - which does not match the conditional)
+			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
+
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -596,11 +938,378 @@ namespace Terminal.Gui.Views {
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 
 			GraphViewTests.InitFakeDriver ();
-			tv.ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				HotFocus = Application.Driver.MakeAttribute (Color.White, Color.Black)
-			};
+			tv.ColorScheme = Colors.Base;
 			return tv;
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void ScrollDown_OneLineAtATime ()
+		{
+			var tableView = new TableView ();
+
+			// Set big table
+			tableView.Table = BuildTable (25, 50);
+
+			// 1 header + 4 rows visible
+			tableView.Bounds = new Rect (0, 0, 25, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+
+			// select last row
+			tableView.SelectedRow = 3; // row is 0 indexed so this is the 4th visible row
+
+			// Scroll down
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorDown });
+
+			// Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
+			Assert.Equal(4,tableView.SelectedRow);
+			Assert.Equal (1, tableView.RowOffset);
+		}
+
+		[Fact]
+		public void ScrollRight_SmoothScrolling ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected = 
+				@"
+│A│B│C│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			tableView.Redraw (tableView.Bounds);
+
+			// Note that with SmoothHorizontalScrolling only a single new column
+			// is exposed when scrolling right.  This is not always the case though
+			// sometimes if the leftmost column is long (i.e. A is a long column)
+			// then when A is pushed off the screen multiple new columns could be exposed
+			// (not just D but also E and F).  This is because TableView never shows
+			// 'half cells' or scrolls by console unit (scrolling is done by table row/column increments).
+
+			expected =
+				@"
+│B│C│D│
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void ScrollRight_WithoutSmoothScrolling ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = false;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│A│B│C│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			tableView.Redraw (tableView.Bounds);
+
+			// notice that without smooth scrolling we just update the first column
+			// rendered in the table to the newly exposed column (D).  This is fast
+			// since we don't have to worry about repeatedly measuring the content
+			// area as we scroll until the new column (D) is exposed.  But it makes
+			// the view 'jump' to expose all new columns
+
+
+			expected =
+				@"
+│D│E│F│
+│4│5│6│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void LongColumnTest ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 25 characters can be printed into table
+			tableView.Bounds = new Rect (0, 0, 25, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("Very Long Column");
+
+			dt.Rows.Add (1, 2, new string('a',500));
+			dt.Rows.Add (1, 2, "aaa");
+
+			tableView.Table = dt;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// default behaviour of TableView is not to render
+			// columns unless there is sufficient space
+			string expected = 
+				@"
+│A│B                    │
+├─┼─────────────────────►
+│1│2                    │
+│1│2                    │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// get a style for the long column
+			var style = tableView.Style.GetOrCreateColumnStyle(dt.Columns[2]);
+			
+			// one way the API user can fix this for long columns
+			// is to specify a max width for the column
+			style.MaxWidth = 10;
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long          │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaa         │
+│1│2│aaa                │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// revert the style change
+			style.MaxWidth = TableView.DefaultMaxCellWidth;
+
+			// another way API user can fix problem is to implement
+			// RepresentationGetter and apply max length there
+
+			style.RepresentationGetter = (s)=>{
+				return s.ToString().Length < 15 ? s.ToString() : s.ToString().Substring(0,13)+"...";
+			};
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long Column   │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaaaaa...   │
+│1│2│aaa                │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// revert style change
+			style.RepresentationGetter = null;
+
+			// Both of the above methods rely on having a fixed
+			// size limit for the column.  These are awkward if a
+			// table is resizeable e.g. Dim.Fill().  Ideally we want
+			// to render in any space available and truncate the content
+			// of the column dynamically so it fills the free space at
+			// the end of the table.
+
+			// We can now specify that the column can be any length
+			// (Up to MaxWidth) but the renderer can accept using
+			// less space down to this limit
+			style.MinAcceptableWidth = 5;
+
+			tableView.Redraw (tableView.Bounds);
+			expected = 
+				@"
+│A│B│Very Long Column   │
+├─┼─┼───────────────────┤
+│1│2│aaaaaaaaaaaaaaaaaaa│
+│1│2│aaa                │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Now test making the width too small for the MinAcceptableWidth
+			// the Column won't fit so should not be rendered
+			Application.Shutdown ();
+			GraphViewTests.InitFakeDriver ();
+
+			tableView.Bounds = new Rect(0,0,9,5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B    │
+├─┼─────►
+│1│2    │
+│1│2    │
+
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// setting width to 10 leaves just enough space for the column to
+			// meet MinAcceptableWidth of 5.  Column width includes terminator line
+			// symbol (e.g. ┤ or │)
+			tableView.Bounds = new Rect (0, 0, 10, 5);
+			tableView.Redraw (tableView.Bounds);
+			expected =
+@"
+│A│B│Very│
+├─┼─┼────┤
+│1│2│aaaa│
+│1│2│aaa │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Application.Shutdown ();
+		}
+
+
+		[Fact]
+		public void ScrollIndicators ()
+		{
+			GraphViewTests.InitFakeDriver ();
+
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+
+			// select last visible column
+			tableView.SelectedColumn = 2; // column C
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected = 
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+
+			// since A is now pushed off screen we get indicator showing
+			// that user can scroll left to see first column
+			tableView.Redraw (tableView.Bounds);
+
+			expected =
+				@"
+│B│C│D│
+◄─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Scroll right twice more (to end of columns)
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
+
+			tableView.Redraw (tableView.Bounds);
+
+			expected =
+				@"
+│D│E│F│
+◄─┼─┼─┤
+│4│5│6│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 
 		/// <summary>

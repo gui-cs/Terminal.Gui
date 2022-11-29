@@ -4,8 +4,8 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Text Alignment", Description: "Demonstrates text alignment")]
-	[ScenarioCategory ("Text")]
+	[ScenarioMetadata (Name: "Simple Text Alignment", Description: "Demonstrates horizontal text alignment")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class TextAlignments : Scenario {
 		public override void Setup ()
 		{
@@ -22,8 +22,8 @@ namespace UICatalog.Scenarios {
 			var multiLineHeight = 5;
 
 			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog };
-				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog };
+				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog, AutoSize = false };
+				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog, AutoSize = false };
 			}
 
 			// Add a label & text field so we can demo IsDefault

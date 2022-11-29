@@ -68,10 +68,10 @@ namespace Terminal.Gui {
 				}
 				child = value;
 				savedChild = new SavedPosDim () {
-					X = child?.X,
-					Y = child?.Y,
-					Width = child?.Width,
-					Height = child?.Height
+					X = child?.X ?? child?.Frame.X,
+					Y = child?.Y ?? child?.Frame.Y,
+					Width = child?.Width ?? child?.Frame.Width,
+					Height = child?.Height ?? child?.Frame.Height
 				};
 				if (child == null) {
 					Visible = false;
@@ -236,6 +236,7 @@ namespace Terminal.Gui {
 		{
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (Child.GetNormalColor ());
+				Clear ();
 				Child.Border.DrawContent (Border.Child);
 			}
 			var savedClip = childContentView.ClipToBounds ();

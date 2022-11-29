@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// View for tabular data based on a <see cref="DataTable"/>.
 	/// 
-	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
+	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableView : View {
 
@@ -60,10 +60,19 @@ namespace Terminal.Gui {
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
+		Point? scrollLeftPoint;
+		Point? scrollRightPoint;
+
 		/// <summary>
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
 		/// </summary>
 		public const int DefaultMaxCellWidth = 100;
+
+
+		/// <summary>
+		/// The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/>
+		/// </summary>
+		public const int DefaultMinAcceptableWidth = 100;
 
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
@@ -261,6 +270,9 @@ namespace Terminal.Gui {
 				Move (0, 0);
 				var frame = Frame;
 
+				scrollRightPoint = null;
+				scrollLeftPoint = null;
+
 				// What columns to render at what X offset in viewport
 				var columnsToRender = CalculateViewport (bounds).ToArray ();
 
@@ -420,11 +432,25 @@ namespace Terminal.Gui {
 
 			for (int c = 0; c < availableWidth; c++) {
 
+				// Start by assuming we just draw a straight line the
+				// whole way but update to instead draw a header indicator
+				// or scroll arrow etc
 				var rune = Driver.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
+						// for first character render line
 						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
+
+						// unless we have horizontally scrolled along
+						// in which case render an arrow, to indicate user
+						// can scroll left
+						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
+						{
+							rune = Driver.LeftArrow;
+							scrollLeftPoint = new Point(c,row);
+						}
+							
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
@@ -432,7 +458,20 @@ namespace Terminal.Gui {
 						/*TODO: is ┼ symbol in Driver?*/
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
+
+						// for the last character in the table
 						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
+
+						// unless there is more of the table we could horizontally
+						// scroll along to see. In which case render an arrow,
+						// to indicate user can scroll right
+						if(Style.ShowHorizontalScrollIndicators &&
+							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
+						{
+							rune = Driver.RightArrow;
+							scrollRightPoint = new Point(c,row);
+						}
+
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
@@ -447,6 +486,8 @@ namespace Terminal.Gui {
 		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
+			var focused = HasFocus;
+
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs(Table,rowToRender))) ?? ColorScheme;
 
@@ -456,8 +497,18 @@ namespace Terminal.Gui {
 
 			//start by clearing the entire line
 			Move (0, row);
-			Driver.SetAttribute (FullRowSelect && IsSelected (0, rowToRender) ? rowScheme.HotFocus
-				: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+			Attribute color;
+
+			if(FullRowSelect && IsSelected (0, rowToRender)) {
+				color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+			}
+			else 
+			{
+				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+			}
+
+			Driver.SetAttribute (color);
 			Driver.AddStr (new string (' ', Bounds.Width));
 
 			// Render cells for each visible header for the current row
@@ -497,7 +548,12 @@ namespace Terminal.Gui {
 					scheme = rowScheme;
 				}
 
-				var cellColor = isSelectedCell ? scheme.HotFocus : Enabled ? scheme.Normal : scheme.Disabled;
+				Attribute cellColor;
+				if (isSelectedCell) {
+					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+				} else {
+					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
+				}
 
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
@@ -508,8 +564,14 @@ namespace Terminal.Gui {
 								
 				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
 				if (scheme != rowScheme) {
-					Driver.SetAttribute (isSelectedCell ? rowScheme.HotFocus
-						: Enabled ? rowScheme.Normal : rowScheme.Disabled);
+
+					if(isSelectedCell) {
+						color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+					}
+					else {
+						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+					}
+					Driver.SetAttribute (color);
 				}
 
 				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
@@ -621,7 +683,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Table == null) {
+			if (Table == null || Table.Columns.Count <= 0) {
 				PositionCursor ();
 				return false;
 			}
@@ -807,11 +869,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y)
 		{
-			var top = Math.Min (pt1Y, pt2Y);
-			var bot = Math.Max (pt1Y, pt2Y);
+			var top = Math.Max(Math.Min (pt1Y, pt2Y), 0);
+			var bot = Math.Max(Math.Max (pt1Y, pt2Y), 0);
 
-			var left = Math.Min (pt1X, pt2X);
-			var right = Math.Max (pt1X, pt2X);
+			var left = Math.Max(Math.Min (pt1X, pt2X), 0);
+			var right = Math.Max(Math.Max (pt1X, pt2X), 0);
 
 			// Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
 			return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1));
@@ -865,7 +927,7 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 
-			if (Table == null) {
+			if (Table == null || Table.Columns.Count <= 0) {
 				return false;
 			}
 
@@ -898,6 +960,24 @@ namespace Terminal.Gui {
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
+				if (scrollLeftPoint != null 
+					&& scrollLeftPoint.Value.X == me.X
+					&& scrollLeftPoint.Value.Y == me.Y)
+				{
+					ColumnOffset--;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
+				if (scrollRightPoint != null 
+					&& scrollRightPoint.Value.X == me.X
+					&& scrollRightPoint.Value.Y == me.Y)
+				{
+					ColumnOffset++;
+					EnsureValidScrollOffsets ();
+					SetNeedsDisplay ();
+				}
+
 				var hit = ScreenToCell (me.X, me.Y);
 				if (hit != null) {
 
@@ -925,7 +1005,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -956,7 +1036,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1080,12 +1160,31 @@ namespace Terminal.Gui {
 
 			//if we have scrolled too far to the right
 			if (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
-				ColumnOffset = SelectedColumn;
+
+				if(Style.SmoothHorizontalScrolling) {
+
+					// Scroll right 1 column at a time until the users selected column is visible
+					while(SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+
+						ColumnOffset++;
+						columnsToRender = CalculateViewport (Bounds).ToArray ();
+
+						// if we are already scrolled to the last column then break
+						// this will prevent any theoretical infinite loop
+						if (ColumnOffset >= Table.Columns.Count - 1)
+							break;
+
+					}
+				}
+				else {
+					ColumnOffset = SelectedColumn;
+				}
+				
 			}
 
 			//if we have scrolled too far down
 			if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight)) {
-				RowOffset = SelectedRow;
+				RowOffset = SelectedRow - (Bounds.Height - headerHeight) + 1;
 			}
 			//if we have scrolled too far up
 			if (SelectedRow < RowOffset) {
@@ -1118,7 +1217,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (Table == null)
+			if (Table == null || Table.Columns.Count <= 0)
 				yield break;
 
 			int usedSpace = 0;
@@ -1144,11 +1243,40 @@ namespace Terminal.Gui {
 				int colWidth;
 
 				// is there enough space for this column (and it's data)?
-				usedSpace += colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
 
-				// no (don't render it) unless its the only column we are render (that must be one massively wide column!)
-				if (!first && usedSpace > availableHorizontalSpace)
-					yield break;
+				// there is not enough space for this columns 
+				// visible content
+				if (usedSpace + colWidth > availableHorizontalSpace)
+				{
+					bool showColumn = false;
+
+					// if this column accepts flexible width rendering and
+					// is therefore happy rendering into less space
+					if ( colStyle != null && colStyle.MinAcceptableWidth > 0 &&
+						// is there enough space to meet the MinAcceptableWidth
+						(availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth)
+					{
+						// show column and use use whatever space is 
+						// left for rendering it
+						showColumn = true;
+						colWidth = availableHorizontalSpace - usedSpace;
+					}
+
+					// If its the only column we are able to render then
+					// accept it anyway (that must be one massively wide column!)
+					if (first)
+					{
+						showColumn = true;
+					}
+
+					// no special exceptions and we are out of space
+					// so stop accepting new columns for the render area
+					if(!showColumn)
+						break;
+				}
+
+				usedSpace += colWidth;
 
 				// there is space
 				yield return new ColumnToRender (col, startingIdxForCurrentHeader,
@@ -1245,7 +1373,7 @@ namespace Terminal.Gui {
 		/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
 		/// and textual representation of cells (e.g. date formats)
 		/// 
-		/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
+		/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 		/// </summary>
 		public class ColumnStyle {
 
@@ -1281,9 +1409,23 @@ namespace Terminal.Gui {
 			public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
 			/// <summary>
-			/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// Set the minimum width of the column in characters.  Setting this will ensure that
+			/// even when a column has short content/header it still fills a given width of the control.
+			/// 
+			/// <para>This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> 
+			/// or the <see cref="MaxWidth"/>
+			/// </para>
+			/// <remarks>
+			/// For setting a flexible column width (down to a lower limit) use <see cref="MinAcceptableWidth"/>
+			/// instead
+			/// </remarks>
 			/// </summary>
 			public int MinWidth { get; set; }
+
+			/// <summary>
+			/// Enables flexible sizing of this column based on available screen space to render into.
+			/// </summary>
+			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
@@ -1321,7 +1463,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Defines rendering options that affect how the table is displayed.
 		/// 
-		/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
+		/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 		/// </summary>
 		public class TableStyle {
 
@@ -1351,6 +1493,14 @@ namespace Terminal.Gui {
 			public bool ShowVerticalHeaderLines { get; set; } = true;
 
 			/// <summary>
+			/// True to render a arrows on the right/left of the table when 
+			/// there are more column(s) that can be scrolled to.  Requires
+			/// <see cref="ShowHorizontalHeaderUnderline"/> to be true.
+			/// Defaults to true
+			/// </summary>
+			public bool ShowHorizontalScrollIndicators { get; set; } = true;
+
+			/// <summary>
 			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
 			/// This gives the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show
 			/// this
@@ -1377,6 +1527,22 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <value></value>
 			public bool ExpandLastColumn {get;set;} = true;
+
+			/// <summary>
+			/// <para>
+			/// Determines how <see cref="TableView.ColumnOffset"/> is updated when scrolling
+			/// right off the end of the currently visible area.
+			/// </para>
+			/// <para>
+			/// If true then when scrolling right the scroll offset is increased the minimum required to show
+			/// the new column.  This may be slow if you have an incredibly large number of columns in
+			/// your table and/or slow <see cref="ColumnStyle.RepresentationGetter"/> implementations
+			/// </para>
+			/// <para>
+			/// If false then scroll offset is set to the currently selected column (i.e. PageRight).
+			/// </para>
+			/// </summary>
+			public bool SmoothHorizontalScrolling { get; set; } = true;
 			
 			/// <summary>
 			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it

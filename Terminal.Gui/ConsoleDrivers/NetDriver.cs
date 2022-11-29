@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 		int lastWindowHeight;
 		int largestWindowHeight;
 #if PROCESS_REQUEST
-		bool neededProcessRequest;
+				bool neededProcessRequest;
 #endif
 		public int NumberOfCSI { get; }
 
@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 					inputReady.Reset ();
 				}
 #if PROCESS_REQUEST
-				neededProcessRequest = false;
+								neededProcessRequest = false;
 #endif
 				if (inputResultQueue.Count > 0) {
 					return inputResultQueue.Dequeue ();
@@ -198,7 +198,8 @@ namespace Terminal.Gui {
 					if (Console.WindowTop != consoleDriver.Top) {
 						// Top only working on Windows.
 						var winPositionEv = new WindowPositionEvent () {
-							Top = Console.WindowTop
+							Top = Console.WindowTop,
+							Left = Console.WindowLeft
 						};
 						inputResultQueue.Enqueue (new InputResult () {
 							EventType = EventType.WindowPosition,
@@ -207,10 +208,10 @@ namespace Terminal.Gui {
 						return;
 					}
 #if PROCESS_REQUEST
-					if (!neededProcessRequest) {
-						Console.Out.Write ("\x1b[6n");
-						neededProcessRequest = true;
-					}
+										if (!neededProcessRequest) {
+											Console.Out.Write ("\x1b[6n");
+											neededProcessRequest = true;
+										}
 #endif
 				}
 			}
@@ -471,12 +472,14 @@ namespace Terminal.Gui {
 			string value = "";
 			for (int i = 0; i < kChar.Length; i++) {
 				var c = kChar [i];
-				if (c == '[') {
+				if (c == '\u001b' || c == '[') {
 					foundPoint++;
-				} else if (foundPoint == 1 && c != ';') {
+				} else if (foundPoint == 1 && c != ';' && c != '?') {
 					value += c.ToString ();
+				} else if (c == '?') {
+					foundPoint++;
 				} else if (c == ';') {
-					if (foundPoint == 1) {
+					if (foundPoint >= 1) {
 						point.Y = int.Parse (value) - 1;
 					}
 					value = "";
@@ -501,6 +504,8 @@ namespace Terminal.Gui {
 						} else {
 							return;
 						}
+						break;
+					case 'c': // CSI?1;0c ("VT101 with No Options")
 						break;
 					default:
 						throw new NotImplementedException ();
@@ -530,6 +535,7 @@ namespace Terminal.Gui {
 			int foundPoint = 0;
 			string value = "";
 			var kChar = GetKeyCharArray (cki);
+			//System.Diagnostics.Debug.WriteLine ($"kChar: {new string (kChar)}");
 			for (int i = 0; i < kChar.Length; i++) {
 				var c = kChar [i];
 				if (c == '<') {
@@ -556,6 +562,8 @@ namespace Terminal.Gui {
 					//} else if (c == 'm') {
 					//	isButtonPressed = false;
 					//}
+
+					//System.Diagnostics.Debug.WriteLine ($"buttonCode: {buttonCode}");
 
 					switch (buttonCode) {
 					case 0:
@@ -944,7 +952,7 @@ namespace Terminal.Gui {
 			await Task.Delay (200);
 			while (isButtonPressed) {
 				await Task.Delay (100);
-				var view = Application.wantContinuousButtonPressedView;
+				var view = Application.WantContinuousButtonPressedView;
 				if (view == null) {
 					break;
 				}
@@ -1142,6 +1150,7 @@ namespace Terminal.Gui {
 
 		public struct WindowPositionEvent {
 			public int Top;
+			public int Left;
 			public Point CursorPosition;
 		}
 
@@ -1175,19 +1184,18 @@ namespace Terminal.Gui {
 		const int COLOR_BRIGHT_CYAN = 96;
 		const int COLOR_BRIGHT_WHITE = 97;
 
-		int cols, rows, top;
+		int cols, rows, left, top;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override int Left => 0;
+		public override int Left => left;
 		public override int Top => top;
 		public override bool HeightAsBuffer { get; set; }
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
-		public bool AlwaysSetPosition { get; set; }
 		public override IClipboard Clipboard { get; }
-		internal override int [,,] Contents => contents;
+		public override int [,,] Contents => contents;
 
 		readonly bool supportsTrueColorOutput;
 		public override bool SupportsTrueColorOutput => supportsTrueColorOutput;
@@ -1227,6 +1235,7 @@ namespace Terminal.Gui {
 
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
+
 		public override void Move (int col, int row)
 		{
 			ccol = col;
@@ -1240,29 +1249,42 @@ namespace Terminal.Gui {
 			}
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			if (Clip.Contains (ccol, crow) && ccol + Math.Max (runeWidth, 1) <= Cols) {
-				var position = crow * Cols + ccol;
-				OutputAttributeBuffer [position] = currentAttribute;
+			var validClip = IsValidContent (ccol, crow, Clip);
+			var position = crow * Cols + ccol;
 
-				contents [crow, ccol, 0] = (int)(uint)rune;
+			if (validClip) {
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
+					contents [crow, ccol + 1, 2] = 1;
+
+				}
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
+				OutputAttributeBuffer [position] = currentAttribute;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
-				dirtyLine [crow] = true;
 
-				ccol++;
-				if (runeWidth > 1) {
-					for (int i = 1; i < runeWidth; i++) {
-						if (ccol < cols) {
-							contents [crow, ccol, 2] = 0;
-						} else {
-							break;
-						}
-						ccol++;
-					}
-				}
-			} else if (ccol > -1 && crow > -1 && ccol < cols && crow < rows) {
-				contents [crow, ccol, 2] = 1;
 				dirtyLine [crow] = true;
+			}
+
+			ccol++;
+			if (runeWidth > 1) {
+				if (validClip && ccol < Clip.Right) {
+					OutputAttributeBuffer [position] = currentAttribute;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
+				}
+				ccol++;
 			}
 
 			//if (ccol == Cols) {
@@ -1290,6 +1312,9 @@ namespace Terminal.Gui {
 			StopReportingMouseMoves ();
 			Console.ResetColor ();
 			Clear ();
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?25h");
+			Console.Out.Flush ();
 		}
 
 		void Clear ()
@@ -1299,6 +1324,11 @@ namespace Terminal.Gui {
 				Console.Out.Write ("\x1b[3J");
 				//Console.Out.Write ("\x1b[?25l");
 			}
+		}
+
+		public override Attribute MakeColor (Color foreground, Color background)
+		{
+			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
 		}
 
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -1315,60 +1345,26 @@ namespace Terminal.Gui {
 		{
 			TerminalResized = terminalResized;
 
+			//Set cursor key to application.
+			Console.Out.Write ("\x1b[?25l");
+			Console.Out.Flush ();
+
 			Console.TreatControlCAsInput = true;
 
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
-			Clear ();
 			ResizeScreen ();
 			UpdateOffScreen ();
 
 			StartReportingMouseMoves ();
 
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
+			CreateColors ();
 
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-			Colors.TopLevel.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Black);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Base.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.DarkBlue);
-
-			// Focused,
-			//    Selected, Hot: Yellow on Black
-			//    Selected, text: white on black
-			//    Unselected, hot: yellow on cyan
-			//    unselected, text: same as unfocused
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
-			Colors.Dialog.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Gray);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
-			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
-			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
-			Colors.Error.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.White);
+			Clear ();
 		}
 
-		void ResizeScreen ()
+		public override void ResizeScreen ()
 		{
 			if (!HeightAsBuffer) {
 				if (Console.WindowHeight > 0) {
@@ -1413,29 +1409,31 @@ namespace Terminal.Gui {
 			OutputAttributeBuffer = new Attribute [Rows * Cols];
 
 			Clip = new Rect (0, 0, Cols, Rows);
-
-			contents = new int [Rows, Cols, 3];
-			dirtyLine = new bool [Rows];
+			Console.Out.Write ("\x1b[3J");
+			Console.Out.Flush ();
 		}
 
-		void UpdateOffScreen ()
+		public override void UpdateOffScreen ()
 		{
-			// Can raise an exception while is still resizing.
-			try {
-				for (int row = 0; row < rows; row++) {
-					for (int c = 0; c < cols; c++) {
-						int position = row * cols + c;
-						OutputAttributeBuffer [position] = Colors.TopLevel.Normal;
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
 
-						contents [row, c, 0] = ' ';
-						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-						contents [row, c, 2] = 0;
-						dirtyLine [row] = true;
+			lock (contents) {
+				// Can raise an exception while is still resizing.
+				try {
+					for (int row = 0; row < rows; row++) {
+						for (int c = 0; c < cols; c++) {
+							int position = row * cols + c;
+							OutputAttributeBuffer [position] = Colors.TopLevel.Normal;
+
+							contents [row, c, 0] = ' ';
+							contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+							contents [row, c, 2] = 0;
+							dirtyLine [row] = true;
+						}
 					}
-				}
-			} catch (IndexOutOfRangeException) { }
-
-			winChanging = false;
+				} catch (IndexOutOfRangeException) { }
+			}
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -1446,21 +1444,25 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			UpdateScreen ();
+			UpdateCursor ();
 		}
 
 		Attribute redrawAttr = null;
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
+			if (Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
 				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
 				|| (HeightAsBuffer && Rows != largestWindowHeight)) {
 				return;
 			}
 
 			int top = Top;
+			int left = Left;
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
+			System.Text.StringBuilder output = new System.Text.StringBuilder ();
+			var lastCol = -1;
 
 			Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
@@ -1468,36 +1470,56 @@ namespace Terminal.Gui {
 					continue;
 				}
 				dirtyLine [row] = false;
-				System.Text.StringBuilder output = new System.Text.StringBuilder ();
-				for (int col = 0; col < cols; col++) {
-					if (contents [row, col, 2] != 1) {
-						continue;
-					}
+				output.Clear ();
+				for (int col = left; col < cols; col++) {
 					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
 						return;
 					}
+					lastCol = -1;
+					var outputWidth = 0;
 					for (; col < cols; col++) {
+						if (contents [row, col, 2] == 0) {
+							if (output.Length > 0) {
+								//Console.CursorLeft = lastCol;
+								//Console.CursorTop = row;
+								SetVirtualCursorPosition (lastCol, row);
+								Console.Write (output);
+								output.Clear ();
+								lastCol += outputWidth;
+								outputWidth = 0;
+							} else if (lastCol == -1) {
+								lastCol = col;
+							}
+							if (lastCol + 1 < cols)
+								lastCol++;
+							continue;
+						}
+
+						if (lastCol == -1)
+							lastCol = col;
+
 						var attr = OutputAttributeBuffer [row * cols + col];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
 						}
-						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
-							return;
-						}
-						if (AlwaysSetPosition) {
-							Console.Write ($"{output}{(char)contents [row, col, 0]}");
-						} else {
-							output.Append ((char)contents [row, col, 0]);
-						}
+						outputWidth++;
+						output.Append ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
-						if (!AlwaysSetPosition && col == cols - 1) {
-							Console.Write (output);
-						}
 					}
 				}
+				if (output.Length > 0) {
+					//Console.CursorLeft = lastCol;
+					//Console.CursorTop = row;
+					SetVirtualCursorPosition (lastCol, row);
+					Console.Write (output);
+				}
 			}
-			Console.CursorVisible = true;
-			UpdateCursor ();
+		}
+
+		void SetVirtualCursorPosition (int lastCol, int row)
+		{
+			Console.Out.Write ($"\x1b[{row + 1};{lastCol + 1}H");
+			Console.Out.Flush ();
 		}
 
 		System.Text.StringBuilder WriteAttributes (Attribute attr)
@@ -1590,11 +1612,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private CursorVisibility? savedCursorVisibility;
+
 		public override void UpdateCursor ()
 		{
+			if (!EnsureCursorVisibility ())
+				return;
+
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (ccol >= 0 && ccol <= cols && crow >= 0 && crow <= rows) {
+				if (ccol >= 0 && ccol < Console.BufferWidth && crow >= 0 && crow < Console.BufferHeight) {
 					Console.SetCursorPosition (ccol, crow);
 				}
 			} catch (System.IO.IOException) {
@@ -1622,6 +1649,22 @@ namespace Terminal.Gui {
 		public override void SetAttribute (Attribute c)
 		{
 			currentAttribute = c;
+		}
+
+		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+		{
+			if (consoleKeyInfo.Key != ConsoleKey.Packet) {
+				return consoleKeyInfo;
+			}
+
+			var mod = consoleKeyInfo.Modifiers;
+			var shift = (mod & ConsoleModifiers.Shift) != 0;
+			var alt = (mod & ConsoleModifiers.Alt) != 0;
+			var control = (mod & ConsoleModifiers.Control) != 0;
+
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+
+			return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -1701,7 +1744,7 @@ namespace Terminal.Gui {
 					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
 						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 					}
 				}
@@ -1768,14 +1811,23 @@ namespace Terminal.Gui {
 		{
 			switch (inputEvent.EventType) {
 			case NetEvents.EventType.Key:
+				ConsoleKeyInfo consoleKeyInfo = inputEvent.ConsoleKeyInfo;
+				if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+					consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+				}
 				keyModifiers = new KeyModifiers ();
-				var map = MapKey (inputEvent.ConsoleKeyInfo);
+				var map = MapKey (consoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
 				}
-				keyDownHandler (new KeyEvent (map, keyModifiers));
-				keyHandler (new KeyEvent (map, keyModifiers));
-				keyUpHandler (new KeyEvent (map, keyModifiers));
+				if (map == Key.Null) {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				} else {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				}
 				break;
 			case NetEvents.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
@@ -1785,25 +1837,25 @@ namespace Terminal.Gui {
 				break;
 			case NetEvents.EventType.WindowPosition:
 				var newTop = inputEvent.WindowPositionEvent.Top;
-				if (HeightAsBuffer && top != newTop) {
+				var newLeft = inputEvent.WindowPositionEvent.Left;
+				if (HeightAsBuffer && (top != newTop || left != newLeft)) {
 					top = newTop;
+					left = newLeft;
 					Refresh ();
 				}
 				break;
 			}
 		}
 
-		bool winChanging;
-
 		void ChangeWin ()
 		{
-			winChanging = true;
 			const int Min_WindowWidth = 14;
 			Size size = new Size ();
 			if (!HeightAsBuffer) {
 				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
 					Console.WindowHeight);
 				top = 0;
+				left = 0;
 			} else {
 				//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 				largestWindowHeight = Console.BufferHeight;
@@ -1813,13 +1865,13 @@ namespace Terminal.Gui {
 			rows = size.Height;
 			ResizeScreen ();
 			UpdateOffScreen ();
-			if (!winChanging) {
-				TerminalResized.Invoke ();
-			}
+			TerminalResized?.Invoke ();
 		}
 
 		MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
 		{
+			//System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
+
 			MouseFlags mouseFlag = 0;
 
 			if ((me.ButtonState & NetEvents.MouseButtonState.Button1Pressed) != 0) {
@@ -1922,34 +1974,37 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Default;
-
-			return false;
+			visibility = savedCursorVisibility ?? CursorVisibility.Default;
+			return visibility == CursorVisibility.Default;
 		}
+
 
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return false;
+			savedCursorVisibility = visibility;
+			return Console.CursorVisible = visibility == CursorVisibility.Default;
 		}
 
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			return false;
+			if (!(ccol >= 0 && crow >= 0 && ccol < Cols && crow < Rows)) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return false;
+			}
+
+			SetCursorVisibility (savedCursorVisibility ?? CursorVisibility.Default);
+			return savedCursorVisibility == CursorVisibility.Default;
 		}
 
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{
 			NetEvents.InputResult input = new NetEvents.InputResult ();
-			ConsoleKey ck;
-			if (char.IsLetter (keyChar)) {
-				ck = key;
-			} else {
-				ck = (ConsoleKey)'\0';
-			}
 			input.EventType = NetEvents.EventType.Key;
-			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, ck, shift, alt, control);
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control);
 
 			try {
 				ProcessInput (input);

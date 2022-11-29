@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -45,19 +46,58 @@ namespace Terminal.Gui {
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
 	public class MainLoop {
-		internal class Timeout {
+		/// <summary>
+		/// Provides data for timers running manipulation.
+		/// </summary>
+		public sealed class Timeout {
+			/// <summary>
+			/// Time to wait before invoke the callback.
+			/// </summary>
 			public TimeSpan Span;
+			/// <summary>
+			/// The function that will be invoked.
+			/// </summary>
 			public Func<MainLoop, bool> Callback;
 		}
 
 		internal SortedList<long, Timeout> timeouts = new SortedList<long, Timeout> ();
+		object timeoutsLockToken = new object ();
+
+		/// <summary>
+		/// The idle handlers and lock that must be held while manipulating them
+		/// </summary>
+		object idleHandlersLock = new object ();
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
+
+		/// <summary>
+		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks./>.
+		/// A shorter limit time can be added at the end, but it will be called before an
+		///  earlier addition that has a longer limit time.
+		/// </summary>
+		public SortedList<long, Timeout> Timeouts => timeouts;
+
+		/// <summary>
+		/// Gets a copy of the list of all idle handlers.
+		/// </summary>
+		public ReadOnlyCollection<Func<bool>> IdleHandlers {
+			get {
+				lock (idleHandlersLock) {
+					return new List<Func<bool>> (idleHandlers).AsReadOnly ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// The current IMainLoopDriver in use.
 		/// </summary>
 		/// <value>The driver.</value>
 		public IMainLoopDriver Driver { get; }
+
+		/// <summary>
+		/// Invoked when a new timeout is added. To be used in the case
+		/// when <see cref="Application.ExitRunLoopAfterFirstIteration"/> is <see langword="true"/>.
+		/// </summary>
+		public event Action<long> TimeoutAdded;
 
 		/// <summary>
 		///  Creates a new Mainloop. 
@@ -95,7 +135,7 @@ namespace Terminal.Gui {
 		/// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
 		public Func<bool> AddIdle (Func<bool> idleHandler)
 		{
-			lock (idleHandlers) {
+			lock (idleHandlersLock) {
 				idleHandlers.Add (idleHandler);
 			}
 
@@ -111,18 +151,16 @@ namespace Terminal.Gui {
 		///  This method also returns <c>false</c> if the idle handler is not found.
 		public bool RemoveIdle (Func<bool> token)
 		{
-			lock (token)
+			lock (idleHandlersLock)
 				return idleHandlers.Remove (token);
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			lock (timeouts) {
+			lock (timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
-				while (timeouts.ContainsKey (k)) {
-					k = (DateTime.UtcNow + time).Ticks;
-				}
-				timeouts.Add (k, timeout);
+				timeouts.Add (NudgeToUniqueKey (k), timeout);
+				TimeoutAdded?.Invoke (k);
 			}
 		}
 
@@ -159,7 +197,7 @@ namespace Terminal.Gui {
 		/// This method also returns <c>false</c> if the timeout is not found.
 		public bool RemoveTimeout (object token)
 		{
-			lock (timeouts) {
+			lock (timeoutsLockToken) {
 				var idx = timeouts.IndexOfValue (token as Timeout);
 				if (idx == -1)
 					return false;
@@ -171,8 +209,17 @@ namespace Terminal.Gui {
 		void RunTimers ()
 		{
 			long now = DateTime.UtcNow.Ticks;
-			var copy = timeouts;
-			timeouts = new SortedList<long, Timeout> ();
+			SortedList<long, Timeout> copy;
+
+			// lock prevents new timeouts being added
+			// after we have taken the copy but before
+			// we have allocated a new list (which would
+			// result in lost timeouts or errors during enumeration)
+			lock (timeoutsLockToken) {
+				copy = timeouts;
+				timeouts = new SortedList<long, Timeout> ();
+			}
+
 			foreach (var t in copy) {
 				var k = t.Key;
 				var timeout = t.Value;
@@ -180,24 +227,41 @@ namespace Terminal.Gui {
 					if (timeout.Callback (this))
 						AddTimeout (timeout.Span, timeout);
 				} else {
-					lock (timeouts) {
-						timeouts.Add (k, timeout);
+					lock (timeoutsLockToken) {
+						timeouts.Add (NudgeToUniqueKey (k), timeout);
 					}
 				}
 			}
 		}
 
+		/// <summary>
+		/// Finds the closest number to <paramref name="k"/> that is not
+		/// present in <see cref="timeouts"/> (incrementally).
+		/// </summary>
+		/// <param name="k"></param>
+		/// <returns></returns>
+		private long NudgeToUniqueKey (long k)
+		{
+			lock (timeoutsLockToken) {
+				while (timeouts.ContainsKey (k)) {
+					k++;
+				}
+			}
+
+			return k;
+		}
+
 		void RunIdle ()
 		{
 			List<Func<bool>> iterate;
-			lock (idleHandlers) {
+			lock (idleHandlersLock) {
 				iterate = idleHandlers;
 				idleHandlers = new List<Func<bool>> ();
 			}
 
 			foreach (var idle in iterate) {
 				if (idle ())
-					lock (idleHandlers)
+					lock (idleHandlersLock)
 						idleHandlers.Add (idle);
 			}
 		}
@@ -242,9 +306,12 @@ namespace Terminal.Gui {
 
 			Driver.MainIteration ();
 
-			lock (idleHandlers) {
-				if (idleHandlers.Count > 0)
-					RunIdle ();
+			bool runIdle = false;
+			lock (idleHandlersLock) {
+				runIdle = idleHandlers.Count > 0;
+			}
+			if (runIdle) {
+				RunIdle ();
 			}
 		}
 

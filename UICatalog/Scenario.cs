@@ -12,7 +12,7 @@ namespace UICatalog {
 	///  <list type="number">
 	///  <item><description>Create a new <c>.cs</c> file in the <cs>Scenarios</cs> directory that derives from <see cref="Scenario"/>.</description></item>
 	///  <item><description>Annotate the <see cref="Scenario"/> derived class with a <see cref="Scenario.ScenarioMetadata"/> attribute specifying the scenario's name and description.</description></item>
-	///  <item><description>Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "All".</description></item>
+	///  <item><description>Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "_All".</description></item>
 	///  <item><description>Implement the <see cref="Setup"/> override which will be called when a user selects the scenario to run.</description></item>
 	///  <item><description>Optionally, implement the <see cref="Init(Toplevel, ColorScheme)"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description></item>
 	///  </list>
@@ -48,12 +48,7 @@ namespace UICatalog {
 		private bool _disposedValue;
 
 		/// <summary>
-		/// The Top level for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
-		/// </summary>
-		public Toplevel Top { get; set; }
-
-		/// <summary>
-		/// The Window for the <see cref="Scenario"/>. This should be set within the <see cref="Terminal.Gui.Application.Top"/> in most cases.
+		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
 		/// </summary>
 		public Window Win { get; set; }
 
@@ -63,24 +58,20 @@ namespace UICatalog {
 		/// the Scenario picker UI.
 		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
 		/// </summary>
-		/// <param name="top">The Toplevel created by the UI Catalog host.</param>
 		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
 		/// <para>
-		/// The base implementation calls <see cref="Application.Init"/>, sets <see cref="Top"/> to the passed in <see cref="Toplevel"/>, creates a <see cref="Window"/> for <see cref="Win"/> and adds it to <see cref="Top"/>.
+		/// The base implementation calls <see cref="Application.Init"/> and creates a <see cref="Window"/> for <see cref="Win"/> 
+		/// and adds it to <see cref="Application.Top"/>.
 		/// </para>
 		/// <para>
-		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating any views or calling other Terminal.Gui APIs.
+		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> 
+		/// before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init(Toplevel top, ColorScheme colorScheme)
+		public virtual void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
 
 			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
@@ -89,7 +80,7 @@ namespace UICatalog {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 		}
 
 		/// <summary>
@@ -177,7 +168,14 @@ namespace UICatalog {
 		/// <returns>list of category names</returns>
 		public List<string> GetCategories () => ScenarioCategory.GetCategories (this.GetType ());
 
-		public override string ToString () => $"{GetName (),-30}{GetDescription ()}";
+		private static int _maxScenarioNameLen = 30;
+
+		/// <summary>
+		/// Gets the Scenario Name + Description with the Description padded
+		/// based on the longest known Scenario name.
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString () => $"{GetName ().PadRight(_maxScenarioNameLen)}{GetDescription ()}";
 
 		/// <summary>
 		/// Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...). 
@@ -197,7 +195,7 @@ namespace UICatalog {
 		public virtual void Run ()
 		{
 			// Must explicit call Application.Shutdown method to shutdown.
-			Application.Run (Top);
+			Application.Run (Application.Top);
 		}
 
 		/// <summary>
@@ -213,27 +211,35 @@ namespace UICatalog {
 		/// </summary>
 		internal static List<string> GetAllCategories ()
 		{
-			List<string> categories = new List<string> () { "All" };
+			List<string> categories = new List<string> ();
 			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
 			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
 				List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();
 				categories = categories.Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name)).ToList ();
 			}
+
+			// Sort
+			categories = categories.OrderBy (c => c).ToList ();
+
+			// Put "All" at the top
+			categories.Insert (0, "All Scenarios");
 			return categories;
 		}
 
 		/// <summary>
-		/// Returns an instance of each <see cref="Scenario"/> defined in the project. 
+		/// Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by <see cref="ScenarioMetadata.Name"/>.
 		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
 		/// </summary>
-		public static List<Type> GetDerivedClasses<T> ()
+		public static List<Scenario> GetScenarios ()
 		{
-			List<Type> objects = new List<Type> ();
-			foreach (Type type in typeof (T).Assembly.GetTypes ()
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (T)))) {
-				objects.Add (type);
+			List<Scenario> objects = new List<Scenario> ();
+			foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
+			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
+				var scenario = (Scenario)Activator.CreateInstance (type);
+				objects.Add (scenario);
+				_maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
 			}
-			return objects;
+			return objects.OrderBy (s => s.GetName ()).ToList ();
 		}
 
 		protected virtual void Dispose (bool disposing)

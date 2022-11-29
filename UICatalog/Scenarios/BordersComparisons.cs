@@ -2,14 +2,12 @@
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders Comparisons", Description: "Compares Window, Toplevel and FrameView borders.")]
-	[ScenarioCategory ("Border")]
+	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Borders")]
 	public class BordersComparisons : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
-			top.Dispose ();
 			Application.Init ();
-
-			top = Application.Top;
 
 			var borderStyle = BorderStyle.Double;
 			var drawMarginFrame = false;
@@ -45,7 +43,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf2 = new TextField ("1234567890") {
@@ -54,7 +51,7 @@ namespace UICatalog.Scenarios {
 				Width = 10
 			};
 			win.Add (tf1, button, label, tv, tf2);
-			top.Add (win);
+			Application.Top.Add (win);
 
 			var top2 = new Border.ToplevelContainer (new Rect (50, 5, 40, 20),
 				new Border () {
@@ -64,9 +61,9 @@ namespace UICatalog.Scenarios {
 					BorderBrush = borderBrush,
 					Padding = padding,
 					Background = background,
-					Effect3D = effect3D
-				},
-				"Test2") {
+					Effect3D = effect3D,
+					Title = "Test2"
+				}) {
 				ColorScheme = Colors.Base,
 			};
 
@@ -85,7 +82,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf4 = new TextField ("1234567890") {
@@ -94,7 +90,7 @@ namespace UICatalog.Scenarios {
 				Width = 10
 			};
 			top2.Add (tf3, button2, label2, tv2, tf4);
-			top.Add (top2);
+			Application.Top.Add (top2);
 
 			var frm = new FrameView (new Rect (95, 5, 40, 20), "Test3", null,
 				new Border () {
@@ -122,7 +118,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (2),
 				Width = 10,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Dialog,
 				Text = "1234567890"
 			};
 			var tf6 = new TextField ("1234567890") {
@@ -131,7 +126,7 @@ namespace UICatalog.Scenarios {
 				Width = 10
 			};
 			frm.Add (tf5, button3, label3, tv3, tf6);
-			top.Add (frm);
+			Application.Top.Add (frm);
 
 			Application.Run ();
 		}

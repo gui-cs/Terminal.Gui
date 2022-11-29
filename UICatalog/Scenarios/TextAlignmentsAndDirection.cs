@@ -4,8 +4,8 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demonstrates text alignment")]
-	[ScenarioCategory ("Text")]
+	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demos horiztonal and vertical text alignment and text direction.")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class TextAlignmentsAndDirections : Scenario {
 
 		public override void Setup ()
@@ -60,7 +60,7 @@ namespace UICatalog.Scenarios {
 
 			// Multi-Line
 
-			var container = new View () { X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (7), ColorScheme = color2 };
+			var container = new View () { X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (6), ColorScheme = color2 };
 
 			var txtLabelTL = new Label (txt) { X = 1 /*                    */, Y = 1, Width = Dim.Percent (100f / 3f), Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Left, VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1 };
 			var txtLabelTC = new Label (txt) { X = Pos.Right (txtLabelTL) + 2, Y = 1, Width = Dim.Percent (100f / 3f), Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Centered, VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1 };
@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (container) + 1,
 				Width = Dim.Fill (10),
 				Height = Dim.Fill (1),
-				ColorScheme = color2,
+				ColorScheme = Colors.TopLevel,
 				Text = txt
 			};
 

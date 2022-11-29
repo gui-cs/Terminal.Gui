@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Unicode", Description: "Tries to test Unicode in all controls (#204)")]
-	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Text and Formatting")]
 	[ScenarioCategory ("Controls")]
 	public class UnicodeInMenu : Scenario {
 		public override void Setup ()
@@ -34,14 +34,14 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Paste", "", null)
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Выход", () => Application.RequestStop()),
 				new StatusItem (Key.Unknown, "~F2~ Создать", null),
 				new StatusItem(Key.Unknown, "~F3~ Со_хранить", null),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			var label = new Label ("Label:") { X = 0, Y = 1 };
 			Win.Add (label);

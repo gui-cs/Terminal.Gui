@@ -8,10 +8,9 @@ namespace UICatalog.Scenarios {
 	// 
 	// This would be a great scenario to show of threading (Issue #471)
 	//
-	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading")]
+	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("MainLoop")]
-	[ScenarioCategory ("Threading")]
+	[ScenarioCategory ("Threading"), ScenarioCategory ("ProgressBar")]
 	public class Progress : Scenario {
 
 		class ProgressDemo : FrameView {

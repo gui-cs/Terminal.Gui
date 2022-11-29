@@ -8,7 +8,11 @@ packages
 # User-specific files
 *.user
 
+# API Docs
 docfx/api
+
+# Never push ./docs folder - the gh-pages branch is now used to publish to GH Pages
+docs/
 
 UnitTests/TestResults
 
@@ -17,6 +21,6 @@ UnitTests/TestResults
 
 .vscode/
 
-demo.txt
+demo.*
 
 *.deb

@@ -1,10 +1,10 @@
-name: Build Terminal.Gui with .NET Core
+name: Build & Test Terminal.Gui with .NET Core
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   build:
@@ -12,18 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: 6.0.100
 
     - name: Install dependencies
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+    - name: Build Debug
+      run: dotnet build --configuration Debug --no-restore
 
     - name: Test
       run: |

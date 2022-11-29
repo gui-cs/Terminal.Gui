@@ -9,14 +9,14 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Dynamic MenuBar", Description: "Demonstrates how to add and remove a MenuBar, Menus and change titles dynamically.")]
-	[ScenarioCategory ("Dynamic")]
+	[ScenarioMetadata (Name: "Dynamic MenuBar", Description: "Demonstrates how to change a MenuBar dynamically.")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Menus")]
 	public class DynamicMenuBar : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = Application.Top;
-			Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
 		}
 
 		public class DynamicMenuItemList {
@@ -680,7 +680,6 @@ namespace UICatalog.Scenarios {
 				Add (_lblAction);
 
 				_txtAction = new TextView () {
-					ColorScheme = Colors.Dialog,
 					X = Pos.Left (_txtTitle),
 					Y = Pos.Top (_lblAction),
 					Width = Dim.Fill (),

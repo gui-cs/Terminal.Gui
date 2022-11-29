@@ -6,9 +6,6 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using NStack;
 
 namespace Terminal.Gui {
@@ -27,37 +24,39 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect frame) : base (frame)
+		public Label (Rect frame, bool autosize = false) : base (frame)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (ustring text) : base (text)
+		public Label (ustring text, bool autosize = true) : base (text)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (Rect rect, ustring text) : base (rect, text)
+		public Label (Rect rect, ustring text, bool autosize = false) : base (rect, text)
 		{
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (int x, int y, ustring text) : base (x, y, text)
+		public Label (int x, int y, ustring text, bool autosize = true) : base (x, y, text)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
 		/// <inheritdoc/>
-		public Label (ustring text, TextDirection direction)
+		public Label (ustring text, TextDirection direction, bool autosize = true)
 			: base (text, direction)
 		{
-			Initialize ();
+			Initialize (autosize);
 		}
 
-		void Initialize ()
+		void Initialize (bool autosize = true)
 		{
-			AutoSize = true;
+			AutoSize = autosize;
 		}
 
 		/// <summary>
@@ -108,7 +107,7 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				Clicked?.Invoke ();
+				OnClicked ();
 				return true;
 			}
 			return false;
@@ -120,6 +119,27 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			return base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				if (!HasFocus) {
+					SetFocus ();
+				}
+				OnClicked ();
+				return true;
+			}
+			return base.ProcessHotKey (ke);
+		}
+
+		/// <summary>
+		/// Virtual method to invoke the <see cref="Clicked"/> event.
+		/// </summary>
+		public virtual void OnClicked ()
+		{
+			Clicked?.Invoke ();
 		}
 	}
 }

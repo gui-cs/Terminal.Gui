@@ -3,8 +3,10 @@ using System.Text.RegularExpressions;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Show five TextView Autocomplete Popup effects")]
+	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Shows five TextView Autocomplete Popup effects")]
+	[ScenarioCategory ("TextView")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Mouse and Keyboard")]
 	public class TextViewAutocompletePopup : Scenario {
 
 		TextView textViewTopLeft;
@@ -22,7 +24,6 @@ namespace UICatalog.Scenarios {
 		{
 			Win.Title = GetName ();
 			var width = 20;
-			var colorScheme = Colors.Dialog;
 			var text = " jamp jemp jimp jomp jump";
 
 			var menu = new MenuBar (new MenuBarItem [] {
@@ -32,12 +33,11 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit())
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			textViewTopLeft = new TextView () {
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
@@ -47,7 +47,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.AnchorEnd (width),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
@@ -57,7 +56,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
@@ -68,7 +66,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.AnchorEnd (height),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
@@ -79,7 +76,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center (),
 				Width = width,
 				Height = height,
-				ColorScheme = colorScheme,
 				Text = text
 			};
 			textViewCentered.DrawContent += TextViewCentered_DrawContent;
@@ -93,7 +89,7 @@ namespace UICatalog.Scenarios {
 				siMultiline = new StatusItem(Key.Null, "", null),
 				siWrap = new StatusItem(Key.Null, "", null)
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			Win.LayoutStarted += Win_LayoutStarted;
 		}

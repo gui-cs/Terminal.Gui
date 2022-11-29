@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,16 +12,17 @@ using Terminal.Gui.TextValidateProviders;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")]
+	[ScenarioCategory ("Mouse and Keyboard")]
+	[ScenarioCategory ("Text and Formatting")]
 	public class Text : Scenario {
 		public override void Setup ()
 		{
-			var s = "TAB to jump between text fields.";
-			var textField = new TextField (s) {
+			// TextField is a simple, single-line text input control
+			var textField = new TextField ("TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!") {
 				X = 1,
-				Y = 1,
-				Width = Dim.Percent (50),
-				//ColorScheme = Colors.Dialog
+				Y = 0,
+				Width = Dim.Percent (50) - 1,
+				Height = 2
 			};
 			textField.TextChanging += TextField_TextChanging;
 
@@ -35,7 +37,7 @@ namespace UICatalog.Scenarios {
 			var labelMirroringTextField = new Label (textField.Text) {
 				X = Pos.Right (textField) + 1,
 				Y = Pos.Top (textField),
-				Width = Dim.Fill (1)
+				Width = Dim.Fill (1) - 1
 			};
 			Win.Add (labelMirroringTextField);
 
@@ -43,16 +45,17 @@ namespace UICatalog.Scenarios {
 				labelMirroringTextField.Text = textField.Text;
 			};
 
+			// TextView is a rich (as in functionality, not formatting) text editing control
 			var textView = new TextView () {
 				X = 1,
-				Y = 3,
-				Width = Dim.Percent (50),
+				Y = Pos.Bottom (textField),
+				Width = Dim.Percent (50) - 1,
 				Height = Dim.Percent (30),
-				ColorScheme = Colors.Dialog
 			};
-			textView.Text = s;
+			textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!" ;
 			textView.DrawContent += TextView_DrawContent;
 
+			// This shows how to enable autocomplete in TextView.
 			void TextView_DrawContent (Rect e)
 			{
 				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
@@ -61,40 +64,89 @@ namespace UICatalog.Scenarios {
 			}
 			Win.Add (textView);
 
-			var labelMirroringTextView = new Label (textView.Text) {
+			var labelMirroringTextView = new Label () {
 				X = Pos.Right (textView) + 1,
 				Y = Pos.Top (textView),
-				Width = Dim.Fill (1),
-				Height = Dim.Height (textView),
+				Width = Dim.Fill (1) - 1,
+				Height = Dim.Height (textView) - 1,
 			};
 			Win.Add (labelMirroringTextView);
 
-			textView.TextChanged += () => {
+			// Use ContentChanged to detect if the user has typed something in a TextView.
+			// The TextChanged property is only fired if the TextView.Text property is
+			// explicitly set
+			textView.ContentsChanged += (a) => {
+				labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
 				labelMirroringTextView.Text = textView.Text;
 			};
 
-			var btnMultiline = new Button ("Toggle Multiline") {
-				X = Pos.Right (textView) + 1,
-				Y = Pos.Top (textView) + 1
+			// By default TextView is a multi-line control. It can be forced to 
+			// single-line mode.
+			var chxMultiline = new CheckBox ("Multiline") {
+				X = Pos.Left (textView),
+				Y = Pos.Bottom (textView), 
+				Checked = true
 			};
-			btnMultiline.Clicked += () => textView.Multiline = !textView.Multiline;
-			Win.Add (btnMultiline);
+			chxMultiline.Toggled += (b) => textView.Multiline = b;
+			Win.Add (chxMultiline);
 
-			// BUGBUG: 531 - TAB doesn't go to next control from HexView
-			var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (s))) {
-				X = 1,
-				Y = Pos.Bottom (textView) + 1,
-				Width = Dim.Fill (1),
-				Height = Dim.Percent (30),
-				//ColorScheme = Colors.Dialog
+			var chxWordWrap = new CheckBox ("Word Wrap") {
+				X = Pos.Right (chxMultiline) + 2,
+				Y = Pos.Top (chxMultiline)
 			};
-			Win.Add (hexView);
+			chxWordWrap.Toggled += (b) => textView.WordWrap = b;
+			Win.Add (chxWordWrap);
+
+			// TextView captures Tabs (so users can enter /t into text) by default;
+			// This means using Tab to navigate doesn't work by default. This shows
+			// how to turn tab capture off.
+			var chxCaptureTabs = new CheckBox ("Capture Tabs") {
+				X = Pos.Right (chxWordWrap) + 2,
+				Y = Pos.Top (chxWordWrap),
+				Checked = true
+			};
+
+			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
+			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
+			chxCaptureTabs.Toggled += (b) => { 
+				if (b) {
+					textView.AddKeyBinding (keyTab, Command.Tab);
+					textView.AddKeyBinding (keyBackTab, Command.BackTab);
+				} else {
+					textView.ClearKeybinding (keyTab);
+					textView.ClearKeybinding (keyBackTab);
+				}
+				textView.WordWrap = b; 
+			};
+			Win.Add (chxCaptureTabs);
+
+			var hexEditor = new HexView (new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))) {
+				X = 1,
+				Y = Pos.Bottom (chxMultiline) + 1,
+				Width = Dim.Percent (50) - 1,
+				Height = Dim.Percent (30),
+			};
+			Win.Add (hexEditor);
+
+			var labelMirroringHexEditor = new Label () {
+				X = Pos.Right (hexEditor) + 1,
+				Y = Pos.Top (hexEditor),
+				Width = Dim.Fill (1) - 1,
+				Height = Dim.Height (hexEditor) - 1,
+			};
+			var array = ((MemoryStream)hexEditor.Source).ToArray ();
+			labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
+			hexEditor.Edited += (kv) => {
+				hexEditor.ApplyEdits ();
+				var array = ((MemoryStream)hexEditor.Source).ToArray (); 
+				labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
+			};
+			Win.Add (labelMirroringHexEditor);
 
 			var dateField = new DateField (System.DateTime.Now) {
 				X = 1,
-				Y = Pos.Bottom (hexView) + 1,
+				Y = Pos.Bottom (hexEditor) + 1,
 				Width = 20,
-				//ColorScheme = Colors.Dialog,
 				IsShortFormat = false
 			};
 			Win.Add (dateField);
@@ -113,9 +165,8 @@ namespace UICatalog.Scenarios {
 
 			_timeField = new TimeField (DateTime.Now.TimeOfDay) {
 				X = Pos.Right (labelMirroringDateField) + 5,
-				Y = Pos.Bottom (hexView) + 1,
+				Y = Pos.Bottom (hexEditor) + 1,
 				Width = 20,
-				//ColorScheme = Colors.Dialog,
 				IsShortFormat = false
 			};
 			Win.Add (_timeField);
@@ -130,8 +181,8 @@ namespace UICatalog.Scenarios {
 
 			_timeField.TimeChanged += TimeChanged;
 
-			// MaskedTextProvider
-			var netProviderLabel = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+			// MaskedTextProvider - uses .NET MaskedTextProvider
+			var netProviderLabel = new Label ("NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
 				X = Pos.Left (dateField),
 				Y = Pos.Bottom (dateField) + 1
 			};
@@ -141,13 +192,13 @@ namespace UICatalog.Scenarios {
 
 			var netProviderField = new TextValidateField (netProvider) {
 				X = Pos.Right (netProviderLabel) + 1,
-				Y = Pos.Y (netProviderLabel)
+				Y = Pos.Y (netProviderLabel),
 			};
 
 			Win.Add (netProviderField);
 
-			// TextRegexProvider
-			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+			// TextRegexProvider - Regex provider implemented by Terminal.Gui
+			var regexProvider = new Label ("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
 				X = Pos.Left (netProviderLabel),
 				Y = Pos.Bottom (netProviderLabel) + 1
 			};

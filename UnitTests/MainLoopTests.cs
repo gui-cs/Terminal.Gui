@@ -29,12 +29,18 @@ namespace Terminal.Gui.Core {
 		{
 			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-			Func<bool> fnTrue = () => { return true; };
-			Func<bool> fnFalse = () => { return false; };
+			Func<bool> fnTrue = () => true;
+			Func<bool> fnFalse = () => false;
+
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnFalse);
 
+			Assert.Equal (2, ml.IdleHandlers.Count);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Single (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -52,8 +58,19 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fnTrue);
 			ml.AddIdle (fnTrue);
 
+			Assert.Equal (2, ml.IdleHandlers.Count);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.True (ml.IdleHandlers [0] ());
+			Assert.Equal (fnTrue, ml.IdleHandlers [1]);
+			Assert.True (ml.IdleHandlers [1] ());
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Single (ml.IdleHandlers);
+			Assert.Equal (fnTrue, ml.IdleHandlers [0]);
+			Assert.NotEqual (fnFalse, ml.IdleHandlers [0]);
+
 			Assert.True (ml.RemoveIdle (fnTrue));
+			Assert.Empty (ml.IdleHandlers);
 
 			// BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
 			// throw an exception in this case, or return an error.
@@ -125,14 +142,17 @@ namespace Terminal.Gui.Core {
 			ml.AddIdle (fn);
 			ml.MainIteration ();
 			Assert.Equal (2, functionCalled);
+			Assert.Equal (2, ml.IdleHandlers.Count);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
+			Assert.Single (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (1, functionCalled);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
+			Assert.Empty (ml.IdleHandlers);
 			ml.MainIteration ();
 			Assert.Equal (0, functionCalled);
 			Assert.False (ml.RemoveIdle (fn));
@@ -505,5 +525,242 @@ namespace Terminal.Gui.Core {
 		// - wait = false
 
 		// TODO: Add IMainLoop tests
+
+		volatile static int tbCounter = 0;
+		static ManualResetEventSlim _wakeUp = new ManualResetEventSlim (false);
+
+		private static void Launch (Random r, TextField tf, int target)
+		{
+			Task.Run (() => {
+				Thread.Sleep (r.Next (2, 4));
+				Application.MainLoop.Invoke (() => {
+					tf.Text = $"index{r.Next ()}";
+					Interlocked.Increment (ref tbCounter);
+					if (target == tbCounter) {
+						// On last increment wake up the check
+						_wakeUp.Set ();
+					}
+				});
+			});
+		}
+
+		private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
+		{
+			for (int j = 0; j < numPasses; j++) {
+
+				_wakeUp.Reset ();
+				for (var i = 0; i < numIncrements; i++) {
+					Launch (r, tf, (j + 1) * numIncrements);
+				}
+
+
+				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
+				{
+					var tbNow = tbCounter;
+					_wakeUp.Wait (pollMs);
+					if (tbCounter == tbNow) {
+						// No change after wait: Idle handlers added via Application.MainLoop.Invoke have gone missing
+						Application.MainLoop.Invoke (() => Application.RequestStop ());
+						throw new TimeoutException (
+							$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
+							$"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
+					}
+				};
+			}
+			Application.MainLoop.Invoke (() => Application.RequestStop ());
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public async Task InvokeLeakTest ()
+		{
+			Random r = new ();
+			TextField tf = new ();
+			Application.Top.Add (tf);
+
+			const int numPasses = 5;
+			const int numIncrements = 5000;
+			const int pollMs = 10000;
+
+			var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
+
+			// blocks here until the RequestStop is processed at the end of the test
+			Application.Run ();
+
+			await task; // Propagate exception if any occurred
+
+			Assert.Equal ((numIncrements * numPasses), tbCounter);
+		}
+
+		private static int total;
+		private static Button btn;
+		private static string clickMe;
+		private static string cancel;
+		private static string pewPew;
+		private static int zero;
+		private static int one;
+		private static int two;
+		private static int three;
+		private static int four;
+		private static bool taskCompleted;
+
+		[Theory, AutoInitShutdown]
+		[MemberData (nameof (TestAddIdle))]
+		public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (Action action, string pclickMe, string pcancel, string ppewPew, int pzero, int pone, int ptwo, int pthree, int pfour)
+		{
+			total = 0;
+			btn = null;
+			clickMe = pclickMe;
+			cancel = pcancel;
+			pewPew = ppewPew;
+			zero = pzero;
+			one = pone;
+			two = ptwo;
+			three = pthree;
+			four = pfour;
+			taskCompleted = false;
+
+			var btnLaunch = new Button ("Open Window");
+
+			btnLaunch.Clicked += () => action ();
+
+			Application.Top.Add (btnLaunch);
+
+			var iterations = -1;
+
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.Null (btn);
+					Assert.Equal (zero, total);
+					Assert.True (btnLaunch.ProcessKey (new KeyEvent (Key.Enter, null)));
+					if (btn == null) {
+						Assert.Null (btn);
+						Assert.Equal (zero, total);
+					} else {
+						Assert.Equal (clickMe, btn.Text);
+						Assert.Equal (four, total);
+					}
+				} else if (iterations == 1) {
+					Assert.Equal (clickMe, btn.Text);
+					Assert.Equal (zero, total);
+					Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
+					Assert.Equal (cancel, btn.Text);
+					Assert.Equal (one, total);
+				} else if (taskCompleted) {
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+
+			Assert.True (taskCompleted);
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (four, total);
+		}
+
+		public static IEnumerable<object []> TestAddIdle {
+			get {
+				// Goes fine
+				Action a1 = StartWindow;
+				yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+
+				// Also goes fine
+				Action a2 = () => Application.MainLoop.Invoke (StartWindow);
+				yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+			}
+		}
+
+		private static void StartWindow ()
+		{
+			var startWindow = new Window {
+				Modal = true
+			};
+
+			btn = new Button {
+				Text = "Click Me"
+			};
+
+			btn.Clicked += RunAsyncTest;
+
+			var totalbtn = new Button () {
+				X = Pos.Right (btn),
+				Text = "total"
+			};
+
+			totalbtn.Clicked += () => {
+				MessageBox.Query ("Count", $"Count is {total}", "Ok");
+			};
+
+			startWindow.Add (btn);
+			startWindow.Add (totalbtn);
+
+			Application.Run (startWindow);
+
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (four, total);
+
+			Application.RequestStop ();
+		}
+
+		private static async void RunAsyncTest ()
+		{
+			Assert.Equal (clickMe, btn.Text);
+			Assert.Equal (zero, total);
+
+			btn.Text = "Cancel";
+			Interlocked.Increment (ref total);
+			btn.SetNeedsDisplay ();
+
+			await Task.Run (() => {
+				try {
+					Assert.Equal (cancel, btn.Text);
+					Assert.Equal (one, total);
+
+					RunSql ();
+				} finally {
+					SetReadyToRun ();
+				}
+			}).ContinueWith (async (s, e) => {
+
+				await Task.Delay (1000);
+				Assert.Equal (clickMe, btn.Text);
+				Assert.Equal (three, total);
+
+				Interlocked.Increment (ref total);
+
+				Assert.Equal (clickMe, btn.Text);
+				Assert.Equal (four, total);
+
+				taskCompleted = true;
+
+			}, TaskScheduler.FromCurrentSynchronizationContext ());
+		}
+
+		private static void RunSql ()
+		{
+			Thread.Sleep (100);
+			Assert.Equal (cancel, btn.Text);
+			Assert.Equal (one, total);
+
+			Application.MainLoop.Invoke (() => {
+				btn.Text = "Pew Pew";
+				Interlocked.Increment (ref total);
+				btn.SetNeedsDisplay ();
+			});
+		}
+
+		private static void SetReadyToRun ()
+		{
+			Thread.Sleep (100);
+			Assert.Equal (pewPew, btn.Text);
+			Assert.Equal (two, total);
+
+			Application.MainLoop.Invoke (() => {
+				btn.Text = "Click Me";
+				Interlocked.Increment (ref total);
+				btn.SetNeedsDisplay ();
+			});
+		}
 	}
 }

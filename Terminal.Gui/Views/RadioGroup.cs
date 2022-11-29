@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// <see cref="RadioGroup"/> shows a group of radio labels, only one of those can be selected at a given time
+	/// Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.
 	/// </summary>
 	public class RadioGroup : View {
 		int selected = -1;
@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (ustring [] radioLabels, int selected = 0) : base ()
 		{
-			Initialize (radioLabels, selected);
+			Initialize (Rect.Empty, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (Rect rect, ustring [] radioLabels, int selected = 0) : base (rect)
 		{
-			Initialize (radioLabels, selected);
+			Initialize (rect, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
 		{ }
 
-		void Initialize (ustring [] radioLabels, int selected)
+		void Initialize (Rect rect, ustring [] radioLabels, int selected)
 		{
 			if (radioLabels == null) {
 				this.radioLabels = new List<ustring> ();
@@ -61,7 +61,11 @@ namespace Terminal.Gui {
 			}
 
 			this.selected = selected;
-			SetWidthHeight (this.radioLabels);
+			if (rect == Rect.Empty) {
+				SetWidthHeight (this.radioLabels);
+			} else {
+				Frame = rect;
+			}
 			CanFocus = true;
 
 			// Things this view knows how to do
@@ -102,6 +106,7 @@ namespace Terminal.Gui {
 				if (horizontalSpace != value && displayMode == DisplayModeLayout.Horizontal) {
 					horizontalSpace = value;
 					SetWidthHeight (radioLabels);
+					UpdateTextFormatterText ();
 					SetNeedsDisplay ();
 				}
 			}
@@ -112,7 +117,7 @@ namespace Terminal.Gui {
 			switch (displayMode) {
 			case DisplayModeLayout.Vertical:
 				var r = MakeRect (0, 0, radioLabels);
-				if (LayoutStyle == LayoutStyle.Computed) {
+				if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
 					Width = r.Width;
 					Height = radioLabels.Count;
 				} else {
@@ -126,9 +131,11 @@ namespace Terminal.Gui {
 					length += item.length;
 				}
 				var hr = new Rect (0, 0, length, 1);
-				if (LayoutStyle == LayoutStyle.Computed) {
+				if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
 					Width = hr.Width;
 					Height = 1;
+				} else {
+					Frame = new Rect (Frame.Location, new Size (hr.Width, radioLabels.Count));
 				}
 				break;
 			}
@@ -136,17 +143,16 @@ namespace Terminal.Gui {
 
 		static Rect MakeRect (int x, int y, List<ustring> radioLabels)
 		{
-			int width = 0;
-
 			if (radioLabels == null) {
-				return new Rect (x, y, width, 0);
+				return new Rect (x, y, 0, 0);
 			}
 
+			int width = 0;
+
 			foreach (var s in radioLabels)
-				width = Math.Max (s.RuneCount + 3, width);
+				width = Math.Max (s.ConsoleWidth + 3, width);
 			return new Rect (x, y, width, radioLabels.Count);
 		}
-
 
 		List<ustring> radioLabels = new List<ustring> ();
 
@@ -176,7 +182,7 @@ namespace Terminal.Gui {
 				int length = 0;
 				for (int i = 0; i < radioLabels.Count; i++) {
 					start += length;
-					length = radioLabels [i].RuneCount + horizontalSpace;
+					length = radioLabels [i].ConsoleWidth + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
 					horizontal.Add ((start, length));
 				}
 			}
@@ -188,7 +194,7 @@ namespace Terminal.Gui {
 		//	for (int i = 0; i < radioLabels.Count; i++) {
 		//		Move(0, i);
 		//		Driver.SetAttribute(ColorScheme.Normal);
-		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].RuneCount + 4)));
+		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].ConsoleWidth + 4)));
 		//	}
 		//	if (newRadioLabels.Count != radioLabels.Count) {
 		//		SetWidthHeight(newRadioLabels);
@@ -210,7 +216,7 @@ namespace Terminal.Gui {
 					break;
 				}
 				Driver.SetAttribute (GetNormalColor ());
-				Driver.AddStr (ustring.Make (new Rune [] { (i == selected ? Driver.Selected : Driver.UnSelected), ' ' }));
+				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? Driver.Selected : Driver.UnSelected, ' ' }));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
 		}

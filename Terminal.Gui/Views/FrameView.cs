@@ -108,7 +108,8 @@ namespace Terminal.Gui {
 
 		void Initialize (Rect frame, ustring title, View [] views = null, Border border = null)
 		{
-			this.title = title;
+			if (title == null) title = ustring.Empty;
+			this.Title = title;
 			if (border == null) {
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single
@@ -123,20 +124,23 @@ namespace Terminal.Gui {
 		{
 			var borderLength = Border.DrawMarginFrame ? 1 : 0;
 			var sumPadding = Border.GetSumThickness ();
+			var wp = new Point ();
 			var wb = new Size ();
 			if (frame == Rect.Empty) {
+				wp.X = borderLength + sumPadding.Left;
+				wp.Y = borderLength + sumPadding.Top;
 				wb.Width = borderLength + sumPadding.Right;
 				wb.Height = borderLength + sumPadding.Bottom;
 				if (contentView == null) {
 					contentView = new ContentView () {
-						X = borderLength + sumPadding.Left,
-						Y = borderLength + sumPadding.Top,
+						X = wp.X,
+						Y = wp.Y,
 						Width = Dim.Fill (wb.Width),
 						Height = Dim.Fill (wb.Height)
 					};
 				} else {
-					contentView.X = borderLength + sumPadding.Left;
-					contentView.Y = borderLength + sumPadding.Top;
+					contentView.X = wp.X;
+					contentView.Y = wp.Y;
 					contentView.Width = Dim.Fill (wb.Width);
 					contentView.Height = Dim.Fill (wb.Height);
 				}
@@ -216,22 +220,22 @@ namespace Terminal.Gui {
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (GetNormalColor ());
 				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
-				Border.DrawContent ();
+				Clear ();
 			}
 
 			var savedClip = contentView.ClipToBounds ();
-			contentView.Redraw (contentView.Bounds);
+			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearNeedsDisplay ();
-			if (Border.BorderStyle != BorderStyle.None) {
-				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				//Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
+
+			Driver.SetAttribute (GetNormalColor ());
+			//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
+			Border.DrawContent (this, false);
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			if (Border.DrawMarginFrame)
 				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			}
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
@@ -239,7 +243,7 @@ namespace Terminal.Gui {
 		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public override ustring Text {
-			get => contentView.Text;
+			get => contentView?.Text;
 			set {
 				base.Text = value;
 				if (contentView != null) {

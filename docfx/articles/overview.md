@@ -8,7 +8,7 @@ well as modern color terminals with mouse support.
 This library works across Windows, Linux and MacOS.
 
 This library provides a text-based toolkit as works in a way similar
-to graphic toolkits.   There are many controls that can be used to
+to graphic toolkits. There are many controls that can be used to
 create your applications and it is event based, meaning that you
 create the user interface, hook up various events and then let the
 a processing loop run your application, and your code is invoked via
@@ -26,7 +26,8 @@ class Demo {
 
         var n = MessageBox.Query (50, 7, 
             "Question", "Do you like console apps?", "Yes", "No");
-
+            
+		Application.Shutdown ();
         return n;
     }
 }
@@ -37,7 +38,7 @@ which value was selected by the user (Yes, No, or if they use chose
 not to make a decision and instead pressed the ESC key).
 
 More interesting user interfaces can be created by composing some of
-the various views that are included.   In the following sections, you
+the various views that are included. In the following sections, you
 will see how applications are put together.
 
 In the example above, you can see that we have initialized the runtime by calling the 
@@ -62,6 +63,7 @@ class Demo {
         };
         Application.Top.Add (label);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 ```
@@ -95,20 +97,20 @@ class Demo {
         // Add both menu and win in a single call
         Application.Top.Add (menu, win);
         Application.Run ();
+        Application.Shutdown ();
     }
 }
 ```
 
-Views
-=====
+## Views
 
 All visible elements on a Terminal.Gui application are implemented as
-[Views](~/api/Terminal.Gui/Terminal.Gui.View.yml).   Views are self-contained
-objects that take care of displaying themselves, can receive keyboard and mouse
-input and participate in the focus mechanism.
+[Views](~/api/Terminal.Gui/Terminal.Gui.View.yml). Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.
 
-Every view can contain an arbitrary number of children views.   These are called
-the Subviews.   You can add a view to an existing view, by calling the 
+See the full list of [Views provided by the Terminal.Gui library here](views.md).
+
+Every view can contain an arbitrary number of children views. These are called
+the Subviews. You can add a view to an existing view, by calling the 
 [`Add`](~/api/Terminal.Gui/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_) method, for example, to add a couple of buttons to a UI, you can do this:
 
 ```csharp
@@ -135,24 +137,19 @@ void SetupMyView (View myView)
 The container of a given view is called the `SuperView` and it is a property of every
 View.
 
-There are many views that you can use to spice up your application:
-
-[Buttons](~/api/Terminal.Gui/Terminal.Gui.Button.yml), [Labels](~/api/Terminal.Gui/Terminal.Gui.Label.yml), [Text entry](~/api/Terminal.Gui/Terminal.Gui.TextField.yml), [Text view](~/api/Terminal.Gui/Terminal.Gui.TextView.yml), [Radio buttons](~/api/Terminal.Gui/Terminal.Gui.RadioGroup.yml), [Checkboxes](~/api/Terminal.Gui/Terminal.Gui.CheckBox.yml), [Dialog boxes](~/api/Terminal.Gui/Terminal.Gui.Dialog.yml), [Message boxes](~/api/Terminal.Gui/Terminal.Gui.MessageBox.yml), [Windows](~/api/Terminal.Gui/Terminal.Gui.Window.yml), [Menus](~/api/Terminal.Gui/Terminal.Gui.MenuBar.yml), [ListViews](~/api/Terminal.Gui/Terminal.Gui.ListView.yml), [Frames](~/api/Terminal.Gui/Terminal.Gui.FrameView.yml), [ProgressBars](~/api/Terminal.Gui/Terminal.Gui.ProgressBar.yml), [Scroll views](~/api/Terminal.Gui/Terminal.Gui.ScrollView.yml) and [Scrollbars](~/api/Terminal.Gui/Terminal.Gui.ScrollBarView.yml).
-
-Layout
-------
+## Layout
 
 `Terminal.Gui` supports two different layout systems, absolute and computed \
 (controlled by the [`LayoutStyle`](~/api/Terminal.Gui/Terminal.Gui.LayoutStyle.yml)
 property on the view.
 
 The absolute system is used when you want the view to be positioned exactly in
-one location and want to manually control where the view is.   This is done
-by invoking your View constructor with an argument of type [`Rect`](~/api/Terminal.Gui/Terminal.Gui.Rect.yml).   When you do this, to change the
+one location and want to manually control where the view is. This is done
+by invoking your View constructor with an argument of type [`Rect`](~/api/Terminal.Gui/Terminal.Gui.Rect.yml). When you do this, to change the
 position of the View, you can change the `Frame` property on the View.
 
 The computed layout system offers a few additional capabilities, like automatic
-centering, expanding of dimensions and a handful of other features.  To use
+centering, expanding of dimensions and a handful of other features. To use
 this you construct your object without an initial `Frame`, but set the 
  `X`, `Y`, `Width` and `Height` properties after the object has been created.
 
@@ -221,20 +218,20 @@ view.Height = Dim.Percent(20) - 1;
 anotherView.Height = Dim.Height (view)+1
 ```
 
-# TopLevels, Windows and Dialogs.
+## TopLevels, Windows and Dialogs.
 
 Among the many kinds of views, you typically will create a [Toplevel](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) view (or any of its subclasses,
 like [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) or [Dialog](~/api/Terminal.Gui/Terminal.Gui.Dialog.yml) which is special kind of views
 that can be executed modally - that is, the view can take over all input and returns
-only when the user chooses to complete their work there.   
+only when the user chooses to complete their work there. 
 
 The following sections cover the differences.
 
-## TopLevel Views
+### TopLevel Views
 
 [Toplevel](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) views have no visible user interface elements and occupy an arbitrary portion of the screen.
 
-You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example.   You 
+You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example. You 
 typically would add a Menu and a Window to your Toplevel, it would look like this:
 
 ```csharp
@@ -277,19 +274,18 @@ class Demo {
         // Add both menu and win in a single call
         top.Add (win, menu);
         Application.Run (top);
+        Application.Shutdown ();
     }
 }
 ```
 
-Window Views
-------------
+### Window Views
 
 [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)
 
 From a user interface perspective, you might have more than one Window on the screen at a given time.
 
-Dialogs
--------
+### Dialogs
 
 [Dialog](~/api/Terminal.Gui/Terminal.Gui.Dialog.yml) are [Window](~/api/Terminal.Gui/Terminal.Gui.Window.yml) objects that happen to be centered in the middle of the screen.
 
@@ -318,11 +314,10 @@ Which will show something like this:
 +------------------------------------------------------+
 ```
 
-Running Modally
----------------
+### Running Modally
 
 To run your Dialog, Window or Toplevel modally, you will invoke the `Application.Run`
-method on the toplevel.   It is up to your code and event handlers to invoke the `Application.RequestStop()` method to terminate the modal execution.
+method on the toplevel. It is up to your code and event handlers to invoke the `Application.RequestStop()` method to terminate the modal execution.
 
 ```csharp
 bool okpressed = false;
@@ -350,21 +345,20 @@ There is no return value from running modally, so your code will need to have a 
 of indicating the reason that the execution of the modal dialog was completed, in the 
 case above, the `okpressed` value is set to true if the user pressed or selected the Ok button.
 
-Input Handling
-==============
+## Input Handling
 
 Every view has a focused view, and if that view has nested views, one of those is 
-the focused view.   This is called the focus chain, and at any given time, only one
-View has the focus.   
+the focused view. This is called the focus chain, and at any given time, only one
+View has the focus. 
 
 The library binds the key Tab to focus the next logical view,
-and the Shift-Tab combination to focus the previous logical view.   
+and the Shift-Tab combination to focus the previous logical view. 
 
 Keyboard processing is divided in three stages: HotKey processing, regular processing and
-cold key processing.   
+cold key processing. 
 
 * Hot key processing happens first, and it gives all the views in the current
-  toplevel a chance to monitor whether the key needs to be treated specially.  This
+  toplevel a chance to monitor whether the key needs to be treated specially. This
   for example handles the scenarios where the user pressed Alt-o, and a view with a 
   highlighted "o" is being displayed.
 
@@ -372,7 +366,7 @@ cold key processing.
   view.
 
 * If the key was not processed by the normal processing, all views are given 
-  a chance to process the keystroke in their cold processing stage.  Examples
+  a chance to process the keystroke in their cold processing stage. Examples
   include the processing of the "return" key in a dialog when a button in the
   dialog has been flagged as the "default" action.
 
@@ -380,16 +374,15 @@ The most common case is the normal processing, which sends the keystrokes to the
 currently focused view.
 
 Mouse events are processed in visual order, and the event will be sent to the
-view on the screen.   The only exception is that no mouse events are delivered
-to background views when a modal view is running.   
+view on the screen. The only exception is that no mouse events are delivered
+to background views when a modal view is running. 
 
 More details are available on the [`Keyboard Event Processing`](keyboard.md) document.
 
-Colors and Color Schemes
-========================
+## Colors and Color Schemes
 
 All views have been configured with a color scheme that will work both in color
-terminals as well as the more limited black and white terminals.   
+terminals as well as the more limited black and white terminals. 
 
 The various styles are captured in the [`Colors`](~/api/Terminal.Gui/Terminal.Gui.Colors.yml) class which defined color schemes for
 the toplevel, the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:
@@ -423,7 +416,10 @@ var label = new Label (...);
 label.TextColor = myColor
 ```
 
-MainLoop, Threads and Input Handling
-====================================
+## MainLoop, Threads and Input Handling
 
 Detailed description of the mainloop is described on the [Event Processing and the Application Main Loop](~/articles/mainloop.md) document.
+
+## Cross-Platform Drivers
+
+See [Cross-platform Driver Model](drivers.md).

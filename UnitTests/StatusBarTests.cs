@@ -34,7 +34,7 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (Dim.Fill (), sb.Width);
 			Assert.Equal (1, sb.Height);
 
-			Assert.Equal (0, sb.Y);
+			Assert.Null (sb.Y);
 
 			var driver = new FakeDriver ();
 			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
@@ -113,7 +113,7 @@ namespace Terminal.Gui.Views {
 ^O Open {Application.Driver.VLine} ^Q Quit
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			sb = new StatusBar (new StatusItem [] {
 				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-O~ Open", null),
@@ -125,7 +125,7 @@ namespace Terminal.Gui.Views {
 CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit
 ";
 
-			GraphViewTests.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact]

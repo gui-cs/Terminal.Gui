@@ -4,9 +4,11 @@ using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "ProgressBar Styles", Description: "Shows the ProgressBar Styles")]
+	[ScenarioMetadata (Name: "ProgressBar Styles", Description: "Shows the ProgressBar Styles.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("MainLoop")]
+	[ScenarioCategory ("ProgressBar")]
+	[ScenarioCategory ("Threading")]
+
 	public class ProgressBarStyles : Scenario {
 		private Timer _fractionTimer;
 		private Timer _pulseTimer;
@@ -129,15 +131,19 @@ namespace UICatalog.Scenarios {
 				Application.MainLoop.Driver.Wakeup ();
 			}, null, 0, 300);
 
-			Top.Unloaded += Top_Unloaded;
+			Application.Top.Unloaded += Top_Unloaded;
 
 			void Top_Unloaded ()
 			{
+				if (_fractionTimer != null) {
+					_fractionTimer.Dispose ();
+					_fractionTimer = null;
+				}
 				if (_pulseTimer != null) {
 					_pulseTimer.Dispose ();
 					_pulseTimer = null;
-					Top.Unloaded -= Top_Unloaded;
 				}
+				Application.Top.Unloaded -= Top_Unloaded;
 			}
 		}
 	}

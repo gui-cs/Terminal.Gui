@@ -1,11 +1,61 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
+      "commandName": "Project"
     },
     "UICatalog : -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
+    },
+    "Wizards": {
+      "commandName": "Project",
+      "commandLineArgs": "Wizards"
+    },
+    "Dialogs": {
+      "commandName": "Project",
+      "commandLineArgs": "Dialogs"
+    },
+    "Buttons": {
+      "commandName": "Project",
+      "commandLineArgs": "Buttons"
+    },
+    "WizardAsView": {
+      "commandName": "Project",
+      "commandLineArgs": "WizardAsView"
+    },
+    "VkeyPacketSimulator": {
+      "commandName": "Project",
+      "commandLineArgs": "VkeyPacketSimulator"
+    },
+    "CollectionNavigatorTester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Search Collection Nav\""
+    },
+    "Charmap": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Character Map\""
+    },
+    "WSL2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll"
+    },
+    "WSL2 : -usc": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll -usc"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "All Views Tester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"All Views Tester\""
+    },
+    "Windows & FrameViews": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Windows & FrameViews\""
     }
   }
 }

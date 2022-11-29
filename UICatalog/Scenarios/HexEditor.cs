@@ -4,12 +4,12 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
+	[ScenarioMetadata (Name: "HexEditor", Description: "A binary (hex) editor using the HexView control.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Text and Formatting")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Files and IO")]
 	public class HexEditor : Scenario {
 		private string _fileName = "demo.bin";
 		private HexView _hexView;
@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 					miAllowEdits = new MenuItem ("_AllowEdits", "", () => ToggleAllowEdits ()){Checked = _hexView.AllowEdits, CheckType = MenuItemCheckStyle.Checked}
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
@@ -61,7 +61,7 @@ namespace UICatalog.Scenarios {
 				siPositionChanged = new StatusItem(Key.Null,
 					$"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X} Line length: {_hexView.BytesPerLine}", () => {})
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 		}
 
 		private void _hexView_PositionChanged (HexView.HexViewEventArgs obj)

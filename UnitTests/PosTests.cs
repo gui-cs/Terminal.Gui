@@ -1,17 +1,26 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Views;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
 	public class PosTests {
+		readonly ITestOutputHelper output;
+
+		public PosTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void New_Works ()
 		{
@@ -70,11 +79,11 @@ namespace Terminal.Gui.Core {
 
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews[0].Frame);
-			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString());
+			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString ());
 			Assert.Equal (new Rect (1, 1, 79, 24), new Rect (
-				win.Subviews[0].Frame.Left, win.Subviews [0].Frame.Top,
-				win.Subviews [0].Frame.Right, win.Subviews[0].Frame.Bottom));
+				win.Subviews [0].Frame.Left, win.Subviews [0].Frame.Top,
+				win.Subviews [0].Frame.Right, win.Subviews [0].Frame.Bottom));
 			Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
 		}
 
@@ -123,7 +132,7 @@ namespace Terminal.Gui.Core {
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
-				Y = Pos.Bottom (win) - 4  // two lines top border more two lines above border
+				Y = Pos.Bottom (win) - 3  // two lines top and bottom borders more one line above the bottom border
 			};
 
 			win.Add (label);
@@ -131,15 +140,78 @@ namespace Terminal.Gui.Core {
 			var top = Application.Top;
 			top.Add (win);
 			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 
-			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-			Assert.Equal (new Rect (1, 1, 78, 23), win.Subviews [0].Frame);
-			Assert.Equal ("ContentView()({X=1,Y=1,Width=78,Height=23})", win.Subviews [0].ToString ());
-			Assert.Equal (new Rect (0, 0, 80, 25), new Rect (
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 8), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=8})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 10), new Rect (
 				win.Frame.Left, win.Frame.Top,
 				win.Frame.Right, win.Frame.Bottom));
-			Assert.Equal (new Rect (0, 21, 78, 1), label.Frame);
+			Assert.Equal (new Rect (0, 7, 38, 1), label.Frame);
+			var expected = @"
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│    This should be the last line.     │
+└──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void AnchorEnd_Better_Than_Bottom_Equal_Inside_Window ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the last line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.AnchorEnd (1)
+			};
+
+			win.Add (label);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (29, label.Text.Length);
+			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 8), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=8})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 10), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 7, 38, 1), label.Frame);
+			var expected = @"
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│    This should be the last line.     │
+└──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]
@@ -153,17 +225,18 @@ namespace Terminal.Gui.Core {
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
-				Y = Pos.Bottom (win) - 4  // two lines top border more two lines above border
+				Y = Pos.Bottom (win) - 4  // two lines top and bottom borders more two lines above border
 			};
 
 			win.Add (label);
 
-			var menu = new MenuBar ();
-			var status = new StatusBar ();
+			var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+			var status = new StatusBar (new StatusItem [] { new (Key.F1, "~F1~ Help", null) });
 			var top = Application.Top;
 			top.Add (win, menu, status);
 			Application.Begin (top);
 
+			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
 			Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
@@ -173,6 +246,98 @@ namespace Terminal.Gui.Core {
 				win.Frame.Left, win.Frame.Top,
 				win.Frame.Right, win.Frame.Bottom));
 			Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
+			var expected = @"
+ Menu                                                                           
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                        This should be the last line.                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+ F1 Help                                                                        
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void AnchorEnd_Better_Than_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the last line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.AnchorEnd (1)
+			};
+
+			win.Add (label);
+
+			var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+			var status = new StatusBar (new StatusItem [] { new (Key.F1, "~F1~ Help", null) });
+			var top = Application.Top;
+			top.Add (win, menu, status);
+			Application.Begin (top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+			Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+			Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+			Assert.Equal (new Rect (1, 1, 78, 21), win.Subviews [0].Frame);
+			Assert.Equal (new Rect (0, 1, 80, 24), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
+			var expected = @"
+ Menu                                                                           
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                        This should be the last line.                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+ F1 Help                                                                        
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
 		[Fact]
@@ -383,7 +548,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ($"Pos.Combine(Pos.Combine(Pos.View(side={side}, target=View()({{X={testRect.X},Y={testRect.Y},Width={testRect.Width},Height={testRect.Height}}}))+Pos.Absolute(0)){(testInt < 0 ? '-' : '+')}Pos.Absolute({testInt}))", pos.ToString ());
 		}
 
-		// See: https://github.com/migueldeicaza/gui.cs/issues/504
+		// See: https://github.com/gui-cs/Terminal.Gui/issues/504
 		[Fact]
 		public void LeftTopBottomRight_Win_ShouldNotThrow ()
 		{
@@ -488,11 +653,37 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Percent_Equal ()
 		{
-			var n1 = 0;
-			var n2 = 0;
+			float n1 = 0;
+			float n2 = 0;
 			var pos1 = Pos.Percent (n1);
 			var pos2 = Pos.Percent (n2);
-			// BUGBUG: Pos.Percent should support equality 
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 0.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = n2 = 100f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.Equal (pos1, pos2);
+
+			n1 = 0;
+			n2 = 1;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
+			Assert.NotEqual (pos1, pos2);
+
+			n1 = 0.5f;
+			n2 = 1.5f;
+			pos1 = Pos.Percent (n1);
+			pos2 = Pos.Percent (n2);
 			Assert.NotEqual (pos1, pos2);
 		}
 
@@ -507,7 +698,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact]
-		public void Pos_Validation_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type ()
+		public void ForceValidatePosDim_True_Pos_Validation_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type ()
 		{
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
@@ -519,7 +710,8 @@ namespace Terminal.Gui.Core {
 			};
 			var v = new View ("v") {
 				X = Pos.Center (),
-				Y = Pos.Percent (10)
+				Y = Pos.Percent (10),
+				ForceValidatePosDim = true
 			};
 
 			w.Add (v);
@@ -810,6 +1002,70 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (40, posRight.Anchor (0));
 			var posViewBottom = new Pos.PosView (view, 3);
 			Assert.Equal (11, posViewBottom.Anchor (0));
+		}
+
+		[Fact]
+		public void Function_SetsValue ()
+		{
+			var text = "Test";
+			var pos = Pos.Function (() => text.Length);
+			Assert.Equal ("Pos.PosFunc(4)", pos.ToString ());
+
+			text = "New Test";
+			Assert.Equal ("Pos.PosFunc(8)", pos.ToString ());
+
+			text = "";
+			Assert.Equal ("Pos.PosFunc(0)", pos.ToString ());
+		}
+
+		[Fact]
+		public void Function_Equal ()
+		{
+			var f1 = () => 0;
+			var f2 = () => 0;
+
+			var pos1 = Pos.Function (f1);
+			var pos2 = Pos.Function (f2);
+			Assert.Equal (pos1, pos2);
+
+			f2 = () => 1;
+			pos2 = Pos.Function (f2);
+			Assert.NotEqual (pos1, pos2);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+
+		public void PosPercentPlusOne (bool testHorizontal)
+		{
+			var container = new View {
+				Width = 100,
+				Height = 100,
+			};
+
+			var label = new Label {
+				X = testHorizontal ? Pos.Percent (50) + Pos.Percent (10) + 1 : 1,
+				Y = testHorizontal ? 1 : Pos.Percent (50) + Pos.Percent (10) + 1,
+				Width = 10,
+				Height = 10,
+			};
+
+			container.Add (label);
+			Application.Top.Add (container);
+			Application.Top.LayoutSubviews ();
+
+
+			Assert.Equal (100, container.Frame.Width);
+			Assert.Equal (100, container.Frame.Height);
+
+			if (testHorizontal) {
+				Assert.Equal (61, label.Frame.X);
+				Assert.Equal (1, label.Frame.Y);
+			} else {
+				Assert.Equal (1, label.Frame.X);
+				Assert.Equal (61, label.Frame.Y);
+			}
 		}
 	}
 }

@@ -1092,15 +1092,20 @@ namespace Terminal.Gui.Views {
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("to jump between text ", tf.Text);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.T | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal ("to jump between text ", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.D | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal ("", tf.Text);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
 		public void Adjust_First ()
 		{
-			TextField tf = new TextField ();
-			tf.Width = Dim.Fill ();
-			tf.Text = "This is a test.";
+			TextField tf = new TextField () {
+				Width = Dim.Fill (),
+				Text = "This is a test."
+			};
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
@@ -1114,6 +1119,167 @@ namespace Terminal.Gui.Views {
 				}
 				return item;
 			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DeleteSelectedText_InsertText_DeleteCharLeft_DeleteCharRight_Cut ()
+		{
+			var newText = "";
+			var oldText = "";
+			var tf = new TextField () { Width = 10, Text = "-1" };
+
+			tf.TextChanging += (e) => newText = e.NewText.ToString ();
+			tf.TextChanged += (e) => oldText = e.ToString ();
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Assert.Equal ("-1", tf.Text);
+
+			// InsertText
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers ())));
+			Assert.Equal ("-2", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-2", tf.Text);
+
+			// DeleteCharLeft
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("2", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-2", oldText);
+			Assert.Equal ("-", tf.Text);
+
+			// DeleteCharRight
+			tf.Text = "-1";
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-", tf.Text);
+
+			// Cut
+			tf.Text = "-1";
+			tf.SelectedStart = 1;
+			tf.CursorPosition = 2;
+			Assert.Equal (1, tf.SelectedLength);
+			Assert.Equal ("1", tf.SelectedText);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.X | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal ("-", newText);
+			Assert.Equal ("-1", oldText);
+			Assert.Equal ("-", tf.Text);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Test_RootKeyEvent_Cancel ()
+		{
+			Application.RootKeyEvent += SuppressKey;
+
+			var tf = new TextField ();
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Application.Driver.SendKeys ('a', ConsoleKey.A, false, false, false);
+			Assert.Equal ("a", tf.Text.ToString ());
+
+			// SuppressKey suppresses the 'j' key
+			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Assert.Equal ("a", tf.Text.ToString ());
+
+			Application.RootKeyEvent -= SuppressKey;
+
+			// Now that the delegate has been removed we can type j again
+			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Assert.Equal ("aj", tf.Text.ToString ());
+		}
+		[Fact]
+		[AutoInitShutdown]
+		public void Test_RootMouseKeyEvent_Cancel ()
+		{
+			Application.RootMouseEvent += SuppressRightClick;
+
+			var tf = new TextField () { Width = 10 };
+			int clickCounter = 0;
+			tf.MouseClick += (m) => { clickCounter++; };
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			var processMouseEventMethod = typeof (Application).GetMethod ("ProcessMouseEvent", BindingFlags.Static | BindingFlags.NonPublic)
+				?? throw new Exception ("Expected private method not found 'ProcessMouseEvent', this method was used for testing mouse behaviours");
+
+			var mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button1Clicked,
+				View = tf
+			};
+
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (1, clickCounter);
+
+			// Get a fresh instance that represents a right click.
+			// Should be ignored because of SuppressRightClick callback
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (1, clickCounter);
+
+			Application.RootMouseEvent -= SuppressRightClick;
+
+			// Get a fresh instance that represents a right click.
+			// Should no longer be ignored as the callback was removed
+			mouseEvent = new MouseEvent {
+				Flags = MouseFlags.Button3Clicked,
+				View = tf
+			};
+
+			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Assert.Equal (2, clickCounter);
+		}
+
+
+		private bool SuppressKey (KeyEvent arg)
+		{
+			if (arg.KeyValue == 'j')
+				return true;
+
+			return false;
+		}
+
+		private void SuppressRightClick (MouseEvent arg)
+		{
+			if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
+				arg.Handled = true;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ScrollOffset_Initialize ()
+		{
+			var tf = new TextField ("Testing Scrolls.") {
+				X = 1,
+				Y = 1,
+				Width = 20
+			};
+			Assert.Equal (0, tf.ScrollOffset);
+			Assert.Equal (16, tf.CursorPosition);
+
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (0, tf.ScrollOffset);
+			Assert.Equal (16, tf.CursorPosition);
 		}
 	}
 }

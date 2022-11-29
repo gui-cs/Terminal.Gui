@@ -4,32 +4,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 	public class ScrollViewTests {
+		readonly ITestOutputHelper output;
+
+		public ScrollViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		[Fact]
 		public void Constructors_Defaults ()
 		{
 			var sv = new ScrollView ();
+			Assert.Equal (LayoutStyle.Computed, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
 			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Equal (0, sv.X);
-			Assert.Equal (0, sv.Y);
-			Assert.Equal (0, sv.Width);
-			Assert.Equal (0, sv.Height);
+			Assert.Null (sv.X);
+			Assert.Null (sv.Y);
+			Assert.Null (sv.Width);
+			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.True (sv.KeepContentAlwaysInViewport);
 
 			sv = new ScrollView (new Rect (1, 2, 20, 10));
+			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Equal (1, sv.X);
-			Assert.Equal (2, sv.Y);
-			Assert.Equal (20, sv.Width);
-			Assert.Equal (10, sv.Height);
+			Assert.Null (sv.X);
+			Assert.Null (sv.Y);
+			Assert.Null (sv.Width);
+			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -170,6 +180,105 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
 			Assert.False (sv.ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.False (sv.ShowHorizontalScrollIndicator);
+			Assert.False (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			sv.AutoHideScrollBars = false;
+			sv.ShowHorizontalScrollIndicator = true;
+			sv.ShowVerticalScrollIndicator = true;
+			sv.Redraw (sv.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ┬
+         │
+         │
+         │
+         │
+         │
+         ┴
+         ▼
+◄├─────┤► 
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ┬
+         ┴
+         ░
+         ░
+         ░
+         ░
+         ░
+         ▼
+◄├┤░░░░░► 
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+		{
+			var sv = new ScrollView {
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50),
+				ContentOffset = new Point (25, 25)
+			};
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (-25, sv.ContentOffset.X);
+			Assert.Equal (-25, sv.ContentOffset.Y);
+			Assert.Equal (50, sv.ContentSize.Width);
+			Assert.Equal (50, sv.ContentSize.Height);
+			Assert.True (sv.AutoHideScrollBars);
+			Assert.True (sv.ShowHorizontalScrollIndicator);
+			Assert.True (sv.ShowVerticalScrollIndicator);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+         ▲
+         ░
+         ░
+         ░
+         ┬
+         │
+         ┴
+         ░
+         ▼
+◄░░░├─┤░► 
+", output);
 		}
 	}
 }

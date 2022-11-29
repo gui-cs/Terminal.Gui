@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "SendKeys", Description: "SendKeys sample - Send key combinations.")]
-	[ScenarioCategory ("Input")]
+	[ScenarioCategory ("Mouse and Keyboard")]
 	public class SendKeys : Scenario {
 		public override void Setup ()
 		{

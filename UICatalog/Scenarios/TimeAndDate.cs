@@ -3,8 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Time And Date", Description: "Illustrates TimeField and time & date handling")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Bug Repro")] // Issue #246
+	[ScenarioCategory ("Controls"), ScenarioCategory ("DateTime")]
 	public class TimeAndDate : Scenario {
 		Label lblOldTime;
 		Label lblNewTime;

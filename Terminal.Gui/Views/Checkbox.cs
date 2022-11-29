@@ -13,9 +13,9 @@ namespace Terminal.Gui {
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
-		ustring text;
-		int hot_pos = -1;
-		Rune hot_key;
+		Rune charChecked;
+		Rune charUnChecked;
+		bool @checked;
 
 		/// <summary>
 		///   Toggled event, raised when the <see cref="CheckBox"/>  is toggled.
@@ -68,18 +68,22 @@ namespace Terminal.Gui {
 		///   The size of <see cref="CheckBox"/> is computed based on the
 		///   text length. 
 		/// </remarks>
-		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
+		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
 		{
 			Initialize (s, is_checked);
 		}
 
 		void Initialize (ustring s, bool is_checked)
 		{
+			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
+			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
 			Checked = is_checked;
-			Text = s;
+			HotKeySpecifier = new Rune ('_');
 			CanFocus = true;
-			Height = 1;
-			Width = s.RuneCount + 4;
+			AutoSize = true;
+			Text = s;
+			UpdateTextFormatterText ();
+			ProcessResizeView ();
 
 			// Things this view knows how to do
 			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
@@ -89,52 +93,38 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
-		/// <summary>
-		///    The state of the <see cref="CheckBox"/>
-		/// </summary>
-		public bool Checked { get; set; }
-
-		/// <summary>
-		///   The text displayed by this <see cref="CheckBox"/>
-		/// </summary>
-		public new ustring Text {
-			get {
-				return text;
-			}
-
-			set {
-				text = value;
-
-				int i = 0;
-				hot_pos = -1;
-				hot_key = (char)0;
-				foreach (Rune c in text) {
-					//if (Rune.IsUpper (c)) {
-					if (c == '_') {
-						hot_key = text [i + 1];
-						HotKey = (Key)(char)hot_key.ToString ().ToUpper () [0];
-						text = text.ToString ().Replace ("_", "");
-						hot_pos = i;
-						break;
-					}
-					i++;
-				}
+		/// <inheritdoc/>
+		protected override void UpdateTextFormatterText ()
+		{
+			switch (TextAlignment) {
+			case TextAlignment.Left:
+			case TextAlignment.Centered:
+			case TextAlignment.Justified:
+				TextFormatter.Text = ustring.Make (Checked ? charChecked : charUnChecked) + " " + GetFormatterText ();
+				break;
+			case TextAlignment.Right:
+				TextFormatter.Text = GetFormatterText () + " " + ustring.Make (Checked ? charChecked : charUnChecked);
+				break;
 			}
 		}
 
-		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		ustring GetFormatterText ()
 		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
-			Move (0, 0);
-			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
-			Driver.AddRune (' ');
-			Move (2, 0);
-			Driver.AddStr (Text);
-			if (hot_pos != -1) {
-				Move (2 + hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled);
-				Driver.AddRune (hot_key);
+			if (AutoSize || ustring.IsNullOrEmpty (Text) || Frame.Width <= 2) {
+				return Text;
+			}
+			return Text.RuneSubstring (0, Math.Min (Frame.Width - 2, Text.RuneCount));
+		}
+
+		/// <summary>
+		///    The state of the <see cref="CheckBox"/>
+		/// </summary>
+		public bool Checked {
+			get => @checked;
+			set {
+				@checked = value;
+				UpdateTextFormatterText ();
+				ProcessResizeView ();
 			}
 		}
 

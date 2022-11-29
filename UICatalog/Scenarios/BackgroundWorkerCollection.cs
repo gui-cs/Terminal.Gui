@@ -8,21 +8,14 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "BackgroundWorker Collection", Description: "A persisting multi Toplevel BackgroundWorker threading")]
 	[ScenarioCategory ("Threading")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Top Level Windows")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
 	public class BackgroundWorkerCollection : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
-		{
-			Application.Top.Dispose ();
-
-			Application.Run<MdiMain> ();
-
-			Application.Top.Dispose ();
-		}
 
 		public override void Run ()
 		{
+			Application.Run<MdiMain> ();
 		}
 
 		class MdiMain : Toplevel {
@@ -286,7 +279,7 @@ namespace UICatalog.Scenarios {
 			public void WriteLog (string msg)
 			{
 				log.Add (msg);
-				listLog.MoveEnd ();
+				listLog.MoveDown ();
 			}
 		}
 

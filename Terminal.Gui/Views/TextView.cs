@@ -1,35 +1,15 @@
-//
 // TextView.cs: multi-line text editing
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// 
-// TODO:
-// In ReadOnly mode backspace/space behave like pageup/pagedown
-// Attributed text on spans
-// Replace insertion with Insert method
-// String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
-// Alt-D, Alt-Backspace
-// API to set the cursor position
-// API to scroll to a particular place
-// keybindings to go to top/bottom
-// public API to insert, remove ranges
-// Add word forward/word backwards commands
-// Save buffer API
-// Mouse
-//
-// Desirable:
-//   Move all the text manipulation into the TextModel
-
-
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using NStack;
-
+using Terminal.Gui.Resources;
+using static Terminal.Gui.Graphs.PathAnnotation;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -739,6 +719,7 @@ namespace Terminal.Gui {
 			historyTextItems.Clear ();
 			idxHistoryText = -1;
 			originalText = text;
+			OnChangeText (null);
 		}
 
 		public bool IsDirty (ustring text)
@@ -767,7 +748,7 @@ namespace Terminal.Gui {
 		}
 
 		public TextModel WrapModel (int width, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
-			int row = 0, int col = 0, int startRow = 0, int startCol = 0, int tabWidth = 0)
+			int row = 0, int col = 0, int startRow = 0, int startCol = 0, int tabWidth = 0, bool preserveTrailingSpaces = true)
 		{
 			frameWidth = width;
 
@@ -788,8 +769,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (ustring.Make (line), width,
-					TextAlignment.Left, true, true, tabWidth));
+					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
@@ -917,12 +897,13 @@ namespace Terminal.Gui {
 			var line = GetCurrentLine (modelRow);
 			var modelCol = GetModelColFromWrappedLines (row, col);
 
-			if (modelCol >= line.Count) {
+			if (modelCol > line.Count) {
 				Model.RemoveLine (modelRow);
 				RemoveAt (row, 0);
 				return false;
 			}
-			line.RemoveAt (modelCol);
+			if (modelCol < line.Count)
+				line.RemoveAt (modelCol);
 			if (line.Count > frameWidth || (row + 1 < wrappedModelLines.Count
 				&& wrappedModelLines [row + 1].ModelLine == modelRow)) {
 				return true;
@@ -994,130 +975,159 @@ namespace Terminal.Gui {
 		}
 
 		public void UpdateModel (TextModel model, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
-			int row, int col, int startRow, int startCol)
+			int row, int col, int startRow, int startCol, bool preserveTrailingSpaces)
 		{
 			isWrapModelRefreshing = true;
 			Model = model;
-			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol);
+			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol, tabWidth: 0, preserveTrailingSpaces);
 			isWrapModelRefreshing = false;
+		}
+
+		public int GetWrappedLineColWidth (int line, int col, WordWrapManager wrapManager)
+		{
+			if (wrappedModelLines?.Count == 0)
+				return 0;
+
+			var wModelLines = wrapManager.wrappedModelLines;
+			var modelLine = GetModelLineFromWrappedLines (line);
+			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
+			int modelCol = 0;
+			int colWidthOffset = 0;
+			int i = firstLine;
+
+			while (modelCol < col) {
+				var wLine = wrappedModelLines [i];
+				var wLineToCompare = wModelLines [i];
+
+				if (wLine.ModelLine != modelLine || wLineToCompare.ModelLine != modelLine)
+					break;
+
+				modelCol += Math.Max (wLine.ColWidth, wLineToCompare.ColWidth);
+				colWidthOffset += wLine.ColWidth - wLineToCompare.ColWidth;
+				if (modelCol > col) {
+					modelCol += col - modelCol;
+				}
+				i++;
+			}
+
+			return modelCol - colWidthOffset;
 		}
 	}
 
 	/// <summary>
-	///   Multi-line text editing <see cref="View"/>
+	///  Multi-line text editing <see cref="View"/>.
 	/// </summary>
 	/// <remarks>
-	///   <para>
-	///     <see cref="TextView"/> provides a multi-line text editor. Users interact
-	///     with it with the standard Emacs commands for movement or the arrow
-	///     keys. 
-	///   </para> 
-	///   <list type="table"> 
-	///     <listheader>
-	///       <term>Shortcut</term>
-	///       <description>Action performed</description>
-	///     </listheader>
-	///     <item>
-	///        <term>Left cursor, Control-b</term>
-	///        <description>
-	///          Moves the editing point left.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Right cursor, Control-f</term>
-	///        <description>
-	///          Moves the editing point right.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-b</term>
-	///        <description>
-	///          Moves one word back.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-f</term>
-	///        <description>
-	///          Moves one word forward.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Up cursor, Control-p</term>
-	///        <description>
-	///          Moves the editing point one line up.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Down cursor, Control-n</term>
-	///        <description>
-	///          Moves the editing point one line down
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Home key, Control-a</term>
-	///        <description>
-	///          Moves the cursor to the beginning of the line.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>End key, Control-e</term>
-	///        <description>
-	///          Moves the cursor to the end of the line.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-Home</term>
-	///        <description>
-	///          Scrolls to the first line and moves the cursor there.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-End</term>
-	///        <description>
-	///          Scrolls to the last line and moves the cursor there.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Delete, Control-d</term>
-	///        <description>
-	///          Deletes the character in front of the cursor.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Backspace</term>
-	///        <description>
-	///          Deletes the character behind the cursor.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-k</term>
-	///        <description>
-	///          Deletes the text until the end of the line and replaces the kill buffer
-	///          with the deleted text.   You can paste this text in a different place by
-	///          using Control-y.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-y</term>
-	///        <description>
-	///           Pastes the content of the kill ring into the current position.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-d</term>
-	///        <description>
-	///           Deletes the word above the cursor and adds it to the kill ring.  You 
-	///           can paste the contents of the kill ring with Control-y.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-q</term>
-	///        <description>
-	///          Quotes the next input character, to prevent the normal processing of
-	///          key handling to take place.
-	///        </description>
-	///     </item>
-	///   </list>
+	///  <para>
+	///   <see cref="TextView"/> provides a multi-line text editor. Users interact
+	///   with it with the standard Windows, Mac, and Linux (Emacs) commands. 
+	///  </para> 
+	///  <list type="table"> 
+	///   <listheader>
+	///    <term>Shortcut</term>
+	///    <description>Action performed</description>
+	///   </listheader>
+	///   <item>
+	///    <term>Left cursor, Control-b</term>
+	///    <description>
+	///     Moves the editing point left.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Right cursor, Control-f</term>
+	///    <description>
+	///     Moves the editing point right.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-b</term>
+	///    <description>
+	///     Moves one word back.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-f</term>
+	///    <description>
+	///     Moves one word forward.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Up cursor, Control-p</term>
+	///    <description>
+	///     Moves the editing point one line up.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Down cursor, Control-n</term>
+	///    <description>
+	///     Moves the editing point one line down
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Home key, Control-a</term>
+	///    <description>
+	///     Moves the cursor to the beginning of the line.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>End key, Control-e</term>
+	///    <description>
+	///     Moves the cursor to the end of the line.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-Home</term>
+	///    <description>
+	///     Scrolls to the first line and moves the cursor there.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-End</term>
+	///    <description>
+	///     Scrolls to the last line and moves the cursor there.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Delete, Control-d</term>
+	///    <description>
+	///     Deletes the character in front of the cursor.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Backspace</term>
+	///    <description>
+	///     Deletes the character behind the cursor.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-k</term>
+	///    <description>
+	///     Deletes the text until the end of the line and replaces the kill buffer
+	///     with the deleted text. You can paste this text in a different place by
+	///     using Control-y.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-y</term>
+	///    <description>
+	///      Pastes the content of the kill ring into the current position.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-d</term>
+	///    <description>
+	///      Deletes the word above the cursor and adds it to the kill ring. You 
+	///      can paste the contents of the kill ring with Control-y.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-q</term>
+	///    <description>
+	///     Quotes the next input character, to prevent the normal processing of
+	///     key handling to take place.
+	///    </description>
+	///   </item>
+	///  </list>
 	/// </remarks>
 	public class TextView : View {
 		TextModel model = new TextModel ();
@@ -1136,30 +1146,40 @@ namespace Terminal.Gui {
 		bool allowsReturn = true;
 		bool multiline = true;
 		HistoryText historyText = new HistoryText ();
+		CultureInfo currentCulture;
 
 		/// <summary>
-		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
+		/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly
+		/// set, not as the user types. To be notified as the user changes the contents of the TextView
+		/// see <see cref="IsDirty"/>.
+		/// </remarks>
 		public event Action TextChanged;
 
 		/// <summary>
+		///  Raised when the contents of the <see cref="TextView"/> are changed. 
+		/// </summary>
+		/// <remarks>
+		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
+		/// otherwise changes the contents of the <see cref="TextView"/>.
+		/// </remarks>
+		public Action<ContentsChangedEventArgs> ContentsChanged;
+
+		/// <summary>
+		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
+		/// </summary>
+		public event Action<Point> UnwrappedCursorPosition;
+
+		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-#if false
 		/// <summary>
-		///   Changed event, raised when the text has clicked.
-		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the text in the entry changes.
-		/// </remarks>
-		public Action Changed;
-#endif
-		/// <summary>
-		///   Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
+		///  Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -1169,8 +1189,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a <see cref="TextView"/> on the specified area, 
-		///   with dimensions controlled with the X, Y, Width and Height properties.
+		///  Initializes a <see cref="TextView"/> on the specified area, 
+		///  with dimensions controlled with the X, Y, Width and Height properties.
 		/// </summary>
 		public TextView () : base ()
 		{
@@ -1233,6 +1253,12 @@ namespace Terminal.Gui {
 			AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
 			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
 			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
+			AddCommand (Command.Accept, () => {
+				ContextMenu.Position = new Point (CursorPosition.X - leftColumn + 2, CursorPosition.Y - topRow + 2);
+				ShowContextMenu ();
+				return true;
+			});
 
 			// Default keybindings for this view
 			AddKeyBinding (Key.PageDown, Command.PageDown);
@@ -1327,47 +1353,88 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
 			AddKeyBinding (Key.R | Key.CtrlMask, Command.Redo);
+
+			AddKeyBinding (Key.G | Key.CtrlMask, Command.DeleteAll);
+			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+
+			currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+
+			AddKeyBinding (ContextMenu.Key, Command.Accept);
+		}
+
+		private MenuBarItem BuildContextMenuBarItem ()
+		{
+			return new MenuBarItem (new MenuItem [] {
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+				});
+		}
+
+		private void ContextMenu_KeyChanged (Key obj)
+		{
+			ReplaceKeyBinding (obj, ContextMenu.Key);
 		}
 
 		private void Model_LinesLoaded ()
 		{
-			historyText.Clear (Text);
+			// This call is not needed. Model_LinesLoaded gets invoked when
+			// model.LoadString (value) is called. LoadString is called from one place
+			// (Text.set) and historyText.Clear() is called immediately after.
+			// If this call happens, HistoryText_ChangeText will get called multiple times
+			// when Text is set, which is wrong.
+			//historyText.Clear (Text);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
-			var startLine = obj.CursorPosition.Y;
+			SetWrapModel ();
 
-			if (obj.RemovedOnAdded != null) {
-				int offset;
-				if (obj.IsUndoing) {
-					offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
-				} else {
-					offset = obj.RemovedOnAdded.Lines.Count - 1;
-				}
-				for (int i = 0; i < offset; i++) {
-					if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
-						model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+			if (obj != null) {
+				var startLine = obj.CursorPosition.Y;
+
+				if (obj.RemovedOnAdded != null) {
+					int offset;
+					if (obj.IsUndoing) {
+						offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
 					} else {
-						break;
+						offset = obj.RemovedOnAdded.Lines.Count - 1;
+					}
+					for (int i = 0; i < offset; i++) {
+						if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
+							model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+						} else {
+							break;
+						}
 					}
 				}
-			}
 
-			for (int i = 0; i < obj.Lines.Count; i++) {
-				if (i == 0) {
-					model.ReplaceLine (startLine, obj.Lines [i]);
-				} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
-						|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
-					model.AddLine (startLine, obj.Lines [i]);
-				} else if (Lines > obj.CursorPosition.Y + 1) {
-					model.RemoveLine (obj.CursorPosition.Y + 1);
+				for (int i = 0; i < obj.Lines.Count; i++) {
+					if (i == 0) {
+						model.ReplaceLine (startLine, obj.Lines [i]);
+					} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
+							|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+						model.AddLine (startLine, obj.Lines [i]);
+					} else if (Lines > obj.CursorPosition.Y + 1) {
+						model.RemoveLine (obj.CursorPosition.Y + 1);
+					}
+					startLine++;
 				}
-				startLine++;
+
+				CursorPosition = obj.FinalCursorPosition;
 			}
 
-			CursorPosition = obj.FinalCursorPosition;
+			UpdateWrapModel ();
+			
 			Adjust ();
+			OnContentsChanged ();
 		}
 
 		void TextView_Initialized (object sender, EventArgs e)
@@ -1376,6 +1443,7 @@ namespace Terminal.Gui {
 
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			OnContentsChanged ();
 		}
 
 		void Top_AlternateBackwardKeyChanged (Key obj)
@@ -1397,15 +1465,16 @@ namespace Terminal.Gui {
 		void ResetPosition ()
 		{
 			topRow = leftColumn = currentRow = currentColumn = 0;
-			selecting = false;
-			shiftSelecting = false;
+			StopSelecting ();
 			ResetCursorVisibility ();
 		}
 
 		/// <summary>
-		///   Sets or gets the text in the <see cref="TextView"/>.
+		///  Sets or gets the text in the <see cref="TextView"/>.
 		/// </summary>
 		/// <remarks>
+		/// The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however,
+		/// that Text is not set by <see cref="TextView"/> as the user types.
 		/// </remarks>
 		public override ustring Text {
 			get {
@@ -1421,7 +1490,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _, out _, out _);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -1443,12 +1512,12 @@ namespace Terminal.Gui {
 		void WrapTextModel ()
 		{
 			if (wordWrap && wrapManager != null) {
-				model = wrapManager.WrapModel (Frame.Width - 2,
+				model = wrapManager.WrapModel (frameWidth,
 					out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
 					selectionStartRow, selectionStartColumn,
-					tabWidth);
+					tabWidth, preserveTrailingSpaces: true);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
@@ -1456,6 +1525,8 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
+
+		int frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
 
 		/// <summary>
 		/// Gets or sets the top row.
@@ -1465,7 +1536,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the left column.
 		/// </summary>
-		public int LeftColumn { get => leftColumn; set => leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0); }
+		public int LeftColumn {
+			get => leftColumn;
+			set {
+				if (value > 0 && wordWrap)
+					return;
+				leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+			}
+		}
 
 		/// <summary>
 		/// Gets the maximum visible length line.
@@ -1473,12 +1551,12 @@ namespace Terminal.Gui {
 		public int Maxlength => model.GetMaxVisibleLine (topRow, topRow + Frame.Height, TabWidth);
 
 		/// <summary>
-		/// Gets the  number of lines.
+		/// Gets the number of lines.
 		/// </summary>
 		public int Lines => model.Count;
 
 		/// <summary>
-		///    Sets or gets the current cursor position.
+		///  Sets or gets the current cursor position.
 		/// </summary>
 		public Point CursorPosition {
 			get => new Point (currentColumn, currentRow);
@@ -1529,12 +1607,7 @@ namespace Terminal.Gui {
 					return ustring.Empty;
 				}
 
-				SetWrapModel ();
-				var sel = GetRegion ();
-				UpdateWrapModel ();
-				Adjust ();
-
-				return sel;
+				return GetSelectedRegion ();
 			}
 		}
 
@@ -1566,7 +1639,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
+					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}
@@ -1596,7 +1669,7 @@ namespace Terminal.Gui {
 		public int RightOffset {
 			get => rightOffset;
 			set {
-				if (currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
+				if (!wordWrap && currentColumn == GetCurrentLine ().Count && rightOffset > 0 && value == 0) {
 					leftColumn = Math.Max (leftColumn - rightOffset, 0);
 				}
 				rightOffset = value;
@@ -1624,8 +1697,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether pressing the TAB key in a <see cref="TextView"/>
-		/// types a TAB character in the view instead of moving the focus to the next view in the tab order.
+		/// Gets or sets whether the <see cref="TextView"/> inserts a tab character into the text or ignores 
+		/// tab input. If set to `false` and the user presses the tab key (or shift-tab) the focus will move to the
+		/// next view (or previous with shift-tab). The default is `true`; if the user presses the tab key, a tab 
+		/// character will be inserted into the text.
 		/// </summary>
 		public bool AllowsTab {
 			get => allowsTab;
@@ -1714,6 +1789,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool HasHistoryChanges => historyText.HasHistoryChanges;
 
+		/// <summary>
+		/// Get the <see cref="ContextMenu"/> for this view.
+		/// </summary>
+		public ContextMenu ContextMenu { get; private set; }
+
 		int GetSelectedLength ()
 		{
 			return SelectedText.Length;
@@ -1740,20 +1820,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Loads the contents of the file into the  <see cref="TextView"/>.
+		/// Loads the contents of the file into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="path">Path to the file to load.</param>
 		public bool LoadFile (string path)
 		{
-			var res = model.LoadFile (path);
-			ResetPosition ();
-			SetNeedsDisplay ();
+			bool res;
+			try {
+				SetWrapModel ();
+				res = model.LoadFile (path);
+				ResetPosition ();
+			} catch (Exception) {
+				throw;
+			} finally {
+				UpdateWrapModel ();
+				SetNeedsDisplay ();
+				Adjust ();
+				OnContentsChanged ();
+			}
 			return res;
 		}
 
 		/// <summary>
-		/// Loads the contents of the stream into the  <see cref="TextView"/>.
+		/// Loads the contents of the stream into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="stream">Stream to load the contents from.</param>
@@ -1762,10 +1852,11 @@ namespace Terminal.Gui {
 			model.LoadStream (stream);
 			ResetPosition ();
 			SetNeedsDisplay ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
-		/// Closes the contents of the stream into the  <see cref="TextView"/>.
+		/// Closes the contents of the stream into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 		public bool CloseFile ()
@@ -1777,7 +1868,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    Gets the current cursor row.
+		///  Gets the current cursor row.
 		/// </summary>
 		public int CurrentRow => currentRow;
 
@@ -1788,7 +1879,7 @@ namespace Terminal.Gui {
 		public int CurrentColumn => currentColumn;
 
 		/// <summary>
-		///   Positions the cursor on the current row and column
+		///  Positions the cursor on the current row and column
 		/// </summary>
 		public override void PositionCursor ()
 		{
@@ -1839,45 +1930,63 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the driver to the default color for the control where no text is being rendered.  Defaults to <see cref="ColorScheme.Normal"/>.
+		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
-		protected virtual void ColorNormal ()
+		protected virtual void SetNormalColor ()
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorNormal (List<Rune> line, int idx)
+		protected virtual void SetNormalColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorSelection (List<Rune> line, int idx)
+		protected virtual void SetSelectionColor (List<Rune> line, int idx)
 		{
-			Driver.SetAttribute (ColorScheme.Focus);
+			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
 		}
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="idx"></param>
+		protected virtual void SetReadOnlyColor (List<Rune> line, int idx)
+		{
+			Attribute attribute;
+			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
+				attribute = new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+			} else {
+				attribute = new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
+			}
+			Driver.SetAttribute (attribute);
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.HotFocus"/>.
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void ColorUsed (List<Rune> line, int idx)
+		protected virtual void SetUsedColor (List<Rune> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
@@ -1885,14 +1994,18 @@ namespace Terminal.Gui {
 		bool isReadOnly = false;
 
 		/// <summary>
-		/// Gets or sets whether the  <see cref="TextView"/> is in read-only mode or not
+		/// Gets or sets whether the <see cref="TextView"/> is in read-only mode or not
 		/// </summary>
 		/// <value>Boolean value(Default false)</value>
 		public bool ReadOnly {
 			get => isReadOnly;
 			set {
-				isReadOnly = value;
-				SetNeedsDisplay ();
+				if (value != isReadOnly) {
+					isReadOnly = value;
+
+					SetNeedsDisplay ();
+					Adjust ();
+				}
 			}
 		}
 
@@ -1923,10 +2036,18 @@ namespace Terminal.Gui {
 		}
 
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
-		void GetEncodedRegionBounds (out long start, out long end)
+		void GetEncodedRegionBounds (out long start, out long end,
+			int? startRow = null, int? startCol = null, int? cRow = null, int? cCol = null)
 		{
-			long selection = ((long)(uint)selectionStartRow << 32) | (uint)selectionStartColumn;
-			long point = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			long selection;
+			long point;
+			if (startRow == null || startCol == null || cRow == null || cCol == null) {
+				selection = ((long)(uint)selectionStartRow << 32) | (uint)selectionStartColumn;
+				point = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			} else {
+				selection = ((long)(uint)startRow << 32) | (uint)startCol;
+				point = ((long)(uint)cRow << 32) | (uint)cCol;
+			}
 			if (selection > point) {
 				start = point;
 				end = selection;
@@ -1948,10 +2069,10 @@ namespace Terminal.Gui {
 		// Returns a ustring with the text in the selected 
 		// region.
 		//
-		ustring GetRegion ()
+		ustring GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel model = null)
 		{
 			long start, end;
-			GetEncodedRegionBounds (out start, out end);
+			GetEncodedRegionBounds (out start, out end, sRow, sCol, cRow, cCol);
 			if (start == end) {
 				return ustring.Empty;
 			}
@@ -1959,7 +2080,7 @@ namespace Terminal.Gui {
 			var maxrow = ((int)(end >> 32));
 			int startCol = (int)(start & 0xffffffff);
 			var endCol = (int)(end & 0xffffffff);
-			var line = model.GetLine (startRow);
+			var line = model == null ? this.model.GetLine (startRow) : model.GetLine (startRow);
 
 			if (startRow == maxrow)
 				return StringFromRunes (line.GetRange (startCol, endCol - startCol));
@@ -1967,9 +2088,10 @@ namespace Terminal.Gui {
 			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
 
 			for (int row = startRow + 1; row < maxrow; row++) {
-				res = res + ustring.Make (Environment.NewLine) + StringFromRunes (model.GetLine (row));
+				res = res + ustring.Make (Environment.NewLine) + StringFromRunes (model == null
+					? this.model.GetLine (row) : model.GetLine (row));
 			}
-			line = model.GetLine (maxrow);
+			line = model == null ? this.model.GetLine (maxrow) : model.GetLine (maxrow);
 			res = res + ustring.Make (Environment.NewLine) + StringFromRunes (line.GetRange (0, endCol));
 			return res;
 		}
@@ -1979,6 +2101,8 @@ namespace Terminal.Gui {
 		//
 		void ClearRegion ()
 		{
+			SetWrapModel ();
+
 			long start, end;
 			long currentEncoded = ((long)(uint)currentRow << 32) | (uint)currentColumn;
 			GetEncodedRegionBounds (out start, out end);
@@ -2005,6 +2129,8 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 
@@ -2026,6 +2152,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> (removedLines), CursorPosition,
 				HistoryText.LineStatus.Removed);
+
+			UpdateWrapModel ();
 
 			SetNeedsDisplay ();
 		}
@@ -2169,12 +2297,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		string currentCaller;
+
 		/// <summary>
 		/// Restore from original model.
 		/// </summary>
-		void SetWrapModel ()
+		void SetWrapModel ([CallerMemberName] string caller = null)
 		{
+			if (currentCaller != null)
+				return;
+
 			if (wordWrap) {
+				currentCaller = caller;
+
 				currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 				currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				selectionStartColumn = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
@@ -2186,25 +2321,64 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Update the original model.
 		/// </summary>
-		void UpdateWrapModel ()
+		void UpdateWrapModel ([CallerMemberName] string caller = null)
 		{
+			if (currentCaller != null && currentCaller != caller)
+				return;
+
 			if (wordWrap) {
+				currentCaller = null;
+
 				wrapManager.UpdateModel (model, out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
-					selectionStartRow, selectionStartColumn);
+					selectionStartRow, selectionStartColumn, preserveTrailingSpaces: true);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
 				selectionStartColumn = nStartCol;
 				wrapNeeded = true;
 			}
+			if (currentCaller != null)
+				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
+		}
+
+		/// <summary>
+		/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
+		/// </summary>
+		public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
+		{
+			var row = cRow == null ? currentRow : cRow;
+			var col = cCol == null ? currentColumn : cCol;
+			if (cRow == null && cCol == null && wordWrap) {
+				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
+				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+			}
+			UnwrappedCursorPosition?.Invoke (new Point ((int)col, (int)row));
+		}
+
+		ustring GetSelectedRegion ()
+		{
+			var cRow = currentRow;
+			var cCol = currentColumn;
+			var startRow = selectionStartRow;
+			var startCol = selectionStartColumn;
+			var model = this.model;
+			if (wordWrap) {
+				cRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
+				cCol = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+				startRow = wrapManager.GetModelLineFromWrappedLines (selectionStartRow);
+				startCol = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
+				model = wrapManager.Model;
+			}
+			OnUnwrappedCursorPosition (cRow, cCol);
+			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			ColorNormal ();
+			SetNormalColor ();
 
 			var offB = OffSetBackground ();
 			int right = Frame.Width + offB.width + RightOffset;
@@ -2220,12 +2394,14 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);
 					if (idxCol < line.Count && selecting && PointInSelection (idxCol, idxRow)) {
-						ColorSelection (line, idxCol);
+						SetSelectionColor (line, idxCol);
 					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						ColorUsed (line, idxCol);
+						SetSelectionColor (line, idxCol);
+					} else if (ReadOnly) {
+						SetReadOnlyColor (line, idxCol);
 					} else {
-						ColorNormal (line, idxCol);
+						SetNormalColor (line, idxCol);
 					}
 
 					if (rune == '\t') {
@@ -2249,13 +2425,13 @@ namespace Terminal.Gui {
 					}
 				}
 				if (col < right) {
-					ColorNormal ();
+					SetNormalColor ();
 					ClearRegion (col, row, right, row + 1);
 				}
 				row++;
 			}
 			if (row < bottom) {
-				ColorNormal ();
+				SetNormalColor ();
 				ClearRegion (bounds.Left, row, right, bottom);
 			}
 
@@ -2274,6 +2450,12 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		///<inheritdoc/>
@@ -2316,6 +2498,12 @@ namespace Terminal.Gui {
 
 				InsertText (new KeyEvent () { Key = key });
 			}
+
+			if (NeedDisplay.IsEmpty) {
+				PositionCursor ();
+			} else {
+				Adjust ();
+			}
 		}
 
 		void Insert (Rune rune)
@@ -2329,21 +2517,11 @@ namespace Terminal.Gui {
 				}
 				line.Insert (Math.Min (currentColumn, line.Count), rune);
 			}
-			if (wordWrap) {
-				if (Used) {
-					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
-				} else {
-					wrapNeeded = wrapManager.RemoveAt (currentRow, currentColumn);
-					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
-				}
-				if (wrapNeeded) {
-					SetNeedsDisplay ();
-				}
-			}
 			var prow = currentRow - topRow;
 			if (!wrapNeeded) {
-				SetNeedsDisplay (new Rect (0, prow, Frame.Width, prow + 1));
+				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
 			}
+
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
@@ -2382,6 +2560,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var line = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
@@ -2402,6 +2582,11 @@ namespace Terminal.Gui {
 				} else {
 					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
 				}
+
+				UpdateWrapModel ();
+
+				OnContentsChanged ();
+
 				return;
 			}
 
@@ -2444,6 +2629,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -2478,8 +2665,8 @@ namespace Terminal.Gui {
 				leftColumn = TextModel.CalculateLeftColumn (line, leftColumn, currentColumn,
 					Frame.Width + offB.width - RightOffset, TabWidth);
 				need = true;
-			} else if (dSize.size + RightOffset < Frame.Width + offB.width
-				&& tSize.size + RightOffset < Frame.Width + offB.width) {
+			} else if ((wordWrap && leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width
+				&& tSize.size + RightOffset < Frame.Width + offB.width)) {
 				leftColumn = 0;
 				need = true;
 			}
@@ -2502,6 +2689,44 @@ namespace Terminal.Gui {
 			} else {
 				PositionCursor ();
 			}
+
+			OnUnwrappedCursorPosition ();
+		}
+
+		/// <summary>
+		/// Event arguments for events for when the contents of the TextView change. E.g. the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public class ContentsChangedEventArgs : EventArgs {
+			/// <summary>
+			/// Creates a new <see cref="ContentsChanged"/> instance.
+			/// </summary>
+			/// <param name="currentRow">Contains the row where the change occurred.</param>
+			/// <param name="currentColumn">Contains the column where the change occured.</param>
+			public ContentsChangedEventArgs (int currentRow, int currentColumn)
+			{
+				Row = currentRow;
+				Col = currentColumn;
+			}
+
+			/// <summary>
+			/// 
+			/// Contains the row where the change occurred.
+			/// </summary>
+			public int Row { get; private set; }
+
+			/// <summary>
+			/// Contains the column where the change occurred.
+			/// </summary>
+			public int Col { get; private set; }
+		}
+
+		/// <summary>
+		/// Called when the contents of the TextView change. E.g. when the user types text or deletes text. Raises
+		/// the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public virtual void OnContentsChanged ()
+		{
+			ContentsChanged?.Invoke (new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 		}
 
 		(int width, int height) OffSetBackground ()
@@ -2522,7 +2747,7 @@ namespace Terminal.Gui {
 		/// will scroll the <see cref="TextView"/> to display the specified column at the left if <paramref name="isRow"/> is false.
 		/// </summary>
 		/// <param name="idx">Row that should be displayed at the top or Column that should be displayed at the left,
-		///  if the value is negative it will be reset to zero</param>
+		/// if the value is negative it will be reset to zero</param>
 		/// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
 		public void ScrollTo (int idx, bool isRow = true)
 		{
@@ -2533,7 +2758,7 @@ namespace Terminal.Gui {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else if (!wordWrap) {
 				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset, TabWidth);
-				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+				leftColumn = Math.Max (!wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
 		}
@@ -2572,7 +2797,7 @@ namespace Terminal.Gui {
 
 		void RedoChanges ()
 		{
-			if (ReadOnly || wordWrap)
+			if (ReadOnly)
 				return;
 
 			historyText.Redo ();
@@ -2580,7 +2805,7 @@ namespace Terminal.Gui {
 
 		void UndoChanges ()
 		{
-			if (ReadOnly || wordWrap)
+			if (ReadOnly)
 				return;
 
 			historyText.Undo ();
@@ -2894,10 +3119,12 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsTab) {
-				return false;
+			if (!AllowsTab || isReadOnly) {
+				return ProcessMovePreviousView ();
 			}
 			if (currentColumn > 0) {
+				SetWrapModel ();
+
 				var currentLine = GetCurrentLine ();
 				if (currentLine.Count > 0 && currentLine [currentColumn - 1] == '\t') {
 
@@ -2909,6 +3136,8 @@ namespace Terminal.Gui {
 					historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Replaced);
 				}
+
+				UpdateWrapModel ();
 			}
 			DoNeededAction ();
 			return true;
@@ -2918,8 +3147,8 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsTab) {
-				return false;
+			if (!AllowsTab || isReadOnly) {
+				return ProcessMoveNextView ();
 			}
 			InsertText (new KeyEvent ((Key)'\t', null));
 			DoNeededAction ();
@@ -2937,11 +3166,11 @@ namespace Terminal.Gui {
 		{
 			ResetColumnTrack ();
 
-			if (!AllowsReturn) {
+			if (!AllowsReturn || isReadOnly) {
 				return false;
 			}
-			if (isReadOnly)
-				return true;
+
+			SetWrapModel ();
 
 			var currentLine = GetCurrentLine ();
 
@@ -2963,10 +3192,6 @@ namespace Terminal.Gui {
 
 			historyText.Add (addedLines, CursorPosition, HistoryText.LineStatus.Added);
 
-			if (wordWrap) {
-				wrapManager.AddLine (currentRow, currentColumn);
-				wrapNeeded = true;
-			}
 			currentRow++;
 
 			bool fullNeedsDisplay = false;
@@ -2989,7 +3214,10 @@ namespace Terminal.Gui {
 			else
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
 
+			UpdateWrapModel ();
+
 			DoNeededAction ();
+			OnContentsChanged ();
 			return true;
 		}
 
@@ -2997,6 +3225,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
@@ -3007,20 +3238,22 @@ namespace Terminal.Gui {
 				historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 			var newPos = WordBackward (currentColumn, currentRow);
 			if (newPos.HasValue && currentRow == newPos.Value.row) {
 				var restCount = currentColumn - newPos.Value.col;
 				currentLine.RemoveRange (newPos.Value.col, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
 			} else if (newPos.HasValue) {
 				var restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
-				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn = newPos.Value.col;
@@ -3029,6 +3262,8 @@ namespace Terminal.Gui {
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
@@ -3042,6 +3277,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
@@ -3051,6 +3289,8 @@ namespace Terminal.Gui {
 
 				historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+
+				UpdateWrapModel ();
 
 				return;
 			}
@@ -3063,12 +3303,14 @@ namespace Terminal.Gui {
 				restCount = currentLine.Count - currentColumn;
 				currentLine.RemoveRange (currentColumn, restCount);
 			}
-			if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+			if (wordWrap) {
 				wrapNeeded = true;
 			}
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
+
+			UpdateWrapModel ();
 
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
@@ -3109,9 +3351,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			var setLastWasKill = true;
 			if (currentLine.Count > 0 && currentColumn == 0) {
+				UpdateWrapModel ();
+
 				DeleteTextBackwards ();
 				return;
 			}
@@ -3163,7 +3409,12 @@ namespace Terminal.Gui {
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
-			SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			UpdateWrapModel ();
+
+			if (wrapNeeded)
+				SetNeedsDisplay ();
+			else
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3177,9 +3428,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			var setLastWasKill = true;
 			if (currentLine.Count > 0 && currentColumn == currentLine.Count) {
+				UpdateWrapModel ();
+
 				DeleteTextForwards ();
 				return;
 			}
@@ -3225,7 +3480,12 @@ namespace Terminal.Gui {
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
-			SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			UpdateWrapModel ();
+
+			if (wrapNeeded)
+				SetNeedsDisplay ();
+			else
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3253,6 +3513,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			if (selecting) {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
@@ -3264,11 +3527,18 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 			if (DeleteTextForwards ()) {
+				UpdateWrapModel ();
+
 				return;
 			}
+
+			UpdateWrapModel ();
+
 			DoNeededAction ();
 		}
 
@@ -3279,6 +3549,9 @@ namespace Terminal.Gui {
 		{
 			if (isReadOnly)
 				return;
+
+			SetWrapModel ();
+
 			if (selecting) {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
@@ -3290,11 +3563,18 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
+				UpdateWrapModel ();
+
 				return;
 			}
 			if (DeleteTextBackwards ()) {
+				UpdateWrapModel ();
+
 				return;
 			}
+
+			UpdateWrapModel ();
+
 			DoNeededAction ();
 		}
 
@@ -3403,29 +3683,67 @@ namespace Terminal.Gui {
 			if (isReadOnly)
 				return true;
 
-			var curPos = CursorPosition;
+			SetWrapModel ();
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
 
 			if (selecting) {
 				ClearSelectedRegion ();
 			}
-			if (Used) {
-				Insert ((uint)kb.Key);
-				currentColumn++;
-				if (currentColumn >= leftColumn + Frame.Width) {
-					leftColumn++;
-					SetNeedsDisplay ();
-				}
+			if (kb.Key == Key.Enter) {
+				model.AddLine (currentRow + 1, new List<Rune> ());
+				currentRow++;
+				currentColumn = 0;
+			} else if ((uint)kb.Key == 13) {
+				currentColumn = 0;
 			} else {
-				Insert ((uint)kb.Key);
-				currentColumn++;
+				if (Used) {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+					if (currentColumn >= leftColumn + Frame.Width) {
+						leftColumn++;
+						SetNeedsDisplay ();
+					}
+				} else {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+				}
 			}
 
 			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
+			UpdateWrapModel ();
+			OnContentsChanged ();
+
 			return true;
+		}
+
+		void ShowContextMenu ()
+		{
+			if (currentCulture != Thread.CurrentThread.CurrentUICulture) {
+
+				currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+				ContextMenu.MenuItems = BuildContextMenuBarItem ();
+			}
+			ContextMenu.Show ();
+		}
+
+		/// <summary>
+		/// Deletes all text.
+		/// </summary>
+		public void DeleteAll ()
+		{
+			if (Lines == 0) {
+				return;
+			}
+
+			selectionStartColumn = 0;
+			selectionStartRow = 0;
+			MoveBottomEndExtend ();
+			DeleteCharLeft ();
+			SetNeedsDisplay ();
 		}
 
 		///<inheritdoc/>
@@ -3450,10 +3768,15 @@ namespace Terminal.Gui {
 
 		bool DeleteTextForwards ()
 		{
+			SetWrapModel ();
+
 			var currentLine = GetCurrentLine ();
 			if (currentColumn == currentLine.Count) {
-				if (currentRow + 1 == model.Count)
+				if (currentRow + 1 == model.Count) {
+					UpdateWrapModel ();
+
 					return true;
+				}
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
@@ -3471,11 +3794,15 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
-				var sr = currentRow - topRow;
-				SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					var sr = currentRow - topRow;
+					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+				}
 			} else {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
@@ -3484,18 +3811,27 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
-				var r = currentRow - topRow;
-				SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					var r = currentRow - topRow;
+					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+				}
 			}
+
+			UpdateWrapModel ();
 
 			return false;
 		}
 
 		bool DeleteTextBackwards ()
 		{
+			SetWrapModel ();
+
 			if (currentColumn > 0) {
 				// Delete backwards 
 				var currentLine = GetCurrentLine ();
@@ -3503,7 +3839,7 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (currentColumn - 1);
-				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentColumn--;
@@ -3535,8 +3871,7 @@ namespace Terminal.Gui {
 				var prevCount = prevRow.Count;
 				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 				model.RemoveLine (currentRow);
-				bool lineRemoved = false;
-				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+				if (wordWrap) {
 					wrapNeeded = true;
 				}
 				currentRow--;
@@ -3544,13 +3879,11 @@ namespace Terminal.Gui {
 				historyText.Add (new List<List<Rune>> () { GetCurrentLine () }, new Point (currentColumn, prowIdx),
 					HistoryText.LineStatus.Replaced);
 
-				if (wrapNeeded && !lineRemoved) {
-					currentColumn = Math.Max (prevCount - 1, 0);
-				} else {
-					currentColumn = prevCount;
-				}
+				currentColumn = prevCount;
 				SetNeedsDisplay ();
 			}
+
+			UpdateWrapModel ();
 
 			return false;
 		}
@@ -3591,6 +3924,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 			selecting = false;
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -3621,6 +3955,7 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+				OnContentsChanged ();
 			} else {
 				if (selecting) {
 					ClearRegion ();
@@ -3653,6 +3988,7 @@ namespace Terminal.Gui {
 		{
 			shiftSelecting = false;
 			selecting = false;
+			isButtonShift = false;
 		}
 
 		void ClearSelectedRegion ()
@@ -3932,6 +4268,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool isButtonShift;
+
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
@@ -3942,7 +4280,8 @@ namespace Terminal.Gui {
 				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
-				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
+				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
+				&& !ev.Flags.HasFlag (ContextMenu.MouseFlags)) {
 				return false;
 			}
 
@@ -3962,9 +4301,8 @@ namespace Terminal.Gui {
 			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
-				if (shiftSelecting) {
-					shiftSelecting = false;
-					selecting = false;
+				if (shiftSelecting && !isButtonShift) {
+					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
 				PositionCursor ();
@@ -4015,6 +4353,7 @@ namespace Terminal.Gui {
 				columnTrack = currentColumn;
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)) {
 				if (!shiftSelecting) {
+					isButtonShift = true;
 					StartSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
@@ -4023,8 +4362,7 @@ namespace Terminal.Gui {
 				columnTrack = currentColumn;
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 				if (shiftSelecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
 				PositionCursor ();
@@ -4033,7 +4371,7 @@ namespace Terminal.Gui {
 				}
 				lastWasKill = false;
 				columnTrack = currentColumn;
-				if (Application.mouseGrabView == null) {
+				if (Application.MouseGrabView == null) {
 					Application.GrabMouse (this);
 				}
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Released)) {
@@ -4079,6 +4417,9 @@ namespace Terminal.Gui {
 				PositionCursor ();
 				lastWasKill = false;
 				columnTrack = currentColumn;
+			} else if (ev.Flags == ContextMenu.MouseFlags) {
+				ContextMenu.Position = new Point (ev.X + 2, ev.Y + 2);
+				ShowContextMenu ();
 			}
 
 			return true;
@@ -4109,7 +4450,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
-			if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
+			if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				Application.UngrabMouse ();
 			}
 
@@ -4121,9 +4462,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearHistoryChanges ()
 		{
-			historyText.Clear (Text);
+			historyText?.Clear (Text);
 		}
 	}
+
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

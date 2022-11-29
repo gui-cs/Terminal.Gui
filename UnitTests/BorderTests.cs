@@ -26,6 +26,7 @@ namespace Terminal.Gui.Core {
 			Assert.False (b.Effect3D);
 			Assert.Equal (new Point (1, 1), b.Effect3DOffset);
 			Assert.Null (b.Effect3DBrush);
+			Assert.Equal (NStack.ustring.Empty, b.Title);
 		}
 
 		[Fact]

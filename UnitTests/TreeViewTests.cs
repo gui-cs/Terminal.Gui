@@ -6,10 +6,19 @@ using System.Threading.Tasks;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Views {
 
 	public class TreeViewTests {
+
+		readonly ITestOutputHelper output;
+
+		public TreeViewTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
 		#region Test Setup Methods
 		class Factory {
 			public Car [] Cars { get; set; }
@@ -534,6 +543,15 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tree.ScrollOffsetVertical);
 		}
 
+		[Fact]
+		public void GoToEnd_ShouldNotFailOnEmptyTreeView ()
+		{
+			var tree = new TreeView ();
+
+			var exception = Record.Exception (() => tree.GoToEnd ());
+
+			Assert.Null (exception);
+		}
 
 		[Fact]
 		public void ObjectActivated_CustomKey ()
@@ -710,6 +728,209 @@ namespace Terminal.Gui.Views {
 			tree.RefreshObject (root);
 			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
 
+		}
+		[Fact, AutoInitShutdown]
+		public void TestGetObjectOnRow ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n1_1, tv.GetObjectOnRow (1));
+			Assert.Same (n1_2, tv.GetObjectOnRow (2));
+			Assert.Same (n2, tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			TestHelpers.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+
+			Assert.Same (n1, tv.GetObjectOnRow (0));
+			Assert.Same (n2, tv.GetObjectOnRow (1));
+			Assert.Null (tv.GetObjectOnRow (2));
+			Assert.Null (tv.GetObjectOnRow (3));
+			Assert.Null (tv.GetObjectOnRow (4));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestGetObjectRow ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			TestHelpers.AssertDriverContentsAre (
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Equal (1, tv.GetObjectRow (n1_1));
+			Assert.Equal (2, tv.GetObjectRow (n1_2));
+			Assert.Equal (3, tv.GetObjectRow (n2));
+
+			tv.Collapse (n1);
+
+			tv.Redraw (tv.Bounds);
+
+
+			TestHelpers.AssertDriverContentsAre (
+@"├+normal
+└─pink
+", output);
+			Assert.Equal (0, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (1, tv.GetObjectRow (n2));
+
+
+			// scroll down 1
+			tv.ScrollOffsetVertical = 1;
+
+			tv.Redraw (tv.Bounds);
+
+
+			TestHelpers.AssertDriverContentsAre (
+@"└─pink
+", output);
+			Assert.Equal (-1, tv.GetObjectRow (n1));
+			Assert.Null (tv.GetObjectRow (n1_1));
+			Assert.Null (tv.GetObjectRow (n1_2));
+			Assert.Equal (0, tv.GetObjectRow (n2));
+		}
+		[Fact, AutoInitShutdown]
+		public void TestTreeViewColor ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n1_1 = new TreeNode ("pink");
+			var n1_2 = new TreeNode ("normal");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			var pink = new Attribute (Color.Magenta, Color.Black);
+			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre(
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+			// Should all be the same color
+			TestHelpers.AssertDriverColorsAre(
+@"00000000
+00000000
+0000000000
+000000
+",
+				new [] { tv.ColorScheme.Normal, pink });
+
+			// create a new color scheme
+			var pinkScheme = new ColorScheme {
+				Normal = pink,
+				Focus = hotpink
+			};
+
+			// and a delegate that uses the pink color scheme 
+			// for nodes "pink"
+			tv.ColorGetter = (n) => n.Text.Equals ("pink") ? pinkScheme : null;
+
+			// redraw now that the custom color
+			// delegate is registered
+			tv.Redraw (tv.Bounds);
+
+			// Same text
+			TestHelpers.AssertDriverContentsAre(
+@"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+", output);
+			// but now the item (only not lines) appear
+			// in pink when they are the word "pink"
+			TestHelpers.AssertDriverColorsAre(
+@"00000000
+00001111
+0000000000
+001111
+",
+				new [] { tv.ColorScheme.Normal, pink });
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DesiredCursorVisibility_MultiSelect ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("normal");
+			var n2 = new TreeNode ("pink");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Assert.True (tv.MultiSelect);
+			Assert.True (tv.HasFocus);
+			Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+
+			tv.SelectAll ();
+			tv.DesiredCursorVisibility = CursorVisibility.Default;
+			Application.Refresh ();
+			Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
+			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+			Assert.Equal (CursorVisibility.Default, visibility);
 		}
 
 		/// <summary>

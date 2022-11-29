@@ -4,14 +4,18 @@ using System.Text;
 using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Globalization;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
+	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("TopLevel")]
+	[ScenarioCategory ("Text and Formatting")]
+	[ScenarioCategory ("Top Level Windows")]
+	[ScenarioCategory ("Files and IO")]
+	[ScenarioCategory ("TextView")]
+
 	public class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
@@ -22,16 +26,16 @@ namespace UICatalog.Scenarios {
 		private string _textToReplace;
 		private bool _matchCase;
 		private bool _matchWholeWord;
-		private Window winDialog;
+		private Window _winDialog;
 		private TabView _tabView;
+		private MenuItem _miForceMinimumPosToZero;
+		private bool _forceMinimumPosToZero = true;
+		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
+			_cultureInfos = Application.SupportedCultures;
 
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
@@ -40,7 +44,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 
 			_textView = new TextView () {
 				X = 0,
@@ -52,6 +56,12 @@ namespace UICatalog.Scenarios {
 			};
 
 			CreateDemoFile (_fileName);
+
+			var siCursorPosition = new StatusItem (Key.Null, "", null);
+
+			_textView.UnwrappedCursorPosition += (e) => {
+				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
+			};
 
 			LoadFile ();
 
@@ -87,24 +97,34 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("Forma_t", new MenuItem [] {
 					CreateWrapChecked (),
 					CreateAutocomplete(),
-					CreateAllowsTabChecked ()
+					CreateAllowsTabChecked (),
+					CreateReadOnlyChecked ()
 				}),
 				new MenuBarItem ("_Responder", new MenuItem [] {
 					CreateCanFocusChecked (),
 					CreateEnabledChecked (),
 					CreateVisibleChecked ()
 				}),
+				new MenuBarItem ("Conte_xtMenu", new MenuItem [] {
+					_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
+						_miForceMinimumPosToZero.Checked = _forceMinimumPosToZero = !_forceMinimumPosToZero;
+						_textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
+					new MenuBarItem ("_Languages", GetSupportedCultures ())
+				})
 			});
-			Top.Add (menu);
+
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
+				siCursorPosition,
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
@@ -153,20 +173,20 @@ namespace UICatalog.Scenarios {
 
 			Win.KeyPress += (e) => {
 				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
+				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
 					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
 					DisposeWinDialog ();
 				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Quit ();
 					e.Handled = true;
-				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
@@ -175,13 +195,15 @@ namespace UICatalog.Scenarios {
 					e.Handled = true;
 				}
 			};
+
+			Application.Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()
 		{
-			winDialog.Dispose ();
-			Win.Remove (winDialog);
-			winDialog = null;
+			_winDialog.Dispose ();
+			Win.Remove (_winDialog);
+			_winDialog = null;
 		}
 
 		public override void Setup ()
@@ -259,7 +281,7 @@ namespace UICatalog.Scenarios {
 				Find ();
 				return;
 			} else if (replace && (string.IsNullOrEmpty (_textToFind)
-				|| (winDialog == null && string.IsNullOrEmpty (_textToReplace)))) {
+				|| (_winDialog == null && string.IsNullOrEmpty (_textToReplace)))) {
 				Replace ();
 				return;
 			}
@@ -306,7 +328,7 @@ namespace UICatalog.Scenarios {
 
 		private void ReplaceAll ()
 		{
-			if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && winDialog == null)) {
+			if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && _winDialog == null)) {
 				Replace ();
 				return;
 			}
@@ -446,6 +468,46 @@ namespace UICatalog.Scenarios {
 			sw.Close ();
 		}
 
+		private MenuItem [] GetSupportedCultures ()
+		{
+			List<MenuItem> supportedCultures = new List<MenuItem> ();
+			var index = -1;
+
+			foreach (var c in _cultureInfos) {
+				var culture = new MenuItem {
+					CheckType = MenuItemCheckStyle.Checked
+				};
+				if (index == -1) {
+					culture.Title = "_English";
+					culture.Help = "en-US";
+					culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == "en-US";
+					CreateAction (supportedCultures, culture);
+					supportedCultures.Add (culture);
+					index++;
+					culture = new MenuItem {
+						CheckType = MenuItemCheckStyle.Checked
+					};
+				}
+				culture.Title = $"_{c.Parent.EnglishName}";
+				culture.Help = c.Name;
+				culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
+				CreateAction (supportedCultures, culture);
+				supportedCultures.Add (culture);
+			}
+			return supportedCultures.ToArray ();
+
+			void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
+			{
+				culture.Action += () => {
+					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help.ToString ());
+					culture.Checked = true;
+					foreach (var item in supportedCultures) {
+						item.Checked = item.Help.ToString () == Thread.CurrentThread.CurrentUICulture.Name;
+					}
+				};
+			}
+		}
+
 		private MenuItem [] CreateKeepChecked ()
 		{
 			var item = new MenuItem ();
@@ -467,11 +529,9 @@ namespace UICatalog.Scenarios {
 			item.Action += () => {
 				_textView.WordWrap = item.Checked = !item.Checked;
 				if (_textView.WordWrap) {
-					_scrollBar.AutoHideScrollBars = false;
 					_scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
 					_textView.BottomOffset = 0;
 				} else {
-					_scrollBar.AutoHideScrollBars = true;
 					_textView.BottomOffset = 1;
 				}
 			};
@@ -512,6 +572,18 @@ namespace UICatalog.Scenarios {
 			item.Action += () => {
 				_textView.AllowsTab = item.Checked = !item.Checked;
 			};
+
+			return item;
+		}
+
+		private MenuItem CreateReadOnlyChecked ()
+		{
+			var item = new MenuItem {
+				Title = "Read Only"
+			};
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = _textView.ReadOnly;
+			item.Action += () => _textView.ReadOnly = item.Checked = !item.Checked;
 
 			return item;
 		}
@@ -647,17 +719,17 @@ namespace UICatalog.Scenarios {
 
 		private void CreateFindReplace (bool isFind = true)
 		{
-			if (winDialog != null) {
-				winDialog.SetFocus ();
+			if (_winDialog != null) {
+				_winDialog.SetFocus ();
 				return;
 			}
 
-			winDialog = new Window (isFind ? "Find" : "Replace") {
+			_winDialog = new Window (isFind ? "Find" : "Replace") {
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
 				ColorScheme = Colors.TopLevel
 			};
-			winDialog.Border.Effect3D = true;
+			_winDialog.Border.Effect3D = true;
 
 			_tabView = new TabView () {
 				X = 0,
@@ -670,15 +742,15 @@ namespace UICatalog.Scenarios {
 			var replace = ReplaceTab ();
 			_tabView.AddTab (new TabView.Tab ("Replace", replace), !isFind);
 			_tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
-			winDialog.Add (_tabView);
+			_winDialog.Add (_tabView);
 
-			Win.Add (winDialog);
+			Win.Add (_winDialog);
 
-			winDialog.Width = replace.Width + 4;
-			winDialog.Height = replace.Height + 4;
+			_winDialog.Width = replace.Width + 4;
+			_winDialog.Height = replace.Height + 4;
 
-			winDialog.SuperView.BringSubviewToFront (winDialog);
-			winDialog.SetFocus ();
+			_winDialog.SuperView.BringSubviewToFront (_winDialog);
+			_winDialog.SetFocus ();
 		}
 
 		private void SetFindText ()
@@ -692,12 +764,7 @@ namespace UICatalog.Scenarios {
 
 		private View FindTab ()
 		{
-			var d = new View () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			var d = new View ();
 			d.DrawContent += (e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
@@ -706,10 +773,11 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label (0, 1, "Find:") {
+			var label = new Label ("Find:") {
+				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				LayoutStyle = LayoutStyle.Computed
+				AutoSize = false
 			};
 			d.Add (label);
 
@@ -728,7 +796,8 @@ namespace UICatalog.Scenarios {
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
-				IsDefault = true
+				IsDefault = true,
+				AutoSize = false
 			};
 			btnFindNext.Clicked += () => FindNext ();
 			d.Add (btnFindNext);
@@ -738,7 +807,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnFindPrevious.Clicked += () => FindPrevious ();
 			d.Add (btnFindPrevious);
@@ -754,7 +824,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
 				Width = 20,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnCancel.Clicked += () => {
 				DisposeWinDialog ();
@@ -785,12 +856,7 @@ namespace UICatalog.Scenarios {
 
 		private View ReplaceTab ()
 		{
-			var d = new View () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			var d = new View ();
 			d.DrawContent += (e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
@@ -799,10 +865,11 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label (0, 1, "Find:") {
+			var label = new Label ("Find:") {
+				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				LayoutStyle = LayoutStyle.Computed
+				AutoSize = false
 			};
 			d.Add (label);
 
@@ -821,7 +888,8 @@ namespace UICatalog.Scenarios {
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
 				TextAlignment = TextAlignment.Centered,
-				IsDefault = true
+				IsDefault = true,
+				AutoSize = false
 			};
 			btnFindNext.Clicked += () => ReplaceNext ();
 			d.Add (btnFindNext);
@@ -848,7 +916,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnFindPrevious.Clicked += () => ReplacePrevious ();
 			d.Add (btnFindPrevious);
@@ -858,7 +927,8 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
 				Enabled = !txtToFind.Text.IsEmpty,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnReplaceAll.Clicked += () => ReplaceAll ();
 			d.Add (btnReplaceAll);
@@ -875,7 +945,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
 				Width = 20,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = TextAlignment.Centered,
+				AutoSize = false
 			};
 			btnCancel.Clicked += () => {
 				DisposeWinDialog ();
