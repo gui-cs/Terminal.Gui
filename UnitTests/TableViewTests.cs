@@ -1389,7 +1389,40 @@ namespace Terminal.Gui.Views {
 
 			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
 		}
+		
+		[Theory, AutoInitShutdown]
+		[InlineData(new object[] { true,true })]
+		[InlineData (new object[] { false,true })]
+		[InlineData (new object [] { true, false})]
+		[InlineData (new object [] { false, false})]
+		public void TestColumnStyle_VisibleFalse_DoesNotEffect_EnsureSelectedCellIsVisible (bool smooth, bool invisibleCol)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			tableView.Style.SmoothHorizontalScrolling = smooth;
+			
+			if(invisibleCol) {
+				tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			}
 
+			// New TableView should have first cell selected 
+			Assert.Equal (0,tableView.SelectedColumn);
+			// With no scrolling
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// A,B and C are visible on screen at the moment so these should have no effect
+			tableView.SelectedColumn = 1;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			tableView.SelectedColumn = 2;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// Selecting D should move the visible table area to fit D onto the screen
+			tableView.SelectedColumn = 3;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
+		}
 		[Fact]
 		public void LongColumnTest ()
 		{
