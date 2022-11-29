@@ -1544,7 +1544,7 @@ namespace Terminal.Gui {
 				const string CSI = "\x1b[";
 				int bg = 0;
 				int fg = 0;
-				
+
 				IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
 				      .OfType<ConsoleColor> ()
 				      .Select (s => (int)s);

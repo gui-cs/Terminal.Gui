@@ -958,7 +958,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 			var result = BashRunner.Run ("uname -a", runCurses: false);
-			if (result.ToLower().Contains ("microsoft") && (Environment.GetEnvironmentVariable ("WSL_DISTRO_NAME") != null)) {
+			if (result.ToLower ().Contains ("microsoft") && (Environment.GetEnvironmentVariable ("WSL_DISTRO_NAME") != null)) {
 				return true;
 			}
 			return false;

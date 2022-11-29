@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// 24bit color. Support translate it to 4bit(Windows) and 8bit(Linux) color
+	/// Represents a 24bit color. Supports translating to 4bit (Windows) and 8bit (Linux) colors.
 	/// </summary>
 	public struct TrueColor {
 		/// <summary>
@@ -117,8 +117,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static TrueColor Color4 (int code)
 		{
-			if (code == 7) { code = 8; }
-			else if (code == 8) { code = 7; }
+			if (code == 7) { code = 8; } else if (code == 8) { code = 7; }
 
 			if (code == 8) { return new TrueColor (192, 192, 192); }
 
@@ -294,7 +293,7 @@ namespace Terminal.Gui {
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
 		public TrueColorAttribute (TrueColor foreground, TrueColor background)
-			: base((Color)TrueColor.GetCode4 (foreground), (Color)TrueColor.GetCode4 (background))
+			: base ((Color)TrueColor.GetCode4 (foreground), (Color)TrueColor.GetCode4 (background))
 		{
 			TrueColorForeground = foreground;
 			TrueColorBackground = background;
@@ -305,7 +304,7 @@ namespace Terminal.Gui {
 		///  with the same colors for the foreground and background.
 		/// </summary>
 		/// <param name="color">The color.</param>
-		public TrueColorAttribute (TrueColor color) : this(color, color) { }
+		public TrueColorAttribute (TrueColor color) : this (color, color) { }
 
 		/// <summary>
 		/// The foreground color.
@@ -822,7 +821,7 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
