@@ -161,18 +161,13 @@ namespace UICatalog.Scenarios {
 
 		private void SortColumn (DataColumn clickedCol)
 		{
-			// work out new sort order
-			var sort = tableView.Table.DefaultView.Sort;
-			bool isAsc;
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
-			if (sort?.EndsWith ("ASC") ?? false) {
-				sort = $"{clickedCol.ColumnName} DESC";
-				isAsc = false;
-			} else {
-				sort = $"{clickedCol.ColumnName} ASC";
-				isAsc = true;
-			}
+			SortColumn (clickedCol, sort, isAsc);
+		}
 
+		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
+		{
 			// set a sort order
 			tableView.Table.DefaultView.Sort = sort;
 
@@ -186,7 +181,7 @@ namespace UICatalog.Scenarios {
 			foreach (DataColumn col in tableView.Table.Columns) {
 
 				// remove any lingering sort indicator
-				col.ColumnName = col.ColumnName.TrimEnd ('▼', '▲');
+				col.ColumnName = TrimArrows(col.ColumnName);
 
 				// add a new one if this the one that is being sorted
 				if (col == clickedCol) {
@@ -196,13 +191,42 @@ namespace UICatalog.Scenarios {
 
 			tableView.Update ();
 		}
+
+		private string TrimArrows (string columnName)
+		{
+			return columnName.TrimEnd ('▼', '▲');
+		}
+		private string StripArrows (string columnName)
+		{
+			return columnName.Replace ("▼", "").Replace ("▲", "");
+		}
+		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+		{
+			// work out new sort order
+			var sort = tableView.Table.DefaultView.Sort;
+
+			if (sort?.EndsWith ("ASC") ?? false) {
+				sort = $"{clickedCol.ColumnName} DESC";
+				isAsc = false;
+			} else {
+				sort = $"{clickedCol.ColumnName} ASC";
+				isAsc = true;
+			}
+
+			return sort;
+		}
+
 		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
 		{
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
 			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Hide '{clickedCol.ColumnName}'", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,sort,isAsc)),
 				})
 			);
+
 			contextMenu.Show ();
 		}
 
