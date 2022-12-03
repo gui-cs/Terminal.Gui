@@ -1663,5 +1663,183 @@ namespace Terminal.Gui.Views {
 
 			return dt;
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_ScreenToCell ()
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// ---------------- X=0 -----------------------
+			// click is before first cell
+			Assert.Null (tableView.ScreenToCell (0, 0));
+			Assert.Null (tableView.ScreenToCell (0, 1));
+			Assert.Null (tableView.ScreenToCell (0, 2));
+			Assert.Null (tableView.ScreenToCell (0, 3));
+			Assert.Null (tableView.ScreenToCell (0, 4));
+
+			// ---------------- X=1 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (1, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (1, 1));
+			// click in cell 0,0
+			Assert.Equal (new Point(0,0),tableView.ScreenToCell (1, 2));
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (1, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (1, 4));
+
+
+			// ---------------- X=2 -----------------------
+			// ( even though there is a horizontal dividing line here we treat it as a hit on the cell before)
+			// click in header
+			Assert.Null (tableView.ScreenToCell (2, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (2, 1));
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2));
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (2, 4));
+
+
+			// ---------------- X=3 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (3, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (3, 1));
+			// click in cell 1,0
+			Assert.Equal (new Point (1, 0), tableView.ScreenToCell (3, 2));
+			// click in cell 1,1
+			Assert.Equal (new Point (1, 1), tableView.ScreenToCell (3, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (3, 4));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_ScreenToCell_DataColumnOverload ()
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			DataColumn col;
+
+			// ---------------- X=0 -----------------------
+			// click is before first cell
+			Assert.Null (tableView.ScreenToCell (0, 0,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 1,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 2,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 3,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 4,out col));
+			Assert.Null (col);
+
+			// ---------------- X=1 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (1, 0, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in header row line  (click in the horizontal line below header counts as click in header above - consistent with the column hit box)
+			Assert.Null (tableView.ScreenToCell (1, 1, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (1, 2, out col));
+			Assert.Null (col);
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (1, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (1, 4, out col));
+			Assert.Null (col);
+
+
+			// ---------------- X=2 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (2, 0, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (2, 1, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2, out col));
+			Assert.Null (col);
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (2, 4, out col));
+			Assert.Null (col);
+
+
+			// ---------------- X=3 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (3, 0, out col));
+			Assert.Equal ("B", col.ColumnName);
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (3, 1, out col));
+			Assert.Equal ("B", col.ColumnName);
+			// click in cell 1,0
+			Assert.Equal (new Point (1, 0), tableView.ScreenToCell (3, 2, out col));
+			Assert.Null (col);
+			// click in cell 1,1
+			Assert.Equal (new Point (1, 1), tableView.ScreenToCell (3, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (3, 4, out col));
+			Assert.Null (col);
+		}
+		private TableView GetTwoRowSixColumnTable ()
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visible
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+			return tableView;
+		}
 	}
 }

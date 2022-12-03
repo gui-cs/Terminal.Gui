@@ -1055,14 +1055,27 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
 		/// </summary>
-		/// <param name="clientX">X offset from the top left of the control</param>
-		/// <param name="clientY">Y offset from the top left of the control</param>
-		/// <returns></returns>
+		/// <param name="clientX">X offset from the top left of the control.</param>
+		/// <param name="clientY">Y offset from the top left of the control.</param>
+		/// <returns>Cell clicked or null.</returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
+			return ScreenToCell(clientX, clientY, out _);
+		}
+
+		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+		/// <param name="clientX">X offset from the top left of the control.</param>
+		/// <param name="clientY">Y offset from the top left of the control.</param>
+		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+		public Point? ScreenToCell (int clientX, int clientY, out DataColumn headerIfAny)
+		{
+			headerIfAny = null;
+
 			if (TableIsNullOrInvisible ())
 				return null;
 
@@ -1073,10 +1086,19 @@ namespace Terminal.Gui {
 			var col = viewPort.LastOrDefault (c => c.X <= clientX);
 
 			// Click is on the header section of rendered UI
-			if (clientY < headerHeight)
+			if (clientY < headerHeight) {
+				headerIfAny = col?.Column;
 				return null;
+			}
+				
 
 			var rowIdx = RowOffset - headerHeight + clientY;
+
+			// if click is off bottom of the rows don't give an
+			// invalid index back to user!
+			if (rowIdx >= Table.Rows.Count) {
+				return null;
+			}	
 
 			if (col != null && rowIdx >= 0) {
 
