@@ -55,6 +55,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>Action to invoke.</value>
 		public Action Action { get; }
+
+		/// <summary>
+		/// Gets or sets arbitrary data for the status item.
+		/// </summary>
+		/// <remarks>This property is not used internally.</remarks>
+		public object Data { get; set; }
 	};
 
 	/// <summary>
