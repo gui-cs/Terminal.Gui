@@ -1638,6 +1638,24 @@ Edit
 		}
 
 		[Fact, AutoInitShutdown]
+		public void MenuBar_With_Action_But_Without_MenuItems_Not_Throw ()
+		{
+			var menu = new MenuBar (
+			    menus: new []
+			    {
+				new MenuBarItem { Title = "Test 1", Action = () => { } },
+				new MenuBarItem { Title = "Test 2", Action = () => { } },
+			    });
+
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			Assert.False (Application.Top.OnKeyDown (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+		}
+
+		[Fact, AutoInitShutdown]
 		public void MenuBar_In_Window_Without_Other_Views ()
 		{
 			var win = new Window ();

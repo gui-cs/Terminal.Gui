@@ -1483,7 +1483,13 @@ namespace Terminal.Gui {
 							output.Append (WriteAttributes (attr));
 						}
 						outputWidth++;
-						output.Append ((char)contents [row, col, 0]);
+						var rune = contents [row, col, 0];
+						char [] spair;
+						if (Rune.DecodeSurrogatePair((uint) rune, out spair)) {
+							output.Append (spair);
+						} else {
+							output.Append ((char)rune);
+						}
 						contents [row, col, 2] = 0;
 					}
 				}

@@ -1321,8 +1321,9 @@ namespace Terminal.Gui {
 
 			// Remove focus down the chain of subviews if focus is removed
 			if (!value && focused != null) {
-				focused.OnLeave (view);
-				focused.SetHasFocus (false, view);
+				var f = focused;
+				f.OnLeave (view);
+				f.SetHasFocus (false, view);
 				focused = null;
 			}
 		}
@@ -3061,6 +3062,17 @@ namespace Terminal.Gui {
 		public virtual Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+		}
+
+		/// <summary>
+		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
+		/// </summary>
+		/// <returns><see cref="Terminal.Gui.ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// If it's overridden can return other values.</returns>
+		public virtual Attribute GetHotNormalColor ()
+		{
+			return Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
 		}
 
 		/// <summary>

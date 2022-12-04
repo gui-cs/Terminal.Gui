@@ -1198,7 +1198,9 @@ namespace Terminal.Gui {
 		public virtual void OnMenuOpened ()
 		{
 			MenuItem mi = null;
-			if (openCurrentMenu.barItems.Children != null && openCurrentMenu?.current > -1) {
+			if (openCurrentMenu.barItems.Children != null && openCurrentMenu.barItems.Children.Length > 0
+				&& openCurrentMenu?.current > -1) {
+
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
 			} else if (openCurrentMenu.barItems.IsTopLevel) {
 				mi = openCurrentMenu.barItems;
