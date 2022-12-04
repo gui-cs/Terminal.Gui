@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using NStack;
 using System.Text.RegularExpressions;
+using CsvHelper;
 
 namespace UICatalog.Scenarios {
 
@@ -371,16 +372,23 @@ namespace UICatalog.Scenarios {
 				MessageBox.ErrorQuery ("No file loaded", "No file is currently loaded", "Ok");
 				return;
 			}
+			using var writer = new CsvWriter (
+				new StreamWriter (File.OpenWrite (currentFile)),
+				CultureInfo.InvariantCulture);
 
-			var sb = new StringBuilder ();
-
-			sb.AppendLine (string.Join (",", tableView.Table.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)));
-
-			foreach (DataRow row in tableView.Table.Rows) {
-				sb.AppendLine (string.Join (",", row.ItemArray));
+			foreach (var col in tableView.Table.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
+				writer.WriteField (col);
 			}
 
-			File.WriteAllText (currentFile, sb.ToString ());
+			writer.NextRecord ();
+
+			foreach (DataRow row in tableView.Table.Rows) {
+				foreach (var item in row.ItemArray) {
+					writer.WriteField (item);
+				}
+				writer.NextRecord ();
+			}
+
 		}
 
 		private void Open ()
@@ -402,24 +410,34 @@ namespace UICatalog.Scenarios {
 			int lineNumber = 0;
 			currentFile = null;
 
+			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
+
 			try {
 				var dt = new DataTable ();
-				var lines = File.ReadAllLines (filename);
 
-				foreach (var h in lines [0].Split (',')) {
-					dt.Columns.Add (h);
+				reader.Read ();
+
+				if (reader.ReadHeader ()) {
+					foreach (var h in reader.HeaderRecord) {
+						dt.Columns.Add (h);
+					}
 				}
 
-
-				foreach (var line in lines.Skip (1)) {
+				while (reader.Read ()) {
 					lineNumber++;
-					dt.Rows.Add (line.Split (','));
+
+					var newRow = dt.Rows.Add ();
+					for (int i = 0; i < dt.Columns.Count; i++) {
+						newRow [i] = reader [i];
+					}
 				}
 
 				tableView.Table = dt;
 
-				// Only set the current filename if we succesfully loaded the entire file
+				// Only set the current filename if we successfully loaded the entire file
 				currentFile = filename;
+				Win.Title = $"{this.GetName ()} - {Path.GetFileName(currentFile)}";
+
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
 			}
