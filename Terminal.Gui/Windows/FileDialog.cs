@@ -116,11 +116,17 @@ namespace Terminal.Gui {
 
 		void Watcher_Error (object sender, ErrorEventArgs e)
 		{
+			if (Application.MainLoop == null)
+				return;
+
 			Application.MainLoop.Invoke (() => Reload ());
 		}
 
 		void Watcher_Changed (object sender, FileSystemEventArgs e)
 		{
+			if (Application.MainLoop == null)
+				return;
+
 			Application.MainLoop.Invoke (() => Reload ());
 		}
 
