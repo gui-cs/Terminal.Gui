@@ -172,7 +172,7 @@ namespace Terminal.Gui.Graphs {
 
 			foreach (var entry in entries) {
 
-				if (entry.Item1.Color.HasValue) {
+				if (entry.Item1.Color != null) {
 					Application.Driver.SetAttribute (entry.Item1.Color.Value);
 				} else {
 					graph.SetDriverColorToGraphColor ();
@@ -226,7 +226,7 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Color for the line that connects points
 		/// </summary>
-		public Attribute? LineColor { get; set; }
+		public Attribute LineColor { get; set; }
 
 		/// <summary>
 		/// The symbol that gets drawn along the line, defaults to '.'

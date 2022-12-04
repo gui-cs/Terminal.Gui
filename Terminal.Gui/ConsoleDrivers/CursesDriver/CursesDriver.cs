@@ -958,9 +958,19 @@ namespace Terminal.Gui {
 				return false;
 			}
 			var result = BashRunner.Run ("uname -a", runCurses: false);
-			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+			if (result.ToLower ().Contains ("microsoft") && (Environment.GetEnvironmentVariable ("WSL_DISTRO_NAME") != null)) {
 				return true;
 			}
+			return false;
+		}
+
+		public static bool CanColorTermTrueColor ()
+		{
+			if (Environment.GetEnvironmentVariable ("COLORTERM") is string value) {
+				value = value.ToLower ();
+				return value.Contains ("truecolor") || value.Contains ("24bit");
+			}
+
 			return false;
 		}
 

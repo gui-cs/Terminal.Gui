@@ -83,6 +83,85 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Represents a 24bit color. Supports translating to 4bit (Windows) and 8bit (Linux) colors.
+	/// </summary>
+	public struct TrueColor {
+		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int Red { get; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int Green { get; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int Blue { get; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public TrueColor (int red, int green, int blue)
+		{
+			Red = red;
+			Green = green;
+			Blue = blue;
+		}
+
+		/// <summary>
+		/// Get color by 16 colors palette
+		/// </summary>
+		public static TrueColor Color4 (int code)
+		{
+			if (code == 7) { code = 8; } else if (code == 8) { code = 7; }
+
+			if (code == 8) { return new TrueColor (192, 192, 192); }
+
+			int k = (code > 8) ? 255 : 128;
+
+			return new TrueColor (code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
+		}
+
+		/// <summary>
+		/// Return color diff
+		/// </summary>
+		public static int Diff (TrueColor c1, TrueColor c2)
+		{
+			// TODO: maybe use CIEDE2000
+			return ((c1.Red - c2.Red) * (c1.Red - c2.Red))
+				+ ((c1.Green - c2.Green) * (c1.Green - c2.Green))
+				+ (c1.Blue - c2.Blue) * (c1.Blue - c2.Blue);
+		}
+
+		/// <summary>
+		/// Get color code in 16 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode4 (TrueColor c)
+		{
+			int ans = 0;
+			for (int i = 1; i < 16; i++) {
+				if (Diff (Color4 (i), c) < Diff (Color4 (ans), c)) { ans = i; }
+			}
+
+			return ans;
+		}
+
+		/// <summary>
+		/// Convert code in 16 colors palette to 256 colors palette
+		/// </summary>
+		public static int Code4ToCode8 (int code)
+		{
+			if (code == 0 || code == 7 || code == 8 || code == 15)
+				return code;
+			return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
+		}
+	}
+
+	/// <summary>
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
@@ -90,7 +169,7 @@ namespace Terminal.Gui {
 	///   scenarios, they encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
-	public struct Attribute {
+	public class Attribute : IEquatable<Attribute> {
 		/// <summary>
 		/// The color attribute value.
 		/// </summary>
@@ -105,11 +184,11 @@ namespace Terminal.Gui {
 		public Color Background { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
+		/// Initializes a new instance of the <see cref="Attribute"/> class with only the value passed to
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value)
+		public Attribute (int value = 0)
 		{
 			Color foreground = default;
 			Color background = default;
@@ -140,7 +219,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (Color foreground = new Color (), Color background = new Color ())
+		public Attribute (Color foreground, Color background)
 		{
 			Value = Make (foreground, background).Value;
 			Foreground = foreground;
@@ -154,12 +233,18 @@ namespace Terminal.Gui {
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
 
+		/// <inheritdoc/>
+		public bool Equals (Attribute other)
+		{
+			return (Value == other.Value) && (Foreground == other.Foreground) && (Background == other.Background);
+		}
+
 		/// <summary>
 		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
 		/// </summary>
 		/// <returns>The integer value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) => c.Value;
+		public static implicit operator int (Attribute c) => c?.Value ?? 0;
 
 		/// <summary>
 		/// Implicitly convert an integer value into an <see cref="Attribute"/>
@@ -191,6 +276,44 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.GetAttribute ();
 		}
+
+		/// <summary>
+		/// Default empty attribute.
+		/// </summary>
+		public static readonly Attribute Default = new Attribute ();
+	}
+
+	/// <summary>
+	/// Defines a true color attribute.
+	/// </summary>
+	public class TrueColorAttribute : Attribute {
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColorAttribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public TrueColorAttribute (TrueColor foreground, TrueColor background)
+			: base ((Color)TrueColor.GetCode4 (foreground), (Color)TrueColor.GetCode4 (background))
+		{
+			TrueColorForeground = foreground;
+			TrueColorBackground = background;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColorAttribute"/> struct
+		///  with the same colors for the foreground and background.
+		/// </summary>
+		/// <param name="color">The color.</param>
+		public TrueColorAttribute (TrueColor color) : this (color, color) { }
+
+		/// <summary>
+		/// The foreground color.
+		/// </summary>
+		public TrueColor TrueColorForeground { get; }
+		/// <summary>
+		/// The background color.
+		/// </summary>
+		public TrueColor TrueColorBackground { get; }
 	}
 
 	/// <summary>
@@ -199,11 +322,11 @@ namespace Terminal.Gui {
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal;
-		Attribute _focus;
-		Attribute _hotNormal;
-		Attribute _hotFocus;
-		Attribute _disabled;
+		Attribute _normal = Attribute.Default;
+		Attribute _focus = Attribute.Default;
+		Attribute _hotNormal = Attribute.Default;
+		Attribute _hotFocus = Attribute.Default;
+		Attribute _disabled = Attribute.Default;
 		internal string caller = "";
 
 		/// <summary>
@@ -246,18 +369,18 @@ namespace Terminal.Gui {
 			case "TopLevel":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -265,19 +388,19 @@ namespace Terminal.Gui {
 			case "Base":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -285,31 +408,31 @@ namespace Terminal.Gui {
 			case "Menu":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				case "Disabled":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -317,24 +440,24 @@ namespace Terminal.Gui {
 			case "Dialog":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					if (Normal.Foreground != attribute.Background)
-						Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					if (Normal?.Foreground != attribute.Background)
+						Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -342,13 +465,13 @@ namespace Terminal.Gui {
 			case "Error":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
 					break;
 				case "HotNormal":
 				case "HotFocus":
 					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
 					break;
 				}
 				break;
@@ -670,6 +793,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual int [,,] Contents { get; }
 
+
+		/// <summary>
+		/// Determinates if the current console driver supports TrueColor output-
+		/// </summary>
+		public virtual bool SupportsTrueColorOutput { get => false; }
+
+		bool useTrueColor;
+
+		/// <summary>
+		/// Controls the TureColor output mode. Can be only enabled if the underlying ConsoleDriver supports it.
+		/// Note this will be enabled automaticaly if supported. See also <see cref="SupportsTrueColorOutput"/>
+		/// </summary>
+		public bool UseTrueColor {
+			get => useTrueColor;
+			set => this.useTrueColor = value && SupportsTrueColorOutput;
+		}
+
 		/// <summary>
 		/// Initializes the driver
 		/// </summary>
@@ -681,7 +821,7 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>

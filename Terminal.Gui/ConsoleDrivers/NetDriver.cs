@@ -18,6 +18,8 @@ namespace Terminal.Gui {
 		IntPtr InputHandle, OutputHandle, ErrorHandle;
 		uint originalInputConsoleMode, originalOutputConsoleMode, originalErrorConsoleMode;
 
+		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
+
 		public NetWinVTConsole ()
 		{
 			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
@@ -1162,6 +1164,9 @@ namespace Terminal.Gui {
 	}
 
 	internal class NetDriver : ConsoleDriver {
+
+		Attribute [] OutputAttributeBuffer;
+
 		const int COLOR_BLACK = 30;
 		const int COLOR_RED = 31;
 		const int COLOR_GREEN = 32;
@@ -1192,6 +1197,9 @@ namespace Terminal.Gui {
 		public override IClipboard Clipboard { get; }
 		public override int [,,] Contents => contents;
 
+		readonly bool supportsTrueColorOutput;
+		public override bool SupportsTrueColorOutput => supportsTrueColorOutput;
+
 		int largestWindowHeight;
 
 		public NetDriver ()
@@ -1200,6 +1208,7 @@ namespace Terminal.Gui {
 			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
+				supportsTrueColorOutput = NetWinConsole.SupportTrueColor;
 			}
 			//largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 			largestWindowHeight = Console.BufferHeight;
@@ -1213,7 +1222,9 @@ namespace Terminal.Gui {
 				} else {
 					Clipboard = new CursesClipboard ();
 				}
+				supportsTrueColorOutput = CursesDriver.CanColorTermTrueColor ();
 			}
+			UseTrueColor = true;
 		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
@@ -1239,6 +1250,7 @@ namespace Terminal.Gui {
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
 			var validClip = IsValidContent (ccol, crow, Clip);
+			var position = crow * Cols + ccol;
 
 			if (validClip) {
 				if (runeWidth < 2 && ccol > 0
@@ -1258,6 +1270,7 @@ namespace Terminal.Gui {
 				} else {
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
+				OutputAttributeBuffer [position] = currentAttribute;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 
@@ -1267,6 +1280,7 @@ namespace Terminal.Gui {
 			ccol++;
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
+					OutputAttributeBuffer [position] = currentAttribute;
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
@@ -1391,6 +1405,9 @@ namespace Terminal.Gui {
 						$";{Rows};{Cols}w");
 				}
 			}
+
+			OutputAttributeBuffer = new Attribute [Rows * Cols];
+
 			Clip = new Rect (0, 0, Cols, Rows);
 			Console.Out.Write ("\x1b[3J");
 			Console.Out.Flush ();
@@ -1406,6 +1423,9 @@ namespace Terminal.Gui {
 				try {
 					for (int row = 0; row < rows; row++) {
 						for (int c = 0; c < cols; c++) {
+							int position = row * cols + c;
+							OutputAttributeBuffer [position] = Colors.TopLevel.Normal;
+
 							contents [row, c, 0] = ' ';
 							contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
 							contents [row, c, 2] = 0;
@@ -1427,7 +1447,7 @@ namespace Terminal.Gui {
 			UpdateCursor ();
 		}
 
-		int redrawAttr = -1;
+		Attribute redrawAttr = null;
 
 		public override void UpdateScreen ()
 		{
@@ -1478,7 +1498,7 @@ namespace Terminal.Gui {
 						if (lastCol == -1)
 							lastCol = col;
 
-						var attr = contents [row, col, 1];
+						var attr = OutputAttributeBuffer [row * cols + col];
 						if (attr != redrawAttr) {
 							output.Append (WriteAttributes (attr));
 						}
@@ -1502,24 +1522,42 @@ namespace Terminal.Gui {
 			Console.Out.Flush ();
 		}
 
-		System.Text.StringBuilder WriteAttributes (int attr)
+		System.Text.StringBuilder WriteAttributes (Attribute attr)
 		{
-			const string CSI = "\x1b[";
-			int bg = 0;
-			int fg = 0;
 			System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
+			if ((UseTrueColor) && (attr is TrueColorAttribute tca)) {
+				sb.Append (new [] { '\x1b', '[', '3', '8', ';', '2', ';' });
+				sb.Append (tca.TrueColorForeground.Red);
+				sb.Append (';');
+				sb.Append (tca.TrueColorForeground.Green);
+				sb.Append (';');
+				sb.Append (tca.TrueColorForeground.Blue);
+				sb.Append (new [] { ';', '4', '8', ';', '2', ';' });
+				sb.Append (tca.TrueColorBackground.Red);
+				sb.Append (';');
+				sb.Append (tca.TrueColorBackground.Green);
+				sb.Append (';');
+				sb.Append (tca.TrueColorBackground.Blue);
+				sb.Append ('m');
+			} else {
+				const string CSI = "\x1b[";
+				int bg = 0;
+				int fg = 0;
+
+				IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+				      .OfType<ConsoleColor> ()
+				      .Select (s => (int)s);
+				if (values.Contains (attr & 0xffff)) {
+					bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
+				}
+				if (values.Contains ((attr >> 16) & 0xffff)) {
+					fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
+				}
+				sb.Append ($"{CSI}{bg};{fg}m");
+			}
+
 			redrawAttr = attr;
-			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
-			if (values.Contains (attr & 0xffff)) {
-				bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
-			}
-			if (values.Contains ((attr >> 16) & 0xffff)) {
-				fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
-			}
-			sb.Append ($"{CSI}{bg};{fg}m");
 
 			return sb;
 		}

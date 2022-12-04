@@ -323,7 +323,7 @@ namespace Terminal.Gui {
 		private Thickness padding;
 		private bool effect3D;
 		private Point effect3DOffset = new Point (1, 1);
-		private Attribute? effect3DBrush;
+		private Attribute effect3DBrush;
 		private ustring title = ustring.Empty;
 
 		/// <summary>
@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
-		public Attribute? Effect3DBrush {
+		public Attribute Effect3DBrush {
 			get => effect3DBrush;
 			set {
 				effect3DBrush = value;

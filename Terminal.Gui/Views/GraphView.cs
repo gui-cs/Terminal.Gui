@@ -63,7 +63,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The color of the background of the graph and axis/labels
 		/// </summary>
-		public Attribute? GraphColor { get; set; }
+		public Attribute GraphColor { get; set; }
 
 		/// <summary>
 		/// Creates a new graph with a 1 to 1 graph space with absolute layout

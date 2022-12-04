@@ -58,17 +58,90 @@ namespace Terminal.Gui {
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 			newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
 			ConsoleMode = newConsoleMode;
+
+			uint newOutputConsoleMode = OutputConsoleMode;
+			newOutputConsoleMode |= (uint)(OutputConsoleModes.EnableProcessedOutput | OutputConsoleModes.EnableVirtualTerminalProcessing | OutputConsoleModes.DisableNewLineAutoReturn);
+			newOutputConsoleMode &= ~(uint)(OutputConsoleModes.EnableWrapAtEolOutput);
+			OutputConsoleMode = newOutputConsoleMode;
 		}
 
 		public CharInfo [] OriginalStdOutChars;
 
-		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+		public bool SupportTrueColor { get; } = (Environment.OSVersion.Version.Build >= 14931);
+
+		public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool forceUseBasicColor)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
 			}
 
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			if (!SupportTrueColor || forceUseBasicColor) {
+				var i = 0;
+				var ci = new CharInfo [charInfoBuffer.Length];
+				foreach (var info in charInfoBuffer) {
+					ci[i++] = new CharInfo () {
+						Char = new CharUnion () { UnicodeChar = info.Char },
+						Attributes = (ushort)(int)info.Attribute
+					};
+				}
+
+				return WriteConsoleOutput (ScreenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			}
+
+			return WriteConsoleTrueColorOutput (charInfoBuffer);
+		}
+
+		readonly System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder (256*1024);
+		readonly char [] SafeCursor = new [] { '\x1b', '7', '\x1b', '[', '0', ';', '0', 'H' };
+		readonly char [] RestoreCursor = new [] { '\x1b', '8' };
+		readonly char [] SendTrueColorFg = new [] { '\x1b', '[', '3', '8', ';', '2', ';' };
+		readonly char [] SendTrueColorBg = new [] { ';', '4', '8', ';', '2', ';' };
+		readonly char [] SendColorFg = new [] { '\x1b', '[', '3', '8', ';', '5', ';' };
+		readonly char [] SendColorBg = new [] { ';', '4', '8', ';', '5', ';' };
+
+		private bool WriteConsoleTrueColorOutput(ExtendedCharInfo [] charInfoBuffer)
+		{
+			stringBuilder.Clear ();
+
+			stringBuilder.Append (SafeCursor);
+
+			Attribute prev = null;
+			foreach (var info in charInfoBuffer) {
+				var attr = info.Attribute;
+
+				if (attr != prev) {
+					prev = attr;
+					if (attr is TrueColorAttribute tca) {
+						stringBuilder.Append (SendTrueColorFg);
+						stringBuilder.Append (tca.TrueColorForeground.Red);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorForeground.Green);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorForeground.Blue);
+						stringBuilder.Append (SendTrueColorBg);
+						stringBuilder.Append (tca.TrueColorBackground.Red);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorBackground.Green);
+						stringBuilder.Append (';');
+						stringBuilder.Append (tca.TrueColorBackground.Blue);
+						stringBuilder.Append ('m');
+					} else {
+						var cc = (int)attr;
+						stringBuilder.Append (SendColorFg);
+						stringBuilder.Append (TrueColor.Code4ToCode8 (cc % 16));
+						stringBuilder.Append (SendColorBg);
+						stringBuilder.Append (TrueColor.Code4ToCode8 (cc / 16));
+						stringBuilder.Append ('m');
+					}
+				}
+
+				stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
+			}
+
+			stringBuilder.Append (RestoreCursor);
+
+			string s = stringBuilder.ToString ();
+			return WriteConsole (ScreenBuffer, s, (uint)(s.Length), out uint _, null);
 		}
 
 		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -302,12 +375,31 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public uint OutputConsoleMode {
+			get {
+				GetConsoleMode (OutputHandle, out uint v);
+				return v;
+			}
+			set {
+				SetConsoleMode (OutputHandle, value);
+			}
+		}
+
 		[Flags]
 		public enum ConsoleModes : uint {
 			EnableProcessedInput = 1,
+			EnableWindowInput = 8,
 			EnableMouseInput = 16,
 			EnableQuickEditMode = 64,
 			EnableExtendedFlags = 128,
+		}
+
+		[Flags]
+		public enum OutputConsoleModes : uint {
+			EnableProcessedOutput = 1,
+			EnableWrapAtEolOutput = 2,
+			EnableVirtualTerminalProcessing = 4,
+			DisableNewLineAutoReturn = 8,
 		}
 
 		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
@@ -482,6 +574,11 @@ namespace Terminal.Gui {
 			[FieldOffset (2)] public ushort Attributes;
 		}
 
+		public struct ExtendedCharInfo {
+			public char Char { get; set; }
+			public Attribute Attribute { get; set; }
+		}
+
 		[StructLayout (LayoutKind.Sequential)]
 		public struct SmallRect {
 			public short Left;
@@ -574,6 +671,15 @@ namespace Terminal.Gui {
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpWriteRegion
+		);
+
+		[DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool WriteConsole (
+			IntPtr hConsoleOutput,
+			String lpbufer,
+			UInt32 NumberOfCharsToWriten,
+			out UInt32 lpNumberOfCharsWritten,
+			object lpReserved
 		);
 
 		[DllImport ("kernel32.dll")]
@@ -722,7 +828,7 @@ namespace Terminal.Gui {
 
 	internal class WindowsDriver : ConsoleDriver {
 		static bool sync = false;
-		WindowsConsole.CharInfo [] OutputBuffer;
+		WindowsConsole.ExtendedCharInfo [] OutputBuffer;
 		int cols, rows, left, top;
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
@@ -736,6 +842,8 @@ namespace Terminal.Gui {
 		public override IClipboard Clipboard => clipboard;
 		public override int [,,] Contents => contents;
 
+		public override bool SupportsTrueColorOutput => WinConsole.SupportTrueColor;
+
 		public WindowsConsole WinConsole { get; private set; }
 
 		Action<KeyEvent> keyHandler;
@@ -747,6 +855,7 @@ namespace Terminal.Gui {
 		{
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
+			UseTrueColor = true;
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1469,7 +1578,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			OutputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 			Clip = new Rect (0, 0, Cols, Rows);
 			damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
@@ -1488,10 +1597,10 @@ namespace Terminal.Gui {
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
-					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
-					OutputBuffer [position].Char.UnicodeChar = ' ';
-					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
-					contents [row, col, 1] = OutputBuffer [position].Attributes;
+					OutputBuffer [position].Attribute = Colors.TopLevel.Normal;
+					OutputBuffer [position].Char = ' ';
+					contents [row, col, 0] = OutputBuffer [position].Char;
+					contents [row, col, 1] = OutputBuffer [position].Attribute;
 					contents [row, col, 2] = 0;
 				}
 			}
@@ -1521,25 +1630,25 @@ namespace Terminal.Gui {
 					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
 					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+					OutputBuffer [prevPosition].Char = ' ';
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
 					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					var prevPosition = GetOutputBufferPosition () + 1;
-					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+					OutputBuffer [prevPosition].Char = (char)' ';
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 
 				}
 				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					OutputBuffer [position].Char.UnicodeChar = (char)' ';
+					OutputBuffer [position].Char = (char)' ';
 					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					OutputBuffer [position].Char.UnicodeChar = (char)rune;
+					OutputBuffer [position].Char = (char)rune;
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
+				OutputBuffer [position].Attribute = currentAttribute;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
@@ -1549,8 +1658,8 @@ namespace Terminal.Gui {
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
-					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
+					OutputBuffer [position].Attribute = currentAttribute;
+					OutputBuffer [position].Char = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
@@ -1643,7 +1752,7 @@ namespace Terminal.Gui {
 			//	Bottom = (short)Clip.Bottom
 			//};
 
-			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion, !UseTrueColor);
 
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
