@@ -75,7 +75,17 @@ namespace UICatalog.Scenarios {
 					return;
 				}
 
-				imageView.SetImage(Image.Load<Rgba32> (File.ReadAllBytes (path)));
+				Image<Rgba32> img;
+
+				try {
+					img = Image.Load<Rgba32> (File.ReadAllBytes (path));
+				} catch (Exception ex) {
+
+					MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
+					return;
+				}
+				
+				imageView.SetImage(img);
 			};
 		}
 
