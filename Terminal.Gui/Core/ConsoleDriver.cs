@@ -250,7 +250,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> class.  Populates
-		/// <see cref="TrueColorBackground"/> and <see cref="TrueColorForeground"/> but also
+		/// <see cref="TrueColorBackground"/> and <see cref="TrueColorForeground"/>. Also computes
 		/// <see cref="Foreground"/> and <see cref="Background"/> (basic console colors) in case
 		/// driver does not support true color rendering.
 		/// </summary>
@@ -262,6 +262,28 @@ namespace Terminal.Gui {
 			TrueColorBackground = trueColorBackground;
 
 			PopulateConsoleColorsFromTrueColors ();
+		}
+
+
+		/// <summary>
+		/// <para>
+		/// Initializes a new instance of the <see cref="Attribute"/> class.  Populates
+		/// <see cref="TrueColorBackground"/> and <see cref="TrueColorForeground"/> with explicit
+		/// fallback values for <see cref="Foreground"/> and <see cref="Background"/> (in case
+		/// driver does not support true color rendering). 
+		/// </para>
+		/// <remarks>If you do not want to manually specify the fallback colors use <see cref="Attribute(TrueColor,TrueColor)"/>
+		/// instead which auto calculates these.</remarks>
+		/// </summary>
+		/// <param name="trueColorForeground">True color RGB values you would like to use.</param>
+		/// <param name="trueColorBackground">True color RGB values you would like to use.</param>
+		/// <param name="foreground">Simple console color replacement if driver does not support true color.</param>
+		/// <param name="background">Simple console color replacement if driver does not support true color.</param>
+		public Attribute (TrueColor trueColorForeground, TrueColor trueColorBackground, Color foreground, Color background)
+			: this (foreground, background)
+		{
+			TrueColorForeground = trueColorForeground;
+			TrueColorBackground = trueColorBackground;
 		}
 
 		/// <inheritdoc/>
@@ -325,24 +347,24 @@ namespace Terminal.Gui {
 
 		private TrueColor ConsoleColorToTrueColor (Color consoleColor)
 		{
-			switch(consoleColor) {
-				case Color.Black : return new TrueColor (0, 0, 0);
-				case Color.Blue : return new TrueColor (0, 0, 0x80);
-				case Color.Green : return new TrueColor (0, 0x80, 0);
-				case Color.Cyan : return new TrueColor (0, 0x80, 0x80);
-				case Color.Red : return new TrueColor (0x80, 0, 0);
-				case Color.Magenta : return new TrueColor (0x80, 0, 0x80);
-				case Color.Brown :return new TrueColor (0xA5, 0x2A, 0x2A); // TODO confirm this
-				case Color.Gray : return new TrueColor (0xC0, 0xC0, 0xC0);
-				case Color.DarkGray : return new TrueColor (0x80, 0x80, 0x80);
-				case Color.BrightBlue : return new TrueColor (0, 0, 0xFF);
-				case Color.BrightGreen : return new TrueColor (0, 0xFF, 0);
-				case Color.BrightCyan : return new TrueColor (0, 0xFF, 0xFF);
-				case Color.BrightRed : return new TrueColor (0xFF, 0, 0);
-				case Color.BrightMagenta : return new TrueColor (0xFF, 0, 0xFF);
-				case Color.BrightYellow : return new TrueColor (0xFF, 0xFF, 0);
-				case Color.White : return new TrueColor (0xFF, 0xFF, 0xFF);
-				default : throw new ArgumentOutOfRangeException (nameof (consoleColor));
+			switch (consoleColor) {
+			case Color.Black: return new TrueColor (0, 0, 0);
+			case Color.Blue: return new TrueColor (0, 0, 0x80);
+			case Color.Green: return new TrueColor (0, 0x80, 0);
+			case Color.Cyan: return new TrueColor (0, 0x80, 0x80);
+			case Color.Red: return new TrueColor (0x80, 0, 0);
+			case Color.Magenta: return new TrueColor (0x80, 0, 0x80);
+			case Color.Brown: return new TrueColor (0xA5, 0x2A, 0x2A); // TODO confirm this
+			case Color.Gray: return new TrueColor (0xC0, 0xC0, 0xC0);
+			case Color.DarkGray: return new TrueColor (0x80, 0x80, 0x80);
+			case Color.BrightBlue: return new TrueColor (0, 0, 0xFF);
+			case Color.BrightGreen: return new TrueColor (0, 0xFF, 0);
+			case Color.BrightCyan: return new TrueColor (0, 0xFF, 0xFF);
+			case Color.BrightRed: return new TrueColor (0xFF, 0, 0);
+			case Color.BrightMagenta: return new TrueColor (0xFF, 0, 0xFF);
+			case Color.BrightYellow: return new TrueColor (0xFF, 0xFF, 0);
+			case Color.White: return new TrueColor (0xFF, 0xFF, 0xFF);
+			default: throw new ArgumentOutOfRangeException (nameof (consoleColor));
 			};
 		}
 
@@ -350,1227 +372,1322 @@ namespace Terminal.Gui {
 		{
 			Foreground = TrueColorToConsoleColor (TrueColorForeground);
 			Background = TrueColorToConsoleColor (TrueColorBackground);
+			Value = Make (Foreground, Background).Value;
 		}
 
-		private Color TrueColorToConsoleColor (TrueColor trueColorForeground)
+		private Color TrueColorToConsoleColor (TrueColor trueColor)
 		{
-			//TODO
-			throw new NotImplementedException ();
+			// The points we could return from
+			var lookup = new Dictionary<TrueColor, Color> () {
+				{ new TrueColor(0,0,0),Color.Black},
+				{ new TrueColor (0, 0, 0x80),Color.Blue},
+				{ new TrueColor (0, 0x80, 0),Color.Green},
+				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
+				{ new TrueColor (0x80, 0, 0),Color.Red},
+				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
+				{ new TrueColor (0xA5, 0x2A, 0x2A),Color.Brown},  // TODO confirm this
+				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
+				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
+				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
+				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
+				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
+				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
+				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
+				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
+				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
+			};
+
+			var distances = lookup.Select (
+				k => Tuple.Create (
+					// the candidate we are considering matching against (RGB)
+					k.Key,
+
+					CalculateDistance (k.Key, trueColor)
+				));
+				
+			// get the closest
+			var match = distances.OrderBy (t => t.Item2).First ();
+
+			return lookup [match.Item1];
+		}
+
+		private float CalculateDistance (TrueColor color1, TrueColor color2)
+		{
+			RGBtoHSV (color1, out var h1, out var s1, out var v1);
+			RGBtoHSV (color2, out var h2, out var s2, out var v2);
+			
+
+			if(float.IsNaN(h1)) {
+				h1 = -1f;
+			}
+
+			if (float.IsNaN (h2)) {
+				h2 = -1f;
+			}
+			
+			// the distance we are from this point in HSV space
+			// with an emphasis on Hue
+			return Math.Abs(h1 - h2) +
+				Math.Abs (s1 - s2) +
+				Math.Abs (v1 - v2);		
+		}
+
+		void RGBtoHSV (TrueColor color, out float h, out float s, out float v)
+		{
+			RGBtoHSV (color.Red / 255f, color.Green / 255f, color.Blue / 255f, out h, out s, out v);
+		}
+
+
+		// https://www.cs.rit.edu/~ncs/color/t_convert.html
+		// r,g,b values are from 0 to 1
+		// h = [0,360], s = [0,1], v = [0,1]
+		//		if s == 0, then h = -1 (undefined)
+
+		void RGBtoHSV (float r, float g, float b, out float h, out float s, out float v)
+		{
+			float min, max, delta;
+
+			min = Math.Min (Math.Min (r, g), b);
+			max = Math.Max (Math.Max (r, g), b);
+			v = max;                               // v
+
+			delta = max - min;
+
+			if (max != 0)
+				s = delta / max;               // s
+			else {
+				// r = g = b = 0		// s = 0, v is undefined
+				s = 0;
+				h = -1;
+				return;
+			}
+
+			if (r == max)
+				h = (g - b) / delta;           // between yellow & magenta
+			else if (g == max)
+				h = 2 + (b - r) / delta;       // between cyan & yellow
+			else
+				h = 4 + (r - g) / delta;       // between magenta & cyan
+
+			h *= 60;                               // degrees
+			if (h < 0)
+				h += 360;
+
 		}
 	}
 
-/// <summary>
-/// Color scheme definitions, they cover some common scenarios and are used
-/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
-/// views contained inside.
-/// </summary>
-public class ColorScheme : IEquatable<ColorScheme> {
-	Attribute _normal = Attribute.Default;
-	Attribute _focus = Attribute.Default;
-	Attribute _hotNormal = Attribute.Default;
-	Attribute _hotFocus = Attribute.Default;
-	Attribute _disabled = Attribute.Default;
-	internal string caller = "";
-
 	/// <summary>
-	/// The default color for text, when the view is not focused.
+	/// Color scheme definitions, they cover some common scenarios and are used
+	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
+	/// views contained inside.
 	/// </summary>
-	public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
+	public class ColorScheme : IEquatable<ColorScheme> {
+		Attribute _normal = Attribute.Default;
+		Attribute _focus = Attribute.Default;
+		Attribute _hotNormal = Attribute.Default;
+		Attribute _hotFocus = Attribute.Default;
+		Attribute _disabled = Attribute.Default;
+		internal string caller = "";
 
-	/// <summary>
-	/// The color for text when the view has the focus.
-	/// </summary>
-	public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
+		/// <summary>
+		/// The default color for text, when the view is not focused.
+		/// </summary>
+		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
 
-	/// <summary>
-	/// The color for the hotkey when a view is not focused
-	/// </summary>
-	public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
+		/// <summary>
+		/// The color for text when the view has the focus.
+		/// </summary>
+		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
 
-	/// <summary>
-	/// The color for the hotkey when the view is focused.
-	/// </summary>
-	public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+		/// <summary>
+		/// The color for the hotkey when a view is not focused
+		/// </summary>
+		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
 
-	/// <summary>
-	/// The default color for text, when the view is disabled.
-	/// </summary>
-	public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
+		/// <summary>
+		/// The color for the hotkey when the view is focused.
+		/// </summary>
+		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
 
-	bool preparingScheme = false;
+		/// <summary>
+		/// The default color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
 
-	Attribute SetAttribute (Attribute attribute, [CallerMemberName] string callerMemberName = null)
-	{
-		if (!Application._initialized && !preparingScheme)
-			return attribute;
+		bool preparingScheme = false;
 
-		if (preparingScheme)
-			return attribute;
+		Attribute SetAttribute (Attribute attribute, [CallerMemberName] string callerMemberName = null)
+		{
+			if (!Application._initialized && !preparingScheme)
+				return attribute;
 
-		preparingScheme = true;
-		switch (caller) {
-		case "TopLevel":
-			switch (callerMemberName) {
-			case "Normal":
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				break;
-			case "Focus":
-				HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotNormal":
-				HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
-				break;
-			case "HotFocus":
-				HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
-				if (Focus?.Foreground != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
-				break;
-			}
-			break;
+			if (preparingScheme)
+				return attribute;
 
-		case "Base":
-			switch (callerMemberName) {
-			case "Normal":
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				break;
-			case "Focus":
-				HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotNormal":
-				HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
-				Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotFocus":
-				HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
-				if (Focus?.Foreground != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
-				break;
-			}
-			break;
-
-		case "Menu":
-			switch (callerMemberName) {
-			case "Normal":
-				if (Focus?.Background != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
-				break;
-			case "Focus":
-				Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
-				HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotNormal":
-				if (Focus?.Background != attribute.Background)
+			preparingScheme = true;
+			switch (caller) {
+			case "TopLevel":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					break;
+				case "Focus":
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotNormal":
 					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
-				Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
-				Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
+					break;
+				}
 				break;
-			case "HotFocus":
-				HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
-				if (Focus?.Foreground != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
-				break;
-			case "Disabled":
-				if (Focus?.Background != attribute.Background)
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
-				Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				break;
-			}
-			break;
 
-		case "Dialog":
-			switch (callerMemberName) {
-			case "Normal":
-				if (Focus?.Background != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				break;
-			case "Focus":
-				Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
-				HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotNormal":
-				if (Focus?.Background != attribute.Background)
+			case "Base":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					break;
+				case "Focus":
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotNormal":
 					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
-				if (Normal?.Foreground != attribute.Background)
 					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
+					break;
+				}
 				break;
-			case "HotFocus":
-				HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
-				if (Focus?.Foreground != attribute.Background)
-					Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
+
+			case "Menu":
+				switch (callerMemberName) {
+				case "Normal":
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
+					break;
+				case "Focus":
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotNormal":
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
+					break;
+				case "Disabled":
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					break;
+				}
+				break;
+
+			case "Dialog":
+				switch (callerMemberName) {
+				case "Normal":
+					if (Focus?.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus?.Background ?? default);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					break;
+				case "Focus":
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal?.Background ?? default);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotNormal":
+					if (Focus?.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus?.Background ?? default);
+					if (Normal?.Foreground != attribute.Background)
+						Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal?.Background ?? default);
+					if (Focus?.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus?.Foreground ?? default, attribute.Background);
+					break;
+				}
+				break;
+
+			case "Error":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
+					break;
+				case "HotNormal":
+				case "HotFocus":
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
+					break;
+				}
 				break;
 			}
-			break;
-
-		case "Error":
-			switch (callerMemberName) {
-			case "Normal":
-				HotNormal = Application.Driver.MakeAttribute (HotNormal?.Foreground ?? default, attribute.Background);
-				HotFocus = Application.Driver.MakeAttribute (HotFocus?.Foreground ?? default, attribute.Background);
-				break;
-			case "HotNormal":
-			case "HotFocus":
-				HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
-				Normal = Application.Driver.MakeAttribute (Normal?.Foreground ?? default, attribute.Background);
-				break;
-			}
-			break;
-		}
-		preparingScheme = false;
-		return attribute;
-	}
-
-	/// <summary>
-	/// Compares two <see cref="ColorScheme"/> objects for equality.
-	/// </summary>
-	/// <param name="obj"></param>
-	/// <returns>true if the two objects are equal</returns>
-	public override bool Equals (object obj)
-	{
-		return Equals (obj as ColorScheme);
-	}
-
-	/// <summary>
-	/// Compares two <see cref="ColorScheme"/> objects for equality.
-	/// </summary>
-	/// <param name="other"></param>
-	/// <returns>true if the two objects are equal</returns>
-	public bool Equals (ColorScheme other)
-	{
-		return other != null &&
-		       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-		       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-		       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-		       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-		       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
-	}
-
-	/// <summary>
-	/// Returns a hashcode for this instance.
-	/// </summary>
-	/// <returns>hashcode for this instance</returns>
-	public override int GetHashCode ()
-	{
-		int hashCode = -1242460230;
-		hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
-		hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
-		hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
-		hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
-		hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
-		return hashCode;
-	}
-
-	/// <summary>
-	/// Compares two <see cref="ColorScheme"/> objects for equality.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns><c>true</c> if the two objects are equivalent</returns>
-	public static bool operator == (ColorScheme left, ColorScheme right)
-	{
-		return EqualityComparer<ColorScheme>.Default.Equals (left, right);
-	}
-
-	/// <summary>
-	/// Compares two <see cref="ColorScheme"/> objects for inequality.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns><c>true</c> if the two objects are not equivalent</returns>
-	public static bool operator != (ColorScheme left, ColorScheme right)
-	{
-		return !(left == right);
-	}
-}
-
-/// <summary>
-/// The default <see cref="ColorScheme"/>s for the application.
-/// </summary>
-public static class Colors {
-	static Colors ()
-	{
-		// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
-		// by the class. 
-		ColorSchemes = typeof (Colors).GetProperties ()
-			.Where (p => p.PropertyType == typeof (ColorScheme))
-			.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
-			.ToDictionary (t => t.Key, t => t.Value);
-	}
-
-	/// <summary>
-	/// The application toplevel color scheme, for the default toplevel views.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["TopLevel"];</c>
-	/// </para>
-	/// </remarks>
-	public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The base color scheme, for the default toplevel views.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Base"];</c>
-	/// </para>
-	/// </remarks>
-	public static ColorScheme Base { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The dialog color scheme, for standard popup dialog boxes
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Dialog"];</c>
-	/// </para>
-	/// </remarks>
-	public static ColorScheme Dialog { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The menu bar color
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Menu"];</c>
-	/// </para>
-	/// </remarks>
-	public static ColorScheme Menu { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The color scheme for showing errors.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
-	/// </para>
-	/// </remarks>
-	public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
-	{
-		return ColorSchemes [callerMemberName];
-	}
-
-	static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
-	{
-		ColorSchemes [callerMemberName] = colorScheme;
-		colorScheme.caller = callerMemberName;
-	}
-
-	/// <summary>
-	/// Provides the defined <see cref="ColorScheme"/>s.
-	/// </summary>
-	public static Dictionary<string, ColorScheme> ColorSchemes { get; }
-}
-
-/// <summary>
-/// Cursors Visibility that are displayed
-/// </summary>
-// 
-// Hexa value are set as 0xAABBCCDD where :
-//
-//     AA stand for the TERMINFO DECSUSR parameter value to be used under Linux & MacOS
-//     BB stand for the NCurses curs_set parameter value to be used under Linux & MacOS
-//     CC stand for the CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows
-//     DD stand for the CONSOLE_CURSOR_INFO.dwSize parameter value to be used under Windows
-//
-public enum CursorVisibility {
-	/// <summary>
-	///	Cursor caret has default
-	/// </summary>
-	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.</remarks>
-	Default = 0x00010119,
-
-	/// <summary>
-	///	Cursor caret is hidden
-	/// </summary>
-	Invisible = 0x03000019,
-
-	/// <summary>
-	///	Cursor caret is normally shown as a blinking underline bar _
-	/// </summary>
-	Underline = 0x03010119,
-
-	/// <summary>
-	///	Cursor caret is normally shown as a underline bar _
-	/// </summary>
-	/// <remarks>Under Windows, this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
-	UnderlineFix = 0x04010119,
-
-	/// <summary>
-	///	Cursor caret is displayed a blinking vertical bar |
-	/// </summary>
-	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
-	Vertical = 0x05010119,
-
-	/// <summary>
-	///	Cursor caret is displayed a blinking vertical bar |
-	/// </summary>
-	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
-	VerticalFix = 0x06010119,
-
-	/// <summary>
-	///	Cursor caret is displayed as a blinking block ▉
-	/// </summary>
-	Box = 0x01020164,
-
-	/// <summary>
-	///	Cursor caret is displayed a block ▉
-	/// </summary>
-	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
-	BoxFix = 0x02020164,
-}
-
-///// <summary>
-///// Special characters that can be drawn with 
-///// </summary>
-//public enum SpecialChar {
-//	/// <summary>
-//	/// Horizontal line character.
-//	/// </summary>
-//	HLine,
-
-//	/// <summary>
-//	/// Vertical line character.
-//	/// </summary>
-//	VLine,
-
-//	/// <summary>
-//	/// Stipple pattern
-//	/// </summary>
-//	Stipple,
-
-//	/// <summary>
-//	/// Diamond character
-//	/// </summary>
-//	Diamond,
-
-//	/// <summary>
-//	/// Upper left corner
-//	/// </summary>
-//	ULCorner,
-
-//	/// <summary>
-//	/// Lower left corner
-//	/// </summary>
-//	LLCorner,
-
-//	/// <summary>
-//	/// Upper right corner
-//	/// </summary>
-//	URCorner,
-
-//	/// <summary>
-//	/// Lower right corner
-//	/// </summary>
-//	LRCorner,
-
-//	/// <summary>
-//	/// Left tee
-//	/// </summary>
-//	LeftTee,
-
-//	/// <summary>
-//	/// Right tee
-//	/// </summary>
-//	RightTee,
-
-//	/// <summary>
-//	/// Top tee
-//	/// </summary>
-//	TopTee,
-
-//	/// <summary>
-//	/// The bottom tee.
-//	/// </summary>
-//	BottomTee,
-//}
-
-/// <summary>
-/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
-/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
-/// </summary>
-public abstract class ConsoleDriver {
-	/// <summary>
-	/// The handler fired when the terminal is resized.
-	/// </summary>
-	protected Action TerminalResized;
-
-	/// <summary>
-	/// The current number of columns in the terminal.
-	/// </summary>
-	public abstract int Cols { get; }
-
-	/// <summary>
-	/// The current number of rows in the terminal.
-	/// </summary>
-	public abstract int Rows { get; }
-
-	/// <summary>
-	/// The current left in the terminal.
-	/// </summary>
-	public abstract int Left { get; }
-
-	/// <summary>
-	/// The current top in the terminal.
-	/// </summary>
-	public abstract int Top { get; }
-
-	/// <summary>
-	/// Get the operation system clipboard.
-	/// </summary>
-	public abstract IClipboard Clipboard { get; }
-
-	/// <summary>
-	/// If false height is measured by the window height and thus no scrolling.
-	/// If true then height is measured by the buffer height, enabling scrolling.
-	/// </summary>
-	public abstract bool HeightAsBuffer { get; set; }
-
-	/// <summary>
-	/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-	/// </summary>
-	public virtual int [,,] Contents { get; }
-
-
-	/// <summary>
-	/// Determinates if the current console driver supports TrueColor output-
-	/// </summary>
-	public virtual bool SupportsTrueColorOutput { get => false; }
-
-	bool useTrueColor;
-
-	/// <summary>
-	/// Controls the TureColor output mode. Can be only enabled if the underlying ConsoleDriver supports it.
-	/// Note this will be enabled automaticaly if supported. See also <see cref="SupportsTrueColorOutput"/>
-	/// </summary>
-	public bool UseTrueColor {
-		get => useTrueColor;
-		set => this.useTrueColor = value && SupportsTrueColorOutput;
-	}
-
-	/// <summary>
-	/// Initializes the driver
-	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	public abstract void Init (Action terminalResized);
-	/// <summary>
-	/// Moves the cursor to the specified column and row.
-	/// </summary>
-	/// <param name="col">Column to move the cursor to.</param>
-	/// <param name="row">Row to move the cursor to.</param>
-	public abstract void Move (int col, int row);
-
-	/// <summary>
-	/// Adds the specified rune to the display at the current cursor position.
-	/// </summary>
-	/// <param name="rune">Rune to add.</param>
-	public abstract void AddRune (Rune rune);
-
-	/// <summary>
-	/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
-	/// to equivalent, printable, Unicode chars.
-	/// </summary>
-	/// <param name="c">Rune to translate</param>
-	/// <returns></returns>
-	public static Rune MakePrintable (Rune c)
-	{
-		var controlChars = c & 0xFFFF;
-		if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
-			// ASCII (C0) control characters.
-			// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-			return new Rune (controlChars + 0x2400);
+			preparingScheme = false;
+			return attribute;
 		}
 
-		return c;
-	}
-
-	/// <summary>
-	/// Ensures that the column and line are in a valid range from the size of the driver.
-	/// </summary>
-	/// <param name="col">The column.</param>
-	/// <param name="row">The row.</param>
-	/// <param name="clip">The clip.</param>
-	/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
-	public bool IsValidContent (int col, int row, Rect clip) =>
-		col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
-
-	/// <summary>
-	/// Adds the <paramref name="str"/> to the display at the cursor position.
-	/// </summary>
-	/// <param name="str">String.</param>
-	public abstract void AddStr (ustring str);
-
-	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
-	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
-
-	/// <summary>
-	/// Updates the screen to reflect all the changes that have been done to the display buffer
-	/// </summary>
-	public abstract void Refresh ();
-
-	/// <summary>
-	/// Updates the location of the cursor position
-	/// </summary>
-	public abstract void UpdateCursor ();
-
-	/// <summary>
-	/// Retreive the cursor caret visibility
-	/// </summary>
-	/// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-	/// <returns>true upon success</returns>
-	public abstract bool GetCursorVisibility (out CursorVisibility visibility);
-
-	/// <summary>
-	/// Change the cursor caret visibility
-	/// </summary>
-	/// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-	/// <returns>true upon success</returns>
-	public abstract bool SetCursorVisibility (CursorVisibility visibility);
-
-	/// <summary>
-	/// Ensure the cursor visibility
-	/// </summary>
-	/// <returns>true upon success</returns>
-	public abstract bool EnsureCursorVisibility ();
-
-	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
-
-	/// <summary>
-	/// Resizes the clip area when the screen is resized.
-	/// </summary>
-	public abstract void ResizeScreen ();
-
-	/// <summary>
-	/// Reset and recreate the contents and the driver buffer.
-	/// </summary>
-	public abstract void UpdateOffScreen ();
-
-	/// <summary>
-	/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
-	/// </summary>
-	public abstract void UpdateScreen ();
-
-	/// <summary>
-	/// Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
-	/// </summary>
-	/// <param name="c">C.</param>
-	public abstract void SetAttribute (Attribute c);
-
-	/// <summary>
-	/// Set Colors from limit sets of colors.
-	/// </summary>
-	/// <param name="foreground">Foreground.</param>
-	/// <param name="background">Background.</param>
-	public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
-
-	// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-	// that independently with the R, G, B values.
-	/// <summary>
-	/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-	/// that independently with the R, G, B values.
-	/// </summary>
-	/// <param name="foregroundColorId">Foreground color identifier.</param>
-	/// <param name="backgroundColorId">Background color identifier.</param>
-	public abstract void SetColors (short foregroundColorId, short backgroundColorId);
-
-	/// <summary>
-	/// Gets the foreground and background colors based on the value.
-	/// </summary>
-	/// <param name="value">The value.</param>
-	/// <param name="foreground">The foreground.</param>
-	/// <param name="background">The background.</param>
-	/// <returns></returns>
-	public abstract bool GetColors (int value, out Color foreground, out Color background);
-
-	/// <summary>
-	/// Allows sending keys without typing on a keyboard.
-	/// </summary>
-	/// <param name="keyChar">The character key.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If shift key is sending.</param>
-	/// <param name="alt">If alt key is sending.</param>
-	/// <param name="control">If control key is sending.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control);
-
-	/// <summary>
-	/// Set the handler when the terminal is resized.
-	/// </summary>
-	/// <param name="terminalResized"></param>
-	public void SetTerminalResized (Action terminalResized)
-	{
-		TerminalResized = terminalResized;
-	}
-
-	/// <summary>
-	/// Draws the title for a Window-style view incorporating padding. 
-	/// </summary>
-	/// <param name="region">Screen relative region where the frame will be drawn.</param>
-	/// <param name="title">The title for the window. The title will only be drawn if <c>title</c> is not null or empty and paddingTop is greater than 0.</param>
-	/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
-	/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
-	/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
-	/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-	/// <param name="textAlignment">Not yet implemented.</param>
-	/// <remarks></remarks>
-	public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
-	{
-		var width = region.Width - (paddingLeft + 2) * 2;
-		if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
-			Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
-			AddRune (' ');
-			var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
-				? TextFormatter.Format (title, width - 2, false, false) [0] : title;
-			AddStr (str);
-			AddRune (' ');
-		}
-	}
-
-	/// <summary>
-	/// Enables diagnostic functions
-	/// </summary>
-	[Flags]
-	public enum DiagnosticFlags : uint {
 		/// <summary>
-		/// All diagnostics off
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
 		/// </summary>
-		Off = 0b_0000_0000,
-		/// <summary>
-		/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will draw a 
-		/// ruler in the frame for any side with a padding value greater than 0.
-		/// </summary>
-		FrameRuler = 0b_0000_0001,
-		/// <summary>
-		/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will use
-		/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
-		/// </summary>
-		FramePadding = 0b_0000_0010,
-	}
-
-	/// <summary>
-	/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
-	/// </summary>
-	public static DiagnosticFlags Diagnostics { get; set; }
-
-	/// <summary>
-	/// Draws a frame for a window with padding and an optional visible border inside the padding. 
-	/// </summary>
-	/// <param name="region">Screen relative region where the frame will be drawn.</param>
-	/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
-	/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
-	/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
-	/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-	/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
-	/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
-	/// <param name="borderContent">The <see cref="Border"/> to be used if defined.</param>
-	public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
-		int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)
-	{
-		char clearChar = ' ';
-		char leftChar = clearChar;
-		char rightChar = clearChar;
-		char topChar = clearChar;
-		char bottomChar = clearChar;
-
-		if ((Diagnostics & DiagnosticFlags.FramePadding) == DiagnosticFlags.FramePadding) {
-			leftChar = 'L';
-			rightChar = 'R';
-			topChar = 'T';
-			bottomChar = 'B';
-			clearChar = 'C';
-		}
-
-		void AddRuneAt (int col, int row, Rune ch)
+		/// <param name="obj"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public override bool Equals (object obj)
 		{
-			Move (col, row);
-			AddRune (ch);
+			return Equals (obj as ColorScheme);
 		}
 
-		// fwidth is count of hLine chars
-		int fwidth = (int)(region.Width - (paddingRight + paddingLeft));
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public bool Equals (ColorScheme other)
+		{
+			return other != null &&
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+		}
 
-		// fheight is count of vLine chars
-		int fheight = (int)(region.Height - (paddingBottom + paddingTop));
+		/// <summary>
+		/// Returns a hashcode for this instance.
+		/// </summary>
+		/// <returns>hashcode for this instance</returns>
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
+			return hashCode;
+		}
 
-		// fleft is location of left frame line
-		int fleft = region.X + paddingLeft - 1;
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are equivalent</returns>
+		public static bool operator == (ColorScheme left, ColorScheme right)
+		{
+			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
+		}
 
-		// fright is location of right frame line
-		int fright = fleft + fwidth + 1;
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are not equivalent</returns>
+		public static bool operator != (ColorScheme left, ColorScheme right)
+		{
+			return !(left == right);
+		}
+	}
 
-		// ftop is location of top frame line
-		int ftop = region.Y + paddingTop - 1;
+	/// <summary>
+	/// The default <see cref="ColorScheme"/>s for the application.
+	/// </summary>
+	public static class Colors {
+		static Colors ()
+		{
+			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
+			// by the class. 
+			ColorSchemes = typeof (Colors).GetProperties ()
+				.Where (p => p.PropertyType == typeof (ColorScheme))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
+				.ToDictionary (t => t.Key, t => t.Value);
+		}
 
-		// fbottom is location of bottom frame line
-		int fbottom = ftop + fheight + 1;
+		/// <summary>
+		/// The application toplevel color scheme, for the default toplevel views.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["TopLevel"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+		/// <summary>
+		/// The base color scheme, for the default toplevel views.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Base"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Base { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		Rune hLine = default, vLine = default,
-			uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
+		/// <summary>
+		/// The dialog color scheme, for standard popup dialog boxes
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Dialog"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Dialog { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		if (border) {
-			switch (borderStyle) {
-			case BorderStyle.None:
-				break;
-			case BorderStyle.Single:
-				hLine = HLine;
-				vLine = VLine;
-				uRCorner = URCorner;
-				uLCorner = ULCorner;
-				lLCorner = LLCorner;
-				lRCorner = LRCorner;
-				break;
-			case BorderStyle.Double:
-				hLine = HDLine;
-				vLine = VDLine;
-				uRCorner = URDCorner;
-				uLCorner = ULDCorner;
-				lLCorner = LLDCorner;
-				lRCorner = LRDCorner;
-				break;
-			case BorderStyle.Rounded:
-				hLine = HRLine;
-				vLine = VRLine;
-				uRCorner = URRCorner;
-				uLCorner = ULRCorner;
-				lLCorner = LLRCorner;
-				lRCorner = LRRCorner;
-				break;
+		/// <summary>
+		/// The menu bar color
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Menu"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Menu { get => GetColorScheme (); set => SetColorScheme (value); }
+
+		/// <summary>
+		/// The color scheme for showing errors.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
+
+		static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
+		{
+			return ColorSchemes [callerMemberName];
+		}
+
+		static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
+		{
+			ColorSchemes [callerMemberName] = colorScheme;
+			colorScheme.caller = callerMemberName;
+		}
+
+		/// <summary>
+		/// Provides the defined <see cref="ColorScheme"/>s.
+		/// </summary>
+		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
+	}
+
+	/// <summary>
+	/// Cursors Visibility that are displayed
+	/// </summary>
+	// 
+	// Hexa value are set as 0xAABBCCDD where :
+	//
+	//     AA stand for the TERMINFO DECSUSR parameter value to be used under Linux & MacOS
+	//     BB stand for the NCurses curs_set parameter value to be used under Linux & MacOS
+	//     CC stand for the CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows
+	//     DD stand for the CONSOLE_CURSOR_INFO.dwSize parameter value to be used under Windows
+	//
+	public enum CursorVisibility {
+		/// <summary>
+		///	Cursor caret has default
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.</remarks>
+		Default = 0x00010119,
+
+		/// <summary>
+		///	Cursor caret is hidden
+		/// </summary>
+		Invisible = 0x03000019,
+
+		/// <summary>
+		///	Cursor caret is normally shown as a blinking underline bar _
+		/// </summary>
+		Underline = 0x03010119,
+
+		/// <summary>
+		///	Cursor caret is normally shown as a underline bar _
+		/// </summary>
+		/// <remarks>Under Windows, this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
+		UnderlineFix = 0x04010119,
+
+		/// <summary>
+		///	Cursor caret is displayed a blinking vertical bar |
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
+		Vertical = 0x05010119,
+
+		/// <summary>
+		///	Cursor caret is displayed a blinking vertical bar |
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
+		VerticalFix = 0x06010119,
+
+		/// <summary>
+		///	Cursor caret is displayed as a blinking block ▉
+		/// </summary>
+		Box = 0x01020164,
+
+		/// <summary>
+		///	Cursor caret is displayed a block ▉
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
+		BoxFix = 0x02020164,
+	}
+
+	///// <summary>
+	///// Special characters that can be drawn with 
+	///// </summary>
+	//public enum SpecialChar {
+	//	/// <summary>
+	//	/// Horizontal line character.
+	//	/// </summary>
+	//	HLine,
+
+	//	/// <summary>
+	//	/// Vertical line character.
+	//	/// </summary>
+	//	VLine,
+
+	//	/// <summary>
+	//	/// Stipple pattern
+	//	/// </summary>
+	//	Stipple,
+
+	//	/// <summary>
+	//	/// Diamond character
+	//	/// </summary>
+	//	Diamond,
+
+	//	/// <summary>
+	//	/// Upper left corner
+	//	/// </summary>
+	//	ULCorner,
+
+	//	/// <summary>
+	//	/// Lower left corner
+	//	/// </summary>
+	//	LLCorner,
+
+	//	/// <summary>
+	//	/// Upper right corner
+	//	/// </summary>
+	//	URCorner,
+
+	//	/// <summary>
+	//	/// Lower right corner
+	//	/// </summary>
+	//	LRCorner,
+
+	//	/// <summary>
+	//	/// Left tee
+	//	/// </summary>
+	//	LeftTee,
+
+	//	/// <summary>
+	//	/// Right tee
+	//	/// </summary>
+	//	RightTee,
+
+	//	/// <summary>
+	//	/// Top tee
+	//	/// </summary>
+	//	TopTee,
+
+	//	/// <summary>
+	//	/// The bottom tee.
+	//	/// </summary>
+	//	BottomTee,
+	//}
+
+	/// <summary>
+	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
+	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
+	/// </summary>
+	public abstract class ConsoleDriver {
+		/// <summary>
+		/// The handler fired when the terminal is resized.
+		/// </summary>
+		protected Action TerminalResized;
+
+		/// <summary>
+		/// The current number of columns in the terminal.
+		/// </summary>
+		public abstract int Cols { get; }
+
+		/// <summary>
+		/// The current number of rows in the terminal.
+		/// </summary>
+		public abstract int Rows { get; }
+
+		/// <summary>
+		/// The current left in the terminal.
+		/// </summary>
+		public abstract int Left { get; }
+
+		/// <summary>
+		/// The current top in the terminal.
+		/// </summary>
+		public abstract int Top { get; }
+
+		/// <summary>
+		/// Get the operation system clipboard.
+		/// </summary>
+		public abstract IClipboard Clipboard { get; }
+
+		/// <summary>
+		/// If false height is measured by the window height and thus no scrolling.
+		/// If true then height is measured by the buffer height, enabling scrolling.
+		/// </summary>
+		public abstract bool HeightAsBuffer { get; set; }
+
+		/// <summary>
+		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public virtual int [,,] Contents { get; }
+
+
+		/// <summary>
+		/// Determinates if the current console driver supports TrueColor output-
+		/// </summary>
+		public virtual bool SupportsTrueColorOutput { get => false; }
+
+		bool useTrueColor;
+
+		/// <summary>
+		/// Controls the TureColor output mode. Can be only enabled if the underlying ConsoleDriver supports it.
+		/// Note this will be enabled automaticaly if supported. See also <see cref="SupportsTrueColorOutput"/>
+		/// </summary>
+		public bool UseTrueColor {
+			get => useTrueColor;
+			set => this.useTrueColor = value && SupportsTrueColorOutput;
+		}
+
+		/// <summary>
+		/// Initializes the driver
+		/// </summary>
+		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
+		public abstract void Init (Action terminalResized);
+		/// <summary>
+		/// Moves the cursor to the specified column and row.
+		/// </summary>
+		/// <param name="col">Column to move the cursor to.</param>
+		/// <param name="row">Row to move the cursor to.</param>
+		public abstract void Move (int col, int row);
+
+		/// <summary>
+		/// Adds the specified rune to the display at the current cursor position.
+		/// </summary>
+		/// <param name="rune">Rune to add.</param>
+		public abstract void AddRune (Rune rune);
+
+		/// <summary>
+		/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
+		/// to equivalent, printable, Unicode chars.
+		/// </summary>
+		/// <param name="c">Rune to translate</param>
+		/// <returns></returns>
+		public static Rune MakePrintable (Rune c)
+		{
+			var controlChars = c & 0xFFFF;
+			if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
+				// ASCII (C0) control characters.
+				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
+				return new Rune (controlChars + 0x2400);
 			}
-		} else {
-			hLine = vLine = uRCorner = uLCorner = lLCorner = lRCorner = clearChar;
+
+			return c;
 		}
 
-		// Outside top
-		if (paddingTop > 1) {
-			for (int r = region.Y; r < ftop; r++) {
+		/// <summary>
+		/// Ensures that the column and line are in a valid range from the size of the driver.
+		/// </summary>
+		/// <param name="col">The column.</param>
+		/// <param name="row">The row.</param>
+		/// <param name="clip">The clip.</param>
+		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
+		public bool IsValidContent (int col, int row, Rect clip) =>
+			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
+
+		/// <summary>
+		/// Adds the <paramref name="str"/> to the display at the cursor position.
+		/// </summary>
+		/// <param name="str">String.</param>
+		public abstract void AddStr (ustring str);
+
+		/// <summary>
+		/// Prepare the driver and set the key and mouse events handlers.
+		/// </summary>
+		/// <param name="mainLoop">The main loop.</param>
+		/// <param name="keyHandler">The handler for ProcessKey</param>
+		/// <param name="keyDownHandler">The handler for key down events</param>
+		/// <param name="keyUpHandler">The handler for key up events</param>
+		/// <param name="mouseHandler">The handler for mouse events</param>
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+
+		/// <summary>
+		/// Updates the screen to reflect all the changes that have been done to the display buffer
+		/// </summary>
+		public abstract void Refresh ();
+
+		/// <summary>
+		/// Updates the location of the cursor position
+		/// </summary>
+		public abstract void UpdateCursor ();
+
+		/// <summary>
+		/// Retreive the cursor caret visibility
+		/// </summary>
+		/// <param name="visibility">The current <see cref="CursorVisibility"/></param>
+		/// <returns>true upon success</returns>
+		public abstract bool GetCursorVisibility (out CursorVisibility visibility);
+
+		/// <summary>
+		/// Change the cursor caret visibility
+		/// </summary>
+		/// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
+		/// <returns>true upon success</returns>
+		public abstract bool SetCursorVisibility (CursorVisibility visibility);
+
+		/// <summary>
+		/// Ensure the cursor visibility
+		/// </summary>
+		/// <returns>true upon success</returns>
+		public abstract bool EnsureCursorVisibility ();
+
+		/// <summary>
+		/// Ends the execution of the console driver.
+		/// </summary>
+		public abstract void End ();
+
+		/// <summary>
+		/// Resizes the clip area when the screen is resized.
+		/// </summary>
+		public abstract void ResizeScreen ();
+
+		/// <summary>
+		/// Reset and recreate the contents and the driver buffer.
+		/// </summary>
+		public abstract void UpdateOffScreen ();
+
+		/// <summary>
+		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
+		/// </summary>
+		public abstract void UpdateScreen ();
+
+		/// <summary>
+		/// Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
+		/// </summary>
+		/// <param name="c">C.</param>
+		public abstract void SetAttribute (Attribute c);
+
+		/// <summary>
+		/// Set Colors from limit sets of colors.
+		/// </summary>
+		/// <param name="foreground">Foreground.</param>
+		/// <param name="background">Background.</param>
+		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+
+		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		// that independently with the R, G, B values.
+		/// <summary>
+		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		/// that independently with the R, G, B values.
+		/// </summary>
+		/// <param name="foregroundColorId">Foreground color identifier.</param>
+		/// <param name="backgroundColorId">Background color identifier.</param>
+		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
+
+		/// <summary>
+		/// Gets the foreground and background colors based on the value.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="foreground">The foreground.</param>
+		/// <param name="background">The background.</param>
+		/// <returns></returns>
+		public abstract bool GetColors (int value, out Color foreground, out Color background);
+
+		/// <summary>
+		/// Allows sending keys without typing on a keyboard.
+		/// </summary>
+		/// <param name="keyChar">The character key.</param>
+		/// <param name="key">The key.</param>
+		/// <param name="shift">If shift key is sending.</param>
+		/// <param name="alt">If alt key is sending.</param>
+		/// <param name="control">If control key is sending.</param>
+		public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control);
+
+		/// <summary>
+		/// Set the handler when the terminal is resized.
+		/// </summary>
+		/// <param name="terminalResized"></param>
+		public void SetTerminalResized (Action terminalResized)
+		{
+			TerminalResized = terminalResized;
+		}
+
+		/// <summary>
+		/// Draws the title for a Window-style view incorporating padding. 
+		/// </summary>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
+		/// <param name="title">The title for the window. The title will only be drawn if <c>title</c> is not null or empty and paddingTop is greater than 0.</param>
+		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
+		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
+		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
+		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
+		/// <param name="textAlignment">Not yet implemented.</param>
+		/// <remarks></remarks>
+		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
+		{
+			var width = region.Width - (paddingLeft + 2) * 2;
+			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
+				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
+				AddRune (' ');
+				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
+					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
+				AddStr (str);
+				AddRune (' ');
+			}
+		}
+
+		/// <summary>
+		/// Enables diagnostic functions
+		/// </summary>
+		[Flags]
+		public enum DiagnosticFlags : uint {
+			/// <summary>
+			/// All diagnostics off
+			/// </summary>
+			Off = 0b_0000_0000,
+			/// <summary>
+			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will draw a 
+			/// ruler in the frame for any side with a padding value greater than 0.
+			/// </summary>
+			FrameRuler = 0b_0000_0001,
+			/// <summary>
+			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will use
+			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
+			/// </summary>
+			FramePadding = 0b_0000_0010,
+		}
+
+		/// <summary>
+		/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
+		/// </summary>
+		public static DiagnosticFlags Diagnostics { get; set; }
+
+		/// <summary>
+		/// Draws a frame for a window with padding and an optional visible border inside the padding. 
+		/// </summary>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
+		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
+		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
+		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
+		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
+		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
+		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
+		/// <param name="borderContent">The <see cref="Border"/> to be used if defined.</param>
+		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
+			int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)
+		{
+			char clearChar = ' ';
+			char leftChar = clearChar;
+			char rightChar = clearChar;
+			char topChar = clearChar;
+			char bottomChar = clearChar;
+
+			if ((Diagnostics & DiagnosticFlags.FramePadding) == DiagnosticFlags.FramePadding) {
+				leftChar = 'L';
+				rightChar = 'R';
+				topChar = 'T';
+				bottomChar = 'B';
+				clearChar = 'C';
+			}
+
+			void AddRuneAt (int col, int row, Rune ch)
+			{
+				Move (col, row);
+				AddRune (ch);
+			}
+
+			// fwidth is count of hLine chars
+			int fwidth = (int)(region.Width - (paddingRight + paddingLeft));
+
+			// fheight is count of vLine chars
+			int fheight = (int)(region.Height - (paddingBottom + paddingTop));
+
+			// fleft is location of left frame line
+			int fleft = region.X + paddingLeft - 1;
+
+			// fright is location of right frame line
+			int fright = fleft + fwidth + 1;
+
+			// ftop is location of top frame line
+			int ftop = region.Y + paddingTop - 1;
+
+			// fbottom is location of bottom frame line
+			int fbottom = ftop + fheight + 1;
+
+			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+
+			Rune hLine = default, vLine = default,
+				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
+
+			if (border) {
+				switch (borderStyle) {
+				case BorderStyle.None:
+					break;
+				case BorderStyle.Single:
+					hLine = HLine;
+					vLine = VLine;
+					uRCorner = URCorner;
+					uLCorner = ULCorner;
+					lLCorner = LLCorner;
+					lRCorner = LRCorner;
+					break;
+				case BorderStyle.Double:
+					hLine = HDLine;
+					vLine = VDLine;
+					uRCorner = URDCorner;
+					uLCorner = ULDCorner;
+					lLCorner = LLDCorner;
+					lRCorner = LRDCorner;
+					break;
+				case BorderStyle.Rounded:
+					hLine = HRLine;
+					vLine = VRLine;
+					uRCorner = URRCorner;
+					uLCorner = ULRCorner;
+					lLCorner = LLRCorner;
+					lRCorner = LRRCorner;
+					break;
+				}
+			} else {
+				hLine = vLine = uRCorner = uLCorner = lLCorner = lRCorner = clearChar;
+			}
+
+			// Outside top
+			if (paddingTop > 1) {
+				for (int r = region.Y; r < ftop; r++) {
+					for (int c = region.X; c < region.X + region.Width; c++) {
+						AddRuneAt (c, r, topChar);
+					}
+				}
+			}
+
+			// Outside top-left
+			for (int c = region.X; c < fleft; c++) {
+				AddRuneAt (c, ftop, leftChar);
+			}
+
+			// Frame top-left corner
+			AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : leftChar);
+
+			// Frame top
+			for (int c = fleft + 1; c < fleft + 1 + fwidth; c++) {
+				AddRuneAt (c, ftop, paddingTop > 0 ? hLine : topChar);
+			}
+
+			// Frame top-right corner
+			if (fright > fleft) {
+				AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : rightChar);
+			}
+
+			// Outside top-right corner
+			for (int c = fright + 1; c < fright + paddingRight; c++) {
+				AddRuneAt (c, ftop, rightChar);
+			}
+
+			// Left, Fill, Right
+			if (fbottom > ftop) {
+				for (int r = ftop + 1; r < fbottom; r++) {
+					// Outside left
+					for (int c = region.X; c < fleft; c++) {
+						AddRuneAt (c, r, leftChar);
+					}
+
+					// Frame left
+					AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : leftChar);
+
+					// Fill
+					if (fill) {
+						for (int x = fleft + 1; x < fright; x++) {
+							AddRuneAt (x, r, clearChar);
+						}
+					}
+
+					// Frame right
+					if (fright > fleft) {
+						var v = vLine;
+						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
+							v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
+						}
+						AddRuneAt (fright, r, paddingRight > 0 ? v : rightChar);
+					}
+
+					// Outside right
+					for (int c = fright + 1; c < fright + paddingRight; c++) {
+						AddRuneAt (c, r, rightChar);
+					}
+				}
+
+				// Outside Bottom
 				for (int c = region.X; c < region.X + region.Width; c++) {
-					AddRuneAt (c, r, topChar);
-				}
-			}
-		}
-
-		// Outside top-left
-		for (int c = region.X; c < fleft; c++) {
-			AddRuneAt (c, ftop, leftChar);
-		}
-
-		// Frame top-left corner
-		AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : leftChar);
-
-		// Frame top
-		for (int c = fleft + 1; c < fleft + 1 + fwidth; c++) {
-			AddRuneAt (c, ftop, paddingTop > 0 ? hLine : topChar);
-		}
-
-		// Frame top-right corner
-		if (fright > fleft) {
-			AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : rightChar);
-		}
-
-		// Outside top-right corner
-		for (int c = fright + 1; c < fright + paddingRight; c++) {
-			AddRuneAt (c, ftop, rightChar);
-		}
-
-		// Left, Fill, Right
-		if (fbottom > ftop) {
-			for (int r = ftop + 1; r < fbottom; r++) {
-				// Outside left
-				for (int c = region.X; c < fleft; c++) {
-					AddRuneAt (c, r, leftChar);
+					AddRuneAt (c, fbottom, leftChar);
 				}
 
-				// Frame left
-				AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : leftChar);
+				// Frame bottom-left
+				AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : leftChar);
 
-				// Fill
-				if (fill) {
-					for (int x = fleft + 1; x < fright; x++) {
-						AddRuneAt (x, r, clearChar);
-					}
-				}
-
-				// Frame right
 				if (fright > fleft) {
-					var v = vLine;
-					if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
-						v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
+					// Frame bottom
+					for (int c = fleft + 1; c < fright; c++) {
+						var h = hLine;
+						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
+							h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
+						}
+						AddRuneAt (c, fbottom, paddingBottom > 0 ? h : bottomChar);
 					}
-					AddRuneAt (fright, r, paddingRight > 0 ? v : rightChar);
+
+					// Frame bottom-right
+					AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : rightChar);
 				}
 
 				// Outside right
 				for (int c = fright + 1; c < fright + paddingRight; c++) {
-					AddRuneAt (c, r, rightChar);
+					AddRuneAt (c, fbottom, rightChar);
 				}
 			}
 
-			// Outside Bottom
-			for (int c = region.X; c < region.X + region.Width; c++) {
-				AddRuneAt (c, fbottom, leftChar);
-			}
-
-			// Frame bottom-left
-			AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : leftChar);
-
-			if (fright > fleft) {
-				// Frame bottom
-				for (int c = fleft + 1; c < fright; c++) {
-					var h = hLine;
-					if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
-						h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
+			// Out bottom - ensure top is always drawn if we overlap
+			if (paddingBottom > 0) {
+				for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
+					for (int c = region.X; c < region.X + region.Width; c++) {
+						AddRuneAt (c, r, bottomChar);
 					}
-					AddRuneAt (c, fbottom, paddingBottom > 0 ? h : bottomChar);
-				}
-
-				// Frame bottom-right
-				AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : rightChar);
-			}
-
-			// Outside right
-			for (int c = fright + 1; c < fright + paddingRight; c++) {
-				AddRuneAt (c, fbottom, rightChar);
-			}
-		}
-
-		// Out bottom - ensure top is always drawn if we overlap
-		if (paddingBottom > 0) {
-			for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
-				for (int c = region.X; c < region.X + region.Width; c++) {
-					AddRuneAt (c, r, bottomChar);
 				}
 			}
 		}
-	}
 
-	/// <summary>
-	/// Draws a frame on the specified region with the specified padding around the frame.
-	/// </summary>
-	/// <param name="region">Screen relative region where the frame will be drawn.</param>
-	/// <param name="padding">Padding to add on the sides.</param>
-	/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-	/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/>.</remarks>
-	/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
-	/// A padding value of 0 means there is actually a one cell border.
-	/// </remarks>
-	public virtual void DrawFrame (Rect region, int padding, bool fill)
-	{
-		// DrawFrame assumes the border is always at least one row/col thick
-		// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
-		DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height),
-			padding + 1, padding + 1, padding + 1, padding + 1, border: false, fill: fill);
-	}
-
-
-	/// <summary>
-	/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
-	/// </summary>
-	public abstract void Suspend ();
-
-	Rect clip;
-
-	/// <summary>
-	/// Controls the current clipping region that AddRune/AddStr is subject to.
-	/// </summary>
-	/// <value>The clip.</value>
-	public Rect Clip {
-		get => clip;
-		set => this.clip = value;
-	}
-
-	/// <summary>
-	/// Start of mouse moves.
-	/// </summary>
-	public abstract void StartReportingMouseMoves ();
-
-	/// <summary>
-	/// Stop reporting mouses moves.
-	/// </summary>
-	public abstract void StopReportingMouseMoves ();
-
-	/// <summary>
-	/// Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
-	/// </summary>
-	public abstract void UncookMouse ();
-
-	/// <summary>
-	/// Enables the cooked event processing from the mouse driver
-	/// </summary>
-	public abstract void CookMouse ();
-
-	/// <summary>
-	/// Horizontal line character.
-	/// </summary>
-	public Rune HLine = '\u2500';
-
-	/// <summary>
-	/// Vertical line character.
-	/// </summary>
-	public Rune VLine = '\u2502';
-
-	/// <summary>
-	/// Stipple pattern
-	/// </summary>
-	public Rune Stipple = '\u2591';
-
-	/// <summary>
-	/// Diamond character
-	/// </summary>
-	public Rune Diamond = '\u25ca';
-
-	/// <summary>
-	/// Upper left corner
-	/// </summary>
-	public Rune ULCorner = '\u250C';
-
-	/// <summary>
-	/// Lower left corner
-	/// </summary>
-	public Rune LLCorner = '\u2514';
-
-	/// <summary>
-	/// Upper right corner
-	/// </summary>
-	public Rune URCorner = '\u2510';
-
-	/// <summary>
-	/// Lower right corner
-	/// </summary>
-	public Rune LRCorner = '\u2518';
-
-	/// <summary>
-	/// Left tee
-	/// </summary>
-	public Rune LeftTee = '\u251c';
-
-	/// <summary>
-	/// Right tee
-	/// </summary>
-	public Rune RightTee = '\u2524';
-
-	/// <summary>
-	/// Top tee
-	/// </summary>
-	public Rune TopTee = '\u252c';
-
-	/// <summary>
-	/// The bottom tee.
-	/// </summary>
-	public Rune BottomTee = '\u2534';
-
-	/// <summary>
-	/// Checkmark.
-	/// </summary>
-	public Rune Checked = '\u221a';
-
-	/// <summary>
-	/// Un-checked checkmark.
-	/// </summary>
-	public Rune UnChecked = '\u2574';
-
-	/// <summary>
-	/// Selected mark.
-	/// </summary>
-	public Rune Selected = '\u25cf';
-
-	/// <summary>
-	/// Un-selected selected mark.
-	/// </summary>
-	public Rune UnSelected = '\u25cc';
-
-	/// <summary>
-	/// Right Arrow.
-	/// </summary>
-	public Rune RightArrow = '\u25ba';
-
-	/// <summary>
-	/// Left Arrow.
-	/// </summary>
-	public Rune LeftArrow = '\u25c4';
-
-	/// <summary>
-	/// Down Arrow.
-	/// </summary>
-	public Rune DownArrow = '\u25bc';
-
-	/// <summary>
-	/// Up Arrow.
-	/// </summary>
-	public Rune UpArrow = '\u25b2';
-
-	/// <summary>
-	/// Left indicator for default action (e.g. for <see cref="Button"/>).
-	/// </summary>
-	public Rune LeftDefaultIndicator = '\u25e6';
-
-	/// <summary>
-	/// Right indicator for default action (e.g. for <see cref="Button"/>).
-	/// </summary>
-	public Rune RightDefaultIndicator = '\u25e6';
-
-	/// <summary>
-	/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
-	/// </summary>
-	public Rune LeftBracket = '[';
-
-	/// <summary>
-	/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
-	/// </summary>
-	public Rune RightBracket = ']';
-
-	/// <summary>
-	/// Blocks Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
-	/// </summary>
-	public Rune BlocksMeterSegment = '\u258c';
-
-	/// <summary>
-	/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
-	/// </summary>
-	public Rune ContinuousMeterSegment = '\u2588';
-
-	/// <summary>
-	/// Horizontal double line character.
-	/// </summary>
-	public Rune HDLine = '\u2550';
-
-	/// <summary>
-	/// Vertical double line character.
-	/// </summary>
-	public Rune VDLine = '\u2551';
-
-	/// <summary>
-	/// Upper left double corner
-	/// </summary>
-	public Rune ULDCorner = '\u2554';
-
-	/// <summary>
-	/// Lower left double corner
-	/// </summary>
-	public Rune LLDCorner = '\u255a';
-
-	/// <summary>
-	/// Upper right double corner
-	/// </summary>
-	public Rune URDCorner = '\u2557';
-
-	/// <summary>
-	/// Lower right double corner
-	/// </summary>
-	public Rune LRDCorner = '\u255d';
-
-	/// <summary>
-	/// Horizontal line character for rounded corners.
-	/// </summary>
-	public Rune HRLine = '\u2500';
-
-	/// <summary>
-	/// Vertical line character for rounded corners.
-	/// </summary>
-	public Rune VRLine = '\u2502';
-
-	/// <summary>
-	/// Upper left rounded corner
-	/// </summary>
-	public Rune ULRCorner = '\u256d';
-
-	/// <summary>
-	/// Lower left rounded corner
-	/// </summary>
-	public Rune LLRCorner = '\u2570';
-
-	/// <summary>
-	/// Upper right rounded corner
-	/// </summary>
-	public Rune URRCorner = '\u256e';
-
-	/// <summary>
-	/// Lower right rounded corner
-	/// </summary>
-	public Rune LRRCorner = '\u256f';
-
-	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public abstract Attribute MakeAttribute (Color fore, Color back);
-
-	/// <summary>
-	/// Gets the current <see cref="Attribute"/>.
-	/// </summary>
-	/// <returns>The current attribute.</returns>
-	public abstract Attribute GetAttribute ();
-
-	/// <summary>
-	/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.
-	/// </summary>
-	/// <param name="foreground">The foreground color.</param>
-	/// <param name="background">The background color.</param>
-	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (Color foreground, Color background);
-
-	/// <summary>
-	/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
-	/// </summary>
-	/// <param name="hasColors">Flag indicating if colors are supported.</param>
-	public void CreateColors (bool hasColors = true)
-	{
-		Colors.TopLevel = new ColorScheme ();
-		Colors.Base = new ColorScheme ();
-		Colors.Dialog = new ColorScheme ();
-		Colors.Menu = new ColorScheme ();
-		Colors.Error = new ColorScheme ();
-
-		if (!hasColors) {
-			return;
+		/// <summary>
+		/// Draws a frame on the specified region with the specified padding around the frame.
+		/// </summary>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
+		/// <param name="padding">Padding to add on the sides.</param>
+		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
+		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/>.</remarks>
+		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
+		/// A padding value of 0 means there is actually a one cell border.
+		/// </remarks>
+		public virtual void DrawFrame (Rect region, int padding, bool fill)
+		{
+			// DrawFrame assumes the border is always at least one row/col thick
+			// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
+			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height),
+				padding + 1, padding + 1, padding + 1, padding + 1, border: false, fill: fill);
 		}
 
-		Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
-		Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
-		Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
-		Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
-		Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
 
-		Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
-		Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
-		Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
-		Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
-		Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
+		/// <summary>
+		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+		/// </summary>
+		public abstract void Suspend ();
 
-		Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
-		Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
-		Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
-		Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
-		Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+		Rect clip;
 
-		Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
-		Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
-		Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
-		Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
-		Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+		/// <summary>
+		/// Controls the current clipping region that AddRune/AddStr is subject to.
+		/// </summary>
+		/// <value>The clip.</value>
+		public Rect Clip {
+			get => clip;
+			set => this.clip = value;
+		}
 
-		Colors.Error.Normal = MakeColor (Color.Red, Color.White);
-		Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
-		Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-		Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
-		Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+		/// <summary>
+		/// Start of mouse moves.
+		/// </summary>
+		public abstract void StartReportingMouseMoves ();
+
+		/// <summary>
+		/// Stop reporting mouses moves.
+		/// </summary>
+		public abstract void StopReportingMouseMoves ();
+
+		/// <summary>
+		/// Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+		/// </summary>
+		public abstract void UncookMouse ();
+
+		/// <summary>
+		/// Enables the cooked event processing from the mouse driver
+		/// </summary>
+		public abstract void CookMouse ();
+
+		/// <summary>
+		/// Horizontal line character.
+		/// </summary>
+		public Rune HLine = '\u2500';
+
+		/// <summary>
+		/// Vertical line character.
+		/// </summary>
+		public Rune VLine = '\u2502';
+
+		/// <summary>
+		/// Stipple pattern
+		/// </summary>
+		public Rune Stipple = '\u2591';
+
+		/// <summary>
+		/// Diamond character
+		/// </summary>
+		public Rune Diamond = '\u25ca';
+
+		/// <summary>
+		/// Upper left corner
+		/// </summary>
+		public Rune ULCorner = '\u250C';
+
+		/// <summary>
+		/// Lower left corner
+		/// </summary>
+		public Rune LLCorner = '\u2514';
+
+		/// <summary>
+		/// Upper right corner
+		/// </summary>
+		public Rune URCorner = '\u2510';
+
+		/// <summary>
+		/// Lower right corner
+		/// </summary>
+		public Rune LRCorner = '\u2518';
+
+		/// <summary>
+		/// Left tee
+		/// </summary>
+		public Rune LeftTee = '\u251c';
+
+		/// <summary>
+		/// Right tee
+		/// </summary>
+		public Rune RightTee = '\u2524';
+
+		/// <summary>
+		/// Top tee
+		/// </summary>
+		public Rune TopTee = '\u252c';
+
+		/// <summary>
+		/// The bottom tee.
+		/// </summary>
+		public Rune BottomTee = '\u2534';
+
+		/// <summary>
+		/// Checkmark.
+		/// </summary>
+		public Rune Checked = '\u221a';
+
+		/// <summary>
+		/// Un-checked checkmark.
+		/// </summary>
+		public Rune UnChecked = '\u2574';
+
+		/// <summary>
+		/// Selected mark.
+		/// </summary>
+		public Rune Selected = '\u25cf';
+
+		/// <summary>
+		/// Un-selected selected mark.
+		/// </summary>
+		public Rune UnSelected = '\u25cc';
+
+		/// <summary>
+		/// Right Arrow.
+		/// </summary>
+		public Rune RightArrow = '\u25ba';
+
+		/// <summary>
+		/// Left Arrow.
+		/// </summary>
+		public Rune LeftArrow = '\u25c4';
+
+		/// <summary>
+		/// Down Arrow.
+		/// </summary>
+		public Rune DownArrow = '\u25bc';
+
+		/// <summary>
+		/// Up Arrow.
+		/// </summary>
+		public Rune UpArrow = '\u25b2';
+
+		/// <summary>
+		/// Left indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftDefaultIndicator = '\u25e6';
+
+		/// <summary>
+		/// Right indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightDefaultIndicator = '\u25e6';
+
+		/// <summary>
+		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftBracket = '[';
+
+		/// <summary>
+		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightBracket = ']';
+
+		/// <summary>
+		/// Blocks Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune BlocksMeterSegment = '\u258c';
+
+		/// <summary>
+		/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune ContinuousMeterSegment = '\u2588';
+
+		/// <summary>
+		/// Horizontal double line character.
+		/// </summary>
+		public Rune HDLine = '\u2550';
+
+		/// <summary>
+		/// Vertical double line character.
+		/// </summary>
+		public Rune VDLine = '\u2551';
+
+		/// <summary>
+		/// Upper left double corner
+		/// </summary>
+		public Rune ULDCorner = '\u2554';
+
+		/// <summary>
+		/// Lower left double corner
+		/// </summary>
+		public Rune LLDCorner = '\u255a';
+
+		/// <summary>
+		/// Upper right double corner
+		/// </summary>
+		public Rune URDCorner = '\u2557';
+
+		/// <summary>
+		/// Lower right double corner
+		/// </summary>
+		public Rune LRDCorner = '\u255d';
+
+		/// <summary>
+		/// Horizontal line character for rounded corners.
+		/// </summary>
+		public Rune HRLine = '\u2500';
+
+		/// <summary>
+		/// Vertical line character for rounded corners.
+		/// </summary>
+		public Rune VRLine = '\u2502';
+
+		/// <summary>
+		/// Upper left rounded corner
+		/// </summary>
+		public Rune ULRCorner = '\u256d';
+
+		/// <summary>
+		/// Lower left rounded corner
+		/// </summary>
+		public Rune LLRCorner = '\u2570';
+
+		/// <summary>
+		/// Upper right rounded corner
+		/// </summary>
+		public Rune URRCorner = '\u256e';
+
+		/// <summary>
+		/// Lower right rounded corner
+		/// </summary>
+		public Rune LRRCorner = '\u256f';
+
+		/// <summary>
+		/// Make the attribute for the foreground and background colors.
+		/// </summary>
+		/// <param name="fore">Foreground.</param>
+		/// <param name="back">Background.</param>
+		/// <returns></returns>
+		public abstract Attribute MakeAttribute (Color fore, Color back);
+
+		/// <summary>
+		/// Gets the current <see cref="Attribute"/>.
+		/// </summary>
+		/// <returns>The current attribute.</returns>
+		public abstract Attribute GetAttribute ();
+
+		/// <summary>
+		/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.
+		/// </summary>
+		/// <param name="foreground">The foreground color.</param>
+		/// <param name="background">The background color.</param>
+		/// <returns>The attribute for the foreground and background colors.</returns>
+		public abstract Attribute MakeColor (Color foreground, Color background);
+
+		/// <summary>
+		/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
+		/// </summary>
+		/// <param name="hasColors">Flag indicating if colors are supported.</param>
+		public void CreateColors (bool hasColors = true)
+		{
+			Colors.TopLevel = new ColorScheme ();
+			Colors.Base = new ColorScheme ();
+			Colors.Dialog = new ColorScheme ();
+			Colors.Menu = new ColorScheme ();
+			Colors.Error = new ColorScheme ();
+
+			if (!hasColors) {
+				return;
+			}
+
+			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
+			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
+			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
+			Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
+			Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
+
+			Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
+			Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
+			Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
+			Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
+			Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
+
+			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
+			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
+			Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
+			Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
+			Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
+			Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
+			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
+			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
+			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
+			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+		}
 	}
-}
 }
