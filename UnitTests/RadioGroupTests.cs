@@ -172,5 +172,20 @@ namespace Terminal.Gui.Views {
 			Assert.True (rg.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.Equal (1, rg.SelectedItem);
 		}
+
+		[Fact]
+		public void ProcessColdKey_HotKey ()
+		{
+			var rg = new RadioGroup (new NStack.ustring [] { "Left", "Right", "Cen_tered", "Justified" });
+
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.t, new KeyModifiers ())));
+			Assert.Equal (2, rg.SelectedItem);
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.L, new KeyModifiers ())));
+			Assert.Equal (0, rg.SelectedItem);
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.J, new KeyModifiers ())));
+			Assert.Equal (3, rg.SelectedItem);
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.R, new KeyModifiers ())));
+			Assert.Equal (1, rg.SelectedItem);
+		}
 	}
 }

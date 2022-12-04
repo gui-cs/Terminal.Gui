@@ -31,10 +31,9 @@ namespace Terminal.Gui.Views {
 			Assert.False (sb.CanFocus);
 			Assert.Equal (Colors.Menu, sb.ColorScheme);
 			Assert.Equal (0, sb.X);
+			Assert.Equal ("Pos.AnchorEnd(margin=1)", sb.Y.ToString ());
 			Assert.Equal (Dim.Fill (), sb.Width);
 			Assert.Equal (1, sb.Height);
-
-			Assert.Null (sb.Y);
 
 			var driver = new FakeDriver ();
 			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
@@ -47,11 +46,11 @@ namespace Terminal.Gui.Views {
 			Assert.True (FakeConsole.CursorVisible);
 
 			Application.Iteration += () => {
-				Assert.Equal (24, sb.Y);
+				Assert.Equal (24, sb.Frame.Y);
 
 				driver.SetWindowSize (driver.Cols, 15);
 
-				Assert.Equal (14, sb.Y);
+				Assert.Equal (14, sb.Frame.Y);
 
 				sb.OnEnter (null);
 				driver.GetCursorVisibility (out cv);

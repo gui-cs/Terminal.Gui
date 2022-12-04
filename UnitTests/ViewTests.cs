@@ -4062,5 +4062,60 @@ This is a tes
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void SetHasFocus_Do_Not_Throws_If_OnLeave_Remove_Focused_Changing_To_Null ()
+		{
+			var view1Leave = false;
+			var subView1Leave = false;
+			var subView1subView1Leave = false;
+			var top = Application.Top;
+			var view1 = new View { CanFocus = true };
+			var subView1 = new View { CanFocus = true };
+			var subView1subView1 = new View { CanFocus = true };
+			view1.Leave += (e) => {
+				view1Leave = true;
+			};
+			subView1.Leave += (e) => {
+				subView1.Remove (subView1subView1);
+				subView1Leave = true;
+			};
+			view1.Add (subView1);
+			subView1subView1.Leave += (e) => {
+				// This is never invoked
+				subView1subView1Leave = true;
+			};
+			subView1.Add (subView1subView1);
+			var view2 = new View { CanFocus = true };
+			top.Add (view1, view2);
+			Application.Begin (top);
+
+			view2.SetFocus ();
+			Assert.True (view1Leave);
+			Assert.True (subView1Leave);
+			Assert.False (subView1subView1Leave);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.Normal, view.GetNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetHotNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.HotNormal, view.GetHotNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
+		}
 	}
 }
