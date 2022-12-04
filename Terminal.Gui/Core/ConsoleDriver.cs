@@ -416,66 +416,11 @@ namespace Terminal.Gui {
 
 		private float CalculateDistance (TrueColor color1, TrueColor color2)
 		{
-			RGBtoHSV (color1, out var h1, out var s1, out var v1);
-			RGBtoHSV (color2, out var h2, out var s2, out var v2);
-			
-
-			if(float.IsNaN(h1)) {
-				h1 = -1f;
-			}
-
-			if (float.IsNaN (h2)) {
-				h2 = -1f;
-			}
-			
-			// the distance we are from this point in HSV space
-			// with an emphasis on Hue
-			return Math.Abs(h1 - h2) +
-				Math.Abs (s1 - s2) +
-				Math.Abs (v1 - v2);		
-		}
-
-		void RGBtoHSV (TrueColor color, out float h, out float s, out float v)
-		{
-			RGBtoHSV (color.Red / 255f, color.Green / 255f, color.Blue / 255f, out h, out s, out v);
-		}
-
-
-		// https://www.cs.rit.edu/~ncs/color/t_convert.html
-		// r,g,b values are from 0 to 1
-		// h = [0,360], s = [0,1], v = [0,1]
-		//		if s == 0, then h = -1 (undefined)
-
-		void RGBtoHSV (float r, float g, float b, out float h, out float s, out float v)
-		{
-			float min, max, delta;
-
-			min = Math.Min (Math.Min (r, g), b);
-			max = Math.Max (Math.Max (r, g), b);
-			v = max;                               // v
-
-			delta = max - min;
-
-			if (max != 0)
-				s = delta / max;               // s
-			else {
-				// r = g = b = 0		// s = 0, v is undefined
-				s = 0;
-				h = -1;
-				return;
-			}
-
-			if (r == max)
-				h = (g - b) / delta;           // between yellow & magenta
-			else if (g == max)
-				h = 2 + (b - r) / delta;       // between cyan & yellow
-			else
-				h = 4 + (r - g) / delta;       // between magenta & cyan
-
-			h *= 60;                               // degrees
-			if (h < 0)
-				h += 360;
-
+			// use RGB distance
+			return
+				Math.Abs (color1.Red - color2.Red) +
+				Math.Abs (color1.Green - color2.Green) +
+				Math.Abs (color1.Blue - color2.Blue);
 		}
 	}
 
