@@ -4095,5 +4095,27 @@ This is a tes
 			Assert.True (subView1Leave);
 			Assert.False (subView1subView1Leave);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void GetNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.Normal, view.GetNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetHotNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.HotNormal, view.GetHotNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
+		}
 	}
 }
