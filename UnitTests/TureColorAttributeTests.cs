@@ -17,17 +17,17 @@ namespace Terminal.Gui.ConsoleDrivers {
 			var fg = new TrueColor (255, 0, 0);
 			var bg = new TrueColor (0, 255, 0);
 
-			var attr = new TrueColorAttribute (fg, bg);
+			var attr = new Attribute (fg, bg);
 
 			Assert.Equal (fg, attr.TrueColorForeground);
 			Assert.Equal (bg, attr.TrueColorBackground);
 
 			// Test unified color
-			attr = new TrueColorAttribute (fg);
+			attr = new Attribute (fg,fg);
 			Assert.Equal (fg, attr.TrueColorForeground);
 			Assert.Equal (fg, attr.TrueColorBackground);
 
-			attr = new TrueColorAttribute (bg);
+			attr = new Attribute (bg,bg);
 			Assert.Equal (bg, attr.TrueColorForeground);
 			Assert.Equal (bg, attr.TrueColorBackground);
 
@@ -43,37 +43,37 @@ namespace Terminal.Gui.ConsoleDrivers {
 			driver.Init (() => { });
 
 			// Test bright basic colors
-			var attr = new TrueColorAttribute (new TrueColor (128, 0, 0), new TrueColor (0, 128, 0));
+			var attr = new Attribute (new TrueColor (128, 0, 0), new TrueColor (0, 128, 0));
 			Assert.Equal (Color.Red, attr.Foreground);
 			Assert.Equal (Color.Green, attr.Background);
 
-			attr = new TrueColorAttribute (new TrueColor (128, 128, 0), new TrueColor (0, 0, 128));
+			attr = new Attribute (new TrueColor (128, 128, 0), new TrueColor (0, 0, 128));
 			Assert.Equal (Color.Brown, attr.Foreground);
 			Assert.Equal (Color.Blue, attr.Background);
 
-			attr = new TrueColorAttribute (new TrueColor (128, 0, 128), new TrueColor (0, 128, 128));
+			attr = new Attribute (new TrueColor (128, 0, 128), new TrueColor (0, 128, 128));
 			Assert.Equal (Color.Magenta, attr.Foreground);
 			Assert.Equal (Color.Cyan, attr.Background);
 
 			// Test basic colors
-			attr = new TrueColorAttribute (new TrueColor (255, 0, 0), new TrueColor (0, 255, 0));
+			attr = new Attribute (new TrueColor (255, 0, 0), new TrueColor (0, 255, 0));
 			Assert.Equal (Color.BrightRed, attr.Foreground);
 			Assert.Equal (Color.BrightGreen, attr.Background);
 
-			attr = new TrueColorAttribute (new TrueColor (255, 255, 0), new TrueColor (0, 0, 255));
+			attr = new Attribute (new TrueColor (255, 255, 0), new TrueColor (0, 0, 255));
 			Assert.Equal (Color.BrightYellow, attr.Foreground);
 			Assert.Equal (Color.BrightBlue, attr.Background);
 
-			attr = new TrueColorAttribute (new TrueColor (255, 0, 255), new TrueColor (0, 255, 255));
+			attr = new Attribute (new TrueColor (255, 0, 255), new TrueColor (0, 255, 255));
 			Assert.Equal (Color.BrightMagenta, attr.Foreground);
 			Assert.Equal (Color.BrightCyan, attr.Background);
 
 			// Test gray basic colors
-			attr = new TrueColorAttribute (new TrueColor (128, 128, 128), new TrueColor (255, 255, 255));
+			attr = new Attribute (new TrueColor (128, 128, 128), new TrueColor (255, 255, 255));
 			Assert.Equal (Color.DarkGray, attr.Foreground);
 			Assert.Equal (Color.White, attr.Background);
 
-			attr = new TrueColorAttribute (new TrueColor (192, 192, 192), new TrueColor (0, 0, 0));
+			attr = new Attribute (new TrueColor (192, 192, 192), new TrueColor (0, 0, 0));
 			Assert.Equal (Color.Gray, attr.Foreground);
 			Assert.Equal (Color.Black, attr.Background);
 

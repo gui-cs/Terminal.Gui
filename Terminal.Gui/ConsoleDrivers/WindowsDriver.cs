@@ -111,7 +111,9 @@ namespace Terminal.Gui {
 
 				if (attr != prev) {
 					prev = attr;
-					if (attr is TrueColorAttribute tca) {
+					
+					// TODO: this is now always true
+					if (attr is Attribute tca) {
 						stringBuilder.Append (SendTrueColorFg);
 						stringBuilder.Append (tca.TrueColorForeground.Red);
 						stringBuilder.Append (';');

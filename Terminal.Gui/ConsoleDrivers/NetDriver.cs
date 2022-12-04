@@ -1526,19 +1526,19 @@ namespace Terminal.Gui {
 		{
 			System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
-			if ((UseTrueColor) && (attr is TrueColorAttribute tca)) {
+			if (UseTrueColor) {
 				sb.Append (new [] { '\x1b', '[', '3', '8', ';', '2', ';' });
-				sb.Append (tca.TrueColorForeground.Red);
+				sb.Append (attr.TrueColorForeground.Red);
 				sb.Append (';');
-				sb.Append (tca.TrueColorForeground.Green);
+				sb.Append (attr.TrueColorForeground.Green);
 				sb.Append (';');
-				sb.Append (tca.TrueColorForeground.Blue);
+				sb.Append (attr.TrueColorForeground.Blue);
 				sb.Append (new [] { ';', '4', '8', ';', '2', ';' });
-				sb.Append (tca.TrueColorBackground.Red);
+				sb.Append (attr.TrueColorBackground.Red);
 				sb.Append (';');
-				sb.Append (tca.TrueColorBackground.Green);
+				sb.Append (attr.TrueColorBackground.Green);
 				sb.Append (';');
-				sb.Append (tca.TrueColorBackground.Blue);
+				sb.Append (attr.TrueColorBackground.Blue);
 				sb.Append ('m');
 			} else {
 				const string CSI = "\x1b[";

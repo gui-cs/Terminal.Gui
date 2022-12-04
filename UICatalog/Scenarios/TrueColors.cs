@@ -81,16 +81,11 @@ namespace UICatalog.Scenarios {
 			Win.Add (lblBlue);
 
 			Application.RootMouseEvent = (e) => {
+				var normal = e.View.GetNormalColor ();
 				if (e.View != null) {
-					if (e.View.GetNormalColor () is TrueColorAttribute colorAttribute) {
-						lblRed.Text = colorAttribute.TrueColorForeground.Red.ToString();
-						lblGreen.Text = colorAttribute.TrueColorForeground.Green.ToString ();
-						lblBlue.Text = colorAttribute.TrueColorForeground.Blue.ToString ();
-					} else {
-						lblRed.Text = "na";
-						lblGreen.Text = "na";
-						lblBlue.Text = "na";
-					}
+					lblRed.Text = normal.TrueColorForeground.Red.ToString();
+					lblGreen.Text = normal.TrueColorForeground.Green.ToString ();
+					lblBlue.Text = normal.TrueColorForeground.Blue.ToString ();
 				}
 			};
 		}
@@ -106,7 +101,10 @@ namespace UICatalog.Scenarios {
 				var l = new Label (" ") {
 					X = dx++,
 					Y = y,
-					ColorScheme = new ColorScheme () { Normal = new TrueColorAttribute (colorFunc(i > 255 ? 255 : i)) }
+					ColorScheme = new ColorScheme () { Normal = new Terminal.Gui.Attribute (
+						colorFunc (i > 255 ? 255 : i),
+						colorFunc (i > 255 ? 255 : i)
+						) }
 				};
 				Win.Add (l);
 			}
