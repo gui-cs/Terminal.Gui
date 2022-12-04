@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = Table == null ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
+			set => columnOffset = TableIsNullOrInvisible() ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
 		}
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int RowOffset {
 			get => rowOffset;
-			set => rowOffset = Table == null ? 0 : Math.Max (0, Math.Min (Table.Rows.Count - 1, value));
+			set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows.Count - 1, value));
 		}
 
 		/// <summary>
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 				var oldValue = selectedColumn;
 
 				//try to prevent this being set to an out of bounds column
-				selectedColumn = Table == null ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+				selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
 
 				if (oldValue != selectedColumn)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, oldValue, SelectedColumn, SelectedRow, SelectedRow));
@@ -146,7 +146,7 @@ namespace Terminal.Gui {
 
 				var oldValue = selectedRow;
 
-				selectedRow = Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+				selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
 
 				if (oldValue != selectedRow)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, SelectedColumn, SelectedColumn, oldValue, selectedRow));
@@ -315,7 +315,7 @@ namespace Terminal.Gui {
 				var rowToRender = RowOffset + (line - headerLinesConsumed);
 
 				//if we have run off the end of the table
-				if (Table == null || rowToRender >= Table.Rows.Count || rowToRender < 0)
+				if (TableIsNullOrInvisible () || rowToRender >= Table.Rows.Count || rowToRender < 0)
 					continue;
 
 				RenderRow (line, rowToRender, columnsToRender);
@@ -427,6 +427,36 @@ namespace Terminal.Gui {
 
 		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
 		{
+			/*
+			 *  First lets work out if we should be rendering scroll indicators
+			 */
+
+			// are there are visible columns to the left that have been pushed
+			// off the screen due to horizontal scrolling?
+			bool moreColumnsToLeft = ColumnOffset > 0;
+
+			// if we moved left would we find a new column (or are they all invisible?)
+			if(!TryGetNearestVisibleColumn (ColumnOffset-1, false, false, out _)) {
+				moreColumnsToLeft = false;
+			}
+
+			// are there visible columns to the right that have not yet been reached?
+			// lets find out, what is the column index of the last column we are rendering
+			int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
+			
+			// are there more valid indexes?
+			bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns.Count;
+
+			// if we went right from the last column would we find a new visible column?
+			if(!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _)) {
+				// no we would not
+				moreColumnsToRight = false;
+			}
+
+			/*
+			 *  Now lets draw the line itself
+			 */
+
 			// Renders a line below the table headers (when visible) like:
 			// ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
 
@@ -436,7 +466,7 @@ namespace Terminal.Gui {
 				// whole way but update to instead draw a header indicator
 				// or scroll arrow etc
 				var rune = Driver.HLine;
-
+				
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
 						// for first character render line
@@ -445,7 +475,7 @@ namespace Terminal.Gui {
 						// unless we have horizontally scrolled along
 						// in which case render an arrow, to indicate user
 						// can scroll left
-						if(Style.ShowHorizontalScrollIndicators && ColumnOffset > 0)
+						if(Style.ShowHorizontalScrollIndicators && moreColumnsToLeft)
 						{
 							rune = Driver.LeftArrow;
 							scrollLeftPoint = new Point(c,row);
@@ -465,8 +495,7 @@ namespace Terminal.Gui {
 						// unless there is more of the table we could horizontally
 						// scroll along to see. In which case render an arrow,
 						// to indicate user can scroll right
-						if(Style.ShowHorizontalScrollIndicators &&
-							ColumnOffset + columnsToRender.Length < Table.Columns.Count)
+						if(Style.ShowHorizontalScrollIndicators && moreColumnsToRight)
 						{
 							rune = Driver.RightArrow;
 							scrollRightPoint = new Point(c,row);
@@ -683,7 +712,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();
 				return false;
 			}
@@ -705,6 +734,12 @@ namespace Terminal.Gui {
 		/// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
 		public void SetSelection (int col, int row, bool extendExistingSelection)
 		{
+			// if we are trying to increase the column index then
+			// we are moving right otherwise we are moving left
+			bool lookRight = col > selectedColumn;
+
+			col = GetNearestVisibleColumn (col, lookRight, true);
+
 			if (!MultiSelect || !extendExistingSelection)
 				MultiSelectedRegions.Clear ();
 
@@ -804,7 +839,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SelectAll ()
 		{
-			if (Table == null || !MultiSelect || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible() || !MultiSelect || Table.Rows.Count == 0)
 				return;
 
 			MultiSelectedRegions.Clear ();
@@ -820,7 +855,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
-			if (Table == null || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
 				yield break;
 
 			EnsureValidSelection ();
@@ -880,13 +915,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>)
+		/// <para>
+		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>).
+		/// </para>
+		/// <remarks>Returns <see langword="false"/> if <see cref="ColumnStyle.Visible"/> is <see langword="false"/>.</remarks>
 		/// </summary>
 		/// <param name="col"></param>
 		/// <param name="row"></param>
 		/// <returns></returns>
 		public bool IsSelected (int col, int row)
 		{
+			if(!IsColumnVisible(col)) {
+				return false;
+			}	
+
 			// Cell is also selected if in any multi selection region
 			if (MultiSelect && MultiSelectedRegions.Any (r => r.Rect.Contains (col, row)))
 				return true;
@@ -900,11 +942,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Returns true if the given <paramref name="columnIndex"/> indexes a visible
+		/// column otherwise false.  Returns false for indexes that are out of bounds.
+		/// </summary>
+		/// <param name="columnIndex"></param>
+		/// <returns></returns>
+		private bool IsColumnVisible (int columnIndex)
+		{
+			// if the column index provided is out of bounds
+			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+				return false;
+			}
+
+			return this.Style.GetColumnStyleIfAny (Table.Columns [columnIndex])?.Visible ?? true;
+		}
+
+		/// <summary>
 		/// Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base implementation if active cell is not visible due to scrolling or table is loaded etc
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				base.PositionCursor ();
 				return;
 			}
@@ -927,7 +985,7 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (TableIsNullOrInvisible ()) {
 				return false;
 			}
 
@@ -997,15 +1055,28 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
 		/// </summary>
-		/// <param name="clientX">X offset from the top left of the control</param>
-		/// <param name="clientY">Y offset from the top left of the control</param>
-		/// <returns></returns>
+		/// <param name="clientX">X offset from the top left of the control.</param>
+		/// <param name="clientY">Y offset from the top left of the control.</param>
+		/// <returns>Cell clicked or null.</returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			return ScreenToCell(clientX, clientY, out _);
+		}
+
+		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+		/// <param name="clientX">X offset from the top left of the control.</param>
+		/// <param name="clientY">Y offset from the top left of the control.</param>
+		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+		public Point? ScreenToCell (int clientX, int clientY, out DataColumn headerIfAny)
+		{
+			headerIfAny = null;
+
+			if (TableIsNullOrInvisible ())
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1015,10 +1086,19 @@ namespace Terminal.Gui {
 			var col = viewPort.LastOrDefault (c => c.X <= clientX);
 
 			// Click is on the header section of rendered UI
-			if (clientY < headerHeight)
+			if (clientY < headerHeight) {
+				headerIfAny = col?.Column;
 				return null;
+			}
+				
 
 			var rowIdx = RowOffset - headerHeight + clientY;
+
+			// if click is off bottom of the rows don't give an
+			// invalid index back to user!
+			if (rowIdx >= Table.Rows.Count) {
+				return null;
+			}	
 
 			if (col != null && rowIdx >= 0) {
 
@@ -1036,7 +1116,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (TableIsNullOrInvisible ())
 				return null;
 
 			var viewPort = CalculateViewport (Bounds);
@@ -1065,7 +1145,7 @@ namespace Terminal.Gui {
 		/// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void Update ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				SetNeedsDisplay ();
 				return;
 			}
@@ -1084,7 +1164,7 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureValidScrollOffsets ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible ()) {
 				return;
 			}
 
@@ -1099,7 +1179,7 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureValidSelection ()
 		{
-			if (Table == null) {
+			if (TableIsNullOrInvisible()) {
 
 				// Table doesn't exist, we should probably clear those selections
 				MultiSelectedRegions.Clear ();
@@ -1108,6 +1188,9 @@ namespace Terminal.Gui {
 
 			SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns.Count - 1), 0);
 			SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows.Count - 1), 0);
+
+			// If SelectedColumn is invisible move it to a visible one
+			SelectedColumn = GetNearestVisibleColumn (SelectedColumn, lookRight: true, true);
 
 			var oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
 
@@ -1137,7 +1220,100 @@ namespace Terminal.Gui {
 
 				MultiSelectedRegions.Push (region);
 			}
+		}
 
+		/// <summary>
+		/// Returns true if the <see cref="Table"/> is not set or all the
+		/// <see cref="DataColumn"/> in the <see cref="Table"/> have an explicit
+		/// <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/>
+		/// <see langword="false"/>.
+		/// </summary>
+		/// <returns></returns>
+		private bool TableIsNullOrInvisible ()
+		{
+			return Table == null ||
+				Table.Columns.Count <= 0 ||
+				Table.Columns.Cast<DataColumn> ().All (
+				c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false);
+		}
+
+		/// <summary>
+		/// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for
+		/// the indexed <see cref="DataColumn"/>.  If so then the index returned is nudged to the nearest visible
+		/// column.
+		/// </summary>
+		/// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
+		/// <param name="columnIndex">The input column index.</param>
+		/// <param name="lookRight">When nudging invisible selections look right first.
+		/// <see langword="true"/> to look right, <see langword="false"/> to look left.</param>
+		/// <param name="allowBumpingInOppositeDirection">If we cannot find anything visible when
+		/// looking in direction of <paramref name="lookRight"/> then should we look in the opposite
+		/// direction instead? Use true if you want to push a selection to a valid index no matter what.
+		/// Use false if you are primarily interested in learning about directional column visibility.</param>
+		private int GetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection)
+		{
+			if(TryGetNearestVisibleColumn(columnIndex,lookRight,allowBumpingInOppositeDirection, out var answer))
+			{
+				return answer;
+			}
+
+			return columnIndex;
+		}
+
+		private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
+		{
+			// if the column index provided is out of bounds
+			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+
+				idx = columnIndex;
+				return false;
+			}
+
+			// get the column visibility by index (if no style visible is true)
+			bool [] columnVisibility = Table.Columns.Cast<DataColumn> ()
+				.Select (c => this.Style.GetColumnStyleIfAny (c)?.Visible ?? true)
+				.ToArray();
+
+			// column is visible
+			if (columnVisibility [columnIndex]) {
+				idx = columnIndex;
+				return true;
+			}
+
+			int increment = lookRight ? 1 : -1;
+
+			// move in that direction
+			for (int i = columnIndex; i >=0 && i < columnVisibility.Length; i += increment) {
+				// if we find a visible column
+				if(columnVisibility [i]) 
+				{
+					idx = i;
+					return true;
+				}
+			}
+
+			// Caller only wants to look in one direction and we did not find any
+			// visible columns in that direction
+			if(!allowBumpingInOppositeDirection) {
+				idx = columnIndex;
+				return false;
+			}
+
+			// Caller will let us look in the other direction so
+			// now look other way
+			increment = -increment;
+
+			for (int i = columnIndex; i >= 0 && i < columnVisibility.Length; i += increment) {
+				// if we find a visible column
+				if (columnVisibility [i]) {
+					idx = i;
+					return true;
+				}
+			}
+
+			// nothing seems to be visible so just return input index
+			idx = columnIndex;
+			return false;
 		}
 
 		/// <summary>
@@ -1217,7 +1393,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (Table == null || Table.Columns.Count <= 0)
+			if (TableIsNullOrInvisible ())
 				yield break;
 
 			int usedSpace = 0;
@@ -1241,6 +1417,12 @@ namespace Terminal.Gui {
 				int startingIdxForCurrentHeader = usedSpace;
 				var colStyle = Style.GetColumnStyleIfAny (col);
 				int colWidth;
+
+				// if column is not being rendered
+				if(colStyle?.Visible == false) {
+					// do not add it to the returned columns
+					continue;
+				}
 
 				// is there enough space for this column (and it's data)?
 				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
@@ -1289,7 +1471,7 @@ namespace Terminal.Gui {
 
 		private bool ShouldRenderHeaders ()
 		{
-			if (Table == null || Table.Columns.Count == 0)
+			if (TableIsNullOrInvisible ())
 				return false;
 
 			return Style.AlwaysShowHeaders || rowOffset == 0;
@@ -1397,6 +1579,7 @@ namespace Terminal.Gui {
 			/// Return null for the default
 			/// </summary>
 			public CellColorGetterDelegate ColorGetter;
+			private bool visible = true;
 
 			/// <summary>
 			/// Defines the format for values e.g. "yyyy-MM-dd" for dates
@@ -1426,6 +1609,15 @@ namespace Terminal.Gui {
 			/// Enables flexible sizing of this column based on available screen space to render into.
 			/// </summary>
 			public int MinAcceptableWidth { get; set; } = DefaultMinAcceptableWidth;
+
+			/// <summary>
+			/// Gets or Sets a value indicating whether the column should be visible to the user.
+			/// This affects both whether it is rendered and whether it can be selected. Defaults to
+			/// true.
+			/// </summary>
+			/// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
+			public bool Visible { get => MaxWidth >= 0 && visible; set => visible = value; }
+
 
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>

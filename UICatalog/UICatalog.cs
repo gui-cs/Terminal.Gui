@@ -150,12 +150,12 @@ namespace UICatalog {
 		class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
-	    
+
 			public FrameView LeftPane;
 			public ListView CategoryListView;
 			public FrameView RightPane;
 			public ListView ScenarioListView;
-	    
+
 			public StatusItem Capslock;
 			public StatusItem Numlock;
 			public StatusItem Scrolllock;

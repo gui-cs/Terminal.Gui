@@ -4137,5 +4137,31 @@ This TextFormatter (tf2) is rewritten.
 			text = $"First Line 界\nSecond Line 界\nThird Line 界\n";
 			Assert.Equal (14, TextFormatter.MaxWidthLine (text));
 		}
+
+		[Fact]
+		public void Ustring_Array_Is_Not_Equal_ToRunes_Array_And_String_Array ()
+		{
+			var text = "New Test 你";
+			ustring us = text;
+			string s = text;
+			Assert.Equal (10, us.RuneCount);
+			Assert.Equal (10, s.Length);
+			// The reason is ustring index is related to byte length and not rune length
+			Assert.Equal (12, us.Length);
+			Assert.NotEqual (20320, us [9]);
+			Assert.Equal (20320, s [9]);
+			Assert.Equal (228, us [9]);
+			Assert.Equal ("ä", ((Rune)us [9]).ToString ());
+			Assert.Equal ("你", s [9].ToString ());
+
+			// Rune array is equal to string array
+			var usToRunes = us.ToRunes ();
+			Assert.Equal (10, usToRunes.Length);
+			Assert.Equal (10, s.Length);
+			Assert.Equal (20320, (int)usToRunes [9]);
+			Assert.Equal (20320, s [9]);
+			Assert.Equal ("你", ((Rune)usToRunes [9]).ToString ());
+			Assert.Equal ("你", s [9].ToString ());
+		}
 	}
 }
