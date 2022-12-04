@@ -1942,6 +1942,7 @@ namespace Terminal.Gui.Views {
 				var tv = new TextView ();
 				tv.LoadStream (stream);
 
+				Assert.Equal (14, buff.Length);
 				Assert.False (tv.AllowsNullTerminated);
 				Assert.Equal (text.Length, tv.Text.Length);
 				Assert.Equal (text, tv.Text);
@@ -1958,6 +1959,48 @@ namespace Terminal.Gui.Views {
 				tv.AllowsNullTerminated = true;
 				tv.LoadStream (stream);
 
+				Assert.Equal (14, buff.Length);
+				Assert.Equal (buff.Length, tv.Text.Length);
+				Assert.NotEqual (text, tv.Text);
+				Assert.Equal (buff, tv.Text);
+				Assert.False (tv.IsDirty);
+				Assert.Equal ('\u2400', ConsoleDriver.MakePrintable ((char)tv.Text [1]));
+			}
+		}
+
+		[Fact]
+		public void LoadStream_IsDirty_AllowsNullTerminator_With_Null_On_The_Text ()
+		{
+			var text = "Test\0ing";
+			byte [] buff = System.Text.Encoding.Unicode.GetBytes (text);
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream (buff, true)) {
+
+				stream.Write (buff, 0, buff.Length);
+				stream.Position = 0;
+
+				var tv = new TextView ();
+				tv.LoadStream (stream);
+
+				Assert.Equal (16, buff.Length);
+				Assert.False (tv.AllowsNullTerminated);
+				Assert.NotEqual (text.Length, tv.Text.Length);
+				Assert.Equal (8, text.Length);
+				Assert.Equal (7, tv.Text.Length);
+				Assert.NotEqual (text, tv.Text);
+				Assert.False (tv.IsDirty);
+			}
+
+			buff = System.Text.Encoding.Unicode.GetBytes (text);
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream (buff, true)) {
+
+				stream.Write (buff, 0, buff.Length);
+				stream.Position = 0;
+
+				var tv = new TextView ();
+				tv.AllowsNullTerminated = true;
+				tv.LoadStream (stream);
+
+				Assert.Equal (16, buff.Length);
 				Assert.Equal (buff.Length, tv.Text.Length);
 				Assert.NotEqual (text, tv.Text);
 				Assert.Equal (buff, tv.Text);
