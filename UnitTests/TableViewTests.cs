@@ -1098,6 +1098,331 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		private TableView GetABCDEFTableView (out DataTable dt)
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visible
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = false;
+
+			dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.Table = dt;
+
+			return tableView;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_IsNotRendered()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│A│C│D│
+│1│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_IsNotRendered ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│B│C│D│
+├─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["C"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+
+			// expect nothing to be rendered when all columns are invisible
+			string expected =
+				@"
+";
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// expect behavior to match when Table is null
+			tableView.Table = null;
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because DEF are of screen
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if DEF are invisible we shouldn't be showing the indicator
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│A│B│C│
+├─┼─┼─┤
+│1│2│3│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.ColumnOffset = 1;
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because A,E and F are of screen
+			string expected =
+				@"
+│B│C│D│
+◄─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if E and F are invisible so we shouldn't show right
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+◄─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// now also A is invisible so we cannot scroll in either direction
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+├─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			// Expect the cursor navigation to skip over the invisible column(s)
+			Assert.Equal(2,tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			// Expect the cursor navigation backwards to skip over invisible column too
+			Assert.Equal (0, tableView.SelectedColumn);
+		}
+
+		[InlineData(true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1(bool useHome)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			Assert.Equal (0, tableView.SelectedColumn);
+
+			// column 0 is invisible so this method should move to 1
+			tableView.EnsureValidSelection();
+			Assert.Equal (1, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = useHome ? Key.Home : Key.CursorLeft 
+			});
+
+			// Expect the cursor to stay at 1
+			Assert.Equal (1, tableView.SelectedColumn);
+		}
+
+		[InlineData (true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+						
+			// select D 
+			tableView.SelectedColumn = 3;
+			Assert.Equal (3, tableView.SelectedColumn);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			// column D is invisible so this method should move to 2 (C)
+			tableView.EnsureValidSelection ();
+			Assert.Equal (2, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent {
+				Key = useEnd ? Key.End : Key.CursorRight
+			});
+
+			// Expect the cursor to stay at 2
+			Assert.Equal (2, tableView.SelectedColumn);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelected ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// user has rectangular selection 
+			tableView.MultiSelectedRegions.Push (
+				new TableView.TableSelection(
+					new Point(0,0),
+					new Rect(0, 0, 3, 1))
+				);
+
+			Assert.Equal (3, tableView.GetAllSelectedCells ().Count());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.True (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			// it should not be included in the selection
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain(new Point(1,0),tableView.GetAllSelectedCells ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight | Key.ShiftMask });
+
+			// Selection should extend from A to C but skip B
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+		}
+		
+		[Theory, AutoInitShutdown]
+		[InlineData(new object[] { true,true })]
+		[InlineData (new object[] { false,true })]
+		[InlineData (new object [] { true, false})]
+		[InlineData (new object [] { false, false})]
+		public void TestColumnStyle_VisibleFalse_DoesNotEffect_EnsureSelectedCellIsVisible (bool smooth, bool invisibleCol)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			tableView.Style.SmoothHorizontalScrolling = smooth;
+			
+			if(invisibleCol) {
+				tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			}
+
+			// New TableView should have first cell selected 
+			Assert.Equal (0,tableView.SelectedColumn);
+			// With no scrolling
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// A,B and C are visible on screen at the moment so these should have no effect
+			tableView.SelectedColumn = 1;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			tableView.SelectedColumn = 2;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// Selecting D should move the visible table area to fit D onto the screen
+			tableView.SelectedColumn = 3;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
+		}
 		[Fact]
 		public void LongColumnTest ()
 		{
