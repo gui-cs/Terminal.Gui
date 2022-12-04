@@ -277,9 +277,7 @@ namespace Terminal.Gui {
 		{
 			var padding = Border.GetSumThickness ();
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-			//var borderLength = Border.DrawMarginFrame ? 1 : 0;
 
-			// FIXED: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
