@@ -415,7 +415,7 @@ namespace UICatalog.Scenarios {
 			try {
 				var dt = new DataTable ();
 
-reader.Read ();
+				reader.Read ();
 
 				if (reader.ReadHeader ()) {
 					foreach (var h in reader.HeaderRecord) {
