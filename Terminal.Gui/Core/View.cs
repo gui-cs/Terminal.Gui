@@ -3065,6 +3065,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
+		/// </summary>
+		/// <returns><see cref="Terminal.Gui.ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// If it's overridden can return other values.</returns>
+		public virtual Attribute GetHotNormalColor ()
+		{
+			return Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
+		}
+
+		/// <summary>
 		/// Get the top superview of a given <see cref="View"/>.
 		/// </summary>
 		/// <returns>The superview view.</returns>
