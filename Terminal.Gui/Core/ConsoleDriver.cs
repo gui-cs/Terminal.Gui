@@ -347,6 +347,9 @@ namespace Terminal.Gui {
 
 		private TrueColor ConsoleColorToTrueColor (Color consoleColor)
 		{
+			// Brown in cmd is 
+			// C1 9C 00
+
 			switch (consoleColor) {
 			case Color.Black: return new TrueColor (0, 0, 0);
 			case Color.Blue: return new TrueColor (0, 0, 0x80);
@@ -354,7 +357,7 @@ namespace Terminal.Gui {
 			case Color.Cyan: return new TrueColor (0, 0x80, 0x80);
 			case Color.Red: return new TrueColor (0x80, 0, 0);
 			case Color.Magenta: return new TrueColor (0x80, 0, 0x80);
-			case Color.Brown: return new TrueColor (0xA5, 0x2A, 0x2A); // TODO confirm this
+			case Color.Brown: return new TrueColor (0xC1, 0x9C, 0x00); // TODO confirm this
 			case Color.Gray: return new TrueColor (0xC0, 0xC0, 0xC0);
 			case Color.DarkGray: return new TrueColor (0x80, 0x80, 0x80);
 			case Color.BrightBlue: return new TrueColor (0, 0, 0xFF);
@@ -385,7 +388,7 @@ namespace Terminal.Gui {
 				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
 				{ new TrueColor (0x80, 0, 0),Color.Red},
 				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
-				{ new TrueColor (0xA5, 0x2A, 0x2A),Color.Brown},  // TODO confirm this
+				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
 				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
 				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
 				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},

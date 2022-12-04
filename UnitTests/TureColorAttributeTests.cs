@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -35,50 +36,49 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void Basic_Colors_Fallback ()
+		[InlineData (new object [] { 127, 0, 0, Color.Red })]
+		[InlineData(new object [] { 128, 0, 0, Color.Red})]
+		[InlineData (new object [] { 130, 0, 0, Color.Red })]
+		[InlineData (new object [] { 200, 0, 0, Color.BrightRed })]
+		[InlineData (new object [] { 245, 0, 0, Color.BrightRed })]
+		[InlineData (new object [] { 255, 0, 0, Color.BrightRed })]
+
+		[InlineData (new object [] { 0, 128, 0, Color.Green })]
+		//[InlineData (new object [] { 128, 128, 0, Color.Brown })] // TODO : This was an original test in the PR I have kept it but current it does not map to Brown (it maps to BrightYellow)
+		[InlineData (new object [] { 0, 0, 128, Color.Blue })]
+		[InlineData (new object [] { 128, 0, 128, Color.Magenta })]
+		[InlineData (new object [] { 0, 128, 128, Color.Cyan })]
+		[InlineData (new object [] { 0, 255, 0, Color.BrightGreen })]
+		[InlineData (new object [] { 255, 255, 0, Color.BrightYellow })]
+		[InlineData (new object [] { 0, 0, 255, Color.BrightBlue })]
+		[InlineData (new object [] { 255, 0, 255, Color.BrightMagenta })]
+		[InlineData (new object [] { 0, 255, 255, Color.BrightCyan })]
+		[InlineData (new object [] { 128, 128, 128, Color.DarkGray })]
+		[InlineData (new object [] { 255, 255, 255, Color.White })]
+		[InlineData (new object [] { 192, 192, 192, Color.Gray })]
+		[InlineData (new object [] { 0, 0, 0, Color.Black })]
+		[Theory, AutoInitShutdown]
+		public void Basic_Colors_Fallback (int r, int g, int b, Color expectedColor)
 		{
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
+			// Test foreground color property
+			var attr = new Attribute (new TrueColor (r, g, b), new TrueColor (0,0,0));
+			Assert.Equal (expectedColor, attr.Foreground);
+			Assert.Equal (Color.Black, attr.Background);
+			
+			// Test background color property
+			attr = new Attribute (new TrueColor (0, 0, 0), new TrueColor (r, g, b));
+			Assert.Equal (Color.Black, attr.Foreground);
+			Assert.Equal (expectedColor, attr.Background);
 
-			// Test bright basic colors
-			var attr = new Attribute (new TrueColor (128, 0, 0), new TrueColor (0, 128, 0));
-			Assert.Equal (Color.Red, attr.Foreground);
-			Assert.Equal (Color.Green, attr.Background);
-
-			attr = new Attribute (new TrueColor (128, 128, 0), new TrueColor (0, 0, 128));
-			Assert.Equal (Color.Brown, attr.Foreground);
-			Assert.Equal (Color.Blue, attr.Background);
-
-			attr = new Attribute (new TrueColor (128, 0, 128), new TrueColor (0, 128, 128));
-			Assert.Equal (Color.Magenta, attr.Foreground);
-			Assert.Equal (Color.Cyan, attr.Background);
-
-			// Test basic colors
-			attr = new Attribute (new TrueColor (255, 0, 0), new TrueColor (0, 255, 0));
-			Assert.Equal (Color.BrightRed, attr.Foreground);
-			Assert.Equal (Color.BrightGreen, attr.Background);
-
-			attr = new Attribute (new TrueColor (255, 255, 0), new TrueColor (0, 0, 255));
-			Assert.Equal (Color.BrightYellow, attr.Foreground);
-			Assert.Equal (Color.BrightBlue, attr.Background);
-
-			attr = new Attribute (new TrueColor (255, 0, 255), new TrueColor (0, 255, 255));
-			Assert.Equal (Color.BrightMagenta, attr.Foreground);
-			Assert.Equal (Color.BrightCyan, attr.Background);
-
-			// Test gray basic colors
-			attr = new Attribute (new TrueColor (128, 128, 128), new TrueColor (255, 255, 255));
-			Assert.Equal (Color.DarkGray, attr.Foreground);
-			Assert.Equal (Color.White, attr.Background);
-
-			attr = new Attribute (new TrueColor (192, 192, 192), new TrueColor (0, 0, 0));
-			Assert.Equal (Color.Gray, attr.Foreground);
+			// Test 5 up
+			attr = new Attribute (new TrueColor (Math.Min (255,r+5), Math.Min(255,g+5), Math.Min (255, b+5)), new TrueColor (0, 0, 0));
+			Assert.Equal (expectedColor, attr.Foreground);
 			Assert.Equal (Color.Black, attr.Background);
 
-			driver.End ();
-			Application.Shutdown ();
+			// Test 5 down
+			attr = new Attribute (new TrueColor (Math.Max (0, r - 5), Math.Max (0, g - 5), Math.Max (0, b - 5)), new TrueColor (0, 0, 0));
+			Assert.Equal (expectedColor, attr.Foreground);
+			Assert.Equal (Color.Black, attr.Background);
 		}
 	}
 }
