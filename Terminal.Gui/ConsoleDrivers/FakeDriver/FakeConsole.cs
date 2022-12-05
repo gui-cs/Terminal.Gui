@@ -1401,7 +1401,10 @@ namespace Terminal.Gui {
 		/// <param name="buffer"></param>
 		public static void Write (char [] buffer)
 		{
-			throw new NotImplementedException ();
+			_buffer [CursorLeft, CursorTop] = (char)0;
+			foreach (var ch in buffer) {
+				_buffer [CursorLeft, CursorTop] += ch;
+			}
 		}
 
 		//

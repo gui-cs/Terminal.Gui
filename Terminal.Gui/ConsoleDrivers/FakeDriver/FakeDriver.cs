@@ -104,12 +104,12 @@ namespace Terminal.Gui {
 					needMove = false;
 				}
 				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
 
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
 
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 					contents [crow, ccol + 1, 2] = 1;
@@ -234,7 +234,12 @@ namespace Terminal.Gui {
 						if (color != redrawColor)
 							SetColor (color);
 
-						FakeConsole.Write ((char)contents [row, col, 0]);
+						Rune rune = contents [row, col, 0];
+						if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+							FakeConsole.Write (spair);
+						} else {
+							FakeConsole.Write ((char)rune);
+						}
 						contents [row, col, 2] = 0;
 					}
 				}
