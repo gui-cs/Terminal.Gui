@@ -1242,12 +1242,12 @@ namespace Terminal.Gui {
 
 			if (validClip) {
 				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
 
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
 
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 					contents [crow, ccol + 1, 2] = 1;
@@ -1483,10 +1483,9 @@ namespace Terminal.Gui {
 							output.Append (WriteAttributes (attr));
 						}
 						outputWidth++;
-						var rune = contents [row, col, 0];
-						char [] spair;
-						if (Rune.DecodeSurrogatePair((uint) rune, out spair)) {
-							output.Append (spair);
+						Rune rune = contents [row, col, 0];
+						if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+							output.Append (spair).Append ('\ufeff');
 						} else {
 							output.Append ((char)rune);
 						}

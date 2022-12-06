@@ -451,5 +451,27 @@ namespace Terminal.Gui.Views {
 			lv.SetSourceAsync (null);
 			Assert.NotNull (lv.Source);
 		}
+
+		[Fact]
+		public void ListWrapper_StartsWith ()
+		{
+			var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+
+			Assert.Equal (1, lw.StartsWith ("t"));
+			Assert.Equal (1, lw.StartsWith ("tw"));
+			Assert.Equal (2, lw.StartsWith ("th"));
+			Assert.Equal (1, lw.StartsWith ("T"));
+			Assert.Equal (1, lw.StartsWith ("TW"));
+			Assert.Equal (2, lw.StartsWith ("TH"));
+
+			lw = new ListWrapper (new List<NStack.ustring> { "One", "Two", "Three" });
+
+			Assert.Equal (1, lw.StartsWith ("t"));
+			Assert.Equal (1, lw.StartsWith ("tw"));
+			Assert.Equal (2, lw.StartsWith ("th"));
+			Assert.Equal (1, lw.StartsWith ("T"));
+			Assert.Equal (1, lw.StartsWith ("TW"));
+			Assert.Equal (2, lw.StartsWith ("TH"));
+		}
 	}
 }
