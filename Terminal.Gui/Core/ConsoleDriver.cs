@@ -681,7 +681,7 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
@@ -696,11 +696,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			var controlChars = c & 0xFFFF;
-			if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
+			if (c <= 0x1F || (c >= 0X7F && c <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (controlChars + 0x2400);
+				return new Rune (c + 0x2400);
 			}
 
 			return c;

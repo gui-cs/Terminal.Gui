@@ -1654,5 +1654,85 @@ Edit
 			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_In_Window_Without_Other_Views ()
+		{
+			var win = new Window ();
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuBarItem ("Delete", new MenuItem [] {
+						new MenuItem ("All", "", null),
+						new MenuItem ("Selected", "", null)
+					})
+				})
+			}); ;
+			win.Add (menu);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│                     │
+│      └─────────┘                     │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│┌───────────┐        │
+│      └─────────┘│ All       │        │
+│                 │ Selected  │        │
+│                 └───────────┘        │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+		}
 	}
 }
