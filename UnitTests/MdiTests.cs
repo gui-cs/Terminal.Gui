@@ -30,9 +30,11 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 
+#if DEBUG_IDISPOSABLE
 			Assert.Equal (2, Responder.Instances.Count);
 			Assert.True (Responder.Instances [0].WasDisposed);
 			Assert.True (Responder.Instances [1].WasDisposed);
+#endif
 		}
 
 		[Fact]
@@ -45,10 +47,11 @@ namespace Terminal.Gui.Core {
 			Application.End (rs);
 
 			Application.Shutdown ();
-
+#if DEBUG_IDISPOSABLE
 			Assert.Equal (2, Responder.Instances.Count);
 			Assert.True (Responder.Instances [0].WasDisposed);
 			Assert.True (Responder.Instances [1].WasDisposed);
+#endif
 		}
 
 		[Fact, AutoInitShutdown]

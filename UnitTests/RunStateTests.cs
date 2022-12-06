@@ -40,8 +40,9 @@ namespace Terminal.Gui.Core {
 
 			// Should not throw because Toplevel was null
 			rs.Dispose ();
+#if DEBUG_IDISPOSABLE
 			Assert.True (rs.WasDisposed);
-
+#endif
 			var top = new Toplevel ();
 			rs = new Application.RunState (top);
 			Assert.NotNull (rs);
@@ -52,8 +53,10 @@ namespace Terminal.Gui.Core {
 			rs.Toplevel.Dispose ();
 			rs.Toplevel = null;
 			rs.Dispose ();
+#if DEBUG_IDISPOSABLE
 			Assert.True (rs.WasDisposed);
 			Assert.True (top.WasDisposed);
+#endif
 		}
 
 		void Init ()
@@ -67,10 +70,12 @@ namespace Terminal.Gui.Core {
 		void Shutdown ()
 		{
 			Application.Shutdown ();
+#if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding RunState-based instances left
 			foreach (var inst in Application.RunState.Instances) {
 				Assert.True (inst.WasDisposed);
 			}
+#endif
 		}
 
 		[Fact]
@@ -95,7 +100,9 @@ namespace Terminal.Gui.Core {
 
 			Shutdown ();
 
+#if DEBUG_IDISPOSABLE
 			Assert.True (rs.WasDisposed);
+#endif
 
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);

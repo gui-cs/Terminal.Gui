@@ -75,13 +75,14 @@ namespace Terminal.Gui.Core {
 
 			// Verify state is back to initial
 			Pre_Init_State ();
-
+#if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding Responder-based instances 
 			// after a scenario was selected to run. This proves the main UI Catalog
 			// 'app' closed cleanly.
 			foreach (var inst in Responder.Instances) {
 				Assert.True (inst.WasDisposed);
 			}
+#endif
 		}
 
 		[Fact]
@@ -91,8 +92,10 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 
+#if DEBUG_IDISPOSABLE
 			Assert.Single (Responder.Instances);
 			Assert.True (Responder.Instances [0].WasDisposed);
+#endif
 		}
 
 		[Fact]
