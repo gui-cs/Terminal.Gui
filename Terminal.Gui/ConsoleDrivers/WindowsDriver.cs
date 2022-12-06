@@ -60,9 +60,9 @@ namespace Terminal.Gui {
 			ConsoleMode = newConsoleMode;
 		}
 
-		public CharInfo [] OriginalStdOutChars;
+		public CharInfo [,] OriginalStdOutChars;
 
-		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (Size size, CharInfo [,] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 
-			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+			OriginalStdOutChars = new CharInfo [size.Height, size.Width];
 
 			if (!ReadConsoleOutput (ScreenBuffer, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
@@ -558,19 +558,19 @@ namespace Terminal.Gui {
 			uint nLength,
 			out uint lpNumberOfEventsRead);
 
-		[DllImport ("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleOutputW", SetLastError = true, CharSet = CharSet.Unicode)]
 		static extern bool ReadConsoleOutput (
 			IntPtr hConsoleOutput,
-			[Out] CharInfo [] lpBuffer,
+			[MarshalAs (UnmanagedType.LPArray), Out] CharInfo [,] lpBuffer,
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpReadRegion
 		);
 
-		[DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutput", SetLastError = true, CharSet = CharSet.Unicode)]
+		[DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutputW", SetLastError = true, CharSet = CharSet.Unicode)]
 		static extern bool WriteConsoleOutput (
 			IntPtr hConsoleOutput,
-			CharInfo [] lpBuffer,
+			[MarshalAs (UnmanagedType.LPArray), In] CharInfo [,] lpBuffer,
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpWriteRegion
@@ -722,7 +722,7 @@ namespace Terminal.Gui {
 
 	internal class WindowsDriver : ConsoleDriver {
 		static bool sync = false;
-		WindowsConsole.CharInfo [] OutputBuffer;
+		WindowsConsole.CharInfo [,] OutputBuffer;
 		int cols, rows, left, top;
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
@@ -1469,7 +1469,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			OutputBuffer = new WindowsConsole.CharInfo [Rows, Cols];
 			Clip = new Rect (0, 0, Cols, Rows);
 			damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
@@ -1487,11 +1487,10 @@ namespace Terminal.Gui {
 			contents = new int [rows, cols, 3];
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
-					int position = row * cols + col;
-					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
-					OutputBuffer [position].Char.UnicodeChar = ' ';
-					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
-					contents [row, col, 1] = OutputBuffer [position].Attributes;
+					OutputBuffer [row, col].Attributes = (ushort)Colors.TopLevel.Normal;
+					OutputBuffer [row, col].Char.UnicodeChar = ' ';
+					contents [row, col, 0] = OutputBuffer [row, col].Char.UnicodeChar;
+					contents [row, col, 1] = OutputBuffer [row, col].Attributes;
 					contents [row, col, 2] = 0;
 				}
 			}
@@ -1504,53 +1503,63 @@ namespace Terminal.Gui {
 			crow = row;
 		}
 
-		int GetOutputBufferPosition ()
-		{
-			return crow * Cols + ccol;
-		}
-
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var position = GetOutputBufferPosition ();
 			var validClip = IsValidContent (ccol, crow, Clip);
+			Rune.DecodeSurrogatePair (rune, out char [] spair);
+			var spairAdded = false;
 
 			if (validClip) {
 				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
 
-					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+					OutputBuffer [crow, ccol - 1].Char.UnicodeChar = ' ';
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
 
-					var prevPosition = GetOutputBufferPosition () + 1;
-					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+					OutputBuffer [crow, ccol + 1].Char.UnicodeChar = (char)' ';
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 
 				}
 				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					OutputBuffer [position].Char.UnicodeChar = (char)' ';
+					OutputBuffer [crow, ccol].Char.UnicodeChar = (char)' ';
 					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else if (spair != null) {
+					OutputBuffer [crow, ccol].Char.UnicodeChar = spair [0];
+					OutputBuffer [crow, ccol].Attributes = (ushort)currentAttribute;
+					contents [crow, ccol, 0] = (int)(uint)rune;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
+					ccol++;
+					OutputBuffer [crow, ccol].Char.UnicodeChar = spair [1];
+					OutputBuffer [crow, ccol].Attributes = (ushort)currentAttribute;
+					contents [crow, ccol, 0] = (int)(uint)0x00;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 0;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
+					spairAdded = true;
 				} else {
-					OutputBuffer [position].Char.UnicodeChar = (char)rune;
+					OutputBuffer [crow, ccol].Char.UnicodeChar = (char)rune;
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
+				if (!spairAdded) {
+					OutputBuffer [crow, ccol].Attributes = (ushort)currentAttribute;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
+				}
 			}
 
 			ccol++;
-			if (runeWidth > 1) {
+			if (!spairAdded && runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
-					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
+					OutputBuffer [crow, ccol].Attributes = (ushort)currentAttribute;
+					OutputBuffer [crow, ccol].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
 					contents [crow, ccol, 1] = currentAttribute;
 					contents [crow, ccol, 2] = 0;
