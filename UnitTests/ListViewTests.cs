@@ -473,5 +473,45 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, lw.StartsWith ("TW"));
 			Assert.Equal (2, lw.StartsWith ("TH"));
 		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsuresVisibilitySelectedItem_SelectedItem ()
+		{
+			var source = new List<string> ();
+			for (int i = 0; i < 10; i++) {
+				source.Add ($"Item {i}");
+			}
+			var lv = new ListView (source) {
+				Width = 10,
+				Height = 5
+			};
+			Application.Top.Add (lv);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4", output);
+
+			lv.SelectedItem = 6;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4", output);
+
+			lv.EnsuresVisibilitySelectedItem ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 2
+Item 3
+Item 4
+Item 5
+Item 6", output);
+		}
 	}
 }
