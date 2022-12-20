@@ -1281,5 +1281,20 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (0, tf.ScrollOffset);
 			Assert.Equal (16, tf.CursorPosition);
 		}
+
+		[Fact]
+		public void HistoryText_IsDirty_ClearHistoryChanges ()
+		{
+			var text = "Testing";
+			var tf = new TextField (text);
+
+			Assert.Equal (text, tf.Text);
+			tf.ClearHistoryChanges ();
+			Assert.False (tf.IsDirty);
+
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ())));
+			Assert.Equal ($"{text}A", tf.Text);
+			Assert.True (tf.IsDirty);
+		}
 	}
 }

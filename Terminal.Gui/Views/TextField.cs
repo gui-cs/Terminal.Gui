@@ -235,7 +235,10 @@ namespace Terminal.Gui {
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
-			Text = ustring.Make (obj.Lines [obj.CursorPosition.Y]);
+			if (obj == null)
+				return;
+
+			Text = ustring.Make (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
