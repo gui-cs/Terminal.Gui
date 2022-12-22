@@ -851,7 +851,7 @@ namespace Terminal.Gui {
 			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
 			int modelCol = 0;
 
-			for (int i = firstLine; i <= line; i++) {
+			for (int i = firstLine; i <= Math.Min (line, wrappedModelLines.Count - 1); i++) {
 				var wLine = wrappedModelLines [i];
 
 				if (i < line) {
@@ -1165,7 +1165,7 @@ namespace Terminal.Gui {
 		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
 		/// otherwise changes the contents of the <see cref="TextView"/>.
 		/// </remarks>
-		public Action<ContentsChangedEventArgs> ContentsChanged;
+		public event Action<ContentsChangedEventArgs> ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
@@ -1432,7 +1432,7 @@ namespace Terminal.Gui {
 			}
 
 			UpdateWrapModel ();
-			
+
 			Adjust ();
 			OnContentsChanged ();
 		}
@@ -1830,6 +1830,7 @@ namespace Terminal.Gui {
 			try {
 				SetWrapModel ();
 				res = model.LoadFile (path);
+				historyText.Clear (Text);
 				ResetPosition ();
 			} catch (Exception) {
 				throw;
@@ -1837,7 +1838,6 @@ namespace Terminal.Gui {
 				UpdateWrapModel ();
 				SetNeedsDisplay ();
 				Adjust ();
-				OnContentsChanged ();
 			}
 			return res;
 		}
@@ -1850,9 +1850,9 @@ namespace Terminal.Gui {
 		public void LoadStream (Stream stream)
 		{
 			model.LoadStream (stream);
+			historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
-			OnContentsChanged ();
 		}
 
 		/// <summary>
