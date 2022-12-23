@@ -19,6 +19,9 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 </Project>

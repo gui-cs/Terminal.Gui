@@ -987,13 +987,13 @@ namespace Terminal.Gui {
 			if (view == null || subviews == null)
 				return;
 
-			SetNeedsLayout ();
-			SetNeedsDisplay ();
 			var touched = view.Frame;
 			subviews.Remove (view);
 			tabIndexes.Remove (view);
 			view.container = null;
 			view.tabIndex = -1;
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
 			if (subviews.Count < 1) {
 				CanFocus = false;
 			}

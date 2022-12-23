@@ -1498,7 +1498,7 @@ Edit
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Redraw (Application.Top.Bounds);
-			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen(0), output);
+			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Right - Edit has no sub menu; this tests that no sub menu shows
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
@@ -1635,6 +1635,104 @@ Edit
 00000000000000
 00000000000000
 00000000000000", attributes);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_With_Action_But_Without_MenuItems_Not_Throw ()
+		{
+			var menu = new MenuBar (
+			    menus: new []
+			    {
+				new MenuBarItem { Title = "Test 1", Action = () => { } },
+				new MenuBarItem { Title = "Test 2", Action = () => { } },
+			    });
+
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			Assert.False (Application.Top.OnKeyDown (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_In_Window_Without_Other_Views ()
+		{
+			var win = new Window ();
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuBarItem ("Delete", new MenuItem [] {
+						new MenuItem ("All", "", null),
+						new MenuItem ("Selected", "", null)
+					})
+				})
+			}); ;
+			win.Add (menu);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│                     │
+│      └─────────┘                     │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│┌───────────┐        │
+│      └─────────┘│ All       │        │
+│                 │ Selected  │        │
+│                 └───────────┘        │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
 		}
 	}
 }
