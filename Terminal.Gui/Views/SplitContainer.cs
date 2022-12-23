@@ -8,6 +8,8 @@ namespace Terminal.Gui {
 		private LineView splitterLine = new LineView ();
 		private bool panel1Collapsed;
 		private bool panel2Collapsed;
+		private Pos splitterDistance = Pos.Percent (50);
+		private Orientation orientation = Orientation.Vertical;
 
 		public SplitContainer ()
 		{
@@ -18,18 +20,18 @@ namespace Terminal.Gui {
 			this.Add (Panel1);
 			this.Add (Panel2);
 
-			SetOrientation (Orientation.Vertical, Pos.Percent (50));
+			Setup ();
 
 			// TODO: Actually respect collapsed statuses
 		}
 
-		private void SetOrientation (Orientation orientation, Pos splitterDistance)
+		private void Setup ()
 		{
 			// TODO: Enforce minimum sizes
 
-			splitterLine.Orientation = orientation;
+			splitterLine.Orientation = Orientation;
 
-			switch (orientation) {
+			switch (Orientation) {
 			case Orientation.Horizontal:
 				splitterLine.X = 0;
 				splitterLine.Y = splitterDistance;
@@ -78,6 +80,10 @@ namespace Terminal.Gui {
 		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>.
 		/// </summary>
 		public View Panel1 { get; } = new View ();
+
+		/// <summary>
+		/// TODO: not implemented yet
+		/// </summary>
 		public int Panel1MinSize { get; set; }
 
 		/// <summary>
@@ -89,7 +95,9 @@ namespace Terminal.Gui {
 				panel1Collapsed = value;
 				if (value && panel2Collapsed) {
 					panel2Collapsed = false;
-				}	
+				}
+
+				Setup ();
 			}
 
 		}
@@ -100,6 +108,10 @@ namespace Terminal.Gui {
 		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>
 		/// </summary>
 		public View Panel2 { get; } = new View ();
+
+		/// <summary>
+		/// TODO: not implemented yet
+		/// </summary>
 		public int Panel2MinSize { get; set; }
 
 		/// <summary>
@@ -112,9 +124,24 @@ namespace Terminal.Gui {
 				if (value && panel1Collapsed) {
 					panel1Collapsed = false;
 				}
+				Setup ();
 			}
 		}
-		public Orientation Orientation { get; set; }
-		public Pos SplitterDistance { get; set; }
+
+		public Orientation Orientation {
+			get { return orientation; }
+			set {
+				orientation = value;
+				Setup ();
+			}
+		}
+
+		public Pos SplitterDistance {
+			get { return splitterDistance; }
+			set {
+				splitterDistance = value;
+				Setup ();
+			}
+		}
 	}
 }
