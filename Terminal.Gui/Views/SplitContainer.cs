@@ -223,10 +223,58 @@ namespace Terminal.Gui {
 			// TODO: Make focusable and allow moving with keyboard
 			public SplitContainerLineView(SplitContainer parent)
 			{
-				CanFocus = true;	
+				CanFocus = true;
 				this.parent = parent;
+
+				base.AddCommand (Command.Right, () => {
+					if (Orientation == Orientation.Vertical) {
+						parent.SplitterDistance = Offset (X, 1);
+						return true;
+					}
+					return false;
+				});
+
+				base.AddCommand (Command.Left, () => {
+					if (Orientation == Orientation.Vertical) {
+						parent.SplitterDistance = Offset (X, -1);
+						return true;
+					}
+					return false;
+				});
+
+				base.AddCommand (Command.LineUp, () => {
+					if (Orientation == Orientation.Horizontal) {
+						parent.SplitterDistance = Offset (Y, -1);
+						return true;
+					}
+					return false;
+				});
+
+				base.AddCommand (Command.LineDown, () => {
+					if (Orientation == Orientation.Horizontal) {
+						parent.SplitterDistance = Offset (Y, 1);
+						return true;
+					}
+					return false;
+				});
+
+				AddKeyBinding (Key.CursorRight, Command.Right);
+				AddKeyBinding (Key.CursorLeft, Command.Left);
+				AddKeyBinding (Key.CursorUp, Command.LineUp);
+				AddKeyBinding (Key.CursorDown, Command.LineDown);
 			}
-			
+
+
+			///<inheritdoc/>
+			public override bool ProcessKey (KeyEvent kb)
+			{
+				var result = InvokeKeybindings (kb);
+				if (result != null)
+					return (bool)result;
+
+				return base.ProcessKey (kb);
+			}
+
 			///<inheritdoc/>
 			public override bool MouseEvent (MouseEvent mouseEvent)
 			{

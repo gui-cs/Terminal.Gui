@@ -37,6 +37,9 @@ namespace UICatalog.Scenarios {
 			splitContainer.Panel2.Add (new Label ("World"));
 			splitContainer.Panel2.Add (lbl2 = new Label ("Type Here Too:"){Y=2});
 			splitContainer.Panel2.Add (new TextField (){Width = Dim.Fill(),Y=2,X=Pos.Right(lbl2)+1});
+			splitContainer.Panel2.Add (new Label ("Here is a Text box:") { Y = 4 });
+			splitContainer.Panel2.Add (new TextView () { Y = 5, Width = Dim.Fill(), Height = Dim.Fill(), AllowsTab = false});
+
 
 			Win.Add (splitContainer);
 
