@@ -31,6 +31,29 @@ namespace Terminal.Gui {
 
 			splitterLine.Orientation = Orientation;
 
+			if(panel1Collapsed || panel2Collapsed) {
+				SetupForCollapsedPanel ();
+			}
+			else {
+				SetupForNormal ();
+			}
+		}
+
+		private void SetupForNormal ()
+		{
+			// Ensure all our component views are here
+			// (e.g. if we are transitioning from a collapsed state)
+
+			if (!this.Subviews.Contains (splitterLine)) {
+				this.Add (splitterLine);
+			}
+			if (!this.Subviews.Contains (Panel1)) {
+				this.Add (Panel1);
+			}
+			if (!this.Subviews.Contains (Panel2)) {
+				this.Add (Panel2);
+			}
+
 			switch (Orientation) {
 			case Orientation.Horizontal:
 				splitterLine.X = 0;
@@ -72,6 +95,27 @@ namespace Terminal.Gui {
 
 			default: throw new ArgumentOutOfRangeException (nameof (orientation));
 			};
+		}
+
+		private void SetupForCollapsedPanel ()
+		{
+			View toRemove = panel1Collapsed ? Panel1 : Panel2;
+			View toFullSize = panel1Collapsed ? Panel2 : Panel1;
+			
+			if (this.Subviews.Contains (splitterLine)) {
+				this.Subviews.Remove (splitterLine);
+			}
+			if (this.Subviews.Contains(toRemove)) {
+				this.Subviews.Remove (toRemove);
+			}
+			if(!this.Subviews.Contains(toFullSize)) {
+				this.Add (toFullSize);
+			}
+
+			toFullSize.X = 0;
+			toFullSize.Y = 0;
+			toFullSize.Width = Dim.Fill ();
+			toFullSize.Height = Dim.Fill ();
 		}
 
 		/// <summary>
