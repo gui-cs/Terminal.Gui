@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 			splitContainer = new SplitContainer {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				SplitterDistance = Pos.Percent(50),
+				SplitterDistance = Pos.Percent (50), // TODO: get this to work with drag resizing and percents
 			};
 
 

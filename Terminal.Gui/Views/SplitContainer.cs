@@ -233,10 +233,6 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
-
-				int nx, ny;
-
 				// Start a drag
 				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
 
@@ -244,14 +240,11 @@ namespace Terminal.Gui {
 					Application.EnsuresTopOnFront ();
 
 					if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
-						nx = mouseEvent.X - mouseEvent.OfX;
-						ny = mouseEvent.Y - mouseEvent.OfY;
-						dragPosition = new Point (nx, ny);
+						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 						dragOrignalPos = Orientation == Orientation.Horizontal ? Y : X;
 						Application.GrabMouse (this);
 					}
 
-					System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
 					return true;
 				} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) 
 				{
@@ -260,18 +253,16 @@ namespace Terminal.Gui {
 						// how far has user dragged from original location?						
 						if(Orientation == Orientation.Horizontal)
 						{
-							int dy = dragPosition.Value.Y - mouseEvent.Y;
-							Y = dragOrignalPos + dy;
+							int dy = mouseEvent.Y - dragPosition.Value.Y;
+							parent.SplitterDistance = Offset(dragOrignalPos , dy);
 						}
 						else
 						{
-							int dx = dragPosition.Value.X - mouseEvent.X;
-							X = dragOrignalPos + dx;
+							int dx = mouseEvent.X - dragPosition.Value.X;
+							parent.SplitterDistance = Offset(dragOrignalPos , dx);
 						}
-						//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
 
-						SetNeedsDisplay ();
-						parent.Setup();
+						parent.SetNeedsDisplay ();
 						return true;
 					}
 				}
@@ -282,9 +273,17 @@ namespace Terminal.Gui {
 					dragPosition = null;
 				}
 
-				//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
-				//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
 				return false;
+			}
+
+			private Pos Offset (Pos pos, int delta)
+			{
+				// TODO : it would be nice if we could keep this as a percent
+				// but for now convert it to absolute
+				var posAbsolute = pos.Anchor (Orientation == Orientation.Horizontal ?
+					parent.Bounds.Width : parent.Bounds.Height);
+
+				return posAbsolute + delta;
 			}
 		}
 	}
