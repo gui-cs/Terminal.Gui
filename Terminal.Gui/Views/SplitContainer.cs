@@ -1,6 +1,7 @@
 ﻿using System;
 using Terminal.Gui.Graphs;
 using static Terminal.Gui.Dim;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui {
 	public class SplitContainer : View {
@@ -254,12 +255,12 @@ namespace Terminal.Gui {
 						if(Orientation == Orientation.Horizontal)
 						{
 							int dy = mouseEvent.Y - dragPosition.Value.Y;
-							parent.SplitterDistance = Offset(dragOrignalPos , dy);
+							parent.SplitterDistance = Offset(Y , dy);
 						}
 						else
 						{
 							int dx = mouseEvent.X - dragPosition.Value.X;
-							parent.SplitterDistance = Offset(dragOrignalPos , dx);
+							parent.SplitterDistance = Offset(X , dx);
 						}
 
 						parent.SetNeedsDisplay ();
@@ -270,6 +271,7 @@ namespace Terminal.Gui {
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 					Application.UngrabMouse ();
 					Driver.UncookMouse ();
+					FinalisePosition ();
 					dragPosition = null;
 				}
 
@@ -278,12 +280,29 @@ namespace Terminal.Gui {
 
 			private Pos Offset (Pos pos, int delta)
 			{
-				// TODO : it would be nice if we could keep this as a percent
-				// but for now convert it to absolute
 				var posAbsolute = pos.Anchor (Orientation == Orientation.Horizontal ?
 					parent.Bounds.Width : parent.Bounds.Height);
 
 				return posAbsolute + delta;
+			}
+			private void FinalisePosition ()
+			{
+				// if before dragging we were a proportional position
+				// then preserve that when the mouse is released so that
+				// resizing continues to work as intended
+				if(dragOrignalPos is PosFactor) {
+					if(Orientation == Orientation.Horizontal) {
+						Y = ToPosFactor (Y, parent.Bounds.Height); 
+					} else {
+						X = ToPosFactor (X, parent.Bounds.Width);
+					}
+				}
+			}
+
+			private Pos ToPosFactor (Pos y, int parentLength)
+			{
+				int position = y.Anchor (parentLength);
+				return new PosFactor (position / (float)parentLength);
 			}
 		}
 	}
