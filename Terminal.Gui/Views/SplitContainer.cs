@@ -5,16 +5,21 @@ using static Terminal.Gui.Dim;
 namespace Terminal.Gui {
 	public class SplitContainer : View {
 
-		private LineView splitterLine = new LineView ();
+		private LineView splitterLine;
 		private bool panel1Collapsed;
 		private bool panel2Collapsed;
 		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
+		private int panel1MinSize;
 
+		/// <summary>
+		/// Creates a new instance of the SplitContainer class.
+		/// </summary>
 		public SplitContainer ()
 		{
 			// Default to a border of 1 so that View looks nice
 			Border = new Border ();
+			splitterLine = new SplitContainerLineView (this);
 
 			this.Add (splitterLine);
 			this.Add (Panel1);
@@ -23,20 +28,107 @@ namespace Terminal.Gui {
 			Setup ();
 
 			CanFocus = false;
+		}
 
-			// TODO: Actually respect collapsed statuses
+		/// <summary>
+		/// The left or top panel of the <see cref="SplitContainer"/>
+		/// (depending on <see cref="Orientation"/>).  Add panel contents
+		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>.
+		/// </summary>
+		public View Panel1 { get; } = new View ();
+
+		/// <summary>
+		/// The minimum size <see cref="Panel1"/> can be when adjusting
+		/// <see cref="SplitterDistance"/>.
+		/// </summary>
+		public int Panel1MinSize {
+			get { return panel1MinSize; }
+			set {
+				panel1MinSize = value;
+				Setup();
+			}
+		}
+
+		/// <summary>
+		/// This determines if <see cref="Panel1"/> is collapsed.
+		/// </summary>
+		public bool Panel1Collapsed {
+			get { return panel1Collapsed; }
+			set {
+				panel1Collapsed = value;
+				if (value && panel2Collapsed) {
+					panel2Collapsed = false;
+				}
+
+				Setup ();
+			}
+
+		}
+
+		/// <summary>
+		/// The right or bottom panel of the <see cref="SplitContainer"/>
+		/// (depending on <see cref="Orientation"/>).  Add panel contents
+		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>
+		/// </summary>
+		public View Panel2 { get; } = new View ();
+
+		/// <summary>
+		/// The minimum size <see cref="Panel2"/> can be when adjusting
+		/// <see cref="SplitterDistance"/>.
+		/// </summary>
+		public int Panel2MinSize { get; set; }
+
+		/// <summary>
+		/// This determines if <see cref="Panel2"/> is collapsed.
+		/// </summary>
+		public bool Panel2Collapsed {
+			get { return panel2Collapsed; }
+			set {
+				panel2Collapsed = value;
+				if (value && panel1Collapsed) {
+					panel1Collapsed = false;
+				}
+				Setup ();
+			}
+		}
+
+		/// <summary>
+		/// Orientation of the dividing line (Horizontal or Vertical).
+		/// </summary>
+		public Orientation Orientation {
+			get { return orientation; }
+			set {
+				orientation = value;
+				Setup ();
+			}
+		}
+
+
+		/// <summary>
+		/// Distance Horizontally or Vertically to the splitter line when
+		/// neither panel is collapsed.
+		/// </summary>
+		public Pos SplitterDistance {
+			get { return splitterDistance; }
+			set {
+				splitterDistance = value;
+				Setup ();
+			}
+		}
+
+		public override bool OnEnter (View view)
+		{
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			return base.OnEnter (view);
 		}
 
 		private void Setup ()
 		{
-			// TODO: Enforce minimum sizes
-
 			splitterLine.Orientation = Orientation;
 
-			if(panel1Collapsed || panel2Collapsed) {
+			if (panel1Collapsed || panel2Collapsed) {
 				SetupForCollapsedPanel ();
-			}
-			else {
+			} else {
 				SetupForNormal ();
 			}
 		}
@@ -103,14 +195,14 @@ namespace Terminal.Gui {
 		{
 			View toRemove = panel1Collapsed ? Panel1 : Panel2;
 			View toFullSize = panel1Collapsed ? Panel2 : Panel1;
-			
+
 			if (this.Subviews.Contains (splitterLine)) {
 				this.Subviews.Remove (splitterLine);
 			}
-			if (this.Subviews.Contains(toRemove)) {
+			if (this.Subviews.Contains (toRemove)) {
 				this.Subviews.Remove (toRemove);
 			}
-			if(!this.Subviews.Contains(toFullSize)) {
+			if (!this.Subviews.Contains (toFullSize)) {
 				this.Add (toFullSize);
 			}
 
@@ -120,73 +212,79 @@ namespace Terminal.Gui {
 			toFullSize.Height = Dim.Fill ();
 		}
 
-		/// <summary>
-		/// The left or top panel of the <see cref="SplitContainer"/>
-		/// (depending on <see cref="Orientation"/>).  Add panel contents
-		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>.
-		/// </summary>
-		public View Panel1 { get; } = new View ();
+		private class SplitContainerLineView : LineView
+		{
+			private SplitContainer parent;
 
-		/// <summary>
-		/// TODO: not implemented yet
-		/// </summary>
-		public int Panel1MinSize { get; set; }
+			Point? dragPosition;
+			Pos dragOrignalPos;
 
-		/// <summary>
-		/// This determines if <see cref="Panel1"/> is collapsed.
-		/// </summary>
-		public bool Panel1Collapsed {
-			get { return panel1Collapsed; }
-			set {
-				panel1Collapsed = value;
-				if (value && panel2Collapsed) {
-					panel2Collapsed = false;
+			// TODO: Make focusable and allow moving with keyboard
+			public SplitContainerLineView(SplitContainer parent)
+			{
+				CanFocus = true;	
+				this.parent = parent;
+			}
+			
+			///<inheritdoc/>
+			public override bool MouseEvent (MouseEvent mouseEvent)
+			{
+				if (!CanFocus) {
+					return true;
 				}
 
-				Setup ();
-			}
+				//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
 
-		}
+				int nx, ny;
 
-		/// <summary>
-		/// The right or bottom panel of the <see cref="SplitContainer"/>
-		/// (depending on <see cref="Orientation"/>).  Add panel contents
-		/// to this <see cref="View"/> using <see cref="View.Add(View)"/>
-		/// </summary>
-		public View Panel2 { get; } = new View ();
+				// Start a drag
+				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
 
-		/// <summary>
-		/// TODO: not implemented yet
-		/// </summary>
-		public int Panel2MinSize { get; set; }
+					SetFocus ();
+					Application.EnsuresTopOnFront ();
 
-		/// <summary>
-		/// This determines if <see cref="Panel2"/> is collapsed.
-		/// </summary>
-		public bool Panel2Collapsed {
-			get { return panel2Collapsed; }
-			set {
-				panel2Collapsed = value;
-				if (value && panel1Collapsed) {
-					panel1Collapsed = false;
+					if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
+						nx = mouseEvent.X - mouseEvent.OfX;
+						ny = mouseEvent.Y - mouseEvent.OfY;
+						dragPosition = new Point (nx, ny);
+						dragOrignalPos = Orientation == Orientation.Horizontal ? Y : X;
+						Application.GrabMouse (this);
+					}
+
+					System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
+					return true;
+				} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) 
+				{
+					if (dragPosition.HasValue) {
+						
+						// how far has user dragged from original location?						
+						if(Orientation == Orientation.Horizontal)
+						{
+							int dy = dragPosition.Value.Y - mouseEvent.Y;
+							Y = dragOrignalPos + dy;
+						}
+						else
+						{
+							int dx = dragPosition.Value.X - mouseEvent.X;
+							X = dragOrignalPos + dx;
+						}
+						//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
+
+						SetNeedsDisplay ();
+						parent.Setup();
+						return true;
+					}
 				}
-				Setup ();
-			}
-		}
 
-		public Orientation Orientation {
-			get { return orientation; }
-			set {
-				orientation = value;
-				Setup ();
-			}
-		}
+				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
+					Application.UngrabMouse ();
+					Driver.UncookMouse ();
+					dragPosition = null;
+				}
 
-		public Pos SplitterDistance {
-			get { return splitterDistance; }
-			set {
-				splitterDistance = value;
-				Setup ();
+				//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
+				//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
+				return false;
 			}
 		}
 	}
