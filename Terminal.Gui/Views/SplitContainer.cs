@@ -22,6 +22,8 @@ namespace Terminal.Gui {
 
 			Setup ();
 
+			CanFocus = false;
+
 			// TODO: Actually respect collapsed statuses
 		}
 
