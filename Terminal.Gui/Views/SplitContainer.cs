@@ -58,7 +58,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void OnSplitterMoved ()
 		{
-			SplitterMoved?.Invoke (this,new SplitterEventArgs(this,splitterDistance));
+			SplitterMoved?.Invoke (this, new SplitterEventArgs (this, splitterDistance));
 		}
 
 
@@ -127,15 +127,17 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Distance Horizontally or Vertically to the splitter line when
+		/// <para>Distance Horizontally or Vertically to the splitter line when
 		/// neither panel is collapsed.
+		/// </para>
+		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
+		/// are supported for this property.</para>
 		/// </summary>
 		public Pos SplitterDistance {
 			get { return splitterDistance; }
 			set {
-				if(!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor))
-				{
-					throw new ArgumentException($"Only Percent and Absolute values are supported for {nameof(SplitterDistance)} property.  Passed value was {value.GetType().Name}");
+				if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
+					throw new ArgumentException ($"Only Percent and Absolute values are supported for {nameof (SplitterDistance)} property.  Passed value was {value.GetType ().Name}");
 				}
 
 				splitterDistance = value;
@@ -258,14 +260,14 @@ namespace Terminal.Gui {
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
 				return (Pos)Math.Min (panel1MinSizeAbs, availableSpace);
 			}
-			
+
 			// bad position because not enough space for panel2
-			if(availableSpace - idealPosition <= panel2MinSizeAbs) {
+			if (availableSpace - idealPosition <= panel2MinSizeAbs) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
 
 				// +1 is to allow space for the splitter
-				return (Pos)Math.Max (availableSpace - (panel2MinSizeAbs+1), 0);
+				return (Pos)Math.Max (availableSpace - (panel2MinSizeAbs + 1), 0);
 			}
 
 			// this splitter position is fine, there is enough space for everyone
@@ -278,7 +280,7 @@ namespace Terminal.Gui {
 			View toFullSize = panel1Collapsed ? Panel2 : Panel1;
 
 			if (this.Subviews.Contains (splitterLine)) {
-				this.Remove(splitterLine);
+				this.Remove (splitterLine);
 			}
 			if (this.Subviews.Contains (toRemove)) {
 				this.Remove (toRemove);
