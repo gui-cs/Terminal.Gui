@@ -613,11 +613,8 @@ namespace Terminal.Gui {
 			}
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			var canChange = SetWidth (top.Frame.Width, out int rWidth);
-			if (canChange && rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Max (top.Frame.Right - 2, 0);
-			} else if (rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Min (nx + 1, top.Frame.Right - 2);
+			if (nx + (top.Border != null && top.Border.DrawMarginFrame ? 2 : 1) > top.Frame.X + top.Frame.Width) {
+				nx = Math.Max (top.Frame.Right - (top.Border.DrawMarginFrame ? 2 : 1), 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
@@ -656,11 +653,8 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			canChange = SetHeight (top.Frame.Height, out int rHeight);
-			if (canChange && rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Max (top.Frame.Bottom - 2, 0);
-			} else if (rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Min (ny + 1, top.Frame.Bottom - 2);
+			if (ny + (top.Border != null && top.Border.DrawMarginFrame ? 2 : 1) > top.Frame.Y + top.Frame.Height) {
+				ny = Math.Max (top.Frame.Bottom - (top.Border.DrawMarginFrame ? 2 : 1), 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
@@ -701,7 +695,7 @@ namespace Terminal.Gui {
 			}
 
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-					&& top.Height is Dim.DimFill) {
+				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 				top.Height = Dim.Fill (sb.Visible ? 1 : 0);
 				layoutSubviews = true;

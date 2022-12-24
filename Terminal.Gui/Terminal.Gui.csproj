@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="NStack.Core" Version="1.0.5" />
+    <PackageReference Include="NStack.Core" Version="1.0.7" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
   <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
