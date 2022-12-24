@@ -46,7 +46,7 @@ namespace Terminal.Gui {
 			get { return panel1MinSize; }
 			set {
 				panel1MinSize = value;
-				Setup();
+				Setup ();
 			}
 		}
 
@@ -213,17 +213,19 @@ namespace Terminal.Gui {
 			toFullSize.Height = Dim.Fill ();
 		}
 
-		private class SplitContainerLineView : LineView
-		{
+		private class SplitContainerLineView : LineView {
 			private SplitContainer parent;
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
+			Point? moveRuneRenderLocation;
 
 			// TODO: Make focusable and allow moving with keyboard
-			public SplitContainerLineView(SplitContainer parent)
+			public SplitContainerLineView (SplitContainer parent)
 			{
 				CanFocus = true;
+				TabStop = true;
+
 				this.parent = parent;
 
 				base.AddCommand (Command.Right, () => {
@@ -274,6 +276,32 @@ namespace Terminal.Gui {
 
 				return base.ProcessKey (kb);
 			}
+			public override void PositionCursor ()
+			{
+				base.PositionCursor ();
+				Move (this.Bounds.Width / 2, this.Bounds.Height / 2);
+			}
+
+			public override bool OnEnter (View view)
+			{
+				Driver.SetCursorVisibility (CursorVisibility.Default);
+				PositionCursor ();
+
+				return base.OnEnter (view);
+			}
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				if (CanFocus && HasFocus) {
+
+					var location = moveRuneRenderLocation ??
+						new Point (bounds.Width / 2, bounds.Height / 2);
+
+					AddRune (location.X,location.Y, Driver.Diamond);
+				}
+
+			}
 
 			///<inheritdoc/>
 			public override bool MouseEvent (MouseEvent mouseEvent)
@@ -282,9 +310,9 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				// Start a drag
 				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
-
+					
+					// Start a Drag
 					SetFocus ();
 					Application.EnsuresTopOnFront ();
 
@@ -295,32 +323,36 @@ namespace Terminal.Gui {
 					}
 
 					return true;
-				} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) 
-				{
-					if (dragPosition.HasValue) {
-						
-						// how far has user dragged from original location?						
-						if(Orientation == Orientation.Horizontal)
-						{
-							int dy = mouseEvent.Y - dragPosition.Value.Y;
-							parent.SplitterDistance = Offset(Y , dy);
-						}
-						else
-						{
-							int dx = mouseEvent.X - dragPosition.Value.X;
-							parent.SplitterDistance = Offset(X , dx);
-						}
+				} else if (
+					dragPosition.HasValue &&
+					(mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 
-						parent.SetNeedsDisplay ();
-						return true;
+					// Continue Drag
+
+					// how far has user dragged from original location?						
+					if (Orientation == Orientation.Horizontal) {
+						int dy = mouseEvent.Y - dragPosition.Value.Y;
+						parent.SplitterDistance = Offset (Y, dy);
+						moveRuneRenderLocation = new Point (mouseEvent.X, 0);
+					} else {
+						int dx = mouseEvent.X - dragPosition.Value.X;
+						parent.SplitterDistance = Offset (X, dx);
+						moveRuneRenderLocation = new Point (0, mouseEvent.Y);
 					}
+
+					parent.SetNeedsDisplay ();
+					return true;
 				}
 
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
+
+					// End Drag
+
 					Application.UngrabMouse ();
 					Driver.UncookMouse ();
 					FinalisePosition ();
 					dragPosition = null;
+					moveRuneRenderLocation = null;
 				}
 
 				return false;
@@ -338,9 +370,9 @@ namespace Terminal.Gui {
 				// if before dragging we were a proportional position
 				// then preserve that when the mouse is released so that
 				// resizing continues to work as intended
-				if(dragOrignalPos is PosFactor) {
-					if(Orientation == Orientation.Horizontal) {
-						Y = ToPosFactor (Y, parent.Bounds.Height); 
+				if (dragOrignalPos is PosFactor) {
+					if (Orientation == Orientation.Horizontal) {
+						Y = ToPosFactor (Y, parent.Bounds.Height);
 					} else {
 						X = ToPosFactor (X, parent.Bounds.Width);
 					}
