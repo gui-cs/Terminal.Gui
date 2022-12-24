@@ -26,6 +26,13 @@ namespace UnitTests {
      │
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect if it is not focused
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
 		}
 		[Fact, AutoInitShutdown]
 		public void TestSplitContainer_Vertical_Focused ()
@@ -41,6 +48,30 @@ namespace UnitTests {
      ◊
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Now while focused move the splitter 1 unit right
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+111111│2222
+      ◊
+      │     ";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			// and 2 to the left
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+1111│222222
+    ◊
+    │     ";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -55,6 +86,12 @@ namespace UnitTests {
 11111111111
 ───────────
 22222222222";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect if it is not focused
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
@@ -75,6 +112,27 @@ namespace UnitTests {
 ─────◊─────
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Now move splitter line down
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+			looksLike =
+@"    
+11111111111
+
+─────◊─────";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// And 2 up
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+			looksLike =
+@"    
+─────◊─────
+22222222222";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
 		}
 
 

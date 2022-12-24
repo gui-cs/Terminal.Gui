@@ -1,7 +1,5 @@
 ﻿using System;
 using Terminal.Gui.Graphs;
-using static Terminal.Gui.Dim;
-using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui {
 	public class SplitContainer : View {
@@ -125,6 +123,14 @@ namespace Terminal.Gui {
 			return base.OnEnter (view);
 		}
 
+		public override void Redraw (Rect bounds)
+		{
+			Driver.SetAttribute (ColorScheme.Normal);
+			Clear ();
+			base.Redraw (bounds);
+		}
+		
+
 		private void Setup ()
 		{
 			splitterLine.Orientation = Orientation;
@@ -162,7 +168,7 @@ namespace Terminal.Gui {
 				this.Panel1.X = 0;
 				this.Panel1.Y = 0;
 				this.Panel1.Width = Dim.Fill ();
-				this.Panel1.Height = new DimFunc (() =>
+				this.Panel1.Height = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Height));
 
 				this.Panel2.Y = Pos.Bottom (splitterLine);
@@ -181,7 +187,7 @@ namespace Terminal.Gui {
 				this.Panel1.X = 0;
 				this.Panel1.Y = 0;
 				this.Panel1.Height = Dim.Fill ();
-				this.Panel1.Width = new DimFunc (() =>
+				this.Panel1.Width = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Width));
 
 				this.Panel2.X = Pos.Right (splitterLine);
@@ -233,35 +239,19 @@ namespace Terminal.Gui {
 				this.parent = parent;
 
 				base.AddCommand (Command.Right, () => {
-					if (Orientation == Orientation.Vertical) {
-						parent.SplitterDistance = Offset (X, 1);
-						return true;
-					}
-					return false;
+					return MoveSplitter (1,0);
 				});
 
 				base.AddCommand (Command.Left, () => {
-					if (Orientation == Orientation.Vertical) {
-						parent.SplitterDistance = Offset (X, -1);
-						return true;
-					}
-					return false;
+					return MoveSplitter (-1, 0);
 				});
 
 				base.AddCommand (Command.LineUp, () => {
-					if (Orientation == Orientation.Horizontal) {
-						parent.SplitterDistance = Offset (Y, -1);
-						return true;
-					}
-					return false;
+					return MoveSplitter (0,-1);
 				});
 
 				base.AddCommand (Command.LineDown, () => {
-					if (Orientation == Orientation.Horizontal) {
-						parent.SplitterDistance = Offset (Y, 1);
-						return true;
-					}
-					return false;
+					return MoveSplitter (0, 1);
 				});
 
 				AddKeyBinding (Key.CursorRight, Command.Right);
@@ -274,6 +264,10 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public override bool ProcessKey (KeyEvent kb)
 			{
+				if (!CanFocus || !HasFocus) {
+					return base.ProcessKey (kb);
+				}
+				
 				var result = InvokeKeybindings (kb);
 				if (result != null)
 					return (bool)result;
@@ -354,39 +348,89 @@ namespace Terminal.Gui {
 
 					Application.UngrabMouse ();
 					Driver.UncookMouse ();
-					FinalisePosition ();
+					FinalisePosition (
+						dragOrignalPos,
+						Orientation == Orientation.Horizontal ? Y : X);
 					dragPosition = null;
 					moveRuneRenderLocation = null;
 				}
 
 				return false;
 			}
+			private bool MoveSplitter (int distanceX, int distanceY)
+			{
+				if (Orientation == Orientation.Vertical) {
+
+					// Cannot move in this direction
+					if (distanceX == 0) {
+						return false;
+					}
+
+					var oldX = X;
+					FinalisePosition (oldX, (Pos)Offset (X, distanceX));
+					return true;
+				} else {
+
+					// Cannot move in this direction
+					if (distanceY == 0) {
+						return false;
+					}
+
+					var oldY = Y;
+					FinalisePosition (oldY, (Pos)Offset (Y, distanceY));
+					return true;
+				}
+			}
+
 
 			private Pos Offset (Pos pos, int delta)
 			{
 				var posAbsolute = pos.Anchor (Orientation == Orientation.Horizontal ?
-					parent.Bounds.Width : parent.Bounds.Height);
+					parent.Bounds.Height : parent.Bounds.Width);
 
 				return posAbsolute + delta;
 			}
-			private void FinalisePosition ()
+
+			/// <summary>
+			/// <para>
+			/// Moves <see cref="parent"/> <see cref="SplitContainer.SplitterDistance"/> to 
+			/// <see cref="Pos"/> <paramref name="newValue"/> preserving <see cref="Pos"/> format
+			/// (absolute / relative) that <paramref name="oldValue"/> had.
+			/// </para>
+			/// <remarks>This ensures that if splitter location was e.g. 50% before and you move it
+			/// to absolute 5 then you end up with 10% (assuming a parent had 50 width). </remarks>
+			/// </summary>
+			/// <param name="oldValue"></param>
+			/// <param name="newValue"></param>
+			private void FinalisePosition (Pos oldValue, Pos newValue)
 			{
-				// if before dragging we were a proportional position
-				// then preserve that when the mouse is released so that
-				// resizing continues to work as intended
-				if (dragOrignalPos is PosFactor) {
+				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						parent.splitterDistance = ToPosFactor (Y, parent.Bounds.Height);
+						parent.SplitterDistance = ConvertToPosFactor (newValue, parent.Bounds.Height);
 					} else {
-						parent.splitterDistance = ToPosFactor (X, parent.Bounds.Width);
+						parent.SplitterDistance = ConvertToPosFactor (newValue, parent.Bounds.Width);
 					}
+				}
+				else {
+					parent.SplitterDistance = newValue;
 				}
 			}
 
-			private Pos ToPosFactor (Pos y, int parentLength)
+			/// <summary>
+			/// <para>
+			/// Determines the absolute position of <paramref name="p"/> and
+			/// returns a <see cref="Pos.PosFactor"/> that describes the percentage of that.
+			/// </para>
+			/// <para>Effectively turning any <see cref="Pos"/> into a <see cref="Pos.PosFactor"/>
+			/// (as if created with <see cref="Pos.Percent(float)"/>)</para>
+			/// </summary>
+			/// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(float)"/></param>
+			/// <param name="parentLength">The Height/Width that <paramref name="p"/> lies within</param>
+			/// <returns></returns>
+			private Pos ConvertToPosFactor (Pos p, int parentLength)
 			{
-				int position = y.Anchor (parentLength);
-				return new PosFactor (position / (float)parentLength);
+				int position = p.Anchor (parentLength);
+				return new Pos.PosFactor (position / (float)parentLength);
 			}
 		}
 	}
