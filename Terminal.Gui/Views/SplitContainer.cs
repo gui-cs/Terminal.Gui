@@ -2,6 +2,11 @@
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
+
+	/// <summary>
+	/// A <see cref="View"/> consisting of a moveable bar that divides
+	/// the display area into 2 resizeable panels.
+	/// </summary>
 	public class SplitContainer : View {
 
 		private LineView splitterLine;
@@ -146,12 +151,14 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
 		public override bool OnEnter (View view)
 		{
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
 			return base.OnEnter (view);
 		}
 
+		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
