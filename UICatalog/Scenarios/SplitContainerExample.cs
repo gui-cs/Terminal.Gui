@@ -11,6 +11,9 @@ namespace UICatalog.Scenarios {
 
 
 		private MenuItem miVertical;
+		private MenuItem miShowBoth;
+		private MenuItem miShowPanel1;
+		private MenuItem miShowPanel2;
 
 		/// <summary>
 		/// Setup the scenario.
@@ -21,10 +24,16 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1;
 
+			Win.Add (new Label ("This is a SplitContainer with a minimum panel size of 2.  Drag the splitter to resize:"));
+			Win.Add (new LineView (Orientation.Horizontal) { Y = 1 });
+
 			splitContainer = new SplitContainer {
+				Y = 2,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				SplitterDistance = Pos.Percent (50), // TODO: get this to work with drag resizing and percents
+				Panel1MinSize = 2,
+				Panel2MinSize = 2,
 			};
 
 
@@ -52,10 +61,43 @@ namespace UICatalog.Scenarios {
 				miVertical = new MenuItem ("_Vertical", "", () => ToggleOrientation())
 				{
 					Checked = splitContainer.Orientation == Orientation.Vertical,
-					CheckType = MenuItemCheckStyle.Checked 
-				}})
-			});
+					CheckType = MenuItemCheckStyle.Checked
+				},
+				new MenuBarItem ("_Show", new MenuItem [] {
+						miShowBoth = new MenuItem ("Both", "",()=>{
+							splitContainer.Panel1Collapsed = false;
+							splitContainer.Panel2Collapsed = false;
+							UpdateShowMenuCheckedStates();
+						}),
+						miShowPanel1 = new MenuItem ("Panel1", "", () => {
+
+							splitContainer.Panel2Collapsed = true;
+							UpdateShowMenuCheckedStates();
+						}),
+						miShowPanel2 = new MenuItem ("Panel2", "", () => {
+							splitContainer.Panel1Collapsed = true;
+							UpdateShowMenuCheckedStates();
+						}),							
+					})
+				}),
+
+			}) ;
+
+			UpdateShowMenuCheckedStates ();
+			
 			Application.Top.Add (menu);
+		}
+
+		private void UpdateShowMenuCheckedStates ()
+		{
+			miShowBoth.Checked = (!splitContainer.Panel1Collapsed) && (!splitContainer.Panel2Collapsed);
+			miShowBoth.CheckType = MenuItemCheckStyle.Checked;
+
+			miShowPanel1.Checked = splitContainer.Panel2Collapsed;
+			miShowPanel1.CheckType = MenuItemCheckStyle.Checked;
+
+			miShowPanel2.Checked = splitContainer.Panel1Collapsed;
+			miShowPanel2.CheckType = MenuItemCheckStyle.Checked;
 		}
 
 		public void ToggleOrientation()

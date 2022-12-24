@@ -9,17 +9,14 @@ namespace Terminal.Gui {
 		private bool panel2Collapsed;
 		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
-		private int panel1MinSize;
+		private Pos panel1MinSize = 0;
+		private Pos panel2MinSize = 0;
 
 		/// <summary>
 		/// Creates a new instance of the SplitContainer class.
 		/// </summary>
 		public SplitContainer ()
 		{
-			// Default to a border of 0 but not null so that user can
-			// more easily change size (without null references)
-			Border = new Border ();
-
 			splitterLine = new SplitContainerLineView (this);
 
 			this.Add (Panel1);
@@ -42,7 +39,7 @@ namespace Terminal.Gui {
 		/// The minimum size <see cref="Panel1"/> can be when adjusting
 		/// <see cref="SplitterDistance"/>.
 		/// </summary>
-		public int Panel1MinSize {
+		public Pos Panel1MinSize {
 			get { return panel1MinSize; }
 			set {
 				panel1MinSize = value;
@@ -77,7 +74,16 @@ namespace Terminal.Gui {
 		/// The minimum size <see cref="Panel2"/> can be when adjusting
 		/// <see cref="SplitterDistance"/>.
 		/// </summary>
-		public int Panel2MinSize { get; set; }
+		public Pos Panel2MinSize {
+			get {
+				return panel2MinSize;
+			}
+
+			set {
+				panel2MinSize = value;
+				Setup ();
+			}
+		}
 
 		/// <summary>
 		/// This determines if <see cref="Panel2"/> is collapsed.
@@ -129,7 +135,6 @@ namespace Terminal.Gui {
 			Clear ();
 			base.Redraw (bounds);
 		}
-		
 
 		private void Setup ()
 		{
@@ -156,6 +161,8 @@ namespace Terminal.Gui {
 			if (!this.Subviews.Contains (Panel2)) {
 				this.Add (Panel2);
 			}
+
+			splitterDistance = BoundByMinimumSizes (splitterDistance);
 
 			switch (Orientation) {
 			case Orientation.Horizontal:
@@ -202,16 +209,58 @@ namespace Terminal.Gui {
 			this.LayoutSubviews ();
 		}
 
+		/// <summary>
+		/// Considers <paramref name="pos"/> as a candidate for <see cref="splitterDistance"/>
+		/// then either returns (if valid) or returns adjusted if invalid with respect to
+		/// <see cref="Panel1MinSize"/> or <see cref="Panel2MinSize"/>.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		private Pos BoundByMinimumSizes (Pos pos)
+		{
+			// if we are not yet initialized then we don't know
+			// how big we are and therefore cannot sensibly calculate
+			// how big the panels will be with a given SplitterDistance
+			if (!IsInitialized) {
+				return pos;
+			}
+
+			var availableSpace = Orientation == Orientation.Horizontal ? this.Bounds.Height : this.Bounds.Width;
+
+			var idealPosition = pos.Anchor (availableSpace);
+			var panel1MinSizeAbs = panel1MinSize.Anchor (availableSpace);
+			var panel2MinSizeAbs = panel2MinSize.Anchor (availableSpace);
+
+			// bad position because not enough space for panel1
+			if (idealPosition < panel1MinSizeAbs) {
+
+				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
+				return (Pos)Math.Min (panel1MinSizeAbs, availableSpace);
+			}
+			
+			// bad position because not enough space for panel2
+			if(availableSpace - idealPosition <= panel2MinSizeAbs) {
+
+				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
+
+				// +1 is to allow space for the splitter
+				return (Pos)Math.Max (availableSpace - (panel2MinSizeAbs+1), 0);
+			}
+
+			// this splitter position is fine, there is enough space for everyone
+			return pos;
+		}
+
 		private void SetupForCollapsedPanel ()
 		{
 			View toRemove = panel1Collapsed ? Panel1 : Panel2;
 			View toFullSize = panel1Collapsed ? Panel2 : Panel1;
 
 			if (this.Subviews.Contains (splitterLine)) {
-				this.Subviews.Remove (splitterLine);
+				this.Remove(splitterLine);
 			}
 			if (this.Subviews.Contains (toRemove)) {
-				this.Subviews.Remove (toRemove);
+				this.Remove (toRemove);
 			}
 			if (!this.Subviews.Contains (toFullSize)) {
 				this.Add (toFullSize);
@@ -239,7 +288,7 @@ namespace Terminal.Gui {
 				this.parent = parent;
 
 				base.AddCommand (Command.Right, () => {
-					return MoveSplitter (1,0);
+					return MoveSplitter (1, 0);
 				});
 
 				base.AddCommand (Command.Left, () => {
@@ -247,7 +296,7 @@ namespace Terminal.Gui {
 				});
 
 				base.AddCommand (Command.LineUp, () => {
-					return MoveSplitter (0,-1);
+					return MoveSplitter (0, -1);
 				});
 
 				base.AddCommand (Command.LineDown, () => {
@@ -267,7 +316,7 @@ namespace Terminal.Gui {
 				if (!CanFocus || !HasFocus) {
 					return base.ProcessKey (kb);
 				}
-				
+
 				var result = InvokeKeybindings (kb);
 				if (result != null)
 					return (bool)result;
@@ -296,7 +345,7 @@ namespace Terminal.Gui {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
-					AddRune (location.X,location.Y, Driver.Diamond);
+					AddRune (location.X, location.Y, Driver.Diamond);
 				}
 
 			}
@@ -309,7 +358,7 @@ namespace Terminal.Gui {
 				}
 
 				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
-					
+
 					// Start a Drag
 					SetFocus ();
 					Application.EnsuresTopOnFront ();
@@ -410,8 +459,7 @@ namespace Terminal.Gui {
 					} else {
 						parent.SplitterDistance = ConvertToPosFactor (newValue, parent.Bounds.Width);
 					}
-				}
-				else {
+				} else {
 					parent.SplitterDistance = newValue;
 				}
 			}
