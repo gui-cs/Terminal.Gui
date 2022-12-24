@@ -18,12 +18,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public SplitContainer ()
 		{
-			// Default to a border of 1 so that View looks nice
+			// Default to a border of 0 but not null so that user can
+			// more easily change size (without null references)
 			Border = new Border ();
+
 			splitterLine = new SplitContainerLineView (this);
 
-			this.Add (splitterLine);
 			this.Add (Panel1);
+			this.Add (splitterLine);
 			this.Add (Panel2);
 
 			Setup ();
@@ -161,9 +163,9 @@ namespace Terminal.Gui {
 				this.Panel1.Y = 0;
 				this.Panel1.Width = Dim.Fill ();
 				this.Panel1.Height = new DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Height) - 1);
+					splitterDistance.Anchor (Bounds.Height));
 
-				this.Panel2.Y = Pos.Bottom (splitterLine) + 1;
+				this.Panel2.Y = Pos.Bottom (splitterLine);
 				this.Panel2.X = 0;
 				this.Panel2.Width = Dim.Fill ();
 				this.Panel2.Height = Dim.Fill ();
@@ -180,9 +182,9 @@ namespace Terminal.Gui {
 				this.Panel1.Y = 0;
 				this.Panel1.Height = Dim.Fill ();
 				this.Panel1.Width = new DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Width) - 1);
+					splitterDistance.Anchor (Bounds.Width));
 
-				this.Panel2.X = Pos.Right (splitterLine) + 1;
+				this.Panel2.X = Pos.Right (splitterLine);
 				this.Panel2.Y = 0;
 				this.Panel2.Width = Dim.Fill ();
 				this.Panel2.Height = Dim.Fill ();
@@ -190,6 +192,8 @@ namespace Terminal.Gui {
 
 			default: throw new ArgumentOutOfRangeException (nameof (orientation));
 			};
+
+			this.LayoutSubviews ();
 		}
 
 		private void SetupForCollapsedPanel ()
@@ -296,7 +300,7 @@ namespace Terminal.Gui {
 				if (CanFocus && HasFocus) {
 
 					var location = moveRuneRenderLocation ??
-						new Point (bounds.Width / 2, bounds.Height / 2);
+						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
 					AddRune (location.X,location.Y, Driver.Diamond);
 				}
@@ -372,9 +376,9 @@ namespace Terminal.Gui {
 				// resizing continues to work as intended
 				if (dragOrignalPos is PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						Y = ToPosFactor (Y, parent.Bounds.Height);
+						parent.splitterDistance = ToPosFactor (Y, parent.Bounds.Height);
 					} else {
-						X = ToPosFactor (X, parent.Bounds.Width);
+						parent.splitterDistance = ToPosFactor (X, parent.Bounds.Width);
 					}
 				}
 			}
