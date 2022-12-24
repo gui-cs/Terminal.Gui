@@ -477,8 +477,10 @@ namespace Terminal.Gui {
 			/// <returns></returns>
 			private Pos ConvertToPosFactor (Pos p, int parentLength)
 			{
-				int position = p.Anchor (parentLength);
-				return new Pos.PosFactor (position / (float)parentLength);
+				// calculate position in the 'middle' of the cell at p distance along parentLength
+				float position = p.Anchor (parentLength) + 0.5f;
+
+				return new Pos.PosFactor (position / parentLength);
 			}
 		}
 	}
