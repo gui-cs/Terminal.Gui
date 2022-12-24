@@ -226,6 +226,24 @@ namespace UnitTests {
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_CannotSetSplitterPosToFuncEtc ()
+		{
+			var splitContainer = Get11By3SplitContainer ();
+
+			var ex = Assert.Throws<ArgumentException>(()=>splitContainer.SplitterDistance = Pos.Right(splitContainer));
+			Assert.Equal("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine",ex.Message);
+
+
+			ex = Assert.Throws<ArgumentException>(()=>splitContainer.SplitterDistance = Pos.Function(()=>1));
+			Assert.Equal("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosFunc",ex.Message);
+
+			// Also not allowed because this results in a PosCombine
+			ex = Assert.Throws<ArgumentException>(()=>splitContainer.SplitterDistance = Pos.Percent(50) - 1);
+			Assert.Equal("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine",ex.Message);
+		}
+
 		private SplitContainer Get11By3SplitContainer ()
 		{
 			var container = new SplitContainer () {

@@ -133,6 +133,11 @@ namespace Terminal.Gui {
 		public Pos SplitterDistance {
 			get { return splitterDistance; }
 			set {
+				if(!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor))
+				{
+					throw new ArgumentException($"Only Percent and Absolute values are supported for {nameof(SplitterDistance)} property.  Passed value was {value.GetType().Name}");
+				}
+
 				splitterDistance = value;
 				Setup ();
 				OnSplitterMoved ();
