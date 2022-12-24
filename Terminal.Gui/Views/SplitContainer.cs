@@ -47,6 +47,21 @@ namespace Terminal.Gui {
 			}
 		}
 
+
+		/// <summary>
+		/// Invoked when the <see cref="SplitterDistance"/> is changed
+		/// </summary>
+		public event SplitterEventHandler SplitterMoved;
+
+		/// <summary>
+		/// Raises the <see cref="SplitterMoved"/> event
+		/// </summary>
+		protected virtual void OnSplitterMoved ()
+		{
+			SplitterMoved?.Invoke (this,new SplitterEventArgs(this,splitterDistance));
+		}
+
+
 		/// <summary>
 		/// This determines if <see cref="Panel1"/> is collapsed.
 		/// </summary>
@@ -120,6 +135,7 @@ namespace Terminal.Gui {
 			set {
 				splitterDistance = value;
 				Setup ();
+				OnSplitterMoved ();
 			}
 		}
 
@@ -483,5 +499,38 @@ namespace Terminal.Gui {
 				return new Pos.PosFactor (position / parentLength);
 			}
 		}
+
 	}
+
+	/// <summary>
+	///  Provides data for <see cref="SplitContainer"/> events.
+	/// </summary>
+	public class SplitterEventArgs : EventArgs {
+
+		/// <summary>
+		/// Creates a new instance of the <see cref="SplitterEventArgs"/> class.
+		/// </summary>
+		/// <param name="splitContainer"></param>
+		/// <param name="splitterDistance"></param>
+		public SplitterEventArgs (SplitContainer splitContainer, Pos splitterDistance)
+		{
+			SplitterDistance = splitterDistance;
+			SplitContainer = splitContainer;
+		}
+
+		/// <summary>
+		/// New position of the <see cref="SplitContainer.SplitterDistance"/>
+		/// </summary>
+		public Pos SplitterDistance { get; }
+
+		/// <summary>
+		/// Container (sender) of the event.
+		/// </summary>
+		public SplitContainer SplitContainer { get; }
+	}
+
+	/// <summary>
+	///  Represents a method that will handle splitter events.
+	/// </summary>
+	public delegate void SplitterEventHandler (object sender, SplitterEventArgs e);
 }
