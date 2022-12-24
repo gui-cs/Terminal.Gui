@@ -239,7 +239,8 @@ namespace UnitTests {
 			Application.Top.Add (container);
 			container.ColorScheme = new ColorScheme ();
 			container.LayoutSubviews ();
-
+			container.BeginInit ();
+			container.EndInit ();
 			return container;
 		}
 	}
