@@ -1,4 +1,4 @@
-﻿using NStack;
+using NStack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -151,9 +151,9 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public FrameView LeftPane;
+			public FrameView ContentPane;
+			public SplitContainer SplitContainer;
 			public ListView CategoryListView;
-			public FrameView RightPane;
 			public ListView ScenarioListView;
 
 			public StatusItem Capslock;
@@ -201,24 +201,29 @@ namespace UICatalog {
 					}),
 					new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
-						LeftPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-						RightPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
+						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
 						SetChildNeedsDisplay();
 					}),
 					DriverName,
 				};
 
-				LeftPane = new FrameView ("Categories") {
+				ContentPane = new FrameView ("Categories") {
 					X = 0,
 					Y = 1, // for menu
-					Width = 25,
+					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C
 				};
-				LeftPane.Title = $"{LeftPane.Title} ({LeftPane.ShortcutTag})";
-				LeftPane.ShortcutAction = () => LeftPane.SetFocus ();
+				
+				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
+
+				SplitContainer = new SplitContainer {
+					Width = Dim.Fill (0),
+					Height = Dim.Fill (0),
+					SplitterDistance = 25
+				};
 
 				CategoryListView = new ListView (_categories) {
 					X = 0,
@@ -229,21 +234,19 @@ namespace UICatalog {
 					CanFocus = true,
 				};
 				CategoryListView.OpenSelectedItem += (a) => {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
-				LeftPane.Add (CategoryListView);
+				ContentPane.Add (SplitContainer);
 
-				RightPane = new FrameView ("Scenarios") {
-					X = 25,
-					Y = 1, // for menu
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.S
+				SplitContainer.Panel1.Add (CategoryListView);
+
+				SetTitlePaddingToAlignScenariosHeader ();
+
+				SplitContainer.SplitterMoved += (s, e) => {
+					SetTitlePaddingToAlignScenariosHeader ();
 				};
-				RightPane.Title = $"{RightPane.Title} ({RightPane.ShortcutTag})";
-				RightPane.ShortcutAction = () => RightPane.SetFocus ();
+
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -255,12 +258,11 @@ namespace UICatalog {
 				};
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
-				RightPane.Add (ScenarioListView);
+				SplitContainer.Panel2.Add (ScenarioListView);
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);
-				Add (LeftPane);
-				Add (RightPane);
+				Add (ContentPane);
 				Add (StatusBar);
 
 				Loaded += LoadedHandler;
@@ -268,6 +270,21 @@ namespace UICatalog {
 				// Restore previous selections
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
+			}
+
+			private void SetTitlePaddingToAlignScenariosHeader ()
+			{ 
+				// Pos.Anchor is internal so we have to use reflection to access it
+				var anchor = typeof (Pos).GetMethod ("Anchor", BindingFlags.Instance | BindingFlags.NonPublic);
+				var splitterWidth = (int)anchor.Invoke (
+					SplitContainer.SplitterDistance, new object [] { SplitContainer.Bounds.Width}
+					);
+
+				var newTitle = $"Categories ({ContentPane.ShortcutTag})";
+				newTitle = newTitle.PadRight (splitterWidth + 1, (char)Driver.HLine);
+				newTitle += "Scenarios";
+
+				ContentPane.Title = newTitle;				
 			}
 
 			void LoadedHandler ()
@@ -287,7 +304,7 @@ namespace UICatalog {
 					_isFirstRunning = false;
 				}
 				if (!_isFirstRunning) {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				}
 				Loaded -= LoadedHandler;
 			}
