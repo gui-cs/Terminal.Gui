@@ -17,6 +17,8 @@ namespace Terminal.Gui {
         public const string HeaderModified  = "Modified";
         public const string HeaderType  = "Type";
 
+        private Stack<DirectoryInfo> navigationStack = new Stack<DirectoryInfo>();
+
 
 		private TextField tbPath;
 
@@ -75,7 +77,7 @@ namespace Terminal.Gui {
 				}
 			};
 
-            InitializeColorSchemes();
+            SetupColorSchemes();
 
             SetupTableColumns();
 
@@ -84,9 +86,30 @@ namespace Terminal.Gui {
 
             tbPath.TextChanged += (s)=>PathChanged();
 
+            // Give this view priority on key handling
+            tableView.KeyUp += (k)=> k.Handled = this.ProcessHotKey(k.KeyEvent);
+            tableView.ColorScheme = ColorSchemeDefault;
+
             // TODO: delay or consider not doing this to avoid double load
             tbPath.Text = Environment.CurrentDirectory;
+
         }
+
+        public override bool ProcessHotKey (KeyEvent keyEvent)
+        {
+            if(keyEvent.Key == Key.Backspace && navigationStack.Count > 0)
+            {
+                var popped = navigationStack.Pop();
+                if(popped != null)
+                {
+                    Path = popped.FullName;
+                    this.SetNeedsDisplay();
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         private void SortColumn (DataColumn clickedCol)
 		{
@@ -185,7 +208,7 @@ namespace Terminal.Gui {
 			return tableView.Table.Columns [tableView.SelectedColumn];
 		}
 
-		private void InitializeColorSchemes ()
+		private void SetupColorSchemes ()
 		{
             if(ColorSchemeDirectory != null){
                 return;
@@ -197,8 +220,8 @@ namespace Terminal.Gui {
 
 
 			ColorSchemeDefault = new ColorScheme{
-                Normal = Driver.MakeAttribute(Color.Gray,Color.Black),
-                Focus = Driver.MakeAttribute(Color.Black,Color.Gray),
+                Normal = Driver.MakeAttribute(Color.White,Color.Black),
+                Focus = Driver.MakeAttribute(Color.Black,Color.Black),
             };            
 		}
 
@@ -226,9 +249,10 @@ namespace Terminal.Gui {
 		{
 			var stats = RowToStats(obj.Row);
             
+            
             if(stats.FileSystemInfo is DirectoryInfo d)
             {
-                SetupAsDirectory(d);
+                Path = d.FullName;
                 return;
             }
 		}
@@ -270,10 +294,17 @@ namespace Terminal.Gui {
 
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
+            // TODO : Access permissions Exceptions, Dir not exists etc
+
 			var entries = dir.GetFileSystemInfos();
             dtFiles.Rows.Clear();
             fileStats.Clear();
                 
+            // if changing directory
+            if(navigationStack.Count == 0 || navigationStack.Peek().FullName != dir.FullName)
+            {
+                navigationStack.Push(dir);
+            }
 
             foreach(var e in entries)
             {
