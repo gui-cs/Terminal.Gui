@@ -57,6 +57,24 @@ namespace Terminal.Gui {
             tableView.Style.AlwaysShowHeaders = true;
             tableView.CellActivated += CellActivate;
 
+			// if user clicks the mouse in TableView
+			tableView.MouseClick += e => {
+
+				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+
+				if (clickedCol != null) {
+					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+						
+						// left click in a header
+						SortColumn (clickedCol);
+					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+						// right click in a header
+						ShowHeaderContextMenu (clickedCol, e);
+					}
+				}
+			};
+
             InitializeColorSchemes();
 
             SetupTableColumns();
@@ -69,6 +87,103 @@ namespace Terminal.Gui {
             // TODO: delay or consider not doing this to avoid double load
             tbPath.Text = Environment.CurrentDirectory;
         }
+
+        private void SortColumn (DataColumn clickedCol)
+		{
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+			SortColumn (clickedCol, sort, isAsc);
+		}
+
+		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
+		{
+			// set a sort order
+			var style = tableView.Style.GetOrCreateColumnStyle(clickedCol);
+			tableView.Table.DefaultView.Sort = sort;
+            
+            // TODO: Consider preserving selection
+            dtFiles.Rows.Clear();
+
+            var colName = StripArrows(clickedCol.ColumnName);
+
+            var ordered = isAsc?
+                fileStats.Select((v,i)=>new {v,i}).OrderBy(f=>f.v.GetOrderByValue(colName)).ToArray():
+                fileStats.Select((v,i)=>new {v,i}).OrderByDescending(f=>f.v.GetOrderByValue(colName)).ToArray();
+
+            foreach(var o in ordered)
+            {
+                dtFiles.Rows.Add(o.i,o.i,o.i,o.i);
+            }
+
+			foreach (DataColumn col in tableView.Table.Columns) {
+
+				// remove any lingering sort indicator
+				col.ColumnName = TrimArrows(col.ColumnName);
+
+				// add a new one if this the one that is being sorted
+				if (col == clickedCol) {
+					col.ColumnName += isAsc ? '▲' : '▼';
+				}
+			}
+
+			tableView.Update ();
+		}
+
+		private static string TrimArrows (string columnName)
+		{
+			return columnName.TrimEnd ('▼', '▲');
+		}
+		private static string StripArrows (string columnName)
+		{
+			return columnName.Replace ("▼", "").Replace ("▲", "");
+		}
+		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+		{
+			// work out new sort order
+			var sort = tableView.Table.DefaultView.Sort;
+
+			if (sort?.EndsWith ("ASC") ?? false) {
+				sort = $"{clickedCol.ColumnName} DESC";
+				isAsc = false;
+			} else {
+				sort = $"{clickedCol.ColumnName} ASC";
+				isAsc = true;
+			}
+
+			return sort;
+		}
+
+		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+		{
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,sort,isAsc)),
+				})
+			);
+
+			contextMenu.Show ();
+		}
+
+		private void HideColumn (DataColumn clickedCol)
+		{
+			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
+			style.Visible = false;
+			tableView.Update ();
+		}
+
+		private DataColumn GetColumn ()
+		{
+			if (tableView.Table == null)
+				return null;
+
+			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns.Count)
+				return null;
+
+			return tableView.Table.Columns [tableView.SelectedColumn];
+		}
 
 		private void InitializeColorSchemes ()
 		{
@@ -181,6 +296,7 @@ namespace Terminal.Gui {
             
             public FileSystemInfo FileSystemInfo {get;}
             public string HumanReadableLength {get;}
+            public long MachineReadableLength {get;}
 			public DateTime? DateModified { get; }
             public string Type {get;}
 
@@ -200,7 +316,8 @@ namespace Terminal.Gui {
                 
                 if(fsi is FileInfo fi)
                 {
-                    HumanReadableLength = GetHumanReadableFileSize(fi.Length);
+                    MachineReadableLength = fi.Length;
+                    HumanReadableLength = GetHumanReadableFileSize(MachineReadableLength);
                     DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc(fi.FullName) : File.GetLastWriteTime(fi.FullName);
                     Type = fi.Extension;
                 }
@@ -229,6 +346,18 @@ namespace Terminal.Gui {
 
                 return string.Format("{0:n2} {1}", adjustedSize, SizeSuffixes[mag]);
             }
-        }
+
+			internal object GetOrderByValue (string columnName)
+			{
+                switch(columnName)
+                {
+                    case HeaderFilename : return FileSystemInfo.Name;
+                    case HeaderSize : return MachineReadableLength;
+                    case HeaderModified : return DateModified;
+                    case HeaderType : return Type;
+                    default : throw new ArgumentOutOfRangeException(nameof(columnName));
+                }
+			}
+		}
 	}
 }
