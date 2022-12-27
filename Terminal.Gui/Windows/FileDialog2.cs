@@ -34,15 +34,24 @@ namespace Terminal.Gui {
         
         public static ColorScheme ColorSchemeDirectory;
         public static ColorScheme ColorSchemeDefault;
+		private List<string> suggestions = new List<string>();
+        private bool makingSuggestion = false;
 
-        public FileDialog2()
+		public FileDialog2()
         {
+            const int okWidth = 8;
+
             var lblPath = new Label("Path:");
+            var btnOk = new Button("Ok"){
+                IsDefault = true,
+                X = Pos.AnchorEnd(okWidth),
+            };
+            this.Add(btnOk);
             
             this.Add(lblPath);
             tbPath = new TextField{
                 X = Pos.Right(lblPath),
-                Width = Dim.Fill()
+                Width = Dim.Fill(okWidth)
             };
             this.Add(tbPath);
 
@@ -53,6 +62,7 @@ namespace Terminal.Gui {
                 Height = Dim.Fill(1),
                 FullRowSelect = true,
             };
+
             tableView.Style.ShowHorizontalHeaderOverline = false;
             tableView.Style.ShowVerticalCellLines = false;
             tableView.Style.ShowVerticalHeaderLines = false;
@@ -84,18 +94,26 @@ namespace Terminal.Gui {
             tableView.Table = dtFiles;
             this.Add(tableView);
 
-            tbPath.TextChanged += (s)=>PathChanged();
+            tbPath.TextChanged += (s)=>PathChanged(s);
 
             // Give this view priority on key handling
-            tableView.KeyUp += (k)=> k.Handled = this.ProcessHotKey(k.KeyEvent);
+            tableView.KeyUp += (k)=> k.Handled = this.HandleKey(k.KeyEvent);
             tableView.ColorScheme = ColorSchemeDefault;
 
             // TODO: delay or consider not doing this to avoid double load
             tbPath.Text = Environment.CurrentDirectory;
+            tbPath.KeyPress += (k)=> {
+                if(k.KeyEvent.Key == Key.Tab && makingSuggestion)
+                {
+                    tbPath.ClearAllSelection();
+                    tbPath.CursorPosition = tbPath.Text.Length;
+                    k.Handled = true;
+                }
+            };
 
         }
 
-        public override bool ProcessHotKey (KeyEvent keyEvent)
+        private bool HandleKey (KeyEvent keyEvent)
         {
             if(keyEvent.Key == Key.Backspace && navigationStack.Count > 0)
             {
@@ -274,32 +292,93 @@ namespace Terminal.Gui {
 			return fileStats[(int)tableView.Table.Rows[rowIndex][0]];
 		}
 
-		private void PathChanged ()
+        bool proceessingPathChanged = false;
+		private void PathChanged (ustring oldString)
 		{
-            var path = tbPath.Text?.ToString();
-
-            if(string.IsNullOrWhiteSpace(path))
+            // avoid re-entry
+            if(proceessingPathChanged)
             {
-                SetupAsClear();
                 return;
             }
 
-            var dir = new DirectoryInfo(path);
-
-            if(dir.Exists)
+            proceessingPathChanged = true;
+            try
             {
-                SetupAsDirectory(dir);
+                var path = tbPath.Text?.ToString();
+
+                if(string.IsNullOrWhiteSpace(path))
+                {
+                    SetupAsClear();
+                    return;
+                }
+
+                var dir = new DirectoryInfo(path);
+
+                if(dir.Exists)
+                {
+                    SetupAsDirectory(dir);
+                }
+
+                GenerateSuggestions(oldString);
+                
             }
+            finally
+            {
+                proceessingPathChanged = false;
+            }
+
+            return;
+		}
+
+
+		private void GenerateSuggestions (ustring oldString)
+		{
+            makingSuggestion = false;
+
+            if(oldString.Length > tbPath.Text.Length )
+            {
+                return;
+            }
+
+
+            if(tbPath.CursorPosition < tbPath.Text.Length && !makingSuggestion)
+            {
+                return;
+            }
+
+            var path = tbPath.Text.ToString();
+			var last = path.LastIndexOfAny(
+                new []{System.IO.Path.PathSeparator,System.IO.Path.AltDirectorySeparatorChar});
+                
+            if(last == -1 || suggestions.Count == 0 || last >= path.Length-1)
+            {
+                return;
+            }
+
+            var term = path.Substring(last+1);
+
+            // TODO: Be case insensitive on Windows
+            var match = suggestions.Where(s=>s.StartsWith(term)).OrderBy(m=>m.Length).FirstOrDefault();
+
+            if(match == null || term.Length == match.Length)
+            {
+                return;
+            }
+
+            var oldLength = path.Length;
+            tbPath.Text = path + match.Substring(term.Length);
+            tbPath.PrepareSelection(oldLength,match.Length - term.Length);
+            makingSuggestion = true;
 		}
 
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
             // TODO : Access permissions Exceptions, Dir not exists etc
-
 			var entries = dir.GetFileSystemInfos();
             dtFiles.Rows.Clear();
             fileStats.Clear();
-                
+            suggestions = entries.Select(e=>e.Name).ToList();
+
             // if changing directory
             if(navigationStack.Count == 0 || navigationStack.Peek().FullName != dir.FullName)
             {
