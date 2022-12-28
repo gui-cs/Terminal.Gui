@@ -6,68 +6,69 @@ using System.IO;
 using System.Linq;
 using Terminal.Gui.Resources;
 using System.Data;
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 
-    public class FileDialog2 : Dialog
-    {
-        public string Path {get => tbPath.Text.ToString(); set => tbPath.Text = value;}
-		public const string HeaderFilename  = "Filename";
-        public const string HeaderSize  = "Size";
-        public const string HeaderModified  = "Modified";
-        public const string HeaderType  = "Type";
+	public class FileDialog2 : Dialog {
+		public string Path { get => tbPath.Text.ToString (); set => tbPath.Text = value; }
+		public const string HeaderFilename = "Filename";
+		public const string HeaderSize = "Size";
+		public const string HeaderModified = "Modified";
+		public const string HeaderType = "Type";
 
-        private Stack<DirectoryInfo> navigationStack = new Stack<DirectoryInfo>();
+		bool proceessingPathChanged = false;
+		private Stack<DirectoryInfo> navigationStack = new Stack<DirectoryInfo> ();
+		private bool skipNavigationPush = false;
 
 
-		private TextField tbPath;
+		private TextFieldWithAppendAutocomplete tbPath;
+		private DirectoryInfo currentDirectory;
 
-        /// <summary>
-        /// True to use Utc dates for date modified
-        /// </summary>
-        public static bool UseUtcDates = false;
+		/// <summary>
+		/// True to use Utc dates for date modified
+		/// </summary>
+		public static bool UseUtcDates = false;
 
-        DataTable dtFiles;
-        TableView tableView;
+		DataTable dtFiles;
+		TableView tableView;
 
-        List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats>();
-        
-        public static ColorScheme ColorSchemeDirectory;
-        public static ColorScheme ColorSchemeDefault;
-		private List<string> suggestions = new List<string>();
-        private bool makingSuggestion = false;
+		List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats> ();
 
-		public FileDialog2()
-        {
-            const int okWidth = 8;
+		public static ColorScheme ColorSchemeDirectory;
+		public static ColorScheme ColorSchemeDefault;
+		public FileDialog2 ()
+		{
+			const int okWidth = 8;
 
-            var lblPath = new Label("Path:");
-            var btnOk = new Button("Ok"){
-                IsDefault = true,
-                X = Pos.AnchorEnd(okWidth),
-            };
-            this.Add(btnOk);
-            
-            this.Add(lblPath);
-            tbPath = new TextField{
-                X = Pos.Right(lblPath),
-                Width = Dim.Fill(okWidth)
-            };
-            this.Add(tbPath);
+			var lblPath = new Label ("Path:");
+			var btnOk = new Button ("Ok") {
+				IsDefault = true,
+				X = Pos.AnchorEnd (okWidth),
+			};
+			this.Add (btnOk);
 
-            tableView = new TableView{
-                X = 0,
-                Y = 1,
-                Width = Dim.Fill(0),
-                Height = Dim.Fill(1),
-                FullRowSelect = true,
-            };
+			this.Add (lblPath);
+			tbPath = new TextFieldWithAppendAutocomplete {
+				X = Pos.Right (lblPath),
+				Width = Dim.Fill (okWidth)
+			};
+			this.Add (tbPath);
 
-            tableView.Style.ShowHorizontalHeaderOverline = false;
-            tableView.Style.ShowVerticalCellLines = false;
-            tableView.Style.ShowVerticalHeaderLines = false;
-            tableView.Style.AlwaysShowHeaders = true;
-            tableView.CellActivated += CellActivate;
+			tableView = new TableView {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (0),
+				Height = Dim.Fill (1),
+				FullRowSelect = true,
+			};
+
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.ShowVerticalCellLines = false;
+			tableView.Style.ShowVerticalHeaderLines = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.CellActivated += CellActivate;
 
 			// if user clicks the mouse in TableView
 			tableView.MouseClick += e => {
@@ -76,7 +77,7 @@ namespace Terminal.Gui {
 
 				if (clickedCol != null) {
 					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-						
+
 						// left click in a header
 						SortColumn (clickedCol);
 					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
@@ -87,49 +88,166 @@ namespace Terminal.Gui {
 				}
 			};
 
-            SetupColorSchemes();
+			SetupColorSchemes ();
 
-            SetupTableColumns();
+			SetupTableColumns ();
 
-            tableView.Table = dtFiles;
-            this.Add(tableView);
+			tableView.Table = dtFiles;
+			this.Add (tableView);
 
-            tbPath.TextChanged += (s)=>PathChanged(s);
+			tbPath.TextChanged += (s) => PathChanged ();
 
-            // Give this view priority on key handling
-            tableView.KeyUp += (k)=> k.Handled = this.HandleKey(k.KeyEvent);
-            tableView.ColorScheme = ColorSchemeDefault;
+			// Give this view priority on key handling
+			tableView.KeyUp += (k) => k.Handled = this.HandleKey (k.KeyEvent);
+			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
+			tableView.ColorScheme = ColorSchemeDefault;
 
-            // TODO: delay or consider not doing this to avoid double load
-            tbPath.Text = Environment.CurrentDirectory;
-            tbPath.KeyPress += (k)=> {
-                if(k.KeyEvent.Key == Key.Tab && makingSuggestion)
-                {
-                    tbPath.ClearAllSelection();
-                    tbPath.CursorPosition = tbPath.Text.Length;
-                    k.Handled = true;
-                }
-            };
+			// TODO: delay or consider not doing this to avoid double load
+			tbPath.Text = Environment.CurrentDirectory;
+		}
 
-        }
+		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
+		{
+			// if Table is empty or no selection
+			if(obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+				return;
+			}
 
-        private bool HandleKey (KeyEvent keyEvent)
-        {
-            if(keyEvent.Key == Key.Backspace && navigationStack.Count > 0)
-            {
-                var popped = navigationStack.Pop();
-                if(popped != null)
-                {
-                    Path = popped.FullName;
-                    this.SetNeedsDisplay();
-                    return true;
-                }
-            }
-            return false;
-        }
+			var idx = (int)obj.Table.Rows [obj.NewRow][0];
 
+			try {
+				proceessingPathChanged = true;
+				tbPath.Text = fileStats [idx].FileSystemInfo.FullName;
+				tbPath.ClearAllSelection ();
 
-        private void SortColumn (DataColumn clickedCol)
+			} finally {
+
+				proceessingPathChanged = false;
+			}
+		}
+
+		class TextFieldWithAppendAutocomplete : TextField {
+
+			int? currentFragment = null;
+			string[] validFragments = new string[0];
+
+			char [] separators = new [] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
+			
+			public TextFieldWithAppendAutocomplete ()
+			{
+				KeyPress += (k) => {
+					if (k.KeyEvent.Key == Key.Tab) {
+						k.Handled = AcceptSelectionIfAny ();
+					}
+				};
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				if(currentFragment == null) {
+					return;
+				}
+
+				// draw it like its selected even though its not
+				Driver.SetAttribute (new Attribute (Color.Black,Color.White));
+				Move (Text.Length,0);
+				Driver.AddStr(validFragments[currentFragment.Value]);
+			}
+
+			private bool AcceptSelectionIfAny ()
+			{
+				if(currentFragment != null) {
+					Text += validFragments [currentFragment.Value];
+					CursorPosition = Text.Length+1;
+					return true;
+				}
+
+				return false;
+			}
+
+			internal void GenerateSuggestions (List<string> suggestions)
+			{
+				// if cursor is not at the end then user is editing the middle of the path
+				if(CursorPosition < Text.Length-1) {
+					return;
+				}
+
+				var path = Text.ToString ();
+				var last = path.LastIndexOfAny (separators);
+
+				if (last == -1 || suggestions.Count == 0 || last >= path.Length - 1) {
+					currentFragment = null;
+					return;
+				}
+
+				var term = path.Substring (last + 1);
+
+				// TODO: Be case insensitive on Windows
+				var validSuggestions = suggestions
+					.Where (s => s.StartsWith (term))
+					.OrderBy (m => m.Length)
+					.ToArray();
+				
+				// nothing to suggest 
+				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
+					ClearSuggestions ();
+					return;
+				}
+
+				validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray();
+				currentFragment  = 0;
+			}
+
+			public void ClearSuggestions ()
+			{
+				currentFragment = null;
+				validFragments = new string [0];
+			}
+		}
+		private bool HandleKey (KeyEvent keyEvent)
+		{
+			if (keyEvent.Key == Key.Backspace) {
+				return ProcessBackspaceKeystroke ();
+
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Navigates backwards through the navigation history or if history
+		/// is empty navigates up the current directory hierarchy.
+		/// </summary>
+		/// <returns></returns>
+		private bool ProcessBackspaceKeystroke ()
+		{
+			DirectoryInfo goTo = null;
+
+			if (navigationStack.Count > 0) {
+
+				goTo = navigationStack.Pop ();
+			} else {
+
+				if (currentDirectory != null) {
+					goTo = currentDirectory.Parent;
+				}
+			}
+
+			// nowhere to go
+			if (goTo == null) {
+				return false;
+			}
+
+			// Navigate backwards or up but suppress history tracking for op
+			skipNavigationPush = true;
+			Path = goTo.FullName;
+			skipNavigationPush = false;
+			this.SetNeedsDisplay ();
+			return true;
+		}
+
+		private void SortColumn (DataColumn clickedCol)
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
@@ -139,27 +257,26 @@ namespace Terminal.Gui {
 		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
 		{
 			// set a sort order
-			var style = tableView.Style.GetOrCreateColumnStyle(clickedCol);
+			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
 			tableView.Table.DefaultView.Sort = sort;
-            
-            // TODO: Consider preserving selection
-            dtFiles.Rows.Clear();
 
-            var colName = StripArrows(clickedCol.ColumnName);
+			// TODO: Consider preserving selection
+			dtFiles.Rows.Clear ();
 
-            var ordered = isAsc?
-                fileStats.Select((v,i)=>new {v,i}).OrderBy(f=>f.v.GetOrderByValue(colName)).ToArray():
-                fileStats.Select((v,i)=>new {v,i}).OrderByDescending(f=>f.v.GetOrderByValue(colName)).ToArray();
+			var colName = StripArrows (clickedCol.ColumnName);
 
-            foreach(var o in ordered)
-            {
-                dtFiles.Rows.Add(o.i,o.i,o.i,o.i);
-            }
+			var ordered = isAsc ?
+			    fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByValue (colName)).ToArray () :
+			    fileStats.Select ((v, i) => new { v, i }).OrderByDescending (f => f.v.GetOrderByValue (colName)).ToArray ();
+
+			foreach (var o in ordered) {
+				dtFiles.Rows.Add (o.i, o.i, o.i, o.i);
+			}
 
 			foreach (DataColumn col in tableView.Table.Columns) {
 
 				// remove any lingering sort indicator
-				col.ColumnName = TrimArrows(col.ColumnName);
+				col.ColumnName = TrimArrows (col.ColumnName);
 
 				// add a new one if this the one that is being sorted
 				if (col == clickedCol) {
@@ -215,200 +332,157 @@ namespace Terminal.Gui {
 			tableView.Update ();
 		}
 
-		private DataColumn GetColumn ()
-		{
-			if (tableView.Table == null)
-				return null;
-
-			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns.Count)
-				return null;
-
-			return tableView.Table.Columns [tableView.SelectedColumn];
-		}
-
 		private void SetupColorSchemes ()
 		{
-            if(ColorSchemeDirectory != null){
-                return;
-            }
-			ColorSchemeDirectory = new ColorScheme{
-                Normal = Driver.MakeAttribute(Color.Blue,Color.Black),
-                Focus = Driver.MakeAttribute(Color.Black,Color.Blue),
-            };
+			if (ColorSchemeDirectory != null) {
+				return;
+			}
+			ColorSchemeDirectory = new ColorScheme {
+				Normal = Driver.MakeAttribute (Color.Blue, Color.Black),
+				HotNormal = Driver.MakeAttribute (Color.Blue, Color.Black),
+				Focus = Driver.MakeAttribute (Color.Black, Color.Blue),
+				HotFocus = Driver.MakeAttribute (Color.Black, Color.Blue),
+
+			};
 
 
-			ColorSchemeDefault = new ColorScheme{
-                Normal = Driver.MakeAttribute(Color.White,Color.Black),
-                Focus = Driver.MakeAttribute(Color.Black,Color.Black),
-            };            
+			ColorSchemeDefault = new ColorScheme {
+				Normal = Driver.MakeAttribute (Color.White, Color.Black),
+				HotNormal = Driver.MakeAttribute (Color.White, Color.Black),
+				Focus = Driver.MakeAttribute (Color.Black, Color.Black),
+				HotFocus = Driver.MakeAttribute (Color.Black, Color.White),
+			};
 		}
 
 		private void SetupTableColumns ()
 		{
-			dtFiles = new DataTable();
+			dtFiles = new DataTable ();
 
-            var nameStyle = tableView.Style.GetOrCreateColumnStyle(dtFiles.Columns.Add(HeaderFilename,typeof(int)));
-            nameStyle.RepresentationGetter = (i)=> fileStats[(int)i].FileSystemInfo.Name;
-            
-            var sizeStyle = tableView.Style.GetOrCreateColumnStyle(dtFiles.Columns.Add(HeaderSize,typeof(int)));
-            sizeStyle.RepresentationGetter = (i)=> fileStats[(int)i].HumanReadableLength;
+			var nameStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderFilename, typeof (int)));
+			nameStyle.RepresentationGetter = (i) => fileStats [(int)i].FileSystemInfo.Name;
 
-            var dateModifiedStyle = tableView.Style.GetOrCreateColumnStyle(dtFiles.Columns.Add(HeaderModified,typeof(int)));
-            dateModifiedStyle.RepresentationGetter = (i)=> fileStats[(int)i].DateModified?.ToString() ?? "";
+			var sizeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderSize, typeof (int)));
+			sizeStyle.RepresentationGetter = (i) => fileStats [(int)i].HumanReadableLength;
 
-            var typeStyle = tableView.Style.GetOrCreateColumnStyle(dtFiles.Columns.Add(HeaderType,typeof(int)));
-            typeStyle.RepresentationGetter = (i)=> fileStats[(int)i].Type ?? "";
+			var dateModifiedStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderModified, typeof (int)));
+			dateModifiedStyle.RepresentationGetter = (i) => fileStats [(int)i].DateModified?.ToString () ?? "";
 
-            tableView.Style.RowColorGetter = ColorGetter;
+			var typeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderType, typeof (int)));
+			typeStyle.RepresentationGetter = (i) => fileStats [(int)i].Type ?? "";
+
+			tableView.Style.RowColorGetter = ColorGetter;
 		}
 
 
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
-			var stats = RowToStats(obj.Row);
-            
-            
-            if(stats.FileSystemInfo is DirectoryInfo d)
-            {
-                Path = d.FullName;
-                return;
-            }
+			var stats = RowToStats (obj.Row);
+
+
+			if (stats.FileSystemInfo is DirectoryInfo d) {
+				proceessingPathChanged = true;
+				Path = d.FullName;
+				proceessingPathChanged = false;
+				SetupAsDirectory (d);
+				tbPath.ClearSuggestions ();
+				return;
+			}
 		}
 
 		private ColorScheme ColorGetter (TableView.RowColorGetterArgs args)
 		{
-			var stats = RowToStats(args.RowIndex);
+			var stats = RowToStats (args.RowIndex);
 
-            if(stats.Type == "dir")            
-            {
-                return ColorSchemeDirectory;
-            }
+			if (stats.Type == "dir") {
+				return ColorSchemeDirectory;
+			}
 
-            return ColorSchemeDefault;
+			return ColorSchemeDefault;
 		}
 
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return fileStats[(int)tableView.Table.Rows[rowIndex][0]];
-		}
-
-        bool proceessingPathChanged = false;
-		private void PathChanged (ustring oldString)
-		{
-            // avoid re-entry
-            if(proceessingPathChanged)
-            {
-                return;
-            }
-
-            proceessingPathChanged = true;
-            try
-            {
-                var path = tbPath.Text?.ToString();
-
-                if(string.IsNullOrWhiteSpace(path))
-                {
-                    SetupAsClear();
-                    return;
-                }
-
-                var dir = new DirectoryInfo(path);
-
-                if(dir.Exists)
-                {
-                    SetupAsDirectory(dir);
-                }
-
-                GenerateSuggestions(oldString);
-                
-            }
-            finally
-            {
-                proceessingPathChanged = false;
-            }
-
-            return;
+			return fileStats [(int)tableView.Table.Rows [rowIndex] [0]];
 		}
 
 
-		private void GenerateSuggestions (ustring oldString)
+		private void PathChanged ()
 		{
-            makingSuggestion = false;
+			// avoid re-entry
+			if (proceessingPathChanged) {
+				return;
+			}
 
-            if(oldString.Length > tbPath.Text.Length )
-            {
-                return;
-            }
+			proceessingPathChanged = true;
+			try {
+				var path = tbPath.Text?.ToString ();
 
+				if (string.IsNullOrWhiteSpace (path)) {
+					SetupAsClear ();
+					return;
+				}
 
-            if(tbPath.CursorPosition < tbPath.Text.Length && !makingSuggestion)
-            {
-                return;
-            }
+				var dir = new DirectoryInfo (path);
 
-            var path = tbPath.Text.ToString();
-			var last = path.LastIndexOfAny(
-                new []{System.IO.Path.PathSeparator,System.IO.Path.AltDirectorySeparatorChar});
-                
-            if(last == -1 || suggestions.Count == 0 || last >= path.Length-1)
-            {
-                return;
-            }
+				if (dir.Exists) {
+					SetupAsDirectory (dir);
+				} else 
+				if(dir.Parent?.Exists ?? false){
+					SetupAsDirectory (dir.Parent);
+				}
 
-            var term = path.Substring(last+1);
+			} finally {
+				proceessingPathChanged = false;
+			}
 
-            // TODO: Be case insensitive on Windows
-            var match = suggestions.Where(s=>s.StartsWith(term)).OrderBy(m=>m.Length).FirstOrDefault();
-
-            if(match == null || term.Length == match.Length)
-            {
-                return;
-            }
-
-            var oldLength = path.Length;
-            tbPath.Text = path + match.Substring(term.Length);
-            tbPath.PrepareSelection(oldLength,match.Length - term.Length);
-            makingSuggestion = true;
+			return;
 		}
 
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
-            // TODO : Access permissions Exceptions, Dir not exists etc
-			var entries = dir.GetFileSystemInfos();
-            dtFiles.Rows.Clear();
-            fileStats.Clear();
-            suggestions = entries.Select(e=>e.Name).ToList();
+			// if changing directory
+			if (navigationStack.Count == 0 || navigationStack.Peek () != currentDirectory) {
 
-            // if changing directory
-            if(navigationStack.Count == 0 || navigationStack.Peek().FullName != dir.FullName)
-            {
-                navigationStack.Push(dir);
-            }
+				if (currentDirectory != null && !skipNavigationPush) {
+					navigationStack.Push (currentDirectory);
+				}
 
-            foreach(var e in entries)
-            {
-                fileStats.Add(new FileSystemInfoStats(e));
-            }
+				currentDirectory = dir;
 
-            for(int i=0;i<fileStats.Count;i++)
-            {
-                dtFiles.Rows.Add(i,i,i,i);
-            }
+			}
 
-            tableView.Update();
+			// TODO : Access permissions Exceptions, Dir not exists etc
+			var entries = dir.GetFileSystemInfos ();
+			dtFiles.Rows.Clear ();
+			fileStats.Clear ();
+
+			var suggestions = entries.Select (e => e.Name).ToList ();
+			tbPath.GenerateSuggestions (suggestions);
+
+
+			foreach (var e in entries) {
+				fileStats.Add (new FileSystemInfoStats (e));
+			}
+
+			for (int i = 0; i < fileStats.Count; i++) {
+				dtFiles.Rows.Add (i, i, i, i);
+			}
+
+			tableView.Update ();
 		}
 
 		private void SetupAsClear ()
 		{
-            
+
 		}
-        class FileSystemInfoStats{
-            
-            public FileSystemInfo FileSystemInfo {get;}
-            public string HumanReadableLength {get;}
-            public long MachineReadableLength {get;}
+
+		class FileSystemInfoStats {
+
+			public FileSystemInfo FileSystemInfo { get; }
+			public string HumanReadableLength { get; }
+			public long MachineReadableLength { get; }
 			public DateTime? DateModified { get; }
-            public string Type {get;}
+			public string Type { get; }
 
 			/*
 			* Blue: Directory
@@ -420,53 +494,49 @@ namespace Terminal.Gui {
 			* Red with black background: Broken link
 			*/
 
-			public FileSystemInfoStats(FileSystemInfo fsi)
-            {
-                FileSystemInfo = fsi;
-                
-                if(fsi is FileInfo fi)
-                {
-                    MachineReadableLength = fi.Length;
-                    HumanReadableLength = GetHumanReadableFileSize(MachineReadableLength);
-                    DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc(fi.FullName) : File.GetLastWriteTime(fi.FullName);
-                    Type = fi.Extension;
-                }
-                else
-                {
-                    HumanReadableLength = "";
-                    Type = "dir";
-                }
-            }
+			public FileSystemInfoStats (FileSystemInfo fsi)
+			{
+				FileSystemInfo = fsi;
 
-            static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-            static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
+				if (fsi is FileInfo fi) {
+					MachineReadableLength = fi.Length;
+					HumanReadableLength = GetHumanReadableFileSize (MachineReadableLength);
+					DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
+					Type = fi.Extension;
+				} else {
+					HumanReadableLength = "";
+					Type = "dir";
+				}
+			}
 
-            // TODO: is executable;
+			static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+			static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
 
-            const long byteConversion = 1024;
-            public static string GetHumanReadableFileSize(long value)
-            {
+			// TODO: is executable;
 
-                if (value < 0) { return "-" + GetHumanReadableFileSize(-value); }
-                if (value == 0) { return "0.0 bytes"; }
+			const long byteConversion = 1024;
+			public static string GetHumanReadableFileSize (long value)
+			{
 
-                int mag = (int)Math.Log(value, byteConversion);
-                double adjustedSize = (value / Math.Pow(1000, mag));
+				if (value < 0) { return "-" + GetHumanReadableFileSize (-value); }
+				if (value == 0) { return "0.0 bytes"; }
+
+				int mag = (int)Math.Log (value, byteConversion);
+				double adjustedSize = (value / Math.Pow (1000, mag));
 
 
-                return string.Format("{0:n2} {1}", adjustedSize, SizeSuffixes[mag]);
-            }
+				return string.Format ("{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+			}
 
 			internal object GetOrderByValue (string columnName)
 			{
-                switch(columnName)
-                {
-                    case HeaderFilename : return FileSystemInfo.Name;
-                    case HeaderSize : return MachineReadableLength;
-                    case HeaderModified : return DateModified;
-                    case HeaderType : return Type;
-                    default : throw new ArgumentOutOfRangeException(nameof(columnName));
-                }
+				switch (columnName) {
+				case HeaderFilename: return FileSystemInfo.Name;
+				case HeaderSize: return MachineReadableLength;
+				case HeaderModified: return DateModified;
+				case HeaderType: return Type;
+				default: throw new ArgumentOutOfRangeException (nameof (columnName));
+				}
 			}
 		}
 	}

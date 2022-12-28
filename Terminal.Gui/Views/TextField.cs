@@ -1128,7 +1128,7 @@ namespace Terminal.Gui {
 			return point;
 		}
 
-		internal void PrepareSelection (int x, int direction = 0)
+		void PrepareSelection (int x, int direction = 0)
 		{
 			x = x + first < -1 ? 0 : x;
 			selectedStart = selectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : selectedStart;
