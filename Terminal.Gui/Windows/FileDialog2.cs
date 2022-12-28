@@ -1,13 +1,9 @@
 
 using System;
 using System.Collections.Generic;
-using NStack;
 using System.IO;
 using System.Linq;
-using Terminal.Gui.Resources;
 using System.Data;
-using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 
@@ -38,27 +34,32 @@ namespace Terminal.Gui {
 
 		public static ColorScheme ColorSchemeDirectory;
 		public static ColorScheme ColorSchemeDefault;
+		private Button btnOk;
+
 		public FileDialog2 ()
 		{
+			// TODO: handle Save File / Folder too
+			Title = "Open File";
+
 			const int okWidth = 8;
 
-			var lblPath = new Label ("Path:");
-			var btnOk = new Button ("Ok") {
-				IsDefault = true,
+			var lblPath = new Label (">");
+			btnOk = new Button ("Ok") {
 				X = Pos.AnchorEnd (okWidth),
+				IsDefault = true
 			};
 			this.Add (btnOk);
 
 			this.Add (lblPath);
 			tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
-				Width = Dim.Fill (okWidth)
+				Width = Dim.Fill (okWidth+1)
 			};
 			this.Add (tbPath);
 
 			tableView = new TableView {
 				X = 0,
-				Y = 1,
+				Y = 2,
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
 				FullRowSelect = true,
@@ -96,7 +97,7 @@ namespace Terminal.Gui {
 			this.Add (tableView);
 
 			tbPath.TextChanged += (s) => PathChanged ();
-
+			
 			// Give this view priority on key handling
 			tableView.KeyUp += (k) => k.Handled = this.HandleKey (k.KeyEvent);
 			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
@@ -108,17 +109,16 @@ namespace Terminal.Gui {
 
 		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
 		{
-			// if Table is empty or no selection
-			if(obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+			if(!tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
 				return;
 			}
-
+			
 			var idx = (int)obj.Table.Rows [obj.NewRow][0];
 
 			try {
 				proceessingPathChanged = true;
 				tbPath.Text = fileStats [idx].FileSystemInfo.FullName;
-				tbPath.ClearAllSelection ();
+				tbPath.ClearSuggestions ();
 
 			} finally {
 
@@ -136,10 +136,40 @@ namespace Terminal.Gui {
 			public TextFieldWithAppendAutocomplete ()
 			{
 				KeyPress += (k) => {
-					if (k.KeyEvent.Key == Key.Tab) {
+					var key = k.KeyEvent.Key;
+					if (key == Key.Tab) {
 						k.Handled = AcceptSelectionIfAny ();
 					}
+					else
+					if(key == Key.CursorUp) {
+						k.Handled = CycleSuggestion (1);
+					} else
+					if (key == Key.CursorDown) {
+						k.Handled = CycleSuggestion (-1);
+					}
 				};
+
+				ColorScheme = new ColorScheme {
+					Normal = new Attribute (Color.White, Color.Black),
+					HotNormal = new Attribute (Color.White, Color.Black),
+					Focus = new Attribute (Color.White, Color.Black),
+					HotFocus = new Attribute (Color.White, Color.Black),
+				};
+			}
+
+			private bool CycleSuggestion (int direction)
+			{
+				if(currentFragment == null || validFragments.Length <= 1) {
+					return false;
+				}
+
+				currentFragment = (currentFragment + direction) % validFragments.Length;
+
+				if(currentFragment < 0) {
+					currentFragment = validFragments.Length - 1;
+				}
+				SetNeedsDisplay ();
+				return true;
 			}
 
 			public override void Redraw (Rect bounds)
@@ -161,6 +191,8 @@ namespace Terminal.Gui {
 				if(currentFragment != null) {
 					Text += validFragments [currentFragment.Value];
 					CursorPosition = Text.Length+1;
+
+					ClearSuggestions ();
 					return true;
 				}
 
@@ -204,14 +236,28 @@ namespace Terminal.Gui {
 			{
 				currentFragment = null;
 				validFragments = new string [0];
+				SetNeedsDisplay ();
 			}
+		}
+
+		public override void OnLoaded ()
+		{
+			base.OnLoaded ();
+			tbPath.FocusFirst ();
+
+
+
+			tbPath.TabIndex = 3;
+			btnOk.TabIndex = 2;
+			tableView.TabIndex = 1;
+
 		}
 		private bool HandleKey (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
 				return ProcessBackspaceKeystroke ();
-
 			}
+			
 			return false;
 		}
 
@@ -381,10 +427,11 @@ namespace Terminal.Gui {
 
 			if (stats.FileSystemInfo is DirectoryInfo d) {
 				proceessingPathChanged = true;
+				tbPath.ClearSuggestions ();
 				Path = d.FullName;
+				tbPath.CursorPosition = tbPath.Text.Length;
 				proceessingPathChanged = false;
 				SetupAsDirectory (d);
-				tbPath.ClearSuggestions ();
 				return;
 			}
 		}
@@ -469,6 +516,8 @@ namespace Terminal.Gui {
 			}
 
 			tableView.Update ();
+
+			tbPath.CursorPosition = tbPath.Text.Length;
 		}
 
 		private void SetupAsClear ()
