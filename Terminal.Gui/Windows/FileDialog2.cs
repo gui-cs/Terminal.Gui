@@ -15,14 +15,12 @@ namespace Terminal.Gui {
 		public const string HeaderType = "Type";
 
 		bool proceessingPathChanged = false;
-		private Stack<DirectoryInfo> navigationStack = new Stack<DirectoryInfo> ();
-		private bool skipNavigationPush = false;
 
 
 		private TextFieldWithAppendAutocomplete tbPath;
-		private DirectoryInfo currentDirectory;
 
 		FileDialogSorter sorter;
+		FileDialogHistory history;
 
 		/// <summary>
 		/// True to use Utc dates for date modified
@@ -36,7 +34,7 @@ namespace Terminal.Gui {
 
 		public static ColorScheme ColorSchemeDirectory;
 		public static ColorScheme ColorSchemeDefault;
-		public static ColorScheme ColorSchemeImage; 
+		public static ColorScheme ColorSchemeImage;
 
 		/// <summary>
 		/// ColorScheme to use for entries that are executable or match the users file extension
@@ -60,10 +58,22 @@ namespace Terminal.Gui {
 			};
 			this.Add (btnOk);
 
+			var lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
+			lblUp.Clicked += () => history.Up ();
+			this.Add (lblUp);
+
+			var lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
+			lblBack.Clicked += ()=>history.Back ();
+			this.Add (lblBack);
+
+			var lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
+			lblForward.Clicked += () => history.Forward ();
+			this.Add (lblForward);
+
 			this.Add (lblPath);
 			tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
-				Width = Dim.Fill (okWidth+1)
+				Width = Dim.Fill (okWidth + 1)
 			};
 			this.Add (tbPath);
 
@@ -81,18 +91,19 @@ namespace Terminal.Gui {
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.CellActivated += CellActivate;
 
-			
+
 			SetupColorSchemes ();
 
 			SetupTableColumns ();
-			
+
 			sorter = new FileDialogSorter (this, tableView);
+			history = new FileDialogHistory (this);
 
 			tableView.Table = dtFiles;
 			this.Add (tableView);
 
 			tbPath.TextChanged += (s) => PathChanged ();
-			
+
 			// Give this view priority on key handling
 			tableView.KeyUp += (k) => k.Handled = this.HandleKey (k.KeyEvent);
 			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
@@ -104,11 +115,11 @@ namespace Terminal.Gui {
 
 		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
 		{
-			if(!tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+			if (!tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
 				return;
 			}
-			
-			var idx = (int)obj.Table.Rows [obj.NewRow][0];
+
+			var idx = (int)obj.Table.Rows [obj.NewRow] [0];
 
 			try {
 				proceessingPathChanged = true;
@@ -124,19 +135,18 @@ namespace Terminal.Gui {
 		class TextFieldWithAppendAutocomplete : TextField {
 
 			int? currentFragment = null;
-			string[] validFragments = new string[0];
+			string [] validFragments = new string [0];
 
 			char [] separators = new [] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
-			
+
 			public TextFieldWithAppendAutocomplete ()
 			{
 				KeyPress += (k) => {
 					var key = k.KeyEvent.Key;
 					if (key == Key.Tab) {
 						k.Handled = AcceptSelectionIfAny ();
-					}
-					else
-					if(key == Key.CursorUp) {
+					} else
+					if (key == Key.CursorUp) {
 						k.Handled = CycleSuggestion (1);
 					} else
 					if (key == Key.CursorDown) {
@@ -154,13 +164,13 @@ namespace Terminal.Gui {
 
 			private bool CycleSuggestion (int direction)
 			{
-				if(currentFragment == null || validFragments.Length <= 1) {
+				if (currentFragment == null || validFragments.Length <= 1) {
 					return false;
 				}
 
 				currentFragment = (currentFragment + direction) % validFragments.Length;
 
-				if(currentFragment < 0) {
+				if (currentFragment < 0) {
 					currentFragment = validFragments.Length - 1;
 				}
 				SetNeedsDisplay ();
@@ -171,21 +181,21 @@ namespace Terminal.Gui {
 			{
 				base.Redraw (bounds);
 
-				if(currentFragment == null) {
+				if (currentFragment == null) {
 					return;
 				}
 
 				// draw it like its selected even though its not
-				Driver.SetAttribute (new Attribute (Color.Black,Color.White));
-				Move (Text.Length,0);
-				Driver.AddStr(validFragments[currentFragment.Value]);
+				Driver.SetAttribute (new Attribute (Color.Black, Color.White));
+				Move (Text.Length, 0);
+				Driver.AddStr (validFragments [currentFragment.Value]);
 			}
 
 			private bool AcceptSelectionIfAny ()
 			{
-				if(currentFragment != null) {
+				if (currentFragment != null) {
 					Text += validFragments [currentFragment.Value];
-					CursorPosition = Text.Length+1;
+					CursorPosition = Text.Length + 1;
 
 					ClearSuggestions ();
 					return true;
@@ -197,7 +207,7 @@ namespace Terminal.Gui {
 			internal void GenerateSuggestions (List<string> suggestions)
 			{
 				// if cursor is not at the end then user is editing the middle of the path
-				if(CursorPosition < Text.Length-1) {
+				if (CursorPosition < Text.Length - 1) {
 					return;
 				}
 
@@ -215,16 +225,16 @@ namespace Terminal.Gui {
 				var validSuggestions = suggestions
 					.Where (s => s.StartsWith (term))
 					.OrderBy (m => m.Length)
-					.ToArray();
-				
+					.ToArray ();
+
 				// nothing to suggest 
 				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
 					ClearSuggestions ();
 					return;
 				}
 
-				validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray();
-				currentFragment  = 0;
+				validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray ();
+				currentFragment = 0;
 			}
 
 			public void ClearSuggestions ()
@@ -248,44 +258,14 @@ namespace Terminal.Gui {
 		private bool HandleKey (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
-				return ProcessBackspaceKeystroke ();
+				return history.Back ();
 			}
-			
+			if (keyEvent.Key == (Key.ShiftMask | Key.Backspace)) {
+				return history.Forward ();
+			}
+
 			return false;
 		}
-
-		/// <summary>
-		/// Navigates backwards through the navigation history or if history
-		/// is empty navigates up the current directory hierarchy.
-		/// </summary>
-		/// <returns></returns>
-		private bool ProcessBackspaceKeystroke ()
-		{
-			DirectoryInfo goTo = null;
-
-			if (navigationStack.Count > 0) {
-
-				goTo = navigationStack.Pop ();
-			} else {
-
-				if (currentDirectory != null) {
-					goTo = currentDirectory.Parent;
-				}
-			}
-
-			// nowhere to go
-			if (goTo == null) {
-				return false;
-			}
-
-			// Navigate backwards or up but suppress history tracking for op
-			skipNavigationPush = true;
-			Path = goTo.FullName;
-			skipNavigationPush = false;
-			this.SetNeedsDisplay ();
-			return true;
-		}
-
 
 
 		private void SetupColorSchemes ()
@@ -361,13 +341,13 @@ namespace Terminal.Gui {
 		{
 			var stats = RowToStats (args.RowIndex);
 
-			if (stats.IsDir()) {
+			if (stats.IsDir ()) {
 				return ColorSchemeDirectory;
 			}
-			if (stats.IsImage()) {
+			if (stats.IsImage ()) {
 				return ColorSchemeImage;
 			}
-			if(stats.IsExecutable ()) {
+			if (stats.IsExecutable ()) {
 				return ColorSchemeExeOrInteresting;
 			}
 
@@ -400,8 +380,8 @@ namespace Terminal.Gui {
 
 				if (dir.Exists) {
 					SetupAsDirectory (dir);
-				} else 
-				if(dir.Parent?.Exists ?? false){
+				} else
+				if (dir.Parent?.Exists ?? false) {
 					SetupAsDirectory (dir.Parent);
 				}
 
@@ -414,16 +394,7 @@ namespace Terminal.Gui {
 
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
-			// if changing directory
-			if (navigationStack.Count == 0 || navigationStack.Peek () != currentDirectory) {
-
-				if (currentDirectory != null && !skipNavigationPush) {
-					navigationStack.Push (currentDirectory);
-				}
-
-				currentDirectory = dir;
-
-			}
+			history.Push (dir);
 
 			// TODO : Access permissions Exceptions, Dir not exists etc
 			var entries = dir.GetFileSystemInfos ();
@@ -492,17 +463,17 @@ namespace Terminal.Gui {
 
 			// TODO: is executable;
 
-			public bool IsDir()
+			public bool IsDir ()
 			{
 				return Type == "dir";
 			}
-			public bool IsImage()
+			public bool IsImage ()
 			{
-				return this.FileSystemInfo is FileSystemInfo f && 
-					ImageExtensions.Contains(f.Extension,
+				return this.FileSystemInfo is FileSystemInfo f &&
+					ImageExtensions.Contains (f.Extension,
 					StringComparer.InvariantCultureIgnoreCase);
 			}
-			public bool IsExecutable()
+			public bool IsExecutable ()
 			{
 				// TODO: handle linux executable status
 				return this.FileSystemInfo is FileSystemInfo f &&
@@ -537,7 +508,7 @@ namespace Terminal.Gui {
 
 			internal object GetOrderByDefault ()
 			{
-				if(IsDir()) {
+				if (IsDir ()) {
 					return -1;
 				}
 
@@ -545,10 +516,91 @@ namespace Terminal.Gui {
 			}
 		}
 
+		class FileDialogHistory {
+			private Stack<DirectoryInfo> back = new Stack<DirectoryInfo> ();
+			private Stack<DirectoryInfo> forward = new Stack<DirectoryInfo> ();
+			private bool skipNavigationPush = false;
+			private FileDialog2 dlg;
+			private DirectoryInfo currentDirectory;
+
+			public FileDialogHistory (FileDialog2 dlg)
+			{
+				this.dlg = dlg;
+			}
+
+			public bool Back ()
+			{
+
+				DirectoryInfo goTo = null;
+
+				if (back.Count > 0) {
+
+					goTo = back.Pop ();
+				} else {
+
+					if (currentDirectory != null) {
+						goTo = currentDirectory.Parent;
+					}
+				}
+
+				// nowhere to go
+				if (goTo == null) {
+					return false;
+				}
+
+				forward.Push (goTo);
+				GoTo (goTo);
+				return true;
+			}
+			internal bool Forward ()
+			{
+				if(forward.Count > 0) {
+					GoTo (forward.Pop ());
+					return true;					
+				}
+
+				return false;
+			}
+			public bool Up ()
+			{
+				var parent = currentDirectory?.Parent;
+				if (parent != null) {
+
+					back.Push (parent);
+					GoTo (parent);
+					return true;
+				}
+
+				return false;
+			}
+
+			private void GoTo (DirectoryInfo goTo)
+			{
+				// Navigate backwards or up but suppress history tracking for op
+				skipNavigationPush = true;
+				dlg.Path = goTo.FullName;
+				skipNavigationPush = false;
+				dlg.SetNeedsDisplay ();
+			}
+
+			internal void Push (DirectoryInfo dir)
+			{
+				// if changing directory
+				if (back.Count == 0 || back.Peek () != currentDirectory) {
+
+					if (currentDirectory != null && !skipNavigationPush) {
+						back.Push (currentDirectory);
+						forward.Clear ();
+					}
+
+					currentDirectory = dir;
+				}
+			}
+		}
 		private class FileDialogSorter {
 			readonly FileDialog2 dlg;
 			private TableView tableView;
-			
+
 			private DataColumn currentSort = null;
 			private bool currentSortIsAsc = true;
 
@@ -600,8 +652,8 @@ namespace Terminal.Gui {
 
 				var colName = col == null ? null : StripArrows (col.ColumnName);
 
-				var ordered = 
-					colName == null ? dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByDefault()).ToArray():
+				var ordered =
+					colName == null ? dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByDefault ()).ToArray () :
 					currentSortIsAsc ?
 					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByValue (colName)).ToArray () :
 					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderByDescending (f => f.v.GetOrderByValue (colName)).ToArray ();
@@ -626,7 +678,7 @@ namespace Terminal.Gui {
 
 			private void BuildRow (int idx)
 			{
-				tableView.Table.Rows.Add (idx, idx, idx,idx);
+				tableView.Table.Rows.Add (idx, idx, idx, idx);
 			}
 
 			private static string TrimArrows (string columnName)
