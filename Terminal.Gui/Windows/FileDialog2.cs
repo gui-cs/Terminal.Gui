@@ -22,6 +22,8 @@ namespace Terminal.Gui {
 		private TextFieldWithAppendAutocomplete tbPath;
 		private DirectoryInfo currentDirectory;
 
+		FileDialogSorter sorter;
+
 		/// <summary>
 		/// True to use Utc dates for date modified
 		/// </summary>
@@ -30,10 +32,18 @@ namespace Terminal.Gui {
 		DataTable dtFiles;
 		TableView tableView;
 
-		List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats> ();
+		private List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats> ();
 
 		public static ColorScheme ColorSchemeDirectory;
 		public static ColorScheme ColorSchemeDefault;
+		public static ColorScheme ColorSchemeImage; 
+
+		/// <summary>
+		/// ColorScheme to use for entries that are executable or match the users file extension
+		/// provided (e.g. if role of dialog is to pick a .csv file)
+		/// </summary>
+		public static ColorScheme ColorSchemeExeOrInteresting;
+
 		private Button btnOk;
 
 		public FileDialog2 ()
@@ -71,27 +81,12 @@ namespace Terminal.Gui {
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.CellActivated += CellActivate;
 
-			// if user clicks the mouse in TableView
-			tableView.MouseClick += e => {
-
-				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
-
-				if (clickedCol != null) {
-					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-
-						// left click in a header
-						SortColumn (clickedCol);
-					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
-
-						// right click in a header
-						ShowHeaderContextMenu (clickedCol, e);
-					}
-				}
-			};
-
+			
 			SetupColorSchemes ();
 
 			SetupTableColumns ();
+			
+			sorter = new FileDialogSorter (this, tableView);
 
 			tableView.Table = dtFiles;
 			this.Add (tableView);
@@ -245,8 +240,6 @@ namespace Terminal.Gui {
 			base.OnLoaded ();
 			tbPath.FocusFirst ();
 
-
-
 			tbPath.TabIndex = 3;
 			btnOk.TabIndex = 2;
 			tableView.TabIndex = 1;
@@ -293,90 +286,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private void SortColumn (DataColumn clickedCol)
-		{
-			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
-			SortColumn (clickedCol, sort, isAsc);
-		}
-
-		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
-		{
-			// set a sort order
-			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
-			tableView.Table.DefaultView.Sort = sort;
-
-			// TODO: Consider preserving selection
-			dtFiles.Rows.Clear ();
-
-			var colName = StripArrows (clickedCol.ColumnName);
-
-			var ordered = isAsc ?
-			    fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByValue (colName)).ToArray () :
-			    fileStats.Select ((v, i) => new { v, i }).OrderByDescending (f => f.v.GetOrderByValue (colName)).ToArray ();
-
-			foreach (var o in ordered) {
-				dtFiles.Rows.Add (o.i, o.i, o.i, o.i);
-			}
-
-			foreach (DataColumn col in tableView.Table.Columns) {
-
-				// remove any lingering sort indicator
-				col.ColumnName = TrimArrows (col.ColumnName);
-
-				// add a new one if this the one that is being sorted
-				if (col == clickedCol) {
-					col.ColumnName += isAsc ? '▲' : '▼';
-				}
-			}
-
-			tableView.Update ();
-		}
-
-		private static string TrimArrows (string columnName)
-		{
-			return columnName.TrimEnd ('▼', '▲');
-		}
-		private static string StripArrows (string columnName)
-		{
-			return columnName.Replace ("▼", "").Replace ("▲", "");
-		}
-		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
-		{
-			// work out new sort order
-			var sort = tableView.Table.DefaultView.Sort;
-
-			if (sort?.EndsWith ("ASC") ?? false) {
-				sort = $"{clickedCol.ColumnName} DESC";
-				isAsc = false;
-			} else {
-				sort = $"{clickedCol.ColumnName} ASC";
-				isAsc = true;
-			}
-
-			return sort;
-		}
-
-		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
-		{
-			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
-
-			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
-				new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
-					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,sort,isAsc)),
-				})
-			);
-
-			contextMenu.Show ();
-		}
-
-		private void HideColumn (DataColumn clickedCol)
-		{
-			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
-			style.Visible = false;
-			tableView.Update ();
-		}
 
 		private void SetupColorSchemes ()
 		{
@@ -391,12 +301,23 @@ namespace Terminal.Gui {
 
 			};
 
-
 			ColorSchemeDefault = new ColorScheme {
 				Normal = Driver.MakeAttribute (Color.White, Color.Black),
 				HotNormal = Driver.MakeAttribute (Color.White, Color.Black),
 				Focus = Driver.MakeAttribute (Color.Black, Color.Black),
 				HotFocus = Driver.MakeAttribute (Color.Black, Color.White),
+			};
+			ColorSchemeImage = new ColorScheme {
+				Normal = Driver.MakeAttribute (Color.Magenta, Color.Black),
+				HotNormal = Driver.MakeAttribute (Color.Magenta, Color.Black),
+				Focus = Driver.MakeAttribute (Color.Black, Color.Magenta),
+				HotFocus = Driver.MakeAttribute (Color.Black, Color.Magenta),
+			};
+			ColorSchemeExeOrInteresting = new ColorScheme {
+				Normal = Driver.MakeAttribute (Color.Green, Color.Black),
+				HotNormal = Driver.MakeAttribute (Color.Green, Color.Black),
+				Focus = Driver.MakeAttribute (Color.Black, Color.Green),
+				HotFocus = Driver.MakeAttribute (Color.Black, Color.Green),
 			};
 		}
 
@@ -440,8 +361,14 @@ namespace Terminal.Gui {
 		{
 			var stats = RowToStats (args.RowIndex);
 
-			if (stats.Type == "dir") {
+			if (stats.IsDir()) {
 				return ColorSchemeDirectory;
+			}
+			if (stats.IsImage()) {
+				return ColorSchemeImage;
+			}
+			if(stats.IsExecutable ()) {
+				return ColorSchemeExeOrInteresting;
 			}
 
 			return ColorSchemeDefault;
@@ -515,6 +442,7 @@ namespace Terminal.Gui {
 				dtFiles.Rows.Add (i, i, i, i);
 			}
 
+			sorter.ApplySort ();
 			tableView.Update ();
 
 			tbPath.CursorPosition = tbPath.Text.Length;
@@ -560,8 +488,27 @@ namespace Terminal.Gui {
 
 			static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 			static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
+			static readonly List<string> ExecutableExtensions = new List<string> { ".EXE", ".BAT" };
 
 			// TODO: is executable;
+
+			public bool IsDir()
+			{
+				return Type == "dir";
+			}
+			public bool IsImage()
+			{
+				return this.FileSystemInfo is FileSystemInfo f && 
+					ImageExtensions.Contains(f.Extension,
+					StringComparer.InvariantCultureIgnoreCase);
+			}
+			public bool IsExecutable()
+			{
+				// TODO: handle linux executable status
+				return this.FileSystemInfo is FileSystemInfo f &&
+					ExecutableExtensions.Contains (f.Extension,
+					StringComparer.InvariantCultureIgnoreCase);
+			}
 
 			const long byteConversion = 1024;
 			public static string GetHumanReadableFileSize (long value)
@@ -586,6 +533,141 @@ namespace Terminal.Gui {
 				case HeaderType: return Type;
 				default: throw new ArgumentOutOfRangeException (nameof (columnName));
 				}
+			}
+
+			internal object GetOrderByDefault ()
+			{
+				if(IsDir()) {
+					return -1;
+				}
+
+				return 100;
+			}
+		}
+
+		private class FileDialogSorter {
+			readonly FileDialog2 dlg;
+			private TableView tableView;
+			
+			private DataColumn currentSort = null;
+			private bool currentSortIsAsc = true;
+
+			public FileDialogSorter (FileDialog2 dlg, TableView tableView)
+			{
+				this.dlg = dlg;
+				this.tableView = tableView;
+
+				// if user clicks the mouse in TableView
+				this.tableView.MouseClick += e => {
+
+					this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+
+					if (clickedCol != null) {
+						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+
+							// left click in a header
+							SortColumn (clickedCol);
+						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+							// right click in a header
+							ShowHeaderContextMenu (clickedCol, e);
+						}
+					}
+				};
+
+			}
+			private void SortColumn (DataColumn clickedCol)
+			{
+				GetProposedNewSortOrder (clickedCol, out var isAsc);
+				SortColumn (clickedCol, isAsc);
+			}
+
+			private void SortColumn (DataColumn col, bool isAsc)
+			{
+				// set a sort order
+				currentSort = col;
+				currentSortIsAsc = isAsc;
+
+				ApplySort ();
+			}
+
+			public void ApplySort ()
+			{
+				var col = currentSort;
+
+				// TODO: Consider preserving selection
+				tableView.Table.Rows.Clear ();
+
+				var colName = col == null ? null : StripArrows (col.ColumnName);
+
+				var ordered = 
+					colName == null ? dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByDefault()).ToArray():
+					currentSortIsAsc ?
+					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByValue (colName)).ToArray () :
+					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderByDescending (f => f.v.GetOrderByValue (colName)).ToArray ();
+
+				foreach (var o in ordered) {
+					BuildRow (o.i);
+				}
+
+				foreach (DataColumn c in tableView.Table.Columns) {
+
+					// remove any lingering sort indicator
+					c.ColumnName = TrimArrows (c.ColumnName);
+
+					// add a new one if this the one that is being sorted
+					if (c == col) {
+						c.ColumnName += currentSortIsAsc ? '▲' : '▼';
+					}
+				}
+
+				tableView.Update ();
+			}
+
+			private void BuildRow (int idx)
+			{
+				tableView.Table.Rows.Add (idx, idx, idx,idx);
+			}
+
+			private static string TrimArrows (string columnName)
+			{
+				return columnName.TrimEnd ('▼', '▲');
+			}
+			private static string StripArrows (string columnName)
+			{
+				return columnName.Replace ("▼", "").Replace ("▲", "");
+			}
+			private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+			{
+				// work out new sort order
+				if (currentSort == clickedCol && currentSortIsAsc) {
+					isAsc = false;
+					return $"{clickedCol.ColumnName} DESC";
+				} else {
+					isAsc = true;
+					return $"{clickedCol.ColumnName} ASC";
+				}
+			}
+
+			private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+			{
+				var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+				var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
+					new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,isAsc)),
+					})
+				);
+
+				contextMenu.Show ();
+			}
+
+			private void HideColumn (DataColumn clickedCol)
+			{
+				var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
+				style.Visible = false;
+				tableView.Update ();
 			}
 		}
 	}
