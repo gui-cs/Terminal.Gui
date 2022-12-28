@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Data;
+using NStack;
 
 namespace Terminal.Gui {
 
@@ -47,10 +48,12 @@ namespace Terminal.Gui {
 		private Label lblBack;
 		private Label lblUp;
 
+		private string title;
+
 		public FileDialog2 ()
 		{
 			// TODO: handle Save File / Folder too
-			Title = "Open File";
+			title = "Open File";
 
 			const int okWidth = 8;
 
@@ -116,6 +119,28 @@ namespace Terminal.Gui {
 			tbPath.Text = Environment.CurrentDirectory;
 
 			UpdateNavigationVisibility ();
+		}
+		/// <inheritdoc/>
+		public override void Redraw (Rect bounds)
+		{
+			base.Redraw (bounds);
+
+			Move (1, 0, false);
+
+			var padding = ((bounds.Width - this.title.Sum (c=>Rune.ColumnWidth(c))) / 2) - 1;
+
+			Driver.SetAttribute (
+			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
+
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
+
+			Driver.SetAttribute (
+			    new Attribute (ColorScheme.Normal.Foreground,ColorScheme.Normal.Background));
+			Driver.AddStr (this.title);
+
+			Driver.SetAttribute (
+			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
 		}
 
 		private void UpdateNavigationVisibility ()
@@ -346,6 +371,8 @@ namespace Terminal.Gui {
 				proceessingPathChanged = false;
 				SetupAsDirectory (d);
 				history.ClearForward ();
+				tableView.RowOffset = 0;
+				tableView.SelectedRow = 0;
 				return;
 			}
 		}
