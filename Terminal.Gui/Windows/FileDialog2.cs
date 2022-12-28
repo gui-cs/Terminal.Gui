@@ -43,6 +43,9 @@ namespace Terminal.Gui {
 		public static ColorScheme ColorSchemeExeOrInteresting;
 
 		private Button btnOk;
+		private Label lblForward;
+		private Label lblBack;
+		private Label lblUp;
 
 		public FileDialog2 ()
 		{
@@ -58,15 +61,15 @@ namespace Terminal.Gui {
 			};
 			this.Add (btnOk);
 
-			var lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
+			lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
 			lblUp.Clicked += () => history.Up ();
 			this.Add (lblUp);
 
-			var lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
-			lblBack.Clicked += ()=>history.Back ();
+			lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
+			lblBack.Clicked += () => history.Back ();
 			this.Add (lblBack);
 
-			var lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
+			lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
 			lblForward.Clicked += () => history.Forward ();
 			this.Add (lblForward);
 
@@ -111,6 +114,15 @@ namespace Terminal.Gui {
 
 			// TODO: delay or consider not doing this to avoid double load
 			tbPath.Text = Environment.CurrentDirectory;
+
+			UpdateNavigationVisibility ();
+		}
+
+		private void UpdateNavigationVisibility ()
+		{
+			lblBack.Visible = history.CanBack ();
+			lblForward.Visible = history.CanForward ();
+			lblUp.Visible = history.CanUp ();
 		}
 
 		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
@@ -333,6 +345,7 @@ namespace Terminal.Gui {
 				tbPath.CursorPosition = tbPath.Text.Length;
 				proceessingPathChanged = false;
 				SetupAsDirectory (d);
+				history.ClearForward ();
 				return;
 			}
 		}
@@ -389,7 +402,7 @@ namespace Terminal.Gui {
 				proceessingPathChanged = false;
 			}
 
-			return;
+			UpdateNavigationVisibility ();
 		}
 
 		private void SetupAsDirectory (DirectoryInfo dir)
@@ -401,7 +414,10 @@ namespace Terminal.Gui {
 			dtFiles.Rows.Clear ();
 			fileStats.Clear ();
 
-			var suggestions = entries.Select (e => e.Name).ToList ();
+			var suggestions = entries.Select (
+				e => e is DirectoryInfo ? e.Name + System.IO.Path.DirectorySeparatorChar
+							: e.Name
+							).ToList ();
 			tbPath.GenerateSuggestions (suggestions);
 
 
@@ -533,14 +549,11 @@ namespace Terminal.Gui {
 
 				DirectoryInfo goTo = null;
 
-				if (back.Count > 0) {
+				if (CanBack ()) {
 
 					goTo = back.Pop ();
-				} else {
-
-					if (currentDirectory != null) {
-						goTo = currentDirectory.Parent;
-					}
+				} else if (CanUp ()) {
+					goTo = currentDirectory?.Parent;
 				}
 
 				// nowhere to go
@@ -548,15 +561,21 @@ namespace Terminal.Gui {
 					return false;
 				}
 
-				forward.Push (goTo);
+				forward.Push (currentDirectory);
 				GoTo (goTo);
 				return true;
 			}
+
+			internal bool CanBack ()
+			{
+				return back.Count > 0;
+			}
+
 			internal bool Forward ()
 			{
-				if(forward.Count > 0) {
+				if (forward.Count > 0) {
 					GoTo (forward.Pop ());
-					return true;					
+					return true;
 				}
 
 				return false;
@@ -574,6 +593,11 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			internal bool CanUp ()
+			{
+				return currentDirectory?.Parent != null;
+			}
+
 			private void GoTo (DirectoryInfo goTo)
 			{
 				// Navigate backwards or up but suppress history tracking for op
@@ -581,6 +605,7 @@ namespace Terminal.Gui {
 				dlg.Path = goTo.FullName;
 				skipNavigationPush = false;
 				dlg.SetNeedsDisplay ();
+				dlg.UpdateNavigationVisibility ();
 			}
 
 			internal void Push (DirectoryInfo dir)
@@ -590,11 +615,21 @@ namespace Terminal.Gui {
 
 					if (currentDirectory != null && !skipNavigationPush) {
 						back.Push (currentDirectory);
-						forward.Clear ();
+						ClearForward ();
 					}
 
 					currentDirectory = dir;
 				}
+			}
+
+			internal bool CanForward ()
+			{
+				return forward.Count > 0;
+			}
+
+			internal void ClearForward ()
+			{
+				forward.Clear ();
 			}
 		}
 		private class FileDialogSorter {
