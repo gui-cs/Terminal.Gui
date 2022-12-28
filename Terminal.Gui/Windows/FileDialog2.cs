@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Data;
 using NStack;
+using Terminal.Gui.Trees;
+using static System.Environment;
 
 namespace Terminal.Gui {
 
@@ -30,6 +32,8 @@ namespace Terminal.Gui {
 
 		DataTable dtFiles;
 		TableView tableView;
+		TreeView<object> treeView;
+		SplitContainer splitContainer;
 
 		private List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats> ();
 
@@ -44,6 +48,7 @@ namespace Terminal.Gui {
 		public static ColorScheme ColorSchemeExeOrInteresting;
 
 		private Button btnOk;
+		private Button btnToggleSplitterCollapse;
 		private Label lblForward;
 		private Label lblBack;
 		private Label lblUp;
@@ -83,13 +88,62 @@ namespace Terminal.Gui {
 			};
 			this.Add (tbPath);
 
-			tableView = new TableView {
+			splitContainer = new SplitContainer () {
 				X = 0,
 				Y = 2,
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
+				SplitterDistance = 30,
+				Panel1Collapsed = true,
+			};
+
+			tableView = new TableView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
 				FullRowSelect = true,
 			};
+
+			treeView = new TreeView<object> () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+			
+			treeView.TreeBuilder = new FileDialogTreeBuilder ();
+			treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
+			
+
+			try {
+				treeView.AddObjects (
+					Environment.GetLogicalDrives ()
+					.Select (d =>
+						new FileDialogRootTreeNode (d, new DirectoryInfo (d)))
+					);
+				
+			} catch (Exception) {
+				// Cannot get the system disks thats fine
+			}
+			
+
+			treeView.AddObjects (
+				Enum.GetValues (typeof(SpecialFolder))
+				.Cast<SpecialFolder>()
+				.Where(IsValidSpecialFolder)
+				.Select(GetTreeNode));
+
+			treeView.SelectionChanged += TreeView_SelectionChanged;
+
+			splitContainer.Panel2.Add (tableView);
+			splitContainer.Panel1.Add (treeView);
+
+			btnToggleSplitterCollapse = new Button (">>") {
+				Y = Pos.AnchorEnd(1),
+			};
+			btnToggleSplitterCollapse.Clicked += () => {
+				var newState = !splitContainer.Panel1Collapsed;
+				splitContainer.Panel1Collapsed = newState;
+				btnToggleSplitterCollapse.Text = newState ? ">>" : "<<";
+			};
+			Add (btnToggleSplitterCollapse);
 
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.ShowVerticalCellLines = false;
@@ -106,7 +160,7 @@ namespace Terminal.Gui {
 			history = new FileDialogHistory (this);
 
 			tableView.Table = dtFiles;
-			this.Add (tableView);
+			this.Add (splitContainer);
 
 			tbPath.TextChanged += (s) => PathChanged ();
 
@@ -120,6 +174,32 @@ namespace Terminal.Gui {
 
 			UpdateNavigationVisibility ();
 		}
+
+		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
+		{
+			if(e.NewValue == null) {
+				return;
+			}
+			tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
+		}
+
+		private bool IsValidSpecialFolder (SpecialFolder arg)
+		{
+			try {
+				var path = Environment.GetFolderPath (arg);
+				return !string.IsNullOrWhiteSpace (path) && Directory.Exists(path);
+			} catch (Exception) {
+
+				return false;
+			}
+		}
+		private FileDialogRootTreeNode GetTreeNode (SpecialFolder arg)
+		{
+			return new FileDialogRootTreeNode (
+				arg.ToString (), 
+				new DirectoryInfo(Environment.GetFolderPath (arg)));
+		}
+
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -127,7 +207,7 @@ namespace Terminal.Gui {
 
 			Move (1, 0, false);
 
-			var padding = ((bounds.Width - this.title.Sum (c=>Rune.ColumnWidth(c))) / 2) - 1;
+			var padding = ((bounds.Width - this.title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
 
 			Driver.SetAttribute (
 			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
@@ -135,7 +215,7 @@ namespace Terminal.Gui {
 			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
 
 			Driver.SetAttribute (
-			    new Attribute (ColorScheme.Normal.Foreground,ColorScheme.Normal.Background));
+			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
 			Driver.AddStr (this.title);
 
 			Driver.SetAttribute (
@@ -287,10 +367,10 @@ namespace Terminal.Gui {
 			base.OnLoaded ();
 			tbPath.FocusFirst ();
 
-			tbPath.TabIndex = 3;
-			btnOk.TabIndex = 2;
-			tableView.TabIndex = 1;
-
+			tbPath.TabIndex = 5;
+			btnOk.TabIndex = 4;
+			tableView.TabIndex = 3;
+			btnToggleSplitterCollapse.TabIndex = 2;
 		}
 		private bool HandleKey (KeyEvent keyEvent)
 		{
@@ -344,16 +424,19 @@ namespace Terminal.Gui {
 
 			var nameStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderFilename, typeof (int)));
 			nameStyle.RepresentationGetter = (i) => fileStats [(int)i].FileSystemInfo.Name;
+			nameStyle.MinWidth = 50;
 
 			var sizeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderSize, typeof (int)));
 			sizeStyle.RepresentationGetter = (i) => fileStats [(int)i].HumanReadableLength;
+			nameStyle.MinWidth = 10;
 
 			var dateModifiedStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderModified, typeof (int)));
 			dateModifiedStyle.RepresentationGetter = (i) => fileStats [(int)i].DateModified?.ToString () ?? "";
+			dateModifiedStyle.MinWidth = 30;
 
 			var typeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderType, typeof (int)));
 			typeStyle.RepresentationGetter = (i) => fileStats [(int)i].Type ?? "";
-
+			typeStyle.MinWidth = 6;
 			tableView.Style.RowColorGetter = ColorGetter;
 		}
 
@@ -782,6 +865,50 @@ namespace Terminal.Gui {
 				var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
 				style.Visible = false;
 				tableView.Update ();
+			}
+		}
+
+
+		private class FileDialogRootTreeNode {
+			public string DisplayName { get; set; }
+			public DirectoryInfo Path { get; set; }
+			public FileDialogRootTreeNode (string displayName, DirectoryInfo path)
+			{
+				this.DisplayName = displayName;
+				this.Path = path;
+			}
+
+			public override string ToString ()
+			{
+				return DisplayName;
+			}
+		}
+		private class FileDialogTreeBuilder : ITreeBuilder<object> {
+			public bool SupportsCanExpand => true;
+
+			public bool CanExpand (object toExpand)
+			{
+				return TryGetDirectories(NodeToDirectory (toExpand)).Any();
+			}
+
+			private IEnumerable<DirectoryInfo> TryGetDirectories (DirectoryInfo directoryInfo)
+			{
+				try {
+					return directoryInfo.EnumerateDirectories ();
+				} catch (Exception) {
+
+					return Enumerable.Empty<DirectoryInfo> ();
+				}
+			}
+
+			internal static DirectoryInfo NodeToDirectory (object toExpand)
+			{
+				return toExpand is FileDialogRootTreeNode f ? f.Path : (DirectoryInfo)toExpand;
+			}
+
+			public IEnumerable<object> GetChildren (object forObject)
+			{
+				return TryGetDirectories(NodeToDirectory (forObject));
 			}
 		}
 	}
