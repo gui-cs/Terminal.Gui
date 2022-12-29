@@ -7,6 +7,9 @@ using System.Data;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
+using System.Collections.ObjectModel;
+using Microsoft.VisualBasic;
+using System.Collections;
 
 namespace Terminal.Gui {
 
@@ -17,8 +20,9 @@ namespace Terminal.Gui {
 		public const string HeaderModified = "Modified";
 		public const string HeaderType = "Type";
 
-		bool proceessingPathChanged = false;
+		bool pushingState = false;
 
+		private FileDialogState state;
 
 		private TextFieldWithAppendAutocomplete tbPath;
 
@@ -34,8 +38,6 @@ namespace Terminal.Gui {
 		TableView tableView;
 		TreeView<object> treeView;
 		SplitContainer splitContainer;
-
-		private List<FileSystemInfoStats> fileStats = new List<FileSystemInfoStats> ();
 
 		public static ColorScheme ColorSchemeDirectory;
 		public static ColorScheme ColorSchemeDefault;
@@ -107,10 +109,10 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-			
+
 			treeView.TreeBuilder = new FileDialogTreeBuilder ();
 			treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
-			
+
 
 			try {
 				treeView.AddObjects (
@@ -118,17 +120,17 @@ namespace Terminal.Gui {
 					.Select (d =>
 						new FileDialogRootTreeNode (d, new DirectoryInfo (d)))
 					);
-				
+
 			} catch (Exception) {
 				// Cannot get the system disks thats fine
 			}
-			
+
 
 			treeView.AddObjects (
-				Enum.GetValues (typeof(SpecialFolder))
-				.Cast<SpecialFolder>()
-				.Where(IsValidSpecialFolder)
-				.Select(GetTreeNode));
+				Enum.GetValues (typeof (SpecialFolder))
+				.Cast<SpecialFolder> ()
+				.Where (IsValidSpecialFolder)
+				.Select (GetTreeNode));
 
 			treeView.SelectionChanged += TreeView_SelectionChanged;
 
@@ -136,7 +138,7 @@ namespace Terminal.Gui {
 			splitContainer.Panel1.Add (treeView);
 
 			btnToggleSplitterCollapse = new Button (">>") {
-				Y = Pos.AnchorEnd(1),
+				Y = Pos.AnchorEnd (1),
 			};
 			btnToggleSplitterCollapse.Clicked += () => {
 				var newState = !splitContainer.Panel1Collapsed;
@@ -177,7 +179,7 @@ namespace Terminal.Gui {
 
 		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
 		{
-			if(e.NewValue == null) {
+			if (e.NewValue == null) {
 				return;
 			}
 			tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
@@ -187,7 +189,7 @@ namespace Terminal.Gui {
 		{
 			try {
 				var path = Environment.GetFolderPath (arg);
-				return !string.IsNullOrWhiteSpace (path) && Directory.Exists(path);
+				return !string.IsNullOrWhiteSpace (path) && Directory.Exists (path);
 			} catch (Exception) {
 
 				return false;
@@ -196,8 +198,8 @@ namespace Terminal.Gui {
 		private FileDialogRootTreeNode GetTreeNode (SpecialFolder arg)
 		{
 			return new FileDialogRootTreeNode (
-				arg.ToString (), 
-				new DirectoryInfo(Environment.GetFolderPath (arg)));
+				arg.ToString (),
+				new DirectoryInfo (Environment.GetFolderPath (arg)));
 		}
 
 		/// <inheritdoc/>
@@ -236,16 +238,20 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var idx = (int)obj.Table.Rows [obj.NewRow] [0];
+			var stats = RowToStats (obj.NewRow);
+
+			if (stats == null) {
+				return;
+			}
 
 			try {
-				proceessingPathChanged = true;
-				tbPath.Text = fileStats [idx].FileSystemInfo.FullName;
+				pushingState = true;
+				tbPath.Text = stats.FileSystemInfo.FullName;
 				tbPath.ClearSuggestions ();
 
 			} finally {
 
-				proceessingPathChanged = false;
+				pushingState = false;
 			}
 		}
 
@@ -360,6 +366,21 @@ namespace Terminal.Gui {
 				validFragments = new string [0];
 				SetNeedsDisplay ();
 			}
+
+			internal void GenerateSuggestions(FileDialogState state)
+			{
+				if (state == null) {
+					return;
+				}	
+
+				var suggestions = state.Children.Select (
+					e => e.FileSystemInfo is DirectoryInfo d 
+						? d.Name + System.IO.Path.DirectorySeparatorChar
+						: e.FileSystemInfo.Name)
+					.ToList ();
+
+				GenerateSuggestions (suggestions);
+			}
 		}
 
 		public override void OnLoaded ()
@@ -423,19 +444,19 @@ namespace Terminal.Gui {
 			dtFiles = new DataTable ();
 
 			var nameStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderFilename, typeof (int)));
-			nameStyle.RepresentationGetter = (i) => fileStats [(int)i].FileSystemInfo.Name;
+			nameStyle.RepresentationGetter = (i) => state?.Children [(int)i].FileSystemInfo.Name ?? "";
 			nameStyle.MinWidth = 50;
 
 			var sizeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderSize, typeof (int)));
-			sizeStyle.RepresentationGetter = (i) => fileStats [(int)i].HumanReadableLength;
+			sizeStyle.RepresentationGetter = (i) => state?.Children [(int)i].HumanReadableLength ?? "";
 			nameStyle.MinWidth = 10;
 
 			var dateModifiedStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderModified, typeof (int)));
-			dateModifiedStyle.RepresentationGetter = (i) => fileStats [(int)i].DateModified?.ToString () ?? "";
+			dateModifiedStyle.RepresentationGetter = (i) => state?.Children [(int)i].DateModified?.ToString () ?? "";
 			dateModifiedStyle.MinWidth = 30;
 
 			var typeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderType, typeof (int)));
-			typeStyle.RepresentationGetter = (i) => fileStats [(int)i].Type ?? "";
+			typeStyle.RepresentationGetter = (i) => state?.Children [(int)i].Type ?? "";
 			typeStyle.MinWidth = 6;
 			tableView.Style.RowColorGetter = ColorGetter;
 		}
@@ -447,17 +468,71 @@ namespace Terminal.Gui {
 
 
 			if (stats.FileSystemInfo is DirectoryInfo d) {
-				proceessingPathChanged = true;
+				PushState (d, false);
+				return;
+			}
+		}
+
+		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true)
+		{
+			// no change of state
+			if(d == state?.Directory) {
+				return;
+			}
+
+
+			try {
+				pushingState = true;
+
+				// push the old state to history
+				if (addCurrentStateToHistory) {
+					history.Push (state);
+				}
+
 				tbPath.ClearSuggestions ();
-				Path = d.FullName;
-				tbPath.CursorPosition = tbPath.Text.Length;
-				proceessingPathChanged = false;
-				SetupAsDirectory (d);
+
+				if(setPathText) {
+					tbPath.Text = d.FullName;
+					tbPath.CursorPosition = tbPath.Text.Length;
+				}
+				
+				state = new FileDialogState (d);
+				tbPath.GenerateSuggestions (state);
+
+				WriteStateToTableView ();
+
 				history.ClearForward ();
 				tableView.RowOffset = 0;
 				tableView.SelectedRow = 0;
+
+				SetNeedsDisplay ();
+				UpdateNavigationVisibility ();
+
+			} finally {
+
+				pushingState = false;
+			}
+		}
+
+		private void WriteStateToTableView ()
+		{
+			if(state == null) {
 				return;
 			}
+
+			dtFiles.Rows.Clear ();
+
+			for (int i = 0; i < state.Children.Length; i++) {
+				BuildRow (i);
+			}
+
+			sorter.ApplySort ();
+			tableView.Update ();
+
+		}
+		private void BuildRow (int idx)
+		{
+			tableView.Table.Rows.Add (idx, idx, idx, idx);
 		}
 
 		private ColorScheme ColorGetter (TableView.RowColorGetterArgs args)
@@ -479,70 +554,38 @@ namespace Terminal.Gui {
 
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return fileStats [(int)tableView.Table.Rows [rowIndex] [0]];
+			return state?.Children [(int)tableView.Table.Rows [rowIndex] [0]];
 		}
 
 
 		private void PathChanged ()
 		{
 			// avoid re-entry
-			if (proceessingPathChanged) {
+			if (pushingState) {
 				return;
 			}
 
-			proceessingPathChanged = true;
-			try {
-				var path = tbPath.Text?.ToString ();
+			var path = tbPath.Text?.ToString ();
 
-				if (string.IsNullOrWhiteSpace (path)) {
-					SetupAsClear ();
-					return;
-				}
-
-				var dir = new DirectoryInfo (path);
-
-				if (dir.Exists) {
-					SetupAsDirectory (dir);
-				} else
-				if (dir.Parent?.Exists ?? false) {
-					SetupAsDirectory (dir.Parent);
-				}
-
-			} finally {
-				proceessingPathChanged = false;
+			if (string.IsNullOrWhiteSpace (path)) {
+				SetupAsClear ();
+				return;
 			}
 
-			UpdateNavigationVisibility ();
+			var dir = new DirectoryInfo (path);
+
+			if (dir.Exists) {
+				PushState (dir, true);
+			} else
+			if (dir.Parent?.Exists ?? false) {
+				PushState (dir.Parent,true,false);
+			}
 		}
 
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
-			history.Push (dir);
-
-			// TODO : Access permissions Exceptions, Dir not exists etc
-			var entries = dir.GetFileSystemInfos ();
-			dtFiles.Rows.Clear ();
-			fileStats.Clear ();
-
-			var suggestions = entries.Select (
-				e => e is DirectoryInfo ? e.Name + System.IO.Path.DirectorySeparatorChar
-							: e.Name
-							).ToList ();
-			tbPath.GenerateSuggestions (suggestions);
-
-
-			foreach (var e in entries) {
-				fileStats.Add (new FileSystemInfoStats (e));
-			}
-
-			for (int i = 0; i < fileStats.Count; i++) {
-				dtFiles.Rows.Add (i, i, i, i);
-			}
-
-			sorter.ApplySort ();
-			tableView.Update ();
-
-			tbPath.CursorPosition = tbPath.Text.Length;
+			// TODO: Scrap this method
+			PushState (dir, true);
 		}
 
 		private void SetupAsClear ()
@@ -641,13 +684,27 @@ namespace Terminal.Gui {
 				return 100;
 			}
 		}
+		class FileDialogState {
+			public DirectoryInfo Directory { get; }
 
+			public FileSystemInfoStats[] Children;
+
+			public FileDialogState (DirectoryInfo dir)
+			{
+				Directory = dir;
+
+				try {
+					Children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToArray();
+				} catch (Exception) {
+					// Access permissions Exceptions, Dir not exists etc
+					Children = new FileSystemInfoStats[0];
+				}
+			}
+		}
 		class FileDialogHistory {
-			private Stack<DirectoryInfo> back = new Stack<DirectoryInfo> ();
-			private Stack<DirectoryInfo> forward = new Stack<DirectoryInfo> ();
-			private bool skipNavigationPush = false;
+			private Stack<FileDialogState> back = new Stack<FileDialogState> ();
+			private Stack<FileDialogState> forward = new Stack<FileDialogState> ();
 			private FileDialog2 dlg;
-			private DirectoryInfo currentDirectory;
 
 			public FileDialogHistory (FileDialog2 dlg)
 			{
@@ -661,9 +718,9 @@ namespace Terminal.Gui {
 
 				if (CanBack ()) {
 
-					goTo = back.Pop ();
+					goTo = back.Pop ().Directory;
 				} else if (CanUp ()) {
-					goTo = currentDirectory?.Parent;
+					goTo = dlg.state?.Directory.Parent;
 				}
 
 				// nowhere to go
@@ -671,8 +728,8 @@ namespace Terminal.Gui {
 					return false;
 				}
 
-				forward.Push (currentDirectory);
-				GoTo (goTo);
+				forward.Push (dlg.state);
+				dlg.PushState (goTo, false);
 				return true;
 			}
 
@@ -684,7 +741,7 @@ namespace Terminal.Gui {
 			internal bool Forward ()
 			{
 				if (forward.Count > 0) {
-					GoTo (forward.Pop ());
+					dlg.PushState (forward.Pop ().Directory, false);
 					return true;
 				}
 
@@ -692,11 +749,11 @@ namespace Terminal.Gui {
 			}
 			public bool Up ()
 			{
-				var parent = currentDirectory?.Parent;
+				var parent = dlg.state?.Directory.Parent;
 				if (parent != null) {
 
-					back.Push (parent);
-					GoTo (parent);
+					back.Push (new FileDialogState (parent));
+					dlg.PushState (parent, true);
 					return true;
 				}
 
@@ -705,30 +762,21 @@ namespace Terminal.Gui {
 
 			internal bool CanUp ()
 			{
-				return currentDirectory?.Parent != null;
+				return dlg.state?.Directory.Parent != null;
 			}
 
-			private void GoTo (DirectoryInfo goTo)
+
+			internal void Push (FileDialogState state)
 			{
-				// Navigate backwards or up but suppress history tracking for op
-				skipNavigationPush = true;
-				dlg.Path = goTo.FullName;
-				skipNavigationPush = false;
-				dlg.SetNeedsDisplay ();
-				dlg.UpdateNavigationVisibility ();
-			}
+				if (state == null) {
+					return;
+				}
 
-			internal void Push (DirectoryInfo dir)
-			{
-				// if changing directory
-				if (back.Count == 0 || back.Peek () != currentDirectory) {
+				// if changing to a new directory push onto the Back history
+				if (back.Count == 0 || back.Peek ().Directory != state.Directory) {
 
-					if (currentDirectory != null && !skipNavigationPush) {
-						back.Push (currentDirectory);
-						ClearForward ();
-					}
-
-					currentDirectory = dir;
+					back.Push (state);
+					ClearForward ();
 				}
 			}
 
@@ -797,14 +845,29 @@ namespace Terminal.Gui {
 
 				var colName = col == null ? null : StripArrows (col.ColumnName);
 
+				var stats = dlg.state?.Children ?? new FileSystemInfoStats[0];
+
+				// Do we sort on a column or just use the default sort order?
+				Func<FileSystemInfoStats, object> sortAlgorithm;
+
+				if (colName == null) {
+					sortAlgorithm = (v) => v.GetOrderByDefault ();
+					currentSortIsAsc = true;
+				} else {
+					sortAlgorithm = (v) => v.GetOrderByValue (colName);
+				}
+
 				var ordered =
-					colName == null ? dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByDefault ()).ToArray () :
 					currentSortIsAsc ?
-					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderBy (f => f.v.GetOrderByValue (colName)).ToArray () :
-					    dlg.fileStats.Select ((v, i) => new { v, i }).OrderByDescending (f => f.v.GetOrderByValue (colName)).ToArray ();
+					    stats.Select ((v, i) => new { v, i })
+						.OrderBy (f => sortAlgorithm (f.v))
+						.ToArray () :
+					    stats.Select ((v, i) => new { v, i })
+						.OrderByDescending (f => sortAlgorithm (f.v))
+						.ToArray ();
 
 				foreach (var o in ordered) {
-					BuildRow (o.i);
+					dlg.BuildRow (o.i);
 				}
 
 				foreach (DataColumn c in tableView.Table.Columns) {
@@ -821,10 +884,6 @@ namespace Terminal.Gui {
 				tableView.Update ();
 			}
 
-			private void BuildRow (int idx)
-			{
-				tableView.Table.Rows.Add (idx, idx, idx, idx);
-			}
 
 			private static string TrimArrows (string columnName)
 			{
@@ -888,7 +947,7 @@ namespace Terminal.Gui {
 
 			public bool CanExpand (object toExpand)
 			{
-				return TryGetDirectories(NodeToDirectory (toExpand)).Any();
+				return TryGetDirectories (NodeToDirectory (toExpand)).Any ();
 			}
 
 			private IEnumerable<DirectoryInfo> TryGetDirectories (DirectoryInfo directoryInfo)
@@ -908,7 +967,7 @@ namespace Terminal.Gui {
 
 			public IEnumerable<object> GetChildren (object forObject)
 			{
-				return TryGetDirectories(NodeToDirectory (forObject));
+				return TryGetDirectories (NodeToDirectory (forObject));
 			}
 		}
 	}
