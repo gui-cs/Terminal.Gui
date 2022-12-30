@@ -769,9 +769,11 @@ namespace Terminal.Gui {
 		/// <param name="row"></param>
 		private void UnionSelection (int col, int row)
 		{
-			if(!MultiSelect) {
+			if (!MultiSelect || TableIsNullOrInvisible()) {
 				return;
 			}
+			
+			EnsureValidSelection ();
 
 			var oldColumn = SelectedColumn;
 			var oldRow = SelectedRow;
