@@ -7,14 +7,16 @@ using System.Data;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
-using System.Collections.ObjectModel;
-using Microsoft.VisualBasic;
-using System.Collections;
 
 namespace Terminal.Gui {
 
 	public class FileDialog2 : Dialog {
 		public string Path { get => tbPath.Text.ToString (); set => tbPath.Text = value; }
+
+		public bool AllowsMultipleSelection { 
+			get => tableView.MultiSelect;
+			set => tableView.MultiSelect = value;
+		}
 		public const string HeaderFilename = "Filename";
 		public const string HeaderSize = "Size";
 		public const string HeaderModified = "Modified";
@@ -173,6 +175,7 @@ namespace Terminal.Gui {
 
 			// TODO: delay or consider not doing this to avoid double load
 			tbPath.Text = Environment.CurrentDirectory;
+			this.AllowsMultipleSelection = false;
 
 			UpdateNavigationVisibility ();
 		}
@@ -367,14 +370,14 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 
-			internal void GenerateSuggestions(FileDialogState state)
+			internal void GenerateSuggestions (FileDialogState state)
 			{
 				if (state == null) {
 					return;
-				}	
+				}
 
 				var suggestions = state.Children.Select (
-					e => e.FileSystemInfo is DirectoryInfo d 
+					e => e.FileSystemInfo is DirectoryInfo d
 						? d.Name + System.IO.Path.DirectorySeparatorChar
 						: e.FileSystemInfo.Name)
 					.ToList ();
@@ -461,7 +464,6 @@ namespace Terminal.Gui {
 			tableView.Style.RowColorGetter = ColorGetter;
 		}
 
-
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
 			var stats = RowToStats (obj.Row);
@@ -476,7 +478,7 @@ namespace Terminal.Gui {
 		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true)
 		{
 			// no change of state
-			if(d == state?.Directory) {
+			if (d == state?.Directory) {
 				return;
 			}
 
@@ -491,11 +493,11 @@ namespace Terminal.Gui {
 
 				tbPath.ClearSuggestions ();
 
-				if(setPathText) {
+				if (setPathText) {
 					tbPath.Text = d.FullName;
 					tbPath.CursorPosition = tbPath.Text.Length;
 				}
-				
+
 				state = new FileDialogState (d);
 				tbPath.GenerateSuggestions (state);
 
@@ -516,7 +518,7 @@ namespace Terminal.Gui {
 
 		private void WriteStateToTableView ()
 		{
-			if(state == null) {
+			if (state == null) {
 				return;
 			}
 
@@ -578,7 +580,7 @@ namespace Terminal.Gui {
 				PushState (dir, true);
 			} else
 			if (dir.Parent?.Exists ?? false) {
-				PushState (dir.Parent,true,false);
+				PushState (dir.Parent, true, false);
 			}
 		}
 
@@ -687,17 +689,17 @@ namespace Terminal.Gui {
 		class FileDialogState {
 			public DirectoryInfo Directory { get; }
 
-			public FileSystemInfoStats[] Children;
+			public FileSystemInfoStats [] Children;
 
 			public FileDialogState (DirectoryInfo dir)
 			{
 				Directory = dir;
 
 				try {
-					Children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToArray();
+					Children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToArray ();
 				} catch (Exception) {
 					// Access permissions Exceptions, Dir not exists etc
-					Children = new FileSystemInfoStats[0];
+					Children = new FileSystemInfoStats [0];
 				}
 			}
 		}
@@ -845,7 +847,7 @@ namespace Terminal.Gui {
 
 				var colName = col == null ? null : StripArrows (col.ColumnName);
 
-				var stats = dlg.state?.Children ?? new FileSystemInfoStats[0];
+				var stats = dlg.state?.Children ?? new FileSystemInfoStats [0];
 
 				// Do we sort on a column or just use the default sort order?
 				Func<FileSystemInfoStats, object> sortAlgorithm;
