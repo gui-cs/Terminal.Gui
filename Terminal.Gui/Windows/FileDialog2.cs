@@ -13,10 +13,31 @@ namespace Terminal.Gui {
 	public class FileDialog2 : Dialog {
 		public string Path { get => tbPath.Text.ToString (); set => tbPath.Text = value; }
 
-		public bool AllowsMultipleSelection { 
+		public bool AllowsMultipleSelection {
 			get => tableView.MultiSelect;
 			set => tableView.MultiSelect = value;
 		}
+
+		/// <summary>
+		/// True if the <see cref="FileDialog"/> was closed without confirming a selection
+		/// </summary>
+		public bool Canceled { get; private set; } = true;
+
+		/// <summary>
+		/// Returns all files/dialogs selected or an empty collection if 
+		/// not <see cref="AllowsMultipleSelection"/> or <see cref="Canceled"/>.
+		/// </summary>
+		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
+		public IReadOnlyList<FileSystemInfo> MultiSelected{
+			get {
+				if (!AllowsMultipleSelection || Canceled || state == null) {
+					return new List<FileSystemInfo> ().AsReadOnly ();
+				}
+
+				return state.Selected.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
+			}
+		}
+
 		public const string HeaderFilename = "Filename";
 		public const string HeaderSize = "Size";
 		public const string HeaderModified = "Modified";
@@ -71,6 +92,7 @@ namespace Terminal.Gui {
 				X = Pos.AnchorEnd (okWidth),
 				IsDefault = true
 			};
+			btnOk.Clicked += BtnOk_Clicked;
 			this.Add (btnOk);
 
 			lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
@@ -180,6 +202,12 @@ namespace Terminal.Gui {
 			UpdateNavigationVisibility ();
 		}
 
+		private void BtnOk_Clicked ()
+		{
+			Canceled = false;
+			Application.RequestStop ();
+		}
+
 		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
 		{
 			if (e.NewValue == null) {
@@ -250,6 +278,7 @@ namespace Terminal.Gui {
 			try {
 				pushingState = true;
 				tbPath.Text = stats.FileSystemInfo.FullName;
+				state?.SetSelection (stats);
 				tbPath.ClearSuggestions ();
 
 			} finally {
@@ -691,6 +720,9 @@ namespace Terminal.Gui {
 
 			public FileSystemInfoStats [] Children;
 
+			public List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
+			public IReadOnlyCollection<FileSystemInfoStats> Selected => selected.AsReadOnly ();
+
 			public FileDialogState (DirectoryInfo dir)
 			{
 				Directory = dir;
@@ -701,6 +733,12 @@ namespace Terminal.Gui {
 					// Access permissions Exceptions, Dir not exists etc
 					Children = new FileSystemInfoStats [0];
 				}
+			}
+
+			internal void SetSelection (FileSystemInfoStats stats)
+			{
+				selected.Clear ();
+				selected.Add (stats);
 			}
 		}
 		class FileDialogHistory {
