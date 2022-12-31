@@ -646,6 +646,75 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestShiftClick_MultiSelect_TwoRowTable_FullRowSelect()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+
+			tv.MultiSelect = true;
+			
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 3,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (1, tv.SelectedRow);
+
+			// shift clicking top row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift
+			});
+
+			// should extend the selection
+			Assert.Equal (0, tv.SelectedRow);
+
+			var selected = tv.GetAllSelectedCells ().ToArray();
+
+			Assert.Contains (new Point(0,0), selected);
+			Assert.Contains (new Point (0, 1), selected);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tv.MultiSelect = true;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+			// shift clicking top row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl
+			});
+
+			// should extend the selection
+			// to include bottom and top row but not middle
+			Assert.Equal (0, tv.SelectedRow);
+
+			var selected = tv.GetAllSelectedCells ().ToArray ();
+
+			Assert.Contains (new Point (0, 0), selected);
+			Assert.DoesNotContain (new Point (0, 1), selected);
+			Assert.Contains (new Point (0, 2), selected);
+		}
+
 		[Theory]
 		[InlineData (false)]
 		[InlineData (true)]
