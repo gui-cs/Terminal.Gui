@@ -8,8 +8,11 @@
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Unix.Terminal;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -681,7 +684,7 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
@@ -696,11 +699,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			var controlChars = c & 0xFFFF;
-			if (controlChars <= 0x1F || controlChars >= 0X7F && controlChars <= 0x9F) {
+			if (c <= 0x1F || (c >= 0X7F && c <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (controlChars + 0x2400);
+				return new Rune (c + 0x2400);
 			}
 
 			return c;
@@ -1388,6 +1390,76 @@ namespace Terminal.Gui {
 			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
 			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
 			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+		}
+	}
+
+	/// <summary>
+	/// Helper class for console drivers to invoke shell commands to interact with the clipboard.
+	/// Used primarily by CursesDriver, but also used in Unit tests which is why it is in
+	/// ConsoleDriver.cs.
+	/// </summary>
+	internal static class ClipboardProcessRunner {
+		public static (int exitCode, string result) Bash (string commandLine, string inputText = "", bool waitForOutput = false)
+		{
+			var arguments = $"-c \"{commandLine}\"";
+			var (exitCode, result) = Process ("bash", arguments, inputText, waitForOutput);
+
+			return (exitCode, result.TrimEnd ());
+		}
+
+		public static (int exitCode, string result) Process (string cmd, string arguments, string input = null, bool waitForOutput = true)
+		{
+			var output = string.Empty;
+
+			using (Process process = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = cmd,
+					Arguments = arguments,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true,
+					UseShellExecute = false,
+					CreateNoWindow = true,
+				}
+			}) {
+				var eventHandled = new TaskCompletionSource<bool> ();
+				process.Start ();
+				if (!string.IsNullOrEmpty (input)) {
+					process.StandardInput.Write (input);
+					process.StandardInput.Close ();
+				}
+
+				if (!process.WaitForExit (5000)) {
+					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.";
+					throw new TimeoutException (timeoutError);
+				}
+
+				if (waitForOutput && process.StandardOutput.Peek () != -1) {
+					output = process.StandardOutput.ReadToEnd ();
+				}
+
+				if (process.ExitCode > 0) {
+					output = $@"Process failed to run. Command line: {cmd} {arguments}.
+										Output: {output}
+										Error: {process.StandardError.ReadToEnd ()}";
+				}
+
+				return (process.ExitCode, output);
+			}
+		}
+
+		public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+		{
+			var result = process.WaitForExit (500);
+			if (result) {
+				process.WaitForExit ();
+			}
+			return result;
+		}
+
+		public static bool FileExists (this string value)
+		{
+			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
 		}
 	}
 }

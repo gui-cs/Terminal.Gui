@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
+using Microsoft.DotNet.PlatformAbstractions;
 using Rune = System.Rune;
 
 /// <summary>
@@ -160,6 +160,7 @@ namespace UICatalog {
 			public StatusItem Numlock;
 			public StatusItem Scrolllock;
 			public StatusItem DriverName;
+			public StatusItem OS;
 
 			public UICatalogTopLevel ()
 			{
@@ -182,6 +183,7 @@ namespace UICatalog {
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 				DriverName = new StatusItem (Key.CharMask, "Driver:", null);
+				OS = new StatusItem (Key.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
 					Visible = true,
@@ -207,6 +209,7 @@ namespace UICatalog {
 						SetChildNeedsDisplay();
 					}),
 					DriverName,
+					OS
 				};
 
 				LeftPane = new FrameView ("Categories") {
@@ -281,6 +284,7 @@ namespace UICatalog {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
+				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem}";
 
 				if (_selectedScenario != null) {
 					_selectedScenario = null;

@@ -92,7 +92,15 @@ class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				sb.Append ((char)contents [r, c, 0]);
+				Rune rune = contents [r, c, 0];
+				if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+					sb.Append (spair);
+				} else {
+					sb.Append ((char)rune);
+				}
+				if (Rune.ColumnWidth (rune) > 1) {
+					c++;
+				}
 			}
 			sb.AppendLine ();
 		}
@@ -121,7 +129,7 @@ class TestHelpers {
 
 	public static Rect AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output)
 	{
-		var lines = new List<List<char>> ();
+		var lines = new List<List<Rune>> ();
 		var sb = new StringBuilder ();
 		var driver = ((FakeDriver)Application.Driver);
 		var x = -1;
@@ -132,15 +140,15 @@ class TestHelpers {
 		var contents = driver.Contents;
 
 		for (int r = 0; r < driver.Rows; r++) {
-			var runes = new List<char> ();
+			var runes = new List<Rune> ();
 			for (int c = 0; c < driver.Cols; c++) {
-				var rune = (char)contents [r, c, 0];
+				var rune = (Rune)contents [r, c, 0];
 				if (rune != ' ') {
 					if (x == -1) {
 						x = c;
 						y = r;
 						for (int i = 0; i < c; i++) {
-							runes.InsertRange (i, new List<char> () { ' ' });
+							runes.InsertRange (i, new List<Rune> () { ' ' });
 						}
 					}
 					if (Rune.ColumnWidth (rune) > 1) {
@@ -169,7 +177,7 @@ class TestHelpers {
 
 		// Remove trailing whitespace on each line
 		for (int r = 0; r < lines.Count; r++) {
-			List<char> row = lines [r];
+			List<Rune> row = lines [r];
 			for (int c = row.Count - 1; c >= 0; c--) {
 				var rune = row [c];
 				if (rune != ' ' || (row.Sum (x => Rune.ColumnWidth (x)) == w)) {
@@ -179,9 +187,9 @@ class TestHelpers {
 			}
 		}
 
-		// Convert char list to string
+		// Convert Rune list to string
 		for (int r = 0; r < lines.Count; r++) {
-			var line = new string (lines [r].ToArray ());
+			var line = NStack.ustring.Make (lines [r]).ToString ();
 			if (r == lines.Count - 1) {
 				sb.Append (line);
 			} else {

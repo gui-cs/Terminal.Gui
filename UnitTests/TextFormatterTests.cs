@@ -2424,38 +2424,38 @@ namespace Terminal.Gui.Core {
 			var tf = new TextFormatter ();
 			ustring text = "test";
 			int hotPos = 0;
-			uint tag = tf.HotKeyTagMask | 't';
+			uint tag = 't';
 
 			Assert.Equal (ustring.Make (new Rune [] { tag, 'e', 's', 't' }), tf.ReplaceHotKeyWithTag (text, hotPos));
 
-			tag = tf.HotKeyTagMask | 'e';
+			tag = 'e';
 			hotPos = 1;
 			Assert.Equal (ustring.Make (new Rune [] { 't', tag, 's', 't' }), tf.ReplaceHotKeyWithTag (text, hotPos));
 
 			var result = tf.ReplaceHotKeyWithTag (text, hotPos);
-			Assert.Equal ('e', (uint)(result.ToRunes () [1] & ~tf.HotKeyTagMask));
+			Assert.Equal ('e', (uint)(result.ToRunes () [1]));
 
 			text = "Ok";
-			tag = 0x100000 | 'O';
+			tag = 'O';
 			hotPos = 0;
 			Assert.Equal (ustring.Make (new Rune [] { tag, 'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('O', (uint)(result.ToRunes () [0] & ~tf.HotKeyTagMask));
+			Assert.Equal ('O', (uint)(result.ToRunes () [0]));
 
 			text = "[◦ Ok ◦]";
 			text = ustring.Make (new Rune [] { '[', '◦', ' ', 'O', 'k', ' ', '◦', ']' });
 			var runes = text.ToRuneList ();
 			Assert.Equal (text.RuneCount, runes.Count);
 			Assert.Equal (text, ustring.Make (runes));
-			tag = tf.HotKeyTagMask | 'O';
+			tag = 'O';
 			hotPos = 3;
 			Assert.Equal (ustring.Make (new Rune [] { '[', '◦', ' ', tag, 'k', ' ', '◦', ']' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('O', (uint)(result.ToRunes () [3] & ~tf.HotKeyTagMask));
+			Assert.Equal ('O', (uint)(result.ToRunes () [3]));
 
 			text = "^k";
 			tag = '^';
 			hotPos = 0;
 			Assert.Equal (ustring.Make (new Rune [] { tag, 'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('^', (uint)(result.ToRunes () [0] & ~tf.HotKeyTagMask));
+			Assert.Equal ('^', (uint)(result.ToRunes () [0]));
 		}
 
 		[Fact]
@@ -4162,6 +4162,102 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (20320, s [9]);
 			Assert.Equal ("你", ((Rune)usToRunes [9]).ToString ());
 			Assert.Equal ("你", s [9].ToString ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Non_Bmp_ConsoleWidth_ColumnWidth_Equal_Two ()
+		{
+			ustring us = "\U0001d539";
+			Rune r = 0x1d539;
+
+			Assert.Equal ("𝔹", us);
+			Assert.Equal ("𝔹", r.ToString ());
+			Assert.Equal (us, r.ToString ());
+
+			Assert.Equal (2, us.ConsoleWidth);
+			Assert.Equal (2, Rune.ColumnWidth (r));
+
+			var win = new Window (us);
+			var label = new Label (ustring.Make (r));
+			var tf = new TextField (us) { Y = 1, Width = 3 };
+			win.Add (label, tf);
+			var top = Application.Top;
+			top.Add (win);
+
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			var expected = @"
+┌ 𝔹 ────┐
+│𝔹      │
+│𝔹      │
+└────────┘";
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var expectedColors = new Attribute [] {
+				// 0
+				Colors.Base.Normal,
+				// 1
+				Colors.Base.Focus,
+				// 2
+				Colors.Base.HotNormal
+			};
+
+			TestHelpers.AssertDriverColorsAre (@"
+0222200000
+0000000000
+0111000000
+0000000000", expectedColors);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
+		{
+			ustring us = "\U0000f900";
+			Rune r = 0xf900;
+
+			Assert.Equal ("豈", us);
+			Assert.Equal ("豈", r.ToString ());
+			Assert.Equal (us, r.ToString ());
+
+			Assert.Equal (2, us.ConsoleWidth);
+			Assert.Equal (2, Rune.ColumnWidth (r));
+
+			var win = new Window (us);
+			var label = new Label (ustring.Make (r));
+			var tf = new TextField (us) { Y = 1, Width = 3 };
+			win.Add (label, tf);
+			var top = Application.Top;
+			top.Add (win);
+
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+
+			var expected = @"
+┌ 豈 ────┐
+│豈      │
+│豈      │
+└────────┘";
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var expectedColors = new Attribute [] {
+				// 0
+				Colors.Base.Normal,
+				// 1
+				Colors.Base.Focus,
+				// 2
+				Colors.Base.HotNormal
+			};
+
+			TestHelpers.AssertDriverColorsAre (@"
+0222200000
+0000000000
+0111000000
+0000000000", expectedColors);
 		}
 	}
 }

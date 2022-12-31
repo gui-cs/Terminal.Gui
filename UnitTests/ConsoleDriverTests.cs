@@ -639,7 +639,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[InlineData (0x0000001F, 0x241F)]
 		[InlineData (0x0000007F, 0x247F)]
 		[InlineData (0x0000009F, 0x249F)]
-		[InlineData (0x0001001A, 0x241A)]
+		[InlineData (0x0001001A, 0x1001A)]
 		public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (uint code, uint expected)
 		{
 			var actual = ConsoleDriver.MakePrintable (code);
