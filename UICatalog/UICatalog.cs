@@ -178,7 +178,7 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-
+				
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
@@ -189,9 +189,6 @@ namespace UICatalog {
 					Visible = true,
 				};
 				StatusBar.Items = new StatusItem [] {
-					Capslock,
-					Numlock,
-					Scrolllock,
 					new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 						if (_selectedScenario is null){
 							// This causes GetScenarioToRun to return null
@@ -201,7 +198,7 @@ namespace UICatalog {
 							_selectedScenario.RequestStop();
 						}
 					}),
-					new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
+					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
 						LeftPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						RightPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
@@ -284,7 +281,7 @@ namespace UICatalog {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
-				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem}";
+				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {
 					_selectedScenario = null;

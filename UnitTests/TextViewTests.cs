@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -1924,6 +1923,51 @@ namespace Terminal.Gui.Views {
 			var tv = new TextView ();
 			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+		}
+
+		[Fact]
+		public void LoadStream_IsDirty ()
+		{
+			var text = "Testing";
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream ()) {
+
+				var writer = new System.IO.StreamWriter (stream);
+				writer.Write (text);
+				writer.Flush ();
+				stream.Position = 0;
+
+				var tv = new TextView ();
+				tv.LoadStream (stream);
+
+				Assert.Equal (7, text.Length);
+				Assert.Equal (text.Length, tv.Text.Length);
+				Assert.Equal (text, tv.Text);
+				Assert.False (tv.IsDirty);
+			}
+		}
+
+		[Fact]
+		public void LoadStream_IsDirty_With_Null_On_The_Text ()
+		{
+			var text = "Test\0ing";
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream ()) {
+
+				var writer = new System.IO.StreamWriter (stream);
+				writer.Write (text);
+				writer.Flush ();
+				stream.Position = 0;
+
+				var tv = new TextView ();
+				tv.LoadStream (stream);
+
+				Assert.Equal (8, text.Length);
+				Assert.Equal (text.Length, tv.Text.Length);
+				Assert.Equal (8, text.Length);
+				Assert.Equal (8, tv.Text.Length);
+				Assert.Equal (text, tv.Text);
+				Assert.False (tv.IsDirty);
+				Assert.Equal ('\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
+			}
 		}
 
 		[Fact]
@@ -6426,16 +6470,17 @@ This is the second line.
 		[Fact, AutoInitShutdown]
 		public void ContentsChanged_Event_NoFires_On_CursorPosition ()
 		{
+			var eventcount = 0;
+
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
 			};
 
-			var eventcount = 0;
-			Assert.Null (tv.ContentsChanged);
 			tv.ContentsChanged += (e) => {
 				eventcount++;
 			};
+			Assert.Equal (0, eventcount);
 
 			tv.CursorPosition = new Point (0, 0);
 
@@ -6445,19 +6490,19 @@ This is the second line.
 		[Fact, AutoInitShutdown]
 		public void ContentsChanged_Event_Fires_On_InsertText ()
 		{
+			var eventcount = 0;
+
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
 			};
 			tv.CursorPosition = new Point (0, 0);
 
-			var eventcount = 0;
-
-			Assert.Null (tv.ContentsChanged);
 			tv.ContentsChanged += (e) => {
 				eventcount++;
 			};
 
+			Assert.Equal (0, eventcount);
 
 			tv.InsertText ("a");
 			Assert.Equal (1, eventcount);
@@ -6465,7 +6510,7 @@ This is the second line.
 			tv.CursorPosition = new Point (0, 0);
 			tv.InsertText ("bcd");
 			Assert.Equal (4, eventcount);
-			
+
 			tv.InsertText ("e");
 			Assert.Equal (5, eventcount);
 
@@ -6490,11 +6535,11 @@ This is the second line.
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
-				ContentsChanged = (e) => {
-					eventcount++;
-					Assert.Equal (expectedRow, e.Row);
-					Assert.Equal (expectedCol, e.Col);
-				}
+			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+				Assert.Equal (expectedRow, e.Row);
+				Assert.Equal (expectedCol, e.Col);
 			};
 
 			Application.Top.Add (tv);
@@ -6519,12 +6564,13 @@ This is the second line.
 				// you'd think col would be 3, but it's 0 because TextView sets
 				// row/col = 0 when you set Text
 				Text = "abc",
-				ContentsChanged = (e) => {
-					eventcount++;
-					Assert.Equal (expectedRow, e.Row);
-					Assert.Equal (expectedCol, e.Col);
-				}
 			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+				Assert.Equal (expectedRow, e.Row);
+				Assert.Equal (expectedCol, e.Col);
+			};
+
 			Assert.Equal ("abc", tv.Text);
 
 			Application.Top.Add (tv);
@@ -6550,11 +6596,11 @@ This is the second line.
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
-				ContentsChanged = (e) => {
-					eventcount++;
-					Assert.Equal (expectedRow, e.Row);
-					Assert.Equal (expectedCol, e.Col);
-				}
+			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+				Assert.Equal (expectedRow, e.Row);
+				Assert.Equal (expectedCol, e.Col);
 			};
 
 			Application.Top.Add (tv);
@@ -6576,7 +6622,7 @@ This is the second line.
 		{
 			var eventcount = 0;
 
-			_textView.ContentsChanged = (e) => {
+			_textView.ContentsChanged += (e) => {
 				eventcount++;
 			};
 
@@ -6603,7 +6649,7 @@ This is the second line.
 		{
 			var eventcount = 0;
 
-			_textView.ContentsChanged = (e) => {
+			_textView.ContentsChanged += (e) => {
 				eventcount++;
 			};
 
@@ -6652,7 +6698,7 @@ This is the second line.
 			expectedEventCount += 4;
 			Copy_Without_Selection ();
 			Assert.Equal (expectedEventCount, eventcount);
-			
+
 			// reset
 			expectedEventCount += 1;
 			_textView.Text = TextViewTestsAutoInitShutdown.txt;
@@ -6669,7 +6715,7 @@ This is the second line.
 			var eventcount = 0;
 			var expectedEventCount = 0;
 
-			_textView.ContentsChanged = (e) => {
+			_textView.ContentsChanged += (e) => {
 				eventcount++;
 			};
 
@@ -6712,9 +6758,9 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 				Text = text,
-				ContentsChanged = (e) => {
-					eventcount++;
-				}
+			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
 			};
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
@@ -6723,46 +6769,47 @@ This is the second line.
 
 			var expectedEventCount = 1; // for ENTER key
 			Assert.Equal (expectedEventCount, eventcount);
-			
+
 			tv.ClearHistoryChanges ();
 			expectedEventCount = 2;
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 
 		[Fact]
-		public void ContentsChanged_Event_Fires_LoadStream ()
+		public void ContentsChanged_Event_Fires_LoadStream_By_Calling_HistoryText_Clear ()
 		{
 			var eventcount = 0;
 
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
-				ContentsChanged = (e) => {
-					eventcount++;
-				}
+			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
 			};
 
 			var text = "This is the first line.\r\nThis is the second line.\r\n";
 			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
-			
+
 			Assert.Equal (1, eventcount);
 		}
 
 		[Fact]
-		public void ContentsChanged_Event_Fires_LoadFile ()
+		public void ContentsChanged_Event_Fires_On_LoadFile_By_Calling_HistoryText_Clear ()
 		{
 			var eventcount = 0;
 
 			var tv = new TextView {
 				Width = 50,
 				Height = 10,
-				ContentsChanged = (e) => {
-					eventcount++;
-				}
 			};
+			tv.ContentsChanged += (e) => {
+				eventcount++;
+			};
+
 			var fileName = "textview.txt";
-			System.IO.File.WriteAllText (fileName, "This is the first line.\r\nThis is the second line.\r\n") ;
+			System.IO.File.WriteAllText (fileName, "This is the first line.\r\nThis is the second line.\r\n");
 
 			tv.LoadFile (fileName);
 			Assert.Equal (1, eventcount);
