@@ -287,7 +287,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		class TextFieldWithAppendAutocomplete : TextField {
+		internal class TextFieldWithAppendAutocomplete : TextField {
 
 			int? currentFragment = null;
 			string [] validFragments = new string [0];
@@ -624,7 +624,7 @@ namespace Terminal.Gui {
 
 		}
 
-		class FileSystemInfoStats {
+		internal class FileSystemInfoStats {
 
 			public FileSystemInfo FileSystemInfo { get; }
 			public string HumanReadableLength { get; }
@@ -715,7 +715,7 @@ namespace Terminal.Gui {
 				return 100;
 			}
 		}
-		class FileDialogState {
+		internal class FileDialogState {
 			public DirectoryInfo Directory { get; }
 
 			public FileSystemInfoStats [] Children;
