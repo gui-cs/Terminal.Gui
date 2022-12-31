@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		/// not <see cref="AllowsMultipleSelection"/> or <see cref="Canceled"/>.
 		/// </summary>
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
-		public IReadOnlyList<FileSystemInfo> MultiSelected{
+		public IReadOnlyList<FileSystemInfo> MultiSelected {
 			get {
 				if (!AllowsMultipleSelection || Canceled || state == null) {
 					return new List<FileSystemInfo> ().AsReadOnly ();
@@ -111,6 +111,11 @@ namespace Terminal.Gui {
 				IsDefault = true
 			};
 			btnOk.Clicked += BtnOk_Clicked;
+			btnOk.KeyPress += (k) => {
+				NavigateIf (k, Key.CursorLeft, tbPath);
+				NavigateIf (k, Key.CursorDown, tableView);
+			};
+
 			this.Add (btnOk);
 
 			lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
@@ -130,6 +135,14 @@ namespace Terminal.Gui {
 				X = Pos.Right (lblPath),
 				Width = Dim.Fill (okWidth + 1)
 			};
+			tbPath.KeyPress += (k) => {
+				NavigateIf (k, Key.CursorDown, tableView);
+				
+				if(tbPath.CursorIsAtEnd()) {
+					NavigateIf (k, Key.CursorRight, btnOk);
+				}
+					
+			};
 			this.Add (tbPath);
 
 			splitContainer = new SplitContainer () {
@@ -145,6 +158,12 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				FullRowSelect = true,
+			};
+			tableView.KeyPress += (k) => {
+				if(tableView.SelectedRow <= 0) {
+					NavigateIf (k, Key.CursorUp, tbPath);
+				}
+				
 			};
 
 			treeView = new TreeView<object> () {
@@ -218,6 +237,15 @@ namespace Terminal.Gui {
 			this.AllowsMultipleSelection = false;
 
 			UpdateNavigationVisibility ();
+		}
+
+		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
+		{
+			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
+				// focus the text box
+				to.FocusFirst ();
+				keyEvent.Handled = true;
+			}
 		}
 
 		private void BtnOk_Clicked ()
@@ -298,7 +326,8 @@ namespace Terminal.Gui {
 
 			try {
 				pushingState = true;
-				tbPath.Text = stats.FileSystemInfo.FullName;
+
+				tbPath.SetTextTo (stats.FileSystemInfo);
 				state?.SetSelection (stats);
 				tbPath.ClearSuggestions ();
 
@@ -357,7 +386,7 @@ namespace Terminal.Gui {
 			{
 				base.Redraw (bounds);
 
-				if (currentFragment == null) {
+				if (!MakingSuggestion ()) {
 					return;
 				}
 
@@ -367,9 +396,20 @@ namespace Terminal.Gui {
 				Driver.AddStr (validFragments [currentFragment.Value]);
 			}
 
+			/// <summary>
+			/// Returns true if there is a suggestion that can be made and the control
+			/// is in a state where user would expect to see auto-complete (i.e. focused and 
+			/// cursor in right place).
+			/// </summary>
+			/// <returns></returns>
+			private bool MakingSuggestion ()
+			{
+				return currentFragment != null && HasFocus && CursorIsAtEnd();
+			}
+
 			internal bool AcceptSelectionIfAny ()
 			{
-				if (currentFragment != null) {
+				if (MakingSuggestion ()) {
 					Text += validFragments [currentFragment.Value];
 					CursorPosition = Text.Length + 1;
 
@@ -380,10 +420,9 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			internal void GenerateSuggestions (params string[] suggestions)
+			internal void GenerateSuggestions (params string [] suggestions)
 			{
-				// if cursor is not at the end then user is editing the middle of the path
-				if (CursorPosition < Text.Length - 1) {
+				if (!CursorIsAtEnd()) {
 					return;
 				}
 
@@ -433,6 +472,20 @@ namespace Terminal.Gui {
 					.ToArray ();
 
 				GenerateSuggestions (suggestions);
+			}
+
+			internal void SetTextTo (FileSystemInfo fileSystemInfo)
+			{
+				var newText = fileSystemInfo.FullName;
+				if (fileSystemInfo is DirectoryInfo) {
+					newText += System.IO.Path.DirectorySeparatorChar;
+				}
+				Text = newText;
+			}
+
+			internal bool CursorIsAtEnd ()
+			{
+				return CursorPosition == Text.Length;
 			}
 		}
 

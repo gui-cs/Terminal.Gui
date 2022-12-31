@@ -28,7 +28,7 @@ namespace Terminal.Gui.Core {
 		{
 			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
 
-			tb.Text = "c:\\fish";
+			tb.Text = "c:/fish";
 			tb.CursorPosition = tb.Text.Length;
 			tb.GenerateSuggestions ("fish", "fishes");
 
@@ -37,12 +37,16 @@ namespace Terminal.Gui.Core {
 			Assert.False (tb.AcceptSelectionIfAny());
 		}
 
+		
+
+
+
 		[Fact, AutoInitShutdown]
-		public void Autocomplete_AcceptSuggstion()
+		public void Autocomplete_AcceptSuggstion ()
 		{
 			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
 
-			tb.Text = @"c:\fi";
+			tb.Text = @"c:/fi";
 			tb.CursorPosition = tb.Text.Length;
 			tb.GenerateSuggestions ("fish", "fishes");
 
