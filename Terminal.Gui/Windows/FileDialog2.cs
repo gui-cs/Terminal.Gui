@@ -10,9 +10,22 @@ using static System.Environment;
 
 namespace Terminal.Gui {
 
+	/// <summary>
+	/// Modal dialog for selecting files/directories.  Has auto-complete and expandable
+	/// navigation pane (Recent, Root drives etc).
+	/// </summary>
 	public class FileDialog2 : Dialog {
+
+		/// <summary>
+		/// The currently selected path in the dialog.  This is the result that should
+		/// be used if <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/>
+		/// is true.
+		/// </summary>
 		public string Path { get => tbPath.Text.ToString (); set => tbPath.Text = value; }
 
+		/// <summary>
+		/// True to allow the user to select multiple existing files/directories
+		/// </summary>
 		public bool AllowsMultipleSelection {
 			get => tableView.MultiSelect;
 			set => tableView.MultiSelect = value;
@@ -38,10 +51,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public const string HeaderFilename = "Filename";
-		public const string HeaderSize = "Size";
-		public const string HeaderModified = "Modified";
-		public const string HeaderType = "Type";
+		// TODO : expose these somehow for localization without compromising case/switch statements
+		private const string HeaderFilename = "Filename";
+		private const string HeaderSize = "Size";
+		private const string HeaderModified = "Modified";
+		private const string HeaderType = "Type";
 
 		bool pushingState = false;
 
@@ -62,9 +76,10 @@ namespace Terminal.Gui {
 		TreeView<object> treeView;
 		SplitContainer splitContainer;
 
-		public static ColorScheme ColorSchemeDirectory;
-		public static ColorScheme ColorSchemeDefault;
-		public static ColorScheme ColorSchemeImage;
+		// TODO: refactor somewhere more user friendly
+		private static ColorScheme ColorSchemeDirectory;
+		private static ColorScheme ColorSchemeDefault;
+		private static ColorScheme ColorSchemeImage;
 
 		/// <summary>
 		/// ColorScheme to use for entries that are executable or match the users file extension
@@ -80,6 +95,9 @@ namespace Terminal.Gui {
 
 		private string title;
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="FileDialog2"/> class.
+		/// </summary>
 		public FileDialog2 ()
 		{
 			// TODO: handle Save File / Folder too
@@ -349,7 +367,7 @@ namespace Terminal.Gui {
 				Driver.AddStr (validFragments [currentFragment.Value]);
 			}
 
-			private bool AcceptSelectionIfAny ()
+			internal bool AcceptSelectionIfAny ()
 			{
 				if (currentFragment != null) {
 					Text += validFragments [currentFragment.Value];
@@ -362,7 +380,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			internal void GenerateSuggestions (List<string> suggestions)
+			internal void GenerateSuggestions (params string[] suggestions)
 			{
 				// if cursor is not at the end then user is editing the middle of the path
 				if (CursorPosition < Text.Length - 1) {
@@ -372,7 +390,7 @@ namespace Terminal.Gui {
 				var path = Text.ToString ();
 				var last = path.LastIndexOfAny (separators);
 
-				if (last == -1 || suggestions.Count == 0 || last >= path.Length - 1) {
+				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
 					currentFragment = null;
 					return;
 				}
@@ -412,12 +430,13 @@ namespace Terminal.Gui {
 					e => e.FileSystemInfo is DirectoryInfo d
 						? d.Name + System.IO.Path.DirectorySeparatorChar
 						: e.FileSystemInfo.Name)
-					.ToList ();
+					.ToArray ();
 
 				GenerateSuggestions (suggestions);
 			}
 		}
 
+		/// <inheritdoc/>
 		public override void OnLoaded ()
 		{
 			base.OnLoaded ();
