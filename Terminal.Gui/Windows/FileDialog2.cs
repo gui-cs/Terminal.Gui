@@ -242,6 +242,9 @@ namespace Terminal.Gui {
 
 			var padding = ((bounds.Width - this.title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
 
+			padding = Math.Min (bounds.Width, padding);
+			padding = Math.Max (0, padding);
+
 			Driver.SetAttribute (
 			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
 
