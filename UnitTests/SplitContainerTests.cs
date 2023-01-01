@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
@@ -35,11 +36,31 @@ namespace UnitTests {
 
 		}
 		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_Vertical_WithBorder ()
+		{
+			var splitContainer = Get11By3SplitContainer (true);
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			string looksLike =
+@"
+┌────┬────┐
+│1111│2222│
+└────┴────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect if it is not focused
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+		[Fact, AutoInitShutdown]
 		public void TestSplitContainer_Vertical_Focused ()
 		{
 			var splitContainer = Get11By3SplitContainer ();
-			splitContainer.EnsureFocus ();
-			splitContainer.FocusFirst ();
+			SetInputFocusLine (splitContainer);
+
 			splitContainer.Redraw (splitContainer.Bounds);
 
 			string looksLike =
@@ -75,11 +96,51 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_Vertical_Focused_WithBorder ()
+		{
+			var splitContainer = Get11By3SplitContainer (true);
+			SetInputFocusLine (splitContainer);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			string looksLike =
+@"
+┌────┬────┐
+│1111◊2222│
+└────┴────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Now while focused move the splitter 1 unit right
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+┌─────┬───┐
+│11111◊222│
+└─────┴───┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			// and 2 to the left
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+┌───┬─────┐
+│111◊22222│
+└───┴─────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
 		public void TestSplitContainer_Vertical_Focused_50PercentSplit ()
 		{
 			var splitContainer = Get11By3SplitContainer ();
-			splitContainer.EnsureFocus ();
-			splitContainer.FocusFirst ();
+			SetInputFocusLine (splitContainer);
 			splitContainer.SplitterDistance = Pos.Percent (50);
 			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistance);
 			splitContainer.Redraw (splitContainer.Bounds);
@@ -147,9 +208,7 @@ namespace UnitTests {
 		public void TestSplitContainer_Vertical_Panel1MinSize_Absolute ()
 		{
 			var splitContainer = Get11By3SplitContainer ();
-
-			splitContainer.EnsureFocus ();
-			splitContainer.FocusFirst ();
+			SetInputFocusLine (splitContainer);
 			splitContainer.Panels [0].MinSize = 6;
 
 			// distance is too small (below 6)
@@ -195,8 +254,7 @@ namespace UnitTests {
 			var splitContainer = Get11By3SplitContainer ();
 
 			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			splitContainer.EnsureFocus ();
-			splitContainer.FocusFirst ();
+			SetInputFocusLine (splitContainer);
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -235,8 +293,7 @@ namespace UnitTests {
 			var splitContainer = Get11By3SplitContainer ();
 
 			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			splitContainer.EnsureFocus ();
-			splitContainer.FocusFirst ();
+			SetInputFocusLine (splitContainer);
 			splitContainer.Panels [0].MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of Panel1
@@ -291,15 +348,24 @@ namespace UnitTests {
 			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
 		}
 
-		private SplitContainer Get11By3SplitContainer ()
+		private void SetInputFocusLine (SplitContainer splitContainer)
+		{
+			var line = splitContainer.Subviews [0].Subviews.OfType<LineView> ().Single ();
+			line.SetFocus ();
+			Assert.True (line.HasFocus);
+		}
+
+		private SplitContainer Get11By3SplitContainer (bool withBorder = false)
 		{
 			var container = new SplitContainer () {
 				Width = 11,
 				Height = 3,
 			};
 
-			container.Border.DrawMarginFrame = false;
-			container.Border.BorderStyle = BorderStyle.None;
+			if (!withBorder) {
+				container.Border.BorderStyle = BorderStyle.None;
+				container.Border.DrawMarginFrame = false;
+			}
 
 			container.Panels [0].Add (new Label (new string ('1', 100)));
 			container.Panels [1].Add (new Label (new string ('2', 100)));

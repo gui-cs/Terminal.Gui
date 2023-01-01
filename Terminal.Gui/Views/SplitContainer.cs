@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 
 					splitterPanels[0].Height = Dim.Fill ();
 					splitterPanels[0].Width = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Width)) - 1;
+					splitterDistance.Anchor (Bounds.Width));
 
 					splitterPanels[1].X = Pos.Right (splitterLine);
 					splitterPanels[1].Y = 0;
@@ -322,13 +322,18 @@ namespace Terminal.Gui {
 				LayoutStarted += (e) => {
 					moveRuneRenderLocation = null;
 					if (Orientation == Orientation.Horizontal) {
-						StartingAnchor = Driver.LeftTee;
-						EndingAnchor = Driver.RightTee;
+						StartingAnchor = ParentHasBorder () ? Driver.LeftTee : (Rune?)null;
+						EndingAnchor = ParentHasBorder () ? Driver.RightTee : (Rune?)null;
 					} else {
-						StartingAnchor = Driver.TopTee;
-						EndingAnchor = Driver.BottomTee;
+						StartingAnchor = ParentHasBorder () ? Driver.TopTee : (Rune?)null;
+						EndingAnchor = ParentHasBorder () ? Driver.BottomTee : (Rune?)null;
 					}
 				};
+			}
+
+			private bool ParentHasBorder ()
+			{
+				return parent.Border != null && parent.Border.BorderStyle != BorderStyle.None;
 			}
 
 			public override bool ProcessKey (KeyEvent kb)
