@@ -1306,8 +1306,8 @@ namespace Terminal.Gui {
 		void Clear ()
 		{
 			if (Rows > 0) {
-				Console.Clear ();
-				Console.Out.Write ("\x1b[3J");
+				//Console.Clear ();
+				Console.Out.Write ("\x1b[0J");
 				//Console.Out.Write ("\x1b[?25l");
 			}
 		}
@@ -1392,7 +1392,7 @@ namespace Terminal.Gui {
 				}
 			}
 			Clip = new Rect (0, 0, Cols, Rows);
-			Console.Out.Write ("\x1b[3J");
+			Console.Out.Write ("\x1b[0J");
 			Console.Out.Flush ();
 		}
 
