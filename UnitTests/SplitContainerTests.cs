@@ -150,7 +150,7 @@ namespace UnitTests {
 
 			splitContainer.EnsureFocus ();
 			splitContainer.FocusFirst ();
-			splitContainer.Panel1MinSize = 6;
+			splitContainer.Panels [0].MinSize = 6;
 
 			// distance is too small (below 6)
 			splitContainer.SplitterDistance = 2;
@@ -237,7 +237,7 @@ namespace UnitTests {
 			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			splitContainer.EnsureFocus ();
 			splitContainer.FocusFirst ();
-			splitContainer.Panel1MinSize = 1;
+			splitContainer.Panels [0].MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of Panel1
 			splitContainer.SplitterDistance = 0;
@@ -298,8 +298,11 @@ namespace UnitTests {
 				Height = 3,
 			};
 
-			container.Panel1.Add (new Label (new string ('1', 100)));
-			container.Panel2.Add (new Label (new string ('2', 100)));
+			container.Border.DrawMarginFrame = false;
+			container.Border.BorderStyle = BorderStyle.None;
+
+			container.Panels [0].Add (new Label (new string ('1', 100)));
+			container.Panels [1].Add (new Label (new string ('2', 100)));
 
 			Application.Top.Add (container);
 			container.ColorScheme = new ColorScheme ();
