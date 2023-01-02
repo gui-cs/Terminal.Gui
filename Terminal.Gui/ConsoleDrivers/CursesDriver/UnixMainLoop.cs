@@ -38,6 +38,11 @@ namespace Terminal.Gui {
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
 	internal class UnixMainLoop : IMainLoopDriver {
+		public UnixMainLoop (ConsoleDriver consoleDriver = null)
+		{
+			// UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
+		}
+
 		public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
 
 		[StructLayout (LayoutKind.Sequential)]

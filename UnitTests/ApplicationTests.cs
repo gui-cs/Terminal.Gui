@@ -45,7 +45,7 @@ namespace Terminal.Gui.Core {
 
 		void Init ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (SynchronizationContext.Current);
@@ -62,7 +62,7 @@ namespace Terminal.Gui.Core {
 			// Verify initial state is per spec
 			Pre_Init_State ();
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			// Verify post-Init state is correct
 			Post_Init_State ();
@@ -75,33 +75,36 @@ namespace Terminal.Gui.Core {
 
 			// Verify state is back to initial
 			Pre_Init_State ();
-
+#if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding Responder-based instances 
 			// after a scenario was selected to run. This proves the main UI Catalog
 			// 'app' closed cleanly.
 			foreach (var inst in Responder.Instances) {
 				Assert.True (inst.WasDisposed);
 			}
+#endif
 		}
 
 		[Fact]
 		public void Init_Shutdown_Toplevel_Not_Disposed ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			Application.Shutdown ();
 
+#if DEBUG_IDISPOSABLE
 			Assert.Single (Responder.Instances);
 			Assert.True (Responder.Instances [0].WasDisposed);
+#endif
 		}
 
 		[Fact]
 		public void Init_Unbalanced_Throwss ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			Toplevel topLevel = null;
-			Assert.Throws<InvalidOperationException> (() => Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
+			Assert.Throws<InvalidOperationException> (() => Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ()));
 			Shutdown ();
 
 			Assert.Null (Application.Top);
@@ -110,9 +113,9 @@ namespace Terminal.Gui.Core {
 
 			// Now try the other way
 			topLevel = null;
-			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
 
-			Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
+			Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
 			Shutdown ();
 
 			Assert.Null (Application.Top);
@@ -182,7 +185,7 @@ namespace Terminal.Gui.Core {
 			// NOTE: Run<T>, when called after Init has been called behaves differently than
 			// when called if Init has not been called.
 			Toplevel topLevel = null;
-			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
 
 			Application.RunState runstate = null;
 			Action<Application.RunState> NewRunStateFn = (rs) => {
@@ -255,7 +258,7 @@ namespace Terminal.Gui.Core {
 			Init ();
 
 			// Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
-			Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (errorHandler: null, new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true))));
+			Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (errorHandler: null, new FakeDriver ()));
 
 			Shutdown ();
 
@@ -354,7 +357,7 @@ namespace Terminal.Gui.Core {
 			};
 
 			// Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-			Application.Run<TestToplevel> (errorHandler: null, new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Run<TestToplevel> (errorHandler: null, new FakeDriver ());
 
 			Shutdown ();
 
