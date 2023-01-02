@@ -3,9 +3,15 @@
     "UICatalog": {
       "commandName": "Project"
     },
-    "UICatalog : -usc": {
+    "UICatalog -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
+    },
+    "WSL: UICatalog -usc": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll -usc",
+      "distributionName": ""
     },
     "Wizards": {
       "commandName": "Project",
@@ -35,20 +41,6 @@
       "commandName": "Project",
       "commandLineArgs": "\"Character Map\""
     },
-    "WSL2": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll"
-    },
-    "WSL2 : -usc": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll -usc"
-    },
-    "WSL": {
-      "commandName": "WSL2",
-      "distributionName": ""
-    },
     "All Views Tester": {
       "commandName": "Project",
       "commandLineArgs": "\"All Views Tester\""
@@ -56,6 +48,12 @@
     "Windows & FrameViews": {
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
+    },
+    "WSL : UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll",
+      "distributionName": ""
     }
   }
 }

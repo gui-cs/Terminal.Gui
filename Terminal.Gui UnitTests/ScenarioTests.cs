@@ -61,7 +61,7 @@ namespace UICatalog {
 					return false;
 				};
 
-				Application.Init (new FakeDriver ());
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 				// Close after a short period of time
 				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
@@ -97,7 +97,7 @@ namespace UICatalog {
 			// Passing empty string will cause just a ctrl-q to be fired
 			int stackSize = CreateInput ("");
 
-			Application.Init (new FakeDriver ());
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			int iterations = 0;
 			Application.Iteration = () => {
@@ -179,7 +179,7 @@ namespace UICatalog {
 			List<string> dimNames = new List<String> { "Factor", "Fill", "Absolute" };
 
 
-			Application.Init (new FakeDriver ());
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var Top = Application.Top;
 

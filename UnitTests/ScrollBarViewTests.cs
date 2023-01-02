@@ -20,19 +20,11 @@ namespace Terminal.Gui.Views {
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
 		// as a pair, and b) all unit test functions should be atomic.
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-		public class InitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+		public class ScrollBarAutoInitShutdownAttribute : AutoInitShutdownAttribute {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-				if (_hostView != null) {
-					throw new InvalidOperationException ("After did not run.");
-				}
-
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-
-				var top = Application.Top;
+				base.Before (methodUnderTest);
 
 				ScrollBarViewTests._hostView = new HostView () {
 					Width = Dim.Fill (),
@@ -43,14 +35,13 @@ namespace Terminal.Gui.Views {
 					Cols = 100
 				};
 
-				top.Add (ScrollBarViewTests._hostView);
+				Application.Top.Add (ScrollBarViewTests._hostView);
 			}
 
 			public override void After (MethodInfo methodUnderTest)
 			{
-				Debug.WriteLine ($"After: {methodUnderTest.Name}");
 				ScrollBarViewTests._hostView = null;
-				Application.Shutdown ();
+				base.After (methodUnderTest);
 			}
 		}
 
@@ -113,7 +104,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Hosting_A_Null_View_To_A_ScrollBarView_Throws_ArgumentNullException ()
 		{
 			Assert.Throws<ArgumentNullException> ("The host parameter can't be null.",
@@ -123,7 +114,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Hosting_A_Null_SuperView_View_To_A_ScrollBarView_Throws_ArgumentNullException ()
 		{
 			Assert.Throws<ArgumentNullException> ("The host SuperView parameter can't be null.",
@@ -133,7 +124,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
 		{
 			var top = new Toplevel ();
@@ -147,7 +138,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
 		{
 			var top = new Toplevel ();
@@ -161,7 +152,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
 		{
 			var sbv = new ScrollBarView {
@@ -172,7 +163,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void Hosting_A_View_To_A_ScrollBarView ()
 		{
 			RemoveHandlers ();
@@ -198,7 +189,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void ChangedPosition_Update_The_Hosted_View ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -213,7 +204,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void ChangedPosition_Scrolling ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -240,7 +231,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void ChangedPosition_Negative_Value ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -257,7 +248,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void DrawContent_Update_The_ScrollBarView_Position ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -274,7 +265,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void OtherScrollBarView_Not_Null ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -287,7 +278,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void ShowScrollIndicator_Check ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -299,7 +290,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void KeepContentAlwaysInViewport_True ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -339,7 +330,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void KeepContentAlwaysInViewport_False ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -361,7 +352,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[ScrollBarAutoInitShutdown]
 		public void AutoHideScrollBars_Check ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();
@@ -457,7 +448,7 @@ namespace Terminal.Gui.Views {
 		public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_True_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 		{
 			var exception = Record.Exception (() => {
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 
@@ -527,7 +518,7 @@ namespace Terminal.Gui.Views {
 		public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 		{
 			var exception = Record.Exception (() => {
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;
 
