@@ -829,22 +829,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves or extends the selection to the first cell in the table (0,0)
+		/// Moves or extends the selection to the first cell in the table (0,0).
+		/// If <see cref="FullRowSelect"/> is enabled then selection instead moves
+		/// to (<see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToStartOfTable (bool extend)
 		{
-			SetSelection (0, 0, extend);
+			SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend);
 			Update ();
 		}
 
 		/// <summary>
-		/// Moves or extends the selection to the final cell in the table
+		/// Moves or extends the selection to the final cell in the table (nX,nY).
+		/// If <see cref="FullRowSelect"/> is enabled then selection instead moves
+		/// to (<see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToEndOfTable(bool extend)
 		{
-			SetSelection (Table.Columns.Count - 1, Table.Rows.Count - 1, extend);
+			var finalColumn = Table.Columns.Count - 1;
+
+			SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows.Count - 1, extend);
 			Update ();
 		}
 
