@@ -382,6 +382,9 @@ namespace UnitTests {
 
 			container.Panels [0].Add (new Label (new string ('1', 100)));
 			container.Panels [1].Add (new Label (new string ('2', 100)));
+			
+			container.Panels [0].MinSize = 0;
+			container.Panels [1].MinSize = 0;
 
 			Application.Top.Add (container);
 			container.ColorScheme = new ColorScheme ();

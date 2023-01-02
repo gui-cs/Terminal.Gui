@@ -175,7 +175,7 @@ namespace Terminal.Gui {
 
 					splitterPanels[0].Width = Dim.Fill ();
 					splitterPanels[0].Height = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Height)) - 1;
+					splitterDistance.Anchor (Bounds.Height));
 
 					splitterPanels[1].Y = Pos.Bottom (splitterLine);
 					splitterPanels[1].X = 0;
