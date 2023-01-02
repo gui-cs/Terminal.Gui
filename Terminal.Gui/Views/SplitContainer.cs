@@ -70,6 +70,7 @@ namespace Terminal.Gui {
 			set {
 				orientation = value;
 				Setup ();
+				LayoutSubviews ();
 			}
 		}
 
@@ -90,6 +91,7 @@ namespace Terminal.Gui {
 				splitterDistance = value;
 				Setup ();
 				OnSplitterMoved ();
+				LayoutSubviews ();
 			}
 		}
 
@@ -243,7 +245,7 @@ namespace Terminal.Gui {
 		/// A panel within a <see cref="SplitterPanel"/>. 
 		/// </summary>
 		public class SplitterPanel : View {
-			Pos minSize = 2;
+			Pos minSize = 1;
 
 			/// <summary>
 			/// Gets or sets the minimum size for the panel.
