@@ -48,8 +48,8 @@ namespace UICatalog.Scenarios {
 
 			Label lbl1;
 			splitContainer.Panels [0].Title = "Hello";
-			splitContainer.Panels [0].Add (lbl1 = new Label ("Type Something:") { Y = 1 });
-			splitContainer.Panels [0].Add (new TextField () { Width = Dim.Fill (), Y = 1, X = Pos.Right (lbl1) + 1 });
+			splitContainer.Panels [0].Add (lbl1 = new Label ("Type Something:") { Y = 0 });
+			splitContainer.Panels [0].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl1) + 1 });
 
 			Label lbl2;
 			splitContainer.Panels [1].Title = "World";
@@ -65,11 +65,12 @@ namespace UICatalog.Scenarios {
 			 });
 
 			splitContainer2.Border.BorderStyle = BorderStyle.None;
+			splitContainer2.Border.DrawMarginFrame = false;
 			
-			splitContainer2.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 1 });
-			splitContainer2.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 1, X = Pos.Right (lbl2) + 1 });
-			splitContainer2.Panels [1].Add (new Label ("Here is a Text box:") { Y = 3 });
-			splitContainer2.Panels [1].Add (new TextView () { Y = 4, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
+			splitContainer2.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
+			splitContainer2.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
+			splitContainer2.Panels [1].Add (new Label ("Here is a Text box:") { Y = 1 });
+			splitContainer2.Panels [1].Add (new TextView () { Y = 2, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
 
 			Win.Add (splitContainer);
 

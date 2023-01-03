@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 
 			LayoutStarted += (e) => Setup ();
 
-			CanFocus = false;
+			CanFocus = true;
 		}
 
 		/// <summary>
