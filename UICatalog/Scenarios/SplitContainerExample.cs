@@ -1,6 +1,8 @@
 ﻿using Terminal.Gui;
 using System;
 using Terminal.Gui.Graphs;
+using NStack;
+using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Split Container", Description: "Demonstrates the SplitContainer functionality")]
@@ -9,6 +11,8 @@ namespace UICatalog.Scenarios {
 	public class SplitContainerExample : Scenario {
 
 		private SplitContainer splitContainer;
+
+		private SplitContainer splitContainer2;
 		private MenuItem miVertical;
 		private MenuItem miShowBoth;
 		private MenuItem miShowPanel1;
@@ -33,6 +37,12 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill () - 1,
 				SplitterDistance = Pos.Percent (50), // TODO: get this to work with drag resizing and percents
 			};
+			splitContainer2 = new SplitContainer(){
+				Width = Dim.Fill(),
+				Height = Dim.Fill(),
+				Orientation = Orientation.Horizontal
+			};
+
 			splitContainer.Panels [0].MinSize = 4;
 			splitContainer.Panels [1].MinSize = 4;
 
@@ -43,10 +53,23 @@ namespace UICatalog.Scenarios {
 
 			Label lbl2;
 			splitContainer.Panels [1].Title = "World";
-			splitContainer.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 1 });
-			splitContainer.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 1, X = Pos.Right (lbl2) + 1 });
-			splitContainer.Panels [1].Add (new Label ("Here is a Text box:") { Y = 3 });
-			splitContainer.Panels [1].Add (new TextView () { Y = 4, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
+			splitContainer.Panels[1].Add(splitContainer2);
+
+			splitContainer2.Panels [0].Add (new TextView ()
+			 {
+				Width = Dim.Fill(),
+				Height = Dim.Fill(),
+				Text = GenerateLotsOfText(),
+				AllowsTab = false,
+				WordWrap = true,
+			 });
+
+			splitContainer2.Border.BorderStyle = BorderStyle.None;
+			
+			splitContainer2.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 1 });
+			splitContainer2.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 1, X = Pos.Right (lbl2) + 1 });
+			splitContainer2.Panels [1].Add (new Label ("Here is a Text box:") { Y = 3 });
+			splitContainer2.Panels [1].Add (new TextView () { Y = 4, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
 
 			Win.Add (splitContainer);
 
@@ -90,6 +113,11 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 		}
 
+		private ustring GenerateLotsOfText ()
+		{
+			return "Hello There ".Repeat(100);
+		}
+
 		private void UpdateShowMenuCheckedStates ()
 		{
 			miShowBoth.Checked = (splitContainer.Panels [0].Visible) && (splitContainer.Panels [1].Visible);
@@ -109,6 +137,7 @@ namespace UICatalog.Scenarios {
 		{
 			miVertical.Checked = !miVertical.Checked;
 			splitContainer.Orientation = miVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
+			splitContainer2.Orientation = miVertical.Checked ? Orientation.Horizontal : Orientation.Vertical;
 		}
 
 		private void Quit ()
