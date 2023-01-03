@@ -58,7 +58,7 @@ namespace Terminal.Gui.Views {
 		{
 			var driver = new FakeDriver ();
 			try {
-				Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (driver);
 			} catch (InvalidOperationException) {
 
 				// close it so that we don't get a thousand of these errors in a row
@@ -1506,7 +1506,7 @@ namespace Terminal.Gui.Views {
 		public void LabelChangeText_RendersCorrectly (bool useFill)
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			// create a wide window
