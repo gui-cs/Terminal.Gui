@@ -743,7 +743,10 @@ namespace Terminal.Gui {
 			return base.OnLeave (view);
 		}
 
-		void EnsuresVisibilitySelectedItem ()
+		/// <summary>
+		/// Ensures the selected item is always visible on the screen.
+		/// </summary>
+		public void EnsuresVisibilitySelectedItem ()
 		{
 			SuperView?.LayoutSubviews ();
 			if (selected < top) {
@@ -840,7 +843,7 @@ namespace Terminal.Gui {
 			if (src == null || src?.Count == 0) {
 				return 0;
 			}
-			
+
 			int maxLength = 0;
 			for (int i = 0; i < src.Count; i++) {
 				var t = src [i];
@@ -924,7 +927,7 @@ namespace Terminal.Gui {
 						return i;
 					}
 				} else if (t is string s) {
-					if (s.ToUpperInvariant ().StartsWith (search.ToUpperInvariant ())) {
+					if (s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase)) {
 						return i;
 					}
 				}
