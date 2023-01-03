@@ -181,16 +181,15 @@ namespace Terminal.Gui {
 		{
 			UpdatePollMap ();
 
-			if (CheckTimers (wait, out var pollTimeout)) {
-				return true;
-			}
+			bool checkTimersResult = CheckTimers (wait, out var pollTimeout);
 
 			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
 
 			if (n == KEY_RESIZE) {
 				winChanged = true;
 			}
-			return n >= KEY_RESIZE || CheckTimers (wait, out pollTimeout);
+
+			return checkTimersResult || n >= KEY_RESIZE;
 		}
 
 		bool CheckTimers (bool wait, out int pollTimeout)
