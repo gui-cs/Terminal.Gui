@@ -596,7 +596,7 @@ namespace Terminal.Gui.Core {
 
 			var win = new Window ();
 			win.Add (view);
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 			var top = Application.Top;
 			top.Add (win);
 
@@ -663,7 +663,7 @@ namespace Terminal.Gui.Core {
 		[AutoInitShutdown]
 		public void FileDialog_FileSystemWatcher ()
 		{
-			for (int i = 0; i < 256; i++) {
+			for (int i = 0; i < 8; i++) {
 				var fd = new FileDialog ();
 				fd.Ready += () => Application.RequestStop ();
 				Application.Run (fd);

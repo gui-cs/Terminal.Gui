@@ -20,7 +20,8 @@ jobs:
         dotnet-version: 6.0.100
 
     - name: Install dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
 
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore

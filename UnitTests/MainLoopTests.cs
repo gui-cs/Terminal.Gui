@@ -14,12 +14,17 @@ using Xunit.Sdk;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.Core {
+	/// <summary>
+	/// Tests MainLoop using the FakeMainLoop.
+	/// </summary>
 	public class MainLoopTests {
+
+		// TODO: Expand to test all the MainLoop implementations.
 
 		[Fact]
 		public void Constructor_Setups_Driver ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			Assert.NotNull (ml.Driver);
 		}
 
@@ -27,7 +32,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddIdle_Adds_And_Removes ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			Func<bool> fnTrue = () => true;
 			Func<bool> fnFalse = () => false;
@@ -81,7 +86,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddIdle_Function_GetsCalled_OnIteration ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn = () => {
@@ -97,7 +102,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void RemoveIdle_Function_NotCalled ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn = () => {
@@ -113,7 +118,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddThenRemoveIdle_Function_NotCalled ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn = () => {
@@ -130,7 +135,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTwice_Function_CalledTwice ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn = () => {
@@ -161,7 +166,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void False_Idle_Stops_It_Being_Called_Again ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn1 = () => {
@@ -195,7 +200,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddIdle_Twice_Returns_False_Called_Twice ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn1 = () => {
@@ -227,7 +232,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Run_Runs_Idle_Stop_Stops_Idle ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var functionCalled = 0;
 			Func<bool> fn = () => {
@@ -249,7 +254,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_Adds_Removes_NoFaults ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = 100;
 
 			var callbackCount = 0;
@@ -270,7 +275,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_Run_Called ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = 100;
 
 			var callbackCount = 0;
@@ -290,7 +295,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public async Task AddTimer_Duplicate_Keys_Not_Allowed ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			const int ms = 100;
 			object token1 = null, token2 = null;
 
@@ -322,7 +327,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_In_Parallel_Wont_Throw ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			const int ms = 100;
 			object token1 = null, token2 = null;
 
@@ -359,7 +364,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_Run_CalledAtApproximatelyRightTime ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 			var watch = new System.Diagnostics.Stopwatch ();
 
@@ -385,7 +390,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_Run_CalledTwiceApproximatelyRightTime ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 			var watch = new System.Diagnostics.Stopwatch ();
 
@@ -413,7 +418,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_Remove_NotCalled ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 
 			// Force stop if 10 iterations
@@ -442,7 +447,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void AddTimer_ReturnFalse_StopsBeingCalled ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 
 			// Force stop if 10 iterations
@@ -475,7 +480,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Invoke_Adds_Idle ()
 		{
-			var ml = new MainLoop (new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			var ml = new MainLoop (new FakeMainLoop ());
 
 			var actionCalled = 0;
 			ml.Invoke (() => { actionCalled++; });
