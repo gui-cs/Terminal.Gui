@@ -430,7 +430,7 @@ namespace Terminal.Gui {
 				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
 				if (newItem is int && newItem != -1) {
 					SelectedItem = (int)newItem;
-					EnsuresVisibilitySelectedItem ();
+					EnsureSelectedItemVisible ();
 					SetNeedsDisplay ();
 					return true;
 				}
@@ -727,7 +727,7 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			if (lastSelectedItem == -1) {
-				EnsuresVisibilitySelectedItem ();
+				EnsureSelectedItemVisible ();
 			}
 
 			return base.OnEnter (view);
@@ -746,7 +746,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Ensures the selected item is always visible on the screen.
 		/// </summary>
-		public void EnsuresVisibilitySelectedItem ()
+		public void EnsureSelectedItemVisible ()
 		{
 			SuperView?.LayoutSubviews ();
 			if (selected < top) {

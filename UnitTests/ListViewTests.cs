@@ -203,7 +203,7 @@ namespace Terminal.Gui.Views {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void EnsuresVisibilitySelectedItem_Top ()
+		public void EnsureSelectedItemVisible_Top ()
 		{
 			var source = new List<string> () { "First", "Second" };
 			ListView lv = new ListView (source) { Width = Dim.Fill (), Height = 1 };
@@ -475,7 +475,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void EnsuresVisibilitySelectedItem_SelectedItem ()
+		public void EnsureSelectedItemVisible_SelectedItem ()
 		{
 			var source = new List<string> ();
 			for (int i = 0; i < 10; i++) {
@@ -504,7 +504,7 @@ Item 2
 Item 3
 Item 4", output);
 
-			lv.EnsuresVisibilitySelectedItem ();
+			lv.EnsureSelectedItemVisible ();
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Item 2
