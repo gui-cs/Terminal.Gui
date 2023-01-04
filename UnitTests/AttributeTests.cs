@@ -13,7 +13,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Constuctors_Constuct ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			// Test parameterless constructor
@@ -59,7 +59,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Implicit_Assign ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			var attr = new Attribute ();
@@ -100,7 +100,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Make_Creates ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			var fg = new Color ();
@@ -128,7 +128,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Get_Gets ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 
 			var value = 42;

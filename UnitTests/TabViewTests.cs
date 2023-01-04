@@ -763,7 +763,7 @@ namespace Terminal.Gui.Views {
 		private void InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 			driver.Init (() => { });
 		}
 	}

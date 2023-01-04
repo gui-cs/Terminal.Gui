@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
+using Microsoft.DotNet.PlatformAbstractions;
 using Rune = System.Rune;
 
 /// <summary>
@@ -151,8 +151,7 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public FrameView ContentPane;
-			public SplitContainer SplitContainer;
+			public SplitContainer ContentPane;
 			public ListView CategoryListView;
 			public ListView ScenarioListView;
 
@@ -160,6 +159,7 @@ namespace UICatalog {
 			public StatusItem Numlock;
 			public StatusItem Scrolllock;
 			public StatusItem DriverName;
+			public StatusItem OS;
 
 			public UICatalogTopLevel ()
 			{
@@ -177,19 +177,17 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-
+				
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 				DriverName = new StatusItem (Key.CharMask, "Driver:", null);
+				OS = new StatusItem (Key.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
 					Visible = true,
 				};
 				StatusBar.Items = new StatusItem [] {
-					Capslock,
-					Numlock,
-					Scrolllock,
 					new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 						if (_selectedScenario is null){
 							// This causes GetScenarioToRun to return null
@@ -199,32 +197,27 @@ namespace UICatalog {
 							_selectedScenario.RequestStop();
 						}
 					}),
-					new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
+					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
 						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
 						SetChildNeedsDisplay();
 					}),
 					DriverName,
+					OS
 				};
 
-				ContentPane = new FrameView ("Categories") {
+				ContentPane = new SplitContainer () {
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.C
-				};
-				
-				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
-
-				SplitContainer = new SplitContainer {
-					Width = Dim.Fill (0),
-					Height = Dim.Fill (0),
+					Shortcut = Key.CtrlMask | Key.C,
 					SplitterDistance = 25
 				};
-
+				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
+					
 				CategoryListView = new ListView (_categories) {
 					X = 0,
 					Y = 0,
@@ -237,16 +230,9 @@ namespace UICatalog {
 					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
-				ContentPane.Add (SplitContainer);
 
-				SplitContainer.Panel1.Add (CategoryListView);
-
-				SetTitlePaddingToAlignScenariosHeader ();
-
-				SplitContainer.SplitterMoved += (s, e) => {
-					SetTitlePaddingToAlignScenariosHeader ();
-				};
-
+				ContentPane.Panels [0].Title = "Categories";
+				ContentPane.Panels [0].Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -258,11 +244,14 @@ namespace UICatalog {
 				};
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
-				SplitContainer.Panel2.Add (ScenarioListView);
+
+				ContentPane.Panels [1].Title = "Scenarios";
+				ContentPane.Panels [1].Add (ScenarioListView);
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);
 				Add (ContentPane);
+
 				Add (StatusBar);
 
 				Loaded += LoadedHandler;
@@ -271,22 +260,7 @@ namespace UICatalog {
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
 			}
-
-			private void SetTitlePaddingToAlignScenariosHeader ()
-			{ 
-				// Pos.Anchor is internal so we have to use reflection to access it
-				var anchor = typeof (Pos).GetMethod ("Anchor", BindingFlags.Instance | BindingFlags.NonPublic);
-				var splitterWidth = (int)anchor.Invoke (
-					SplitContainer.SplitterDistance, new object [] { SplitContainer.Bounds.Width}
-					);
-
-				var newTitle = $"Categories ({ContentPane.ShortcutTag})";
-				newTitle = newTitle.PadRight (splitterWidth + 1, (char)Driver.HLine);
-				newTitle += "Scenarios";
-
-				ContentPane.Title = newTitle;				
-			}
-
+ 
 			void LoadedHandler ()
 			{
 				Application.HeightAsBuffer = _heightAsBuffer;
@@ -298,6 +272,7 @@ namespace UICatalog {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
+				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {
 					_selectedScenario = null;

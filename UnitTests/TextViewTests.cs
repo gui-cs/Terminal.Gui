@@ -22,16 +22,12 @@ namespace Terminal.Gui.Views {
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
 		// as a pair, and b) all unit test functions should be atomic.
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+		public class TextViewTestsAutoInitShutdown : AutoInitShutdownAttribute {
 
 			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				if (_textView != null) {
-					throw new InvalidOperationException ("After did not run.");
-				}
-
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				base.Before (methodUnderTest);
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)
@@ -47,12 +43,12 @@ namespace Terminal.Gui.Views {
 			public override void After (MethodInfo methodUnderTest)
 			{
 				_textView = null;
-				Application.Shutdown ();
+				base.After (methodUnderTest);
 			}
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Changing_Selection_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
 		{
 			_textView.SelectionStartColumn = 2;
@@ -69,7 +65,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Selection_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textView.SelectionStartColumn = -2;
@@ -81,7 +77,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Selection_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textView.CursorPosition = new Point (2, 0);
@@ -94,7 +90,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Selection_With_Empty_Text ()
 		{
 			_textView = new TextView ();
@@ -108,7 +104,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Selection_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
 		{
 			_textView.CursorPosition = new Point (33, 2);
@@ -123,7 +119,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textView.CursorPosition = new Point (-1, -1);
@@ -134,7 +130,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textView.CursorPosition = new Point (33, 1);
@@ -145,7 +141,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection ()
 		{
 			_textView.CursorPosition = new Point (0, 0);
@@ -208,7 +204,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection ()
 		{
 			_textView.CursorPosition = new Point (_textView.Text.Length, 0);
@@ -271,7 +267,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordForward_With_Selection ()
 		{
 			_textView.CursorPosition = new Point (0, 0);
@@ -336,7 +332,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordBackward_With_Selection ()
 		{
 			_textView.CursorPosition = new Point (_textView.Text.Length, 0);
@@ -401,7 +397,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textView.CursorPosition = new Point (10, 0);
@@ -450,7 +446,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textView.CursorPosition = new Point (10, 0);
@@ -491,7 +487,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                          1         2         3         4         5    
@@ -597,7 +593,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                          1         2         3         4         5    
@@ -703,7 +699,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordBackward_Multiline_With_Selection ()
 		{
 			//		          4         3          2         1
@@ -818,7 +814,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordForward_Multiline_With_Selection ()
 		{
 			//			    1         2          3         4
@@ -932,7 +928,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
@@ -945,26 +941,26 @@ namespace Terminal.Gui.Views {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
-					Assert.Equal ("This is the first line.", Clipboard.Contents);
+					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ("This is the first line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the second line.", _textView.Text);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
+					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
+					Assert.Equal ("", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents.ToString ());
 
 					// Paste
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
 					break;
 				default:
 					iterationsFinished = true;
@@ -975,7 +971,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
@@ -989,26 +985,26 @@ namespace Terminal.Gui.Views {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
-					Assert.Equal ($"This is the second line.", Clipboard.Contents);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString());
+					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (23, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the first line.", _textView.Text);
-					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
+					Assert.Equal ("This is the first line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents.ToString ());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text);
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
+					Assert.Equal ("", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents.ToString ());
 
 					// Paste inverted
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text.ToString ());
 					break;
 				default:
 					iterationsFinished = true;
@@ -1019,7 +1015,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_Delete_WordForward ()
 		{
 			_textView.Text = "This is the first line.";
@@ -1063,7 +1059,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_Delete_WordBackward ()
 		{
 			_textView.Text = "This is the first line.";
@@ -1108,7 +1104,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_Delete_WordForward_Multiline ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
@@ -1188,7 +1184,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Kill_Delete_WordBackward_Multiline ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
@@ -1268,7 +1264,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Null_If_No_Selection ()
 		{
 			_textView.SelectionStartColumn = 0;
@@ -1280,7 +1276,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
 		{
 			_textView.SelectionStartColumn = 20;
@@ -1293,7 +1289,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_Selection ()
 		{
 			_textView.SelectionStartColumn = 20;
@@ -1312,7 +1308,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_No_Selection ()
 		{
 			_textView.SelectionStartColumn = 20;
@@ -1347,7 +1343,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Cut_Not_Allowed_If_ReadOnly_Is_True ()
 		{
 			_textView.ReadOnly = true;
@@ -1368,7 +1364,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Paste_Always_Clear_The_SelectedText ()
 		{
 			_textView.SelectionStartColumn = 20;
@@ -1381,7 +1377,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TextChanged_Event ()
 		{
 			_textView.TextChanged += () => {
@@ -1396,7 +1392,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TextChanged_Event_NoFires_OnTyping ()
 		{
 			var eventcount = 0;
@@ -1412,7 +1408,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Used_Is_True_By_Default ()
 		{
 			_textView.CursorPosition = new Point (10, 0);
@@ -1428,7 +1424,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Used_Is_False ()
 		{
 			_textView.Used = false;
@@ -1445,7 +1441,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Copy_Without_Selection ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.\n";
@@ -1464,7 +1460,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
 		{
 			Assert.Equal (4, _textView.TabWidth);
@@ -1483,7 +1479,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void AllowsTab_Setting_To_True_Changes_TabWidth_To_Default_If_It_Is_Zero ()
 		{
 			_textView.TabWidth = 0;
@@ -1499,7 +1495,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void AllowsReturn_Setting_To_True_Changes_Multiline_To_True_If_It_Is_False ()
 		{
 			Assert.True (_textView.AllowsReturn);
@@ -1521,7 +1517,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Multiline_Setting_Changes_AllowsReturn_AllowsTab_Height_WordWrap ()
 		{
 			Assert.True (_textView.Multiline);
@@ -1556,7 +1552,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Tab_Test_Follow_By_BackTab ()
 		{
 			Application.Top.Add (_textView);
@@ -1592,7 +1588,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void BackTab_Test_Follow_By_Tab ()
 		{
 			Application.Top.Add (_textView);
@@ -1635,7 +1631,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight ()
 		{
 			Application.Top.Add (_textView);
@@ -1678,7 +1674,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Tab_Test_Follow_By_BackTab_With_Text ()
 		{
 			Application.Top.Add (_textView);
@@ -1714,7 +1710,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Tab_Test_Follow_By_Home_And_Then_Follow_By_End_And_Then_Follow_By_BackTab_With_Text ()
 		{
 			Application.Top.Add (_textView);
@@ -1772,7 +1768,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight_With_Text ()
 		{
 			Application.Top.Add (_textView);
@@ -2020,7 +2016,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordWrap_WrapModel_Output ()
 		{
 			//          0123456789
@@ -2103,7 +2099,7 @@ a
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void WordWrap_ReadOnly_CursorPosition_SelectedText_Copy ()
 		{
 			//          0123456789
@@ -2228,7 +2224,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void BottomOffset_Sets_To_Zero_Adjust_TopRow ()
 		{
 			string text = "";
@@ -2258,7 +2254,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void RightOffset_Sets_To_Zero_Adjust_leftColumn ()
 		{
 			string text = "";
@@ -2288,7 +2284,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TextView_SpaceHandling ()
 		{
 			var tv = new TextView () {
@@ -2316,7 +2312,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void CanFocus_False_Wont_Focus_With_Mouse ()
 		{
 			var top = Application.Top;
@@ -2383,7 +2379,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void DesiredCursorVisibility_Vertical_Navigation ()
 		{
 			string text = "";
@@ -2422,7 +2418,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void DesiredCursorVisibility_Horizontal_Navigation ()
 		{
 			string text = "";
@@ -5942,7 +5938,7 @@ line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void Mouse_Button_Shift_Preserves_Selection ()
 		{
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -6333,7 +6329,7 @@ This is the second line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TextView_InsertText_Newline_LF ()
 		{
 			var tv = new TextView {
@@ -6402,7 +6398,7 @@ This is the second line.
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextViewTestsAutoInitShutdown]
 		public void TextView_InsertText_Newline_CRLF ()
 		{
 			var tv = new TextView {
@@ -6621,7 +6617,7 @@ This is the second line.
 			Assert.Equal ("Yay", tv.Text.ToString ());
 		}
 
-		[Fact, InitShutdown]
+		[Fact, TextViewTestsAutoInitShutdown]
 		public void ContentsChanged_Event_Fires_Using_Kill_Delete_Tests ()
 		{
 			var eventcount = 0;
@@ -6647,7 +6643,8 @@ This is the second line.
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 
-		[Fact, InitShutdown]
+
+		[Fact, TextViewTestsAutoInitShutdown]
 		public void ContentsChanged_Event_Fires_Using_Copy_Or_Cut_Tests ()
 		{
 			var eventcount = 0;
@@ -6659,7 +6656,7 @@ This is the second line.
 			var expectedEventCount = 1;
 
 			// reset
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 3;
@@ -6668,7 +6665,7 @@ This is the second line.
 
 			// reset
 			expectedEventCount += 1;
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 3;
@@ -6677,7 +6674,7 @@ This is the second line.
 
 			// reset
 			expectedEventCount += 1;
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 1;
@@ -6686,7 +6683,7 @@ This is the second line.
 
 			// reset
 			expectedEventCount += 1;
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 1;
@@ -6695,7 +6692,7 @@ This is the second line.
 
 			// reset
 			expectedEventCount += 1;
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 4;
@@ -6704,7 +6701,7 @@ This is the second line.
 
 			// reset
 			expectedEventCount += 1;
-			_textView.Text = InitShutdown.txt;
+			_textView.Text = TextViewTestsAutoInitShutdown.txt;
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount += 4;
@@ -6712,7 +6709,7 @@ This is the second line.
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 
-		[Fact, InitShutdown]
+		[Fact, TextViewTestsAutoInitShutdown]
 		public void ContentsChanged_Event_Fires_On_Undo_Redo ()
 		{
 			var eventcount = 0;

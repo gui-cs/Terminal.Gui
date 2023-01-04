@@ -1381,6 +1381,54 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (1, tableView.SelectedColumn);
 		}
 
+
+		[InlineData(true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestMoveStartEnd_WithFullRowSelect(bool withFullRowSelect)
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+			tableView.FullRowSelect = withFullRowSelect;
+
+			tableView.SelectedRow = 1;
+			tableView.SelectedColumn = 1;
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = Key.Home  | Key.CtrlMask
+			});
+
+			if(withFullRowSelect)
+			{
+				// Should not be any horizontal movement when
+				// using navigate to Start/End and FullRowSelect
+				Assert.Equal (1, tableView.SelectedColumn);
+				Assert.Equal (0, tableView.SelectedRow);
+			}
+			else
+			{
+				Assert.Equal (0, tableView.SelectedColumn);
+				Assert.Equal (0, tableView.SelectedRow);
+			}
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = Key.End  | Key.CtrlMask
+			});
+
+			if(withFullRowSelect)
+			{
+				Assert.Equal (1, tableView.SelectedColumn);
+				Assert.Equal (1, tableView.SelectedRow);
+			}
+			else
+			{
+				Assert.Equal (5, tableView.SelectedColumn);
+				Assert.Equal (1, tableView.SelectedRow);
+			}
+
+		}
+
 		[InlineData (true)]
 		[InlineData (false)]
 		[Theory, AutoInitShutdown]

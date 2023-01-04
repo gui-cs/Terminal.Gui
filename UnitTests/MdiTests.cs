@@ -22,7 +22,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Dispose_Toplevel_IsMdiContainer_False_With_Begin_End ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = new Toplevel ();
 			var rs = Application.Begin (top);
@@ -30,25 +30,28 @@ namespace Terminal.Gui.Core {
 
 			Application.Shutdown ();
 
+#if DEBUG_IDISPOSABLE
 			Assert.Equal (2, Responder.Instances.Count);
 			Assert.True (Responder.Instances [0].WasDisposed);
 			Assert.True (Responder.Instances [1].WasDisposed);
+#endif
 		}
 
 		[Fact]
 		public void Dispose_Toplevel_IsMdiContainer_True_With_Begin ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var mdi = new Toplevel { IsMdiContainer = true };
 			var rs = Application.Begin (mdi);
 			Application.End (rs);
 
 			Application.Shutdown ();
-
+#if DEBUG_IDISPOSABLE
 			Assert.Equal (2, Responder.Instances.Count);
 			Assert.True (Responder.Instances [0].WasDisposed);
 			Assert.True (Responder.Instances [1].WasDisposed);
+#endif
 		}
 
 		[Fact, AutoInitShutdown]
