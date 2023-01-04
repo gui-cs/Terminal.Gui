@@ -103,14 +103,13 @@ namespace Terminal.Gui {
 			// TODO: handle Save File / Folder too
 			title = "Open File";
 
-			const int okWidth = 8;
+			const int okWidth = 6;
 
 			var lblPath = new Label (">");
 			btnOk = new Button ("Ok") {
-				X = Pos.AnchorEnd (okWidth),
-				IsDefault = true
+				X = Pos.AnchorEnd (okWidth)
 			};
-			btnOk.Clicked += BtnOk_Clicked;
+			btnOk.Clicked += Accept;
 			btnOk.KeyPress += (k) => {
 				NavigateIf (k, Key.CursorLeft, tbPath);
 				NavigateIf (k, Key.CursorDown, tableView);
@@ -141,7 +140,8 @@ namespace Terminal.Gui {
 				if(tbPath.CursorIsAtEnd()) {
 					NavigateIf (k, Key.CursorRight, btnOk);
 				}
-					
+
+				AcceptIf(k, Key.Enter);					
 			};
 			this.Add (tbPath);
 
@@ -240,6 +240,21 @@ namespace Terminal.Gui {
 			UpdateNavigationVisibility ();
 		}
 
+		private void AcceptIf (KeyEventEventArgs keyEvent, Key isKey)
+		{
+			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
+				keyEvent.Handled = true;
+				Accept();
+			}
+		}
+
+		private void Accept ()
+		{
+			tbPath.AcceptSelectionIfAny();
+			Canceled = false;
+			Application.RequestStop ();
+		}
+
 		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
@@ -247,12 +262,6 @@ namespace Terminal.Gui {
 				to.FocusFirst ();
 				keyEvent.Handled = true;
 			}
-		}
-
-		private void BtnOk_Clicked ()
-		{
-			Canceled = false;
-			Application.RequestStop ();
 		}
 
 		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
@@ -470,9 +479,11 @@ namespace Terminal.Gui {
 					e => e.FileSystemInfo is DirectoryInfo d
 						? d.Name + System.IO.Path.DirectorySeparatorChar
 						: e.FileSystemInfo.Name)
-					.ToArray ();
+					.ToList ();
 
-				GenerateSuggestions (suggestions);
+				suggestions.Add(state.Directory.Name);
+
+				GenerateSuggestions (suggestions.ToArray());
 			}
 
 			internal void SetTextTo (FileSystemInfo fileSystemInfo)
