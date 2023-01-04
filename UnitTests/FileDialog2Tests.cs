@@ -30,7 +30,7 @@ namespace Terminal.Gui.Core {
 
 			tb.Text = "c:/fish";
 			tb.CursorPosition = tb.Text.Length;
-			tb.GenerateSuggestions ("fish", "fishes");
+			tb.GenerateSuggestions (null, "fish", "fishes");
 
 			// should not report success for autocompletion because we already have that exact
 			// string
@@ -48,7 +48,7 @@ namespace Terminal.Gui.Core {
 
 			tb.Text = @"c:/fi";
 			tb.CursorPosition = tb.Text.Length;
-			tb.GenerateSuggestions ("fish", "fishes");
+			tb.GenerateSuggestions (null, "fish", "fishes");
 
 			Assert.True (tb.AcceptSelectionIfAny ());
 			Assert.Equal (@"c:\fish", tb.Text);

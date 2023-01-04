@@ -430,7 +430,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			internal void GenerateSuggestions (params string [] suggestions)
+			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
 			{
 				if (!CursorIsAtEnd()) {
 					return;
@@ -446,11 +446,18 @@ namespace Terminal.Gui {
 
 				var term = path.Substring (last + 1);
 
+				if(term.Equals(state?.Directory?.Name))
+				{
+					ClearSuggestions();
+					return;
+				}
+
 				// TODO: Be case insensitive on Windows
 				var validSuggestions = suggestions
 					.Where (s => s.StartsWith (term))
 					.OrderBy (m => m.Length)
 					.ToArray ();
+
 
 				// nothing to suggest 
 				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
@@ -479,11 +486,9 @@ namespace Terminal.Gui {
 					e => e.FileSystemInfo is DirectoryInfo d
 						? d.Name + System.IO.Path.DirectorySeparatorChar
 						: e.FileSystemInfo.Name)
-					.ToList ();
+					.ToArray ();
 
-				suggestions.Add(state.Directory.Name);
-
-				GenerateSuggestions (suggestions.ToArray());
+				GenerateSuggestions (state, suggestions);
 			}
 
 			internal void SetTextTo (FileSystemInfo fileSystemInfo)
