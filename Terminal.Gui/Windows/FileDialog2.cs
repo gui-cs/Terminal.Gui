@@ -151,8 +151,9 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
 				SplitterDistance = 30,
-				Panel1Collapsed = true,
 			};
+
+			splitContainer.Panels [0].Visible = false;
 
 			tableView = new TableView () {
 				Width = Dim.Fill (),
@@ -195,16 +196,16 @@ namespace Terminal.Gui {
 
 			treeView.SelectionChanged += TreeView_SelectionChanged;
 
-			splitContainer.Panel2.Add (tableView);
-			splitContainer.Panel1.Add (treeView);
+			splitContainer.Panels [0].Add (treeView);
+			splitContainer.Panels [1].Add (tableView);
 
 			btnToggleSplitterCollapse = new Button (">>") {
 				Y = Pos.AnchorEnd (1),
 			};
 			btnToggleSplitterCollapse.Clicked += () => {
-				var newState = !splitContainer.Panel1Collapsed;
-				splitContainer.Panel1Collapsed = newState;
-				btnToggleSplitterCollapse.Text = newState ? ">>" : "<<";
+				var newState = !splitContainer.Panels[0].Visible;
+				splitContainer.Panels [0].Visible = newState;
+				btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
 			Add (btnToggleSplitterCollapse);
 
