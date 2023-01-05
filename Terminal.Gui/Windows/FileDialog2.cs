@@ -492,7 +492,7 @@ namespace Terminal.Gui {
 
 			var stats = this.RowToStats (obj.NewRow);
 
-			if (stats == null) {
+			if (stats == null || stats.IsParent) {
 				return;
 			}
 
