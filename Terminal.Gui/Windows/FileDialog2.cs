@@ -95,6 +95,12 @@ namespace Terminal.Gui {
 
 		private string title;
 
+		private static char [] separators = new [] {
+			System.IO.Path.AltDirectorySeparatorChar,
+			System.IO.Path.DirectorySeparatorChar
+		};
+			
+
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
@@ -230,15 +236,30 @@ namespace Terminal.Gui {
 			tbPath.TextChanged += (s) => PathChanged ();
 
 			// Give this view priority on key handling
-			tableView.KeyUp += (k) => k.Handled = this.HandleKey (k.KeyEvent);
+			tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 			tableView.ColorScheme = ColorSchemeDefault;
+
+			treeView.ColorScheme = ColorSchemeDefault;
+			treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
 
 			// TODO: delay or consider not doing this to avoid double load
 			tbPath.Text = Environment.CurrentDirectory;
 			this.AllowsMultipleSelection = false;
 
 			UpdateNavigationVisibility ();
+		}
+
+		private bool TreeView_KeyDown (KeyEvent keyEvent)
+		{
+			if (treeView.HasFocus && separators.Contains((char)keyEvent.KeyValue)) {
+				tbPath.FocusFirst ();
+				
+				// let that keystroke go through on the tbPath instead
+				return true;
+			}
+
+			return false;
 		}
 
 		private void AcceptIf (KeyEventEventArgs keyEvent, Key isKey)
@@ -259,7 +280,7 @@ namespace Terminal.Gui {
 		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
-				// focus the text box
+				
 				to.FocusFirst ();
 				keyEvent.Handled = true;
 			}
@@ -353,8 +374,6 @@ namespace Terminal.Gui {
 			int? currentFragment = null;
 			string [] validFragments = new string [0];
 
-			char [] separators = new [] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
-
 			public TextFieldWithAppendAutocomplete ()
 			{
 				KeyPress += (k) => {
@@ -422,13 +441,19 @@ namespace Terminal.Gui {
 			{
 				if (MakingSuggestion ()) {
 					Text += validFragments [currentFragment.Value];
-					CursorPosition = Text.Length + 1;
+					MoveCursorToEnd ();
 
 					ClearSuggestions ();
 					return true;
 				}
 
 				return false;
+			}
+
+			internal void MoveCursorToEnd ()
+			{
+				ClearAllSelection ();
+				CursorPosition = Text.Length;
 			}
 
 			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
@@ -438,7 +463,7 @@ namespace Terminal.Gui {
 				}
 
 				var path = Text.ToString ();
-				var last = path.LastIndexOfAny (separators);
+				var last = path.LastIndexOfAny (FileDialog2.separators);
 
 				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
 					currentFragment = null;
@@ -518,7 +543,7 @@ namespace Terminal.Gui {
 			tableView.TabIndex = 3;
 			btnToggleSplitterCollapse.TabIndex = 2;
 		}
-		private bool HandleKey (KeyEvent keyEvent)
+		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
 				return history.Back ();
@@ -547,7 +572,7 @@ namespace Terminal.Gui {
 			ColorSchemeDefault = new ColorScheme {
 				Normal = Driver.MakeAttribute (Color.White, Color.Black),
 				HotNormal = Driver.MakeAttribute (Color.White, Color.Black),
-				Focus = Driver.MakeAttribute (Color.Black, Color.Black),
+				Focus = Driver.MakeAttribute (Color.Black, Color.White),
 				HotFocus = Driver.MakeAttribute (Color.Black, Color.White),
 			};
 			ColorSchemeImage = new ColorScheme {
@@ -617,7 +642,7 @@ namespace Terminal.Gui {
 
 				if (setPathText) {
 					tbPath.Text = d.FullName;
-					tbPath.CursorPosition = tbPath.Text.Length;
+					tbPath.MoveCursorToEnd ();
 				}
 
 				state = new FileDialogState (d);
