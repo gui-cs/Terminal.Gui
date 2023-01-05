@@ -1296,5 +1296,32 @@ namespace Terminal.Gui.Views {
 			Assert.Equal ($"{text}A", tf.Text);
 			Assert.True (tf.IsDirty);
 		}
+
+		[InlineData ("a")] // Lower than selection
+		[InlineData ("aaaaaaaaaaa")] // Greater than selection
+		[InlineData ("aaaa")] // Equal than selection
+		[Theory]
+		public void TestSetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
+		{
+			var tf = new TextField ();
+			tf.Text = "fish";
+			tf.CursorPosition = tf.Text.Length;
+
+			tf.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+
+			tf.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tf.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+
+			Assert.Equal (1, tf.CursorPosition);
+			Assert.Equal (2, tf.SelectedLength);
+			Assert.Equal ("is", tf.SelectedText);
+
+			tf.Text = newText;
+			tf.CursorPosition = tf.Text.Length;
+
+			Assert.Equal (newText.Length, tf.CursorPosition);
+			Assert.Equal (0, tf.SelectedLength);
+			Assert.Null (tf.SelectedText);
+		}
 	}
 }
