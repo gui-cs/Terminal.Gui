@@ -500,7 +500,7 @@ namespace Terminal.Gui {
 				this.pushingState = true;
 
 				this.tbPath.SetTextTo (stats.FileSystemInfo);
-				this.state?.SetSelection (stats);
+				this.state.Selected = stats;
 				this.tbPath.ClearSuggestions ();
 
 			} finally {
@@ -816,6 +816,28 @@ namespace Terminal.Gui {
 		{
 			return this.state?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
+		private int? StatsToRow(FileSystemInfoStats stats)
+		{
+			// find array index of the current state for the stats
+			var idx = state?.Children.IndexOf ((f)=>f.FileSystemInfo.FullName == stats.FileSystemInfo.FullName);
+
+			if (idx != -1 && idx != null) {
+
+				// find the row number in our DataTable where the cell
+				// contains idx
+				var match = tableView.Table.Rows
+					.Cast<DataRow> ()
+					.Select((r, rIdx) => new {row = r, rowIdx = rIdx })
+					.Where (t=>(int)t.row[0] == idx)
+					.ToArray ();
+
+				if (match.Length == 1) {
+					return match [0].rowIdx;
+				}
+			}
+
+			return null;
+		}
 
 
 		private void PathChanged ()
@@ -1050,7 +1072,7 @@ namespace Terminal.Gui {
 
 		internal class FileDialogState {
 
-			private List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
+			public FileSystemInfoStats Selected { get; set; }
 			public FileDialogState (DirectoryInfo dir, FileDialog2 parent)
 			{
 				this.Directory = dir;
@@ -1061,14 +1083,10 @@ namespace Terminal.Gui {
 			public DirectoryInfo Directory { get; }
 
 			public FileSystemInfoStats [] Children { get; private set; }
-
-			// TODO: Make history restore this
-			public IReadOnlyCollection<FileSystemInfoStats> Selected => this.selected.AsReadOnly ();
-
+			
 			internal void RefreshChildren (FileDialog2 parent)
 			{
 				var dir = this.Directory;
-
 
 				try {
 					List<FileSystemInfoStats> children;
@@ -1112,8 +1130,7 @@ namespace Terminal.Gui {
 
 			internal void SetSelection (FileSystemInfoStats stats)
 			{
-				this.selected.Clear ();
-				this.selected.Add (stats);
+				
 			}
 		}
 
@@ -1300,10 +1317,13 @@ namespace Terminal.Gui {
 			{
 
 				DirectoryInfo goTo = null;
+				FileSystemInfoStats restoreSelection = null;
 
 				if (this.CanBack ()) {
 
-					goTo = this.back.Pop ().Directory;
+					var backTo = this.back.Pop ();
+					goTo = backTo.Directory;
+					restoreSelection = backTo.Selected;
 				} else if (this.CanUp ()) {
 					goTo = this.dlg.state?.Directory.Parent;
 				}
@@ -1315,6 +1335,11 @@ namespace Terminal.Gui {
 
 				this.forward.Push (this.dlg.state);
 				this.dlg.PushState (goTo, false,true,false);
+
+				if(restoreSelection != null) {
+					this.dlg.RestoreSelection (restoreSelection);
+				}
+				
 				return true;
 			}
 
@@ -1379,6 +1404,16 @@ namespace Terminal.Gui {
 				this.forward.Clear ();
 			}
 		}
+
+		private void RestoreSelection (FileSystemInfoStats toRestore)
+		{
+			var toReselect = StatsToRow (toRestore);
+			
+			if(toReselect.HasValue) {
+				tableView.SelectedRow = toReselect.Value;
+			}
+		}
+
 		private class FileDialogSorter {
 			private readonly FileDialog2 dlg;
 			private TableView tableView;
