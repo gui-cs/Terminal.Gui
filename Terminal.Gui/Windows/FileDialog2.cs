@@ -7,6 +7,7 @@ using System.Data;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 
@@ -99,7 +100,7 @@ namespace Terminal.Gui {
 			System.IO.Path.AltDirectorySeparatorChar,
 			System.IO.Path.DirectorySeparatorChar
 		};
-			
+
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialog2"/> class.
@@ -121,35 +122,27 @@ namespace Terminal.Gui {
 				NavigateIf (k, Key.CursorDown, tableView);
 			};
 
-			this.Add (btnOk);
-
 			lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
 			lblUp.Clicked += () => history.Up ();
-			this.Add (lblUp);
 
 			lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
 			lblBack.Clicked += () => history.Back ();
-			this.Add (lblBack);
 
 			lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
 			lblForward.Clicked += () => history.Forward ();
-			this.Add (lblForward);
-
-			this.Add (lblPath);
 			tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
 				Width = Dim.Fill (okWidth + 1)
 			};
 			tbPath.KeyPress += (k) => {
 				NavigateIf (k, Key.CursorDown, tableView);
-				
-				if(tbPath.CursorIsAtEnd()) {
+
+				if (tbPath.CursorIsAtEnd ()) {
 					NavigateIf (k, Key.CursorRight, btnOk);
 				}
 
-				AcceptIf(k, Key.Enter);					
+				AcceptIf (k, Key.Enter);
 			};
-			this.Add (tbPath);
 
 			splitContainer = new SplitContainer () {
 				X = 0,
@@ -168,10 +161,10 @@ namespace Terminal.Gui {
 				FullRowSelect = true,
 			};
 			tableView.KeyPress += (k) => {
-				if(tableView.SelectedRow <= 0) {
+				if (tableView.SelectedRow <= 0) {
 					NavigateIf (k, Key.CursorUp, tbPath);
 				}
-				
+
 			};
 
 			treeView = new TreeView<object> () {
@@ -210,17 +203,15 @@ namespace Terminal.Gui {
 				Y = Pos.AnchorEnd (1),
 			};
 			btnToggleSplitterCollapse.Clicked += () => {
-				var newState = !splitContainer.Panels[0].Visible;
+				var newState = !splitContainer.Panels [0].Visible;
 				splitContainer.Panels [0].Visible = newState;
 				btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
-			Add (btnToggleSplitterCollapse);
 
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.ShowVerticalCellLines = false;
 			tableView.Style.ShowVerticalHeaderLines = false;
 			tableView.Style.AlwaysShowHeaders = true;
-			tableView.CellActivated += CellActivate;
 
 
 			SetupColorSchemes ();
@@ -231,11 +222,10 @@ namespace Terminal.Gui {
 			history = new FileDialogHistory (this);
 
 			tableView.Table = dtFiles;
-			this.Add (splitContainer);
 
 			tbPath.TextChanged += (s) => PathChanged ();
 
-			// Give this view priority on key handling
+			tableView.CellActivated += CellActivate;
 			tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 			tableView.ColorScheme = ColorSchemeDefault;
@@ -248,13 +238,23 @@ namespace Terminal.Gui {
 			this.AllowsMultipleSelection = false;
 
 			UpdateNavigationVisibility ();
+
+			// Determines tab order
+			this.Add (btnOk);
+			this.Add (lblUp);
+			this.Add (lblBack);
+			this.Add (lblForward);
+			this.Add (lblPath);
+			this.Add (tbPath);
+			this.Add (splitContainer);
+			Add (btnToggleSplitterCollapse);
 		}
 
 		private bool TreeView_KeyDown (KeyEvent keyEvent)
 		{
-			if (treeView.HasFocus && separators.Contains((char)keyEvent.KeyValue)) {
+			if (treeView.HasFocus && separators.Contains ((char)keyEvent.KeyValue)) {
 				tbPath.FocusFirst ();
-				
+
 				// let that keystroke go through on the tbPath instead
 				return true;
 			}
@@ -266,13 +266,20 @@ namespace Terminal.Gui {
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 				keyEvent.Handled = true;
-				Accept();
+				Accept ();
 			}
+		}
+
+		private void Accept (FileInfo f)
+		{
+			tbPath.Text = f.FullName;
+			Canceled = false;
+			Application.RequestStop ();
 		}
 
 		private void Accept ()
 		{
-			tbPath.AcceptSelectionIfAny();
+			tbPath.AcceptSelectionIfAny ();
 			Canceled = false;
 			Application.RequestStop ();
 		}
@@ -280,7 +287,7 @@ namespace Terminal.Gui {
 		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
-				
+
 				to.FocusFirst ();
 				keyEvent.Handled = true;
 			}
@@ -434,7 +441,7 @@ namespace Terminal.Gui {
 			/// <returns></returns>
 			private bool MakingSuggestion ()
 			{
-				return currentFragment != null && HasFocus && CursorIsAtEnd();
+				return currentFragment != null && HasFocus && CursorIsAtEnd ();
 			}
 
 			internal bool AcceptSelectionIfAny ()
@@ -458,7 +465,7 @@ namespace Terminal.Gui {
 
 			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
 			{
-				if (!CursorIsAtEnd()) {
+				if (!CursorIsAtEnd ()) {
 					return;
 				}
 
@@ -472,9 +479,8 @@ namespace Terminal.Gui {
 
 				var term = path.Substring (last + 1);
 
-				if(term.Equals(state?.Directory?.Name))
-				{
-					ClearSuggestions();
+				if (term.Equals (state?.Directory?.Name)) {
+					ClearSuggestions ();
 					return;
 				}
 
@@ -524,6 +530,7 @@ namespace Terminal.Gui {
 					newText += System.IO.Path.DirectorySeparatorChar;
 				}
 				Text = newText;
+				MoveCursorToEnd ();
 			}
 
 			internal bool CursorIsAtEnd ()
@@ -536,12 +543,12 @@ namespace Terminal.Gui {
 		public override void OnLoaded ()
 		{
 			base.OnLoaded ();
-			tbPath.FocusFirst ();
 
-			tbPath.TabIndex = 5;
-			btnOk.TabIndex = 4;
-			tableView.TabIndex = 3;
-			btnToggleSplitterCollapse.TabIndex = 2;
+			// to streamline user experience and allow direct typing of paths
+			// with zero navigation we start with focus in the text box and any
+			// default/current path fully selected and ready to be overwritten
+			tbPath.FocusFirst ();			
+			tbPath.SelectAll ();
 		}
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
@@ -594,7 +601,7 @@ namespace Terminal.Gui {
 			dtFiles = new DataTable ();
 
 			var nameStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderFilename, typeof (int)));
-			nameStyle.RepresentationGetter = (i) => state?.Children [(int)i].FileSystemInfo.Name ?? "";
+			nameStyle.RepresentationGetter = (i) => state?.Children [(int)i].Name ?? "";
 			nameStyle.MinWidth = 50;
 
 			var sizeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderSize, typeof (int)));
@@ -619,6 +626,10 @@ namespace Terminal.Gui {
 			if (stats.FileSystemInfo is DirectoryInfo d) {
 				PushState (d, false);
 				return;
+			}
+
+			if(stats.FileSystemInfo is FileInfo f) {
+				Accept (f);
 			}
 		}
 
@@ -721,7 +732,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var dir = new DirectoryInfo (path);
+			var dir = StringToDirectoryInfo (path);
 
 			if (dir.Exists) {
 				PushState (dir, true);
@@ -729,6 +740,19 @@ namespace Terminal.Gui {
 			if (dir.Parent?.Exists ?? false) {
 				PushState (dir.Parent, true, false);
 			}
+		}
+
+		private DirectoryInfo StringToDirectoryInfo (string path)
+		{
+			// if you pass new DirectoryInfo("C:") you get a weird object
+			// where the FullName is in fact the current working directory.
+			// really not what most users would expect
+
+			if (Regex.IsMatch (path,"^\\w:$")) {
+				return new DirectoryInfo (path + System.IO.Path.DirectorySeparatorChar);
+			}
+
+			return new DirectoryInfo (path);
 		}
 
 		private void SetupAsDirectory (DirectoryInfo dir)
@@ -749,6 +773,12 @@ namespace Terminal.Gui {
 			public long MachineReadableLength { get; }
 			public DateTime? DateModified { get; }
 			public string Type { get; }
+
+			/// <summary>
+			/// True if this instance represents the parent of the current state (i.e. dot dot)
+			/// </summary>
+			public bool IsParent { get; internal set; }
+			public string Name => IsParent ? ".." : FileSystemInfo.Name;
 
 			/*
 			* Blue: Directory
@@ -846,7 +876,14 @@ namespace Terminal.Gui {
 				Directory = dir;
 
 				try {
-					Children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToArray ();
+					var children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
+
+					// allow navigating up as '..'
+					if (dir.Parent != null) {
+						children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
+					}	
+
+					Children = children.ToArray ();
 				} catch (Exception) {
 					// Access permissions Exceptions, Dir not exists etc
 					Children = new FileSystemInfoStats [0];
@@ -1018,10 +1055,12 @@ namespace Terminal.Gui {
 				var ordered =
 					currentSortIsAsc ?
 					    stats.Select ((v, i) => new { v, i })
-						.OrderBy (f => sortAlgorithm (f.v))
+						.OrderByDescending(f=>f.v.IsParent)
+						.ThenBy(f => sortAlgorithm (f.v))
 						.ToArray () :
 					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => sortAlgorithm (f.v))
+						.OrderByDescending (f => f.v.IsParent)
+						.ThenByDescending (f => sortAlgorithm (f.v))
 						.ToArray ();
 
 				foreach (var o in ordered) {
