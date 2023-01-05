@@ -1,15 +1,13 @@
-
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Data;
+using System.Text.RegularExpressions;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
-using System.Text.RegularExpressions;
 using static Terminal.Gui.OpenDialog;
-using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 
@@ -19,30 +17,258 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog2 : Dialog {
 
+		// TODO : expose these somehow for localization without compromising case/switch statements
+		private const string HeaderFilename = "Filename";
+		private const string HeaderSize = "Size";
+		private const string HeaderModified = "Modified";
+		private const string HeaderType = "Type";
+
+		private static char [] separators = new []
+		{
+			System.IO.Path.AltDirectorySeparatorChar,
+			System.IO.Path.DirectorySeparatorChar,
+		};
+
 		/// <summary>
-		/// Determine which <see cref="System.IO.FileSystemInfo"/> type to open.
+		/// Characters to prevent entry into <see cref="tbPath"/>.  Note that this is not using
+		/// <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory
+		/// separators, arrow keys etc.
+		/// </summary>
+		private static char [] badChars = new []
+		{
+			'"','<','>','|','*','?',
+		};
+
+
+		/// <summary>
+		/// The UI selected <see cref="AllowedType"/> from combo box. May be null.
+		/// </summary>
+		private AllowedType currentFilter;
+
+		private bool pushingState = false;
+
+		private FileDialogState state;
+
+		private TextFieldWithAppendAutocomplete tbPath;
+
+		private FileDialogSorter sorter;
+		private FileDialogHistory history;
+
+		private DataTable dtFiles;
+		private TableView tableView;
+		private TreeView<object> treeView;
+		private SplitContainer splitContainer;
+		private Button btnOk;
+		private Button btnToggleSplitterCollapse;
+		private Label lblForward;
+		private Label lblBack;
+		private Label lblUp;
+
+		private string title;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
+		/// </summary>
+		public FileDialog2 ()
+		{
+			// TODO: handle Save File / Folder too
+			this.title = "Open File";
+
+			const int okWidth = 6;
+
+			var lblPath = new Label (">");
+			this.btnOk = new Button ("Ok") {
+				X = Pos.AnchorEnd (okWidth)
+			};
+			this.btnOk.Clicked += this.Accept;
+			this.btnOk.KeyPress += (k) => {
+				this.NavigateIf (k, Key.CursorLeft, this.tbPath);
+				this.NavigateIf (k, Key.CursorDown, this.tableView);
+			};
+
+			this.lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
+			this.lblUp.Clicked += () => this.history.Up ();
+
+			this.lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
+			this.lblBack.Clicked += () => this.history.Back ();
+
+			this.lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
+			this.lblForward.Clicked += () => this.history.Forward ();
+			this.tbPath = new TextFieldWithAppendAutocomplete {
+				X = Pos.Right (lblPath),
+				Width = Dim.Fill (okWidth + 1)
+			};
+			this.tbPath.KeyPress += (k) => {
+
+				this.NavigateIf (k, Key.CursorDown, this.tableView);
+
+				if (this.tbPath.CursorIsAtEnd ()) {
+					this.NavigateIf (k, Key.CursorRight, this.btnOk);
+				}
+
+				this.AcceptIf (k, Key.Enter);
+
+				this.SuppressIfBadChar (k);
+			};
+
+			this.splitContainer = new SplitContainer () {
+				X = 0,
+				Y = 2,
+				Width = Dim.Fill (0),
+				Height = Dim.Fill (1),
+				SplitterDistance = 30,
+			};
+			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+			this.splitContainer.Border.DrawMarginFrame = false;
+			this.splitContainer.Panels [0].Visible = false;
+
+			this.tableView = new TableView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				FullRowSelect = true,
+			};
+			this.tableView.KeyPress += (k) => {
+				if (this.tableView.SelectedRow <= 0) {
+					this.NavigateIf (k, Key.CursorUp, this.tbPath);
+				}
+
+			};
+
+			this.treeView = new TreeView<object> () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+
+			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
+			this.treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
+
+
+			try {
+				this.treeView.AddObjects (
+					Environment.GetLogicalDrives ()
+					.Select (d =>
+						new FileDialogRootTreeNode (d, new DirectoryInfo (d))));
+
+			} catch (Exception) {
+				// Cannot get the system disks thats fine
+			}
+
+
+			this.treeView.AddObjects (
+				Enum.GetValues (typeof (SpecialFolder))
+				.Cast<SpecialFolder> ()
+				.Where (this.IsValidSpecialFolder)
+				.Select (this.GetTreeNode));
+
+			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
+
+			this.splitContainer.Panels [0].Add (this.treeView);
+			this.splitContainer.Panels [1].Add (this.tableView);
+
+			this.btnToggleSplitterCollapse = new Button (">>") {
+				Y = Pos.AnchorEnd (1),
+			};
+			this.btnToggleSplitterCollapse.Clicked += () => {
+				var newState = !this.splitContainer.Panels [0].Visible;
+				this.splitContainer.Panels [0].Visible = newState;
+				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
+			};
+
+			this.tableView.Style.ShowHorizontalHeaderOverline = false;
+			this.tableView.Style.ShowVerticalCellLines = false;
+			this.tableView.Style.ShowVerticalHeaderLines = false;
+			this.tableView.Style.AlwaysShowHeaders = true;
+
+
+			this.SetupColorSchemes ();
+
+			this.SetupTableColumns ();
+
+			this.sorter = new FileDialogSorter (this, this.tableView);
+			this.history = new FileDialogHistory (this);
+
+			this.tableView.Table = this.dtFiles;
+
+			this.tbPath.TextChanged += (s) => this.PathChanged ();
+
+			this.tableView.CellActivated += this.CellActivate;
+			this.tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
+			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
+			this.tableView.ColorScheme = ColorSchemeDefault;
+
+			this.treeView.ColorScheme = ColorSchemeDefault;
+			this.treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
+
+			this.AllowsMultipleSelection = false;
+
+			this.UpdateNavigationVisibility ();
+
+			// Determines tab order
+			this.Add (this.btnOk);
+			this.Add (this.lblUp);
+			this.Add (this.lblBack);
+			this.Add (this.lblForward);
+			this.Add (lblPath);
+			this.Add (this.tbPath);
+			this.Add (this.splitContainer);
+			this.Add (this.btnToggleSplitterCollapse);
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether to use Utc dates for date modified.
+		/// Defaults to <see langword="false"/>.
+		/// </summary>
+		public static bool UseUtcDates { get; set; } = false;
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
+		/// the <see cref="TableView"/>.
+		/// </summary>
+		public static ColorScheme ColorSchemeDirectory { private get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
+		/// the <see cref="TableView"/>.  Defaults to White text on Black background.
+		/// </summary>
+		public static ColorScheme ColorSchemeDefault { private get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
+		/// of the <see cref="TableView"/>.  Defaults to White text on Black background.
+		/// </summary>
+		public static ColorScheme ColorSchemeImage { private get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
+		/// or that match <see cref="AllowedTypes"/> in the <see cref="TableView"/>.
+		/// </summary>
+		public static ColorScheme ColorSchemeExeOrRecommended { private get; set; }
+
+		/// <summary>
+		/// Gets or Sets which <see cref="System.IO.FileSystemInfo"/> type can be selected.
 		/// Defaults to <see cref="OpenMode.Mixed"/> (i.e. <see cref="DirectoryInfo"/> or
 		/// <see cref="FileInfo"/>).
 		/// </summary>
 		public OpenMode OpenMode { get; set; } = OpenMode.Mixed;
 
 		/// <summary>
-		/// The currently selected path in the dialog.  This is the result that should
+		/// Gets or Sets the selected path in the dialog.  This is the result that should
 		/// be used if <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/>
 		/// is true.
 		/// </summary>
-		public string Path { get => tbPath.Text.ToString (); set => tbPath.Text = value; }
+		public string Path { get => this.tbPath.Text.ToString (); set => this.tbPath.Text = value; }
 
 		/// <summary>
-		/// True to allow the user to select multiple existing files/directories
+		/// Gets or Sets a value indicating whether to allow selecting 
+		/// multiple existing files/directories.
 		/// </summary>
 		public bool AllowsMultipleSelection {
-			get => tableView.MultiSelect;
-			set => tableView.MultiSelect = value;
+			get => this.tableView.MultiSelect;
+			set => this.tableView.MultiSelect = value;
 		}
 
 		/// <summary>
-		/// Collection of file types that the user can/must select.  Only applies
+		/// Gets or Sets a collection of file types that the user can/must select.  Only applies
 		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>.  See also
 		/// <see cref="AllowedTypesIsStrict"/> if you only want to highlight files.
 		/// </summary>
@@ -56,228 +282,90 @@ namespace Terminal.Gui {
 		public bool AllowedTypesIsStrict { get; set; }
 
 		/// <summary>
-		/// The UI selected <see cref="AllowedType"/> from combo box. May be null.
-		/// </summary>
-		private AllowedType currentFilter;
-
-		/// <summary>
-		/// True if the <see cref="FileDialog"/> was closed without confirming a selection
+		/// Gets a value indicating whether the <see cref="FileDialog"/> was closed
+		/// without confirming a selection.
 		/// </summary>
 		public bool Canceled { get; private set; } = true;
 
 		/// <summary>
-		/// Returns all files/dialogs selected or an empty collection if 
-		/// not <see cref="AllowsMultipleSelection"/> or <see cref="Canceled"/>.
+		/// Gets all files/directories selected or an empty collection
+		/// <see cref="AllowsMultipleSelection"/> is <see langword="false"/> or <see cref="Canceled"/>.
 		/// </summary>
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
 		public IReadOnlyList<FileSystemInfo> MultiSelected { get; private set; }
 
-		// TODO : expose these somehow for localization without compromising case/switch statements
-		private const string HeaderFilename = "Filename";
-		private const string HeaderSize = "Size";
-		private const string HeaderModified = "Modified";
-		private const string HeaderType = "Type";
 
-		bool pushingState = false;
-
-		private FileDialogState state;
-
-		private TextFieldWithAppendAutocomplete tbPath;
-
-		FileDialogSorter sorter;
-		FileDialogHistory history;
-
-		/// <summary>
-		/// True to use Utc dates for date modified
-		/// </summary>
-		public static bool UseUtcDates = false;
-
-		DataTable dtFiles;
-		TableView tableView;
-		TreeView<object> treeView;
-		SplitContainer splitContainer;
-
-		// TODO: refactor somewhere more user friendly
-		private static ColorScheme ColorSchemeDirectory;
-		private static ColorScheme ColorSchemeDefault;
-		private static ColorScheme ColorSchemeImage;
-
-		/// <summary>
-		/// ColorScheme to use for entries that are executable or match the users file extension
-		/// provided (e.g. if role of dialog is to pick a .csv file)
-		/// </summary>
-		public static ColorScheme ColorSchemeExeOrRecommended;
-
-		private Button btnOk;
-		private Button btnToggleSplitterCollapse;
-		private Label lblForward;
-		private Label lblBack;
-		private Label lblUp;
-
-		private string title;
-
-		private static char [] separators = new [] {
-			System.IO.Path.AltDirectorySeparatorChar,
-			System.IO.Path.DirectorySeparatorChar
-		};
-
-
-		/// <summary>
-		/// Characters to prevent entry into <see cref="tbPath"/>.  Note that this is not using
-		/// <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory
-		/// separators, arrow keys etc.
-		/// </summary>
-		private static char [] badChars = new [] {
-			'"','<','>','|','*','?',
-		};
-		
-		/// <summary>
-		/// Creates a new instance of the <see cref="FileDialog2"/> class.
-		/// </summary>
-		public FileDialog2 ()
+		/// <inheritdoc/>
+		public override void Redraw (Rect bounds)
 		{
-			// TODO: handle Save File / Folder too
-			title = "Open File";
+			base.Redraw (bounds);
 
-			const int okWidth = 6;
+			this.Move (1, 0, false);
 
-			var lblPath = new Label (">");
-			btnOk = new Button ("Ok") {
-				X = Pos.AnchorEnd (okWidth)
-			};
-			btnOk.Clicked += Accept;
-			btnOk.KeyPress += (k) => {
-				NavigateIf (k, Key.CursorLeft, tbPath);
-				NavigateIf (k, Key.CursorDown, tableView);
-			};
+			var padding = ((bounds.Width - this.title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
 
-			lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
-			lblUp.Clicked += () => history.Up ();
+			padding = Math.Min (bounds.Width, padding);
+			padding = Math.Max (0, padding);
 
-			lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
-			lblBack.Clicked += () => history.Back ();
+			Driver.SetAttribute (
+			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 
-			lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
-			lblForward.Clicked += () => history.Forward ();
-			tbPath = new TextFieldWithAppendAutocomplete {
-				X = Pos.Right (lblPath),
-				Width = Dim.Fill (okWidth + 1)
-			};
-			tbPath.KeyPress += (k) => {
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
 
-				NavigateIf (k, Key.CursorDown, tableView);
+			Driver.SetAttribute (
+			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
+			Driver.AddStr (this.title);
 
-				if (tbPath.CursorIsAtEnd ()) {
-					NavigateIf (k, Key.CursorRight, btnOk);
+			Driver.SetAttribute (
+			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
+		}
+
+		/// <inheritdoc/>
+		public override void OnLoaded ()
+		{
+			base.OnLoaded ();
+
+			// if filtering on file type is configured then create the ComboBox and establish
+			// initial filtering by extension(s)
+			if (this.AllowedTypes.Any ()) {
+
+				this.currentFilter = this.AllowedTypes [0];
+				var allowed = this.AllowedTypes.ToList ();
+
+				if (!this.AllowedTypesIsStrict) {
+					allowed.Insert (0, AllowedType.Any);
 				}
 
-				AcceptIf (k, Key.Enter);
+				// +2 to allow space for dropdown arrow
+				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 2;
 
-				SuppressIfBadChar (k);
-			};
+				var combo = new ComboBox (allowed) {
+					Width = width,
+					ReadOnly = true,
+					Y = 1,
+					X = Pos.AnchorEnd (width),
+					Height = allowed.Count + 1,
+					SelectedItem = this.AllowedTypesIsStrict ? 0 : 1
+				};
 
-			splitContainer = new SplitContainer () {
-				X = 0,
-				Y = 2,
-				Width = Dim.Fill (0),
-				Height = Dim.Fill (1),
-				SplitterDistance = 30,
-			};
-			splitContainer.Border.BorderStyle = BorderStyle.None;
-			splitContainer.Border.DrawMarginFrame = false;
-			splitContainer.Panels [0].Visible = false;
+				combo.SelectedItemChanged += (e) => this.Combo_SelectedItemChanged (combo, e);
 
-			tableView = new TableView () {
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				FullRowSelect = true,
-			};
-			tableView.KeyPress += (k) => {
-				if (tableView.SelectedRow <= 0) {
-					NavigateIf (k, Key.CursorUp, tbPath);
-				}
-
-			};
-
-			treeView = new TreeView<object> () {
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-
-			treeView.TreeBuilder = new FileDialogTreeBuilder ();
-			treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
-
-
-			try {
-				treeView.AddObjects (
-					Environment.GetLogicalDrives ()
-					.Select (d =>
-						new FileDialogRootTreeNode (d, new DirectoryInfo (d)))
-					);
-
-			} catch (Exception) {
-				// Cannot get the system disks thats fine
+				this.Add (combo);
+				this.LayoutSubviews ();
 			}
 
+			// if no path has been provided
+			if (this.tbPath.Text.Length <= 0) {
+				this.tbPath.Text = Environment.CurrentDirectory;
+			}
 
-			treeView.AddObjects (
-				Enum.GetValues (typeof (SpecialFolder))
-				.Cast<SpecialFolder> ()
-				.Where (IsValidSpecialFolder)
-				.Select (GetTreeNode));
+			// to streamline user experience and allow direct typing of paths
+			// with zero navigation we start with focus in the text box and any
+			// default/current path fully selected and ready to be overwritten
+			this.tbPath.FocusFirst ();
+			this.tbPath.SelectAll ();
 
-			treeView.SelectionChanged += TreeView_SelectionChanged;
-
-			splitContainer.Panels [0].Add (treeView);
-			splitContainer.Panels [1].Add (tableView);
-
-			btnToggleSplitterCollapse = new Button (">>") {
-				Y = Pos.AnchorEnd (1),
-			};
-			btnToggleSplitterCollapse.Clicked += () => {
-				var newState = !splitContainer.Panels [0].Visible;
-				splitContainer.Panels [0].Visible = newState;
-				btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
-			};
-
-			tableView.Style.ShowHorizontalHeaderOverline = false;
-			tableView.Style.ShowVerticalCellLines = false;
-			tableView.Style.ShowVerticalHeaderLines = false;
-			tableView.Style.AlwaysShowHeaders = true;
-
-
-			SetupColorSchemes ();
-
-			SetupTableColumns ();
-
-			sorter = new FileDialogSorter (this, tableView);
-			history = new FileDialogHistory (this);
-
-			tableView.Table = dtFiles;
-
-			tbPath.TextChanged += (s) => PathChanged ();
-
-			tableView.CellActivated += CellActivate;
-			tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
-			tableView.SelectedCellChanged += TableView_SelectedCellChanged;
-			tableView.ColorScheme = ColorSchemeDefault;
-
-			treeView.ColorScheme = ColorSchemeDefault;
-			treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
-
-			this.AllowsMultipleSelection = false;
-
-			UpdateNavigationVisibility ();
-
-			// Determines tab order
-			this.Add (btnOk);
-			this.Add (lblUp);
-			this.Add (lblBack);
-			this.Add (lblForward);
-			this.Add (lblPath);
-			this.Add (tbPath);
-			this.Add (splitContainer);
-			Add (btnToggleSplitterCollapse);
 		}
 
 		private void SuppressIfBadChar (KeyEventEventArgs k)
@@ -292,8 +380,8 @@ namespace Terminal.Gui {
 
 		private bool TreeView_KeyDown (KeyEvent keyEvent)
 		{
-			if (treeView.HasFocus && separators.Contains ((char)keyEvent.KeyValue)) {
-				tbPath.FocusFirst ();
+			if (this.treeView.HasFocus && separators.Contains ((char)keyEvent.KeyValue)) {
+				this.tbPath.FocusFirst ();
 
 				// let that keystroke go through on the tbPath instead
 				return true;
@@ -306,47 +394,47 @@ namespace Terminal.Gui {
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 				keyEvent.Handled = true;
-				Accept ();
+				this.Accept ();
 			}
 		}
 
 		private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
 		{
-			if (!AllowsMultipleSelection) {
+			if (!this.AllowsMultipleSelection) {
 				return;
 			}
 
-			MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
-			tbPath.Text = MultiSelected.Count == 1 ? MultiSelected [0].FullName : "";
-			Canceled = false;
+			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
+			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0].FullName : string.Empty;
+			this.Canceled = false;
 			Application.RequestStop ();
 		}
 		private void Accept (FileInfo f)
 		{
-			if (!IsCompatibleWithOpenMode (f)) {
+			if (!this.IsCompatibleWithOpenMode (f)) {
 				return;
 			}
 
-			tbPath.Text = f.FullName;
-			Canceled = false;
+			this.tbPath.Text = f.FullName;
+			this.Canceled = false;
 			Application.RequestStop ();
 		}
 
 		private void Accept ()
 		{
 			// if an autocomplete is showing
-			if (tbPath.AcceptSelectionIfAny ()) {
+			if (this.tbPath.AcceptSelectionIfAny ()) {
 
 				// enter just accepts it
 				return;
 			}
 
-			if (!IsCompatibleWithOpenMode (tbPath.Text.ToString ())) {
+			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString ())) {
 				return;
 			}
 
 
-			Canceled = false;
+			this.Canceled = false;
 			Application.RequestStop ();
 		}
 
@@ -365,7 +453,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
+			this.tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
 		}
 
 		private bool IsValidSpecialFolder (SpecialFolder arg)
@@ -385,305 +473,64 @@ namespace Terminal.Gui {
 				new DirectoryInfo (Environment.GetFolderPath (arg)));
 		}
 
-		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			base.Redraw (bounds);
-
-			Move (1, 0, false);
-
-			var padding = ((bounds.Width - this.title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
-
-			padding = Math.Min (bounds.Width, padding);
-			padding = Math.Max (0, padding);
-
-			Driver.SetAttribute (
-			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
-
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
-
-			Driver.SetAttribute (
-			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
-			Driver.AddStr (this.title);
-
-			Driver.SetAttribute (
-			    new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
-		}
-
 		private void UpdateNavigationVisibility ()
 		{
-			lblBack.Visible = history.CanBack ();
-			lblForward.Visible = history.CanForward ();
-			lblUp.Visible = history.CanUp ();
+			this.lblBack.Visible = this.history.CanBack ();
+			this.lblForward.Visible = this.history.CanForward ();
+			this.lblUp.Visible = this.history.CanUp ();
 		}
 
 		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
 		{
-			if (!tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+			if (!this.tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
 				return;
 			}
 
-			if (tableView.MultiSelect && tableView.MultiSelectedRegions.Any ()) {
+			if (this.tableView.MultiSelect && this.tableView.MultiSelectedRegions.Any ()) {
 				return;
 			}
 
-			var stats = RowToStats (obj.NewRow);
+			var stats = this.RowToStats (obj.NewRow);
 
 			if (stats == null) {
 				return;
 			}
 
 			try {
-				pushingState = true;
+				this.pushingState = true;
 
-				tbPath.SetTextTo (stats.FileSystemInfo);
-				state?.SetSelection (stats);
-				tbPath.ClearSuggestions ();
+				this.tbPath.SetTextTo (stats.FileSystemInfo);
+				this.state?.SetSelection (stats);
+				this.tbPath.ClearSuggestions ();
 
 			} finally {
 
-				pushingState = false;
+				this.pushingState = false;
 			}
 		}
 
-		internal class TextFieldWithAppendAutocomplete : TextField {
-
-			int? currentFragment = null;
-			string [] validFragments = new string [0];
-
-			public TextFieldWithAppendAutocomplete ()
-			{
-				KeyPress += (k) => {
-					var key = k.KeyEvent.Key;
-					if (key == Key.Tab) {
-						k.Handled = AcceptSelectionIfAny ();
-					} else
-					if (key == Key.CursorUp) {
-						k.Handled = CycleSuggestion (1);
-					} else
-					if (key == Key.CursorDown) {
-						k.Handled = CycleSuggestion (-1);
-					}
-				};
-
-				ColorScheme = new ColorScheme {
-					Normal = new Attribute (Color.White, Color.Black),
-					HotNormal = new Attribute (Color.White, Color.Black),
-					Focus = new Attribute (Color.White, Color.Black),
-					HotFocus = new Attribute (Color.White, Color.Black),
-				};
-			}
-
-			private bool CycleSuggestion (int direction)
-			{
-				if (currentFragment == null || validFragments.Length <= 1) {
-					return false;
-				}
-
-				currentFragment = (currentFragment + direction) % validFragments.Length;
-
-				if (currentFragment < 0) {
-					currentFragment = validFragments.Length - 1;
-				}
-				SetNeedsDisplay ();
-				return true;
-			}
-
-			public override void Redraw (Rect bounds)
-			{
-				base.Redraw (bounds);
-
-				if (!MakingSuggestion ()) {
-					return;
-				}
-
-				// draw it like its selected even though its not
-				Driver.SetAttribute (new Attribute (Color.Black, Color.White));
-				Move (Text.Length, 0);
-				Driver.AddStr (validFragments [currentFragment.Value]);
-			}
-
-			/// <summary>
-			/// Returns true if there is a suggestion that can be made and the control
-			/// is in a state where user would expect to see auto-complete (i.e. focused and 
-			/// cursor in right place).
-			/// </summary>
-			/// <returns></returns>
-			private bool MakingSuggestion ()
-			{
-				return currentFragment != null && HasFocus && CursorIsAtEnd ();
-			}
-
-			/// <summary>
-			/// Accepts the current autocomplete suggestion displaying in the text box.
-			/// Returns true if a valid suggestion was being rendered and acceptable or
-			/// false if no suggestion was showing.
-			/// </summary>
-			/// <returns></returns>
-			internal bool AcceptSelectionIfAny ()
-			{
-				if (MakingSuggestion ()) {
-					Text += validFragments [currentFragment.Value];
-					MoveCursorToEnd ();
-
-					ClearSuggestions ();
-					return true;
-				}
-
-				return false;
-			}
-
-			internal void MoveCursorToEnd ()
-			{
-				ClearAllSelection ();
-				CursorPosition = Text.Length;
-			}
-
-			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
-			{
-				if (!CursorIsAtEnd ()) {
-					return;
-				}
-
-				var path = Text.ToString ();
-				var last = path.LastIndexOfAny (FileDialog2.separators);
-
-				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
-					currentFragment = null;
-					return;
-				}
-
-				var term = path.Substring (last + 1);
-
-				if (term.Equals (state?.Directory?.Name)) {
-					ClearSuggestions ();
-					return;
-				}
-
-				// TODO: Be case insensitive on Windows
-				var validSuggestions = suggestions
-					.Where (s => s.StartsWith (term))
-					.OrderBy (m => m.Length)
-					.ToArray ();
-
-
-				// nothing to suggest 
-				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
-					ClearSuggestions ();
-					return;
-				}
-
-				validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray ();
-				currentFragment = 0;
-			}
-
-			public void ClearSuggestions ()
-			{
-				currentFragment = null;
-				validFragments = new string [0];
-				SetNeedsDisplay ();
-			}
-
-			internal void GenerateSuggestions (FileDialogState state)
-			{
-				if (state == null) {
-					return;
-				}
-
-				var suggestions = state.Children.Select (
-					e => e.FileSystemInfo is DirectoryInfo d
-						? d.Name + System.IO.Path.DirectorySeparatorChar
-						: e.FileSystemInfo.Name)
-					.ToArray ();
-
-				GenerateSuggestions (state, suggestions);
-			}
-
-			internal void SetTextTo (FileSystemInfo fileSystemInfo)
-			{
-				var newText = fileSystemInfo.FullName;
-				if (fileSystemInfo is DirectoryInfo) {
-					newText += System.IO.Path.DirectorySeparatorChar;
-				}
-				Text = newText;
-				MoveCursorToEnd ();
-			}
-
-			internal bool CursorIsAtEnd ()
-			{
-				return CursorPosition == Text.Length;
-			}
-		}
-
-		/// <inheritdoc/>
-		public override void OnLoaded ()
-		{
-			base.OnLoaded ();
-
-			// if filtering on file type is configured then create the ComboBox and establish
-			// initial filtering by extension(s)
-			if (AllowedTypes.Any ()) {
-
-				currentFilter = AllowedTypes [0];
-				var allowed = AllowedTypes.ToList ();
-
-				if (!AllowedTypesIsStrict) {
-					allowed.Insert (0, AllowedType.Any);
-				}
-
-				// +2 to allow space for dropdown arrow
-				var width = AllowedTypes.Max (a => a.ToString ().Length) + 2;
-
-				var combo = new ComboBox (allowed) {
-					Width = width,
-					ReadOnly = true,
-					Y = 1,
-					X = Pos.AnchorEnd (width),
-					Height = allowed.Count + 1,
-					SelectedItem = AllowedTypesIsStrict ? 0 : 1
-				};
-
-				combo.SelectedItemChanged += (e) => Combo_SelectedItemChanged (combo, e);
-
-				Add (combo);
-				LayoutSubviews ();
-			}
-
-			// if no path has been provided
-			if (tbPath.Text.Length <= 0) {
-				tbPath.Text = Environment.CurrentDirectory;
-			}
-
-			// to streamline user experience and allow direct typing of paths
-			// with zero navigation we start with focus in the text box and any
-			// default/current path fully selected and ready to be overwritten
-			tbPath.FocusFirst ();
-			tbPath.SelectAll ();
-
-		}
 
 		private void Combo_SelectedItemChanged (ComboBox combo, ListViewItemEventArgs obj)
 		{
 			var allow = combo.Source.ToList () [obj.Item] as AllowedType;
-			currentFilter = allow == null || allow.IsAny ? null : allow;
+			this.currentFilter = allow == null || allow.IsAny ? null : allow;
 
-			tbPath.ClearAllSelection ();
-			tbPath.ClearSuggestions ();
+			this.tbPath.ClearAllSelection ();
+			this.tbPath.ClearSuggestions ();
 
-			if (state != null) {
-				state.RefreshChildren (this);
-				WriteStateToTableView ();
+			if (this.state != null) {
+				this.state.RefreshChildren (this);
+				this.WriteStateToTableView ();
 			}
 		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
-				return history.Back ();
+				return this.history.Back ();
 			}
 			if (keyEvent.Key == (Key.ShiftMask | Key.Backspace)) {
-				return history.Forward ();
+				return this.history.Forward ();
 			}
 
 			return false;
@@ -725,48 +572,48 @@ namespace Terminal.Gui {
 
 		private void SetupTableColumns ()
 		{
-			dtFiles = new DataTable ();
+			this.dtFiles = new DataTable ();
 
-			var nameStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderFilename, typeof (int)));
-			nameStyle.RepresentationGetter = (i) => state?.Children [(int)i].Name ?? "";
+			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderFilename, typeof (int)));
+			nameStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].Name ?? string.Empty;
 			nameStyle.MinWidth = 50;
 
-			var sizeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderSize, typeof (int)));
-			sizeStyle.RepresentationGetter = (i) => state?.Children [(int)i].HumanReadableLength ?? "";
+			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderSize, typeof (int)));
+			sizeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].HumanReadableLength ?? string.Empty;
 			nameStyle.MinWidth = 10;
 
-			var dateModifiedStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderModified, typeof (int)));
-			dateModifiedStyle.RepresentationGetter = (i) => state?.Children [(int)i].DateModified?.ToString () ?? "";
+			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderModified, typeof (int)));
+			dateModifiedStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].DateModified?.ToString () ?? string.Empty;
 			dateModifiedStyle.MinWidth = 30;
 
-			var typeStyle = tableView.Style.GetOrCreateColumnStyle (dtFiles.Columns.Add (HeaderType, typeof (int)));
-			typeStyle.RepresentationGetter = (i) => state?.Children [(int)i].Type ?? "";
+			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderType, typeof (int)));
+			typeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].Type ?? string.Empty;
 			typeStyle.MinWidth = 6;
-			tableView.Style.RowColorGetter = ColorGetter;
+			this.tableView.Style.RowColorGetter = this.ColorGetter;
 		}
 
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
-			var multi = MultiRowToStats ();
+			var multi = this.MultiRowToStats ();
 			if (multi.Any ()) {
-				if (multi.All (IsCompatibleWithOpenMode)) {
-					Accept (multi);
+				if (multi.All (this.IsCompatibleWithOpenMode)) {
+					this.Accept (multi);
 				} else {
 					return;
 				}
 			}
 
 
-			var stats = RowToStats (obj.Row);
+			var stats = this.RowToStats (obj.Row);
 
 
 			if (stats.FileSystemInfo is DirectoryInfo d) {
-				PushState (d, false);
+				this.PushState (d, false);
 				return;
 			}
 
 			if (stats.FileSystemInfo is FileInfo f) {
-				Accept (f);
+				this.Accept (f);
 			}
 		}
 
@@ -777,41 +624,42 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			switch (OpenMode) {
+			switch (this.OpenMode) {
 			case OpenMode.Directory: return arg.IsDir ();
-			case OpenMode.File: return !arg.IsDir () && IsCompatibleWithOpenMode (arg.FileSystemInfo);
+			case OpenMode.File: return !arg.IsDir () && this.IsCompatibleWithOpenMode (arg.FileSystemInfo);
 			case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
+			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
 			}
 		}
 
 		private bool IsCompatibleWithOpenMode (FileSystemInfo f)
 		{
-			switch (OpenMode) {
+			switch (this.OpenMode) {
 			case OpenMode.Directory: return f is DirectoryInfo;
 			case OpenMode.File:
 				if (f is FileInfo file) {
-					return IsCompatibleWithAllowedExtensions (file);
+					return this.IsCompatibleWithAllowedExtensions (file);
 				}
+
 				return false;
 			case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
-			};
+			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
+			}
 		}
 
 		private bool IsCompatibleWithAllowedExtensions (FileInfo file)
 		{
 			// no restrictions
-			if (!AllowedTypes.Any () || !AllowedTypesIsStrict) {
+			if (!this.AllowedTypes.Any () || !this.AllowedTypesIsStrict) {
 				return true;
 			}
-			return MatchesAllowedTypes (file);
+			return this.MatchesAllowedTypes (file);
 		}
 
 		private bool IsCompatibleWithAllowedExtensions (string path)
 		{
 			// no restrictions
-			if (!AllowedTypes.Any () || !AllowedTypesIsStrict) {
+			if (!this.AllowedTypes.Any () || !this.AllowedTypesIsStrict) {
 				return true;
 			}
 
@@ -822,7 +670,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			return AllowedTypes.Any (t => t.Matches(extension, false));
+			return this.AllowedTypes.Any (t => t.Matches (extension, false));
 		}
 
 		/// <summary>
@@ -833,7 +681,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MatchesAllowedTypes (FileInfo file)
 		{
-			return AllowedTypes.Any (t => t.Matches(file.Extension, true));
+			return this.AllowedTypes.Any (t => t.Matches (file.Extension, true));
 		}
 
 		private bool IsCompatibleWithOpenMode (string s)
@@ -842,83 +690,83 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!IsCompatibleWithAllowedExtensions (s)) {
+			if (!this.IsCompatibleWithAllowedExtensions (s)) {
 				return false;
 			}
 
-			switch (OpenMode) {
+			switch (this.OpenMode) {
 			case OpenMode.Directory: return !File.Exists (s);
 			case OpenMode.File: return !Directory.Exists (s);
 			case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
-			};
+			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
+			}
 		}
 
 		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true)
 		{
 			// no change of state
-			if (d == state?.Directory) {
+			if (d == this.state?.Directory) {
 				return;
 			}
 
 
 			try {
-				pushingState = true;
+				this.pushingState = true;
 
 				// push the old state to history
 				if (addCurrentStateToHistory) {
-					history.Push (state);
+					this.history.Push (this.state);
 				}
 
-				tbPath.ClearSuggestions ();
+				this.tbPath.ClearSuggestions ();
 
 				if (setPathText) {
-					tbPath.Text = d.FullName;
-					tbPath.MoveCursorToEnd ();
+					this.tbPath.Text = d.FullName;
+					this.tbPath.MoveCursorToEnd ();
 				}
 
-				state = new FileDialogState (d, this);
-				tbPath.GenerateSuggestions (state);
+				this.state = new FileDialogState (d, this);
+				this.tbPath.GenerateSuggestions (this.state);
 
-				WriteStateToTableView ();
+				this.WriteStateToTableView ();
 
-				history.ClearForward ();
-				tableView.RowOffset = 0;
-				tableView.SelectedRow = 0;
+				this.history.ClearForward ();
+				this.tableView.RowOffset = 0;
+				this.tableView.SelectedRow = 0;
 
-				SetNeedsDisplay ();
-				UpdateNavigationVisibility ();
+				this.SetNeedsDisplay ();
+				this.UpdateNavigationVisibility ();
 
 			} finally {
 
-				pushingState = false;
+				this.pushingState = false;
 			}
 		}
 
 		private void WriteStateToTableView ()
 		{
-			if (state == null) {
+			if (this.state == null) {
 				return;
 			}
 
-			dtFiles.Rows.Clear ();
+			this.dtFiles.Rows.Clear ();
 
-			for (int i = 0; i < state.Children.Length; i++) {
-				BuildRow (i);
+			for (int i = 0; i < this.state.Children.Length; i++) {
+				this.BuildRow (i);
 			}
 
-			sorter.ApplySort ();
-			tableView.Update ();
+			this.sorter.ApplySort ();
+			this.tableView.Update ();
 
 		}
 		private void BuildRow (int idx)
 		{
-			tableView.Table.Rows.Add (idx, idx, idx, idx);
+			this.tableView.Table.Rows.Add (idx, idx, idx, idx);
 		}
 
 		private ColorScheme ColorGetter (TableView.RowColorGetterArgs args)
 		{
-			var stats = RowToStats (args.RowIndex);
+			var stats = this.RowToStats (args.RowIndex);
 
 			if (stats.IsDir ()) {
 				return ColorSchemeDirectory;
@@ -929,7 +777,7 @@ namespace Terminal.Gui {
 			if (stats.IsExecutable ()) {
 				return ColorSchemeExeOrRecommended;
 			}
-			if (stats.FileSystemInfo is FileInfo f && MatchesAllowedTypes (f)) {
+			if (stats.FileSystemInfo is FileInfo f && this.MatchesAllowedTypes (f)) {
 				return ColorSchemeExeOrRecommended;
 			}
 
@@ -946,11 +794,11 @@ namespace Terminal.Gui {
 		{
 			var toReturn = new HashSet<FileSystemInfoStats> ();
 
-			if (AllowsMultipleSelection && tableView.MultiSelectedRegions.Any ()) {
+			if (this.AllowsMultipleSelection && this.tableView.MultiSelectedRegions.Any ()) {
 
-				foreach (var p in tableView.GetAllSelectedCells ()) {
+				foreach (var p in this.tableView.GetAllSelectedCells ()) {
 
-					var add = state?.Children [(int)tableView.Table.Rows [p.Y] [0]];
+					var add = this.state?.Children [(int)this.tableView.Table.Rows [p.Y] [0]];
 					if (add != null) {
 						toReturn.Add (add);
 					}
@@ -961,31 +809,31 @@ namespace Terminal.Gui {
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return state?.Children [(int)tableView.Table.Rows [rowIndex] [0]];
+			return this.state?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
 
 
 		private void PathChanged ()
 		{
 			// avoid re-entry
-			if (pushingState) {
+			if (this.pushingState) {
 				return;
 			}
 
-			var path = tbPath.Text?.ToString ();
+			var path = this.tbPath.Text?.ToString ();
 
 			if (string.IsNullOrWhiteSpace (path)) {
-				SetupAsClear ();
+				this.SetupAsClear ();
 				return;
 			}
 
-			var dir = StringToDirectoryInfo (path);
+			var dir = this.StringToDirectoryInfo (path);
 
 			if (dir.Exists) {
-				PushState (dir, true);
+				this.PushState (dir, true);
 			} else
 			if (dir.Parent?.Exists ?? false) {
-				PushState (dir.Parent, true, false);
+				this.PushState (dir.Parent, true, false);
 			}
 		}
 
@@ -1005,7 +853,7 @@ namespace Terminal.Gui {
 		private void SetupAsDirectory (DirectoryInfo dir)
 		{
 			// TODO: Scrap this method
-			PushState (dir, true);
+			this.PushState (dir, true);
 		}
 
 		private void SetupAsClear ()
@@ -1013,21 +861,77 @@ namespace Terminal.Gui {
 
 		}
 
-		internal class FileSystemInfoStats {
-
-			public FileSystemInfo FileSystemInfo { get; }
-			public string HumanReadableLength { get; }
-			public long MachineReadableLength { get; }
-			public DateTime? DateModified { get; }
-			public string Type { get; }
+		/// <summary>
+		/// Describes a requirement on what <see cref="FileInfo"/> can be selected
+		/// in a <see cref="FileDialog2"/>.
+		/// </summary>
+		public class AllowedType {
 
 			/// <summary>
-			/// True if this instance represents the parent of the current state (i.e. dot dot)
+			/// Initializes a new instance of the <see cref="AllowedType"/> class.
 			/// </summary>
-			public bool IsParent { get; internal set; }
-			public string Name => IsParent ? ".." : FileSystemInfo.Name;
+			/// <param name="description">The human readable text to display.</param>
+			/// <param name="extensions">Extension(s) to match e.g. .csv.</param>
+			public AllowedType (string description, params string [] extensions)
+			{
+				if (extensions.Length == 0) {
+					throw new ArgumentException ("You must supply at least one extension");
+				}
 
-			/*
+				this.Description = description;
+				this.Extensions = extensions;
+			}
+
+			/// <summary>
+			/// Gets a value of <see cref="AllowedType"/> that matches any file.
+			/// </summary>
+			public static AllowedType Any { get; } = new AllowedType ("Any Files", ".*");
+
+			/// <summary>
+			/// Gets or Sets the human readable description for the file type
+			/// e.g. "Comma Separated Values".
+			/// </summary>
+			public string Description { get; set; }
+
+			/// <summary>
+			/// Gets or Sets the permitted file extension(s) (e.g. ".csv").
+			/// </summary>
+			public string [] Extensions { get; set; }
+
+			/// <summary>
+			/// Gets a value indicating whether this instance is the
+			/// static <see cref="Any"/> value which indicates matching
+			/// any files.
+			/// </summary>
+			public bool IsAny => this == Any;
+
+			/// <summary>
+			/// Returns <see cref="Description"/> plus all <see cref="Extensions"/> separated by semicolons.
+			/// </summary>
+			public override string ToString ()
+			{
+				return $"{this.Description} ({string.Join (";", this.Extensions.Select (e => '*' + e).ToArray ())})";
+			}
+
+			internal bool Matches (string extension, bool strict)
+			{
+				if (this.IsAny) {
+					return !strict;
+				}
+
+				return this.Extensions.Any (e => e.Equals (extension));
+			}
+		}
+
+		/// <summary>
+		/// Wrapper for <see cref="FileSystemInfo"/> that contains additional information
+		/// (e.g. <see cref="IsParent"/>) and helper methods.
+		/// </summary>
+		internal class FileSystemInfoStats {
+
+
+			/* ---- Colors used by the ls command line tool ----
+			 *
 			* Blue: Directory
 			* Green: Executable or recognized data file
 			* Cyan (Sky Blue): Symbolic link file
@@ -1037,149 +941,129 @@ namespace Terminal.Gui {
 			* Red with black background: Broken link
 			*/
 
+			private const long ByteConversion = 1024;
+
+			private static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+			private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
+			private static readonly List<string> ExecutableExtensions = new List<string> { ".EXE", ".BAT" };
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="FileSystemInfoStats"/> class.
+			/// </summary>
+			/// <param name="fsi">The directory of path to wrap.</param>
 			public FileSystemInfoStats (FileSystemInfo fsi)
 			{
-				FileSystemInfo = fsi;
+				this.FileSystemInfo = fsi;
 
 				if (fsi is FileInfo fi) {
-					MachineReadableLength = fi.Length;
-					HumanReadableLength = GetHumanReadableFileSize (MachineReadableLength);
-					DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
-					Type = fi.Extension;
+					this.MachineReadableLength = fi.Length;
+					this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
+					this.DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
+					this.Type = fi.Extension;
 				} else {
-					HumanReadableLength = "";
-					Type = "dir";
+					this.HumanReadableLength = string.Empty;
+					this.Type = "dir";
 				}
 			}
 
-			static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-			static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
-			static readonly List<string> ExecutableExtensions = new List<string> { ".EXE", ".BAT" };
+			/// <summary>
+			/// Gets the wrapped <see cref="FileSystemInfo"/> (directory or file).
+			/// </summary>
+			public FileSystemInfo FileSystemInfo { get; }
+			public string HumanReadableLength { get; }
+			public long MachineReadableLength { get; }
+			public DateTime? DateModified { get; }
+			public string Type { get; }
 
-			// TODO: is executable;
+			/// <summary>
+			/// Gets or Sets a value indicating whether this instance represents
+			/// the parent of the current state (i.e. "..").
+			/// </summary>
+			public bool IsParent { get; internal set; }
+			public string Name => this.IsParent ? ".." : this.FileSystemInfo.Name;
 
 			public bool IsDir ()
 			{
-				return Type == "dir";
+				return this.Type == "dir";
 			}
+
 			public bool IsImage ()
 			{
 				return this.FileSystemInfo is FileSystemInfo f &&
-					ImageExtensions.Contains (f.Extension,
-					StringComparer.InvariantCultureIgnoreCase);
+					ImageExtensions.Contains (
+						f.Extension,
+						StringComparer.InvariantCultureIgnoreCase);
 			}
+
 			public bool IsExecutable ()
 			{
 				// TODO: handle linux executable status
 				return this.FileSystemInfo is FileSystemInfo f &&
-					ExecutableExtensions.Contains (f.Extension,
-					StringComparer.InvariantCultureIgnoreCase);
-			}
-
-			const long byteConversion = 1024;
-			public static string GetHumanReadableFileSize (long value)
-			{
-
-				if (value < 0) { return "-" + GetHumanReadableFileSize (-value); }
-				if (value == 0) { return "0.0 bytes"; }
-
-				int mag = (int)Math.Log (value, byteConversion);
-				double adjustedSize = (value / Math.Pow (1000, mag));
-
-
-				return string.Format ("{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+					ExecutableExtensions.Contains (
+						f.Extension,
+						StringComparer.InvariantCultureIgnoreCase);
 			}
 
 			internal object GetOrderByValue (string columnName)
 			{
 				switch (columnName) {
-				case HeaderFilename: return FileSystemInfo.Name;
-				case HeaderSize: return MachineReadableLength;
-				case HeaderModified: return DateModified;
-				case HeaderType: return Type;
+				case HeaderFilename: return this.FileSystemInfo.Name;
+				case HeaderSize: return this.MachineReadableLength;
+				case HeaderModified: return this.DateModified;
+				case HeaderType: return this.Type;
 				default: throw new ArgumentOutOfRangeException (nameof (columnName));
 				}
 			}
 
 			internal object GetOrderByDefault ()
 			{
-				if (IsDir ()) {
+				if (this.IsDir ()) {
 					return -1;
 				}
 
 				return 100;
 			}
-		}
 
-		/// <summary>
-		/// Describes a requirement on what <see cref="FileInfo"/> can be selected
-		/// in a <see cref="FileDialog2"/>.
-		/// </summary>
-		public class AllowedType {
-			/// <summary>
-			/// Human readable description for the file type
-			/// e.g. "Comma Separated Values"
-			/// </summary>
-			public string Description { get; set; }
-
-			/// <summary>
-			/// Permitted extension(s) (e.g. ".csv")
-			/// </summary>
-			public string[] Extensions { get; set; }
-
-			public bool IsAny => this == Any;
-
-			public static AllowedType Any = new AllowedType ("Any Files", ".*");
-
-			/// <summary>
-			/// Creates a new instance of the <see cref="AllowedType"/> class.
-			/// </summary>
-			/// <param name="description"></param>
-			/// <param name="extension"></param>
-			public AllowedType (string description, params string[] extensions)
+			private static string GetHumanReadableFileSize (long value)
 			{
-				if(extensions.Length == 0) {
-					throw new ArgumentException ("You must supply at least one extension");
+
+				if (value < 0) {
+					return "-" + GetHumanReadableFileSize (-value);
 				}
 
-				Description = description;
-				Extensions = extensions;
-			}
-
-			public override string ToString ()
-			{
-				return $"{Description} ({string.Join(";",Extensions.Select(e=>'*'+e).ToArray())})";
-			}
-
-			internal bool Matches (string extension, bool strict)
-			{
-				if (IsAny) {
-					return !strict;
+				if (value == 0) {
+					return "0.0 bytes";
 				}
 
-				return Extensions.Any (e => e.Equals (extension));
+				int mag = (int)Math.Log (value, ByteConversion);
+				double adjustedSize = value / Math.Pow (1000, mag);
+
+
+				return string.Format ("{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
 			}
 		}
 
 		internal class FileDialogState {
-			public DirectoryInfo Directory { get; }
 
-			public FileSystemInfoStats [] Children;
-
-			public List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
-			public IReadOnlyCollection<FileSystemInfoStats> Selected => selected.AsReadOnly ();
-
+			private List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
 			public FileDialogState (DirectoryInfo dir, FileDialog2 parent)
 			{
-				Directory = dir;
+				this.Directory = dir;
 
-				RefreshChildren (parent);
+				this.RefreshChildren (parent);
 			}
+
+			public DirectoryInfo Directory { get; }
+
+			public FileSystemInfoStats [] Children { get; private set; }
+
+			// TODO: Make history restore this
+			public IReadOnlyCollection<FileSystemInfoStats> Selected => this.selected.AsReadOnly ();
 
 			internal void RefreshChildren (FileDialog2 parent)
 			{
-				var dir = Directory;
-				
+				var dir = this.Directory;
+
 
 				try {
 					List<FileSystemInfoStats> children;
@@ -1196,15 +1080,15 @@ namespace Terminal.Gui {
 
 						children = children.Where (
 							c => c.IsDir () ||
-							(c.FileSystemInfo is FileInfo f && parent.IsCompatibleWithAllowedExtensions (f))
-							).ToList ();
+							(c.FileSystemInfo is FileInfo f && parent.IsCompatibleWithAllowedExtensions (f)))
+							.ToList ();
 					}
 
 					// if theres a UI filter in place too
-					if(parent.currentFilter != null) {
+					if (parent.currentFilter != null) {
 						children = children.Where (
 								c => c.IsDir () ||
-								(c.FileSystemInfo is FileInfo f && parent.currentFilter.Matches (f.Extension,true))
+								(c.FileSystemInfo is FileInfo f && parent.currentFilter.Matches (f.Extension, true))
 								).ToList ();
 					}
 
@@ -1214,20 +1098,190 @@ namespace Terminal.Gui {
 						children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
 					}
 
-					Children = children.ToArray ();
+					this.Children = children.ToArray ();
 				} catch (Exception) {
 					// Access permissions Exceptions, Dir not exists etc
-					Children = new FileSystemInfoStats [0];
+					this.Children = new FileSystemInfoStats [0];
 				}
 			}
 
 			internal void SetSelection (FileSystemInfoStats stats)
 			{
-				selected.Clear ();
-				selected.Add (stats);
+				this.selected.Clear ();
+				this.selected.Add (stats);
 			}
 		}
-		class FileDialogHistory {
+
+		internal class TextFieldWithAppendAutocomplete : TextField {
+
+			private int? currentFragment = null;
+			private string [] validFragments = new string [0];
+
+			public TextFieldWithAppendAutocomplete ()
+			{
+				this.KeyPress += (k) => {
+					var key = k.KeyEvent.Key;
+					if (key == Key.Tab) {
+						k.Handled = this.AcceptSelectionIfAny ();
+					} else
+					if (key == Key.CursorUp) {
+						k.Handled = this.CycleSuggestion (1);
+					} else
+					if (key == Key.CursorDown) {
+						k.Handled = this.CycleSuggestion (-1);
+					}
+				};
+
+				this.ColorScheme = new ColorScheme {
+					Normal = new Attribute (Color.White, Color.Black),
+					HotNormal = new Attribute (Color.White, Color.Black),
+					Focus = new Attribute (Color.White, Color.Black),
+					HotFocus = new Attribute (Color.White, Color.Black),
+				};
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				if (!this.MakingSuggestion ()) {
+					return;
+				}
+
+				// draw it like its selected even though its not
+				Driver.SetAttribute (new Attribute (Color.Black, Color.White));
+				this.Move (this.Text.Length, 0);
+				Driver.AddStr (this.validFragments [this.currentFragment.Value]);
+			}
+
+			/// <summary>
+			/// Accepts the current autocomplete suggestion displaying in the text box.
+			/// Returns true if a valid suggestion was being rendered and acceptable or
+			/// false if no suggestion was showing.
+			/// </summary>
+			/// <returns></returns>
+			internal bool AcceptSelectionIfAny ()
+			{
+				if (this.MakingSuggestion ()) {
+					this.Text += this.validFragments [this.currentFragment.Value];
+					this.MoveCursorToEnd ();
+
+					this.ClearSuggestions ();
+					return true;
+				}
+
+				return false;
+			}
+
+			internal void MoveCursorToEnd ()
+			{
+				this.ClearAllSelection ();
+				this.CursorPosition = this.Text.Length;
+			}
+
+			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
+			{
+				if (!this.CursorIsAtEnd ()) {
+					return;
+				}
+
+				var path = this.Text.ToString ();
+				var last = path.LastIndexOfAny (FileDialog2.separators);
+
+				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
+					this.currentFragment = null;
+					return;
+				}
+
+				var term = path.Substring (last + 1);
+
+				if (term.Equals (state?.Directory?.Name)) {
+					this.ClearSuggestions ();
+					return;
+				}
+
+				// TODO: Be case insensitive on Windows
+				var validSuggestions = suggestions
+					.Where (s => s.StartsWith (term))
+					.OrderBy (m => m.Length)
+					.ToArray ();
+
+
+				// nothing to suggest
+				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
+					this.ClearSuggestions ();
+					return;
+				}
+
+				this.validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray ();
+				this.currentFragment = 0;
+			}
+
+			internal void ClearSuggestions ()
+			{
+				this.currentFragment = null;
+				this.validFragments = new string [0];
+				this.SetNeedsDisplay ();
+			}
+
+			internal void GenerateSuggestions (FileDialogState state)
+			{
+				if (state == null) {
+					return;
+				}
+
+				var suggestions = state.Children.Select (
+					e => e.FileSystemInfo is DirectoryInfo d
+						? d.Name + System.IO.Path.DirectorySeparatorChar
+						: e.FileSystemInfo.Name)
+					.ToArray ();
+
+				this.GenerateSuggestions (state, suggestions);
+			}
+
+			internal void SetTextTo (FileSystemInfo fileSystemInfo)
+			{
+				var newText = fileSystemInfo.FullName;
+				if (fileSystemInfo is DirectoryInfo) {
+					newText += System.IO.Path.DirectorySeparatorChar;
+				}
+				this.Text = newText;
+				this.MoveCursorToEnd ();
+			}
+
+			internal bool CursorIsAtEnd ()
+			{
+				return this.CursorPosition == this.Text.Length;
+			}
+
+			/// <summary>
+			/// Returns true if there is a suggestion that can be made and the control
+			/// is in a state where user would expect to see auto-complete (i.e. focused and
+			/// cursor in right place).
+			/// </summary>
+			/// <returns></returns>
+			private bool MakingSuggestion ()
+			{
+				return this.currentFragment != null && this.HasFocus && this.CursorIsAtEnd ();
+			}
+
+			private bool CycleSuggestion (int direction)
+			{
+				if (this.currentFragment == null || this.validFragments.Length <= 1) {
+					return false;
+				}
+
+				this.currentFragment = (this.currentFragment + direction) % this.validFragments.Length;
+
+				if (this.currentFragment < 0) {
+					this.currentFragment = this.validFragments.Length - 1;
+				}
+				this.SetNeedsDisplay ();
+				return true;
+			}
+		}
+
+		internal class FileDialogHistory {
 			private Stack<FileDialogState> back = new Stack<FileDialogState> ();
 			private Stack<FileDialogState> forward = new Stack<FileDialogState> ();
 			private FileDialog2 dlg;
@@ -1242,11 +1296,11 @@ namespace Terminal.Gui {
 
 				DirectoryInfo goTo = null;
 
-				if (CanBack ()) {
+				if (this.CanBack ()) {
 
-					goTo = back.Pop ().Directory;
-				} else if (CanUp ()) {
-					goTo = dlg.state?.Directory.Parent;
+					goTo = this.back.Pop ().Directory;
+				} else if (this.CanUp ()) {
+					goTo = this.dlg.state?.Directory.Parent;
 				}
 
 				// nowhere to go
@@ -1254,32 +1308,33 @@ namespace Terminal.Gui {
 					return false;
 				}
 
-				forward.Push (dlg.state);
-				dlg.PushState (goTo, false);
+				this.forward.Push (this.dlg.state);
+				this.dlg.PushState (goTo, false);
 				return true;
 			}
 
 			internal bool CanBack ()
 			{
-				return back.Count > 0;
+				return this.back.Count > 0;
 			}
 
 			internal bool Forward ()
 			{
-				if (forward.Count > 0) {
-					dlg.PushState (forward.Pop ().Directory, false);
+				if (this.forward.Count > 0) {
+					this.dlg.PushState (this.forward.Pop ().Directory, false);
 					return true;
 				}
 
 				return false;
 			}
-			public bool Up ()
+
+			internal bool Up ()
 			{
-				var parent = dlg.state?.Directory.Parent;
+				var parent = this.dlg.state?.Directory.Parent;
 				if (parent != null) {
 
-					back.Push (new FileDialogState (parent, dlg));
-					dlg.PushState (parent, true);
+					this.back.Push (new FileDialogState (parent, this.dlg));
+					this.dlg.PushState (parent, true);
 					return true;
 				}
 
@@ -1288,7 +1343,7 @@ namespace Terminal.Gui {
 
 			internal bool CanUp ()
 			{
-				return dlg.state?.Directory.Parent != null;
+				return this.dlg.state?.Directory.Parent != null;
 			}
 
 
@@ -1299,25 +1354,25 @@ namespace Terminal.Gui {
 				}
 
 				// if changing to a new directory push onto the Back history
-				if (back.Count == 0 || back.Peek ().Directory != state.Directory) {
+				if (this.back.Count == 0 || this.back.Peek ().Directory != state.Directory) {
 
-					back.Push (state);
-					ClearForward ();
+					this.back.Push (state);
+					this.ClearForward ();
 				}
 			}
 
 			internal bool CanForward ()
 			{
-				return forward.Count > 0;
+				return this.forward.Count > 0;
 			}
 
 			internal void ClearForward ()
 			{
-				forward.Clear ();
+				this.forward.Clear ();
 			}
 		}
 		private class FileDialogSorter {
-			readonly FileDialog2 dlg;
+			private readonly FileDialog2 dlg;
 			private TableView tableView;
 
 			private DataColumn currentSort = null;
@@ -1337,54 +1392,40 @@ namespace Terminal.Gui {
 						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 							// left click in a header
-							SortColumn (clickedCol);
+							this.SortColumn (clickedCol);
 						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
 
 							// right click in a header
-							ShowHeaderContextMenu (clickedCol, e);
+							this.ShowHeaderContextMenu (clickedCol, e);
 						}
 					}
 				};
 
 			}
-			private void SortColumn (DataColumn clickedCol)
-			{
-				GetProposedNewSortOrder (clickedCol, out var isAsc);
-				SortColumn (clickedCol, isAsc);
-			}
 
-			private void SortColumn (DataColumn col, bool isAsc)
+			internal void ApplySort ()
 			{
-				// set a sort order
-				currentSort = col;
-				currentSortIsAsc = isAsc;
-
-				ApplySort ();
-			}
-
-			public void ApplySort ()
-			{
-				var col = currentSort;
+				var col = this.currentSort;
 
 				// TODO: Consider preserving selection
-				tableView.Table.Rows.Clear ();
+				this.tableView.Table.Rows.Clear ();
 
 				var colName = col == null ? null : StripArrows (col.ColumnName);
 
-				var stats = dlg.state?.Children ?? new FileSystemInfoStats [0];
+				var stats = this.dlg.state?.Children ?? new FileSystemInfoStats [0];
 
 				// Do we sort on a column or just use the default sort order?
 				Func<FileSystemInfoStats, object> sortAlgorithm;
 
 				if (colName == null) {
 					sortAlgorithm = (v) => v.GetOrderByDefault ();
-					currentSortIsAsc = true;
+					this.currentSortIsAsc = true;
 				} else {
 					sortAlgorithm = (v) => v.GetOrderByValue (colName);
 				}
 
 				var ordered =
-					currentSortIsAsc ?
+					this.currentSortIsAsc ?
 					    stats.Select ((v, i) => new { v, i })
 						.OrderByDescending (f => f.v.IsParent)
 						.ThenBy (f => sortAlgorithm (f.v))
@@ -1395,36 +1436,52 @@ namespace Terminal.Gui {
 						.ToArray ();
 
 				foreach (var o in ordered) {
-					dlg.BuildRow (o.i);
+					this.dlg.BuildRow (o.i);
 				}
 
-				foreach (DataColumn c in tableView.Table.Columns) {
+				foreach (DataColumn c in this.tableView.Table.Columns) {
 
 					// remove any lingering sort indicator
 					c.ColumnName = TrimArrows (c.ColumnName);
 
 					// add a new one if this the one that is being sorted
 					if (c == col) {
-						c.ColumnName += currentSortIsAsc ? '▲' : '▼';
+						c.ColumnName += this.currentSortIsAsc ? '▲' : '▼';
 					}
 				}
 
-				tableView.Update ();
+				this.tableView.Update ();
 			}
-
 
 			private static string TrimArrows (string columnName)
 			{
 				return columnName.TrimEnd ('▼', '▲');
 			}
+
 			private static string StripArrows (string columnName)
 			{
-				return columnName.Replace ("▼", "").Replace ("▲", "");
+				return columnName.Replace ("▼", string.Empty).Replace ("▲", string.Empty);
 			}
+
+			private void SortColumn (DataColumn clickedCol)
+			{
+				this.GetProposedNewSortOrder (clickedCol, out var isAsc);
+				this.SortColumn (clickedCol, isAsc);
+			}
+
+			private void SortColumn (DataColumn col, bool isAsc)
+			{
+				// set a sort order
+				this.currentSort = col;
+				this.currentSortIsAsc = isAsc;
+
+				this.ApplySort ();
+			}
+
 			private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
 			{
 				// work out new sort order
-				if (currentSort == clickedCol && currentSortIsAsc) {
+				if (this.currentSort == clickedCol && this.currentSortIsAsc) {
 					isAsc = false;
 					return $"{clickedCol.ColumnName} DESC";
 				} else {
@@ -1435,12 +1492,15 @@ namespace Terminal.Gui {
 
 			private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
 			{
-				var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
-				var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
-					new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
-					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,isAsc)),
+				var contextMenu = new ContextMenu (
+					e.MouseEvent.X + 1,
+					e.MouseEvent.Y + 1,
+					new MenuBarItem (new MenuItem []
+					{
+						new MenuItem($"Hide {TrimArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
+						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
 					})
 				);
 
@@ -1449,33 +1509,45 @@ namespace Terminal.Gui {
 
 			private void HideColumn (DataColumn clickedCol)
 			{
-				var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
+				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
 				style.Visible = false;
-				tableView.Update ();
+				this.tableView.Update ();
 			}
 		}
 
 
 		private class FileDialogRootTreeNode {
-			public string DisplayName { get; set; }
-			public DirectoryInfo Path { get; set; }
 			public FileDialogRootTreeNode (string displayName, DirectoryInfo path)
 			{
 				this.DisplayName = displayName;
 				this.Path = path;
 			}
 
+			public string DisplayName { get; set; }
+			public DirectoryInfo Path { get; set; }
+
 			public override string ToString ()
 			{
-				return DisplayName;
+				return this.DisplayName;
 			}
 		}
+
 		private class FileDialogTreeBuilder : ITreeBuilder<object> {
 			public bool SupportsCanExpand => true;
 
 			public bool CanExpand (object toExpand)
 			{
-				return TryGetDirectories (NodeToDirectory (toExpand)).Any ();
+				return this.TryGetDirectories (NodeToDirectory (toExpand)).Any ();
+			}
+
+			public IEnumerable<object> GetChildren (object forObject)
+			{
+				return this.TryGetDirectories (NodeToDirectory (forObject));
+			}
+
+			internal static DirectoryInfo NodeToDirectory (object toExpand)
+			{
+				return toExpand is FileDialogRootTreeNode f ? f.Path : (DirectoryInfo)toExpand;
 			}
 
 			private IEnumerable<DirectoryInfo> TryGetDirectories (DirectoryInfo directoryInfo)
@@ -1488,15 +1560,6 @@ namespace Terminal.Gui {
 				}
 			}
 
-			internal static DirectoryInfo NodeToDirectory (object toExpand)
-			{
-				return toExpand is FileDialogRootTreeNode f ? f.Path : (DirectoryInfo)toExpand;
-			}
-
-			public IEnumerable<object> GetChildren (object forObject)
-			{
-				return TryGetDirectories (NodeToDirectory (forObject));
-			}
 		}
 	}
 }
