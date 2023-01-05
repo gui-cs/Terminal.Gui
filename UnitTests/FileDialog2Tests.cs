@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -16,6 +17,77 @@ namespace Terminal.Gui.Core {
 			Assert.IsType<FileDialog2.TextFieldWithAppendAutocomplete> ( dlg.Focused.Focused);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void DirectTyping_Allowed ()
+		{
+			var dlg = GetInitializedFileDialog ();
+
+			Send ('.', ConsoleKey.OemPeriod);
+			Send ('\\', ConsoleKey.Separator,false);
+
+			// Entering ./ replaces current text with the full path
+			Assert.Equal (Environment.CurrentDirectory + Path.DirectorySeparatorChar, dlg.Path);
+
+			// continue typing the rest of the path
+			Send ("bob");
+			Send ('.', ConsoleKey.OemPeriod, false);
+			Send ("csv");
+
+			Assert.True (dlg.Canceled);
+
+			SendEnter ();
+			Assert.False (dlg.Canceled);
+			Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DirectTyping_AutoComplete()
+		{
+			var dlg = GetInitializedFileDialog ();
+			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
+
+			Directory.CreateDirectory (openIn);
+
+			var expectedDest = Path.Combine(openIn, "xx");
+			Directory.CreateDirectory (expectedDest);
+
+			dlg.Path = openIn + Path.DirectorySeparatorChar;
+
+			Send ("x");
+
+			// nothing selected yet
+			Assert.True (dlg.Canceled);
+			Assert.Equal ("x", Path.GetFileName (dlg.Path));
+
+			// complete auto typing
+			Send ('\n', ConsoleKey.Enter, false);
+
+			// but do not close dialog
+			Assert.True (dlg.Canceled);
+			Assert.EndsWith("xx" + Path.DirectorySeparatorChar, dlg.Path);
+
+			// press enter again to confirm the dialog
+			Send ('\n', ConsoleKey.Enter, false);
+			Assert.False (dlg.Canceled);
+			Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
+		}
+
+		private void Send (char ch, ConsoleKey ck, bool shift = false)
+		{	
+			Application.Driver.SendKeys (ch, ck, shift, false, false);
+		}
+		private void Send (string chars)
+		{
+			foreach(var ch in chars) {
+				Application.Driver.SendKeys (ch, ConsoleKey.NoName, false, false, false);
+			}
+			
+		}
+		private void SendEnter ()
+		{
+			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+		}
+
 		[Fact,AutoInitShutdown]
 		public void Autocomplete_NoSuggestion_WhenTextMatchesExactly ()
 		{
@@ -30,10 +102,7 @@ namespace Terminal.Gui.Core {
 			// string
 			Assert.False (tb.AcceptSelectionIfAny());
 		}
-
 		
-
-
 
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_AcceptSuggstion ()
@@ -73,7 +142,7 @@ namespace Terminal.Gui.Core {
 			dlg.BeginInit ();
 			dlg.EndInit ();
 			Application.Begin (dlg);
-			
+						
 			return dlg;
 		}
 	}
