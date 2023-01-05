@@ -303,7 +303,8 @@ namespace Terminal.Gui {
 
 			this.Move (1, 0, false);
 
-			if (Title == null || string.IsNullOrEmpty (Title.ToString())) {
+			
+			if (ustring.IsNullOrEmpty(Title)) {
 				return;
 			}
 
@@ -371,7 +372,7 @@ namespace Terminal.Gui {
 			this.tbPath.FocusFirst ();
 			this.tbPath.SelectAll ();
 
-			if (Title == null || Title == string.Empty) {
+			if (ustring.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
 					this.Title = " OPEN FILE ";
