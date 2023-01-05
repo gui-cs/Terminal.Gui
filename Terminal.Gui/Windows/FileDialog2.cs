@@ -104,6 +104,16 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
+		/// Characters to prevent entry into <see cref="tbPath"/>.  Note that this is not using
+		/// <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory
+		/// separators, arrow keys etc.
+		/// </summary>
+		private static char [] badChars = new [] {
+			'"','<','>','|','*','?',
+		};
+		
+
+		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
 		public FileDialog2 ()
@@ -136,6 +146,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (okWidth + 1)
 			};
 			tbPath.KeyPress += (k) => {
+				
 				NavigateIf (k, Key.CursorDown, tableView);
 
 				if (tbPath.CursorIsAtEnd ()) {
@@ -143,6 +154,8 @@ namespace Terminal.Gui {
 				}
 
 				AcceptIf (k, Key.Enter);
+
+				SuppressIfBadChar (k);
 			};
 
 			splitContainer = new SplitContainer () {
@@ -249,6 +262,16 @@ namespace Terminal.Gui {
 			Add (btnToggleSplitterCollapse);
 		}
 
+		private void SuppressIfBadChar (KeyEventEventArgs k)
+		{
+			// don't let user type bad letters
+			var ch = (char)k.KeyEvent.KeyValue;
+
+			if (badChars.Contains (ch)){
+				k.Handled = true;
+			}
+		}
+
 		private bool TreeView_KeyDown (KeyEvent keyEvent)
 		{
 			if (treeView.HasFocus && separators.Contains ((char)keyEvent.KeyValue)) {
@@ -282,6 +305,10 @@ namespace Terminal.Gui {
 		}
 		private void Accept (FileInfo f)
 		{
+			if (!IsCompatibleWithOpenMode (f)) {
+				return;
+			}
+
 			tbPath.Text = f.FullName;
 			Canceled = false;
 			Application.RequestStop ();
@@ -295,6 +322,11 @@ namespace Terminal.Gui {
 				// enter just accepts it
 				return;
 			}
+
+			if (!IsCompatibleWithOpenMode (tbPath.Text.ToString())) {
+				return;
+			}
+
 
 			Canceled = false;
 			Application.RequestStop ();
@@ -681,13 +713,35 @@ namespace Terminal.Gui {
 			if (arg.IsParent) {
 				return false;
 			}
-				
 
 			switch (OpenMode) {
-				case OpenMode.Directory: return arg.IsDir();
-				case OpenMode.File: return !arg.IsDir ();
-				case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException(nameof (OpenMode));
+			case OpenMode.Directory: return arg.IsDir ();
+			case OpenMode.File: return !arg.IsDir ();
+			case OpenMode.Mixed: return true;
+			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
+			};
+		}
+
+		private bool IsCompatibleWithOpenMode (FileSystemInfo f)
+		{
+			switch (OpenMode) {
+			case OpenMode.Directory: return f is DirectoryInfo;
+			case OpenMode.File: return f is FileInfo;
+			case OpenMode.Mixed: return true;
+			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
+			};
+		}
+		private bool IsCompatibleWithOpenMode (string s)
+		{
+			if (string.IsNullOrWhiteSpace (s)) {
+				return false;
+			}
+
+			switch (OpenMode) {
+			case OpenMode.Directory: return !File.Exists (s);
+			case OpenMode.File: return !Directory.Exists (s);
+			case OpenMode.Mixed: return true;
+			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
 			};
 		}
 
