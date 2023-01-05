@@ -42,6 +42,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Collection of file types that the user can/must select.  Only applies
+		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>.  See also
+		/// <see cref="AllowedTypesIsStrict"/> if you only want to highlight files.
+		/// </summary>
+		public List<AllowedType> AllowedTypes { get; set; } = new List<AllowedType> ();
+
+		/// <summary>
+		/// Gets or sets a value indicating whether <see cref="AllowedTypes"/> is a strict
+		/// requirement or simply a recommendation. Defaults to <see langword="true"/> (i.e.
+		/// strict).
+		/// </summary>
+		public bool AllowedTypesIsStrict { get; set; }
+
+		/// <summary>
 		/// True if the <see cref="FileDialog"/> was closed without confirming a selection
 		/// </summary>
 		public bool Canceled { get; private set; } = true;
@@ -87,7 +101,7 @@ namespace Terminal.Gui {
 		/// ColorScheme to use for entries that are executable or match the users file extension
 		/// provided (e.g. if role of dialog is to pick a .csv file)
 		/// </summary>
-		public static ColorScheme ColorSchemeExeOrInteresting;
+		public static ColorScheme ColorSchemeExeOrRecommended;
 
 		private Button btnOk;
 		private Button btnToggleSplitterCollapse;
@@ -111,7 +125,7 @@ namespace Terminal.Gui {
 		private static char [] badChars = new [] {
 			'"','<','>','|','*','?',
 		};
-		
+
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialog2"/> class.
@@ -146,7 +160,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (okWidth + 1)
 			};
 			tbPath.KeyPress += (k) => {
-				
+
 				NavigateIf (k, Key.CursorDown, tableView);
 
 				if (tbPath.CursorIsAtEnd ()) {
@@ -267,7 +281,7 @@ namespace Terminal.Gui {
 			// don't let user type bad letters
 			var ch = (char)k.KeyEvent.KeyValue;
 
-			if (badChars.Contains (ch)){
+			if (badChars.Contains (ch)) {
 				k.Handled = true;
 			}
 		}
@@ -323,7 +337,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!IsCompatibleWithOpenMode (tbPath.Text.ToString())) {
+			if (!IsCompatibleWithOpenMode (tbPath.Text.ToString ())) {
 				return;
 			}
 
@@ -652,7 +666,7 @@ namespace Terminal.Gui {
 				Focus = Driver.MakeAttribute (Color.Black, Color.Magenta),
 				HotFocus = Driver.MakeAttribute (Color.Black, Color.Magenta),
 			};
-			ColorSchemeExeOrInteresting = new ColorScheme {
+			ColorSchemeExeOrRecommended = new ColorScheme {
 				Normal = Driver.MakeAttribute (Color.Green, Color.Black),
 				HotNormal = Driver.MakeAttribute (Color.Green, Color.Black),
 				Focus = Driver.MakeAttribute (Color.Black, Color.Green),
@@ -716,24 +730,70 @@ namespace Terminal.Gui {
 
 			switch (OpenMode) {
 			case OpenMode.Directory: return arg.IsDir ();
-			case OpenMode.File: return !arg.IsDir ();
+			case OpenMode.File: return !arg.IsDir () && IsCompatibleWithOpenMode (arg.FileSystemInfo);
 			case OpenMode.Mixed: return true;
 			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
-			};
+			}
 		}
 
 		private bool IsCompatibleWithOpenMode (FileSystemInfo f)
 		{
 			switch (OpenMode) {
 			case OpenMode.Directory: return f is DirectoryInfo;
-			case OpenMode.File: return f is FileInfo;
+			case OpenMode.File:
+				if (f is FileInfo file) {
+					return IsCompatibleWithAllowedExtensions (file);
+				}
+				return false;
 			case OpenMode.Mixed: return true;
 			default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
 			};
 		}
+
+		private bool IsCompatibleWithAllowedExtensions (FileInfo file)
+		{
+			// no restrictions
+			if (!AllowedTypes.Any () || !AllowedTypesIsStrict) {
+				return true;
+			}
+			return MatchesAllowedTypes (file);
+		}
+
+		private bool IsCompatibleWithAllowedExtensions (string path)
+		{
+			// no restrictions
+			if (!AllowedTypes.Any () || !AllowedTypesIsStrict) {
+				return true;
+			}
+
+			var extension = System.IO.Path.GetExtension (path);
+
+			// There is a requirement to have a particular extension and we have none
+			if (string.IsNullOrEmpty (extension)) {
+				return false;
+			}
+
+			return AllowedTypes.Any (t => t.Extension.Equals (extension));
+		}
+
+		/// <summary>
+		/// Returns true if any <see cref="AllowedTypes"/> matches <paramref name="file"/>
+		/// regardless of <see cref="AllowedTypesIsStrict"/> status.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		private bool MatchesAllowedTypes (FileInfo file)
+		{
+			return AllowedTypes.Any (t => t.Extension.Equals (file.Extension));
+		}
+
 		private bool IsCompatibleWithOpenMode (string s)
 		{
 			if (string.IsNullOrWhiteSpace (s)) {
+				return false;
+			}
+
+			if (!IsCompatibleWithAllowedExtensions (s)) {
 				return false;
 			}
 
@@ -768,7 +828,7 @@ namespace Terminal.Gui {
 					tbPath.MoveCursorToEnd ();
 				}
 
-				state = new FileDialogState (d, OpenMode);
+				state = new FileDialogState (d, this);
 				tbPath.GenerateSuggestions (state);
 
 				WriteStateToTableView ();
@@ -818,7 +878,10 @@ namespace Terminal.Gui {
 				return ColorSchemeImage;
 			}
 			if (stats.IsExecutable ()) {
-				return ColorSchemeExeOrInteresting;
+				return ColorSchemeExeOrRecommended;
+			}
+			if (stats.FileSystemInfo is FileInfo f && MatchesAllowedTypes (f)) {
+				return ColorSchemeExeOrRecommended;
 			}
 
 			return ColorSchemeDefault;
@@ -998,6 +1061,35 @@ namespace Terminal.Gui {
 				return 100;
 			}
 		}
+
+		/// <summary>
+		/// Describes a requirement on what <see cref="FileInfo"/> can be selected
+		/// in a <see cref="FileDialog2"/>.
+		/// </summary>
+		public class AllowedType {
+			/// <summary>
+			/// Human readable description for the file type
+			/// e.g. "Comma Separated Values"
+			/// </summary>
+			public string Description { get; set; }
+
+			/// <summary>
+			/// Permitted extension (e.g. ".csv")
+			/// </summary>
+			public string Extension { get; set; }
+
+			/// <summary>
+			/// Creates a new instance of the <see cref="AllowedType"/> class.
+			/// </summary>
+			/// <param name="description"></param>
+			/// <param name="extension"></param>
+			public AllowedType (string description, string extension)
+			{
+				Description = description;
+				Extension = extension;
+			}
+		}
+
 		internal class FileDialogState {
 			public DirectoryInfo Directory { get; }
 
@@ -1006,7 +1098,7 @@ namespace Terminal.Gui {
 			public List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
 			public IReadOnlyCollection<FileSystemInfoStats> Selected => selected.AsReadOnly ();
 
-			public FileDialogState (DirectoryInfo dir, OpenMode openMode)
+			public FileDialogState (DirectoryInfo dir, FileDialog2 parent)
 			{
 				Directory = dir;
 
@@ -1014,10 +1106,20 @@ namespace Terminal.Gui {
 					List<FileSystemInfoStats> children;
 
 					// if directories only
-					if (openMode == OpenMode.Directory) {
+					if (parent.OpenMode == OpenMode.Directory) {
 						children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
-					} else {
+					}
+					else {
 						children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					}
+
+					// if only allowing specific file types
+					if (parent.AllowedTypes.Any() && parent.AllowedTypesIsStrict && parent.OpenMode == OpenMode.File) {
+
+						children = children.Where (
+							c => c.IsDir () ||
+							(c.FileSystemInfo is FileInfo f && parent.IsCompatibleWithAllowedExtensions (f))
+							).ToList ();
 					}
 
 					// allow navigating up as '..'
@@ -1089,7 +1191,7 @@ namespace Terminal.Gui {
 				var parent = dlg.state?.Directory.Parent;
 				if (parent != null) {
 
-					back.Push (new FileDialogState (parent, dlg.OpenMode));
+					back.Push (new FileDialogState (parent, dlg));
 					dlg.PushState (parent, true);
 					return true;
 				}

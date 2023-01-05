@@ -13,11 +13,12 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			var y = 1;
+			var x = 1;
 
 			foreach(var multi in new bool [] {false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
 					var btn = new Button ($"Select {(multi?"Many": "One")} {openMode}") {
-						X = 1,
+						X = x,
 						Y = y
 					};
 					SetupHandler (btn, openMode, multi);
@@ -25,15 +26,40 @@ namespace UICatalog.Scenarios {
 					Win.Add (btn);
 				}
 			}
+
+			y = 1;
+			// SubViews[0] is ContentView
+			x = Win.Subviews [0].Subviews.OfType<Button> ().Max (b => b.Text.Length + 5);
+
+
+			foreach (var multi in new bool [] { false, true }) {
+				foreach (var strict in new bool [] { false, true }) {
+					{
+						var btn = new Button ($"Select {(multi ? "Many" : "One")} .csv ({(strict?"Strict":"Recommended")})") {
+							X = x,
+							Y = y
+						};
+
+						SetupHandler (btn, OpenDialog.OpenMode.File, multi, true, strict);
+						y += 2;
+						Win.Add (btn);
+					}
+				};
+			}
 		}
 
-		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti)
+		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti, bool csv = false, bool strict = false)
 		{
 			btn.Clicked += ()=>{
 				var fd = new FileDialog2 {
 					AllowsMultipleSelection = isMulti,
 					OpenMode = mode,
 				};
+
+				if (csv) {
+					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Comma Separated Files", ".csv"));
+					fd.AllowedTypesIsStrict = strict;
+				}
 
 				Application.Run (fd);
 
