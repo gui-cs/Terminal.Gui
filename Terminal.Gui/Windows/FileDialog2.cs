@@ -191,6 +191,12 @@ namespace Terminal.Gui {
 			this.tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 			this.tableView.ColorScheme = ColorSchemeDefault;
+			
+			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
+			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
+			this.tableView.AddKeyBinding (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
+			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
+
 
 			this.treeView.ColorScheme = ColorSchemeDefault;
 			this.treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
