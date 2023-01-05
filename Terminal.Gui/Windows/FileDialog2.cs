@@ -608,7 +608,7 @@ namespace Terminal.Gui {
 
 
 			if (stats.FileSystemInfo is DirectoryInfo d) {
-				this.PushState (d, false);
+				this.PushState (d, true);
 				return;
 			}
 
@@ -702,20 +702,22 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true)
+		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
 			// no change of state
 			if (d == this.state?.Directory) {
 				return;
 			}
-
+			if(d.FullName == this.state?.Directory.FullName) {
+				return;
+			}
 
 			try {
 				this.pushingState = true;
 
 				// push the old state to history
 				if (addCurrentStateToHistory) {
-					this.history.Push (this.state);
+					this.history.Push (this.state, clearForward);
 				}
 
 				this.tbPath.ClearSuggestions ();
@@ -730,7 +732,10 @@ namespace Terminal.Gui {
 
 				this.WriteStateToTableView ();
 
-				this.history.ClearForward ();
+				if (clearForward) {
+					this.history.ClearForward ();
+				}
+				
 				this.tableView.RowOffset = 0;
 				this.tableView.SelectedRow = 0;
 
@@ -1309,7 +1314,7 @@ namespace Terminal.Gui {
 				}
 
 				this.forward.Push (this.dlg.state);
-				this.dlg.PushState (goTo, false);
+				this.dlg.PushState (goTo, false,true,false);
 				return true;
 			}
 
@@ -1321,7 +1326,8 @@ namespace Terminal.Gui {
 			internal bool Forward ()
 			{
 				if (this.forward.Count > 0) {
-					this.dlg.PushState (this.forward.Pop ().Directory, false);
+
+					this.dlg.PushState (this.forward.Pop ().Directory, true,true,false);
 					return true;
 				}
 
@@ -1334,7 +1340,7 @@ namespace Terminal.Gui {
 				if (parent != null) {
 
 					this.back.Push (new FileDialogState (parent, this.dlg));
-					this.dlg.PushState (parent, true);
+					this.dlg.PushState (parent, false);
 					return true;
 				}
 
@@ -1347,17 +1353,19 @@ namespace Terminal.Gui {
 			}
 
 
-			internal void Push (FileDialogState state)
+			internal void Push (FileDialogState state, bool clearForward)
 			{
 				if (state == null) {
 					return;
 				}
 
 				// if changing to a new directory push onto the Back history
-				if (this.back.Count == 0 || this.back.Peek ().Directory != state.Directory) {
+				if (this.back.Count == 0 || this.back.Peek ().Directory.FullName != state.Directory.FullName) {
 
 					this.back.Push (state);
-					this.ClearForward ();
+					if (clearForward) {
+						this.ClearForward ();
+					}					
 				}
 			}
 
