@@ -64,7 +64,6 @@ namespace Terminal.Gui {
 		private Label lblBack;
 		private Label lblUp;
 
-		public new string Title { get; set; }
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
@@ -304,7 +303,7 @@ namespace Terminal.Gui {
 
 			this.Move (1, 0, false);
 
-			if (Title == null || string.IsNullOrEmpty (Title)) {
+			if (Title == null || string.IsNullOrEmpty (Title.ToString())) {
 				return;
 			}
 
@@ -372,7 +371,7 @@ namespace Terminal.Gui {
 			this.tbPath.FocusFirst ();
 			this.tbPath.SelectAll ();
 
-			if (Title == null) {
+			if (Title == null || Title == string.Empty) {
 				switch (OpenMode) {
 				case OpenMode.File:
 					this.Title = " OPEN FILE ";
