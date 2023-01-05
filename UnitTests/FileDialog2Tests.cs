@@ -23,7 +23,7 @@ namespace Terminal.Gui.Core {
 			var dlg = GetInitializedFileDialog ();
 
 			Send ('.', ConsoleKey.OemPeriod);
-			Send ('\\', ConsoleKey.Separator,false);
+			SendSlash ();
 
 			// Entering ./ replaces current text with the full path
 			Assert.Equal (Environment.CurrentDirectory + Path.DirectorySeparatorChar, dlg.Path);
@@ -38,6 +38,15 @@ namespace Terminal.Gui.Core {
 			SendEnter ();
 			Assert.False (dlg.Canceled);
 			Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+		}
+
+		private void SendSlash ()
+		{
+			if(Path.DirectorySeparatorChar == '/') {
+				Send ("/");
+			} else {
+				Send ('\\', ConsoleKey.Separator,true);
+			}
 		}
 
 		[Fact, AutoInitShutdown]
