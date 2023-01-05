@@ -271,12 +271,12 @@ namespace Terminal.Gui {
 
 		private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
 		{
-			if(!AllowsMultipleSelection) {
+			if (!AllowsMultipleSelection) {
 				return;
 			}
 
-			MultiSelected = toMultiAccept.Select(s=>s.FileSystemInfo).ToList().AsReadOnly();
-			tbPath.Text = MultiSelected.Count == 1 ? MultiSelected[0].FullName : "";
+			MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
+			tbPath.Text = MultiSelected.Count == 1 ? MultiSelected [0].FullName : "";
 			Canceled = false;
 			Application.RequestStop ();
 		}
@@ -291,7 +291,7 @@ namespace Terminal.Gui {
 		{
 			// if an autocomplete is showing
 			if (tbPath.AcceptSelectionIfAny ()) {
-				
+
 				// enter just accepts it
 				return;
 			}
@@ -374,7 +374,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if(tableView.MultiSelect && tableView.MultiSelectedRegions.Any()) {
+			if (tableView.MultiSelect && tableView.MultiSelectedRegions.Any ()) {
 				return;
 			}
 
@@ -579,8 +579,8 @@ namespace Terminal.Gui {
 			// to streamline user experience and allow direct typing of paths
 			// with zero navigation we start with focus in the text box and any
 			// default/current path fully selected and ready to be overwritten
-			tbPath.FocusFirst ();			
-			tbPath.SelectAll ();			
+			tbPath.FocusFirst ();
+			tbPath.SelectAll ();
 		}
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
@@ -653,10 +653,14 @@ namespace Terminal.Gui {
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
 			var multi = MultiRowToStats ();
-			if(multi.Any()) {
-				Accept (multi);
+			if (multi.Any ()) {
+				if (multi.All (IsCompatibleWithOpenMode)) {
+					Accept (multi);
+				} else {
+					return;
+				}
 			}
-			
+
 
 			var stats = RowToStats (obj.Row);
 
@@ -666,9 +670,25 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if(stats.FileSystemInfo is FileInfo f) {
+			if (stats.FileSystemInfo is FileInfo f) {
 				Accept (f);
 			}
+		}
+
+		private bool IsCompatibleWithOpenMode (FileSystemInfoStats arg)
+		{
+			// don't let the user select .. thats just going to be confusing
+			if (arg.IsParent) {
+				return false;
+			}
+				
+
+			switch (OpenMode) {
+				case OpenMode.Directory: return arg.IsDir();
+				case OpenMode.File: return !arg.IsDir ();
+				case OpenMode.Mixed: return true;
+			default: throw new ArgumentOutOfRangeException(nameof (OpenMode));
+			};
 		}
 
 		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true)
@@ -758,14 +778,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
 		{
-			var toReturn = new HashSet<FileSystemInfoStats>();
+			var toReturn = new HashSet<FileSystemInfoStats> ();
 
-			if(AllowsMultipleSelection && tableView.MultiSelectedRegions.Any()) {
-				
-				foreach(var p in tableView.GetAllSelectedCells()) {
+			if (AllowsMultipleSelection && tableView.MultiSelectedRegions.Any ()) {
 
-					var add = state?.Children[(int)tableView.Table.Rows [p.Y] [0]];
-					if(add != null) {
+				foreach (var p in tableView.GetAllSelectedCells ()) {
+
+					var add = state?.Children [(int)tableView.Table.Rows [p.Y] [0]];
+					if (add != null) {
 						toReturn.Add (add);
 					}
 				}
@@ -809,7 +829,7 @@ namespace Terminal.Gui {
 			// where the FullName is in fact the current working directory.
 			// really not what most users would expect
 
-			if (Regex.IsMatch (path,"^\\w:$")) {
+			if (Regex.IsMatch (path, "^\\w:$")) {
 				return new DirectoryInfo (path + System.IO.Path.DirectorySeparatorChar);
 			}
 
@@ -949,7 +969,7 @@ namespace Terminal.Gui {
 					// allow navigating up as '..'
 					if (dir.Parent != null) {
 						children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
-					}	
+					}
 
 					Children = children.ToArray ();
 				} catch (Exception) {
@@ -1123,8 +1143,8 @@ namespace Terminal.Gui {
 				var ordered =
 					currentSortIsAsc ?
 					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending(f=>f.v.IsParent)
-						.ThenBy(f => sortAlgorithm (f.v))
+						.OrderByDescending (f => f.v.IsParent)
+						.ThenBy (f => sortAlgorithm (f.v))
 						.ToArray () :
 					    stats.Select ((v, i) => new { v, i })
 						.OrderByDescending (f => f.v.IsParent)
