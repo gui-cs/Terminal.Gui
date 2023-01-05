@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,58 +12,50 @@ namespace UICatalog.Scenarios {
 	public class FileDialog2Examples : Scenario {
 		public override void Setup ()
 		{
-			var btnOneFile = new Button ("Select One File") {
-				X = 1,
-				Y = 1
-			};
-			btnOneFile.Clicked += BtnOneFile_Clicked;
-			Win.Add (btnOneFile);
+			var y = 1;
 
-			var btnManyFiles = new Button ("Select Many Files") {
-				X = 1,
-				Y = Pos.Bottom(btnOneFile) + 1
-			};
-			btnManyFiles.Clicked += BtnManyFiles_Clicked;
-			Win.Add (btnManyFiles);
-		}
-
-
-		private void BtnOneFile_Clicked ()
-		{
-			var fd = new FileDialog2 ();
-			Application.Run (fd);
-
-			if (fd.Canceled) {
-				MessageBox.Query (
-					"Dialog Canceled",
-					"You canceled file navigation and did not pick anything",
-				"Yup!");
-			} else {
-				MessageBox.Query (
-					"File chosen!",
-					"You chose " + Environment.NewLine + fd.Path,
-					"Oh yeah!");
+			foreach(var multi in new bool [] {false, true }) {
+				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
+					var btn = new Button ($"Select {(multi?"Many": "One")} {openMode}") {
+						X = 1,
+						Y = y
+					};
+					SetupHandler (btn, openMode, multi);
+					y += 2;
+					Win.Add (btn);
+				}
 			}
 		}
-		private void BtnManyFiles_Clicked ()
-		{
-			var fd = new FileDialog2 {
-				AllowsMultipleSelection = true
-			};
-			Application.Run (fd);
 
-			if (fd.Canceled) {
-				MessageBox.Query (
-					"Dialog Canceled",
-					"You canceled file navigation and did not pick anything",
-				"Yup!");
-			} else {
-				MessageBox.Query (
-					"File chosen!",
-					"You chose " + Environment.NewLine + 
-					string.Join(Environment.NewLine,fd.MultiSelected.Select(m=>m.FullName)),
-					"Oh yeah!");
-			}
+		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti)
+		{
+			btn.Clicked += ()=>{
+				var fd = new FileDialog2 {
+					AllowsMultipleSelection = isMulti,
+					OpenMode = mode,
+				};
+
+				Application.Run (fd);
+
+				if (fd.Canceled) {
+					MessageBox.Query (
+						"Canceled",
+						"You canceled navigation and did not pick anything",
+					"Ok");
+				} else if (isMulti) {
+					MessageBox.Query (
+						"Chosen!",
+						"You chose:" + Environment.NewLine +
+						string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m.FullName)),
+						"Ok");
+				}
+				else{
+					MessageBox.Query (
+						"Chosen!",
+						"You chose:" + Environment.NewLine + fd.Path,
+						"Ok");
+				}
+			};
 		}
 	}
 }

@@ -8,6 +8,8 @@ using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
 using System.Text.RegularExpressions;
+using static Terminal.Gui.OpenDialog;
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 
@@ -16,6 +18,13 @@ namespace Terminal.Gui {
 	/// navigation pane (Recent, Root drives etc).
 	/// </summary>
 	public class FileDialog2 : Dialog {
+
+		/// <summary>
+		/// Determine which <see cref="System.IO.FileSystemInfo"/> type to open.
+		/// Defaults to <see cref="OpenMode.Mixed"/> (i.e. <see cref="DirectoryInfo"/> or
+		/// <see cref="FileInfo"/>).
+		/// </summary>
+		public OpenMode OpenMode { get; set; } = OpenMode.Mixed;
 
 		/// <summary>
 		/// The currently selected path in the dialog.  This is the result that should
@@ -42,15 +51,7 @@ namespace Terminal.Gui {
 		/// not <see cref="AllowsMultipleSelection"/> or <see cref="Canceled"/>.
 		/// </summary>
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
-		public IReadOnlyList<FileSystemInfo> MultiSelected {
-			get {
-				if (!AllowsMultipleSelection || Canceled || state == null) {
-					return new List<FileSystemInfo> ().AsReadOnly ();
-				}
-
-				return state.Selected.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
-			}
-		}
+		public IReadOnlyList<FileSystemInfo> MultiSelected { get; private set; }
 
 		// TODO : expose these somehow for localization without compromising case/switch statements
 		private const string HeaderFilename = "Filename";
@@ -233,8 +234,6 @@ namespace Terminal.Gui {
 			treeView.ColorScheme = ColorSchemeDefault;
 			treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
 
-			// TODO: delay or consider not doing this to avoid double load
-			tbPath.Text = Environment.CurrentDirectory;
 			this.AllowsMultipleSelection = false;
 
 			UpdateNavigationVisibility ();
@@ -270,6 +269,17 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
+		{
+			if(!AllowsMultipleSelection) {
+				return;
+			}
+
+			MultiSelected = toMultiAccept.Select(s=>s.FileSystemInfo).ToList().AsReadOnly();
+			tbPath.Text = MultiSelected.Count == 1 ? MultiSelected[0].FullName : "";
+			Canceled = false;
+			Application.RequestStop ();
+		}
 		private void Accept (FileInfo f)
 		{
 			tbPath.Text = f.FullName;
@@ -279,7 +289,13 @@ namespace Terminal.Gui {
 
 		private void Accept ()
 		{
-			tbPath.AcceptSelectionIfAny ();
+			// if an autocomplete is showing
+			if (tbPath.AcceptSelectionIfAny ()) {
+				
+				// enter just accepts it
+				return;
+			}
+
 			Canceled = false;
 			Application.RequestStop ();
 		}
@@ -298,6 +314,7 @@ namespace Terminal.Gui {
 			if (e.NewValue == null) {
 				return;
 			}
+
 			tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
 		}
 
@@ -354,6 +371,10 @@ namespace Terminal.Gui {
 		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
 		{
 			if (!tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+				return;
+			}
+
+			if(tableView.MultiSelect && tableView.MultiSelectedRegions.Any()) {
 				return;
 			}
 
@@ -444,6 +465,12 @@ namespace Terminal.Gui {
 				return currentFragment != null && HasFocus && CursorIsAtEnd ();
 			}
 
+			/// <summary>
+			/// Accepts the current autocomplete suggestion displaying in the text box.
+			/// Returns true if a valid suggestion was being rendered and acceptable or
+			/// false if no suggestion was showing.
+			/// </summary>
+			/// <returns></returns>
 			internal bool AcceptSelectionIfAny ()
 			{
 				if (MakingSuggestion ()) {
@@ -544,11 +571,16 @@ namespace Terminal.Gui {
 		{
 			base.OnLoaded ();
 
+			// if no path has been provided
+			if (tbPath.Text.Length <= 0) {
+				tbPath.Text = Environment.CurrentDirectory;
+			}
+
 			// to streamline user experience and allow direct typing of paths
 			// with zero navigation we start with focus in the text box and any
 			// default/current path fully selected and ready to be overwritten
 			tbPath.FocusFirst ();			
-			tbPath.SelectAll ();
+			tbPath.SelectAll ();			
 		}
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
@@ -620,6 +652,12 @@ namespace Terminal.Gui {
 
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
+			var multi = MultiRowToStats ();
+			if(multi.Any()) {
+				Accept (multi);
+			}
+			
+
 			var stats = RowToStats (obj.Row);
 
 
@@ -656,7 +694,7 @@ namespace Terminal.Gui {
 					tbPath.MoveCursorToEnd ();
 				}
 
-				state = new FileDialogState (d);
+				state = new FileDialogState (d, OpenMode);
 				tbPath.GenerateSuggestions (state);
 
 				WriteStateToTableView ();
@@ -712,6 +750,29 @@ namespace Terminal.Gui {
 			return ColorSchemeDefault;
 		}
 
+		/// <summary>
+		/// If <see cref="TableView.MultiSelect"/> is on and multiple rows are selected
+		/// this returns a union of all <see cref="FileSystemInfoStats"/> in the selection.
+		/// </summary>
+		/// <remarks>Returns an empty collection if there are not at least 2 rows in the selection</remarks>
+		/// <returns></returns>
+		private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
+		{
+			var toReturn = new HashSet<FileSystemInfoStats>();
+
+			if(AllowsMultipleSelection && tableView.MultiSelectedRegions.Any()) {
+				
+				foreach(var p in tableView.GetAllSelectedCells()) {
+
+					var add = state?.Children[(int)tableView.Table.Rows [p.Y] [0]];
+					if(add != null) {
+						toReturn.Add (add);
+					}
+				}
+			}
+
+			return toReturn.Count > 1 ? toReturn : Enumerable.Empty<FileSystemInfoStats> ();
+		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
 			return state?.Children [(int)tableView.Table.Rows [rowIndex] [0]];
@@ -871,12 +932,19 @@ namespace Terminal.Gui {
 			public List<FileSystemInfoStats> selected = new List<FileSystemInfoStats> ();
 			public IReadOnlyCollection<FileSystemInfoStats> Selected => selected.AsReadOnly ();
 
-			public FileDialogState (DirectoryInfo dir)
+			public FileDialogState (DirectoryInfo dir, OpenMode openMode)
 			{
 				Directory = dir;
 
 				try {
-					var children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					List<FileSystemInfoStats> children;
+
+					// if directories only
+					if (openMode == OpenMode.Directory) {
+						children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					} else {
+						children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					}
 
 					// allow navigating up as '..'
 					if (dir.Parent != null) {
@@ -947,7 +1015,7 @@ namespace Terminal.Gui {
 				var parent = dlg.state?.Directory.Parent;
 				if (parent != null) {
 
-					back.Push (new FileDialogState (parent));
+					back.Push (new FileDialogState (parent, dlg.OpenMode));
 					dlg.PushState (parent, true);
 					return true;
 				}
