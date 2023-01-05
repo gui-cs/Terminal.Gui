@@ -12,7 +12,6 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample app](docfx/images/sample.gif)
 
-
 ## Quick Start
 
 Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
