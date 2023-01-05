@@ -64,16 +64,12 @@ namespace Terminal.Gui {
 		private Label lblBack;
 		private Label lblUp;
 
-		private string title;
-
+		public new string Title { get; set; }
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
 		public FileDialog2 ()
 		{
-			// TODO: handle Save File / Folder too
-			this.title = "Open File";
-
 			const int okWidth = 6;
 
 			var lblPath = new Label (">");
@@ -302,7 +298,11 @@ namespace Terminal.Gui {
 
 			this.Move (1, 0, false);
 
-			var padding = ((bounds.Width - this.title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
+			if (Title == null || string.IsNullOrEmpty (Title)) {
+				return;
+			}
+
+			var padding = ((bounds.Width - this.Title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
 
 			padding = Math.Min (bounds.Width, padding);
 			padding = Math.Max (0, padding);
@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-			Driver.AddStr (this.title);
+			Driver.AddStr (this.Title);
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
@@ -366,6 +366,19 @@ namespace Terminal.Gui {
 			this.tbPath.FocusFirst ();
 			this.tbPath.SelectAll ();
 
+			if (Title == null) {
+				switch (OpenMode) {
+				case OpenMode.File:
+					this.Title = " OPEN FILE ";
+					break;
+				case OpenMode.Directory:
+					this.Title = " OPEN DIRECTORY ";
+					break;
+				case OpenMode.Mixed:
+					this.Title = " OPEN ";
+					break;
+				}
+			}
 		}
 
 		private void SuppressIfBadChar (KeyEventEventArgs k)
@@ -708,7 +721,7 @@ namespace Terminal.Gui {
 			if (d == this.state?.Directory) {
 				return;
 			}
-			if(d.FullName == this.state?.Directory.FullName) {
+			if (d.FullName == this.state?.Directory.FullName) {
 				return;
 			}
 
@@ -735,7 +748,7 @@ namespace Terminal.Gui {
 				if (clearForward) {
 					this.history.ClearForward ();
 				}
-				
+
 				this.tableView.RowOffset = 0;
 				this.tableView.SelectedRow = 0;
 
@@ -816,10 +829,10 @@ namespace Terminal.Gui {
 		{
 			return this.state?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
-		private int? StatsToRow(FileSystemInfoStats stats)
+		private int? StatsToRow (FileSystemInfoStats stats)
 		{
 			// find array index of the current state for the stats
-			var idx = state?.Children.IndexOf ((f)=>f.FileSystemInfo.FullName == stats.FileSystemInfo.FullName);
+			var idx = state?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == stats.FileSystemInfo.FullName);
 
 			if (idx != -1 && idx != null) {
 
@@ -827,8 +840,8 @@ namespace Terminal.Gui {
 				// contains idx
 				var match = tableView.Table.Rows
 					.Cast<DataRow> ()
-					.Select((r, rIdx) => new {row = r, rowIdx = rIdx })
-					.Where (t=>(int)t.row[0] == idx)
+					.Select ((r, rIdx) => new { row = r, rowIdx = rIdx })
+					.Where (t => (int)t.row [0] == idx)
 					.ToArray ();
 
 				if (match.Length == 1) {
@@ -1083,7 +1096,7 @@ namespace Terminal.Gui {
 			public DirectoryInfo Directory { get; }
 
 			public FileSystemInfoStats [] Children { get; private set; }
-			
+
 			internal void RefreshChildren (FileDialog2 parent)
 			{
 				var dir = this.Directory;
@@ -1130,7 +1143,7 @@ namespace Terminal.Gui {
 
 			internal void SetSelection (FileSystemInfoStats stats)
 			{
-				
+
 			}
 		}
 
@@ -1334,12 +1347,12 @@ namespace Terminal.Gui {
 				}
 
 				this.forward.Push (this.dlg.state);
-				this.dlg.PushState (goTo, false,true,false);
+				this.dlg.PushState (goTo, false, true, false);
 
-				if(restoreSelection != null) {
+				if (restoreSelection != null) {
 					this.dlg.RestoreSelection (restoreSelection);
 				}
-				
+
 				return true;
 			}
 
@@ -1352,7 +1365,7 @@ namespace Terminal.Gui {
 			{
 				if (this.forward.Count > 0) {
 
-					this.dlg.PushState (this.forward.Pop ().Directory, true,true,false);
+					this.dlg.PushState (this.forward.Pop ().Directory, true, true, false);
 					return true;
 				}
 
@@ -1390,7 +1403,7 @@ namespace Terminal.Gui {
 					this.back.Push (state);
 					if (clearForward) {
 						this.ClearForward ();
-					}					
+					}
 				}
 			}
 
@@ -1408,8 +1421,8 @@ namespace Terminal.Gui {
 		private void RestoreSelection (FileSystemInfoStats toRestore)
 		{
 			var toReselect = StatsToRow (toRestore);
-			
-			if(toReselect.HasValue) {
+
+			if (toReselect.HasValue) {
 				tableView.SelectedRow = toReselect.Value;
 			}
 		}
