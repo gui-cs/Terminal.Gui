@@ -56,6 +56,11 @@ namespace Terminal.Gui {
 		public bool AllowedTypesIsStrict { get; set; }
 
 		/// <summary>
+		/// The UI selected <see cref="AllowedType"/> from combo box. May be null.
+		/// </summary>
+		private AllowedType currentFilter;
+
+		/// <summary>
 		/// True if the <see cref="FileDialog"/> was closed without confirming a selection
 		/// </summary>
 		public bool Canceled { get; private set; } = true;
@@ -125,8 +130,7 @@ namespace Terminal.Gui {
 		private static char [] badChars = new [] {
 			'"','<','>','|','*','?',
 		};
-
-
+		
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
@@ -617,6 +621,35 @@ namespace Terminal.Gui {
 		{
 			base.OnLoaded ();
 
+			// if filtering on file type is configured then create the ComboBox and establish
+			// initial filtering by extension(s)
+			if (AllowedTypes.Any ()) {
+
+				currentFilter = AllowedTypes [0];
+				var allowed = AllowedTypes.ToList ();
+
+				if (!AllowedTypesIsStrict) {
+					allowed.Insert (0, AllowedType.Any);
+				}
+
+				// +2 to allow space for dropdown arrow
+				var width = AllowedTypes.Max (a => a.ToString ().Length) + 2;
+
+				var combo = new ComboBox (allowed) {
+					Width = width,
+					ReadOnly = true,
+					Y = 1,
+					X = Pos.AnchorEnd (width),
+					Height = allowed.Count + 1,
+					SelectedItem = AllowedTypesIsStrict ? 0 : 1
+				};
+
+				combo.SelectedItemChanged += (e) => Combo_SelectedItemChanged (combo, e);
+
+				Add (combo);
+				LayoutSubviews ();
+			}
+
 			// if no path has been provided
 			if (tbPath.Text.Length <= 0) {
 				tbPath.Text = Environment.CurrentDirectory;
@@ -627,7 +660,23 @@ namespace Terminal.Gui {
 			// default/current path fully selected and ready to be overwritten
 			tbPath.FocusFirst ();
 			tbPath.SelectAll ();
+
 		}
+
+		private void Combo_SelectedItemChanged (ComboBox combo, ListViewItemEventArgs obj)
+		{
+			var allow = combo.Source.ToList () [obj.Item] as AllowedType;
+			currentFilter = allow == null || allow.IsAny ? null : allow;
+
+			tbPath.ClearAllSelection ();
+			tbPath.ClearSuggestions ();
+
+			if (state != null) {
+				state.RefreshChildren (this);
+				WriteStateToTableView ();
+			}
+		}
+
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
@@ -773,7 +822,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			return AllowedTypes.Any (t => t.Extension.Equals (extension));
+			return AllowedTypes.Any (t => t.Matches(extension, false));
 		}
 
 		/// <summary>
@@ -784,7 +833,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MatchesAllowedTypes (FileInfo file)
 		{
-			return AllowedTypes.Any (t => t.Extension.Equals (file.Extension));
+			return AllowedTypes.Any (t => t.Matches(file.Extension, true));
 		}
 
 		private bool IsCompatibleWithOpenMode (string s)
@@ -1074,19 +1123,41 @@ namespace Terminal.Gui {
 			public string Description { get; set; }
 
 			/// <summary>
-			/// Permitted extension (e.g. ".csv")
+			/// Permitted extension(s) (e.g. ".csv")
 			/// </summary>
-			public string Extension { get; set; }
+			public string[] Extensions { get; set; }
+
+			public bool IsAny => this == Any;
+
+			public static AllowedType Any = new AllowedType ("Any Files", ".*");
 
 			/// <summary>
 			/// Creates a new instance of the <see cref="AllowedType"/> class.
 			/// </summary>
 			/// <param name="description"></param>
 			/// <param name="extension"></param>
-			public AllowedType (string description, string extension)
+			public AllowedType (string description, params string[] extensions)
 			{
+				if(extensions.Length == 0) {
+					throw new ArgumentException ("You must supply at least one extension");
+				}
+
 				Description = description;
-				Extension = extension;
+				Extensions = extensions;
+			}
+
+			public override string ToString ()
+			{
+				return $"{Description} ({string.Join(";",Extensions.Select(e=>'*'+e).ToArray())})";
+			}
+
+			internal bool Matches (string extension, bool strict)
+			{
+				if (IsAny) {
+					return !strict;
+				}
+
+				return Extensions.Any (e => e.Equals (extension));
 			}
 		}
 
@@ -1102,25 +1173,41 @@ namespace Terminal.Gui {
 			{
 				Directory = dir;
 
+				RefreshChildren (parent);
+			}
+
+			internal void RefreshChildren (FileDialog2 parent)
+			{
+				var dir = Directory;
+				
+
 				try {
 					List<FileSystemInfoStats> children;
 
 					// if directories only
 					if (parent.OpenMode == OpenMode.Directory) {
 						children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
-					}
-					else {
+					} else {
 						children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
 					}
 
 					// if only allowing specific file types
-					if (parent.AllowedTypes.Any() && parent.AllowedTypesIsStrict && parent.OpenMode == OpenMode.File) {
+					if (parent.AllowedTypes.Any () && parent.AllowedTypesIsStrict && parent.OpenMode == OpenMode.File) {
 
 						children = children.Where (
 							c => c.IsDir () ||
 							(c.FileSystemInfo is FileInfo f && parent.IsCompatibleWithAllowedExtensions (f))
 							).ToList ();
 					}
+
+					// if theres a UI filter in place too
+					if(parent.currentFilter != null) {
+						children = children.Where (
+								c => c.IsDir () ||
+								(c.FileSystemInfo is FileInfo f && parent.currentFilter.Matches (f.Extension,true))
+								).ToList ();
+					}
+
 
 					// allow navigating up as '..'
 					if (dir.Parent != null) {

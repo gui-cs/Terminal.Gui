@@ -57,7 +57,7 @@ namespace UICatalog.Scenarios {
 				};
 
 				if (csv) {
-					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Comma Separated Files", ".csv"));
+					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv",".tsv"));
 					fd.AllowedTypesIsStrict = strict;
 				}
 
