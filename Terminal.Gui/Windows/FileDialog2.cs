@@ -152,7 +152,8 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (1),
 				SplitterDistance = 30,
 			};
-
+			splitContainer.Border.BorderStyle = BorderStyle.None;
+			splitContainer.Border.DrawMarginFrame = false;
 			splitContainer.Panels [0].Visible = false;
 
 			tableView = new TableView () {

@@ -1,14 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using Terminal.Gui;
-using Terminal.Gui.Views;
+using System.Reflection;
 using Xunit;
-using Xunit.Abstractions;
 
 
 namespace Terminal.Gui.Core {
@@ -27,8 +20,9 @@ namespace Terminal.Gui.Core {
 		public void Autocomplete_NoSuggestion_WhenTextMatchesExactly ()
 		{
 			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
+			ForceFocus (tb);
 
-			tb.Text = "c:/fish";
+			tb.Text = "/bob/fish";
 			tb.CursorPosition = tb.Text.Length;
 			tb.GenerateSuggestions (null, "fish", "fishes");
 
@@ -45,13 +39,22 @@ namespace Terminal.Gui.Core {
 		public void Autocomplete_AcceptSuggstion ()
 		{
 			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
+			ForceFocus (tb);
 
-			tb.Text = @"c:/fi";
+			tb.Text = @"/bob/fi";
 			tb.CursorPosition = tb.Text.Length;
 			tb.GenerateSuggestions (null, "fish", "fishes");
 
 			Assert.True (tb.AcceptSelectionIfAny ());
-			Assert.Equal (@"c:\fish", tb.Text);
+			Assert.Equal (@"/bob/fish", tb.Text);
+		}
+
+		private void ForceFocus (View v)
+		{
+			var hasFocus = typeof (View).GetField ("hasFocus", BindingFlags.Instance | BindingFlags.NonPublic)
+				?? throw new Exception ("Could not find expected private member hasFocus");
+
+			hasFocus.SetValue (v, true);
 		}
 
 		private FileDialog2.TextFieldWithAppendAutocomplete GetTextField (FileDialog2 dlg = null)
