@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios {
 
 		private SplitContainer splitContainer;
 
-		private SplitContainer splitContainer2;
+		private SplitContainer nestedSplitContainer;
 		private MenuItem miVertical;
 		private MenuItem miShowBoth;
 		private MenuItem miShowPanel1;
@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill () - 1,
 				SplitterDistance = Pos.Percent (50), // TODO: get this to work with drag resizing and percents
 			};
-			splitContainer2 = new SplitContainer(){
+			nestedSplitContainer = new SplitContainer(){
 				Width = Dim.Fill(),
 				Height = Dim.Fill(),
 				Orientation = Orientation.Horizontal
@@ -53,9 +53,9 @@ namespace UICatalog.Scenarios {
 
 			Label lbl2;
 			splitContainer.Panels [1].Title = "World";
-			splitContainer.Panels[1].Add(splitContainer2);
+			splitContainer.Panels[1].Add(nestedSplitContainer);
 
-			splitContainer2.Panels [0].Add (new TextView ()
+			nestedSplitContainer.Panels [0].Add (new TextView ()
 			 {
 				Width = Dim.Fill(),
 				Height = Dim.Fill(),
@@ -64,13 +64,13 @@ namespace UICatalog.Scenarios {
 				WordWrap = true,
 			 });
 
-			splitContainer2.Border.BorderStyle = BorderStyle.None;
-			splitContainer2.Border.DrawMarginFrame = false;
+			nestedSplitContainer.Border.BorderStyle = BorderStyle.None;
+			nestedSplitContainer.Border.DrawMarginFrame = false;
 			
-			splitContainer2.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
-			splitContainer2.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
-			splitContainer2.Panels [1].Add (new Label ("Here is a Text box:") { Y = 1 });
-			splitContainer2.Panels [1].Add (new TextView () { Y = 2, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
+			nestedSplitContainer.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
+			nestedSplitContainer.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
+			nestedSplitContainer.Panels [1].Add (new Label ("Here is a Text box:") { Y = 1 });
+			nestedSplitContainer.Panels [1].Add (new TextView () { Y = 2, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
 
 			Win.Add (splitContainer);
 
@@ -138,7 +138,7 @@ namespace UICatalog.Scenarios {
 		{
 			miVertical.Checked = !miVertical.Checked;
 			splitContainer.Orientation = miVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
-			splitContainer2.Orientation = miVertical.Checked ? Orientation.Horizontal : Orientation.Vertical;
+			nestedSplitContainer.Orientation = miVertical.Checked ? Orientation.Horizontal : Orientation.Vertical;
 		}
 
 		private void Quit ()
