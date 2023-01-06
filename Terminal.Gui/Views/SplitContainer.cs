@@ -228,6 +228,12 @@ namespace Terminal.Gui {
 				return (Pos)Math.Min (splitterPanels [0].MinSize.Anchor (availableSpace), availableSpace);
 			}
 
+			// if there is a border then 2 screen units are taken occupied
+			// by the border around the edge (one on left, one on right).
+			if (HasBorder ()) {
+				availableSpace -= 2;
+			}
+
 			// bad position because not enough space for splitterPanels[1]
 			if (availableSpace - idealPosition <= splitterPanels [1].MinSize.Anchor (availableSpace)) {
 
@@ -324,18 +330,13 @@ namespace Terminal.Gui {
 				LayoutStarted += (e) => {
 					moveRuneRenderLocation = null;
 					if (Orientation == Orientation.Horizontal) {
-						StartingAnchor = ParentHasBorder () ? Driver.LeftTee : (Rune?)null;
-						EndingAnchor = ParentHasBorder () ? Driver.RightTee : (Rune?)null;
+						StartingAnchor = parent.HasBorder () ? Driver.LeftTee : (Rune?)null;
+						EndingAnchor = parent.HasBorder () ? Driver.RightTee : (Rune?)null;
 					} else {
-						StartingAnchor = ParentHasBorder () ? Driver.TopTee : (Rune?)null;
-						EndingAnchor = ParentHasBorder () ? Driver.BottomTee : (Rune?)null;
+						StartingAnchor = parent.HasBorder () ? Driver.TopTee : (Rune?)null;
+						EndingAnchor = parent.HasBorder () ? Driver.BottomTee : (Rune?)null;
 					}
 				};
-			}
-
-			private bool ParentHasBorder ()
-			{
-				return parent.Border != null && parent.Border.BorderStyle != BorderStyle.None;
 			}
 
 			public override bool ProcessKey (KeyEvent kb)
@@ -518,6 +519,10 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private bool HasBorder ()
+		{
+			return Border != null && Border.BorderStyle != BorderStyle.None;
+		}
 	}
 
 	/// <summary>

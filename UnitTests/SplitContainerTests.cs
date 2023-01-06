@@ -246,6 +246,139 @@ namespace UnitTests {
        │     ";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_Vertical_Panel1MinSize_Absolute_WithBorder ()
+		{
+			var splitContainer = Get11By3SplitContainer (out var line,true);
+			SetInputFocusLine (splitContainer);
+			splitContainer.Panels [0].MinSize = 5;
+
+			// distance is too small (below 5)
+			splitContainer.SplitterDistance = 2;
+
+			// Should bound the value to the minimum distance
+			Assert.Equal (5, splitContainer.SplitterDistance);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			// so should ignore the 2 distance and stick to 5
+			string looksLike =
+@"
+┌─────┬───┐
+│11111◊222│
+└─────┴───┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect because it
+			// would take us below the minimum splitter size
+			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// but we can continue to move the splitter right if we want
+			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+┌──────┬──┐
+│111111◊22│
+└──────┴──┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_Vertical_Panel2MinSize_Absolute ()
+		{
+			var splitContainer = Get11By3SplitContainer (out var line);
+			SetInputFocusLine (splitContainer);
+			splitContainer.Panels [1].MinSize = 6;
+
+			// distance leaves too little space for panel2 (less than 6 would remain)
+			splitContainer.SplitterDistance = 8;
+
+			// Should bound the value to the minimum distance
+			Assert.Equal (4, splitContainer.SplitterDistance);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			// so should ignore the 2 distance and stick to 6
+			string looksLike =
+@"
+1111│222222
+    ◊
+    │     ";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect because it
+			// would take us below the minimum splitter size
+			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// but we can continue to move the splitter left if we want
+			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+111│2222222
+   ◊
+   │     ";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+		[Fact, AutoInitShutdown]
+		public void TestSplitContainer_Vertical_Panel2MinSize_Absolute_WithBorder ()
+		{
+			var splitContainer = Get11By3SplitContainer (out var line, true);
+			SetInputFocusLine (splitContainer);
+			splitContainer.Panels [1].MinSize = 5;
+
+			// distance leaves too little space for panel2 (less than 5 would remain)
+			splitContainer.SplitterDistance = 8;
+
+			// Should bound the value to the minimum distance
+			Assert.Equal (3, splitContainer.SplitterDistance);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			// so should ignore the 2 distance and stick to 6
+			string looksLike =
+@"
+┌───┬─────┐
+│111◊22222│
+└───┴─────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// Keyboard movement on splitter should have no effect because it
+			// would take us below the minimum splitter size
+			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// but we can continue to move the splitter left if we want
+			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			splitContainer.SetNeedsDisplay ();
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			looksLike =
+@"
+┌──┬──────┐
+│11◊222222│
+└──┴──────┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 		}
 		[Fact, AutoInitShutdown]
