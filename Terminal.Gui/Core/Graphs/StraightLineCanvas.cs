@@ -1,0 +1,300 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Terminal.Gui.Graphs {
+
+
+	/// <summary>
+	/// Facilitates box drawing and line intersection detection
+	/// and rendering.
+	/// </summary>
+	public class StraightLineCanvas {
+
+		private List<StraightLine> lines = new List<StraightLine> ();
+		private ConsoleDriver driver;
+
+		public StraightLineCanvas (ConsoleDriver driver)
+		{
+			this.driver = driver;
+		}
+
+		/// <summary>
+		/// Add a new line to the canvas starting at <paramref name="from"/>.
+		/// Use positive <paramref name="length"/> for Right and negative for Left
+		/// when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>.
+		/// Use positive <paramref name="length"/> for Down and negative for Up
+		/// when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>.
+		/// </summary>
+		/// <param name="from">Starting point.</param>
+		/// <param name="length">Length of line.  0 for a dot.  
+		/// Positive for Down/Right.  Negative for Up/Left.</param>
+		/// <param name="orientation">Direction of the line.</param>
+		public void AddLine (Point from, int length, Orientation orientation, BorderStyle style)
+		{
+			lines.Add (new StraightLine (from, length, orientation, style));
+		}
+		/// <summary>
+		/// Evaluate all currently defined lines that lie within 
+		/// <paramref name="inArea"/> and generate a 'bitmap' that
+		/// shows what characters (if any) should be rendered at each
+		/// point so that all lines connect up correctly with appropriate
+		/// intersection symbols.
+		/// <returns></returns>
+		/// </summary>
+		/// <param name="inArea"></param>
+		/// <returns>Map as 2D array where first index is rows and second is column</returns>
+		public Rune? [,] GenerateImage (Rect inArea)
+		{
+			Rune? [,] canvas = new Rune? [inArea.Height, inArea.Width];
+
+			// walk through each pixel of the bitmap
+			for (int y = 0; y < inArea.Height; y++) {
+				for (int x = 0; x < inArea.Width; x++) {
+
+					var intersects = lines
+						.Select (l => l.Intersects (x, y))
+						.Where(i=>i != null)
+						.ToArray();
+
+					// TODO: use Driver and LineStyle to map
+					canvas [x, y] = GetRuneForIntersects (intersects);
+
+				}
+			}
+
+			return canvas;
+		}
+
+		private Rune? GetRuneForIntersects (IntersectionDefinition[] intersects)
+		{
+			if (!intersects.Any ())
+				return null;
+
+			// TODO: merge these intersection types to give correct rune
+
+			return '.';
+		}
+
+		class IntersectionDefinition {
+			/// <summary>
+			/// The point at which the intersection happens
+			/// </summary>
+			public Point Point { get; }
+
+			/// <summary>
+			/// Defines how <see cref="Line"/> position relates
+			/// to <see cref="Point"/>.
+			/// </summary>
+			public IntersectionType Type { get; }
+
+			/// <summary>
+			/// The line that intersects <see cref="Point"/>
+			/// </summary>
+			public StraightLine Line { get; }
+
+			public IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
+			{
+				Point = point;
+				Type = type;
+				Line = line;
+			}
+		}
+
+		/// <summary>
+		/// The type of Rune that we will use before considering
+		/// double width, curved borders etc
+		/// </summary>
+		enum IntersectionRuneType
+		{
+			None,
+			Dot,
+			ULCorner,
+			URCorner,
+			LLCorner,
+			LRCorner,
+			UpperT,
+			LowerT,
+			RightT,
+			LeftT,
+			Crosshair,
+		}
+
+		enum IntersectionType {
+			/// <summary>
+			/// There is no intersection
+			/// </summary>
+			None,
+
+			/// <summary>
+			///  A line passes directly over this point traveling along
+			///  the horizontal axis
+			/// </summary>
+			PassOverHorizontal,
+
+			/// <summary>
+			///  A line passes directly over this point traveling along
+			///  the vertical axis
+			/// </summary>
+			PassOverVertical,
+
+			/// <summary>
+			/// A line starts at this point and is traveling up
+			/// </summary>
+			StartUp,
+
+			/// <summary>
+			/// A line starts at this point and is traveling right
+			/// </summary>
+			StartRight,
+
+			/// <summary>
+			/// A line starts at this point and is traveling down
+			/// </summary>
+			StartDown,
+
+			/// <summary>
+			/// A line starts at this point and is traveling left
+			/// </summary>
+			StartLeft,
+
+			/// <summary>
+			/// A line exists at this point who has 0 length
+			/// </summary>
+			Dot
+		}
+
+		class StraightLine {
+			public Point Start { get; }
+			public int Length { get; }
+			public Orientation Orientation { get; }
+			public BorderStyle Style { get; }
+
+			public StraightLine (Point start, int length, Orientation orientation, BorderStyle style)
+			{
+				this.Start = start;
+				this.Length = length;
+				this.Orientation = orientation;
+				this.Style = style;
+			}
+
+			internal IntersectionDefinition Intersects (int x, int y)
+			{
+				if (IsDot ()) {
+					if (StartsAt (x, y)) {
+						return new IntersectionDefinition (Start, IntersectionType.Dot, this);
+					} else {
+						return null;
+					}
+				}
+
+				switch (Orientation) {
+				case Orientation.Horizontal: return IntersectsHorizontally (x, y);
+				case Orientation.Vertical: return IntersectsVertically (x, y);
+				default: throw new ArgumentOutOfRangeException (nameof (Orientation));
+				}
+
+			}
+
+			private IntersectionDefinition IntersectsHorizontally (int x, int y)
+			{
+				if (Start.Y != y) {
+					return null;
+				} else {
+					if (StartsAt (x, y)) {
+
+						return new IntersectionDefinition (
+							Start,
+							Length < 0 ? IntersectionType.StartLeft : IntersectionType.StartRight,
+							this
+							);
+
+					}
+
+					if (EndsAt (x, y)) {
+
+						return new IntersectionDefinition (
+							Start,
+							Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
+							this
+							);
+
+					} else {
+						var xmin = Math.Min (Start.X, Start.X + Length);
+						var xmax = Math.Max (Start.X, Start.X + Length);
+
+						if (xmin < x && xmax > x) {
+							return new IntersectionDefinition (
+							new Point (x, y),
+							IntersectionType.PassOverHorizontal,
+							this
+							);
+						}
+					}
+
+					return null;
+				}
+			}
+
+			private IntersectionDefinition IntersectsVertically (int x, int y)
+			{
+				if (Start.X != x) {
+					return null;
+				} else {
+					if (StartsAt (x, y)) {
+
+						return new IntersectionDefinition (
+							Start,
+							Length < 0 ? IntersectionType.StartUp : IntersectionType.StartDown,
+							this
+							);
+
+					}
+
+					if (EndsAt (x, y)) {
+
+						return new IntersectionDefinition (
+							Start,
+							Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
+							this
+							);
+
+					} else {
+						var ymin = Math.Min (Start.Y, Start.Y + Length);
+						var ymax = Math.Max (Start.Y, Start.Y + Length);
+
+						if (ymin < y && ymax > y) {
+							return new IntersectionDefinition (
+							new Point (x, y),
+							IntersectionType.PassOverVertical,
+							this
+							);
+						}
+					}
+
+					return null;
+				}
+			}
+
+			private bool EndsAt (int x, int y)
+			{
+				if (Orientation == Orientation.Horizontal) {
+					return Start.X + Length == x && Start.Y == y;
+				}
+
+				return Start.X == x && Start.Y + Length == y;
+			}
+
+			private bool StartsAt (int x, int y)
+			{
+				return Start.X == x && Start.Y == y;
+			}
+
+			private bool IsDot ()
+			{
+				return Length == 0;
+			}
+		}
+	}
+}
