@@ -19,6 +19,9 @@ namespace UICatalog.Scenarios {
 		private MenuItem miShowPanel2;
 		private MenuItem miShowNeither;
 
+		private MenuItem miSplitContainer1Border;
+		private MenuItem minestedSplitContainerBorder;
+
 		/// <summary>
 		/// Setup the scenario.
 		/// </summary>
@@ -84,6 +87,16 @@ namespace UICatalog.Scenarios {
 					Checked = splitContainer.Orientation == Orientation.Vertical,
 					CheckType = MenuItemCheckStyle.Checked
 				},
+				miSplitContainer1Border = new MenuItem ("_Outer Panel Border", "", () => ToggleBorder(miSplitContainer1Border, splitContainer))
+				{
+					Checked = splitContainer.Border.BorderStyle == BorderStyle.Single,
+					CheckType = MenuItemCheckStyle.Checked
+				},
+				minestedSplitContainerBorder = new MenuItem ("_Inner Panel Border", "", () => ToggleBorder(minestedSplitContainerBorder,nestedSplitContainer))
+				{
+					Checked = nestedSplitContainer.Border.BorderStyle == BorderStyle.Single,
+					CheckType = MenuItemCheckStyle.Checked
+				},
 				new MenuBarItem ("_Show", new MenuItem [] {
 						miShowBoth = new MenuItem ("Both", "",()=>{
 							splitContainer.Panels [0].Visible = true;
@@ -139,6 +152,19 @@ namespace UICatalog.Scenarios {
 			miVertical.Checked = !miVertical.Checked;
 			splitContainer.Orientation = miVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
 			nestedSplitContainer.Orientation = miVertical.Checked ? Orientation.Horizontal : Orientation.Vertical;
+		}
+
+		private void ToggleBorder (MenuItem menuItem, SplitContainer splitContainer)
+		{
+			menuItem.Checked = !menuItem.Checked;
+			
+			if(menuItem.Checked) {
+				splitContainer.Border.BorderStyle = BorderStyle.Single;
+				splitContainer.Border.DrawMarginFrame = true;
+			} else {
+				splitContainer.Border.BorderStyle = BorderStyle.None;
+				splitContainer.Border.DrawMarginFrame = false;
+			}
 		}
 
 		private void Quit ()
