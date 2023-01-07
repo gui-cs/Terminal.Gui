@@ -22,15 +22,16 @@ namespace UICatalog.Scenarios {
 
 			var tools = new ToolsView (toolsWidth) {
 				Y = 1,
-				X = Pos.AnchorEnd (toolsWidth+1),
+				X = Pos.AnchorEnd (toolsWidth + 1),
 				Height = Dim.Fill (),
-				Width = Dim.Fill ()				
+				Width = Dim.Fill ()
 			};
 
 
 			tools.ColorChanged += (c) => canvas.SetColor (c);
+			tools.SetHeavy += (b) => canvas.Heavy = b;
 
-			Win.Add(canvas);
+			Win.Add (canvas);
 			Win.Add (tools);
 			Win.Add (new Label (" -Tools-") { X = Pos.AnchorEnd (toolsWidth + 1) });
 		}
@@ -39,6 +40,7 @@ namespace UICatalog.Scenarios {
 
 			StraightLineCanvas grid;
 			public event Action<Color> ColorChanged;
+			public event Action<bool> SetHeavy;
 
 			Dictionary<Point, Color> swatches = new Dictionary<Point, Color> {
 				{ new Point(1,1),Color.Red},
@@ -62,31 +64,45 @@ namespace UICatalog.Scenarios {
 				grid.AddLine (new Point (4, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
 				grid.AddLine (new Point (6, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
 
-
 				grid.AddLine (new Point (0, 4), width, Orientation.Horizontal, BorderStyle.Single);
 			}
 			public override void Redraw (Rect bounds)
 			{
 				base.Redraw (bounds);
 
-				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.Gray, ColorScheme.Normal.Background));
+				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
 				grid.Draw (this, bounds);
 
-				foreach(var swatch in swatches) {
+				foreach (var swatch in swatches) {
 					Driver.SetAttribute (new Terminal.Gui.Attribute (swatch.Value, ColorScheme.Normal.Background));
 					AddRune (swatch.Key.X, swatch.Key.Y, '█');
 				}
+
+				Driver.SetAttribute (new Terminal.Gui.Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
+				AddRune (3, 3, Application.Driver.HDLine);
+				AddRune (5, 3, Application.Driver.HLine);
 			}
 
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 					foreach (var swatch in swatches) {
-						if(mouseEvent.X == swatch.Key.X && mouseEvent.Y == swatch.Key.Y) {
+						if (mouseEvent.X == swatch.Key.X && mouseEvent.Y == swatch.Key.Y) {
 
 							ColorChanged?.Invoke (swatch.Value);
 							return true;
 						}
+					}
+
+					if (mouseEvent.X == 3 && mouseEvent.Y == 3) {
+
+						SetHeavy?.Invoke (true);
+						return true;
+					}
+					if (mouseEvent.X == 5 && mouseEvent.Y == 3) {
+
+						SetHeavy?.Invoke (false);
+						return true;
 					}
 				}
 
@@ -94,16 +110,21 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		class DrawingArea : View
-		{
+		class DrawingArea : View {
 			/// <summary>
 			/// Index into <see cref="canvases"/> by color.
 			/// </summary>
 			Dictionary<Color, int> colorLayers = new Dictionary<Color, int> ();
-			List<StraightLineCanvas> canvases = new List<StraightLineCanvas>();
+			List<StraightLineCanvas> canvases = new List<StraightLineCanvas> ();
 			int currentColor;
 
 			Point? currentLineStart = null;
+
+			/// <summary>
+			/// True to use <see cref="BorderStyle.Double"/> instead of <see cref="BorderStyle.Single"/>
+			/// for lines.
+			/// </summary>
+			public bool Heavy { get; internal set; }
 
 			public DrawingArea ()
 			{
@@ -112,20 +133,20 @@ namespace UICatalog.Scenarios {
 
 			private void AddCanvas (Color c)
 			{
-				if(colorLayers.ContainsKey(c)) {
+				if (colorLayers.ContainsKey (c)) {
 					return;
 				}
 
 				canvases.Add (new StraightLineCanvas (Application.Driver));
-				colorLayers.Add (c, canvases.Count-1);
+				colorLayers.Add (c, canvases.Count - 1);
 				currentColor = canvases.Count - 1;
 			}
 
 			public override void Redraw (Rect bounds)
 			{
 				base.Redraw (bounds);
-				
-				foreach(var kvp in colorLayers) {
+
+				foreach (var kvp in colorLayers) {
 
 					Driver.SetAttribute (new Terminal.Gui.Attribute (kvp.Key, ColorScheme.Normal.Background));
 					canvases [kvp.Value].Draw (this, bounds);
@@ -134,28 +155,31 @@ namespace UICatalog.Scenarios {
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
 
-				if(mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed)) {
-					if(currentLineStart == null) {
-						currentLineStart = new Point(mouseEvent.X,mouseEvent.Y);
+				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+					if (currentLineStart == null) {
+						currentLineStart = new Point (mouseEvent.X, mouseEvent.Y);
 					}
-				}
-				else {
+				} else {
 					if (currentLineStart != null) {
 
 						var start = currentLineStart.Value;
-						var end = new Point(mouseEvent.X, mouseEvent.Y);
+						var end = new Point (mouseEvent.X, mouseEvent.Y);
 						var orientation = Orientation.Vertical;
 						var length = end.Y - start.Y;
 
 						// if line is wider than it is tall switch to horizontal
-						if(Math.Abs(start.X - end.X) > Math.Abs(start.Y - end.Y)) 
-						{
+						if (Math.Abs (start.X - end.X) > Math.Abs (start.Y - end.Y)) {
 							orientation = Orientation.Horizontal;
 							length = end.X - start.X;
 						}
 
 
-						canvases [currentColor].AddLine (start, length, orientation, BorderStyle.Single);
+						canvases [currentColor].AddLine (
+							start,
+							length,
+							orientation,
+							Heavy ? BorderStyle.Double : BorderStyle.Single);
+
 						currentLineStart = null;
 						SetNeedsDisplay ();
 					}
@@ -169,6 +193,7 @@ namespace UICatalog.Scenarios {
 				AddCanvas (c);
 				currentColor = colorLayers [c];
 			}
+
 		}
 	}
 }

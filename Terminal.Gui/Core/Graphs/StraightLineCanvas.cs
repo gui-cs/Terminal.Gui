@@ -94,21 +94,35 @@ namespace Terminal.Gui.Graphs {
 				return null;
 
 			var runeType = GetRuneTypeForIntersects (intersects);
+			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
 
 			switch (runeType) {
-			case IntersectionRuneType.None: return null;
-			case IntersectionRuneType.Dot: return (Rune)'.';
-			case IntersectionRuneType.ULCorner: return driver.ULCorner;
-			case IntersectionRuneType.URCorner: return driver.URCorner;
-			case IntersectionRuneType.LLCorner: return driver.LLCorner;
-			case IntersectionRuneType.LRCorner: return driver.LRCorner;
-			case IntersectionRuneType.TopTee: return driver.TopTee;
-			case IntersectionRuneType.BottomTee: return driver.BottomTee;
-			case IntersectionRuneType.RightTee: return driver.RightTee;
-			case IntersectionRuneType.LeftTee: return driver.LeftTee;
-			case IntersectionRuneType.Crosshair: return '┼';
-			case IntersectionRuneType.HLine: return driver.HLine;
-			case IntersectionRuneType.VLine: return driver.VLine;
+			case IntersectionRuneType.None: 
+				return null;
+			case IntersectionRuneType.Dot: 
+				return (Rune)'.';
+			case IntersectionRuneType.ULCorner:
+				return useDouble ? driver.ULDCorner : driver.ULCorner;
+			case IntersectionRuneType.URCorner: 
+				return useDouble ? driver.URDCorner : driver.URCorner;
+			case IntersectionRuneType.LLCorner: 
+				return useDouble ? driver.LLDCorner : driver.LLCorner;
+			case IntersectionRuneType.LRCorner: 
+				return useDouble ? driver.LRDCorner : driver.LRCorner;
+			case IntersectionRuneType.TopTee: 
+				return useDouble ? '╦' : driver.TopTee;
+			case IntersectionRuneType.BottomTee: 
+				return useDouble ? '╩' : driver.BottomTee;
+			case IntersectionRuneType.RightTee: 
+				return useDouble ? '╣' : driver.RightTee;
+			case IntersectionRuneType.LeftTee: 
+				return useDouble ? '╠' : driver.LeftTee;
+			case IntersectionRuneType.Crosshair: 
+				return useDouble ? '╬' : '┼';
+			case IntersectionRuneType.HLine: 
+				return useDouble ? driver.HDLine : driver.HLine;
+			case IntersectionRuneType.VLine: 
+				return useDouble ? driver.VDLine : driver.VLine;
 			default: throw new ArgumentOutOfRangeException (nameof (runeType));
 			}
 
@@ -120,7 +134,7 @@ namespace Terminal.Gui.Graphs {
 			// ignore dots
 			intersects = intersects.Where (i => i.Type != IntersectionType.Dot).ToArray ();
 
-			var set = new HashSet<IntersectionType>(intersects.Select(i=>i.Type));
+			var set = new HashSet<IntersectionType> (intersects.Select (i => i.Type));
 
 			#region Crosshair Conditions
 			if (Has (set,
@@ -235,7 +249,7 @@ namespace Terminal.Gui.Graphs {
 			}
 			#endregion
 
-			if(All(intersects, Orientation.Horizontal)) {
+			if (All (intersects, Orientation.Horizontal)) {
 				return IntersectionRuneType.HLine;
 			}
 
@@ -246,9 +260,9 @@ namespace Terminal.Gui.Graphs {
 			return IntersectionRuneType.Dot;
 		}
 
-		private bool All (IntersectionDefinition[] intersects, Orientation orientation)
+		private bool All (IntersectionDefinition [] intersects, Orientation orientation)
 		{
-			return intersects.All (i=>i.Line.Orientation == orientation);
+			return intersects.All (i => i.Line.Orientation == orientation);
 		}
 
 		/// <summary>
