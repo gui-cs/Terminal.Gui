@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Terminal.Gui.Graphs {
 
@@ -55,11 +54,11 @@ namespace Terminal.Gui.Graphs {
 
 					var intersects = lines
 						.Select (l => l.Intersects (x, y))
-						.Where(i=>i != null)
-						.ToArray();
+						.Where (i => i != null)
+						.ToArray ();
 
 					// TODO: use Driver and LineStyle to map
-					canvas [x, y] = GetRuneForIntersects (intersects);
+					canvas [y, x] = GetRuneForIntersects (intersects);
 
 				}
 			}
@@ -67,16 +66,175 @@ namespace Terminal.Gui.Graphs {
 			return canvas;
 		}
 
-		private Rune? GetRuneForIntersects (IntersectionDefinition[] intersects)
+		private Rune? GetRuneForIntersects (IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ())
 				return null;
 
-			// TODO: merge these intersection types to give correct rune
+			var runeType = GetRuneTypeForIntersects (intersects);
 
-			return '.';
+			switch (runeType) {
+			case IntersectionRuneType.None: return null;
+			case IntersectionRuneType.Dot: return (Rune)'.';
+			case IntersectionRuneType.ULCorner: return driver.ULCorner;
+			case IntersectionRuneType.URCorner: return driver.URCorner;
+			case IntersectionRuneType.LLCorner: return driver.LLCorner;
+			case IntersectionRuneType.LRCorner: return driver.LRCorner;
+			case IntersectionRuneType.TopTee: return driver.TopTee;
+			case IntersectionRuneType.BottomTee: return driver.BottomTee;
+			case IntersectionRuneType.RightTee: return driver.RightTee;
+			case IntersectionRuneType.LeftTee: return driver.LeftTee;
+			case IntersectionRuneType.Crosshair: return '┼';
+			case IntersectionRuneType.HLine: return driver.HLine;
+			case IntersectionRuneType.VLine: return driver.VLine;
+			default: throw new ArgumentOutOfRangeException (nameof (runeType));
+			}
+
 		}
 
+
+		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
+		{
+			// ignore dots
+			intersects = intersects.Where (i => i.Type != IntersectionType.Dot).ToArray ();
+
+			var set = new HashSet<IntersectionType>(intersects.Select(i=>i.Type));
+
+			#region Crosshair Conditions
+			if (Has (set,
+				IntersectionType.PassOverHorizontal,
+				IntersectionType.PassOverVertical
+				)) {
+				return IntersectionRuneType.Crosshair;
+			}
+
+			if (Has (set,
+				IntersectionType.StartLeft,
+				IntersectionType.StartRight,
+				IntersectionType.StartUp,
+				IntersectionType.StartDown)) {
+				return IntersectionRuneType.Crosshair;
+			}
+			#endregion
+
+
+			#region Corner Conditions
+			if (Exactly (set,
+				IntersectionType.StartRight,
+				IntersectionType.StartDown)) {
+				return IntersectionRuneType.ULCorner;
+			}
+
+			if (Exactly (set,
+				IntersectionType.StartLeft,
+				IntersectionType.StartDown)) {
+				return IntersectionRuneType.URCorner;
+			}
+
+			if (Exactly (set,
+				IntersectionType.StartUp,
+				IntersectionType.StartLeft)) {
+				return IntersectionRuneType.LRCorner;
+			}
+
+			if (Exactly (set,
+				IntersectionType.StartUp,
+				IntersectionType.StartRight)) {
+				return IntersectionRuneType.LLCorner;
+			}
+			#endregion Corner Conditions
+
+			#region T Conditions
+			if (Has (set,
+				IntersectionType.PassOverHorizontal,
+				IntersectionType.StartDown)) {
+				return IntersectionRuneType.TopTee;
+			}
+			if (Has (set,
+				IntersectionType.StartRight,
+				IntersectionType.StartLeft,
+				IntersectionType.StartDown)) {
+				return IntersectionRuneType.TopTee;
+			}
+
+			if (Has (set,
+				IntersectionType.PassOverHorizontal,
+				IntersectionType.StartUp)) {
+				return IntersectionRuneType.BottomTee;
+			}
+			if (Has (set,
+				IntersectionType.StartRight,
+				IntersectionType.StartLeft,
+				IntersectionType.StartUp)) {
+				return IntersectionRuneType.BottomTee;
+			}
+
+
+			if (Has (set,
+				IntersectionType.PassOverVertical,
+				IntersectionType.StartRight)) {
+				return IntersectionRuneType.LeftTee;
+			}
+			if (Has (set,
+				IntersectionType.StartRight,
+				IntersectionType.StartDown,
+				IntersectionType.StartUp)) {
+				return IntersectionRuneType.LeftTee;
+			}
+
+
+			if (Has (set,
+				IntersectionType.PassOverVertical,
+				IntersectionType.StartLeft)) {
+				return IntersectionRuneType.RightTee;
+			}
+			if (Has (set,
+				IntersectionType.StartLeft,
+				IntersectionType.StartDown,
+				IntersectionType.StartUp)) {
+				return IntersectionRuneType.RightTee;
+			}
+			#endregion
+
+			if(All(intersects, Orientation.Horizontal)) {
+				return IntersectionRuneType.HLine;
+			}
+
+			if (All (intersects, Orientation.Vertical)) {
+				return IntersectionRuneType.VLine;
+			}
+
+			return IntersectionRuneType.Dot;
+		}
+
+		private bool All (IntersectionDefinition[] intersects, Orientation orientation)
+		{
+			return intersects.All (i=>i.Line.Orientation == orientation);
+		}
+
+		/// <summary>
+		/// Returns true if the <paramref name="intersects"/> collection has all the <paramref name="types"/>
+		/// specified (i.e. AND).
+		/// </summary>
+		/// <param name="intersects"></param>
+		/// <param name="types"></param>
+		/// <returns></returns>
+		private bool Has (HashSet<IntersectionType> intersects, params IntersectionType [] types)
+		{
+			return types.All (t => intersects.Contains (t));
+		}
+
+		/// <summary>
+		/// Returns true if all requested <paramref name="types"/> appear in <paramref name="intersects"/>
+		/// and there are no additional <see cref="IntersectionRuneType"/>
+		/// </summary>
+		/// <param name="intersects"></param>
+		/// <param name="types"></param>
+		/// <returns></returns>
+		private bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types)
+		{
+			return intersects.SetEquals (types);
+		}
 		class IntersectionDefinition {
 			/// <summary>
 			/// The point at which the intersection happens
@@ -106,19 +264,20 @@ namespace Terminal.Gui.Graphs {
 		/// The type of Rune that we will use before considering
 		/// double width, curved borders etc
 		/// </summary>
-		enum IntersectionRuneType
-		{
+		enum IntersectionRuneType {
 			None,
 			Dot,
 			ULCorner,
 			URCorner,
 			LLCorner,
 			LRCorner,
-			UpperT,
-			LowerT,
-			RightT,
-			LeftT,
+			TopTee,
+			BottomTee,
+			RightTee,
+			LeftTee,
 			Crosshair,
+			HLine,
+			VLine,
 		}
 
 		enum IntersectionType {
