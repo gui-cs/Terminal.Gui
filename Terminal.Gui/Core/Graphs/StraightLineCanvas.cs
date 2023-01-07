@@ -66,6 +66,28 @@ namespace Terminal.Gui.Graphs {
 			return canvas;
 		}
 
+		/// <summary>
+		/// Draws all the lines that lie within the <paramref name="bounds"/> onto
+		/// the <paramref name="view"/> client area.  This method should be called from
+		/// <see cref="View.Redraw(Rect)"/>.
+		/// </summary>
+		/// <param name="view"></param>
+		/// <param name="bounds"></param>
+		public void Draw (View view, Rect bounds)
+		{
+			var runes = GenerateImage (bounds);
+
+			for (int y = bounds.Y; y < bounds.Height; y++) {
+				for (int x = bounds.X; x < bounds.Width; x++) {
+					var rune = runes [y, x];
+
+					if (rune.HasValue) {
+						view.AddRune (x, y, rune.Value);
+					}
+				}
+			}
+		}
+
 		private Rune? GetRuneForIntersects (IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ())
@@ -252,6 +274,7 @@ namespace Terminal.Gui.Graphs {
 		{
 			return intersects.SetEquals (types);
 		}
+
 		class IntersectionDefinition {
 			/// <summary>
 			/// The point at which the intersection happens
