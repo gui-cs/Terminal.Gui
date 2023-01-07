@@ -109,6 +109,23 @@ namespace Terminal.Gui.Graphs {
 			}
 
 			if (Has (set,
+				IntersectionType.PassOverVertical,
+				IntersectionType.StartLeft,
+				IntersectionType.StartRight
+				)) {
+				return IntersectionRuneType.Crosshair;
+			}
+
+			if (Has (set,
+				IntersectionType.PassOverHorizontal,
+				IntersectionType.StartUp,
+				IntersectionType.StartDown
+				)) {
+				return IntersectionRuneType.Crosshair;
+			}
+
+
+			if (Has (set,
 				IntersectionType.StartLeft,
 				IntersectionType.StartRight,
 				IntersectionType.StartUp,
