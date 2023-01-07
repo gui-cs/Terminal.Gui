@@ -131,6 +131,10 @@ namespace Terminal.Gui.Graphs {
 
 		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
 		{
+			if(intersects.All(i=>i.Line.Length == 0)) {
+				return IntersectionRuneType.Dot;
+			}
+
 			// ignore dots
 			intersects = intersects.Where (i => i.Type != IntersectionType.Dot).ToArray ();
 
