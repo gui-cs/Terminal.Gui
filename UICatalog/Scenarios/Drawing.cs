@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios {
 
 
 			tools.ColorChanged += (c) => canvas.SetColor (c);
-			tools.SetHeavy += (b) => canvas.Heavy = b;
+			tools.SetStyle += (b) => canvas.BorderStyle = b;
 
 			Win.Add (canvas);
 			Win.Add (tools);
@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 
 			LineCanvas grid;
 			public event Action<Color> ColorChanged;
-			public event Action<bool> SetHeavy;
+			public event Action<BorderStyle> SetStyle;
 
 			Dictionary<Point, Color> swatches = new Dictionary<Point, Color> {
 				{ new Point(1,1),Color.Red},
@@ -81,6 +81,7 @@ namespace UICatalog.Scenarios {
 				Driver.SetAttribute (new Terminal.Gui.Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
 				AddRune (3, 3, Application.Driver.HDLine);
 				AddRune (5, 3, Application.Driver.HLine);
+				AddRune (7, 3, Application.Driver.ULRCorner);
 			}
 
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
@@ -96,12 +97,17 @@ namespace UICatalog.Scenarios {
 
 					if (mouseEvent.X == 3 && mouseEvent.Y == 3) {
 
-						SetHeavy?.Invoke (true);
+						SetStyle?.Invoke (BorderStyle.Double);
 						return true;
 					}
 					if (mouseEvent.X == 5 && mouseEvent.Y == 3) {
 
-						SetHeavy?.Invoke (false);
+						SetStyle?.Invoke (BorderStyle.Single);
+						return true;
+					}
+					if (mouseEvent.X == 7 && mouseEvent.Y == 3) {
+
+						SetStyle?.Invoke (BorderStyle.Rounded);
 						return true;
 					}
 				}
@@ -120,11 +126,7 @@ namespace UICatalog.Scenarios {
 
 			Point? currentLineStart = null;
 
-			/// <summary>
-			/// True to use <see cref="BorderStyle.Double"/> instead of <see cref="BorderStyle.Single"/>
-			/// for lines.
-			/// </summary>
-			public bool Heavy { get; internal set; }
+			public BorderStyle BorderStyle { get; internal set; }
 
 			public DrawingArea ()
 			{
@@ -178,7 +180,7 @@ namespace UICatalog.Scenarios {
 							start,
 							length,
 							orientation,
-							Heavy ? BorderStyle.Double : BorderStyle.Single);
+							BorderStyle);
 
 						currentLineStart = null;
 						SetNeedsDisplay ();
