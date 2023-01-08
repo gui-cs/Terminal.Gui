@@ -6,7 +6,7 @@ using Terminal.Gui.Graphs;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Drawing", Description: "Demonstrates StraightLineCanvas.")]
+	[ScenarioMetadata (Name: "Drawing", Description: "Demonstrates LineCanvas.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Layout")]
 	public class Drawing : Scenario {
