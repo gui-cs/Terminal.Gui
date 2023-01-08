@@ -7,7 +7,7 @@ namespace Terminal.Gui.Graphs {
 
 	/// <summary>
 	/// Facilitates box drawing and line intersection detection
-	/// and rendering.
+	/// and rendering.  Does not support diagonal lines.
 	/// </summary>
 	public class LineCanvas {
 
@@ -31,6 +31,7 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="length">Length of line.  0 for a dot.  
 		/// Positive for Down/Right.  Negative for Up/Left.</param>
 		/// <param name="orientation">Direction of the line.</param>
+		/// <param name="style">The style of line to use</param>
 		public void AddLine (Point from, int length, Orientation orientation, BorderStyle style)
 		{
 			lines.Add (new StraightLine (from, length, orientation, style));
