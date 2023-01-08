@@ -156,6 +156,41 @@ namespace Terminal.Gui.Core {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
+		/// <summary>
+		/// Demonstrates when <see cref="BorderStyle.Rounded"/> corners are used. Notice how
+		/// not all lines declare rounded.  If there are 1+ lines intersecting and a corner is
+		/// to be used then if any of them are rounded a rounded corner is used.
+		/// </summary>
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_Window_Rounded ()
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Rounded);
+			
+			// BorderStyle.Single is ignored because corner overlaps with the above line which is Rounded
+			// this results in a rounded corner being used.
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single); 
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Rounded);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Single);
+
+			// These lines say rounded but they will result in the T sections which are never rounded.
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Rounded);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Rounded);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+╭────┬───╮
+│    │   │
+├────┼───┤
+│    │   │
+╰────┴───╯";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TestLineCanvas_Window_Double ()
 		{

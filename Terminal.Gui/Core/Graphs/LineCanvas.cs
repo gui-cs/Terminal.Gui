@@ -97,6 +97,7 @@ namespace Terminal.Gui.Graphs {
 
 			var runeType = GetRuneTypeForIntersects (intersects);
 			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
+			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
 
 			switch (runeType) {
 			case IntersectionRuneType.None: 
@@ -104,13 +105,13 @@ namespace Terminal.Gui.Graphs {
 			case IntersectionRuneType.Dot: 
 				return (Rune)'.';
 			case IntersectionRuneType.ULCorner:
-				return useDouble ? driver.ULDCorner : driver.ULCorner;
+				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
 			case IntersectionRuneType.URCorner: 
-				return useDouble ? driver.URDCorner : driver.URCorner;
+				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
 			case IntersectionRuneType.LLCorner: 
-				return useDouble ? driver.LLDCorner : driver.LLCorner;
+				return useDouble ? driver.LLDCorner : useRounded ? driver.LLRCorner : driver.LLCorner;
 			case IntersectionRuneType.LRCorner: 
-				return useDouble ? driver.LRDCorner : driver.LRCorner;
+				return useDouble ? driver.LRDCorner : useRounded ? driver.LRRCorner : driver.LRCorner;
 			case IntersectionRuneType.TopTee: 
 				return useDouble ? '╦' : driver.TopTee;
 			case IntersectionRuneType.BottomTee: 
