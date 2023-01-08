@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 
 		class ToolsView : View {
 
-			StraightLineCanvas grid;
+			LineCanvas grid;
 			public event Action<Color> ColorChanged;
 			public event Action<bool> SetHeavy;
 
@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 
 			public ToolsView (int width)
 			{
-				grid = new StraightLineCanvas (Application.Driver);
+				grid = new LineCanvas (Application.Driver);
 
 				grid.AddLine (new Point (0, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
 				grid.AddLine (new Point (0, 0), width, Orientation.Horizontal, BorderStyle.Single);
@@ -115,7 +115,7 @@ namespace UICatalog.Scenarios {
 			/// Index into <see cref="canvases"/> by color.
 			/// </summary>
 			Dictionary<Color, int> colorLayers = new Dictionary<Color, int> ();
-			List<StraightLineCanvas> canvases = new List<StraightLineCanvas> ();
+			List<LineCanvas> canvases = new List<LineCanvas> ();
 			int currentColor;
 
 			Point? currentLineStart = null;
@@ -137,7 +137,7 @@ namespace UICatalog.Scenarios {
 					return;
 				}
 
-				canvases.Add (new StraightLineCanvas (Application.Driver));
+				canvases.Add (new LineCanvas (Application.Driver));
 				colorLayers.Add (c, canvases.Count - 1);
 				currentColor = canvases.Count - 1;
 			}

@@ -9,12 +9,13 @@ namespace Terminal.Gui.Graphs {
 	/// Facilitates box drawing and line intersection detection
 	/// and rendering.
 	/// </summary>
-	public class StraightLineCanvas {
+	public class LineCanvas {
 
+		
 		private List<StraightLine> lines = new List<StraightLine> ();
 		private ConsoleDriver driver;
 
-		public StraightLineCanvas (ConsoleDriver driver)
+		public LineCanvas (ConsoleDriver driver)
 		{
 			this.driver = driver;
 		}
