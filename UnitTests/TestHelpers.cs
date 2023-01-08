@@ -10,37 +10,76 @@ using Rune = System.Rune;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Diagnostics;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
-// automatically call Application.Init before called and Application.Shutdown after
+// automatically call Application.Init at start of the test and Application.Shutdown after the
+// test exits. 
 // 
 // This is necessary because a) Application is a singleton and Init/Shutdown must be called
-// as a pair, and b) all unit test functions should be atomic.
+// as a pair, and b) all unit test functions should be atomic..
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+	/// <summary>
+	/// Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and
+	/// Application.Shutdown are automatically called Before/After a test runs.
+	/// </summary>
+	/// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
+	/// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
+	/// <param name="consoleDriverType">Determins which ConsoleDriver (FakeDriver, WindowsDriver, 
+	/// CursesDriver, NetDriver) will be used when Appliation.Init is called. If null FakeDriver will be used.
+	/// Only valid if <paramref name="autoInit"/> is true.</param>
+	/// <param name="useFakeClipboard">If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. 
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// <param name="fakeClipboardAlwaysThrowsNotSupportedException">Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
+		Type consoleDriverType = null, 
+		bool useFakeClipboard = false, 
+		bool fakeClipboardAlwaysThrowsNotSupportedException = false, 
+		bool fakeClipboardIsSupportedAlwaysTrue = false)
+	{
+		//Assert.True (autoInit == false && consoleDriverType == null);
+
+		AutoInit = autoInit;
+		AutoShutdown = autoShutdown;
+		DriverType = consoleDriverType ?? typeof (FakeDriver);
+		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
+		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
+		FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+	}
 
 	static bool _init = false;
+	bool AutoInit { get; }
+	bool AutoShutdown { get;  }
+	Type DriverType;
+
 	public override void Before (MethodInfo methodUnderTest)
 	{
-		if (_init) {
-			throw new InvalidOperationException ("After did not run.");
+		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+		if (AutoShutdown && _init) {
+			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
 		}
-
-		Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-		_init = true;
+		if (AutoInit) {
+			Application.Init ((ConsoleDriver)Activator.CreateInstance (DriverType));
+			_init = true;
+		}
 	}
 
 	public override void After (MethodInfo methodUnderTest)
 	{
-		Application.Shutdown ();
-		_init = false;
+		Debug.WriteLine ($"After: {methodUnderTest.Name}");
+		if (AutoShutdown) {
+			Application.Shutdown ();
+			_init = false;
+		}
 	}
 }
 
 class TestHelpers {
-
-
 #pragma warning disable xUnit1013 // Public method should be marked as test
 	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output)
 	{
@@ -53,7 +92,15 @@ class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				sb.Append ((char)contents [r, c, 0]);
+				Rune rune = contents [r, c, 0];
+				if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+					sb.Append (spair);
+				} else {
+					sb.Append ((char)rune);
+				}
+				if (Rune.ColumnWidth (rune) > 1) {
+					c++;
+				}
 			}
 			sb.AppendLine ();
 		}
@@ -82,7 +129,7 @@ class TestHelpers {
 
 	public static Rect AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output)
 	{
-		var lines = new List<List<char>> ();
+		var lines = new List<List<Rune>> ();
 		var sb = new StringBuilder ();
 		var driver = ((FakeDriver)Application.Driver);
 		var x = -1;
@@ -93,15 +140,15 @@ class TestHelpers {
 		var contents = driver.Contents;
 
 		for (int r = 0; r < driver.Rows; r++) {
-			var runes = new List<char> ();
+			var runes = new List<Rune> ();
 			for (int c = 0; c < driver.Cols; c++) {
-				var rune = (char)contents [r, c, 0];
+				var rune = (Rune)contents [r, c, 0];
 				if (rune != ' ') {
 					if (x == -1) {
 						x = c;
 						y = r;
 						for (int i = 0; i < c; i++) {
-							runes.InsertRange (i, new List<char> () { ' ' });
+							runes.InsertRange (i, new List<Rune> () { ' ' });
 						}
 					}
 					if (Rune.ColumnWidth (rune) > 1) {
@@ -130,7 +177,7 @@ class TestHelpers {
 
 		// Remove trailing whitespace on each line
 		for (int r = 0; r < lines.Count; r++) {
-			List<char> row = lines [r];
+			List<Rune> row = lines [r];
 			for (int c = row.Count - 1; c >= 0; c--) {
 				var rune = row [c];
 				if (rune != ' ' || (row.Sum (x => Rune.ColumnWidth (x)) == w)) {
@@ -140,9 +187,9 @@ class TestHelpers {
 			}
 		}
 
-		// Convert char list to string
+		// Convert Rune list to string
 		for (int r = 0; r < lines.Count; r++) {
-			var line = new string (lines [r].ToArray ());
+			var line = NStack.ustring.Make (lines [r]).ToString ();
 			if (r == lines.Count - 1) {
 				sb.Append (line);
 			} else {

@@ -252,7 +252,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void ForceValidatePosDim_True_Dim_Validation_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -292,7 +292,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -313,7 +313,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -346,7 +346,7 @@ namespace Terminal.Gui.Core {
 		{
 			// Testing with the Button because it properly handles the Dim class.
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -541,7 +541,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void DimCombine_Do_Not_Throws ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -588,7 +588,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void PosCombine_Will_Throws ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -622,7 +622,7 @@ namespace Terminal.Gui.Core {
 		public void Dim_Add_Operator ()
 		{
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 
@@ -989,7 +989,7 @@ namespace Terminal.Gui.Core {
 		public void Dim_Add_Operator_With_Text ()
 		{
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 
@@ -1056,7 +1056,7 @@ namespace Terminal.Gui.Core {
 		public void Dim_Subtract_Operator ()
 		{
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 
@@ -1116,7 +1116,7 @@ namespace Terminal.Gui.Core {
 		public void Dim_Subtract_Operator_With_Text ()
 		{
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
 

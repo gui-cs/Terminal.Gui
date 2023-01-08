@@ -1,28 +1,4 @@
-//
 // TextView.cs: multi-line text editing
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// 
-// TODO:
-// In ReadOnly mode backspace/space behave like pageup/pagedown
-// Attributed text on spans
-// Replace insertion with Insert method
-// String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
-// Alt-D, Alt-Backspace
-// API to set the cursor position
-// API to scroll to a particular place
-// keybindings to go to top/bottom
-// public API to insert, remove ranges
-// Add word forward/word backwards commands
-// Save buffer API
-// Mouse
-//
-// Desirable:
-//   Move all the text manipulation into the TextModel
-
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -33,6 +9,7 @@ using System.Text;
 using System.Threading;
 using NStack;
 using Terminal.Gui.Resources;
+using static Terminal.Gui.Graphs.PathAnnotation;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
@@ -742,6 +719,7 @@ namespace Terminal.Gui {
 			historyTextItems.Clear ();
 			idxHistoryText = -1;
 			originalText = text;
+			OnChangeText (null);
 		}
 
 		public bool IsDirty (ustring text)
@@ -873,7 +851,7 @@ namespace Terminal.Gui {
 			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
 			int modelCol = 0;
 
-			for (int i = firstLine; i <= line; i++) {
+			for (int i = firstLine; i <= Math.Min (line, wrappedModelLines.Count - 1); i++) {
 				var wLine = wrappedModelLines [i];
 
 				if (i < line) {
@@ -1037,120 +1015,119 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///   Multi-line text editing <see cref="View"/>
+	///  Multi-line text editing <see cref="View"/>.
 	/// </summary>
 	/// <remarks>
-	///   <para>
-	///     <see cref="TextView"/> provides a multi-line text editor. Users interact
-	///     with it with the standard Emacs commands for movement or the arrow
-	///     keys. 
-	///   </para> 
-	///   <list type="table"> 
-	///     <listheader>
-	///       <term>Shortcut</term>
-	///       <description>Action performed</description>
-	///     </listheader>
-	///     <item>
-	///        <term>Left cursor, Control-b</term>
-	///        <description>
-	///          Moves the editing point left.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Right cursor, Control-f</term>
-	///        <description>
-	///          Moves the editing point right.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-b</term>
-	///        <description>
-	///          Moves one word back.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-f</term>
-	///        <description>
-	///          Moves one word forward.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Up cursor, Control-p</term>
-	///        <description>
-	///          Moves the editing point one line up.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Down cursor, Control-n</term>
-	///        <description>
-	///          Moves the editing point one line down
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Home key, Control-a</term>
-	///        <description>
-	///          Moves the cursor to the beginning of the line.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>End key, Control-e</term>
-	///        <description>
-	///          Moves the cursor to the end of the line.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-Home</term>
-	///        <description>
-	///          Scrolls to the first line and moves the cursor there.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-End</term>
-	///        <description>
-	///          Scrolls to the last line and moves the cursor there.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Delete, Control-d</term>
-	///        <description>
-	///          Deletes the character in front of the cursor.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Backspace</term>
-	///        <description>
-	///          Deletes the character behind the cursor.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-k</term>
-	///        <description>
-	///          Deletes the text until the end of the line and replaces the kill buffer
-	///          with the deleted text.   You can paste this text in a different place by
-	///          using Control-y.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-y</term>
-	///        <description>
-	///           Pastes the content of the kill ring into the current position.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Alt-d</term>
-	///        <description>
-	///           Deletes the word above the cursor and adds it to the kill ring.  You 
-	///           can paste the contents of the kill ring with Control-y.
-	///        </description>
-	///     </item>
-	///     <item>
-	///        <term>Control-q</term>
-	///        <description>
-	///          Quotes the next input character, to prevent the normal processing of
-	///          key handling to take place.
-	///        </description>
-	///     </item>
-	///   </list>
+	///  <para>
+	///   <see cref="TextView"/> provides a multi-line text editor. Users interact
+	///   with it with the standard Windows, Mac, and Linux (Emacs) commands. 
+	///  </para> 
+	///  <list type="table"> 
+	///   <listheader>
+	///    <term>Shortcut</term>
+	///    <description>Action performed</description>
+	///   </listheader>
+	///   <item>
+	///    <term>Left cursor, Control-b</term>
+	///    <description>
+	///     Moves the editing point left.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Right cursor, Control-f</term>
+	///    <description>
+	///     Moves the editing point right.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-b</term>
+	///    <description>
+	///     Moves one word back.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-f</term>
+	///    <description>
+	///     Moves one word forward.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Up cursor, Control-p</term>
+	///    <description>
+	///     Moves the editing point one line up.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Down cursor, Control-n</term>
+	///    <description>
+	///     Moves the editing point one line down
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Home key, Control-a</term>
+	///    <description>
+	///     Moves the cursor to the beginning of the line.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>End key, Control-e</term>
+	///    <description>
+	///     Moves the cursor to the end of the line.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-Home</term>
+	///    <description>
+	///     Scrolls to the first line and moves the cursor there.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-End</term>
+	///    <description>
+	///     Scrolls to the last line and moves the cursor there.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Delete, Control-d</term>
+	///    <description>
+	///     Deletes the character in front of the cursor.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Backspace</term>
+	///    <description>
+	///     Deletes the character behind the cursor.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-k</term>
+	///    <description>
+	///     Deletes the text until the end of the line and replaces the kill buffer
+	///     with the deleted text. You can paste this text in a different place by
+	///     using Control-y.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-y</term>
+	///    <description>
+	///      Pastes the content of the kill ring into the current position.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Alt-d</term>
+	///    <description>
+	///      Deletes the word above the cursor and adds it to the kill ring. You 
+	///      can paste the contents of the kill ring with Control-y.
+	///    </description>
+	///   </item>
+	///   <item>
+	///    <term>Control-q</term>
+	///    <description>
+	///     Quotes the next input character, to prevent the normal processing of
+	///     key handling to take place.
+	///    </description>
+	///   </item>
+	///  </list>
 	/// </remarks>
 	public class TextView : View {
 		TextModel model = new TextModel ();
@@ -1172,9 +1149,23 @@ namespace Terminal.Gui {
 		CultureInfo currentCulture;
 
 		/// <summary>
-		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
+		/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
 		/// </summary>
+		/// <remarks>
+		/// The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly
+		/// set, not as the user types. To be notified as the user changes the contents of the TextView
+		/// see <see cref="IsDirty"/>.
+		/// </remarks>
 		public event Action TextChanged;
+
+		/// <summary>
+		///  Raised when the contents of the <see cref="TextView"/> are changed. 
+		/// </summary>
+		/// <remarks>
+		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
+		/// otherwise changes the contents of the <see cref="TextView"/>.
+		/// </remarks>
+		public event Action<ContentsChangedEventArgs> ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
@@ -1183,22 +1174,12 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position.  Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-#if false
 		/// <summary>
-		///   Changed event, raised when the text has clicked.
-		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the text in the entry changes.
-		/// </remarks>
-		public Action Changed;
-#endif
-		/// <summary>
-		///   Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
+		///  Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -1208,8 +1189,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a <see cref="TextView"/> on the specified area, 
-		///   with dimensions controlled with the X, Y, Width and Height properties.
+		///  Initializes a <see cref="TextView"/> on the specified area, 
+		///  with dimensions controlled with the X, Y, Width and Height properties.
 		/// </summary>
 		public TextView () : base ()
 		{
@@ -1404,48 +1385,56 @@ namespace Terminal.Gui {
 
 		private void Model_LinesLoaded ()
 		{
-			historyText.Clear (Text);
+			// This call is not needed. Model_LinesLoaded gets invoked when
+			// model.LoadString (value) is called. LoadString is called from one place
+			// (Text.set) and historyText.Clear() is called immediately after.
+			// If this call happens, HistoryText_ChangeText will get called multiple times
+			// when Text is set, which is wrong.
+			//historyText.Clear (Text);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
 			SetWrapModel ();
 
-			var startLine = obj.CursorPosition.Y;
+			if (obj != null) {
+				var startLine = obj.CursorPosition.Y;
 
-			if (obj.RemovedOnAdded != null) {
-				int offset;
-				if (obj.IsUndoing) {
-					offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
-				} else {
-					offset = obj.RemovedOnAdded.Lines.Count - 1;
-				}
-				for (int i = 0; i < offset; i++) {
-					if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
-						model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+				if (obj.RemovedOnAdded != null) {
+					int offset;
+					if (obj.IsUndoing) {
+						offset = Math.Max (obj.RemovedOnAdded.Lines.Count - obj.Lines.Count, 1);
 					} else {
-						break;
+						offset = obj.RemovedOnAdded.Lines.Count - 1;
+					}
+					for (int i = 0; i < offset; i++) {
+						if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
+							model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+						} else {
+							break;
+						}
 					}
 				}
-			}
 
-			for (int i = 0; i < obj.Lines.Count; i++) {
-				if (i == 0) {
-					model.ReplaceLine (startLine, obj.Lines [i]);
-				} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
-						|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
-					model.AddLine (startLine, obj.Lines [i]);
-				} else if (Lines > obj.CursorPosition.Y + 1) {
-					model.RemoveLine (obj.CursorPosition.Y + 1);
+				for (int i = 0; i < obj.Lines.Count; i++) {
+					if (i == 0) {
+						model.ReplaceLine (startLine, obj.Lines [i]);
+					} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
+							|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+						model.AddLine (startLine, obj.Lines [i]);
+					} else if (Lines > obj.CursorPosition.Y + 1) {
+						model.RemoveLine (obj.CursorPosition.Y + 1);
+					}
+					startLine++;
 				}
-				startLine++;
-			}
 
-			CursorPosition = obj.FinalCursorPosition;
+				CursorPosition = obj.FinalCursorPosition;
+			}
 
 			UpdateWrapModel ();
 
 			Adjust ();
+			OnContentsChanged ();
 		}
 
 		void TextView_Initialized (object sender, EventArgs e)
@@ -1454,6 +1443,7 @@ namespace Terminal.Gui {
 
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			OnContentsChanged ();
 		}
 
 		void Top_AlternateBackwardKeyChanged (Key obj)
@@ -1480,9 +1470,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Sets or gets the text in the <see cref="TextView"/>.
+		///  Sets or gets the text in the <see cref="TextView"/>.
 		/// </summary>
 		/// <remarks>
+		/// The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however,
+		/// that Text is not set by <see cref="TextView"/> as the user types.
 		/// </remarks>
 		public override ustring Text {
 			get {
@@ -1559,12 +1551,12 @@ namespace Terminal.Gui {
 		public int Maxlength => model.GetMaxVisibleLine (topRow, topRow + Frame.Height, TabWidth);
 
 		/// <summary>
-		/// Gets the  number of lines.
+		/// Gets the number of lines.
 		/// </summary>
 		public int Lines => model.Count;
 
 		/// <summary>
-		///    Sets or gets the current cursor position.
+		///  Sets or gets the current cursor position.
 		/// </summary>
 		public Point CursorPosition {
 			get => new Point (currentColumn, currentRow);
@@ -1828,7 +1820,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Loads the contents of the file into the  <see cref="TextView"/>.
+		/// Loads the contents of the file into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="path">Path to the file to load.</param>
@@ -1838,6 +1830,7 @@ namespace Terminal.Gui {
 			try {
 				SetWrapModel ();
 				res = model.LoadFile (path);
+				historyText.Clear (Text);
 				ResetPosition ();
 			} catch (Exception) {
 				throw;
@@ -1850,19 +1843,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Loads the contents of the stream into the  <see cref="TextView"/>.
+		/// Loads the contents of the stream into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="stream">Stream to load the contents from.</param>
 		public void LoadStream (Stream stream)
 		{
 			model.LoadStream (stream);
+			historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
 		}
 
 		/// <summary>
-		/// Closes the contents of the stream into the  <see cref="TextView"/>.
+		/// Closes the contents of the stream into the <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 		public bool CloseFile ()
@@ -1874,7 +1868,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    Gets the current cursor row.
+		///  Gets the current cursor row.
 		/// </summary>
 		public int CurrentRow => currentRow;
 
@@ -1885,7 +1879,7 @@ namespace Terminal.Gui {
 		public int CurrentColumn => currentColumn;
 
 		/// <summary>
-		///   Positions the cursor on the current row and column
+		///  Positions the cursor on the current row and column
 		/// </summary>
 		public override void PositionCursor ()
 		{
@@ -1936,7 +1930,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the driver to the default color for the control where no text is being rendered.  Defaults to <see cref="ColorScheme.Normal"/>.
+		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		protected virtual void SetNormalColor ()
 		{
@@ -1945,7 +1939,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		/// <param name="line"></param>
@@ -1957,7 +1951,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
 		/// <param name="line"></param>
@@ -1969,7 +1963,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
 		/// <param name="line"></param>
@@ -1987,7 +1981,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>.  Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.HotFocus"/>.
 		/// </summary>
 		/// <param name="line"></param>
@@ -2000,7 +1994,7 @@ namespace Terminal.Gui {
 		bool isReadOnly = false;
 
 		/// <summary>
-		/// Gets or sets whether the  <see cref="TextView"/> is in read-only mode or not
+		/// Gets or sets whether the <see cref="TextView"/> is in read-only mode or not
 		/// </summary>
 		/// <value>Boolean value(Default false)</value>
 		public bool ReadOnly {
@@ -2504,6 +2498,12 @@ namespace Terminal.Gui {
 
 				InsertText (new KeyEvent () { Key = key });
 			}
+
+			if (NeedDisplay.IsEmpty) {
+				PositionCursor ();
+			} else {
+				Adjust ();
+			}
 		}
 
 		void Insert (Rune rune)
@@ -2521,6 +2521,7 @@ namespace Terminal.Gui {
 			if (!wrapNeeded) {
 				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
 			}
+
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
@@ -2583,6 +2584,8 @@ namespace Terminal.Gui {
 				}
 
 				UpdateWrapModel ();
+
+				OnContentsChanged ();
 
 				return;
 			}
@@ -2690,6 +2693,42 @@ namespace Terminal.Gui {
 			OnUnwrappedCursorPosition ();
 		}
 
+		/// <summary>
+		/// Event arguments for events for when the contents of the TextView change. E.g. the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public class ContentsChangedEventArgs : EventArgs {
+			/// <summary>
+			/// Creates a new <see cref="ContentsChanged"/> instance.
+			/// </summary>
+			/// <param name="currentRow">Contains the row where the change occurred.</param>
+			/// <param name="currentColumn">Contains the column where the change occured.</param>
+			public ContentsChangedEventArgs (int currentRow, int currentColumn)
+			{
+				Row = currentRow;
+				Col = currentColumn;
+			}
+
+			/// <summary>
+			/// 
+			/// Contains the row where the change occurred.
+			/// </summary>
+			public int Row { get; private set; }
+
+			/// <summary>
+			/// Contains the column where the change occurred.
+			/// </summary>
+			public int Col { get; private set; }
+		}
+
+		/// <summary>
+		/// Called when the contents of the TextView change. E.g. when the user types text or deletes text. Raises
+		/// the <see cref="ContentsChanged"/> event.
+		/// </summary>
+		public virtual void OnContentsChanged ()
+		{
+			ContentsChanged?.Invoke (new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
+		}
+
 		(int width, int height) OffSetBackground ()
 		{
 			int w = 0;
@@ -2708,7 +2747,7 @@ namespace Terminal.Gui {
 		/// will scroll the <see cref="TextView"/> to display the specified column at the left if <paramref name="isRow"/> is false.
 		/// </summary>
 		/// <param name="idx">Row that should be displayed at the top or Column that should be displayed at the left,
-		///  if the value is negative it will be reset to zero</param>
+		/// if the value is negative it will be reset to zero</param>
 		/// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
 		public void ScrollTo (int idx, bool isRow = true)
 		{
@@ -3178,6 +3217,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 			return true;
 		}
 
@@ -3674,6 +3714,7 @@ namespace Terminal.Gui {
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
+			OnContentsChanged ();
 
 			return true;
 		}
@@ -3883,6 +3924,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 			selecting = false;
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -3913,6 +3955,7 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+				OnContentsChanged ();
 			} else {
 				if (selecting) {
 					ClearRegion ();
@@ -4422,6 +4465,7 @@ namespace Terminal.Gui {
 			historyText?.Clear (Text);
 		}
 	}
+
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

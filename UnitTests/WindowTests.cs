@@ -153,5 +153,88 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (expected, r.Title.ToString ());
 			r.Dispose ();
 		}
+
+		[Fact,AutoInitShutdown]
+		public void MenuBar_And_StatusBar_Inside_Window ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("Open", "", null),
+					new MenuItem ("Quit", "", null),
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuItem ("Copy", "", null),
+				})
+			});
+
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null),
+				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
+				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Copy", null),
+			});
+
+			var fv = new FrameView ("Frame View") {
+				Y = 1,
+				Width = Dim.Fill(),
+				Height = Dim.Fill (1)
+			};
+			var win = new Window ();
+			win.Add (menu, sb, fv);
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File  Edit       │
+│┌ Frame View ────┐│
+││                ││
+││                ││
+││                ││
+││                ││
+│└────────────────┘│
+│ ^Q Quit │ ^O Open│
+└──────────────────┘", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (40, 20);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌ Frame View ────────────────────────┐│
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+││                                    ││
+│└────────────────────────────────────┘│
+│ ^Q Quit │ ^O Open │ ^C Copy          │
+└──────────────────────────────────────┘", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File  Edit       │
+│┌ Frame View ────┐│
+││                ││
+││                ││
+││                ││
+││                ││
+│└────────────────┘│
+│ ^Q Quit │ ^O Open│
+└──────────────────┘", output);
+
+		}
 	}
 }

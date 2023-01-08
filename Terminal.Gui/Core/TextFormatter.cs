@@ -294,12 +294,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the mask to apply to the hotkey to tag it as the hotkey. The default value of <c>0x100000</c> causes
-		/// the underlying Rune to be identified as a "private use" Unicode character.
-		/// </summary>HotKeyTagMask
-		public uint HotKeyTagMask { get; set; } = 0x100000;
-
-		/// <summary>
 		/// Gets the cursor position from <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
 		/// </summary>
 		public int CursorPosition { get; set; }
@@ -317,8 +311,9 @@ namespace Terminal.Gui {
 			get {
 				// With this check, we protect against subclasses with overrides of Text
 				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
-					lines = new List<ustring> ();
-					lines.Add (ustring.Empty);
+					lines = new List<ustring> {
+						ustring.Empty
+					};
 					NeedsFormat = false;
 					return lines;
 				}
@@ -716,7 +711,7 @@ namespace Terminal.Gui {
 		}
 
 		static char [] whitespace = new char [] { ' ', '\t' };
-		private int hotKeyPos;
+		private int hotKeyPos = -1;
 
 		/// <summary>
 		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
@@ -1113,14 +1108,13 @@ namespace Terminal.Gui {
 		/// <returns>The text with the hotkey tagged.</returns>
 		/// <remarks>
 		/// The returned string will not render correctly without first un-doing the tag. To undo the tag, search for 
-		/// Runes with a bitmask of <c>otKeyTagMask</c> and remove that bitmask.
 		/// </remarks>
 		public ustring ReplaceHotKeyWithTag (ustring text, int hotPos)
 		{
 			// Set the high bit
 			var runes = text.ToRuneList ();
 			if (Rune.IsLetterOrNumber (runes [hotPos])) {
-				runes [hotPos] = new Rune ((uint)runes [hotPos] | HotKeyTagMask);
+				runes [hotPos] = new Rune ((uint)runes [hotPos]);
 			}
 			return ustring.Make (runes);
 		}
@@ -1297,13 +1291,13 @@ namespace Terminal.Gui {
 							rune = runes [idx];
 						}
 					}
-					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
+					if (idx == HotKeyPos) {
 						if ((isVertical && textVerticalAlignment == VerticalTextAlignment.Justified) ||
-						    (!isVertical && textAlignment == TextAlignment.Justified)) {
+						(!isVertical && textAlignment == TextAlignment.Justified)) {
 							CursorPosition = idx - start;
 						}
 						Application.Driver?.SetAttribute (hotColor);
-						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
+						Application.Driver?.AddRune (rune);
 						Application.Driver?.SetAttribute (normalColor);
 					} else {
 						Application.Driver?.AddRune (rune);

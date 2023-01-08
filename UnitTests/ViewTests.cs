@@ -574,7 +574,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Initialized_Event_Comparing_With_Added_Event ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = new Toplevel () { Id = "0", };
 
@@ -673,7 +673,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = new Toplevel () { Id = "0", };
 
@@ -782,7 +782,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void CanFocus_Faced_With_Container_Before_Run ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -819,7 +819,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void CanFocus_Faced_With_Container_After_Run ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -862,7 +862,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void CanFocus_Container_ToFalse_Turns_All_Subviews_ToFalse_Too ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -897,7 +897,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void CanFocus_Container_Toggling_All_Subviews_To_Old_Value_When_Is_True ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 
@@ -941,7 +941,7 @@ namespace Terminal.Gui.Core {
 		{
 			// Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
 
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			Application.Top.Ready += () => {
 				Assert.Null (Application.Top.Focused);
@@ -959,7 +959,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Multi_Thread_Toplevels ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			var t = Application.Top;
 			var w = new Window ();
@@ -1148,7 +1148,7 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void KeyPress_Handled_To_True_Prevents_Changes ()
 		{
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver ());
 
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
 
@@ -1584,7 +1584,7 @@ Y
 		public void LabelChangeText_RendersCorrectly_Constructors (int choice)
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver);
 
 			try {
 				// Create a label with a short text 
@@ -4061,6 +4061,61 @@ This is a tes
 			Assert.True (view.IsKeyDown);
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void SetHasFocus_Do_Not_Throws_If_OnLeave_Remove_Focused_Changing_To_Null ()
+		{
+			var view1Leave = false;
+			var subView1Leave = false;
+			var subView1subView1Leave = false;
+			var top = Application.Top;
+			var view1 = new View { CanFocus = true };
+			var subView1 = new View { CanFocus = true };
+			var subView1subView1 = new View { CanFocus = true };
+			view1.Leave += (e) => {
+				view1Leave = true;
+			};
+			subView1.Leave += (e) => {
+				subView1.Remove (subView1subView1);
+				subView1Leave = true;
+			};
+			view1.Add (subView1);
+			subView1subView1.Leave += (e) => {
+				// This is never invoked
+				subView1subView1Leave = true;
+			};
+			subView1.Add (subView1subView1);
+			var view2 = new View { CanFocus = true };
+			top.Add (view1, view2);
+			Application.Begin (top);
+
+			view2.SetFocus ();
+			Assert.True (view1Leave);
+			Assert.True (subView1Leave);
+			Assert.False (subView1subView1Leave);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.Normal, view.GetNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GetHotNormalColor_ColorScheme ()
+		{
+			var view = new View { ColorScheme = Colors.Base };
+
+			Assert.Equal (view.ColorScheme.HotNormal, view.GetHotNormalColor ());
+
+			view.Enabled = false;
+			Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
 		}
 	}
 }

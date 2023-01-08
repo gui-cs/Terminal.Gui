@@ -646,6 +646,75 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestShiftClick_MultiSelect_TwoRowTable_FullRowSelect()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+
+			tv.MultiSelect = true;
+			
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 3,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (1, tv.SelectedRow);
+
+			// shift clicking top row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift
+			});
+
+			// should extend the selection
+			Assert.Equal (0, tv.SelectedRow);
+
+			var selected = tv.GetAllSelectedCells ().ToArray();
+
+			Assert.Contains (new Point(0,0), selected);
+			Assert.Contains (new Point (0, 1), selected);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tv.MultiSelect = true;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+			// shift clicking top row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl
+			});
+
+			// should extend the selection
+			// to include bottom and top row but not middle
+			Assert.Equal (0, tv.SelectedRow);
+
+			var selected = tv.GetAllSelectedCells ().ToArray ();
+
+			Assert.Contains (new Point (0, 0), selected);
+			Assert.DoesNotContain (new Point (0, 1), selected);
+			Assert.Contains (new Point (0, 2), selected);
+		}
+
 		[Theory]
 		[InlineData (false)]
 		[InlineData (true)]
@@ -1098,6 +1167,379 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
+		private TableView GetABCDEFTableView (out DataTable dt)
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visible
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = false;
+
+			dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.Table = dt;
+
+			return tableView;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_IsNotRendered()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│A│C│D│
+│1│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_IsNotRendered ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			string expected =
+				@"
+│B│C│D│
+├─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["C"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+
+			// expect nothing to be rendered when all columns are invisible
+			string expected =
+				@"
+";
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// expect behavior to match when Table is null
+			tableView.Table = null;
+
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because DEF are of screen
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if DEF are invisible we shouldn't be showing the indicator
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│A│B│C│
+├─┼─┼─┤
+│1│2│3│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator ()
+		{
+			var tableView = GetABCDEFTableView (out DataTable dt);
+
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+
+			tableView.ColumnOffset = 1;
+			tableView.Redraw (tableView.Bounds);
+
+			// normally we should have scroll indicators because A,E and F are of screen
+			string expected =
+				@"
+│B│C│D│
+◄─┼─┼─►
+│2│3│4│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// but if E and F are invisible so we shouldn't show right
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+◄─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// now also A is invisible so we cannot scroll in either direction
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+
+			expected =
+			       @"
+│B│C│D│
+├─┼─┼─┤
+│2│3│4│";
+			tableView.Redraw (tableView.Bounds);
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			// Expect the cursor navigation to skip over the invisible column(s)
+			Assert.Equal(2,tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			// Expect the cursor navigation backwards to skip over invisible column too
+			Assert.Equal (0, tableView.SelectedColumn);
+		}
+
+		[InlineData(true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1(bool useHome)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["A"]).Visible = false;
+			tableView.SelectedColumn = 0;
+
+			Assert.Equal (0, tableView.SelectedColumn);
+
+			// column 0 is invisible so this method should move to 1
+			tableView.EnsureValidSelection();
+			Assert.Equal (1, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = useHome ? Key.Home : Key.CursorLeft 
+			});
+
+			// Expect the cursor to stay at 1
+			Assert.Equal (1, tableView.SelectedColumn);
+		}
+
+
+		[InlineData(true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestMoveStartEnd_WithFullRowSelect(bool withFullRowSelect)
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+			tableView.FullRowSelect = withFullRowSelect;
+
+			tableView.SelectedRow = 1;
+			tableView.SelectedColumn = 1;
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = Key.Home  | Key.CtrlMask
+			});
+
+			if(withFullRowSelect)
+			{
+				// Should not be any horizontal movement when
+				// using navigate to Start/End and FullRowSelect
+				Assert.Equal (1, tableView.SelectedColumn);
+				Assert.Equal (0, tableView.SelectedRow);
+			}
+			else
+			{
+				Assert.Equal (0, tableView.SelectedColumn);
+				Assert.Equal (0, tableView.SelectedRow);
+			}
+
+			tableView.ProcessKey (new KeyEvent 
+			{
+				Key = Key.End  | Key.CtrlMask
+			});
+
+			if(withFullRowSelect)
+			{
+				Assert.Equal (1, tableView.SelectedColumn);
+				Assert.Equal (1, tableView.SelectedRow);
+			}
+			else
+			{
+				Assert.Equal (5, tableView.SelectedColumn);
+				Assert.Equal (1, tableView.SelectedRow);
+			}
+
+		}
+
+		[InlineData (true)]
+		[InlineData (false)]
+		[Theory, AutoInitShutdown]
+		public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+						
+			// select D 
+			tableView.SelectedColumn = 3;
+			Assert.Equal (3, tableView.SelectedColumn);
+
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["E"]).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
+
+			// column D is invisible so this method should move to 2 (C)
+			tableView.EnsureValidSelection ();
+			Assert.Equal (2, tableView.SelectedColumn);
+
+			tableView.ProcessKey (new KeyEvent {
+				Key = useEnd ? Key.End : Key.CursorRight
+			});
+
+			// Expect the cursor to stay at 2
+			Assert.Equal (2, tableView.SelectedColumn);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelected ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// user has rectangular selection 
+			tableView.MultiSelectedRegions.Push (
+				new TableView.TableSelection(
+					new Point(0,0),
+					new Rect(0, 0, 3, 1))
+				);
+
+			Assert.Equal (3, tableView.GetAllSelectedCells ().Count());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.True (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			// it should not be included in the selection
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain(new Point(1,0),tableView.GetAllSelectedCells ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["B"]).Visible = false;
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight | Key.ShiftMask });
+
+			// Selection should extend from A to C but skip B
+			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+			Assert.True (tableView.IsSelected (0, 0));
+			Assert.False (tableView.IsSelected (1, 0));
+			Assert.True (tableView.IsSelected (2, 0));
+			Assert.False (tableView.IsSelected (3, 0));
+
+			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+		}
+		
+		[Theory, AutoInitShutdown]
+		[InlineData(new object[] { true,true })]
+		[InlineData (new object[] { false,true })]
+		[InlineData (new object [] { true, false})]
+		[InlineData (new object [] { false, false})]
+		public void TestColumnStyle_VisibleFalse_DoesNotEffect_EnsureSelectedCellIsVisible (bool smooth, bool invisibleCol)
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			tableView.Style.SmoothHorizontalScrolling = smooth;
+			
+			if(invisibleCol) {
+				tableView.Style.GetOrCreateColumnStyle (dt.Columns ["D"]).Visible = false;
+			}
+
+			// New TableView should have first cell selected 
+			Assert.Equal (0,tableView.SelectedColumn);
+			// With no scrolling
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// A,B and C are visible on screen at the moment so these should have no effect
+			tableView.SelectedColumn = 1;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			tableView.SelectedColumn = 2;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (0, tableView.ColumnOffset);
+
+			// Selecting D should move the visible table area to fit D onto the screen
+			tableView.SelectedColumn = 3;
+			tableView.EnsureSelectedCellIsVisible ();
+			Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
+		}
 		[Fact]
 		public void LongColumnTest ()
 		{
@@ -1337,6 +1779,184 @@ namespace Terminal.Gui.Views {
 			}
 
 			return dt;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_ScreenToCell ()
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// ---------------- X=0 -----------------------
+			// click is before first cell
+			Assert.Null (tableView.ScreenToCell (0, 0));
+			Assert.Null (tableView.ScreenToCell (0, 1));
+			Assert.Null (tableView.ScreenToCell (0, 2));
+			Assert.Null (tableView.ScreenToCell (0, 3));
+			Assert.Null (tableView.ScreenToCell (0, 4));
+
+			// ---------------- X=1 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (1, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (1, 1));
+			// click in cell 0,0
+			Assert.Equal (new Point(0,0),tableView.ScreenToCell (1, 2));
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (1, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (1, 4));
+
+
+			// ---------------- X=2 -----------------------
+			// ( even though there is a horizontal dividing line here we treat it as a hit on the cell before)
+			// click in header
+			Assert.Null (tableView.ScreenToCell (2, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (2, 1));
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2));
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (2, 4));
+
+
+			// ---------------- X=3 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (3, 0));
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (3, 1));
+			// click in cell 1,0
+			Assert.Equal (new Point (1, 0), tableView.ScreenToCell (3, 2));
+			// click in cell 1,1
+			Assert.Equal (new Point (1, 1), tableView.ScreenToCell (3, 3));
+			// after last row
+			Assert.Null (tableView.ScreenToCell (3, 4));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_ScreenToCell_DataColumnOverload ()
+		{
+			var tableView = GetTwoRowSixColumnTable ();
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			DataColumn col;
+
+			// ---------------- X=0 -----------------------
+			// click is before first cell
+			Assert.Null (tableView.ScreenToCell (0, 0,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 1,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 2,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 3,out col));
+			Assert.Null (col);
+			Assert.Null (tableView.ScreenToCell (0, 4,out col));
+			Assert.Null (col);
+
+			// ---------------- X=1 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (1, 0, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in header row line  (click in the horizontal line below header counts as click in header above - consistent with the column hit box)
+			Assert.Null (tableView.ScreenToCell (1, 1, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (1, 2, out col));
+			Assert.Null (col);
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (1, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (1, 4, out col));
+			Assert.Null (col);
+
+
+			// ---------------- X=2 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (2, 0, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (2, 1, out col));
+			Assert.Equal ("A", col.ColumnName);
+			// click in cell 0,0
+			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2, out col));
+			Assert.Null (col);
+			// click in cell 0,1
+			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (2, 4, out col));
+			Assert.Null (col);
+
+
+			// ---------------- X=3 -----------------------
+			// click in header
+			Assert.Null (tableView.ScreenToCell (3, 0, out col));
+			Assert.Equal ("B", col.ColumnName);
+			// click in header row line
+			Assert.Null (tableView.ScreenToCell (3, 1, out col));
+			Assert.Equal ("B", col.ColumnName);
+			// click in cell 1,0
+			Assert.Equal (new Point (1, 0), tableView.ScreenToCell (3, 2, out col));
+			Assert.Null (col);
+			// click in cell 1,1
+			Assert.Equal (new Point (1, 1), tableView.ScreenToCell (3, 3, out col));
+			Assert.Null (col);
+			// after last row
+			Assert.Null (tableView.ScreenToCell (3, 4, out col));
+			Assert.Null (col);
+		}
+		private TableView GetTwoRowSixColumnTable ()
+		{
+			var tableView = new TableView ();
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visible
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
+
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.Table = dt;
+			return tableView;
 		}
 	}
 }

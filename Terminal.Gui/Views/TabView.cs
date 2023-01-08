@@ -466,31 +466,10 @@ namespace Terminal.Gui {
 				Width = Dim.Fill ();
 			}
 
-			/// <summary>
-			/// Positions the cursor at the start of the currently selected tab
-			/// </summary>
-			public override void PositionCursor ()
+			public override bool OnEnter (View view)
 			{
-				base.PositionCursor ();
-
-				var selected = host.CalculateViewport (Bounds).FirstOrDefault (t => Equals (host.SelectedTab, t.Tab));
-
-				if (selected == null) {
-					return;
-				}
-
-				int y;
-
-				if (host.Style.TabsOnBottom) {
-					y = 1;
-				} else {
-					y = host.Style.ShowTopLine ? 1 : 0;
-				}
-
-				Move (selected.X, y);
-
-
-
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+				return base.OnEnter (view);
 			}
 
 			public override void Redraw (Rect bounds)

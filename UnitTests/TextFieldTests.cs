@@ -11,11 +11,11 @@ namespace Terminal.Gui.Views {
 		// This is necessary because a) Application is a singleton and Init/Shutdown must be called
 		// as a pair, and b) all unit test functions should be atomic.
 		[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-		public class InitShutdown : Xunit.Sdk.BeforeAfterTestAttribute {
+		public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+				base.Before (methodUnderTest);
 
 				//                                                    1         2         3 
 				//                                          01234567890123456789012345678901=32 (Length)
@@ -25,14 +25,14 @@ namespace Terminal.Gui.Views {
 			public override void After (MethodInfo methodUnderTest)
 			{
 				TextFieldTests._textField = null;
-				Application.Shutdown ();
+				base.After (methodUnderTest);
 			}
 		}
 
 		private static TextField _textField;
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
 		{
 			_textField.SelectedStart = 2;
@@ -46,7 +46,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_With_Value_Less_Than_Minus_One_Changes_To_Minus_One ()
 		{
 			_textField.SelectedStart = -2;
@@ -56,7 +56,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 2;
@@ -67,7 +67,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -79,18 +79,18 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
 		{
 			_textField.SelectedStart = 19;
 			_textField.CursorPosition = 12;
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x75, new KeyModifiers ())); // u
-			Assert.Equal ("TAB to jump u text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump u text fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textField.CursorPosition = -1;
@@ -100,7 +100,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
 		{
 			_textField.CursorPosition = 33;
@@ -110,7 +110,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -161,7 +161,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -212,7 +212,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_Selection ()
 		{
 			_textField.CursorPosition = 0;
@@ -264,7 +264,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_Selection ()
 		{
 			_textField.CursorPosition = _textField.Text.Length;
@@ -316,7 +316,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -356,7 +356,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
 		{
 			_textField.CursorPosition = 10;
@@ -390,7 +390,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -474,7 +474,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
 		{
 			//                           1         2         3         4         5    
@@ -558,7 +558,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Null_If_No_Selection ()
 		{
 			_textField.SelectedStart = -1;
@@ -569,7 +569,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -581,45 +581,45 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_Selection ()
 		{
 			_textField.SelectedStart = 20;
 			_textField.CursorPosition = 24;
 			_textField.Copy ();
 			Assert.Equal ("text", _textField.SelectedText);
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.Paste ();
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.SelectedStart = 20;
 			_textField.Cut ();
 			_textField.Paste ();
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_No_Selection ()
 		{
 			_textField.SelectedStart = 20;
 			_textField.CursorPosition = 24;
 			_textField.Copy ();
 			Assert.Equal ("text", _textField.SelectedText);
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.SelectedStart = -1;
 			_textField.Paste ();
-			Assert.Equal ("TAB to jump between texttext fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between texttext fields.", _textField.Text.ToString ());
 			_textField.SelectedStart = 24;
 			_textField.Cut ();
 			Assert.Null (_textField.SelectedText);
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.SelectedStart = -1;
 			_textField.Paste ();
-			Assert.Equal ("TAB to jump between texttext fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between texttext fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut__Not_Allowed_If_Secret_Is_True ()
 		{
 			_textField.Secret = true;
@@ -637,7 +637,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Paste_Always_Clear_The_SelectedText ()
 		{
 			_textField.SelectedStart = 20;
@@ -649,7 +649,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextChanging_Event ()
 		{
 			bool cancel = true;
@@ -662,14 +662,14 @@ namespace Terminal.Gui.Views {
 			};
 
 			_textField.Text = "changing";
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			cancel = false;
 			_textField.Text = "changing";
-			Assert.Equal ("changing", _textField.Text);
+			Assert.Equal ("changing", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextChanged_Event ()
 		{
 			_textField.TextChanged += (e) => {
@@ -677,40 +677,40 @@ namespace Terminal.Gui.Views {
 			};
 
 			_textField.Text = "changed";
-			Assert.Equal ("changed", _textField.Text);
+			Assert.Equal ("changed", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Used_Is_True_By_Default ()
 		{
 			_textField.CursorPosition = 10;
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x75, new KeyModifiers ())); // u
-			Assert.Equal ("TAB to jumup between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumup between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x73, new KeyModifiers ())); // s
-			Assert.Equal ("TAB to jumusp between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumusp between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x65, new KeyModifiers ())); // e
-			Assert.Equal ("TAB to jumusep between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumusep between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
-			Assert.Equal ("TAB to jumusedp between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumusedp between text fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Used_Is_False ()
 		{
 			_textField.Used = false;
 			_textField.CursorPosition = 10;
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x75, new KeyModifiers ())); // u
-			Assert.Equal ("TAB to jumu between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumu between text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x73, new KeyModifiers ())); // s
-			Assert.Equal ("TAB to jumusbetween text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumusbetween text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x65, new KeyModifiers ())); // e
-			Assert.Equal ("TAB to jumuseetween text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumuseetween text fields.", _textField.Text.ToString ());
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
-			Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text);
+			Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
@@ -718,22 +718,22 @@ namespace Terminal.Gui.Views {
 		{
 			var tf = new TextField ("ABC");
 			tf.EnsureFocus ();
-			Assert.Equal ("ABC", tf.Text);
+			Assert.Equal ("ABC", tf.Text.ToString ());
 			Assert.Equal (3, tf.CursorPosition);
 
 			// now delete the C
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("AB", tf.Text);
+			Assert.Equal ("AB", tf.Text.ToString ());
 			Assert.Equal (2, tf.CursorPosition);
 
 			// then delete the B
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("A", tf.Text);
+			Assert.Equal ("A", tf.Text.ToString ());
 			Assert.Equal (1, tf.CursorPosition);
 
 			// then delete the A
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("", tf.Text);
+			Assert.Equal ("", tf.Text.ToString ());
 			Assert.Equal (0, tf.CursorPosition);
 		}
 
@@ -743,24 +743,24 @@ namespace Terminal.Gui.Views {
 			var tf = new TextField ("ABC");
 			tf.EnsureFocus ();
 			tf.CursorPosition = 2;
-			Assert.Equal ("ABC", tf.Text);
+			Assert.Equal ("ABC", tf.Text.ToString ());
 
 			// now delete the B
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("AC", tf.Text);
+			Assert.Equal ("AC", tf.Text.ToString ());
 
 			// then delete the A
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("C", tf.Text);
+			Assert.Equal ("C", tf.Text.ToString ());
 
 			// then delete nothing
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("C", tf.Text);
+			Assert.Equal ("C", tf.Text.ToString ());
 
 			// now delete the C
 			tf.CursorPosition = 1;
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
-			Assert.Equal ("", tf.Text);
+			Assert.Equal ("", tf.Text.ToString ());
 		}
 
 		[Fact]
@@ -769,35 +769,35 @@ namespace Terminal.Gui.Views {
 			var tf = new TextField ();
 			tf.EnsureFocus ();
 			tf.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ()));
-			Assert.Equal ("A", tf.Text);
+			Assert.Equal ("A", tf.Text.ToString ());
 
 			// cancel the next keystroke
 			tf.TextChanging += (e) => e.Cancel = e.NewText == "AB";
 			tf.ProcessKey (new KeyEvent (Key.B, new KeyModifiers ()));
 
 			// B was canceled so should just be A
-			Assert.Equal ("A", tf.Text);
+			Assert.Equal ("A", tf.Text.ToString ());
 
 			// now delete the A
 			tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ()));
 
-			Assert.Equal ("", tf.Text);
+			Assert.Equal ("", tf.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void Text_Replaces_Tabs_With_Empty_String ()
 		{
 			_textField.Text = "\t\tTAB to jump between text fields.";
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 			_textField.Text = "";
 			Clipboard.Contents = "\t\tTAB to jump between text fields.";
 			_textField.Paste ();
-			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text.ToString ());
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void TextField_SpaceHandling ()
 		{
 			var tf = new TextField () {
@@ -825,7 +825,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		[Fact]
-		[InitShutdown]
+		[TextFieldTestsAutoInitShutdown]
 		public void CanFocus_False_Wont_Focus_With_Mouse ()
 		{
 			var top = Application.Top;
@@ -901,201 +901,201 @@ namespace Terminal.Gui.Views {
 			Assert.False (tf.ReadOnly);
 
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			Assert.Equal ("This is a test.", tf.Text);
+			Assert.Equal ("This is a test.", tf.Text.ToString ());
 			tf.CursorPosition = 0;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			Assert.Equal ("his is a test.", tf.Text);
+			Assert.Equal ("his is a test.", tf.Text.ToString ());
 			tf.ReadOnly = true;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.D | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("his is a test.", tf.Text);
+			Assert.Equal ("his is a test.", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers ())));
-			Assert.Equal ("his is a test.", tf.Text);
+			Assert.Equal ("his is a test.", tf.Text.ToString ());
 			tf.ReadOnly = false;
 			tf.CursorPosition = 1;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			tf.CursorPosition = 5;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Home | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is is", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Home | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is is", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.A | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is is", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.End | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (" a test.", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.End | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (" a test.", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.E | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (" a test.", tf.SelectedText);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (0, tf.CursorPosition);
 			tf.CursorPosition = 5;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Home | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (0, tf.CursorPosition);
 			tf.CursorPosition = 5;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (0, tf.CursorPosition);
 			tf.CursorPosition = 5;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("s", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("s", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Null (tf.SelectedText);
 			tf.CursorPosition = 7;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorLeft | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("a", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorUp | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is a", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent ((Key)((int)'B' + Key.ShiftMask | Key.AltMask), new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is is a", tf.SelectedText);
 			tf.CursorPosition = 3;
 			tf.SelectedStart = -1;
 			Assert.Null (tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorRight | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is ", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is a ", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent ((Key)((int)'F' + Key.ShiftMask | Key.AltMask), new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal ("is a test.", tf.SelectedText);
 			Assert.Equal (13, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Null (tf.SelectedText);
 			Assert.Equal (12, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (11, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (13, tf.CursorPosition);
 			tf.CursorPosition = 0;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (13, tf.CursorPosition);
 			tf.CursorPosition = 0;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.E | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (13, tf.CursorPosition);
 			tf.CursorPosition = 0;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (1, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.F | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.Equal (2, tf.CursorPosition);
 			tf.CursorPosition = 9;
 			tf.ReadOnly = true;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			tf.ReadOnly = false;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
-			Assert.Equal ("est.", Clipboard.Contents);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
+			Assert.Equal ("est.", Clipboard.Contents.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace | Key.AltMask, new KeyModifiers ())));
-			Assert.Equal ("is is a test.", tf.Text);
+			Assert.Equal ("is is a test.", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (8, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorUp | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (6, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent ((Key)((int)'B' + Key.AltMask), new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (3, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (6, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.CursorDown | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (8, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (9, tf.CursorPosition);
 			Assert.True (tf.Used);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.InsertChar, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
 			Assert.Equal (9, tf.CursorPosition);
 			Assert.False (tf.Used);
 			tf.SelectedStart = 3;
 			tf.CursorPosition = 7;
 			Assert.Equal ("is a", tf.SelectedText);
-			Assert.Equal ("est.", Clipboard.Contents);
+			Assert.Equal ("est.", Clipboard.Contents.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
-			Assert.Equal ("is a", Clipboard.Contents);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
+			Assert.Equal ("is a", Clipboard.Contents.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.X | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is  t", tf.Text);
-			Assert.Equal ("is a", Clipboard.Contents);
+			Assert.Equal ("is  t", tf.Text.ToString ());
+			Assert.Equal ("is a", Clipboard.Contents.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.V | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("is is a t", tf.Text);
-			Assert.Equal ("is a", Clipboard.Contents);
+			Assert.Equal ("is is a t", tf.Text.ToString ());
+			Assert.Equal ("is a", Clipboard.Contents.ToString ());
 			Assert.Equal (7, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ())));
-			Assert.Equal (" t", tf.Text);
-			Assert.Equal ("is is a", Clipboard.Contents);
+			Assert.Equal (" t", tf.Text.ToString ());
+			Assert.Equal ("is is a", Clipboard.Contents.ToString ());
 			tf.Text = "TAB to jump between text fields.";
 			Assert.Equal (0, tf.CursorPosition);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("to jump between text fields.", tf.Text);
+			Assert.Equal ("to jump between text fields.", tf.Text.ToString ());
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal ("to jump between text ", tf.Text);
+			Assert.Equal ("to jump between text ", tf.Text.ToString ());
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.T | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("to jump between text ", tf.SelectedText);
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.D | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal ("", tf.Text);
+			Assert.Equal ("", tf.Text.ToString ());
 		}
 
 		[Fact]
@@ -1134,7 +1134,7 @@ namespace Terminal.Gui.Views {
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
-			Assert.Equal ("-1", tf.Text);
+			Assert.Equal ("-1", tf.Text.ToString ());
 
 			// InsertText
 			tf.SelectedStart = 1;
@@ -1144,7 +1144,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers ())));
 			Assert.Equal ("-2", newText);
 			Assert.Equal ("-1", oldText);
-			Assert.Equal ("-2", tf.Text);
+			Assert.Equal ("-2", tf.Text.ToString ());
 
 			// DeleteCharLeft
 			tf.SelectedStart = 1;
@@ -1154,7 +1154,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ("-", newText);
 			Assert.Equal ("-2", oldText);
-			Assert.Equal ("-", tf.Text);
+			Assert.Equal ("-", tf.Text.ToString ());
 
 			// DeleteCharRight
 			tf.Text = "-1";
@@ -1165,7 +1165,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
 			Assert.Equal ("-", newText);
 			Assert.Equal ("-1", oldText);
-			Assert.Equal ("-", tf.Text);
+			Assert.Equal ("-", tf.Text.ToString ());
 
 			// Cut
 			tf.Text = "-1";
@@ -1176,7 +1176,7 @@ namespace Terminal.Gui.Views {
 			Assert.True (tf.ProcessKey (new KeyEvent (Key.X | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("-", newText);
 			Assert.Equal ("-1", oldText);
-			Assert.Equal ("-", tf.Text);
+			Assert.Equal ("-", tf.Text.ToString ());
 		}
 
 		[Fact]
@@ -1280,6 +1280,21 @@ namespace Terminal.Gui.Views {
 
 			Assert.Equal (0, tf.ScrollOffset);
 			Assert.Equal (16, tf.CursorPosition);
+		}
+
+		[Fact]
+		public void HistoryText_IsDirty_ClearHistoryChanges ()
+		{
+			var text = "Testing";
+			var tf = new TextField (text);
+
+			Assert.Equal (text, tf.Text);
+			tf.ClearHistoryChanges ();
+			Assert.False (tf.IsDirty);
+
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ())));
+			Assert.Equal ($"{text}A", tf.Text);
+			Assert.True (tf.IsDirty);
 		}
 	}
 }

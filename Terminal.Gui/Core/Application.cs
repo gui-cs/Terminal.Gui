@@ -309,6 +309,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static bool UseSystemConsole;
 
+		// For Unit testing - ignores UseSystemConsole
+		internal static bool ForceFakeConsole;
+
 		/// <summary>
 		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
 		/// </summary>
@@ -329,29 +332,28 @@ namespace Terminal.Gui {
 		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
 		/// without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
 		/// </para>
-		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
+		/// <param name="driver">
+		/// The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver, resetState: true);
+		/// <param name="mainLoopDriver">
+		/// Specifies the <see cref="MainLoop"/> to use. 
+		/// Must not be <see langword="null"/> if <paramref name="driver"/> is not <see langword="null"/>.
+		/// </param>
+		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => InternalInit (() => Toplevel.Create (), driver, mainLoopDriver);
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
 
-		/// <summary>
-		/// Internal function for initializing a Terminal.Gui application with a <see cref="Toplevel"/> factory object, 
-		/// a <see cref="ConsoleDriver"/>, and <see cref="MainLoop"/>.
-		/// <para>
-		/// This is a low-level function; most applications will use <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> as it is simpler.</para>
-		/// </summary>
-		/// <param name="topLevelFactory">Specifies the <see cref="Toplevel"> factory funtion.</see>/></param>
-		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		/// <param name="resetState">If <see langword="true"/> (default) all <see cref="Application"/> state will be reset. 
-		/// Set to <see langword="false"/> to not reset the state (for when this function is called via 
-		/// <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> when <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>
-		/// has not already been called. f</param>
-		internal static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool resetState = true)
+		// INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
+		//
+		// Called from:
+		// 
+		// Init() - When the user wants to use the default Toplevel. calledViaRunT will be false, causing all state to be reset.
+		// Run<T>() - When the user wants to use a custom Toplevel. calledViaRunT will be true, enabling Run<T>() to be called without calling Init first.
+		// Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
+		// 
+		// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
+		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool calledViaRunT = false)
 		{
 			if (_initialized && driver == null) return;
 
@@ -359,6 +361,7 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
 			}
 
+			// Note in this case, we don't verify the type of the Toplevel created by new T(). 
 			// Used only for start debugging on Unix.
 			//#if DEBUG
 			//			while (!System.Diagnostics.Debugger.IsAttached) {
@@ -367,35 +370,67 @@ namespace Terminal.Gui {
 			//			System.Diagnostics.Debugger.Break ();
 			//#endif
 
-			// Reset all class variables (Application is a singleton).
-			if (resetState) {
+			if (!calledViaRunT) {
+				// Reset all class variables (Application is a singleton).
 				ResetState ();
 			}
 
-			// This supports Unit Tests and the passing of a mock driver/loopdriver
+			// For UnitTests
 			if (driver != null) {
-				if (mainLoopDriver == null) {
-					throw new ArgumentNullException ("mainLoopDriver cannot be null if driver is provided.");
-				}
+				//if (mainLoopDriver == null) {
+				//	throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
+				//}
+				//if (!(driver is FakeDriver)) {
+				//	throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
+				//}
 				Driver = driver;
 			}
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				if (UseSystemConsole) {
+				if (ForceFakeConsole) {
+					// For Unit Testing only
+					Driver = new FakeDriver ();
+				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
-					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
-					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
-					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
+				if (Driver == null) {
+					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+				}
 			}
+
+			if (mainLoopDriver == null) {
+				// TODO: Move this logic into ConsoleDriver
+				if (Driver is FakeDriver) {
+					mainLoopDriver = new FakeMainLoop (Driver);
+				} else if (Driver is NetDriver) {
+					mainLoopDriver = new NetMainLoop (Driver);
+				} else if (Driver is WindowsDriver) {
+					mainLoopDriver = new WindowsMainLoop (Driver);
+				} else if (Driver is CursesDriver) {
+					mainLoopDriver = new UnixMainLoop (Driver);
+				}
+				if (mainLoopDriver == null) {
+					throw new InvalidOperationException ("Init could not determine the MainLoopDriver to use.");
+				}
+			}
+
 			MainLoop = new MainLoop (mainLoopDriver);
 
-			Driver.Init (TerminalResized);
+			try {
+				Driver.Init (TerminalResized);
+			} catch (InvalidOperationException ex) {
+				// This is a case where the driver is unable to initialize the console.
+				// This can happen if the console is already in use by another process or
+				// if running in unit tests.
+				// In this case, we want to throw a more specific exception.
+				throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
+			}
+
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 
 			Top = topLevelFactory ();
@@ -738,8 +773,7 @@ namespace Terminal.Gui {
 
 			if (mouseGrabView != null) {
 				if (view == null) {
-					UngrabMouse ();
-					return;
+					view = mouseGrabView;
 				}
 
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
@@ -754,7 +788,7 @@ namespace Terminal.Gui {
 				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame)) {
 					lastMouseOwnerView?.OnMouseLeave (me);
 				}
-				// System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (mouseGrabView?.OnMouseEvent (nme) == true) {
 					return;
 				}
@@ -882,7 +916,7 @@ namespace Terminal.Gui {
 			}
 
 			var rs = new RunState (toplevel);
-			
+
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
 				initializableNotification.BeginInit ();
@@ -896,7 +930,7 @@ namespace Terminal.Gui {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && toplevel != Top && !toplevels.Contains(Top)) {
+				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
 				}
@@ -1250,8 +1284,7 @@ namespace Terminal.Gui {
 		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 		/// <para>
-		/// If <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has not arleady been called, this function will
-		/// call <see cref="Init(Func{Toplevel}, ConsoleDriver, IMainLoopDriver, bool)"/>.
+		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialze the application.
 		/// </para>
 		/// <para>
 		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -1263,24 +1296,31 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="errorHandler"></param>
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
+		/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
+		/// This parameteter must be <see langword="null"/> if <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has already been called. 
+		/// </param>
 		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
 		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) where T : Toplevel, new()
 		{
-			if (_initialized && Driver != null) {
-				var top = new T ();
-				var type = top.GetType ().BaseType;
-				while (type != typeof (Toplevel) && type != typeof (object)) {
-					type = type.BaseType;
+			if (_initialized) {
+				if (Driver != null) {
+					// Init() has been called and we have a driver, so just run the app.
+					var top = new T ();
+					var type = top.GetType ().BaseType;
+					while (type != typeof (Toplevel) && type != typeof (object)) {
+						type = type.BaseType;
+					}
+					if (type != typeof (Toplevel)) {
+						throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
+					}
+					Run (top, errorHandler);
+				} else {
+					// This codepath should be impossible because Init(null, null) will select the platform default driver
+					throw new InvalidOperationException ("Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
 				}
-				if (type != typeof (Toplevel)) {
-					throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
-				}
-				// Run() will eventually cause Application.Top to be set, via Begin() and SetCurrentAsTop()
-				Run (top, errorHandler);
 			} else {
-				// Note in this case, we don't verify the type of the Toplevel created by new T(). 
-				Init (() => new T (), Driver == null ? driver : Driver, Driver == null ? mainLoopDriver : null, resetState: false);
+				// Init() has NOT been called.
+				InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
 				Run (Top, errorHandler);
 			}
 		}

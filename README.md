@@ -12,7 +12,6 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample app](docfx/images/sample.gif)
 
-
 ## Quick Start
 
 Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
@@ -68,56 +67,71 @@ The following example shows a basic Terminal.Gui application written in C#:
 
 using Terminal.Gui;
 
-// Initialize the console
-Application.Init();
+Application.Run<ExampleWindow> ();
 
-// Creates the top-level window with border and title
-var win = new Window("Example App (Ctrl+Q to quit)");
+System.Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
 
-// Create input components and labels
+// Before the application exits, reset Terminal.Gui for clean shutdown
+Application.Shutdown ();
 
-var usernameLabel = new Label("Username:");
-var usernameText = new TextField("")
-{
-    // Position text field adjacent to label
-    X = Pos.Right(usernameLabel) + 1,
+// Defines a top-level window with border and title
+public class ExampleWindow : Window {
+	public TextField usernameText;
+	
+	public ExampleWindow ()
+	{
+		Title = "Example App (Ctrl+Q to quit)";
 
-    // Fill remaining horizontal space with a margin of 1
-    Width = Dim.Fill(1),
-};
+		// Create input components and labels
+		var usernameLabel = new Label () { 
+			Text = "Username:" 
+		};
 
-var passwordLabel = new Label(0,2,"Password:");
-var passwordText = new TextField("")
-{
-    Secret = true,
-    // align with the text box above
-    X = Pos.Left(usernameText),
-    Y = 2,
-    Width = Dim.Fill(1),
-};
+		usernameText = new TextField ("") {
+			// Position text field adjacent to the label
+			X = Pos.Right (usernameLabel) + 1,
 
-// Create login button
-var btnLogin = new Button("Login")
-{
-    Y = 4,
-    // center the login button horizontally
-    X = Pos.Center(),
-    IsDefault = true,
-};
+			// Fill remaining horizontal space
+			Width = Dim.Fill (),
+		};
 
-// When login button is clicked display a message popup
-btnLogin.Clicked += () => MessageBox.Query("Logging In", "Login Successful", "Ok");
+		var passwordLabel = new Label () {
+			Text = "Password:",
+			X = Pos.Left (usernameLabel),
+			Y = Pos.Bottom (usernameLabel) + 1
+		};
 
-// Add all the views to the window
-win.Add(
-    usernameLabel, usernameText, passwordLabel, passwordText,btnLogin
-);
+		var passwordText = new TextField ("") {
+			Secret = true,
+			// align with the text box above
+			X = Pos.Left (usernameText),
+			Y = Pos.Top (passwordLabel),
+			Width = Dim.Fill (),
+		};
 
-// Show the application
-Application.Run(win);
+		// Create login button
+		var btnLogin = new Button () {
+			Text = "Login",
+			Y = Pos.Bottom(passwordLabel) + 1,
+			// center the login button horizontally
+			X = Pos.Center (),
+			IsDefault = true,
+		};
 
-// After the application exits, release and reset console for clean shutdown
-Application.Shutdown();
+		// When login button is clicked display a message popup
+		btnLogin.Clicked += () => {
+			if (usernameText.Text == "admin" && passwordText.Text == "password") {
+				MessageBox.Query ("Logging In", "Login Successful", "Ok");
+				Application.RequestStop ();
+			} else {
+				MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+			}
+		};
+
+		// Add the views to the Window
+		Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+	}
+}
 ```
 
 When run the application looks as follows:
