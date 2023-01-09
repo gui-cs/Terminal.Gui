@@ -11,6 +11,8 @@ namespace Terminal.Gui.Core {
 	/// 
 	/// </summary>
 	public class ColorJsonConverter : JsonConverter<Color> {
+		private static ColorJsonConverter instance;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -19,13 +21,25 @@ namespace Terminal.Gui.Core {
 			Debug.Assert (colorMap.Count == Enum.GetNames (typeof (Color)).Length);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public static ColorJsonConverter Instance {
+			get {
+				if (instance == null) {
+					instance = new ColorJsonConverter ();
+				}
+
+				return instance;
+			}
+		}
+
 		private static readonly Dictionary<Color, string> colorMap = new Dictionary<Color, string>
 		{
 			{ Color.Black, "Black" },
 			{ Color.Blue, "Blue" },
 			{ Color.Green, "Green" },
 			{ Color.Cyan, "Cyan" },
-			{ Color.Gray, "Gray" },
 			{ Color.Red, "Red" },
 			{ Color.Magenta, "Magenta" },
 			{ Color.Brown, "Brown" },
@@ -39,83 +53,6 @@ namespace Terminal.Gui.Core {
 			{ Color.BrightYellow, "BrightYellow" },
 			{ Color.White, "White" }
 		 };
-
-		private class TrueColor {
-			/// <summary>
-			/// Red color component.
-			/// </summary>
-			public int Red { get; }
-			/// <summary>
-			/// Green color component.
-			/// </summary>
-			public int Green { get; }
-			/// <summary>
-			/// Blue color component.
-			/// </summary>
-			public int Blue { get; }
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="TrueColor"/> struct.
-			/// </summary>
-			/// <param name="red"></param>
-			/// <param name="green"></param>
-			/// <param name="blue"></param>
-			public TrueColor (int red, int green, int blue)
-			{
-				Red = red;
-				Green = green;
-				Blue = blue;
-			}
-
-			public Color ToConsoleColor ()
-			{
-				var trueColorMap = new Dictionary<TrueColor, Color> () {
-				{ new TrueColor (0,0,0),Color.Black},
-				{ new TrueColor (0, 0, 0x80),Color.Blue},
-				{ new TrueColor (0, 0x80, 0),Color.Green},
-				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
-				{ new TrueColor (0x80, 0, 0),Color.Red},
-				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
-				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
-				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
-				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
-				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
-				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
-				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
-				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
-				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
-				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
-				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
-				};
-				// Initialize the minimum distance to the maximum possible value
-				int minDistance = int.MaxValue;
-				Color nearestColor = Color.Black;
-
-				// Iterate over all colors in the map
-				var distances = trueColorMap.Select (
-								k => Tuple.Create (
-									// the candidate we are considering matching against (RGB)
-									k.Key,
-
-									CalculateDistance (k.Key, this)
-								));
-
-				// get the closest
-				var match = distances.OrderBy (t => t.Item2).First ();
-				return nearestColor;
-			}
-
-			private float CalculateDistance (TrueColor color1, TrueColor color2)
-			{
-				// use RGB distance
-				return
-					Math.Abs (color1.Red - color2.Red) +
-					Math.Abs (color1.Green - color2.Green) +
-					Math.Abs (color1.Blue - color2.Blue);
-			}
-		}
-
-		private static readonly Dictionary<string, Color> reverseColorMap = colorMap.ToDictionary (x => x.Value, x => x.Key);
 
 		/// <summary>
 		/// 
@@ -133,7 +70,7 @@ namespace Terminal.Gui.Core {
 				var colorString = reader.GetString ();
 
 				// Check if the color string is a color name
-				if (Enum.TryParse (colorString, out Color color)) {
+				if (Enum.TryParse (colorString, ignoreCase: true, out Color color)) {
 					// Return the parsed color
 					return color;
 				} else {
@@ -163,9 +100,10 @@ namespace Terminal.Gui.Core {
 		public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
 		{
 			// Try to get the human readable color name from the map
-			if (colorMap.TryGetValue (value, out string colorName)) {
+			var name = Enum.GetName (typeof (Color), value);
+			if (name != null) {
 				// Write the color name to the JSON
-				writer.WriteStringValue (colorName);
+				writer.WriteStringValue (name);
 			} else {
 				//// If the color is not in the map, look up its RGB values in the consoleDriver.colors array
 				//ConsoleColor consoleColor = (ConsoleDriver [(int)value]);
@@ -180,5 +118,7 @@ namespace Terminal.Gui.Core {
 		}
 
 	}
+
+
 
 }

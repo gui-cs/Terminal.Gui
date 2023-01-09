@@ -15,6 +15,12 @@
     <InformationalVersion>1.9</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\visualstyles.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\visualstyles.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="1.0.7" />

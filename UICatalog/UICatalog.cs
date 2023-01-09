@@ -9,6 +9,11 @@ using System.Text;
 using Terminal.Gui;
 using Microsoft.DotNet.PlatformAbstractions;
 using Rune = System.Rune;
+using Terminal.Gui.Core;
+using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Reflection;
+using System.Threading;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -45,6 +50,9 @@ namespace UICatalog {
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
 	/// </summary>
 	class UICatalogApp {
+		static FileSystemWatcher _watcher = new FileSystemWatcher ();
+		static string _visualStylesFile = "visualstyles.json";
+
 		static void Main (string [] args)
 		{
 			Console.OutputEncoding = Encoding.Default;
@@ -61,6 +69,17 @@ namespace UICatalog {
 				_useSystemConsole = true;
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
+
+			_watcher.NotifyFilter = NotifyFilters.Attributes
+							| NotifyFilters.CreationTime
+							| NotifyFilters.DirectoryName
+							| NotifyFilters.FileName
+							| NotifyFilters.LastAccess
+							| NotifyFilters.LastWrite
+							| NotifyFilters.Security
+							| NotifyFilters.Size;
+			_watcher.Path = Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location);
+			_watcher.Filter = _visualStylesFile;
 
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
@@ -105,6 +124,28 @@ namespace UICatalog {
 			VerifyObjectsWereDisposed ();
 		}
 
+		private static void Application_NotifyStopRunState (Toplevel obj)
+		{
+			_watcher.EnableRaisingEvents = false;
+			_watcher.Changed -= VisualStylesConfigChanged;
+			_watcher.Created -= VisualStylesConfigChanged;
+		}
+
+		private static void Application_NotifyNewRunState (Application.RunState obj)
+		{
+			_watcher.Changed += VisualStylesConfigChanged;
+			_watcher.Created += VisualStylesConfigChanged;
+			_watcher.EnableRaisingEvents = true;
+		}
+
+		private static void VisualStylesConfigChanged (object sender, FileSystemEventArgs e)
+		{
+			Thread.Sleep (500);
+			VisualStyleManager.ApplyStylesFromFile (_visualStylesFile);
+			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.SetNeedsDisplay ();
+		}
+
 		/// <summary>
 		/// Shows the UI Catalog selection UI. When the user selects a Scenario to run, the
 		/// UI Catalog main app UI is killed and the Scenario is run as though it were Application.Top. 
@@ -118,6 +159,8 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
+			Application.NotifyNewRunState += Application_NotifyNewRunState;
+			Application.NotifyStopRunState += Application_NotifyStopRunState;
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -178,7 +221,7 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-				
+
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);

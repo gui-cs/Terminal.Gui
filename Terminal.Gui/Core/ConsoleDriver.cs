@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Unix.Terminal;
 
@@ -86,6 +87,84 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// 
+	/// </summary>
+	public class TrueColor {
+		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int Red { get; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int Green { get; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int Blue { get; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public TrueColor (int red, int green, int blue)
+		{
+			Red = red;
+			Green = green;
+			Blue = blue;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public Color ToConsoleColor ()
+		{
+			var trueColorMap = new Dictionary<TrueColor, Color> () {
+				{ new TrueColor (0,0,0),Color.Black},
+				{ new TrueColor (0, 0, 0x80),Color.Blue},
+				{ new TrueColor (0, 0x80, 0),Color.Green},
+				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
+				{ new TrueColor (0x80, 0, 0),Color.Red},
+				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
+				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
+				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
+				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
+				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
+				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
+				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
+				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
+				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
+				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
+				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
+				};
+			// Iterate over all colors in the map
+			var distances = trueColorMap.Select (
+							k => Tuple.Create (
+								// the candidate we are considering matching against (RGB)
+								k.Key,
+
+								CalculateDistance (k.Key, this)
+							));
+
+			// get the closest
+			var match = distances.OrderBy (t => t.Item2).First ();
+			return trueColorMap[match.Item1];
+		}
+
+		private float CalculateDistance (TrueColor color1, TrueColor color2)
+		{
+			// use RGB distance
+			return
+				Math.Abs (color1.Red - color2.Red) +
+				Math.Abs (color1.Green - color2.Green) +
+				Math.Abs (color1.Blue - color2.Blue);
+		}
+	}
+
+	/// <summary>
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
@@ -97,14 +176,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The color attribute value.
 		/// </summary>
-		public int Value { get; }
+		[JsonIgnore (Condition = JsonIgnoreCondition.Always)] 
+		public int Value { get; } 
+
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
+		[JsonConverter (typeof (Core.ColorJsonConverter))] 
 		public Color Foreground { get; }
+
 		/// <summary>
 		/// The background color.
 		/// </summary>
+		[JsonConverter (typeof (Core.ColorJsonConverter))] 
 		public Color Background { get; }
 
 		/// <summary>

@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
+using Terminal.Gui.Core;
 
 namespace Terminal.Gui {
 
@@ -423,6 +424,9 @@ namespace Terminal.Gui {
 
 			try {
 				Driver.Init (TerminalResized);
+				VisualStyleManager.LoadDefaults ();
+				VisualStyleManager.ApplyStyles (VisualStyleManager.Defaults);
+
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or
