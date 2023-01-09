@@ -4259,5 +4259,46 @@ This TextFormatter (tf2) is rewritten.
 0111000000
 0000000000", expectedColors);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Colors_On_TextAlignment_Right_And_Bottom ()
+		{
+			var labelRight = new Label ("Test") {
+				Width = 6,
+				Height = 1,
+				TextAlignment = TextAlignment.Right,
+				ColorScheme = Colors.Base
+			};
+			var labelBottom = new Label ("Test", TextDirection.TopBottom_LeftRight) {
+				Y = 1,
+				Width = 1,
+				Height = 6,
+				VerticalTextAlignment = VerticalTextAlignment.Bottom,
+				ColorScheme = Colors.Base
+			};
+			var top = Application.Top;
+			top.Add (labelRight, labelBottom);
+
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 7);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  Test
+      
+      
+T     
+e     
+s     
+t     ", output);
+
+			TestHelpers.AssertDriverColorsAre (@"
+000000
+0
+0
+0
+0
+0
+0", new Attribute [] { Colors.Base.Normal });
+		}
 	}
 }
