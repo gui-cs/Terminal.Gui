@@ -89,5 +89,5 @@
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
   </PropertyGroup>
-  <ProjectExtensions><VisualStudio><UserProperties core_4visualstylemanager_4visual-style_1json__JsonSchema="https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/d2f3fd0301a6f98ae81f38791111dac0e9d3a8db/visual-style.json" resources_4visualstyles_1json__JsonSchema="https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/653e5964650712541681001d66c04490cfb42b46/visual-style.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties core_4visualstylemanager_4visual-style_1json__JsonSchema="https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/d2f3fd0301a6f98ae81f38791111dac0e9d3a8db/visual-style.json" resources_4visualstyles_1json__JsonSchema="https://raw.githubusercontent.com/tig/Terminal.Gui/visual_style_manager/Terminal.Gui/Core/VisualStyleManager/visualstyle-schema.json" /></VisualStudio></ProjectExtensions>
 </Project>

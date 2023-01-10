@@ -1,5 +1,5 @@
 {
-  "@schema": "https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/653e5964650712541681001d66c04490cfb42b46/visual-style.json",
+  "@schema": "https://raw.githubusercontent.com/tig/Terminal.Gui/visual_style_manager/Terminal.Gui/Core/VisualStyleManager/visualstyle-schema.json",
   "ColorSchemes": {
     "TopLevel": {
       "Normal": {
