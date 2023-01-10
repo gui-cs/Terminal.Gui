@@ -1,13 +1,14 @@
 {
+  "@schema": "https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/653e5964650712541681001d66c04490cfb42b46/visual-style.json",
   "ColorSchemes": {
     "TopLevel": {
       "Normal": {
-        "Foreground": "BrightGreen",
-        "Background": "Black"
+        "Foreground": "Black",
+        "Background": "BrightRed"
       },
       "Focus": {
         "Foreground": "White",
-        "Background": "Cyan"
+        "Background": "Gray"
       },
       "HotNormal": {
         "Foreground": "Brown",
@@ -24,7 +25,7 @@
     },
     "Base": {
       "Normal": {
-        "Foreground": "White",
+        "Foreground": "rgb(255,255,255)",
         "Background": "Blue"
       },
       "Focus": {

@@ -51,7 +51,7 @@ namespace UICatalog {
 	/// </summary>
 	class UICatalogApp {
 		static FileSystemWatcher _watcher = new FileSystemWatcher ();
-		static string _visualStylesFile = "visualstyles.json";
+		static string _visualStylesFile = ".tui/UICatalog.visualstyles.json";
 
 		static void Main (string [] args)
 		{
@@ -142,7 +142,7 @@ namespace UICatalog {
 		{
 			Thread.Sleep (500);
 			VisualStyleManager.ApplyStylesFromFile (_visualStylesFile);
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.ColorSchemes ["UICatalog"];
 			Application.Top.SetNeedsDisplay ();
 		}
 
@@ -207,7 +207,8 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				ColorScheme = _colorScheme = Colors.ColorSchemes ["UICatalog"];
+
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
@@ -318,7 +319,7 @@ namespace UICatalog {
 				Application.HeightAsBuffer = _heightAsBuffer;
 
 				if (_colorScheme == null) {
-					ColorScheme = _colorScheme = Colors.Base;
+					ColorScheme = _colorScheme = Colors.ColorSchemes ["UICatalog"];
 				}
 
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;

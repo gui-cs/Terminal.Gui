@@ -38,10 +38,13 @@ namespace Terminal.Gui.Core {
 			}
 
 			Attribute attribute = new Attribute ();
-			Color foreground = Color.Black;
-			Color background = Color.Black;
+			Color foreground = Color.Invalid;
+			Color background = Color.Invalid;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
+					if (foreground == Color.Invalid || background == Color.Invalid) {
+						throw new JsonException ("Both Foreground and Background colors must be provided.");
+					}
 					return attribute;
 				}
 

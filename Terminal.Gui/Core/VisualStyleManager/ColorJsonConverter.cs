@@ -51,7 +51,8 @@ namespace Terminal.Gui.Core {
 			{ Color.BrightRed, "BrightRed" },
 			{ Color.BrightMagenta, "BrightMagenta" },
 			{ Color.BrightYellow, "BrightYellow" },
-			{ Color.White, "White" }
+			{ Color.White, "White" },
+			{ Color.Invalid, "Invalid" }
 		 };
 
 		/// <summary>

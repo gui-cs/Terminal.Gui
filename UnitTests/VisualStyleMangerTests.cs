@@ -59,7 +59,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (Colors.Dialog, readVisualStyle.ColorSchemes ["Dialog"]);
 			Assert.Equal (Colors.Menu, readVisualStyle.ColorSchemes ["Menu"]);
 
-			Colors.Base = readVisualStyle.ColorSchemes["Base"];
+			Colors.Base = readVisualStyle.ColorSchemes ["Base"];
 			Colors.TopLevel = readVisualStyle.ColorSchemes ["TopLevel"];
 			Colors.Error = readVisualStyle.ColorSchemes ["Error"];
 			Colors.Dialog = readVisualStyle.ColorSchemes ["Dialog"];
@@ -122,6 +122,28 @@ namespace Terminal.Gui.Core {
 						""foreground"": ""DarkGray"",
 						""background"": ""Blue""
 					    }
+				},
+				""UserDefined"": {
+					""NORMAL"": {
+						""FOREGROUND"": ""red"",
+						""background"": ""white""
+	    					    },
+					""focus"": {
+						""Foreground"": ""blue"",
+						""Background"": ""green""
+					    },
+					""hotNormal"": {
+						""foreground"": ""brightyellow"",
+						""background"": ""gray""
+					    },
+					""HotFocus"": {
+						""foreground"": ""darkgray"",
+						""background"": ""black""
+					    },
+					""disabled"": {
+						""foreground"": ""cyan"",
+						""background"": ""BrightCyan""
+					    }
 				}
 				}
 			}";
@@ -157,6 +179,73 @@ namespace Terminal.Gui.Core {
 
 			Assert.Equal (Color.DarkGray, visualStyle.ColorSchemes ["TopLevel"].Disabled.Foreground);
 			Assert.Equal (Color.Blue, visualStyle.ColorSchemes ["TopLevel"].Disabled.Background);
+
+			// User defined color scheme
+			Assert.Equal (Color.Red, visualStyle.ColorSchemes ["UserDefined"].Normal.Foreground);
+			Assert.Equal (Color.White, visualStyle.ColorSchemes ["UserDefined"].Normal.Background);
+
+			Assert.Equal (Color.Blue, visualStyle.ColorSchemes ["UserDefined"].Focus.Foreground);
+			Assert.Equal (Color.Green, visualStyle.ColorSchemes ["UserDefined"].Focus.Background);
+
+			Assert.Equal (Color.BrightYellow, visualStyle.ColorSchemes ["UserDefined"].HotNormal.Foreground);
+			Assert.Equal (Color.Gray, visualStyle.ColorSchemes ["UserDefined"].HotNormal.Background);
+
+			Assert.Equal (Color.DarkGray, visualStyle.ColorSchemes ["UserDefined"].HotFocus.Foreground);
+			Assert.Equal (Color.Black, visualStyle.ColorSchemes ["UserDefined"].HotFocus.Background);
+
+			Assert.Equal (Color.Cyan, visualStyle.ColorSchemes ["UserDefined"].Disabled.Foreground);
+			Assert.Equal (Color.BrightCyan, visualStyle.ColorSchemes ["UserDefined"].Disabled.Background);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestVisualStyleManagerLoadInvalidJsonAsserts ()
+		{
+			// Arrange
+			string json = @"
+			{
+			""ColorSchemes"": {
+				""UserDefined"": {
+					""hotNormal"": {
+						""foreground"": ""yellow"",
+						""background"": ""1234""
+					    }
+				}
+				}
+			}";
+
+			VisualStyle visualStyle;
+			JsonException jsonException = Assert.Throws<JsonException> (() => VisualStyleManager.LoadFromJson (json));
+			Assert.Equal ("Invalid color string: 'yellow'", jsonException.Message);
+
+			json = @"
+			{
+			""ColorSchemes"": {
+				""UserDefined"": {
+					""AbNormal"": {
+						""FOREGROUND"": ""red"",
+						""background"": ""white""
+	    					    }
+				}
+				}
+			}";
+
+			jsonException = Assert.Throws<JsonException> (() => VisualStyleManager.LoadFromJson (json));
+			Assert.Equal ("Unrecognized property name: AbNormal", jsonException.Message);
+
+			// Modify hotNormal background only 
+			json = @"
+			{
+			""ColorSchemes"": {
+				""Error"": {
+					""Normal"": {
+						""background"": ""Cyan""
+					    }
+				}
+				}
+			}";
+
+			jsonException = Assert.Throws<JsonException> (() => VisualStyleManager.LoadFromJson (json));
+			Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -171,42 +260,78 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void TestVisualStyleManagerLoadDefaults ()
 		{
-			Assert.Null (VisualStyleManager.Defaults);
 			VisualStyleManager.LoadDefaults ();
 			Assert.NotNull (VisualStyleManager.Defaults);
 
 			// Apply default styles
 			VisualStyleManager.ApplyStyles (VisualStyleManager.Defaults);
 
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+
+			Assert.Equal (Color.Black, Colors.ColorSchemes ["Base"].Focus.Foreground);
+			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Base"].Focus.Background);
+
+			Assert.Equal (Color.BrightCyan, Colors.ColorSchemes ["Base"].HotNormal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].HotNormal.Background);
+
+			Assert.Equal (Color.BrightBlue, Colors.ColorSchemes ["Base"].HotFocus.Foreground);
+			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Base"].HotFocus.Background);
+
+			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["Base"].Disabled.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Disabled.Background);
+
+			Assert.Equal (Color.BrightGreen, Colors.ColorSchemes ["TopLevel"].Normal.Foreground);
+			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Normal.Background);
+
+			Assert.Equal (Color.White, Colors.ColorSchemes ["TopLevel"].Focus.Foreground);
+			Assert.Equal (Color.Cyan, Colors.ColorSchemes ["TopLevel"].Focus.Background);
+
+			Assert.Equal (Color.Brown, Colors.ColorSchemes ["TopLevel"].HotNormal.Foreground);
+			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].HotNormal.Background);
+
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["TopLevel"].HotFocus.Foreground);
+			Assert.Equal (Color.Cyan, Colors.ColorSchemes ["TopLevel"].HotFocus.Background);
+
+			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["TopLevel"].Disabled.Foreground);
+			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Disabled.Background);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestVisualStyleManagerApplyPartialColorScheme ()
+		{
+			VisualStyleManager.LoadDefaults ();
+			Assert.NotNull (VisualStyleManager.Defaults);
+
+			// Apply default styles
+			VisualStyleManager.ApplyStyles (VisualStyleManager.Defaults);
+
+			// Prove Base is defaults (White, Blue)
 			Assert.Equal (Color.White, VisualStyleManager.Defaults.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, VisualStyleManager.Defaults.ColorSchemes ["Base"].Normal.Background);
 
-			Assert.Equal (Color.Black, VisualStyleManager.Defaults.ColorSchemes ["Base"].Focus.Foreground);
-			Assert.Equal (Color.Gray, VisualStyleManager.Defaults.ColorSchemes ["Base"].Focus.Background);
+			// Modify hotNormal
+			string json = @"
+			{
+			""ColorSchemes"": {
+				""Error"": {
+					""Normal"": {
+						""foreground"": ""gray"",
+						""background"": ""DarkGray""
+					    }
+				}
+				}
+			}";
 
-			Assert.Equal (Color.BrightCyan, VisualStyleManager.Defaults.ColorSchemes ["Base"].HotNormal.Foreground);
-			Assert.Equal (Color.Blue, VisualStyleManager.Defaults.ColorSchemes ["Base"].HotNormal.Background);
+			VisualStyleManager.ApplyStyles (json);
 
-			Assert.Equal (Color.BrightBlue, VisualStyleManager.Defaults.ColorSchemes ["Base"].HotFocus.Foreground);
-			Assert.Equal (Color.Gray, VisualStyleManager.Defaults.ColorSchemes ["Base"].HotFocus.Background);
+			// Prove Base didn't change from defaults (White, Blue)
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 
-			Assert.Equal (Color.DarkGray, VisualStyleManager.Defaults.ColorSchemes ["Base"].Disabled.Foreground);
-			Assert.Equal (Color.Blue, VisualStyleManager.Defaults.ColorSchemes ["Base"].Disabled.Background);
-
-			Assert.Equal (Color.BrightGreen, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Normal.Foreground);
-			Assert.Equal (Color.Black, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Normal.Background);
-
-			Assert.Equal (Color.White, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Focus.Foreground);
-			Assert.Equal (Color.Cyan, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Focus.Background);
-
-			Assert.Equal (Color.Brown, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].HotNormal.Foreground);
-			Assert.Equal (Color.Black, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].HotNormal.Background);
-
-			Assert.Equal (Color.Blue, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].HotFocus.Foreground);
-			Assert.Equal (Color.Cyan, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].HotFocus.Background);
-
-			Assert.Equal (Color.DarkGray, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Disabled.Foreground);
-			Assert.Equal (Color.Black, VisualStyleManager.Defaults.ColorSchemes ["TopLevel"].Disabled.Background);
+			// Prove Error's Normal changed
+			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Error"].Normal.Foreground);
+			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["Error"].Normal.Background);
 		}
 	}
 
@@ -361,8 +486,7 @@ namespace Terminal.Gui.Core {
 		}
 	}
 
-	public class ColorSchemeJsonConverterTests
-	{
+	public class ColorSchemeJsonConverterTests {
 		//string json = @"
 		//	{
 		//	""ColorSchemes"": {

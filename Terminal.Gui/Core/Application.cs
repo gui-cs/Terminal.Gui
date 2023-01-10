@@ -425,7 +425,7 @@ namespace Terminal.Gui {
 			try {
 				Driver.Init (TerminalResized);
 				VisualStyleManager.LoadDefaults ();
-				VisualStyleManager.ApplyStyles (VisualStyleManager.Defaults);
+				VisualStyleManager.ApplyStyles ();
 
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.

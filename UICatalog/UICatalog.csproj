@@ -19,11 +19,11 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="visualstyles.json" />
+    <None Remove="Resources\visualstyles.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="visualstyles.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <EmbeddedResource Include="Resources\visualstyles.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,26 @@
+{
+  "ColorSchemes": {
+    "UICatalog": {
+      "Normal": {
+        "Foreground": "Black",
+        "Background": "White"
+      },
+      "Focus": {
+        "Foreground": "Red",
+        "Background": "BrightYellow"
+      },
+      "HotNormal": {
+        "Foreground": "Black",
+        "Background": "BrightCyan"
+      },
+      "HotFocus": {
+        "Foreground": "BrightYellow",
+        "Background": "red"
+      },
+      "Disabled": {
+        "Foreground": "Gray",
+        "Background": "DarkGray"
+      }
+    }
+  }
+}

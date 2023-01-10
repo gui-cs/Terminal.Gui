@@ -83,7 +83,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White
+		White,
+
+		/// <summary>
+		/// Indicates an invalid color
+		/// </summary>
+		Invalid = -1
 	}
 
 	/// <summary>
@@ -294,27 +299,27 @@ namespace Terminal.Gui {
 		internal string caller = "";
 
 		/// <summary>
-		/// The default color for text, when the view is not focused.
+		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
 		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
 
 		/// <summary>
-		/// The color for text when the view has the focus.
+		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
 		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
 
 		/// <summary>
-		/// The color for the hotkey when a view is not focused
+		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
 		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
 
 		/// <summary>
-		/// The color for the hotkey when the view is focused.
+		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
 		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
 
 		/// <summary>
-		/// The default color for text, when the view is disabled.
+		/// The default foreground and background color for text, when the view is disabled.
 		/// </summary>
 		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
 
@@ -329,6 +334,7 @@ namespace Terminal.Gui {
 				return attribute;
 
 			preparingScheme = true;
+
 			switch (caller) {
 			case "TopLevel":
 				switch (callerMemberName) {
@@ -511,6 +517,21 @@ namespace Terminal.Gui {
 	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
 	public static class Colors {
+		private class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
+			public bool Equals (string x, string y)
+			{
+				if (x != null && y != null) {
+					return x.ToLowerInvariant () == y.ToLowerInvariant ();
+				}
+				return false;
+			}
+
+			public int GetHashCode (string obj)
+			{
+				return obj.ToLowerInvariant().GetHashCode ();
+			}
+		}
+
 		static Colors ()
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
@@ -518,7 +539,7 @@ namespace Terminal.Gui {
 			ColorSchemes = typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
 				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
-				.ToDictionary (t => t.Key, t => t.Value);
+				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase());
 		}
 
 		/// <summary>
