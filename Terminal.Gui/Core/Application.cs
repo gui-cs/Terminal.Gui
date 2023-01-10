@@ -387,12 +387,16 @@ namespace Terminal.Gui {
 				Driver = driver;
 			}
 
+			ConfigurationManager.LoadDefaults ();
+			ConfigurationManager.LoadConfigurationFromAllSources ();
+			ConfigurationManager.Config.ApplicationSettings.Apply ();
+
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-				} else if (UseSystemConsole) {
+				} else if (ConfigurationManager.Config.ApplicationSettings.UseSystemConsole.Value) {
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
@@ -403,6 +407,7 @@ namespace Terminal.Gui {
 					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
 				}
 			}
+
 
 			if (mainLoopDriver == null) {
 				// TODO: Move this logic into ConsoleDriver
@@ -424,9 +429,10 @@ namespace Terminal.Gui {
 
 			try {
 				Driver.Init (TerminalResized);
-				VisualStyleManager.LoadDefaults ();
-				VisualStyleManager.ApplyStyles ();
-
+				ConfigurationManager.Config.VisualStyles.GetHardCodedDefaults ();
+				ConfigurationManager.LoadDefaults ();
+				ConfigurationManager.LoadConfigurationFromAllSources ();
+				ConfigurationManager.Config.VisualStyles.Apply ();
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or

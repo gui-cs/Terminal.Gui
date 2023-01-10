@@ -812,7 +812,10 @@ namespace Terminal.Gui {
 		}
 	}
 
-	/// <inheritdoc/>
+	/// <summary>
+	/// Provides a default implementation of <see cref="IListDataSource"/> that renders
+	/// <see cref="ListView"/> items using <see cref="object.ToString()"/>.
+	/// </summary>
 	public class ListWrapper : IListDataSource {
 		IList src;
 		BitArray marks;

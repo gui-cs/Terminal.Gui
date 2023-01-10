@@ -51,7 +51,7 @@ namespace UICatalog {
 	/// </summary>
 	class UICatalogApp {
 		static FileSystemWatcher _watcher = new FileSystemWatcher ();
-		static string _visualStylesFile = ".tui/UICatalog.visualstyles.json";
+		static string _visualStylesFile = "UICatalog.config.json";
 
 		static void Main (string [] args)
 		{
@@ -70,15 +70,8 @@ namespace UICatalog {
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
 
-			_watcher.NotifyFilter = NotifyFilters.Attributes
-							| NotifyFilters.CreationTime
-							| NotifyFilters.DirectoryName
-							| NotifyFilters.FileName
-							| NotifyFilters.LastAccess
-							| NotifyFilters.LastWrite
-							| NotifyFilters.Security
-							| NotifyFilters.Size;
-			_watcher.Path = Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location);
+			_watcher.NotifyFilter = NotifyFilters.LastWrite;
+			_watcher.Path = Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location) + "/.tui/";
 			_watcher.Filter = _visualStylesFile;
 
 			// If a Scenario name has been provided on the commandline
@@ -141,8 +134,12 @@ namespace UICatalog {
 		private static void VisualStylesConfigChanged (object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep (500);
-			VisualStyleManager.ApplyStylesFromFile (_visualStylesFile);
-			Application.Top.ColorScheme = Colors.ColorSchemes ["UICatalog"];
+			ConfigurationManager.UpdateConfigurationFromFile (_watcher.Path + _visualStylesFile);
+			ConfigurationManager.Config.VisualStyles.Apply ();
+			ColorScheme s;
+			if (Colors.ColorSchemes.TryGetValue ("UICatalog", out s)) {
+				Application.Top.ColorScheme = s;
+			}
 			Application.Top.SetNeedsDisplay ();
 		}
 
@@ -207,11 +204,14 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme = Colors.ColorSchemes ["UICatalog"];
+				if (!Colors.ColorSchemes.TryGetValue ("UICatalog", out _colorScheme)) {
+					_colorScheme = Colors.ColorSchemes ["Base"];
+				}
+				ColorScheme = _colorScheme;
 
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
-						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
+						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Application.QuitKey)
 					}),
 					new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
@@ -233,7 +233,7 @@ namespace UICatalog {
 					Visible = true,
 				};
 				StatusBar.Items = new StatusItem [] {
-					new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
+					new StatusItem(Application.QuitKey, $"~{Application.QuitKey} to quit", () => {
 						if (_selectedScenario is null){
 							// This causes GetScenarioToRun to return null
 							_selectedScenario = null;

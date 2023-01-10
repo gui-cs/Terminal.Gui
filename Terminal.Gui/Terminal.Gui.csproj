@@ -15,10 +15,10 @@
     <InformationalVersion>1.9</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\visualstyles.json" />
+    <None Remove="Resources\config.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\visualstyles.json" />
+    <EmbeddedResource Include="Resources\config.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
@@ -89,5 +89,5 @@
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
   </PropertyGroup>
-  <ProjectExtensions><VisualStudio><UserProperties core_4visualstylemanager_4visual-style_1json__JsonSchema="https://gist.githubusercontent.com/tig/1fcbaf1bf454df6a7ba4331503724b15/raw/d2f3fd0301a6f98ae81f38791111dac0e9d3a8db/visual-style.json" resources_4visualstyles_1json__JsonSchema="https://raw.githubusercontent.com/tig/Terminal.Gui/visual_style_manager/Terminal.Gui/Core/VisualStyleManager/visualstyle-schema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 </Project>

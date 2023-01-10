@@ -1,0 +1,40 @@
+{
+  "@schema": "https://gui-cs.github.io/Terminal.Gui/schemas/visualstyle-schema.json",
+  "ApplicationSettings": {
+    "HeightAsBuffer": false,
+    "QuitKey": {
+      "Key": "End",
+      "Modifiers": [
+        "Ctrl"
+      ]
+    },
+    "IsMouseDisabled": false,
+    "UseSystemConsole": false
+  },
+  "VisualStyles": {
+    "ColorSchemes": {
+      "UICatalog": {
+        "Normal": {
+          "Foreground": "White",
+          "Background": "Black"
+        },
+        "Focus": {
+          "Foreground": "White",
+          "Background": "Cyan"
+        },
+        "HotNormal": {
+          "Foreground": "White",
+          "Background": "Red"
+        },
+        "HotFocus": {
+          "Foreground": "White",
+          "Background": "BrightYellow"
+        },
+        "Disabled": {
+          "Foreground": "White",
+          "Background": "Gray"
+        }
+      }
+    }
+  }
+}

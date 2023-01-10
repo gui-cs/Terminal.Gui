@@ -2641,9 +2641,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public static string DefaultBackground { get; internal set; }
-		public static string DefaultForeground { get; internal set; }
-
 		/// <summary>
 		/// Pretty prints the View
 		/// </summary>

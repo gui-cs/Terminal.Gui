@@ -74,7 +74,9 @@ namespace Terminal.Gui.Core {
 					//	break;
 				}
 
-				attribute = new Attribute (foreground, background);
+				if (Application.Driver != null) {
+					attribute = new Attribute (foreground, background);
+				}
 			}
 			throw new JsonException ();
 		}
