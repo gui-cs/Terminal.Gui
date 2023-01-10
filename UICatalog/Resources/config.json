@@ -19,12 +19,12 @@
           "Background": "Black"
         },
         "Focus": {
-          "Foreground": "White",
-          "Background": "Cyan"
+          "Foreground": "Black",
+          "Background": "BrightYellow"
         },
         "HotNormal": {
-          "Foreground": "White",
-          "Background": "Red"
+          "Foreground": "BrightYellow",
+          "Background": "Black"
         },
         "HotFocus": {
           "Foreground": "White",
