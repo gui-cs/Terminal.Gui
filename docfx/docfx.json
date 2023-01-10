@@ -67,7 +67,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "schemas/**"
         ],
         "exclude": [
           "obj/**",
