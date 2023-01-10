@@ -133,7 +133,7 @@ namespace Terminal.Gui {
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
+		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
+		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 		public static MainLoop MainLoop { get; private set; }
 
 		/// <summary>
-		/// Disable or enable the mouse in this <see cref="Application"/>
+		/// Disable or enable the mouse. The mouse is enabled by default.
 		/// </summary>
 		public static bool IsMouseDisabled { get; set; }
 
@@ -306,7 +306,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If set, it forces the use of the System.Console-based driver.
+		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
 		public static bool UseSystemConsole;
 
@@ -387,16 +387,21 @@ namespace Terminal.Gui {
 				Driver = driver;
 			}
 
-			ConfigurationManager.LoadDefaults ();
+			// Start the process of configuration management.
+			// Note that we end up calling LoadConfigurationFromAllSources
+			// mulitlple times. We need to do this because some settings are only
+			// valid after a Driver is loaded. In this cases we need just 
+			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.LoadConfigurationFromAllSources ();
-			ConfigurationManager.Config.ApplicationSettings.Apply ();
+			ConfigurationManager.Config.Settings.Apply ();
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-				} else if (ConfigurationManager.Config.ApplicationSettings.UseSystemConsole.Value) {
+				} else if (ConfigurationManager.Config.Settings.UseSystemConsole.HasValue &&
+					ConfigurationManager.Config.Settings.UseSystemConsole.Value) {
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
@@ -429,10 +434,12 @@ namespace Terminal.Gui {
 
 			try {
 				Driver.Init (TerminalResized);
-				ConfigurationManager.Config.VisualStyles.GetHardCodedDefaults ();
-				ConfigurationManager.LoadDefaults ();
+
+				// Now that the Driver is initialized, load all other configuration
+				// (ColorSchemes can't be set until a Driver is loaded).
 				ConfigurationManager.LoadConfigurationFromAllSources ();
 				ConfigurationManager.Config.VisualStyles.Apply ();
+
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or

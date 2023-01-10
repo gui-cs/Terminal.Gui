@@ -1,5 +1,5 @@
 {
-  "@schema": "https://gui-cs.github.io/Terminal.Gui/schemas/visualstyle-schema.json",
+  "@schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
   "ApplicationSettings": {
     "HeightAsBuffer": false,
     "QuitKey": {

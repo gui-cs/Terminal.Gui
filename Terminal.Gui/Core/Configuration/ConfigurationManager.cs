@@ -12,36 +12,64 @@ using static System.Net.Mime.MediaTypeNames;
 namespace Terminal.Gui.Core {
 
 	/// <summary>
-	/// Defines the VisualStyles for Terminal.Gui. 
+	/// Abstract class for implementing configuration settings within the Terminal.Gui configration schema. 
 	/// </summary>
-	public class VisualStyles {
+	public abstract class Config<T> where T : Config<T> 
+	{
 		/// <summary>
-		/// Creates a new instance, initilziing the styles from the
-		/// Terminal.Gui source code.
+		/// Gets the default configuration from the implementation (e.g. from <see cref="ListView"/>); called to 
+		/// initlize a <see cref="Config{T}"/> instance.
 		/// </summary>
-		public VisualStyles ()
-		{
-		}
+		/// <remarks>
+		/// <para>
+		/// This method is only really useful when using <see cref="ConfigurationManager.SaveDefaultConfig(string)"/>
+		/// to generate the JSON doc that is embedded into Terminal.Gui (during development). 
+		/// </para>
+		/// <para>
+		/// If this method is used before Terminal.Gui has been initizlied (either <see cref="Application"/> 
+		/// or <see cref="ConsoleDriver.Init(Action)"/>) care must be taken to ensure settings that can't be 
+		/// set/read don't throw exceptions. 
+		/// </para>
+		/// </remarks>
+		internal abstract void GetHardCodedDefaults ();
 
+		/// <summary>
+		/// Applys the confirationg settings held by this <see cref="Config{T}"/> object to the running <see cref="Application"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method must only set a target setting if the configuration held here was actually set (because it was
+		/// read from JSON).
+		/// </remarks>
+		public abstract void Apply ();
 
+		/// <summary>
+		/// Updates the internal state of a <see cref="Config{T}"/>  object. Called when JSON has been loaded. This method
+		/// must set the internal state such that <see cref="Apply"/> can know whether a particularly configuration 
+		/// setting was actually set.
+		/// </summary>
+		/// <param name="updates"></param>
+		internal abstract void Update (T updates);
+	}
+
+	/// <summary>
+	/// Defines the VisualStyles for Terminal.Gui. Used to serialize and deserialize 
+	/// JSON.
+	/// </summary>
+	public class VisualStyles : Config<VisualStyles> {
 		/// <summary>
 		/// The <see cref="ColorScheme"/> definitions. 
 		/// </summary>
 		[JsonInclude]
 		public IDictionary<string, ColorScheme> ColorSchemes { get; set; }
 
-		/// <summary>
-		/// Gets the default styles set in the <see cref="Application"/>, etc... classes.
-		/// </summary>
-		internal void GetHardCodedDefaults ()
+		/// <inheritdoc/>
+		internal override void GetHardCodedDefaults ()
 		{
 			ColorSchemes = Colors.ColorSchemes;
 		}
 
-		/// <summary>
-		/// Applys the loaded <see cref="VisualStyles"/> to <see cref="Application"/>.
-		/// </summary>
-		public void Apply ()
+		/// <inheritdoc/>
+		public override void Apply ()
 		{
 			// ColorSchemes
 			foreach (var scheme in ColorSchemes) {
@@ -49,9 +77,10 @@ namespace Terminal.Gui.Core {
 			}
 		}
 
-		internal void Update (VisualStyles updates)
+		/// <inheritdoc/>
+		internal override void Update (VisualStyles updates)
 		{
-			if (updates.ColorSchemes != null) {
+			if (ColorSchemes != null) {
 				foreach (var scheme in updates.ColorSchemes) {
 					ColorSchemes [scheme.Key] = scheme.Value;
 				}
@@ -60,17 +89,10 @@ namespace Terminal.Gui.Core {
 	}
 
 	/// <summary>
-	/// Defines the Application settings for Terminal.Gui.
+	/// Defines the Application settings for Terminal.Gui. Used to serialize and deserialize 
+	/// JSON.
 	/// </summary>
-	public class ApplicationSettings {
-		/// <summary>
-		/// Creates a new instance.
-		/// </summary>
-		public ApplicationSettings ()
-		{
-
-		}
-
+	public class Settings : Config<Settings> {
 		/// <summary>
 		/// The <see cref="Application.HeightAsBuffer"/> setting.
 		/// </summary>
@@ -107,12 +129,12 @@ namespace Terminal.Gui.Core {
 		[JsonInclude]
 		public bool? UseSystemConsole { get; set; }
 
-		/// <summary>
-		/// Gets the defaults set in the <see cref="Application"/> class.
-		/// </summary>
-		public void GetHardCodedDefaults ()
+		/// <inheritdoc/>
+		internal override void GetHardCodedDefaults ()
 		{
-			//HeightAsBuffer = Application.HeightAsBuffer;
+			if (Application.Driver != null) {
+				HeightAsBuffer = Application.HeightAsBuffer;
+			}
 			AlternateForwardKey = Application.AlternateForwardKey;
 			AlternateBackwardKey = Application.AlternateBackwardKey;
 			QuitKey = Application.QuitKey;
@@ -120,10 +142,8 @@ namespace Terminal.Gui.Core {
 			UseSystemConsole = Application.UseSystemConsole;
 		}
 
-		/// <summary>
-		/// Applies the settings to <see cref="Application"/>
-		/// </summary>
-		public void Apply ()
+		/// <inheritdoc/>
+		public override void Apply ()
 		{
 			if (Application.Driver != null && HeightAsBuffer.HasValue) Application.HeightAsBuffer = HeightAsBuffer.Value;
 			if (AlternateForwardKey.HasValue) Application.AlternateForwardKey = AlternateForwardKey.Value;
@@ -133,7 +153,8 @@ namespace Terminal.Gui.Core {
 			if (UseSystemConsole.HasValue) Application.UseSystemConsole = UseSystemConsole.Value;
 		}
 
-		internal void Update (ApplicationSettings updates)
+		/// <inheritdoc/>
+		internal override void Update (Settings updates)
 		{
 			if (updates.HeightAsBuffer.HasValue) HeightAsBuffer = updates.HeightAsBuffer.Value;
 			if (updates.AlternateForwardKey.HasValue) AlternateForwardKey = updates.AlternateForwardKey.Value;
@@ -145,14 +166,14 @@ namespace Terminal.Gui.Core {
 	}
 
 	/// <summary>
-	/// The root object of Terminal.Gui configuration settings. 
+	/// The root object of Terminal.Gui configuration settings / JSON schema.
 	/// </summary>
 	public class Configuration {
 		/// <summary>
 		/// The settings for the <see cref="Application"/>.
 		/// </summary>
 		[JsonInclude]
-		public ApplicationSettings ApplicationSettings { get; set; } = new ApplicationSettings ();
+		public Settings Settings { get; set; } = new Settings ();
 
 		/// <summary>
 		/// The <see cref="VisualStyles"/> for the <see cref="Application"/>.
@@ -162,7 +183,8 @@ namespace Terminal.Gui.Core {
 	}
 
 	/// <summary>
-	/// 
+	/// Provides settings and configuration management for Terminal.Gui applications. See the <see cref="LoadConfigurationFromAllSources"/>
+	/// for how configuraiton settings are applied. 
 	/// </summary>
 	public static class ConfigurationManager {
 
@@ -172,7 +194,7 @@ namespace Terminal.Gui.Core {
 		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
 			PropertyNameCaseInsensitive = true,
-			IgnoreNullValues = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			WriteIndented = true,
 			Converters = {
 				new AttributeJsonConverter (),
@@ -185,25 +207,9 @@ namespace Terminal.Gui.Core {
 
 		/// <summary>
 		/// The <see cref="Configuration"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
-		/// Use <see cref="VisualStyles.Apply()"/>, <see cref="ApplicationSettings.Apply()"/> etc to apply these to the running Terminal.Gui app.
+		/// Use <see cref="VisualStyles.Apply()"/>, <see cref="Settings.Apply()"/> etc to apply these to the running Terminal.Gui app.
 		/// </summary>
 		public static Configuration Config { get { return _config; } }
-
-		/// <summary>
-		/// Loads the default settings from the Terminal.Gui assembly.
-		/// <remarks>
-		/// The settings are read from a JSON file stored in the Terminal.Gui assembly (in Terminal.Gui.Resouces).
-		/// </remarks>
-		/// </summary>
-		public static void LoadDefaults ()
-		{
-			// Load the default styles from the Terminal.Gui assembly
-			using (Stream stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream ($"Terminal.Gui.Resources.{_configFilename}"))
-			using (StreamReader reader = new StreamReader (stream)) {
-				string json = reader.ReadToEnd ();
-				_config = LoadFromJson (json);
-			}
-		}
 
 		/// <summary>
 		/// Loads the <see cref="Configuration"/> from a JSON document. 
@@ -235,7 +241,7 @@ namespace Terminal.Gui.Core {
 			var newConfig = JsonSerializer.Deserialize<Configuration> (json, serializerOptions);
 
 			// TODO: apply only settings defined to _config
-			Config.ApplicationSettings.Update (newConfig.ApplicationSettings);
+			Config.Settings.Update (newConfig.Settings);
 			Config.VisualStyles.Update (newConfig.VisualStyles);
 		}
 
@@ -248,17 +254,25 @@ namespace Terminal.Gui.Core {
 			// Read the JSON file
 			string json = File.ReadAllText (filePath);
 			UpdateConfiguration (json);
+#if DEBUG
+			Debug.WriteLine ($"ConfigurationManager: Read configuration from {filePath}");
+#endif
 		}
 
 		/// <summary>
 		/// Writes the configuration settings hard-coded into the libary to a JSON file. Used
-		/// to create the JSON documents during development. 
+		/// to create the `Terminal.Gui.Resources.config.json` resource during development. See the 
+		/// TestConfigurationManagerSaveDefaults unit test in `ConfigurationManagerTests.cs`.
 		/// </summary>
-		public static void SaveHardCodedConfig (string path)
+		public static void SaveDefaultConfig (string path)
 		{
 			var config = new Configuration ();
 
-			// Serialize the Colors object to a JSON string
+			// Get the hard coded settings
+			config.Settings.GetHardCodedDefaults ();
+			config.VisualStyles.GetHardCodedDefaults ();
+
+			// Serialize to a JSON string
 			string json = ConfigurationManager.ToJson (config);
 
 			// Write the JSON string to the file specified by filePath
@@ -266,49 +280,56 @@ namespace Terminal.Gui.Core {
 		}
 
 		/// <summary>
-		/// Loads all settings found into the <see cref="Configuration"/>. 
+		/// Loads all settings found in the various locations into the <see cref="Config"/> object. 
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		/// Styles are defined in JSON format, according to the schema: 
+		/// Settings are defined in JSON format, according to the schema: 
+		///	https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 		/// </para>
 		/// <para>
 		/// Settings that will apply to all applications reside in files named <c>visualstyles.json</c>. Settings 
-		/// that will apply to a specific Terminal.Gui application reside in files named <c>appname.visualstyles.json</c>,
+		/// that will apply to a specific Terminal.Gui application reside in files named <c>appname.config.json</c>,
 		/// where <c>appname</c> is the assembly name of the application. 
 		/// </para>
-		/// Styles will be appied using the following precidence (higher precidence settings
+		/// Settings will be applied using the following precidence (higher precidence settings
 		/// overwrite lower precidence settings):
 		/// <para>
-		/// 1. App specific styles found in the users's home directory (~/.tui/appname.visualstyles.json).
+		///	1. App specific settings found in the users's home directory (~/.tui/appname.visualstyles.json). -- Highest precidence.
 		/// </para>
 		/// <para>
-		/// 2. App specific styles found in the app startup directory (./.tui/appname.visualstyles.json).
+		///	2. App specific settings found in the current working directory (./.tui/appname.visualstyles.json).
 		/// </para>
 		/// <para>
-		/// 3. App settings in app resources (Resources/{visualStylesFilename}). 
+		///	3. App settings in app resources (Resources/{visualStylesFilename}). 
 		/// </para>
 		/// <para>
-		/// 4. Global styles found in the the user's home direcotry (~/.tui/{visualStylesFilename}).
+		///	4. Global settings found in the the user's home direcotry (~/.tui/{visualStylesFilename}).
 		/// </para>
 		/// <para>
-		/// 5. Global styles found in the app startup's direcotry (./.tui/{visualStylesFilename}).
+		///	5. Global settings found in the app startup's direcotry (./.tui/{visualStylesFilename}).
 		/// </para>
 		/// <para>
-		/// 6. Default styles defined in the Terminal.Gui assembly --lowest priority.
-		/// </para>
-		/// <para>
-		/// The style manager first uses the settings from any copy of the visualstyles.json in the .tui/ directory in the user's home directory. 
-		/// Then it looks for any copies of the file located in the app directories, 
-		/// adding any settings found in them, but ignoring attributes already discovered in higher-priority locations. 
-		/// As a last resort, for any settings not explicitly assigned at either the global or app level, 
-		/// it assigns default values from the settings compiled into Terminal.Gui.dll.
+		///	6. Default settings defined in the Terminal.Gui assembly -- Lowest precidence.
 		/// </para>
 		/// </remarks>
 		public static void LoadConfigurationFromAllSources ()
 		{
-			// Styles in Terminal.Gui assembly (hard-coded) --lowest priority
-			Debug.Assert (Config != null);
+			// Styles defined in code in Terminal.Gui assembly (hard-coded) -- Lowest precidence.
+			// (We actually ignore them at runtime and depend on the embedded `config.json` resource).
+
+			// Load the default styles from the Terminal.Gui assembly 
+			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
+			using (Stream stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName))
+			using (StreamReader reader = new StreamReader (stream)) {
+				string json = reader.ReadToEnd ();
+				_config = LoadFromJson (json);
+#if DEBUG
+				Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
+#endif
+			}
+
+			Debug.Assert(_config != null);
 
 			// Global Styles in local directories (./.tui/{visualStylesFilename})
 			string globalLocal = $"./.tui/{_configFilename}";
@@ -318,7 +339,7 @@ namespace Terminal.Gui.Core {
 			}
 
 			// Global Styles in user home dir (~/.tui/{visualStylesFilename})
-			string globalHome = $"~/.tui/{_configFilename}";
+			string globalHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}";
 			if (File.Exists (globalHome)) {
 				// Load the local file
 				UpdateConfigurationFromFile (globalHome);
@@ -331,21 +352,24 @@ namespace Terminal.Gui.Core {
 				using (StreamReader reader = new StreamReader (stream)) {
 					string json = reader.ReadToEnd ();
 					UpdateConfiguration (json);
+#if DEBUG
+					Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
+#endif
 				}
 			}
 
 			// Get app name
 			string appName = System.Reflection.Assembly.GetEntryAssembly ().FullName.Split (',') [0].Trim ();
 
-			// App Styles in local directories (./.tui/appname.visualstyles.json)
+			// App Styles in the current working directory (./.tui/appname.visualstyles.json)
 			string appLocal = $"./.tui/{appName}.{_configFilename}";
 			if (File.Exists (appLocal)) {
 				// Load the local file
 				UpdateConfigurationFromFile (appLocal);
 			}
 
-			// App Styles in the users's home directory (~/.tui/appname.visualstyles.json)
-			string appHome = $"~/.tui/{appName}.{_configFilename}";
+			// App specific styles in the users's home directory (~/.tui/appname.visualstyles.json)
+			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{appName}.{_configFilename}";
 			if (File.Exists (appHome)) {
 				// Load the global file
 				UpdateConfigurationFromFile (appHome);

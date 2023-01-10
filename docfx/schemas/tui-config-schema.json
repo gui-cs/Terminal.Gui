@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "The JSON schema for the Terminal.Gui Configuration Manager. This schema is published to https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json.",
+  "type": "object",
+  "properties": {
+    "ApplicationSettings": {
+      "description": "Configuration settings for Terminal.Gui applications.",
+      "type": "object",
+      "properties": {
+        "HeightAsBuffer": {
+          "description": "See HeightAsBuffer API documentation.",
+          "type": "boolean"
+        },
+        "AlternateForwardKey": {
+          "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
+          "$ref": "#/definitions/key"
+        },
+        "AlternateBackwardKey": {
+          "description": "Alternative key for navigating backwards through views. Shift+Ctrl+Tab is the primary key.",
+          "$ref": "#/definitions/key"
+        },
+        "QuitKey": {
+          "description": "The key to quit the application. Ctrl+Q is the default.",
+          "$ref": "#/definitions/key"
+        },
+        "IsMouseDisabled": {
+          "description": "Disable or enable the mouse. The mouse is enabled by default.",
+          "type": "boolean"
+        },
+        "UseSystemConsole": {
+          "description": "If true, forces the use of the System.Console-based (aka NetDriver) driver. The default is false.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "HeightAsBuffer",
+        "AlternateForwardKey",
+        "AlternateBackwardKey",
+        "QuitKey",
+        "IsMouseDisabled",
+        "UseSystemConsole"
+      ]
+    },
+    "VisualStyles": {
+      "description": "Defines the Visual Style settings for Terminal.Gui applications.",
+      "type": "object",
+      "properties": {
+        "ColorSchemes": {
+          "description": "A list of ColorSchemes. Each ColorScheme specifies a set of Attributes (Foreground & Background).",
+          "type": "object",
+          "properties": {
+            "TopLevel": {
+              "$ref": "#/definitions/colorScheme"
+            },
+            "Base": {
+              "$ref": "#/definitions/colorScheme"
+            },
+            "Dialog": {
+              "$ref": "#/definitions/colorScheme"
+            },
+            "Menu": {
+              "$ref": "#/definitions/colorScheme"
+            },
+            "Error": {
+              "$ref": "#/definitions/colorScheme"
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/ColorScheme"
+          }
+        }
+      },
+      "required": [
+        "ColorSchemes"
+      ],
+      "definitions": {
+        "ColorScheme": {
+          "description": "A Terminal.Gui ColorScheme. Specifies the Foreground & Background colors for modes of an Terminal.Gui app.",
+          "type": "object",
+          "properties": {
+            "Normal": {
+              "description": "The foreground and background color for text when the view is not focused, hot, or disabled.",
+              "$ref": "#/definitions/Attribute"
+            },
+            "Focus": {
+              "description": "The foreground and background color for text when the view has focus.",
+              "$ref": "#/definitions/Attribute"
+            },
+            "HotNormal": {
+              "description": "The foreground and background color for text when the view is highlighted (hot).",
+              "$ref": "#/definitions/Attribute"
+            },
+            "HotFocus": {
+              "description": "The foreground and background color for text when the view is highlighted (hot) and has focus.",
+              "$ref": "#/definitions/Attribute"
+            },
+            "Disabled": {
+              "description": "The foreground and background color for text when the view disabled.",
+              "$ref": "#/definitions/Attribute"
+            }
+          }
+        },
+        "Attribute": {
+          "description": "A Terminal.Gui color attribute. Specifies the Foreground & Background colors for Terminal.Gui output.",
+          "type": "object",
+          "properties": {
+            "Foreground": {
+              "$ref": "#/definitions/Color"
+            },
+            "Background": {
+              "$ref": "#/definitions/Color"
+            }
+          },
+          "required": [
+            "Foreground",
+            "Background"
+          ]
+        },
+        "Color": {
+          "description": "One be either one of 16 standard color names or an rgb(r,g,b) tuple.",
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "string",
+          "properties": {
+            "color": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "Black",
+                    "Blue",
+                    "Green",
+                    "Cyan",
+                    "Red",
+                    "Magenta",
+                    "Brown",
+                    "Gray",
+                    "DarkGray",
+                    "BrightBlue",
+                    "BrightGreen",
+                    "BrightCyan",
+                    "BrightRed",
+                    "BrightMagenta",
+                    "BrightYellow",
+                    "White"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "pattern": "^rgb\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

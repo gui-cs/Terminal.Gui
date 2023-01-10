@@ -51,7 +51,6 @@ namespace UICatalog {
 	/// </summary>
 	class UICatalogApp {
 		static FileSystemWatcher _watcher = new FileSystemWatcher ();
-		static string _visualStylesFile = "UICatalog.config.json";
 
 		static void Main (string [] args)
 		{
@@ -70,9 +69,16 @@ namespace UICatalog {
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
 
+			// Setup a file system watcher for `./.tui/`
 			_watcher.NotifyFilter = NotifyFilters.LastWrite;
-			_watcher.Path = Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location) + "/.tui/";
-			_watcher.Filter = _visualStylesFile;
+			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
+			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
+
+			if (!Directory.Exists (tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+			_watcher.Path = tuiDir;
+			_watcher.Filter = "*config.json";
 
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
@@ -134,12 +140,12 @@ namespace UICatalog {
 		private static void VisualStylesConfigChanged (object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep (500);
-			ConfigurationManager.UpdateConfigurationFromFile (_watcher.Path + _visualStylesFile);
+			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
 			ConfigurationManager.Config.VisualStyles.Apply ();
-			ColorScheme s;
-			if (Colors.ColorSchemes.TryGetValue ("UICatalog", out s)) {
-				Application.Top.ColorScheme = s;
-			}
+			//ColorScheme s;
+			//if (Colors.ColorSchemes.TryGetValue ("UICatalog", out s)) {
+			//	Application.Top.ColorScheme = s;
+			//}
 			Application.Top.SetNeedsDisplay ();
 		}
 
