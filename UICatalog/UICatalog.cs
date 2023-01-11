@@ -231,8 +231,8 @@ namespace UICatalog {
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 
-				ContentPane.Panels [0].Title = "Categories";
-				ContentPane.Panels [0].Add (CategoryListView);
+				ContentPane.Panel1Title = "Categories";
+				ContentPane.Panel1.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -245,8 +245,8 @@ namespace UICatalog {
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
 
-				ContentPane.Panels [1].Title = "Scenarios";
-				ContentPane.Panels [1].Add (ScenarioListView);
+				ContentPane.Panel2Title = "Scenarios";
+				ContentPane.Panel2.Add (ScenarioListView);
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);

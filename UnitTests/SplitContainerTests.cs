@@ -209,7 +209,7 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitContainer (out var line);
 			SetInputFocusLine (splitContainer);
-			splitContainer.Panels [0].MinSize = 6;
+			splitContainer.Panel1MinSize = 6;
 
 			// distance is too small (below 6)
 			splitContainer.SplitterDistance = 2;
@@ -254,7 +254,7 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitContainer (out var line,true);
 			SetInputFocusLine (splitContainer);
-			splitContainer.Panels [0].MinSize = 5;
+			splitContainer.Panel1MinSize = 5;
 
 			// distance is too small (below 5)
 			splitContainer.SplitterDistance = 2;
@@ -298,7 +298,7 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitContainer (out var line);
 			SetInputFocusLine (splitContainer);
-			splitContainer.Panels [1].MinSize = 6;
+			splitContainer.Panel2MinSize = 6;
 
 			// distance leaves too little space for panel2 (less than 6 would remain)
 			splitContainer.SplitterDistance = 8;
@@ -342,7 +342,7 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitContainer (out var line, true);
 			SetInputFocusLine (splitContainer);
-			splitContainer.Panels [1].MinSize = 5;
+			splitContainer.Panel2MinSize = 5;
 
 			// distance leaves too little space for panel2 (less than 5 would remain)
 			splitContainer.SplitterDistance = 8;
@@ -427,7 +427,7 @@ namespace UnitTests {
 
 			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			SetInputFocusLine (splitContainer);
-			splitContainer.Panels [0].MinSize = 1;
+			splitContainer.Panel1MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of Panel1
 			splitContainer.SplitterDistance = 0;
@@ -513,11 +513,11 @@ namespace UnitTests {
 				container.Border.DrawMarginFrame = false;
 			}
 
-			container.Panels [0].Add (new Label (new string ('1', 100)));
-			container.Panels [1].Add (new Label (new string ('2', 100)));
+			container.Panel1.Add (new Label (new string ('1', 100)));
+			container.Panel2.Add (new Label (new string ('2', 100)));
 			
-			container.Panels [0].MinSize = 0;
-			container.Panels [1].MinSize = 0;
+			container.Panel1MinSize = 0;
+			container.Panel2MinSize = 0;
 
 			Application.Top.Add (container);
 			container.ColorScheme = new ColorScheme ();

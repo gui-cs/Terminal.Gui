@@ -1,8 +1,5 @@
 ﻿using NStack;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
@@ -11,12 +8,38 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> consisting of a moveable bar that divides
 	/// the display area into 2 resizeable panels.
 	/// </summary>
-	public class SplitContainer : FrameView {
+	public class SplitContainer : View {
 
 		private SplitContainerLineView splitterLine;
+		SplitContainer parentSplitPanel;
+
+		/// <summary>
+		/// The <see cref="View"/> showing in the left hand pane of a
+		/// <see cref="Orientation.Vertical"/>  or top of an
+		/// <see cref="Orientation.Horizontal"/> pane.  May be another
+		/// <see cref="SplitContainer"/> if further splitter subdivisions are
+		/// desired (e.g. to create a resizeable grid.
+		/// </summary>
+		public View Panel1 { get; private set; }
+
+		
+		public int Panel1MinSize { get; set; }
+		public ustring Panel1Title { get; set; }
+
+		/// <summary>
+		/// The <see cref="View"/> showing in the right hand pane of a
+		/// <see cref="Orientation.Vertical"/>  or bottom of an
+		/// <see cref="Orientation.Horizontal"/> pane.  May be another
+		/// <see cref="SplitContainer"/> if further splitter subdivisions are
+		/// desired (e.g. to create a resizeable grid.
+		/// </summary>
+		public View Panel2 { get; private set; }
+
+		public int Panel2MinSize { get; set; }
+		public ustring Panel2Title { get; set; }
+
 		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
-		private SplitterPanel [] splitterPanels = { new SplitterPanel(), new SplitterPanel() };
 
 		/// <summary>
 		/// Creates a new instance of the SplitContainer class.
@@ -24,30 +47,15 @@ namespace Terminal.Gui {
 		public SplitContainer ()
 		{
 			splitterLine = new SplitContainerLineView (this);
+			Panel1 = new View () { Width = Dim.Fill (), Height = Dim.Fill() };
+			Panel2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 
-			this.Add (splitterPanels [0]);
+			this.Add (Panel1);
 			this.Add (splitterLine);
-			this.Add (splitterPanels [1]);
-
-			LayoutStarted += (e) => Setup ();
+			this.Add (Panel2);
 
 			CanFocus = true;
 		}
-
-		/// <summary>
-		/// Gets the list of panels. Currently only supports 2 panels.
-		/// <remarks>
-		/// <para>
-		/// The first item in the list is either the leftmost or topmost panel;
-		/// the second item is either the rightmost or bottom panel 
-		/// (depending on <see cref="Orientation"/>)
-		/// </para>
-		/// <para>
-		/// Add panel contents to the <see cref="SplitterPanel"/>s using <see cref="View.Add(View)"/>.
-		/// </para>
-		/// </remarks>
-		/// </summary>
-		public List<SplitterPanel> Panels { get { return splitterPanels.ToList(); } }
 
 		/// <summary>
 		/// Invoked when the <see cref="SplitterDistance"/> is changed
@@ -69,9 +77,17 @@ namespace Terminal.Gui {
 			get { return orientation; }
 			set {
 				orientation = value;
-				Setup ();
 				LayoutSubviews ();
 			}
+		}
+
+		public override void LayoutSubviews ()
+		{
+			if(this.IsRootSplitContainer()) {
+				Setup (this, Bounds);
+			}			
+
+			base.LayoutSubviews ();
 		}
 
 		/// <summary>
@@ -89,11 +105,12 @@ namespace Terminal.Gui {
 				}
 
 				splitterDistance = value;
-				Setup ();
+				GetRootSplitContainer ().LayoutSubviews ();
 				OnSplitterMoved ();
-				LayoutSubviews ();
 			}
 		}
+
+		
 
 		/// <inheritdoc/>
 		public override bool OnEnter (View view)
@@ -114,12 +131,14 @@ namespace Terminal.Gui {
 				splitterLine.Redraw (bounds);
 			}
 
+			// TODO: 
 			// Draw Titles over Border
 			var screen = ViewToScreen (bounds);
-			if (splitterPanels[0].Visible && splitterPanels[0].Title.Length > 0) {
-				Driver.SetAttribute (splitterPanels[0].HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, splitterPanels[0].Frame.Width, 1), splitterPanels[0].Title, 0, 0, 0, 0);
+			if (Panel1.Visible && Panel1Title.Length > 0) {
+				Driver.SetAttribute (Panel1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel1.Frame.Width, 1), Panel1Title, 0, 0, 0, 0);
 			}
+
 			if (splitterLine.Visible) {
 				screen = ViewToScreen (splitterLine.Frame);
 			} else {
@@ -127,26 +146,43 @@ namespace Terminal.Gui {
 				screen.Y--;
 			}
 			if (Orientation == Orientation.Horizontal) {
-				if (splitterPanels[1].Visible && splitterPanels[1].Title.Length > 0) {
+				if (Panel2.Visible && Panel2Title?.Length > 0) {
 
-					Driver.SetAttribute (splitterPanels[1].HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, splitterPanels[1].Bounds.Width, 1), splitterPanels[1].Title, 0, 0, 0, 0);
+					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			} else {
-				if (splitterPanels[1].Visible && splitterPanels[1].Title.Length > 0) {
-					Driver.SetAttribute (splitterPanels[1].HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, splitterPanels[1].Bounds.Width, 1), splitterPanels[1].Title, 0, 0, 0, 0);
+				if (Panel2.Visible && Panel2Title?.Length > 0) {
+					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			}
 		}
 
-		private void Setup ()
+		private bool IsRootSplitContainer ()
+		{
+			// TODO: don't want to layout subviews since the parent recursively lays them all out
+			return parentSplitPanel == null;
+		}
+		private SplitContainer GetRootSplitContainer ()
+		{
+			SplitContainer root = this;
+
+			while (root.parentSplitPanel != null) {
+				root = root.parentSplitPanel;
+			}
+
+			return root;
+		}
+		private void Setup (SplitContainer splitContainer, Rect bounds)
 		{
 			splitterLine.Orientation = Orientation;
-			splitterLine.Text = splitterPanels[1].Title;
+			// splitterLine.Text = Panel2.Title;
 
-			if (!splitterPanels[0].Visible || !splitterPanels[1].Visible) {
-				View toFullSize = !splitterPanels[0].Visible ? splitterPanels[1] : splitterPanels[0];
+			// TODO: Recursion
+
+			if (!Panel1.Visible || !Panel2.Visible) {
+				View toFullSize = !Panel1.Visible ? Panel2 : Panel1;
 
 				splitterLine.Visible = false;
 
@@ -159,41 +195,41 @@ namespace Terminal.Gui {
 
 				splitterDistance = BoundByMinimumSizes (splitterDistance);
 
-				splitterPanels[0].X = 0;
-				splitterPanels[0].Y = 0;
+				Panel1.X = 0;
+				Panel1.Y = 0;
 
-				splitterPanels[1].Width = Dim.Fill ();
-				splitterPanels[1].Height = Dim.Fill ();
+				Panel2.Width = Dim.Fill ();
+				Panel2.Height = Dim.Fill ();
 
 				switch (Orientation) {
 				case Orientation.Horizontal:
-					splitterLine.X = -1;
+					splitterLine.X = 0;
 					splitterLine.Y = splitterDistance;
 					splitterLine.Width = Dim.Fill () + 1;
 					splitterLine.Height = 1;
 					splitterLine.LineRune = Driver.HLine;
 
-					splitterPanels[0].Width = Dim.Fill ();
-					splitterPanels[0].Height = new Dim.DimFunc (() =>
+					Panel1.Width = Dim.Fill ();
+					Panel1.Height = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Height));
 
-					splitterPanels[1].Y = Pos.Bottom (splitterLine);
-					splitterPanels[1].X = 0;
+					Panel2.Y = Pos.Bottom (splitterLine);
+					Panel2.X = 0;
 					break;
 
 				case Orientation.Vertical:
 					splitterLine.X = splitterDistance;
-					splitterLine.Y = -1;
+					splitterLine.Y = 0;
 					splitterLine.Width = 1;
 					splitterLine.Height = Dim.Fill () + 1;
 					splitterLine.LineRune = Driver.VLine;
 
-					splitterPanels[0].Height = Dim.Fill ();
-					splitterPanels[0].Width = new Dim.DimFunc (() =>
+					Panel1.Height = Dim.Fill ();
+					Panel1.Width = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Width));
 
-					splitterPanels[1].X = Pos.Right (splitterLine);
-					splitterPanels[1].Y = 0;
+					Panel2.X = Pos.Right (splitterLine);
+					Panel2.Y = 0;
 					break;
 
 				default: throw new ArgumentOutOfRangeException (nameof (orientation));
@@ -221,11 +257,11 @@ namespace Terminal.Gui {
 
 			var idealPosition = pos.Anchor (availableSpace);
 
-			// bad position because not enough space for splitterPanels[0]
-			if (idealPosition < splitterPanels [0].MinSize.Anchor (availableSpace)) {
+			// bad position because not enough space for Panel1
+			if (idealPosition < Panel1MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
-				return (Pos)Math.Min (splitterPanels [0].MinSize.Anchor (availableSpace), availableSpace);
+				return (Pos)Math.Min (Panel1MinSize, availableSpace);
 			}
 
 			// if there is a border then 2 screen units are taken occupied
@@ -234,13 +270,13 @@ namespace Terminal.Gui {
 				availableSpace -= 2;
 			}
 
-			// bad position because not enough space for splitterPanels[1]
-			if (availableSpace - idealPosition <= splitterPanels [1].MinSize.Anchor (availableSpace)) {
+			// bad position because not enough space for Panel2
+			if (availableSpace - idealPosition <= Panel2MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
 
 				// +1 is to allow space for the splitter
-				return (Pos)Math.Max (availableSpace - (splitterPanels [1].MinSize.Anchor (availableSpace) + 1), 0);
+				return (Pos)Math.Max (availableSpace - (Panel2MinSize + 1), 0);
 			}
 
 			// this splitter position is fine, there is enough space for everyone

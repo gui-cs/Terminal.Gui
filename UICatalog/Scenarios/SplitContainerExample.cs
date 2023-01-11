@@ -46,19 +46,19 @@ namespace UICatalog.Scenarios {
 				Orientation = Orientation.Horizontal
 			};
 
-			splitContainer.Panels [0].MinSize = 4;
-			splitContainer.Panels [1].MinSize = 4;
+			splitContainer.Panel1MinSize = 4;
+			splitContainer.Panel2MinSize = 4;
 
 			Label lbl1;
-			splitContainer.Panels [0].Title = "Hello";
-			splitContainer.Panels [0].Add (lbl1 = new Label ("Type Something:") { Y = 0 });
-			splitContainer.Panels [0].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl1) + 1 });
+			splitContainer.Panel1Title = "Hello";
+			splitContainer.Panel1.Add (lbl1 = new Label ("Type Something:") { Y = 0 });
+			splitContainer.Panel1.Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl1) + 1 });
 
 			Label lbl2;
-			splitContainer.Panels [1].Title = "World";
-			splitContainer.Panels[1].Add(nestedSplitContainer);
+			splitContainer.Panel2Title = "World";
+			splitContainer.Panel2.Add(nestedSplitContainer);
 
-			nestedSplitContainer.Panels [0].Add (new TextView ()
+			nestedSplitContainer.Panel1.Add (new TextView ()
 			 {
 				Width = Dim.Fill(),
 				Height = Dim.Fill(),
@@ -70,10 +70,10 @@ namespace UICatalog.Scenarios {
 			nestedSplitContainer.Border.BorderStyle = BorderStyle.None;
 			nestedSplitContainer.Border.DrawMarginFrame = false;
 			
-			nestedSplitContainer.Panels [1].Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
-			nestedSplitContainer.Panels [1].Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
-			nestedSplitContainer.Panels [1].Add (new Label ("Here is a Text box:") { Y = 1 });
-			nestedSplitContainer.Panels [1].Add (new TextView () { Y = 2, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
+			nestedSplitContainer.Panel2.Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
+			nestedSplitContainer.Panel2.Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
+			nestedSplitContainer.Panel2.Add (new Label ("Here is a Text box:") { Y = 1 });
+			nestedSplitContainer.Panel2.Add (new TextView () { Y = 2, Width = Dim.Fill (), Height = Dim.Fill (), AllowsTab = false });
 
 			Win.Add (splitContainer);
 
@@ -99,23 +99,23 @@ namespace UICatalog.Scenarios {
 				},
 				new MenuBarItem ("_Show", new MenuItem [] {
 						miShowBoth = new MenuItem ("Both", "",()=>{
-							splitContainer.Panels [0].Visible = true;
-							splitContainer.Panels [1].Visible = true;
+							splitContainer.Panel1.Visible = true;
+							splitContainer.Panel2.Visible = true;
 							UpdateShowMenuCheckedStates();
 						}),
 						miShowPanel1 = new MenuItem ("Panel 1", "", () => {
-							splitContainer.Panels [0].Visible = true;
-							splitContainer.Panels [1].Visible = false;
+							splitContainer.Panel1.Visible = true;
+							splitContainer.Panel2.Visible = false;
 							UpdateShowMenuCheckedStates();
 						}),
 						miShowPanel2 = new MenuItem ("Panel 2", "", () => {
-							splitContainer.Panels [0].Visible = false;
-							splitContainer.Panels [1].Visible = true;
+							splitContainer.Panel1.Visible = false;
+							splitContainer.Panel2.Visible = true;
 							UpdateShowMenuCheckedStates();
 						}),
 						miShowNeither = new MenuItem ("Neither", "",()=>{
-							splitContainer.Panels [0].Visible = false;
-							splitContainer.Panels [1].Visible = false;
+							splitContainer.Panel1.Visible = false;
+							splitContainer.Panel2.Visible = false;
 							UpdateShowMenuCheckedStates();
 						}),
 					})
@@ -134,16 +134,16 @@ namespace UICatalog.Scenarios {
 
 		private void UpdateShowMenuCheckedStates ()
 		{
-			miShowBoth.Checked = (splitContainer.Panels [0].Visible) && (splitContainer.Panels [1].Visible);
+			miShowBoth.Checked = (splitContainer.Panel1.Visible) && (splitContainer.Panel2.Visible);
 			miShowBoth.CheckType = MenuItemCheckStyle.Checked;
 
-			miShowPanel1.Checked = splitContainer.Panels [0].Visible && !splitContainer.Panels [1].Visible;
+			miShowPanel1.Checked = splitContainer.Panel1.Visible && !splitContainer.Panel2.Visible;
 			miShowPanel1.CheckType = MenuItemCheckStyle.Checked;
 
-			miShowPanel2.Checked = !splitContainer.Panels [0].Visible && splitContainer.Panels [1].Visible;
+			miShowPanel2.Checked = !splitContainer.Panel1.Visible && splitContainer.Panel2.Visible;
 			miShowPanel2.CheckType = MenuItemCheckStyle.Checked;
 
-			miShowNeither.Checked = (!splitContainer.Panels [0].Visible) && (!splitContainer.Panels [1].Visible);
+			miShowNeither.Checked = (!splitContainer.Panel1.Visible) && (!splitContainer.Panel2.Visible);
 			miShowNeither.CheckType = MenuItemCheckStyle.Checked;
 		}
 
