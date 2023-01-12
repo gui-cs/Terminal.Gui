@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.Configuration {
 	/// <summary>
 	/// 
 	/// </summary>
@@ -41,7 +41,11 @@ namespace Terminal.Gui.Core {
 							if (reader.TokenType == JsonTokenType.String) {
 								Enum.TryParse(reader.GetString(), false, out key);
 								if (key == Key.Unknown) {
-									throw new JsonException ("If Key is a string, it must match a constant in the Key enum.");
+									// The enum uses "D0..D9" for the number keys
+									Enum.TryParse (reader.GetString ().TrimStart('D', 'd'), false, out key);
+									if (key == Key.Unknown) {
+										throw new JsonException ("If Key is a string, it must match a constant in the Key enum.");
+									}
 								}
 								break;
 							}

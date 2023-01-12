@@ -4,7 +4,7 @@ using System.Text.Json;
 using Xunit;
 
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.Configuration {
 	public class ConfigurationMangerTests {
 
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
@@ -22,12 +22,9 @@ namespace Terminal.Gui.Core {
 		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
 		/// </summary>
 		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerSaveDefaults ()
+		public void TestConfigurationManagerSaveHardCodedDefaults ()
 		{
-			ConfigurationManager.SaveDefaultConfig ("config.json");
-
-			// Verify the saved file matches
-
+			ConfigurationManager.SaveHardCodedDefaults ("config.json");
 		}
 
 		[Fact, AutoInitShutdown]
@@ -47,41 +44,41 @@ namespace Terminal.Gui.Core {
 		public void TestConfigurationManagerToJson ()
 		{
 			var configuration = new Configuration ();
-			configuration.VisualStyles.ColorSchemes = Colors.ColorSchemes;
+			configuration.GetAllHardCodedDefaults ();
 			var json = ConfigurationManager.ToJson (configuration);
 
 			var readConfig = ConfigurationManager.LoadFromJson (json);
 
-			Assert.Equal (Colors.Base.Normal, readConfig.VisualStyles.ColorSchemes ["Base"].Normal);
+			Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerInitDriver ()
 		{
 			var configuration = new Configuration ();
-			configuration.VisualStyles.ColorSchemes = Colors.ColorSchemes;
+			configuration.ColorSchemes.GetHardCodedDefaults ();
 
 			// Change Base
 			var json = ConfigurationManager.ToJson (configuration);
 
 			var readConfig = ConfigurationManager.LoadFromJson (json);
-			Assert.Equal (Colors.Base, readConfig.VisualStyles.ColorSchemes ["Base"]);
-			Assert.Equal (Colors.TopLevel, readConfig.VisualStyles.ColorSchemes ["TopLevel"]);
-			Assert.Equal (Colors.Error, readConfig.VisualStyles.ColorSchemes ["Error"]);
-			Assert.Equal (Colors.Dialog, readConfig.VisualStyles.ColorSchemes ["Dialog"]);
-			Assert.Equal (Colors.Menu, readConfig.VisualStyles.ColorSchemes ["Menu"]);
+			Assert.Equal (Colors.Base, readConfig.ColorSchemes ["Base"]);
+			Assert.Equal (Colors.TopLevel, readConfig.ColorSchemes ["TopLevel"]);
+			Assert.Equal (Colors.Error, readConfig.ColorSchemes ["Error"]);
+			Assert.Equal (Colors.Dialog, readConfig.ColorSchemes ["Dialog"]);
+			Assert.Equal (Colors.Menu, readConfig.ColorSchemes ["Menu"]);
 
-			Colors.Base = readConfig.VisualStyles.ColorSchemes ["Base"];
-			Colors.TopLevel = readConfig.VisualStyles.ColorSchemes ["TopLevel"];
-			Colors.Error = readConfig.VisualStyles.ColorSchemes ["Error"];
-			Colors.Dialog = readConfig.VisualStyles.ColorSchemes ["Dialog"];
-			Colors.Menu = readConfig.VisualStyles.ColorSchemes ["Menu"];
+			Colors.Base = readConfig.ColorSchemes ["Base"];
+			Colors.TopLevel = readConfig.ColorSchemes ["TopLevel"];
+			Colors.Error = readConfig.ColorSchemes ["Error"];
+			Colors.Dialog = readConfig.ColorSchemes ["Dialog"];
+			Colors.Menu = readConfig.ColorSchemes ["Menu"];
 
-			Assert.Equal (readConfig.VisualStyles.ColorSchemes ["Base"], Colors.Base);
-			Assert.Equal (readConfig.VisualStyles.ColorSchemes ["TopLevel"], Colors.TopLevel);
-			Assert.Equal (readConfig.VisualStyles.ColorSchemes ["Error"], Colors.Error);
-			Assert.Equal (readConfig.VisualStyles.ColorSchemes ["Dialog"], Colors.Dialog);
-			Assert.Equal (readConfig.VisualStyles.ColorSchemes ["Menu"], Colors.Menu);
+			Assert.Equal (readConfig.ColorSchemes ["Base"], Colors.Base);
+			Assert.Equal (readConfig.ColorSchemes ["TopLevel"], Colors.TopLevel);
+			Assert.Equal (readConfig.ColorSchemes ["Error"], Colors.Error);
+			Assert.Equal (readConfig.ColorSchemes ["Dialog"], Colors.Dialog);
+			Assert.Equal (readConfig.ColorSchemes ["Menu"], Colors.Menu);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -90,125 +87,213 @@ namespace Terminal.Gui.Core {
 			// Arrange
 			string json = @"
 			{
-			""VisualStyles"": {
-			""ColorSchemes"": {
-				""Base"": {
-					""NORMAL"": {
-						""FOREGROUND"": ""WHITE"",
-						""background"": ""blue""
-	    					    },
-					""focus"": {
-						""Foreground"": ""bLAck"",
-						""Background"": ""Gray""
-					    },
-					""hotNormal"": {
-						""foreground"": ""BrightCyan"",
-						""background"": ""Blue""
-					    },
-					""HotFocus"": {
-						""foreground"": ""BrightBlue"",
-						""background"": ""Gray""
-					    },
-					""disabled"": {
-						""foreground"": ""DarkGray"",
-						""background"": ""Blue""
-					    }
-				},
-				""TopLevel"": {
-					""NORMAL"": {
-						""FOREGROUND"": ""WHITE"",
-						""background"": ""blue""
-	    					    },
-					""focus"": {
-						""Foreground"": ""bLAck"",
-						""Background"": ""Gray""
-					    },
-					""hotNormal"": {
-						""foreground"": ""BrightCyan"",
-						""background"": ""Blue""
-					    },
-					""HotFocus"": {
-						""foreground"": ""BrightBlue"",
-						""background"": ""Gray""
-					    },
-					""disabled"": {
-						""foreground"": ""DarkGray"",
-						""background"": ""Blue""
-					    }
-				},
-				""UserDefined"": {
-					""NORMAL"": {
-						""FOREGROUND"": ""red"",
-						""background"": ""white""
-	    					    },
-					""focus"": {
-						""Foreground"": ""blue"",
-						""Background"": ""green""
-					    },
-					""hotNormal"": {
-						""foreground"": ""brightyellow"",
-						""background"": ""gray""
-					    },
-					""HotFocus"": {
-						""foreground"": ""darkgray"",
-						""background"": ""black""
-					    },
-					""disabled"": {
-						""foreground"": ""cyan"",
-						""background"": ""BrightCyan""
-					    }
+			  ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
+			  ""Settings"": {
+			    ""HeightAsBuffer"": false,
+			    ""AlternateForwardKey"": {
+			      ""Key"": ""PageDown"",
+			      ""Modifiers"": [
+				""Ctrl""
+			      ]
+			    },
+			    ""AlternateBackwardKey"": {
+			      ""Key"": ""PageUp"",
+			      ""Modifiers"": [
+				""Ctrl""
+			      ]
+			    },
+			    ""QuitKey"": {
+			      ""Key"": ""End"",
+			      ""Modifiers"": [
+				""Ctrl""
+			      ]
+			    },
+			    ""IsMouseDisabled"": false,
+			    ""UseSystemConsole"": false
+			  },
+			  ""ColorSchemes"": {
+			    ""Base"": {
+			      ""NORMAL"": {
+				""Foreground"": ""WhITE"",
+				""Background"": ""blue""
+			      },
+			      ""Focus"": {
+				""Foreground"": ""Black"",
+				""Background"": ""Gray""
+			      },
+			      ""HotNormal"": {
+				""Foreground"": ""BrightCyan"",
+				""Background"": ""Blue""
+			      },
+			      ""HotFocus"": {
+				""Foreground"": ""BrightBlue"",
+				""Background"": ""Gray""
+			      },
+			      ""Disabled"": {
+				""Foreground"": ""DarkGray"",
+				""Background"": ""Blue""
+			      }
+			    },
+			    ""TopLevel"": {
+			      ""Normal"": {
+				""Foreground"": ""BrightGreen"",
+				""Background"": ""Black""
+			      },
+			      ""Focus"": {
+				""Foreground"": ""White"",
+				""Background"": ""Cyan""
+			      },
+			      ""HotNormal"": {
+				""Foreground"": ""Brown"",
+				""Background"": ""Black""
+			      },
+			      ""HotFocus"": {
+				""Foreground"": ""Blue"",
+				""Background"": ""Cyan""
+			      },
+			      ""Disabled"": {
+				""Foreground"": ""DarkGray"",
+				""Background"": ""Black""
+			      }
+			    },
+			    ""Dialog"": {
+			      ""Normal"": {
+				""Foreground"": ""Black"",
+				""Background"": ""Gray""
+			      },
+			      ""Focus"": {
+				""Foreground"": ""White"",
+				""Background"": ""DarkGray""
+			      },
+			      ""HotNormal"": {
+				""Foreground"": ""Blue"",
+				""Background"": ""Gray""
+			      },
+			      ""HotFocus"": {
+				""Foreground"": ""BrightYellow"",
+				""Background"": ""DarkGray""
+			      },
+			      ""Disabled"": {
+				""Foreground"": ""Gray"",
+				""Background"": ""DarkGray""
+			      }
+			    },
+			    ""Menu"": {
+			      ""Normal"": {
+				""Foreground"": ""White"",
+				""Background"": ""DarkGray""
+			      },
+			      ""Focus"": {
+				""Foreground"": ""White"",
+				""Background"": ""Black""
+			      },
+			      ""HotNormal"": {
+				""Foreground"": ""BrightYellow"",
+				""Background"": ""DarkGray""
+			      },
+			      ""HotFocus"": {
+				""Foreground"": ""BrightYellow"",
+				""Background"": ""Black""
+			      },
+			      ""Disabled"": {
+				""Foreground"": ""Gray"",
+				""Background"": ""DarkGray""
+			      }
+			    },
+			    ""Error"": {
+			      ""Normal"": {
+				""Foreground"": ""Red"",
+				""Background"": ""White""
+			      },
+			      ""Focus"": {
+				""Foreground"": ""Black"",
+				""Background"": ""BrightRed""
+			      },
+			      ""HotNormal"": {
+				""Foreground"": ""Black"",
+				""Background"": ""White""
+			      },
+			      ""HotFocus"": {
+				""Foreground"": ""White"",
+				""Background"": ""BrightRed""
+			      },
+			      ""Disabled"": {
+				""Foreground"": ""DarkGray"",
+				""Background"": ""White""
+			      }
+			    },
+			    ""UserDefined"": {
+				""NORMAL"": {
+					""FOREGROUND"": ""red"",
+					""background"": ""white""
+	    					},
+				""focus"": {
+					""Foreground"": ""blue"",
+					""Background"": ""green""
+					},
+				""hotNormal"": {
+					""foreground"": ""brightyellow"",
+					""background"": ""gray""
+					},
+				""HotFocus"": {
+					""foreground"": ""darkgray"",
+					""background"": ""black""
+					},
+				""disabled"": {
+					""foreground"": ""cyan"",
+					""background"": ""BrightCyan""
+					}
 				}
-				}
-				}
+			    }
 			}";
 
 			var configuration = ConfigurationManager.LoadFromJson (json);
 
-			Assert.Equal (Color.White, configuration.VisualStyles.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (Color.White, configuration.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, configuration.ColorSchemes ["Base"].Normal.Background);
 
-			Assert.Equal (Color.Black, configuration.VisualStyles.ColorSchemes ["Base"].Focus.Foreground);
-			Assert.Equal (Color.Gray, configuration.VisualStyles.ColorSchemes ["Base"].Focus.Background);
+			Assert.Equal (Color.Black, configuration.ColorSchemes ["Base"].Focus.Foreground);
+			Assert.Equal (Color.Gray, configuration.ColorSchemes ["Base"].Focus.Background);
 
-			Assert.Equal (Color.BrightCyan, configuration.VisualStyles.ColorSchemes ["Base"].HotNormal.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["Base"].HotNormal.Background);
+			Assert.Equal (Color.BrightCyan, configuration.ColorSchemes ["Base"].HotNormal.Foreground);
+			Assert.Equal (Color.Blue, configuration.ColorSchemes ["Base"].HotNormal.Background);
 
-			Assert.Equal (Color.BrightBlue, configuration.VisualStyles.ColorSchemes ["Base"].HotFocus.Foreground);
-			Assert.Equal (Color.Gray, configuration.VisualStyles.ColorSchemes ["Base"].HotFocus.Background);
+			Assert.Equal (Color.BrightBlue, configuration.ColorSchemes ["Base"].HotFocus.Foreground);
+			Assert.Equal (Color.Gray, configuration.ColorSchemes ["Base"].HotFocus.Background);
 
-			Assert.Equal (Color.DarkGray, configuration.VisualStyles.ColorSchemes ["Base"].Disabled.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["Base"].Disabled.Background);
+			Assert.Equal (Color.DarkGray, configuration.ColorSchemes ["Base"].Disabled.Foreground);
+			Assert.Equal (Color.Blue, configuration.ColorSchemes ["Base"].Disabled.Background);
 
-			Assert.Equal (Color.White, configuration.VisualStyles.ColorSchemes ["TopLevel"].Normal.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["TopLevel"].Normal.Background);
+			Assert.Equal (Color.BrightGreen, configuration.ColorSchemes ["TopLevel"].Normal.Foreground);
+			Assert.Equal (Color.Black, configuration.ColorSchemes ["TopLevel"].Normal.Background);
 
-			Assert.Equal (Color.Black, configuration.VisualStyles.ColorSchemes ["TopLevel"].Focus.Foreground);
-			Assert.Equal (Color.Gray, configuration.VisualStyles.ColorSchemes ["TopLevel"].Focus.Background);
+			Assert.Equal (Color.White, configuration.ColorSchemes ["TopLevel"].Focus.Foreground);
+			Assert.Equal (Color.Cyan, configuration.ColorSchemes ["TopLevel"].Focus.Background);
 
-			Assert.Equal (Color.BrightCyan, configuration.VisualStyles.ColorSchemes ["TopLevel"].HotNormal.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["TopLevel"].HotNormal.Background);
+			Assert.Equal (Color.Brown, configuration.ColorSchemes ["TopLevel"].HotNormal.Foreground);
+			Assert.Equal (Color.Black, configuration.ColorSchemes ["TopLevel"].HotNormal.Background);
 
-			Assert.Equal (Color.BrightBlue, configuration.VisualStyles.ColorSchemes ["TopLevel"].HotFocus.Foreground);
-			Assert.Equal (Color.Gray, configuration.VisualStyles.ColorSchemes ["TopLevel"].HotFocus.Background);
+			Assert.Equal (Color.Blue, configuration.ColorSchemes ["TopLevel"].HotFocus.Foreground);
+			Assert.Equal (Color.Cyan, configuration.ColorSchemes ["TopLevel"].HotFocus.Background);
 
-			Assert.Equal (Color.DarkGray, configuration.VisualStyles.ColorSchemes ["TopLevel"].Disabled.Foreground);
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["TopLevel"].Disabled.Background);
+			Assert.Equal (Color.DarkGray, configuration.ColorSchemes ["TopLevel"].Disabled.Foreground);
+			Assert.Equal (Color.Black, configuration.ColorSchemes ["TopLevel"].Disabled.Background);
 
 			// User defined color scheme
-			Assert.Equal (Color.Red, configuration.VisualStyles.ColorSchemes ["UserDefined"].Normal.Foreground);
-			Assert.Equal (Color.White, configuration.VisualStyles.ColorSchemes ["UserDefined"].Normal.Background);
+			Assert.Equal (Color.Red, configuration.ColorSchemes ["UserDefined"].Normal.Foreground);
+			Assert.Equal (Color.White, configuration.ColorSchemes ["UserDefined"].Normal.Background);
 
-			Assert.Equal (Color.Blue, configuration.VisualStyles.ColorSchemes ["UserDefined"].Focus.Foreground);
-			Assert.Equal (Color.Green, configuration.VisualStyles.ColorSchemes ["UserDefined"].Focus.Background);
+			Assert.Equal (Color.Blue, configuration.ColorSchemes ["UserDefined"].Focus.Foreground);
+			Assert.Equal (Color.Green, configuration.ColorSchemes ["UserDefined"].Focus.Background);
 
-			Assert.Equal (Color.BrightYellow, configuration.VisualStyles.ColorSchemes ["UserDefined"].HotNormal.Foreground);
-			Assert.Equal (Color.Gray, configuration.VisualStyles.ColorSchemes ["UserDefined"].HotNormal.Background);
+			Assert.Equal (Color.BrightYellow, configuration.ColorSchemes ["UserDefined"].HotNormal.Foreground);
+			Assert.Equal (Color.Gray, configuration.ColorSchemes ["UserDefined"].HotNormal.Background);
 
-			Assert.Equal (Color.DarkGray, configuration.VisualStyles.ColorSchemes ["UserDefined"].HotFocus.Foreground);
-			Assert.Equal (Color.Black, configuration.VisualStyles.ColorSchemes ["UserDefined"].HotFocus.Background);
+			Assert.Equal (Color.DarkGray, configuration.ColorSchemes ["UserDefined"].HotFocus.Foreground);
+			Assert.Equal (Color.Black, configuration.ColorSchemes ["UserDefined"].HotFocus.Background);
 
-			Assert.Equal (Color.Cyan, configuration.VisualStyles.ColorSchemes ["UserDefined"].Disabled.Foreground);
-			Assert.Equal (Color.BrightCyan, configuration.VisualStyles.ColorSchemes ["UserDefined"].Disabled.Background);
+			Assert.Equal (Color.Cyan, configuration.ColorSchemes ["UserDefined"].Disabled.Foreground);
+			Assert.Equal (Color.BrightCyan, configuration.ColorSchemes ["UserDefined"].Disabled.Background);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -217,14 +302,12 @@ namespace Terminal.Gui.Core {
 			// Arrange
 			string json = @"
 			{
-			""VisualStyles"": {
 			""ColorSchemes"": {
 				""UserDefined"": {
 					""hotNormal"": {
 						""foreground"": ""yellow"",
 						""background"": ""1234""
 					    }
-				}
 				}
 				}
 			}";
@@ -234,14 +317,12 @@ namespace Terminal.Gui.Core {
 
 			json = @"
 			{
-			""VisualStyles"": {
 			""ColorSchemes"": {
 				""UserDefined"": {
 					""AbNormal"": {
 						""FOREGROUND"": ""red"",
 						""background"": ""white""
 	    					    }
-				}
 				}
 				}
 			}";
@@ -252,13 +333,11 @@ namespace Terminal.Gui.Core {
 			// Modify hotNormal background only 
 			json = @"
 			{
-			""VisualStyles"": {
 			""ColorSchemes"": {
 				""Error"": {
 					""Normal"": {
 						""background"": ""Cyan""
 					    }
-				}
 				}
 				}
 			}";
@@ -268,13 +347,12 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerHardCodedDefaults ()
+		public void TestConfigurationManagerAllHardCodedDefaults ()
 		{
-			ConfigurationManager.Config.Settings.GetHardCodedDefaults ();
-			ConfigurationManager.Config.VisualStyles.GetHardCodedDefaults ();
-
+			ConfigurationManager.Config.GetAllHardCodedDefaults ();
+			
 			// Apply default styles
-			ConfigurationManager.Config.VisualStyles.Apply ();
+			ConfigurationManager.Config.ApplyAll ();
 
 			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
@@ -310,20 +388,22 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerApplyPartialColorScheme ()
 		{
-			ConfigurationManager.Config.Settings.GetHardCodedDefaults ();
-			ConfigurationManager.Config.VisualStyles.GetHardCodedDefaults ();
+			ConfigurationManager.Config.GetAllHardCodedDefaults ();
 
 			// Apply default styles
-			ConfigurationManager.Config.VisualStyles.Apply ();
+			ConfigurationManager.Config.ColorSchemes.Apply ();
 
 			// Prove Base is defaults (White, Blue)
-			Assert.Equal (Color.White, ConfigurationManager.Config.VisualStyles.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, ConfigurationManager.Config.VisualStyles.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (Color.White, ConfigurationManager.Config.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, ConfigurationManager.Config.ColorSchemes ["Base"].Normal.Background);
+
+			// Prove Error's Normal is default (Red, White)
+			Assert.Equal (Color.Red, Colors.ColorSchemes ["Error"].Normal.Foreground);
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Error"].Normal.Background);
 
 			// Modify hotNormal
 			string json = @"
 			{
-			""VisualStyles"": {
 				""ColorSchemes"": {
 						""Error"": {
 							""Normal"": {
@@ -332,11 +412,10 @@ namespace Terminal.Gui.Core {
 								}
 						}
 					}
-				}
 			}";
 
 			ConfigurationManager.UpdateConfiguration (json);
-			ConfigurationManager.Config.VisualStyles.Apply ();
+			ConfigurationManager.Config.ColorSchemes.Apply ();
 
 			// Prove Base didn't change from defaults (White, Blue)
 			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);

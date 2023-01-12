@@ -6,9 +6,9 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Visual Style Manager", Description: "Configures Visual Styles.")]
+	[ScenarioMetadata (Name: "Configuration Manager", Description: "Configures Terminal.Gui Settings.")]
 	[ScenarioCategory ("Controls"), ScenarioCategory ("Colors")]
-	public class VisualStyleManagerConfig : Scenario {
+	public class ConfigurationManagerConfig : Scenario {
 		TabView tabView;
 
 		private int numbeOfNewTabs = 1;
@@ -61,14 +61,14 @@ namespace UICatalog.Scenarios {
 		{
 			Open ("", null, $"new {numbeOfNewTabs++}");
 			var tab = tabView.SelectedTab as OpenedFile;
-			tab.Text = "~/.tui/visualstyle.json";
+			tab.Text = "~/.tui/config.json";
 			tab.SavedText = JsonSerializer.Serialize (Colors.ColorSchemes, new JsonSerializerOptions () { WriteIndented = true });
 		}
 
 		private void Reload ()
 		{
 			var tab = tabView.SelectedTab as OpenedFile;
-			tab.Text = "~/.tui/visualstyle.json";
+			tab.Text = "~/.tui/config.json";
 			tab.SavedText = JsonSerializer.Serialize (Colors.ColorSchemes, new JsonSerializerOptions () { WriteIndented = true });
 		}
 

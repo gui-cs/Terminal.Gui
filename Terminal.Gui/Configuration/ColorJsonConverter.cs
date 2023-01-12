@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.Configuration {
 	/// <summary>
 	/// 
 	/// </summary>

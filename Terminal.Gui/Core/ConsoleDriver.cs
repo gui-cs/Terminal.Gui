@@ -187,13 +187,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		[JsonConverter (typeof (Core.ColorJsonConverter))] 
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
 		public Color Foreground { get; }
 
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		[JsonConverter (typeof (Core.ColorJsonConverter))] 
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
 		public Color Background { get; }
 
 		/// <summary>

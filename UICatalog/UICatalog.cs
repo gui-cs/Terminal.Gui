@@ -7,13 +7,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
-using Microsoft.DotNet.PlatformAbstractions;
-using Rune = System.Rune;
-using Terminal.Gui.Core;
 using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Reflection;
 using System.Threading;
+using Terminal.Gui.Configuration;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -138,30 +135,30 @@ namespace UICatalog {
 		private static void Application_NotifyStopRunState (Toplevel obj)
 		{
 			_currentDirWatcher.EnableRaisingEvents = false;
-			_currentDirWatcher.Changed -= VisualStylesConfigChanged;
-			_currentDirWatcher.Created -= VisualStylesConfigChanged;
+			_currentDirWatcher.Changed -= ConfigChanged;
+			_currentDirWatcher.Created -= ConfigChanged;
 
 			_homeDirWatcher.EnableRaisingEvents = false;
-			_homeDirWatcher.Changed -= VisualStylesConfigChanged;
-			_homeDirWatcher.Created -= VisualStylesConfigChanged;
+			_homeDirWatcher.Changed -= ConfigChanged;
+			_homeDirWatcher.Created -= ConfigChanged;
 		}
 
 		private static void Application_NotifyNewRunState (Application.RunState obj)
 		{
-			_currentDirWatcher.Changed += VisualStylesConfigChanged;
-			_currentDirWatcher.Created += VisualStylesConfigChanged;
+			_currentDirWatcher.Changed += ConfigChanged;
+			_currentDirWatcher.Created += ConfigChanged;
 			_currentDirWatcher.EnableRaisingEvents = true;
 
-			_homeDirWatcher.Changed += VisualStylesConfigChanged;
-			_homeDirWatcher.Created += VisualStylesConfigChanged;
+			_homeDirWatcher.Changed += ConfigChanged;
+			_homeDirWatcher.Created += ConfigChanged;
 			_homeDirWatcher.EnableRaisingEvents = true;
 		}
 
-		private static void VisualStylesConfigChanged (object sender, FileSystemEventArgs e)
+		private static void ConfigChanged (object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
-			ConfigurationManager.Config.VisualStyles.Apply ();
+			ConfigurationManager.Config.ColorSchemes.Apply ();
 
 			if (Application.Top is UICatalogTopLevel) {
 				foreach (var i in _colorSchemeMenuBarItem.Children) {

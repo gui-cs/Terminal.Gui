@@ -76,8 +76,8 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
-	///   <see cref="string"/> values are converted into <see cref="ustring"/> values before rendering, and other values are
-	///   converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="ustring"/> .
+	///   <see cref="string"/> values are converted into <see cref="NStack.ustring"/> values before rendering, and other values are
+	///   converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="NStack.ustring"/> .
 	/// </para>
 	/// <para>
 	///   To change the contents of the ListView, set the <see cref="Source"/> property (when 

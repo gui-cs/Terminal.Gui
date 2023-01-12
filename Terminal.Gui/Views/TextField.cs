@@ -51,7 +51,7 @@ namespace Terminal.Gui {
 		///   This event is raised when the <see cref="Text"/> changes. 
 		/// </remarks>
 		/// <remarks>
-		///   The passed <see cref="EventArgs"/> is a <see cref="ustring"/> containing the old value. 
+		///   The passed <see cref="EventArgs"/> is a <see cref="NStack.ustring"/> containing the old value. 
 		/// </remarks>
 		public event Action<ustring> TextChanged;
 

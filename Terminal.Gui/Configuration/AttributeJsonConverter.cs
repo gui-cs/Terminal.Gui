@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.Configuration {
 	/// <summary>
 	/// 
 	/// </summary>

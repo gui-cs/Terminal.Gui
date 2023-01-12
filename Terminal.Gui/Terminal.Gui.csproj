@@ -89,5 +89,5 @@
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
   </PropertyGroup>
-  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties resources_4config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

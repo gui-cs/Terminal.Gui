@@ -20,7 +20,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
-using Terminal.Gui.Core;
+using Terminal.Gui.Configuration;
 
 namespace Terminal.Gui {
 
@@ -438,7 +438,7 @@ namespace Terminal.Gui {
 				// Now that the Driver is initialized, load all other configuration
 				// (ColorSchemes can't be set until a Driver is loaded).
 				ConfigurationManager.LoadConfigurationFromAllSources ();
-				ConfigurationManager.Config.VisualStyles.Apply ();
+				ConfigurationManager.Config.ApplyAll ();
 
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
