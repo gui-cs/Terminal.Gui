@@ -1,38 +1,39 @@
 ﻿using NStack;
+using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Configuration Manager", Description: "Configures Terminal.Gui Settings.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("Colors")]
+	[ScenarioMetadata (Name: "Configuration Manager", Description: "Edits Terminal.Gui Config Files.")]
+	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory("Files and IO"), ScenarioCategory("TextView") ]
 	public class ConfigurationManagerConfig : Scenario {
 		TabView tabView;
 
-		private int numbeOfNewTabs = 1;
+		private string [] configFiles = {
+			"~/.tui/UICatalog.config.json",
+			"./.tui/UICatalog.config.json",
+			"~/.tui/config.json",
+			"./.tui/config.json"
+		};
 
 		// Don't create a Window, just return the top-level view
 		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = colorScheme;
 		}
 
 		public override void Setup ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Save", "", () => Save()),
-					new MenuItem ("_Quit", "", () => Quit()),
-				})
-				});
-			Application.Top.Add (menu);
-
 			tabView = new TabView () {
 				X = 0,
-				Y = 1,
+				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
@@ -54,69 +55,37 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (statusBar);
 
-			New ();
+			Open ();
+
+			tabView.SelectedTab = tabView.Tabs.ToArray () [0];
 		}
 
-		private void New ()
+		private void Open ()
 		{
-			Open ("", null, $"new {numbeOfNewTabs++}");
-			var tab = tabView.SelectedTab as OpenedFile;
-			tab.Text = "~/.tui/config.json";
-			tab.SavedText = JsonSerializer.Serialize (Colors.ColorSchemes, new JsonSerializerOptions () { WriteIndented = true });
+			foreach (var configFile in configFiles) {
+				var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
+				FileInfo fileInfo = new FileInfo (configFile.Replace ("~", homeDir));
+				string json;
+				if (!fileInfo.Exists) {
+					if (!Directory.Exists (fileInfo.DirectoryName)) {
+						// Create dir
+						Directory.CreateDirectory (fileInfo.DirectoryName);
+					}
+
+					// Create empty config file
+					json = ConfigurationManager.ToJson (new Configuration ());
+				} else {
+					json = File.ReadAllText (fileInfo.FullName);
+				}
+
+				Open (json, fileInfo, configFile);
+			}
 		}
 
 		private void Reload ()
 		{
 			var tab = tabView.SelectedTab as OpenedFile;
-			tab.Text = "~/.tui/config.json";
-			tab.SavedText = JsonSerializer.Serialize (Colors.ColorSchemes, new JsonSerializerOptions () { WriteIndented = true });
-		}
-
-		private void Close ()
-		{
-			var tab = tabView.SelectedTab as OpenedFile;
-
-			if (tab == null) {
-				return;
-			}
-
-			if (tab.UnsavedChanges) {
-
-				int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.ToString ().TrimEnd ('*')}", "Yes", "No", "Cancel");
-
-				if (result == -1 || result == 2) {
-
-					// user cancelled
-					return;
-				}
-
-				if (result == 0) {
-					tab.Save ();
-				}
-			}
-
-			// close and dispose the tab
-			tabView.RemoveTab (tab);
-			tab.View.Dispose ();
-		}
-
-		private void Open ()
-		{
-			var open = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = true };
-
-			Application.Run (open);
-
-			if (!open.Canceled) {
-
-				foreach (var path in open.FilePaths) {
-
-					if (string.IsNullOrEmpty (path) || !File.Exists (path)) {
-						return;
-					}
-
-					Open (File.ReadAllText (path), new FileInfo (path), Path.GetFileName (path));
-				}
-			}
+			tab.SavedText = File.ReadAllText (tab.File.FullName);
 		}
 
 		/// <summary>
@@ -142,7 +111,6 @@ namespace UICatalog.Scenarios {
 
 				// if current text doesn't match saved text
 				var areDiff = tab.UnsavedChanges;
-
 				if (areDiff) {
 					if (!tab.Text.ToString ().EndsWith ('*')) {
 
@@ -163,39 +131,26 @@ namespace UICatalog.Scenarios {
 		public void Save ()
 		{
 			var tab = tabView.SelectedTab as OpenedFile;
-
-			if (tab == null) {
-				return;
-			}
-
-			if (tab.File == null) {
-				SaveAs ();
-			}
-
 			tab.Save ();
 			tabView.SetNeedsDisplay ();
 		}
 
-		public bool SaveAs ()
+		private void Quit ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
-
-			if (tab == null) {
-				return false;
+			foreach (var t in tabView.Tabs) {
+				var tab = t as OpenedFile;
+				if (tab != null && tab.UnsavedChanges) {
+					int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.ToString ().TrimEnd ('*')}", "Yes", "No", "Cancel");
+					if (result == -1 || result == 2) {
+						// user cancelled
+					}
+					if (result == 0) {
+						tab.Save ();
+					}
+				}
 			}
 
-			var fd = new SaveDialog ();
-			Application.Run (fd);
-
-			if (string.IsNullOrWhiteSpace (fd.FilePath?.ToString ())) {
-				return false;
-			}
-
-			tab.File = new FileInfo (fd.FilePath.ToString ());
-			tab.Text = fd.FileName.ToString ();
-			tab.Save ();
-
-			return true;
+			Application.RequestStop ();
 		}
 
 		private class OpenedFile : TabView.Tab {
@@ -232,11 +187,6 @@ namespace UICatalog.Scenarios {
 
 				Text = Text.ToString ().TrimEnd ('*');
 			}
-		}
-
-		private void Quit ()
-		{
-			Application.RequestStop ();
 		}
 	}
 }

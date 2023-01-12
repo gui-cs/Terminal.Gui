@@ -212,7 +212,8 @@ namespace UICatalog {
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _heightAsBuffer = false;
 		static bool _isFirstRunning = true;
-		static string _colorScheme;
+		static string _colorScheme = "Base";
+
 		static MenuItem [] _colorSchemeMenuItems;
 		static MenuBarItem _colorSchemeMenuBarItem;
 
@@ -237,11 +238,6 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				_colorScheme = "Base";
-				ColorScheme cs = null;
-				if (Colors.ColorSchemes.TryGetValue ("UICatalog", out cs)) {
-					_colorScheme = "UICatalog";
-				}
 				ColorScheme = Colors.ColorSchemes [_colorScheme];
 				_colorSchemeMenuItems = CreateColorSchemeMenuItems ();
 				_colorSchemeMenuBarItem = new MenuBarItem ("_Color Scheme", _colorSchemeMenuItems);
