@@ -10,9 +10,9 @@ using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Configuration Manager", Description: "Edits Terminal.Gui Config Files.")]
+	[ScenarioMetadata (Name: "Configuration Editor", Description: "Edits Terminal.Gui Config Files.")]
 	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory("Files and IO"), ScenarioCategory("TextView") ]
-	public class ConfigurationManagerConfig : Scenario {
+	public class ConfigurationEditor : Scenario {
 		TabView tabView;
 
 		private string [] configFiles = {
