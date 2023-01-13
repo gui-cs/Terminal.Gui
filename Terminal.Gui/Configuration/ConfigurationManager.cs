@@ -68,7 +68,7 @@ namespace Terminal.Gui.Configuration {
 
 		/// <summary>
 		/// The <see cref="Configuration"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
-		/// Use <see cref="Config.Apply()"/>, <see cref="Config.Apply()"/> etc to apply these to the running Terminal.Gui app.
+		/// Use <see cref="Config{T}.Apply()"/> to apply these to the running Terminal.Gui app.
 		/// </summary>
 		public static Configuration Config { get { return _config; } }
 
@@ -101,7 +101,7 @@ namespace Terminal.Gui.Configuration {
 			// Deserialize the JSON into a Configuration object
 			var newConfig = JsonSerializer.Deserialize<Configuration> (json, serializerOptions);
 
-			Config.UpdateAll (newConfig);
+			Config.CopyUpdatedProperitesFrom (newConfig);
 		}
 
 		/// <summary>
@@ -138,7 +138,7 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Loads all settings found in the various locations into the <see cref="Config"/> object. 
+		/// Loads all settings found in the various locations into the <see cref="Config{T}"/> object. 
 		/// </summary>
 		public static void LoadConfigurationFromAllSources ()
 		{

@@ -11,10 +11,10 @@ namespace Terminal.Gui.Configuration {
 	/// </summary>
 	[JsonDerivedType (typeof (Settings))]
 	[JsonDerivedType (typeof (Themes))]
-	public abstract class Config {
+	public abstract class Config<T> {
 		/// <summary>
-		/// Gets the hard coded default settings from the implementation (e.g. from <see cref="ListView"/>); called to 
-		/// initlize a <see cref="Config"/> object instance.
+		/// Retrieves the hard coded default settings from the implementation (e.g. from <see cref="ListView"/>); called to 
+		/// initlize a <see cref="Config{T}"/> object instance.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -30,7 +30,7 @@ namespace Terminal.Gui.Configuration {
 		public abstract void GetHardCodedDefaults ();
 
 		/// <summary>
-		/// Applys the confirationg settings held by this <see cref="Config"/> object to the running <see cref="Application"/>.
+		/// Applys the settings held by this <see cref="Config{T}"/> object to the running <see cref="Application"/>. 
 		/// </summary>
 		/// <remarks>
 		/// This method must only set a target setting if the configuration held here was actually set (because it was
@@ -38,13 +38,24 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		public abstract void Apply ();
 
+		// TODO: Consider refactoring this to use reflection to set the properties.
+		// see: https://github.com/tig/winprint/blob/master/proto/winforms/WinPrint.Core/Models/ModelBase.cs
+		// see: https://github.com/dotnet/runtime/issues/78556
+
 		/// <summary>
-		/// Updates the internal state of a <see cref="Config"/>  object. Called when JSON has been loaded. This method
-		/// must set the internal state such that <see cref="Apply"/> can know whether a particularly configuration 
-		/// setting was actually set.
+		/// Copies new or updated settings from the specified <see cref="Config{T}"/> object into this one. Called when JSON has been loaded. 
 		/// </summary>
-		/// <param name="updates"></param>
-		public abstract void Update (Configuration updates);
+		/// <remarks>
+		/// <para>
+		/// Implementations must set the internal state in such a way that <see cref="Apply"/> can know whether a particular configuration 
+		/// setting was actually set.
+		/// </para>
+		/// <para>
+		/// Implementations must only add or copy properties that were set/changed in <paramref name="changedConfig"/>.
+		/// </para>
+		/// </remarks>		
+		/// <param name="changedConfig">The <see cref="Config{T}"/> object that has new/changed properties.</param>
+		public abstract void CopyUpdatedProperitesFrom (T changedConfig);
 	}
 
 	/// <summary>
@@ -85,7 +96,7 @@ namespace Terminal.Gui.Configuration {
 	/// 		}
 	/// 	}
 	/// </code></example> 
-	public class Theme : Config {
+	public class Theme : Config<Theme> {
 		/// <summary>
 		/// The ColorScheme for the Theme
 		/// </summary>
@@ -109,17 +120,13 @@ namespace Terminal.Gui.Configuration {
 			throw new NotImplementedException ();
 		}
 
-		/// <inheritdoc/>
-		public override void Update (Configuration updates)
-		{
-			throw new NotImplementedException ();
-		}
-
 		/// <summary>
-		/// Performs a sparse copy of a <see cref="Theme"/> (only copies ColorSchemes that are valid/set in the source).
+		/// Performs a sparse copy of a <see cref="Theme"/> (only copies ColorSchemes that are valid/set in the source;
+		/// leveraging the fact that <see cref="Attribute.Make(Color, Color)"/> only copies Colors that are not
+		/// <see cref="Color.Invalid"/>).
 		/// </summary>
 		/// <param name="theme"></param>
-		public void CopyFrom (Theme theme)
+		public override void CopyUpdatedProperitesFrom (Theme theme)
 		{
 			if (theme == null) {
 				return;
@@ -177,7 +184,7 @@ namespace Terminal.Gui.Configuration {
 	/// 	}
 	/// }
 	/// </code></example> 
-	public class Themes : Config {
+	public class Themes : Config<Themes> {
 		/// <summary>
 		/// The currenlty selected theme. 
 		/// </summary>
@@ -211,22 +218,23 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <inheritdoc/>
-		public override void Update (Configuration updates)
+		public override void CopyUpdatedProperitesFrom (Themes updatedThemes)
 		{
-			if (ThemeDefinitions != null && updates.Themes != null) {
-				foreach (var theme in updates.Themes.ThemeDefinitions) {
+			if (ThemeDefinitions != null && updatedThemes != null) {
+				foreach (var theme in updatedThemes.ThemeDefinitions) {
 					if (ThemeDefinitions.ContainsKey (theme.Key)) {
-						ThemeDefinitions [theme.Key].CopyFrom (theme.Value);
+						ThemeDefinitions [theme.Key].CopyUpdatedProperitesFrom (theme.Value);
 					} else {
 						ThemeDefinitions.Add (theme.Key, theme.Value);
 					}
 				}
 			}
 
-			if (!string.IsNullOrEmpty (updates.Themes.SelectedTheme)) {
-				SelectedTheme = updates.Themes.SelectedTheme;
+			if (!string.IsNullOrEmpty (updatedThemes.SelectedTheme)) {
+				SelectedTheme = updatedThemes.SelectedTheme;
 			}
 		}
+
 	}
 
 	/// <summary>
@@ -257,7 +265,7 @@ namespace Terminal.Gui.Configuration {
 	///    "HeightAsBuffer": false
 	///  }
 	/// </code></example>
-	public class Settings : Config {
+	public class Settings : Config<Settings> {
 		/// <summary>
 		/// The <see cref="Application.QuitKey"/> setting.
 		/// </summary>
@@ -314,9 +322,8 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <inheritdoc/>
-		public override void Update (Configuration updates)
+		public override void CopyUpdatedProperitesFrom (Settings updatedSettings)
 		{
-			var updatedSettings = updates.Settings;
 			if (updatedSettings.HeightAsBuffer.HasValue) HeightAsBuffer = updatedSettings.HeightAsBuffer.Value;
 			if (updatedSettings.AlternateForwardKey.HasValue) AlternateForwardKey = updatedSettings.AlternateForwardKey.Value;
 			if (updatedSettings.AlternateBackwardKey.HasValue) AlternateBackwardKey = updatedSettings.AlternateBackwardKey.Value;
@@ -358,7 +365,7 @@ namespace Terminal.Gui.Configuration {
 		public Themes Themes = new Themes ();
 
 		/// <summary>
-		/// Applies the settings in each <see cref="Config"/> object to the running <see cref="Application"/>.
+		/// Applies the settings in each <see cref="Config{T}"/> object to the running <see cref="Application"/>.
 		/// </summary>
 		public void ApplyAll ()
 		{
@@ -372,10 +379,10 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		/// <param name="newConfig"></param>
 		/// <exception cref="NotImplementedException"></exception>
-		internal void UpdateAll (Configuration newConfig)
+		internal void CopyUpdatedProperitesFrom (Configuration newConfig)
 		{
-			Settings.Update (newConfig);
-			Themes.Update (newConfig);
+			Settings.CopyUpdatedProperitesFrom (newConfig.Settings);
+			Themes.CopyUpdatedProperitesFrom (newConfig.Themes);
 		}
 
 		/// <summary>
