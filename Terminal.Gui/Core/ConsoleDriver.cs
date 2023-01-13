@@ -8,6 +8,7 @@
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -19,6 +20,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Basic colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
+	[DefaultValue(Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -301,27 +303,57 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
-		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
+		public Attribute Normal { get { return _normal; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_normal = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
-		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
+		public Attribute Focus { get { return _focus; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_focus = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
-		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
+		public Attribute HotNormal { get { return _hotNormal; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_hotNormal = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
-		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+		public Attribute HotFocus { get { return _hotFocus; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_hotFocus = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
 		/// The default foreground and background color for text, when the view is disabled.
 		/// </summary>
-		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
+		public Attribute Disabled { get { return _disabled; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_disabled = SetAttribute (value);
+			}
+		}
 
 		bool preparingScheme = false;
 

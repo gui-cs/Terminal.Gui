@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml.Linq;
 
 namespace Terminal.Gui.Configuration {
 
@@ -13,7 +14,7 @@ namespace Terminal.Gui.Configuration {
 	/// Classes that read/write configuration file sections (<see cref="Settings"/> and <see cref="ColorSchemes"/> are derived from this class. 
 	/// </summary>
 	[JsonDerivedType (typeof (Settings))]
-	[JsonDerivedType (typeof (ColorSchemes))]
+	[JsonDerivedType (typeof (Themes))]
 	public class Config {
 		/// <summary>
 		/// Gets the hard coded default settings from the implementation (e.g. from <see cref="ListView"/>); called to 
@@ -51,143 +52,181 @@ namespace Terminal.Gui.Configuration {
 	}
 
 	/// <summary>
-	/// Defines the ColorSchemes for a Terminal.Gui application. 
-	/// <remarks>
-	/// A ColorScheme name can be one of the built-in <see cref="ColorScheme"/> names 
-	/// (TopLevel, Base, Dialog, Menu, and Error) or a custom, app-specific name.
-	/// </remarks>
+	/// A Theme is a set of settings.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// A Theme is a collection of settings that are named. 
+	/// </para>
+	/// </remarks>
 	/// <example><code>
-	/// "ColorSchemes": {
-	///    "TopLevel": {
-	///      "Normal": {
-	///        "Foreground": "BrightGreen",
-	///        "Background": "Black"
-	///      },
-	///      "Focus": {
-	///        "Foreground": "White",
-	///        "Background": "Cyan"
-	///      },
-	///      "HotNormal": {
-	///        "Foreground": "Brown",
-	///        "Background": "Black"
-	///      },
-	///      "HotFocus": {
-	///        "Foreground": "Blue",
-	///        "Background": "Cyan"
-	///      },
-	///      "Disabled": {
-	///        "Foreground": "DarkGray",
-	///        "Background": "Black"
-	///      }
-	///    },
-	///      "Base": {
-	///        "Normal": {
-	///        "Foreground": "White",
-	///        "Background": "Blue"
-	///    },
-	///    ...
+	/// 	"Default": {
+	/// 		"ColorSchemes": [
+	/// 		{
+	/// 		"TopLevel": {
+	/// 		"Normal": {
+	/// 			"Foreground": "BrightGreen",
+	/// 			"Background": "Black"
+	/// 		},
+	/// 		"Focus": {
+	/// 		"Foreground": "White",
+	/// 			"Background": "Cyan"
+	/// 
+	/// 		},
+	/// 		"HotNormal": {
+	/// 			"Foreground": "Brown",
+	/// 			"Background": "Black"
+	/// 
+	/// 		},
+	/// 		"HotFocus": {
+	/// 			"Foreground": "Blue",
+	/// 			"Background": "Cyan"
+	/// 		},
+	/// 		"Disabled": {
+	/// 			"Foreground": "DarkGray",
+	/// 			"Background": "Black"
+	/// 
+	/// 		}
+	/// 	}
 	/// </code></example> 
-	public class ColorSchemes : Config, IDictionary<string, ColorScheme> {
+	public class Theme : Config {
 		/// <summary>
-		/// The <see cref="ColorScheme"/> definitions. 
+		/// The ColorScheme for the Theme
 		/// </summary>
-		[JsonIgnore]
-		IDictionary<string, ColorScheme> colorSchemeDict { get; set; } = new Dictionary<string, ColorScheme> ();
-
-
-		/// <inheritdoc/>
-		public override void GetHardCodedDefaults ()
-		{
-			colorSchemeDict = Colors.ColorSchemes;
-		}
+		[JsonConverter (typeof (DictionaryConverter<ColorScheme>))]
+		public Dictionary<string, ColorScheme> ColorSchemes { get; set; } = new Dictionary<string, ColorScheme> ();
 
 		/// <inheritdoc/>
 		public override void Apply ()
 		{
-			if (colorSchemeDict != null) {
+			if (ColorSchemes != null) {
 				// ColorSchemes
-				foreach (var scheme in colorSchemeDict) {
+				foreach (var scheme in ColorSchemes) {
 					Colors.ColorSchemes [scheme.Key] = scheme.Value;
 				}
 			}
 		}
 
 		/// <inheritdoc/>
+		public override void GetHardCodedDefaults ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		/// <inheritdoc/>
 		public override void Update (Configuration updates)
 		{
-			if (colorSchemeDict != null && updates.ColorSchemes != null) {
-				foreach (var scheme in updates.ColorSchemes) {
-					colorSchemeDict [scheme.Key] = scheme.Value;
-				}
+			throw new NotImplementedException ();
+		}
+
+		public void CopyFrom (Theme theme)
+		{
+			if (theme == null) {
+				return;
+			}
+			foreach (var updatedScheme in theme.ColorSchemes) {
+				ColorSchemes [updatedScheme.Key] = updatedScheme.Value;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Defines the Themes for a Terminal.Gui application.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// A Theme is a collection of settings that are named. The default theme is named "Default".
+	/// </para>
+	/// <para>
+	/// The <c>SelectedTheme</c> property is used to detemrine the currently active theme. 
+	/// </para>
+	/// </remarks>
+	/// <example><code>
+	/// "Themes": {
+	/// 	"SelectedTheme" : "Default",
+	/// 	"ThemeDefinitions": [
+	/// 	{
+	/// 		"Default": {
+	/// 			"ColorSchemes": [
+	/// 			{
+	/// 			"TopLevel": {
+	/// 			"Normal": {
+	/// 				"Foreground": "BrightGreen",
+	/// 				"Background": "Black"
+	/// 			},
+	/// 			"Focus": {
+	/// 			"Foreground": "White",
+	/// 				"Background": "Cyan"
+	/// 
+	/// 			},
+	/// 			"HotNormal": {
+	/// 				"Foreground": "Brown",
+	/// 				"Background": "Black"
+	/// 
+	/// 			},
+	/// 			"HotFocus": {
+	/// 				"Foreground": "Blue",
+	/// 				"Background": "Cyan"
+	/// 			},
+	/// 			"Disabled": {
+	/// 				"Foreground": "DarkGray",
+	/// 				"Background": "Black"
+	/// 
+	/// 			}
+	/// 		}
+	/// 	}
+	/// }
+	/// </code></example> 
+	public class Themes : Config {
+		/// <summary>
+		/// The currenlty selected theme. 
+		/// </summary>
+		[JsonInclude]
+		public string SelectedTheme = string.Empty;
+
+		/// <summary>
+		/// The <see cref="Theme"/> definitions. 
+		/// </summary>
+		[JsonInclude]
+		[JsonConverter (typeof (DictionaryConverter<Theme>))]
+		public Dictionary<string, Theme> ThemeDefinitions { get; set; } = new Dictionary<string, Theme> ();
+
+		/// <inheritdoc/>
+		public override void GetHardCodedDefaults ()
+		{
+			SelectedTheme = "Default";
+			var defaultTheme = new Theme () { };
+			foreach (var scheme in Colors.ColorSchemes) {
+				defaultTheme.ColorSchemes.Add (scheme.Key, scheme.Value);
+			}
+			ThemeDefinitions.Add (SelectedTheme, defaultTheme);
+		}
+
+		/// <inheritdoc/>
+		public override void Apply ()
+		{
+			if (ThemeDefinitions != null && ThemeDefinitions.ContainsKey (SelectedTheme)) {
+				ThemeDefinitions [SelectedTheme].Apply ();
 			}
 		}
 
-		// We are derived from IDictionary so that the ColorSchemes JSON element 
-		// has a list of ColorScheme objects. 
-		#region IDictionary
-
-		/// 
-		public ICollection<string> Keys => colorSchemeDict.Keys;
-
-		/// 
-		public ICollection<ColorScheme> Values => colorSchemeDict.Values;
-
-		/// 
-		public int Count => colorSchemeDict.Count;
-
-		/// 
-		public bool IsReadOnly => colorSchemeDict.IsReadOnly;
-
-		ColorScheme IDictionary<string, ColorScheme>.this [string key] { get => colorSchemeDict [key]; set => colorSchemeDict [key] = value; }
-
-		/// 
-		public ColorScheme this [string key] {
-			get {
-				ColorScheme s;
-				if (TryGetValue (key, out s)) {
-					return s;
+		/// <inheritdoc/>
+		public override void Update (Configuration updates)
+		{
+			if (ThemeDefinitions != null && updates.Themes != null) {
+				foreach (var theme in updates.Themes.ThemeDefinitions) {
+					if (ThemeDefinitions.ContainsKey (theme.Key)) {
+						ThemeDefinitions [theme.Key].CopyFrom (theme.Value);
+					} else {
+						ThemeDefinitions.Add (theme.Key, theme.Value);
+					}
 				}
-				return null;
 			}
-			set {
-				value = colorSchemeDict [key];
+
+			if (!string.IsNullOrEmpty (updates.Themes.SelectedTheme)) {
+				SelectedTheme = updates.Themes.SelectedTheme;
 			}
 		}
-
-
-		/// 
-		public bool ContainsKey (string key) => colorSchemeDict.ContainsKey (key);
-
-		/// 
-		public void Add (string key, ColorScheme value) => colorSchemeDict.Add (key, value);
-
-		/// 
-		public bool Remove (string key) => Colors.ColorSchemes.Remove (key);
-
-		/// 
-		public bool TryGetValue (string key, out ColorScheme value) => colorSchemeDict.TryGetValue (key, out value);
-
-		/// 
-		public void Add (KeyValuePair<string, ColorScheme> item) => colorSchemeDict.Add (item.Key, item.Value);
-
-		/// 
-		public void Clear () => colorSchemeDict.Clear ();
-
-		/// 
-		public bool Contains (KeyValuePair<string, ColorScheme> item) => colorSchemeDict.Contains (item);
-
-		/// 
-		public void CopyTo (KeyValuePair<string, ColorScheme> [] array, int arrayIndex) => colorSchemeDict.CopyTo (array, arrayIndex);
-
-		/// 
-		public bool Remove (KeyValuePair<string, ColorScheme> item) => colorSchemeDict.Remove (item.Key);
-
-		/// 
-		public IEnumerator<KeyValuePair<string, ColorScheme>> GetEnumerator () => colorSchemeDict.GetEnumerator ();
-
-		IEnumerator IEnumerable.GetEnumerator () => colorSchemeDict.GetEnumerator ();
-		#endregion
 	}
 
 	/// <summary>
@@ -216,7 +255,7 @@ namespace Terminal.Gui.Configuration {
 	///    "UseSystemConsole": false,
 	///    "IsMouseDisabled": false,
 	///    "HeightAsBuffer": false
-	///  },
+	///  }
 	/// </code></example>
 	public class Settings : Config {
 		/// <summary>
@@ -265,6 +304,7 @@ namespace Terminal.Gui.Configuration {
 		/// <inheritdoc/>
 		public override void Apply ()
 		{
+
 			if (Application.Driver != null && HeightAsBuffer.HasValue) Application.HeightAsBuffer = HeightAsBuffer.Value;
 			if (AlternateForwardKey.HasValue) Application.AlternateForwardKey = AlternateForwardKey.Value;
 			if (AlternateBackwardKey.HasValue) Application.AlternateBackwardKey = AlternateBackwardKey.Value;
@@ -294,7 +334,7 @@ namespace Terminal.Gui.Configuration {
 	///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
 	///    "Settings": {
 	///    },
-	///    "ColorSchemes": {
+	///    "Themes": {
 	///    },
 	///  },
 	/// </code></example>
@@ -315,7 +355,7 @@ namespace Terminal.Gui.Configuration {
 		/// The ColorSchemes.
 		/// </summary>
 		[JsonInclude]
-		public ColorSchemes ColorSchemes = new ColorSchemes ();
+		public Themes Themes = new Themes ();
 
 		/// <summary>
 		/// Applies the settings in each <see cref="Config"/> object to the running <see cref="Application"/>.
@@ -323,7 +363,7 @@ namespace Terminal.Gui.Configuration {
 		public void ApplyAll ()
 		{
 			Settings.Apply ();
-			ColorSchemes.Apply ();
+			Themes.Apply ();
 		}
 
 		/// <summary>
@@ -335,7 +375,7 @@ namespace Terminal.Gui.Configuration {
 		internal void UpdateAll (Configuration newConfig)
 		{
 			Settings.Update (newConfig);
-			ColorSchemes.Update (newConfig);
+			Themes.Update (newConfig);
 		}
 
 		/// <summary>
@@ -345,7 +385,7 @@ namespace Terminal.Gui.Configuration {
 		internal void GetAllHardCodedDefaults ()
 		{
 			Settings.GetHardCodedDefaults ();
-			ColorSchemes.GetHardCodedDefaults ();
+			Themes.GetHardCodedDefaults ();
 		}
 	}
 
@@ -404,6 +444,8 @@ namespace Terminal.Gui.Configuration {
 				new ColorJsonConverter (),
 				new ColorSchemeJsonConverter (),
 				new KeyJsonConverter (),
+				//new DictionaryAsArrayConverter <string, ColorScheme> (),
+				//new DictionaryAsArrayConverter <string, Theme> ()
 			},
 
 		};

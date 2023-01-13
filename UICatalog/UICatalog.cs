@@ -153,12 +153,18 @@ namespace UICatalog {
 			_homeDirWatcher.Created += ConfigChanged;
 			_homeDirWatcher.EnableRaisingEvents = true;
 		}
-
+		
 		private static void ConfigChanged (object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
-			ConfigurationManager.Config.ColorSchemes.Apply ();
+			ConfigurationManager.Config.Themes.Apply ();
+
+			if (Application.Top.MenuBar != null) {
+				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.MenuBar.SetNeedsDisplay ();
+			}
+	
 
 			if (Application.Top is UICatalogTopLevel) {
 				foreach (var i in _colorSchemeMenuBarItem.Children) {

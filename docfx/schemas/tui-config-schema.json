@@ -41,9 +41,37 @@
         "UseSystemConsole"
       ]
     },
+    "ThemeDefinitions": {
+      "description": "A list of Theme objects. Each Theme specifies a set of settings for an application. Set SelectedTheme to the name of the active theme.",
+      "type": "object",
+      "properties": {
+        "SelectedTheme": {
+          "type": "string",
+          "description": "The currently selected theme. The default is 'Default'."
+        },
+        "Themes": {
+          "$ref": "#/definitions/Theme"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/ColorScheme"
+      }
+    }
+  },
+  "definitions": {
+    "Theme": {
+      "description": "A Theme is a collection of settings that are named.",
+      "type": "object",
+      "properties": {
+        "ColorSchemes": {
+          "description": "The ColorSchemes defined for this Theme.",
+          "$ref": "#/definitions/ColorSchemes"
+        }
+      }
+    },    
     "ColorSchemes": {
       "description": "A list of ColorSchemes. Each ColorScheme specifies a set of Attributes (Foreground & Background).",
-      "type": "object",
+      "type": "array",
       "properties": {
         "TopLevel": {
           "$ref": "#/definitions/ColorScheme"
@@ -64,9 +92,7 @@
       "additionalProperties": {
         "$ref": "#/definitions/ColorScheme"
       }
-    }
-  },
-  "definitions": {
+    } ,   
     "ColorScheme": {
       "description": "A Terminal.Gui ColorScheme. Specifies the Foreground & Background colors for modes of an Terminal.Gui app.",
       "type": "object",
