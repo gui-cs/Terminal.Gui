@@ -384,7 +384,9 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		internal void GetAllHardCodedDefaults ()
 		{
+			Settings = new Settings ();
 			Settings.GetHardCodedDefaults ();
+			Themes = new Themes ();
 			Themes.GetHardCodedDefaults ();
 		}
 	}
