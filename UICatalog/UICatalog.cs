@@ -156,6 +156,9 @@ namespace UICatalog {
 		
 		private static void ConfigChanged (object sender, FileSystemEventArgs e)
 		{
+			if (Application.Top == null) {
+				return;
+			}
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
 			ConfigurationManager.Config.Themes.Apply ();
@@ -164,7 +167,11 @@ namespace UICatalog {
 				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
 				Application.Top.MenuBar.SetNeedsDisplay ();
 			}
-	
+
+			if (Application.Top.StatusBar != null) {
+				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.StatusBar.SetNeedsDisplay ();
+			}
 
 			if (Application.Top is UICatalogTopLevel) {
 				foreach (var i in _colorSchemeMenuBarItem.Children) {

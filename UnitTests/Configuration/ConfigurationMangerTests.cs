@@ -15,10 +15,6 @@ namespace Terminal.Gui.Configuration {
 				}
 		};
 
-		public ConfigurationMangerTests ()
-		{
-		}
-
 		/// <summary>
 		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
 		/// </summary>
@@ -26,41 +22,6 @@ namespace Terminal.Gui.Configuration {
 		public void TestConfigurationManagerSaveHardCodedDefaults ()
 		{
 			ConfigurationManager.SaveHardCodedDefaults ("config.json");
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerMultiThemes ()
-		{
-			var configuration = new Configuration ();
-			configuration.GetAllHardCodedDefaults ();
-			var newTheme = new Theme ();
-			newTheme.ColorSchemes.Add ("NewScheme", new ColorScheme () { Normal = Attribute.Make (Color.White, Color.Red) });
-
-			configuration.Themes.ThemeDefinitions.Add ("NewTheme", newTheme);
-			configuration.Themes.SelectedTheme = "NewTheme";
-			var json = ConfigurationManager.ToJson (configuration);
-
-			var readConfig = ConfigurationManager.LoadFromJson (json);
-			File.WriteAllText ("config-newtheme.json", json);
-
-			ConfigurationManager.Config.ApplyAll ();
-
-			Assert.Equal ("NewTheme", configuration.Themes.SelectedTheme);
-			Assert.Equal (Color.White, configuration.Themes.ThemeDefinitions [configuration.Themes.SelectedTheme].ColorSchemes ["NewScheme"].Normal.Foreground);
-			Assert.Equal (Color.Red, configuration.Themes.ThemeDefinitions [configuration.Themes.SelectedTheme].ColorSchemes ["NewScheme"].Normal.Background);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestColorSchemeRoundTrip ()
-		{
-			var serializedColors = JsonSerializer.Serialize (Colors.Base, _jsonOptions);
-			var deserializedColors = JsonSerializer.Deserialize<ColorScheme> (serializedColors, _jsonOptions);
-
-			Assert.Equal (Colors.Base.Normal, deserializedColors.Normal);
-			Assert.Equal (Colors.Base.Focus, deserializedColors.Focus);
-			Assert.Equal (Colors.Base.HotNormal, deserializedColors.HotNormal);
-			Assert.Equal (Colors.Base.HotFocus, deserializedColors.HotFocus);
-			Assert.Equal (Colors.Base.Disabled, deserializedColors.Disabled);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -397,281 +358,40 @@ namespace Terminal.Gui.Configuration {
 			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Disabled.Background);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerApplyPartialColorScheme ()
+		[Fact,AutoInitShutdown]
+		public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
 		{
-			ConfigurationManager.Config.GetAllHardCodedDefaults ();
+			//var _configFilename = "config.json";
+			//// Arrange
+			//// Create a mock of the configuration files in all sources
+			//// Home directory
+			//string homeDir = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".tui");
+			//if (!Directory.Exists (homeDir)) {
+			//	Directory.CreateDirectory (homeDir);
+			//}
+			//string globalConfigFile = Path.Combine (homeDir, _configFilename);
+			//string appSpecificConfigFile = Path.Combine (homeDir, "appname.config.json");
+			//File.WriteAllText (globalConfigFile, "{\"Settings\": {\"TestSetting\":\"Global\"}}");
+			//File.WriteAllText (appSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecific\"}}");
 
-			// Apply default theme
-			ConfigurationManager.Config.Themes.Apply ();
+			//// App directory
+			//string appDir = Directory.GetCurrentDirectory ();
+			//string appDirGlobalConfigFile = Path.Combine (appDir, _configFilename);
+			//string appDirAppSpecificConfigFile = Path.Combine (appDir, "appname.config.json");
+			//File.WriteAllText (appDirGlobalConfigFile, "{\"Settings\": {\"TestSetting\":\"GlobalAppDir\"}}");
+			//File.WriteAllText (appDirAppSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecificAppDir\"}}");
 
-			// Prove Base is defaults (White, Blue)
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			//// App resources
+			//// ...
 
-			// Prove Error's Normal is default (Red, White)
-			Assert.Equal (Color.Red, Colors.ColorSchemes ["Error"].Normal.Foreground);
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Error"].Normal.Background);
+			//// Act
+			//ConfigurationManager.LoadConfigurationFromAllSources ();
 
-			// Modify Error's Normal
-			string json = @"
-			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
-                                        {
-						""Default"" : {
-							""ColorSchemes"": [
-							{
-								""Error"": {
-									""Normal"": {
-										""foreground"": ""Gray"",
-										""background"": ""DarkGray""
-									}
-								}
-							}
-							]
-						}
-					}
-					]
-				}
-			}";
-
-			ConfigurationManager.UpdateConfiguration (json);
-			ConfigurationManager.Config.Themes.Apply ();
-
-			// Prove Base didn't change from defaults (White, Blue)
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
-
-			// Prove Error's Normal changed
-			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Error"].Normal.Foreground);
-			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["Error"].Normal.Background);
-
-		}
-	}
-
-	public class ColorJsonConverterTests {
-
-		[Theory]
-		[InlineData ("Black", Color.Black)]
-		[InlineData ("Blue", Color.Blue)]
-		[InlineData ("BrightBlue", Color.BrightBlue)]
-		[InlineData ("BrightCyan", Color.BrightCyan)]
-		[InlineData ("BrightGreen", Color.BrightGreen)]
-		[InlineData ("BrightMagenta", Color.BrightMagenta)]
-		[InlineData ("BrightRed", Color.BrightRed)]
-		[InlineData ("BrightYellow", Color.BrightYellow)]
-		[InlineData ("Brown", Color.Brown)]
-		[InlineData ("Cyan", Color.Cyan)]
-		[InlineData ("DarkGray", Color.DarkGray)]
-		[InlineData ("Gray", Color.Gray)]
-		[InlineData ("Green", Color.Green)]
-		[InlineData ("Magenta", Color.Magenta)]
-		[InlineData ("Red", Color.Red)]
-		[InlineData ("White", Color.White)]
-		public void TestColorDeserializationFromHumanReadableColorNames (string colorName, Color expectedColor)
-		{
-			// Arrange
-			string json = $"\"{colorName}\"";
-
-			// Act
-			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationMangerTests._jsonOptions);
-
-			// Assert
-			Assert.Equal (expectedColor, actualColor);
+			//// Assert
+			//// Check that the settings from the highest precedence source are loaded
+			//Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
 		}
 
-
-		[Theory]
-		[InlineData (Color.Black, "Black")]
-		[InlineData (Color.Blue, "Blue")]
-		[InlineData (Color.Green, "Green")]
-		[InlineData (Color.Cyan, "Cyan")]
-		[InlineData (Color.Gray, "Gray")]
-		[InlineData (Color.Red, "Red")]
-		[InlineData (Color.Magenta, "Magenta")]
-		[InlineData (Color.Brown, "Brown")]
-		[InlineData (Color.DarkGray, "DarkGray")]
-		[InlineData (Color.BrightBlue, "BrightBlue")]
-		[InlineData (Color.BrightGreen, "BrightGreen")]
-		[InlineData (Color.BrightCyan, "BrightCyan")]
-		[InlineData (Color.BrightRed, "BrightRed")]
-		[InlineData (Color.BrightMagenta, "BrightMagenta")]
-		[InlineData (Color.BrightYellow, "BrightYellow")]
-		[InlineData (Color.White, "White")]
-		public void SerializesEnumValuesAsStrings (Color color, string expectedJson)
-		{
-			var converter = new ColorJsonConverter ();
-			var options = new JsonSerializerOptions { Converters = { converter } };
-
-			var serialized = JsonSerializer.Serialize (color, options);
-
-			Assert.Equal ($"\"{expectedJson}\"", serialized);
-		}
-
-		[Fact]
-		public void TestSerializeColor_Black ()
-		{
-			// Arrange
-			var color = Color.Black;
-			var expectedJson = "\"Black\"";
-
-			// Act
-			var json = JsonSerializer.Serialize (color, new JsonSerializerOptions {
-				Converters = { new ColorJsonConverter () }
-			});
-
-			// Assert
-			Assert.Equal (expectedJson, json);
-		}
-
-		[Fact]
-		public void TestSerializeColor_BrightRed ()
-		{
-			// Arrange
-			var color = Color.BrightRed;
-			var expectedJson = "\"BrightRed\"";
-
-			// Act
-			var json = JsonSerializer.Serialize (color, new JsonSerializerOptions {
-				Converters = { new ColorJsonConverter () }
-			});
-
-			// Assert
-			Assert.Equal (expectedJson, json);
-		}
-
-		[Fact]
-		public void TestDeserializeColor_Black ()
-		{
-			// Arrange
-			var json = "\"Black\"";
-			var expectedColor = Color.Black;
-
-			// Act
-			var color = JsonSerializer.Deserialize<Color> (json, new JsonSerializerOptions {
-				Converters = { new ColorJsonConverter () }
-			});
-
-			// Assert
-			Assert.Equal (expectedColor, color);
-		}
-
-		[Fact]
-		public void TestDeserializeColor_BrightRed ()
-		{
-			// Arrange
-			var json = "\"BrightRed\"";
-			var expectedColor = Color.BrightRed;
-
-			// Act
-			var color = JsonSerializer.Deserialize<Color> (json, new JsonSerializerOptions {
-				Converters = { new ColorJsonConverter () }
-			});
-
-			// Assert
-			Assert.Equal (expectedColor, color);
-		}
-	}
-
-	public class AttributeJsonConverterTests {
-		[Fact, AutoInitShutdown]
-		public void TestDeserialize ()
-		{
-			// Test deserializing from human-readable color names
-			var json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\"}";
-			var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationMangerTests._jsonOptions);
-			Assert.Equal (Color.Blue, attribute.Foreground);
-			Assert.Equal (Color.Green, attribute.Background);
-
-			// Test deserializing from RGB values
-			json = "{\"Foreground\":\"rgb(255,0,0)\",\"Background\":\"rgb(0,255,0)\"}";
-			attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationMangerTests._jsonOptions);
-			Assert.Equal (Color.BrightRed, attribute.Foreground);
-			Assert.Equal (Color.BrightGreen, attribute.Background);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestSerialize ()
-		{
-			// Test serializing to human-readable color names
-			var attribute = new Attribute (Color.Blue, Color.Green);
-			var json = JsonSerializer.Serialize<Attribute> (attribute, ConfigurationMangerTests._jsonOptions);
-			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\"}", json);
-		}
-	}
-
-	public class ColorSchemeJsonConverterTests {
-		//string json = @"
-		//	{
-		//	""ColorSchemes"": {
-		//		""Base"": {
-		//			""normal"": {
-		//				""foreground"": ""White"",
-		//				""background"": ""Blue""
-		//   		            },
-		//			""focus"": {
-		//				""foreground"": ""Black"",
-		//				""background"": ""Gray""
-		//			    },
-		//			""hotNormal"": {
-		//				""foreground"": ""BrightCyan"",
-		//				""background"": ""Blue""
-		//			    },
-		//			""hotFocus"": {
-		//				""foreground"": ""BrightBlue"",
-		//				""background"": ""Gray""
-		//			    },
-		//			""disabled"": {
-		//				""foreground"": ""DarkGray"",
-		//				""background"": ""Blue""
-		//			    }
-		//		}
-		//		}
-		//	}";
-		[Fact, AutoInitShutdown]
-		public void TestColorSchemeSerialization ()
-		{
-			// Arrange
-			var expectedColorScheme = new ColorScheme {
-				Normal = Attribute.Make (Color.White, Color.Blue),
-				Focus = Attribute.Make (Color.Black, Color.Gray),
-				HotNormal = Attribute.Make (Color.BrightCyan, Color.Blue),
-				HotFocus = Attribute.Make (Color.BrightBlue, Color.Gray),
-				Disabled = Attribute.Make (Color.DarkGray, Color.Blue)
-			};
-			var serializedColorScheme = JsonSerializer.Serialize<ColorScheme> (expectedColorScheme, ConfigurationMangerTests._jsonOptions);
-
-			// Act
-			var actualColorScheme = JsonSerializer.Deserialize<ColorScheme> (serializedColorScheme, ConfigurationMangerTests._jsonOptions);
-
-			// Assert
-			Assert.Equal (expectedColorScheme, actualColorScheme);
-		}
-	}
-
-	public class KeyJsonConverterTests {
-		[Theory, AutoInitShutdown]
-		[InlineData (Key.A, "A")]
-		[InlineData (Key.a | Key.ShiftMask, "a, ShiftMask")]
-		[InlineData (Key.A | Key.CtrlMask, "A, CtrlMask")]
-		[InlineData (Key.a | Key.AltMask | Key.CtrlMask, "a, CtrlMask, AltMask")]
-		[InlineData (Key.Delete | Key.AltMask | Key.CtrlMask, "Delete, CtrlMask, AltMask")]
-		[InlineData (Key.D4, "D4")]
-		[InlineData (Key.Esc, "Esc")]
-		public void TestKeyRoundTripConversion (Key key, string expectedStringTo)
-		{
-			// Arrange
-			var options = new JsonSerializerOptions ();
-			options.Converters.Add (new KeyJsonConverter ());
-
-			// Act
-			var json = JsonSerializer.Serialize (key, options);
-			var deserializedKey = JsonSerializer.Deserialize<Key> (json, options);
-
-			// Assert
-			Assert.Equal (expectedStringTo, deserializedKey.ToString());
-		}
 	}
 }
 

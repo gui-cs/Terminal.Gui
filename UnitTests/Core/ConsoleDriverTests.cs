@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Terminal.Gui;
 using Terminal.Gui.Views;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,7 +11,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ConsoleDrivers {
+namespace Terminal.Gui.Core {
 	public class ConsoleDriverTests {
 		readonly ITestOutputHelper output;
 
@@ -53,10 +54,10 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Application.Init (driver);
 			driver.Init (() => { });
 
-			FakeConsole.ForegroundColor = ConsoleColor.Red;
+			Console.ForegroundColor = ConsoleColor.Red;
 			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
 
-			FakeConsole.BackgroundColor = ConsoleColor.Green;
+			Console.BackgroundColor = ConsoleColor.Green;
 			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 			driver.Move (2, 3);
 			Assert.Equal (2, Console.CursorLeft);
@@ -119,9 +120,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Iteration += () => {
 				count++;
-				if (count == 10) {
-					Application.RequestStop ();
-				}
+				if (count == 10) 					Application.RequestStop ();
 			};
 
 			Application.Run ();
@@ -146,7 +145,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 				var cki = new ConsoleKeyInfo (r, ck, false, false, false);
 				mKeys.Push (cki);
 			}
-			FakeConsole.MockKeyPresses = mKeys;
+			Console.MockKeyPresses = mKeys;
 
 			var top = Application.Top;
 			var view = new View ();
@@ -163,9 +162,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			top.Add (view);
 
 			Application.Iteration += () => {
-				if (mKeys.Count == 0) {
-					Application.RequestStop ();
-				}
+				if (mKeys.Count == 0) 					Application.RequestStop ();
 			};
 
 			Application.Run ();
@@ -196,15 +193,10 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			List<Key> GetKeys ()
 			{
-				List<Key> keys = new List<Key> ();
+				var keys = new List<Key> ();
 
-				foreach (Key k in Enum.GetValues (typeof (Key))) {
-					if ((uint)k <= 0xff) {
-						keys.Add (k);
-					} else if ((uint)k > 0xff) {
-						break;
-					}
-				}
+				foreach (Key k in Enum.GetValues (typeof (Key))) 					if ((uint)k <= 0xff) 						keys.Add (k);
+else if ((uint)k > 0xff) 						break;
 
 				return keys;
 			}
@@ -240,9 +232,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 					SendKeys ();
 					break;
 				}
-				if (PushIterations == keyEnums.Count * 4) {
-					Application.RequestStop ();
-				}
+				if (PushIterations == keyEnums.Count * 4) 					Application.RequestStop ();
 			};
 
 			void SendKeys ()
@@ -259,9 +249,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 				key = ShortcutHelper.GetModifiersKey (new KeyEvent (k, mk));
 				Application.Driver.SendKeys (c, ck, shift, alt, control);
 				PushIterations++;
-				if (idxKey + 1 < keyEnums.Count) {
-					idxKey++;
-				} else {
+				if (idxKey + 1 < keyEnums.Count) 					idxKey++;
+else {
 					idxKey = 0;
 					i++;
 				}
@@ -496,35 +485,26 @@ namespace Terminal.Gui.ConsoleDrivers {
 						mKeys.Push (cki);
 						cki = new ConsoleKeyInfo ('\0', ConsoleKey.RightArrow, false, false, false);
 						mKeys.Push (cki);
-						FakeConsole.MockKeyPresses = mKeys;
+						Console.MockKeyPresses = mKeys;
 					}
 					e.Handled = true;
-				} else if (e.KeyEvent.Key == Key.CursorRight) {
-					if (!cursorRight) {
-						cursorRight = true;
-					} else if (ok.HasFocus) {
-						e.Handled = endingKeyPress = true;
-					}
-				}
+				} else if (e.KeyEvent.Key == Key.CursorRight) 					if (!cursorRight) 						cursorRight = true;
+else if (ok.HasFocus) 						e.Handled = endingKeyPress = true;
 			};
 			d.Loaded += () => {
 				var mKeys = new Stack<ConsoleKeyInfo> ();
 				var cki = new ConsoleKeyInfo ('q', ConsoleKey.Q, false, false, true);
 				mKeys.Push (cki);
-				FakeConsole.MockKeyPresses = mKeys;
+				Console.MockKeyPresses = mKeys;
 			};
 			d.Closed += (_) => {
-				if (okClicked && closing) {
-					closed = true;
-				}
+				if (okClicked && closing) 					closed = true;
 			};
 
 			top.Ready += () => Application.Run (d);
 
 			Application.Iteration += () => {
-				if (closed) {
-					Application.RequestStop ();
-				}
+				if (closed) 					Application.RequestStop ();
 			};
 
 			Application.Run ();
@@ -536,7 +516,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			Assert.True (cursorRight);
 			Assert.True (endingKeyPress);
 			Assert.True (closed);
-			Assert.Empty (FakeConsole.MockKeyPresses);
+			Assert.Empty (Console.MockKeyPresses);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -670,33 +650,21 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[ClassData (typeof (PacketTest))]
 		public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey, uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
 		{
-			ConsoleModifiers modifiers = new ConsoleModifiers ();
-			if (shift) {
-				modifiers |= ConsoleModifiers.Shift;
-			}
-			if (alt) {
-				modifiers |= ConsoleModifiers.Alt;
-			}
-			if (control) {
-				modifiers |= ConsoleModifiers.Control;
-			}
+			var modifiers = new ConsoleModifiers ();
+			if (shift) 				modifiers |= ConsoleModifiers.Shift;
+			if (alt) 				modifiers |= ConsoleModifiers.Alt;
+			if (control) 				modifiers |= ConsoleModifiers.Control;
 			var mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
 
-			if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) {
-				Assert.Equal (mappedConsoleKey, initialVirtualKey);
-			} else {
-				Assert.Equal (mappedConsoleKey, outputChar < 0xff ? (uint)(outputChar & 0xff | 0xff << 8) : outputChar);
-			}
+			if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) 				Assert.Equal (mappedConsoleKey, initialVirtualKey);
+else 				Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
 			Assert.Equal (scanCode, initialScanCode);
 
 			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
 
 			//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
-			if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) {
-				Assert.Equal (0, (double)keyChar);
-			} else {
-				Assert.Equal (keyChar, unicodeCharacter);
-			}
+			if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) 				Assert.Equal (0, (double)keyChar);
+else 				Assert.Equal (keyChar, unicodeCharacter);
 			Assert.Equal (consoleKey, expectedVirtualKey);
 			Assert.Equal (scanCode, expectedScanCode);
 
@@ -713,9 +681,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Iteration += () => {
 				iterations++;
-				if (iterations == 0) {
-					Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
-				}
+				if (iterations == 0) 					Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
 			};
 
 			Application.Run ();

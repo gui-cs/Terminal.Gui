@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -129,6 +130,9 @@ namespace Terminal.Gui.Configuration {
 
 			// Get the hard coded settings
 			config.GetAllHardCodedDefaults ();
+
+			// Add Dark theme:
+			config.Themes.ThemeDefinitions.Add ("Dark", new DarkTheme ());
 
 			// Serialize to a JSON string
 			string json = ConfigurationManager.ToJson (config);

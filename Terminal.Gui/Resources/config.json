@@ -150,6 +150,132 @@
             }
           ]
         }
+      },
+      {
+        "Dark": {
+          "ColorSchemes": [
+            {
+              "TopLevel": {
+                "Normal": {
+                  "Foreground": "Gray",
+                  "Background": "White"
+                },
+                "Focus": {
+                  "Foreground": "Gray",
+                  "Background": "BrightYellow"
+                },
+                "HotNormal": {
+                  "Foreground": "BrightYellow",
+                  "Background": "Gray"
+                },
+                "HotFocus": {
+                  "Foreground": "White",
+                  "Background": "Gray"
+                },
+                "Disabled": {
+                  "Foreground": "Gray",
+                  "Background": "Gray"
+                }
+              }
+            },
+            {
+              "Base": {
+                "Normal": {
+                  "Foreground": "Gray",
+                  "Background": "White"
+                },
+                "Focus": {
+                  "Foreground": "Gray",
+                  "Background": "BrightYellow"
+                },
+                "HotNormal": {
+                  "Foreground": "BrightYellow",
+                  "Background": "Gray"
+                },
+                "HotFocus": {
+                  "Foreground": "White",
+                  "Background": "Gray"
+                },
+                "Disabled": {
+                  "Foreground": "Gray",
+                  "Background": "Gray"
+                }
+              }
+            },
+            {
+              "Dialog": {
+                "Normal": {
+                  "Foreground": "Gray",
+                  "Background": "White"
+                },
+                "Focus": {
+                  "Foreground": "Gray",
+                  "Background": "BrightYellow"
+                },
+                "HotNormal": {
+                  "Foreground": "BrightYellow",
+                  "Background": "Gray"
+                },
+                "HotFocus": {
+                  "Foreground": "White",
+                  "Background": "Gray"
+                },
+                "Disabled": {
+                  "Foreground": "Gray",
+                  "Background": "Gray"
+                }
+              }
+            },
+            {
+              "Menu": {
+                "Normal": {
+                  "Foreground": "Gray",
+                  "Background": "White"
+                },
+                "Focus": {
+                  "Foreground": "Gray",
+                  "Background": "BrightYellow"
+                },
+                "HotNormal": {
+                  "Foreground": "BrightYellow",
+                  "Background": "Gray"
+                },
+                "HotFocus": {
+                  "Foreground": "White",
+                  "Background": "Gray"
+                },
+                "Disabled": {
+                  "Foreground": "Gray",
+                  "Background": "Gray"
+                }
+              }
+            },
+            {
+              "Error": {
+                "Normal": {
+                  "Foreground": "Gray",
+                  "Background": "White"
+                },
+                "Focus": {
+                  "Foreground": "Gray",
+                  "Background": "BrightYellow"
+                },
+                "HotNormal": {
+                  "Foreground": "BrightYellow",
+                  "Background": "Gray"
+                },
+                "HotFocus": {
+                  "Foreground": "White",
+                  "Background": "Gray"
+                },
+                "Disabled": {
+                  "Foreground": "Gray",
+                  "Background": "Gray"
+                }
+              }
+            }
+          ]
+        }
       }
     ],
     "SelectedTheme": "Default"
