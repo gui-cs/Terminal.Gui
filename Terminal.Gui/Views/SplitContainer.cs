@@ -165,6 +165,31 @@ namespace Terminal.Gui {
 
 			// TODO : Draw borders and splitter lines into LineCanvas
 
+			var lc = new LineCanvas(Application.Driver);
+	
+			if(HasBorder())
+			{
+				lc.AddLine(new Point(0,0),bounds.Width-1,Orientation.Horizontal,IntegratedBorder);
+				lc.AddLine(new Point(0,0),bounds.Height-1,Orientation.Vertical,IntegratedBorder);
+
+				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Width + 1,Orientation.Horizontal,IntegratedBorder);
+				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Height + 1,Orientation.Vertical,IntegratedBorder);
+				
+				if(splitterLine != null)
+				{
+					lc.AddLine(
+						new Point(splitterLine.Frame.X,splitterLine.Frame.Y),
+						splitterLine.Orientation == Orientation.Horizontal ?
+							splitterLine.Frame.Width:
+							splitterLine.Frame.Height,
+						splitterLine.Orientation,
+						IntegratedBorder);
+				}
+			}
+
+			Driver.SetAttribute (ColorScheme.Normal);
+			lc.Draw(this,bounds);
+
 			// Draw Titles over Border
 			var screen = ViewToScreen (bounds);
 			if (Panel1.Visible && Panel1Title.Length > 0) {
