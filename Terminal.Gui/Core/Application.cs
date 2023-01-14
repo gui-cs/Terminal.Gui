@@ -114,6 +114,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> does not
+		/// change when the console is resized on shrinking (it only grows and never decrease). 
+		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
+		/// </remarks>
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {

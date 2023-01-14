@@ -663,8 +663,17 @@ namespace Terminal.Gui {
 		public abstract IClipboard Clipboard { get; }
 
 		/// <summary>
-		/// If false height is measured by the window height and thus no scrolling.
-		/// If true then height is measured by the buffer height, enabling scrolling.
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> does not
+		/// change when the console is resized on shrinking (it only grows and never decrease). 
+		/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
 		/// </summary>
 		public abstract bool HeightAsBuffer { get; set; }
 

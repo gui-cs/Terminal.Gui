@@ -908,7 +908,11 @@ namespace Terminal.Gui {
 				left = pos.X;
 				top = pos.Y;
 				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				if (HeightAsBuffer) {
+					rows = Math.Max (inputEvent.WindowBufferSizeEvent.size.Y, rows);
+				} else {
+					rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				}
 				//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
 				ResizeScreen ();
 				UpdateOffScreen ();
@@ -1478,13 +1482,6 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
-			// ANSI ESC "[xJ" Clears part of the screen.
-			// If n is 0 (or missing), clear from cursor to end of screen.
-			// If n is 1, clear from cursor to beginning of the screen.
-			// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-			Console.Out.Write ("\x1b[0J");
-			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
