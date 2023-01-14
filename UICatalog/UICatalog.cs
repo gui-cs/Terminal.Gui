@@ -214,7 +214,8 @@ namespace UICatalog {
 					Height = Dim.Fill (1),
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
-					SplitterDistance = 25
+					SplitterDistance = 25,
+					IntegratedBorder = BorderStyle.Rounded,
 				};
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 					

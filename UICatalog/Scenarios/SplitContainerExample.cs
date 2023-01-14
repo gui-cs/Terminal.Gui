@@ -67,8 +67,7 @@ namespace UICatalog.Scenarios {
 				WordWrap = true,
 			 });
 
-			nestedSplitContainer.Border.BorderStyle = BorderStyle.None;
-			nestedSplitContainer.Border.DrawMarginFrame = false;
+			nestedSplitContainer.IntegratedBorder = BorderStyle.None;
 			
 			nestedSplitContainer.Panel2.Add (lbl2 = new Label ("Type Here Too:") { Y = 0 });
 			nestedSplitContainer.Panel2.Add (new TextField () { Width = Dim.Fill (), Y = 0, X = Pos.Right (lbl2) + 1 });
@@ -89,12 +88,12 @@ namespace UICatalog.Scenarios {
 				},
 				miSplitContainer1Border = new MenuItem ("_Outer Panel Border", "", () => ToggleBorder(miSplitContainer1Border, splitContainer))
 				{
-					Checked = splitContainer.Border.BorderStyle == BorderStyle.Single,
+					Checked = splitContainer.IntegratedBorder == BorderStyle.Single,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				minestedSplitContainerBorder = new MenuItem ("_Inner Panel Border", "", () => ToggleBorder(minestedSplitContainerBorder,nestedSplitContainer))
 				{
-					Checked = nestedSplitContainer.Border.BorderStyle == BorderStyle.Single,
+					Checked = nestedSplitContainer.IntegratedBorder == BorderStyle.Single,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				new MenuBarItem ("_Show", new MenuItem [] {
@@ -159,11 +158,9 @@ namespace UICatalog.Scenarios {
 			menuItem.Checked = !menuItem.Checked;
 			
 			if(menuItem.Checked) {
-				splitContainer.Border.BorderStyle = BorderStyle.Single;
-				splitContainer.Border.DrawMarginFrame = true;
+				splitContainer.IntegratedBorder = BorderStyle.Single;
 			} else {
-				splitContainer.Border.BorderStyle = BorderStyle.None;
-				splitContainer.Border.DrawMarginFrame = false;
+				splitContainer.IntegratedBorder = BorderStyle.None;
 			}
 		}
 

@@ -12,6 +12,16 @@ namespace Terminal.Gui {
 
 		private SplitContainerLineView splitterLine;
 		SplitContainer parentSplitPanel;
+		
+		/// TODO: Might be able to make Border virtual and override here
+		/// To make this more API friendly
+
+		/// <summary>
+		/// Use this field instead of Border to create an integrated
+		/// Border in which lines connect with subpanels and splitters
+		/// seamlessly
+		/// </summary>
+		public BorderStyle IntegratedBorder {get;set;}
 
 		/// <summary>
 		/// The <see cref="View"/> showing in the left hand pane of a
@@ -24,7 +34,7 @@ namespace Terminal.Gui {
 
 		
 		public int Panel1MinSize { get; set; }
-		public ustring Panel1Title { get; set; }
+		public ustring Panel1Title { get; set; } = string.Empty;
 
 		/// <summary>
 		/// The <see cref="View"/> showing in the right hand pane of a
@@ -36,7 +46,7 @@ namespace Terminal.Gui {
 		public View Panel2 { get; private set; }
 
 		public int Panel2MinSize { get; set; }
-		public ustring Panel2Title { get; set; }
+		public ustring Panel2Title { get; set; } = string.Empty;
 
 		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
@@ -83,8 +93,33 @@ namespace Terminal.Gui {
 
 		public override void LayoutSubviews ()
 		{
+
+			splitterLine.moveRuneRenderLocation = null;
+
 			if(this.IsRootSplitContainer()) {
-				Setup (this, Bounds);
+
+				var contentArea = Bounds;
+
+				if(HasBorder())
+				{
+					// TODO: Bound with Max/Min
+					contentArea = new Rect(
+						contentArea.X + 1,
+						contentArea.Y + 1,
+						contentArea.Width - 2,
+						contentArea.Height - 2);
+				}
+				else if(HasAnyTitles())
+				{
+					// TODO: Bound with Max/Min
+					contentArea = new Rect(
+						contentArea.X,
+						contentArea.Y + 1,
+						contentArea.Width,
+						contentArea.Height - 1);
+				}
+
+				Setup (this, contentArea);
 			}			
 
 			base.LayoutSubviews ();
@@ -126,35 +161,35 @@ namespace Terminal.Gui {
 			Clear ();
 			base.Redraw (bounds);
 
-			// Draw Splitter over Border (to get Ts)
-			if (splitterLine.Visible) {
-				splitterLine.Redraw (bounds);
-			}
+			// TODO : Gather ALL splitters
 
-			// TODO: 
+			// TODO : Draw borders and splitter lines into LineCanvas
+
 			// Draw Titles over Border
 			var screen = ViewToScreen (bounds);
 			if (Panel1.Visible && Panel1Title.Length > 0) {
 				Driver.SetAttribute (Panel1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel1.Frame.Width, 1), Panel1Title, 0, 0, 0, 0);
+				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel1.Frame.Width, 0), Panel1Title, 0, 0, 0, 0);
 			}
 
 			if (splitterLine.Visible) {
 				screen = ViewToScreen (splitterLine.Frame);
 			} else {
+				
 				screen.X--;
-				screen.Y--;
+				//screen.Y--;
 			}
+
 			if (Orientation == Orientation.Horizontal) {
 				if (Panel2.Visible && Panel2Title?.Length > 0) {
 
 					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			} else {
 				if (Panel2.Visible && Panel2Title?.Length > 0) {
 					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y + 1, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			}
 		}
@@ -186,50 +221,51 @@ namespace Terminal.Gui {
 
 				splitterLine.Visible = false;
 
-				toFullSize.X = 0;
-				toFullSize.Y = 0;
-				toFullSize.Width = Dim.Fill ();
-				toFullSize.Height = Dim.Fill ();
+				toFullSize.X = bounds.X;
+				toFullSize.Y = bounds.Y;
+				toFullSize.Width = bounds.Width;
+				toFullSize.Height = bounds.Height;
 			} else {
 				splitterLine.Visible = true;
 
 				splitterDistance = BoundByMinimumSizes (splitterDistance);
 
-				Panel1.X = 0;
-				Panel1.Y = 0;
-
-				Panel2.Width = Dim.Fill ();
-				Panel2.Height = Dim.Fill ();
+				Panel1.X = bounds.X;
+				Panel1.Y = bounds.Y;
 
 				switch (Orientation) {
 				case Orientation.Horizontal:
 					splitterLine.X = 0;
 					splitterLine.Y = splitterDistance;
-					splitterLine.Width = Dim.Fill () + 1;
+					splitterLine.Width = Dim.Fill ();
 					splitterLine.Height = 1;
 					splitterLine.LineRune = Driver.HLine;
 
-					Panel1.Width = Dim.Fill ();
+					Panel1.Width = Dim.Fill (HasBorder()? 1:0);
 					Panel1.Height = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Height));
 
 					Panel2.Y = Pos.Bottom (splitterLine);
-					Panel2.X = 0;
+					Panel2.X = bounds.X;
+					Panel2.Width = bounds.Width;
+					Panel2.Height = bounds.Height;
 					break;
 
 				case Orientation.Vertical:
 					splitterLine.X = splitterDistance;
 					splitterLine.Y = 0;
 					splitterLine.Width = 1;
-					splitterLine.Height = Dim.Fill () + 1;
+					splitterLine.Height = bounds.Height;
 					splitterLine.LineRune = Driver.VLine;
 
-					Panel1.Height = Dim.Fill ();
+					Panel1.Height = Dim.Fill();
 					Panel1.Width = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (Bounds.Width));
 
 					Panel2.X = Pos.Right (splitterLine);
-					Panel2.Y = 0;
+					Panel2.Y = bounds.Y;
+					Panel2.Height = bounds.Height;
+					Panel2.Width = Dim.Fill(HasBorder()? 1:0);
 					break;
 
 				default: throw new ArgumentOutOfRangeException (nameof (orientation));
@@ -333,7 +369,7 @@ namespace Terminal.Gui {
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
-			Point? moveRuneRenderLocation;
+			public Point? moveRuneRenderLocation;
 
 			public SplitContainerLineView (SplitContainer parent)
 			{
@@ -362,17 +398,6 @@ namespace Terminal.Gui {
 				AddKeyBinding (Key.CursorLeft, Command.Left);
 				AddKeyBinding (Key.CursorUp, Command.LineUp);
 				AddKeyBinding (Key.CursorDown, Command.LineDown);
-
-				LayoutStarted += (e) => {
-					moveRuneRenderLocation = null;
-					if (Orientation == Orientation.Horizontal) {
-						StartingAnchor = parent.HasBorder () ? Driver.LeftTee : (Rune?)null;
-						EndingAnchor = parent.HasBorder () ? Driver.RightTee : (Rune?)null;
-					} else {
-						StartingAnchor = parent.HasBorder () ? Driver.TopTee : (Rune?)null;
-						EndingAnchor = parent.HasBorder () ? Driver.BottomTee : (Rune?)null;
-					}
-				};
 			}
 
 			public override bool ProcessKey (KeyEvent kb)
@@ -557,7 +582,12 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return Border != null && Border.BorderStyle != BorderStyle.None;
+			return IntegratedBorder != BorderStyle.None;
+		}
+		private bool HasAnyTitles()
+		{
+			return Panel1Title.Length > 0 || Panel2Title.Length > 0;
+
 		}
 	}
 
