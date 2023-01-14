@@ -162,33 +162,41 @@ namespace Terminal.Gui {
 			Clear ();
 			base.Redraw (bounds);
 
-			// TODO : Gather ALL splitters
-
-			// TODO : Draw borders and splitter lines into LineCanvas
-
 			var lc = new LineCanvas(Application.Driver);
 	
-			if(HasBorder() && IsRootSplitContainer())
+			if(IsRootSplitContainer())
 			{
-				lc.AddLine(new Point(0,0),bounds.Width-1,Orientation.Horizontal,IntegratedBorder);
-				lc.AddLine(new Point(0,0),bounds.Height-1,Orientation.Vertical,IntegratedBorder);
+				if(HasBorder ()) {
 
-				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Width + 1,Orientation.Horizontal,IntegratedBorder);
-				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Height + 1,Orientation.Vertical,IntegratedBorder);
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, IntegratedBorder);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, IntegratedBorder);
+
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, IntegratedBorder);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
+				}
 
 				foreach (var line in GetAllChildSplitContainerLineViewRecursively(this))
 				{
-					line.ViewToScreen(0,0,out var x1,out var y1);
-					var localOrigin = ScreenToView(x1,y1);
+					bool isRoot = line == splitterLine;
 
-					lc.AddLine(
-						localOrigin,
-						line.Orientation == Orientation.Horizontal ?
-							line.Frame.Width+1:
-							line.Frame.Height+1,
-						line.Orientation,
-						IntegratedBorder);
-					
+					line.ViewToScreen(0,0,out var x1,out var y1);
+					var origin = ScreenToView(x1,y1);
+					var length = line.Orientation == Orientation.Horizontal ?
+							line.Frame.Width - 1 :
+							line.Frame.Height - 1;
+
+					if(!isRoot) {
+						if(line.Orientation == Orientation.Horizontal) {
+							origin.X -= 1;
+						} else {
+							origin.Y -= 1;
+						}
+						length += 2;
+
+						// TODO: Render this title too
+					}
+
+					lc.AddLine(origin,length,line.Orientation,IntegratedBorder);
 				}
 			}
 
@@ -413,7 +421,7 @@ namespace Terminal.Gui {
 		}
 
 		private class SplitContainerLineView : LineView {
-			private SplitContainer parent;
+			public SplitContainer Parent { get; private set; }
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
@@ -424,7 +432,7 @@ namespace Terminal.Gui {
 				CanFocus = true;
 				TabStop = true;
 
-				this.parent = parent;
+				this.Parent = parent;
 
 				base.AddCommand (Command.Right, () => {
 					return MoveSplitter (1, 0);
@@ -523,15 +531,15 @@ namespace Terminal.Gui {
 					// how far has user dragged from original location?						
 					if (Orientation == Orientation.Horizontal) {
 						int dy = mouseEvent.Y - dragPosition.Value.Y;
-						parent.SplitterDistance = Offset (Y, dy);
+						Parent.SplitterDistance = Offset (Y, dy);
 						moveRuneRenderLocation = new Point (mouseEvent.X, 0);
 					} else {
 						int dx = mouseEvent.X - dragPosition.Value.X;
-						parent.SplitterDistance = Offset (X, dx);
+						Parent.SplitterDistance = Offset (X, dx);
 						moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
 					}
 
-					parent.SetNeedsDisplay ();
+					Parent.SetNeedsDisplay ();
 					return true;
 				}
 
@@ -579,7 +587,7 @@ namespace Terminal.Gui {
 			private Pos Offset (Pos pos, int delta)
 			{
 				var posAbsolute = pos.Anchor (Orientation == Orientation.Horizontal ?
-					parent.Bounds.Height : parent.Bounds.Width);
+					Parent.Bounds.Height : Parent.Bounds.Width);
 
 				return posAbsolute + delta;
 			}
@@ -599,12 +607,12 @@ namespace Terminal.Gui {
 			{
 				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						parent.SplitterDistance = ConvertToPosFactor (newValue, parent.Bounds.Height);
+						Parent.SplitterDistance = ConvertToPosFactor (newValue, Parent.Bounds.Height);
 					} else {
-						parent.SplitterDistance = ConvertToPosFactor (newValue, parent.Bounds.Width);
+						Parent.SplitterDistance = ConvertToPosFactor (newValue, Parent.Bounds.Width);
 					}
 				} else {
-					parent.SplitterDistance = newValue;
+					Parent.SplitterDistance = newValue;
 				}
 			}
 
