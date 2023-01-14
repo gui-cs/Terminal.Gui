@@ -95,15 +95,13 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var root = CreateSplitContainer (startHorizontal ?
+			var root = CreateSplitContainer (1,startHorizontal ?
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical, false);
 
 			root.Panel1.Add (CreateTextView (1));
-			root.Panel1Title = titles ? "Panel 1" : string.Empty;
-
 			root.Panel2.Add (CreateTextView (2));
-			root.Panel2Title = titles ? "Panel 2" : string.Empty;
+			
 
 			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
 
@@ -162,31 +160,34 @@ namespace UICatalog.Scenarios {
 			// we can split Panel1
 			var tv = (TextView)to.Panel1.Subviews.Single ();
 
-			var newContainer = CreateSplitContainer (to.Orientation, true);
+			panelsCreated++;
+
+			var newContainer = CreateSplitContainer (panelsCreated, to.Orientation, true);
 
 			to.Remove (to.Panel1);
 			to.Add (newContainer);
 			to.Panel1 = newContainer;
 
 			newContainer.Panel1.Add (tv);
-			newContainer.Panel2.Add (CreateTextView (++panelsCreated));
+			newContainer.Panel2.Add (CreateTextView (panelsCreated));
 		}
 		private void SplitRight(SplitContainer to)
 		{
 			// we can split Panel2
 			var tv = (TextView)to.Panel2.Subviews.Single ();
+			panelsCreated++;
 
-			var newContainer = CreateSplitContainer (to.Orientation, true);
+			var newContainer = CreateSplitContainer (panelsCreated, to.Orientation, true);
 
 			to.Remove (to.Panel2);
 			to.Add (newContainer);
 			to.Panel2 = newContainer;
 
 			newContainer.Panel2.Add (tv);
-			newContainer.Panel1.Add (CreateTextView (++panelsCreated));
+			newContainer.Panel1.Add (CreateTextView (panelsCreated));
 		}
 
-		private SplitContainer CreateSplitContainer (Orientation orientation, bool flip)
+		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation, bool flip)
 		{
 			var toReturn = new SplitContainer {
 				Width = Dim.Fill (),
@@ -200,6 +201,8 @@ namespace UICatalog.Scenarios {
 					Orientation.Horizontal :
 					Orientation.Vertical;
 			}
+			toReturn.Panel1Title = cbTitles.Checked ? $"Panel {titleNumber}" : string.Empty;
+			toReturn.Panel2Title = cbTitles.Checked ? $"Panel {titleNumber+1}" : string.Empty;
 
 			return toReturn;
 		}

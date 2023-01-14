@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
@@ -104,17 +105,17 @@ namespace Terminal.Gui {
 					contentArea = new Rect(
 						contentArea.X + 1,
 						contentArea.Y + 1,
-						contentArea.Width - 2,
-						contentArea.Height - 2);
+						Math.Max (0, contentArea.Width - 2),
+						Math.Max (0, contentArea.Height - 2));
 				}
-				else if(HasAnyTitles())
+				else if(HasAnyTitles() && IsRootSplitContainer())
 				{
 					// TODO: Bound with Max/Min
 					contentArea = new Rect(
 						contentArea.X,
 						contentArea.Y + 1,
 						contentArea.Width,
-						contentArea.Height - 1);
+						Math.Max(0,contentArea.Height - 1));
 				}
 
 				Setup (contentArea);
@@ -155,6 +156,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			var childTitles = new List<ChildSplitterLine> ();
+
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 			base.Redraw (bounds);
@@ -174,7 +177,7 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
 				}
 
-				foreach (var line in allLines)
+				foreach (var line in allLines.Where(l=>l.Visible))
 				{
 					bool isRoot = line == splitterLine;
 
@@ -192,7 +195,9 @@ namespace Terminal.Gui {
 						}
 						length += 2;
 
-						// TODO: Render this title too
+						childTitles.Add (
+							new ChildSplitterLine(line));
+						
 					}
 
 					lc.AddLine(origin,length,line.Orientation,IntegratedBorder);
@@ -207,8 +212,12 @@ namespace Terminal.Gui {
 				line.DrawSplitterSymbol ();
 			}
 
+			foreach(var child in childTitles) {
+				child.DrawTitles ();
+			}
+
 			// Draw Titles over Border
-			var screen = ViewToScreen (bounds);
+			var screen = ViewToScreen (new Rect(0,0,bounds.Width,1));
 			if (Panel1.Visible && Panel1Title.Length > 0) {
 				Driver.SetAttribute (Panel1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
 				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel1.Frame.Width, 0), Panel1Title, 0, 0, 0, 0);
@@ -226,12 +235,12 @@ namespace Terminal.Gui {
 				if (Panel2.Visible && Panel2Title?.Length > 0) {
 
 					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			} else {
 				if (Panel2.Visible && Panel2Title?.Length > 0) {
 					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			}
 		}
@@ -384,7 +393,6 @@ namespace Terminal.Gui {
 			// this splitter position is fine, there is enough space for everyone
 			return pos;
 		}
-		
 		private class SplitContainerLineView : LineView {
 			public SplitContainer Parent { get; private set; }
 
@@ -614,6 +622,25 @@ namespace Terminal.Gui {
 		{
 			return Panel1Title.Length > 0 || Panel2Title.Length > 0;
 
+		}
+
+		private class ChildSplitterLine {
+
+			readonly SplitContainerLineView currentLine;
+			internal ChildSplitterLine (SplitContainerLineView currentLine)
+			{
+				this.currentLine = currentLine;
+			}
+
+			internal void DrawTitles ()
+			{
+				if(currentLine.Orientation == Orientation.Horizontal) 
+				{
+					var screenRect = currentLine.ViewToScreen (
+						new Rect(0,0,currentLine.Frame.Width,currentLine.Frame.Height));
+					Driver.DrawWindowTitle (screenRect, currentLine.Parent.Panel2Title, 0, 0, 0, 0);
+				}
+			}
 		}
 	}
 
