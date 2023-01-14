@@ -1,8 +1,6 @@
 ﻿using Terminal.Gui;
-using System;
 using Terminal.Gui.Graphs;
 using NStack;
-using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Split Container", Description: "Demonstrates the SplitContainer functionality")]

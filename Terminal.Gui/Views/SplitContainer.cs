@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 						contentArea.Height - 1);
 				}
 
-				Setup (this, contentArea);
+				Setup (contentArea);
 			}			
 
 			base.LayoutSubviews ();
@@ -175,17 +175,17 @@ namespace Terminal.Gui {
 
 				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Width + 1,Orientation.Horizontal,IntegratedBorder);
 				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Height + 1,Orientation.Vertical,IntegratedBorder);
-				
-				foreach(var line in GetAllChildSplitContainerLineViewRecursively(this))
+
+				foreach (var line in GetAllChildSplitContainerLineViewRecursively(this))
 				{
-					var lineScreen = line.ViewToScreen(line.Bounds);
-					var localOrigin = ScreenToView(lineScreen.X,lineScreen.Y);
+					line.ViewToScreen(0,0,out var x1,out var y1);
+					var localOrigin = ScreenToView(x1,y1);
 
 					lc.AddLine(
 						localOrigin,
 						line.Orientation == Orientation.Horizontal ?
-							line.Frame.Width:
-							line.Frame.Height,
+							line.Frame.Width+1:
+							line.Frame.Height+1,
 						line.Orientation,
 						IntegratedBorder);
 					
@@ -257,7 +257,7 @@ namespace Terminal.Gui {
 
 			return root;
 		}
-		private void Setup (SplitContainer splitContainer, Rect bounds)
+		private void Setup (Rect bounds)
 		{
 			splitterLine.Orientation = Orientation;
 			// splitterLine.Text = Panel2.Title;
@@ -296,14 +296,14 @@ namespace Terminal.Gui {
 					Panel2.Y = Pos.Bottom (splitterLine);
 					Panel2.X = bounds.X;
 					Panel2.Width = bounds.Width;
-					Panel2.Height = bounds.Height;
+					Panel2.Height = Dim.Fill(HasBorder () ? 1 : 0);
 					break;
 
 				case Orientation.Vertical:
 					splitterLine.X = splitterDistance;
 					splitterLine.Y = 0;
 					splitterLine.Width = 1;
-					splitterLine.Height = bounds.Height;
+					splitterLine.Height = Dim.Fill ();
 					splitterLine.LineRune = Driver.VLine;
 
 					Panel1.Height = Dim.Fill();
