@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel1 { get; private set; }
+		public View Panel1 { get; set; } // TODO: Should not be public set, should be helpers for this
 
 		
 		public int Panel1MinSize { get; set; }
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel2 { get; private set; }
+		public View Panel2 { get; set; } // TODO: Should not be public set, should be helpers for this
 
 		public int Panel2MinSize { get; set; }
 		public ustring Panel2Title { get; set; } = string.Empty;
