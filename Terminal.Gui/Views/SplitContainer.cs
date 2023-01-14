@@ -94,9 +94,6 @@ namespace Terminal.Gui {
 
 		public override void LayoutSubviews ()
 		{
-
-			splitterLine.moveRuneRenderLocation = null;
-
 			if(this.IsRootSplitContainer()) {
 
 				var contentArea = Bounds;
@@ -163,8 +160,10 @@ namespace Terminal.Gui {
 			base.Redraw (bounds);
 
 			var lc = new LineCanvas(Application.Driver);
-	
-			if(IsRootSplitContainer())
+
+			var allLines = GetAllChildSplitContainerLineViewRecursively (this);
+
+			if (IsRootSplitContainer())
 			{
 				if(HasBorder ()) {
 
@@ -175,7 +174,7 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
 				}
 
-				foreach (var line in GetAllChildSplitContainerLineViewRecursively(this))
+				foreach (var line in allLines)
 				{
 					bool isRoot = line == splitterLine;
 
@@ -202,6 +201,11 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Normal);
 			lc.Draw(this,bounds);
+
+			// Redraw the lines so that focus/drag symbol renders
+			foreach(var line in allLines) {
+				line.DrawSplitterSymbol ();
+			}
 
 			// Draw Titles over Border
 			var screen = ViewToScreen (bounds);
@@ -374,52 +378,7 @@ namespace Terminal.Gui {
 			// this splitter position is fine, there is enough space for everyone
 			return pos;
 		}
-
-		/// <summary>
-		/// A panel within a <see cref="SplitterPanel"/>. 
-		/// </summary>
-		public class SplitterPanel : View {
-			Pos minSize = 1;
-
-			/// <summary>
-			/// Gets or sets the minimum size for the panel.
-			/// </summary>
-			public Pos MinSize { get => minSize;
-				set { 
-					minSize = value;
-					SuperView?.SetNeedsLayout ();
-				} 
-			}
-
-			ustring title = ustring.Empty;
-			/// <summary>
-			/// The title to be displayed for this <see cref="SplitterPanel"/>. The title will be rendered 
-			/// on the top border aligned to the left of the panel.
-			/// </summary>
-			/// <value>The title.</value>
-			public ustring Title {
-				get => title;
-				set {
-					title = value;
-					SetNeedsDisplay ();
-				}
-			}
-
-			/// <inheritdoc/>
-			public override void Redraw (Rect bounds)
-			{
-				Driver.SetAttribute (ColorScheme.Normal);
-				base.Redraw (bounds);
-			}
-
-			/// <inheritdoc/>
-			public override void OnVisibleChanged ()
-			{
-				base.OnVisibleChanged ();
-				SuperView?.SetNeedsLayout ();
-			}
-		}
-
+		
 		private class SplitContainerLineView : LineView {
 			public SplitContainer Parent { get; private set; }
 
@@ -489,6 +448,11 @@ namespace Terminal.Gui {
 			{
 				base.Redraw (bounds);
 
+				DrawSplitterSymbol ();
+			}
+
+			public void DrawSplitterSymbol()
+			{
 				if (CanFocus && HasFocus) {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
@@ -553,7 +517,7 @@ namespace Terminal.Gui {
 						dragOrignalPos,
 						Orientation == Orientation.Horizontal ? Y : X);
 					dragPosition = null;
-					//moveRuneRenderLocation = null;
+					moveRuneRenderLocation = null;
 				}
 
 				return false;

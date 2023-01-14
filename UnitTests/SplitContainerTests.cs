@@ -483,7 +483,7 @@ namespace UnitTests {
 
 		private LineView GetSplitContainerLineView (SplitContainer splitContainer)
 		{
-			return splitContainer.Subviews [0].Subviews.OfType<LineView> ().Single ();
+			return splitContainer.Subviews.OfType<LineView> ().Single ();
 		}
 
 		private void SetInputFocusLine (SplitContainer splitContainer)
@@ -508,10 +508,7 @@ namespace UnitTests {
 				Height = 3,
 			};
 
-			if (!withBorder) {
-				container.Border.BorderStyle = BorderStyle.None;
-				container.Border.DrawMarginFrame = false;
-			}
+			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
 
 			container.Panel1.Add (new Label (new string ('1', 100)));
 			container.Panel2.Add (new Label (new string ('2', 100)));
