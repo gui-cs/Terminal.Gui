@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
 
@@ -17,6 +18,8 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbTitles;
 
 		bool loaded = false;
+		int panelsCreated;
+		int panelsToCreate;
 
 		/// <summary>
 		/// Setup the scenario.
@@ -87,7 +90,7 @@ namespace UICatalog.Scenarios {
 			bool startHorizontal = cbHorizontal.Checked;
 
 			workArea.RemoveAll ();
-
+			
 			if (numberOfPanels <= 0) {
 				return;
 			}
@@ -113,7 +116,9 @@ namespace UICatalog.Scenarios {
 
 			if (numberOfPanels > 2) {
 
-				AddMorePanels (root, 2, numberOfPanels);
+				panelsCreated = 2;
+				panelsToCreate = numberOfPanels;
+				AddMorePanels (root);
 			}
 
 			if (loaded) {
@@ -128,59 +133,57 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				Text = number.ToString ().Repeat (1000),
 				AllowsTab = false,
-				WordWrap = true,
+				//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 panels)
 			};
 		}
 
-		private void AddMorePanels (SplitContainer to, int done, int numberOfPanels)
+		private void AddMorePanels (SplitContainer to)
 		{
-			if (done == numberOfPanels) {
-				return;
+			bool canSplitLeft = !(to.Panel1 is SplitContainer);
+			bool canSplitRight = !(to.Panel2 is SplitContainer);
+
+			if(canSplitRight) {
+				SplitRight (to);				
 			}
 
-			View toSplit;
-
-			if (!(to.Panel1 is SplitContainer)) {
-
-				// we can split Panel1
-				var tv = (TextView)to.Panel1.Subviews.Single ();
-
-				var newContainer = CreateSplitContainer (to.Orientation, true);
-
-				to.Remove (to.Panel1);
-				to.Add (newContainer);
-				to.Panel1 = newContainer;
-
-				newContainer.Panel1.Add (tv);
-				newContainer.Panel2.Add (CreateTextView (++done));
-
-				AddMorePanels (to, done, numberOfPanels);
-			} else
-			if (!(to.Panel2 is SplitContainer)) {
-				// we can split Panel2
-				var tv = (TextView)to.Panel2.Subviews.Single ();
-
-				var newContainer = CreateSplitContainer (to.Orientation, true);
-
-				to.Remove (to.Panel2);
-				to.Add (newContainer);
-				to.Panel2 = newContainer;
-
-				newContainer.Panel1.Add (tv);
-				newContainer.Panel2.Add (CreateTextView (++done));
-
-				AddMorePanels (to, done, numberOfPanels);
-			} else {
-				// Both Panel1 and Panel2 are already SplitContainer	
-
-				// So split one of the children
-				if(done % 2 == 0) {
-					AddMorePanels ((SplitContainer)to.Panel1, done, numberOfPanels);
-				} else {
-
-					AddMorePanels ((SplitContainer)to.Panel2, done, numberOfPanels);
-				}
+			if (canSplitLeft && panelsCreated < panelsToCreate) {
+				SplitLeft(to);
 			}
+			
+			if (to.Panel1 is SplitContainer && to.Panel2 is SplitContainer) {
+
+				AddMorePanels ((SplitContainer)to.Panel1);
+				AddMorePanels ((SplitContainer)to.Panel2);
+			}
+
+		}
+		private void SplitLeft(SplitContainer to)
+		{
+			// we can split Panel1
+			var tv = (TextView)to.Panel1.Subviews.Single ();
+
+			var newContainer = CreateSplitContainer (to.Orientation, true);
+
+			to.Remove (to.Panel1);
+			to.Add (newContainer);
+			to.Panel1 = newContainer;
+
+			newContainer.Panel1.Add (tv);
+			newContainer.Panel2.Add (CreateTextView (++panelsCreated));
+		}
+		private void SplitRight(SplitContainer to)
+		{
+			// we can split Panel2
+			var tv = (TextView)to.Panel2.Subviews.Single ();
+
+			var newContainer = CreateSplitContainer (to.Orientation, true);
+
+			to.Remove (to.Panel2);
+			to.Add (newContainer);
+			to.Panel2 = newContainer;
+
+			newContainer.Panel2.Add (tv);
+			newContainer.Panel1.Add (CreateTextView (++panelsCreated));
 		}
 
 		private SplitContainer CreateSplitContainer (Orientation orientation, bool flip)
