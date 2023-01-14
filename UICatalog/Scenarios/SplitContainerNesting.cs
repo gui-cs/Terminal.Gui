@@ -137,17 +137,18 @@ namespace UICatalog.Scenarios {
 
 		private void AddMorePanels (SplitContainer to)
 		{
-			bool canSplitLeft = !(to.Panel1 is SplitContainer);
-			bool canSplitRight = !(to.Panel2 is SplitContainer);
+			if (panelsCreated == panelsToCreate) {
+				return;
+			}
 
-			if(canSplitRight) {
+			if (!(to.Panel1 is SplitContainer)) {
+				SplitLeft (to);
+			}
+
+			if (!(to.Panel2 is SplitContainer)) {
 				SplitRight (to);				
 			}
 
-			if (canSplitLeft && panelsCreated < panelsToCreate) {
-				SplitLeft(to);
-			}
-			
 			if (to.Panel1 is SplitContainer && to.Panel2 is SplitContainer) {
 
 				AddMorePanels ((SplitContainer)to.Panel1);
@@ -157,6 +158,10 @@ namespace UICatalog.Scenarios {
 		}
 		private void SplitLeft(SplitContainer to)
 		{
+			if (panelsCreated == panelsToCreate) {
+				return;
+			}
+
 			// we can split Panel1
 			var tv = (TextView)to.Panel1.Subviews.Single ();
 
@@ -173,6 +178,10 @@ namespace UICatalog.Scenarios {
 		}
 		private void SplitRight(SplitContainer to)
 		{
+			if (panelsCreated == panelsToCreate) {
+				return;
+			}
+
 			// we can split Panel2
 			var tv = (TextView)to.Panel2.Subviews.Single ();
 			panelsCreated++;
