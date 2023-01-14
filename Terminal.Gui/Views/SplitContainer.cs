@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
@@ -167,7 +168,7 @@ namespace Terminal.Gui {
 
 			var lc = new LineCanvas(Application.Driver);
 	
-			if(HasBorder())
+			if(HasBorder() && IsRootSplitContainer())
 			{
 				lc.AddLine(new Point(0,0),bounds.Width-1,Orientation.Horizontal,IntegratedBorder);
 				lc.AddLine(new Point(0,0),bounds.Height-1,Orientation.Vertical,IntegratedBorder);
@@ -175,15 +176,19 @@ namespace Terminal.Gui {
 				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Width + 1,Orientation.Horizontal,IntegratedBorder);
 				lc.AddLine(new Point(bounds.Width-1,bounds.Height-1),-bounds.Height + 1,Orientation.Vertical,IntegratedBorder);
 				
-				if(splitterLine != null)
+				foreach(var line in GetAllChildSplitContainerLineViewRecursively(this))
 				{
+					var lineScreen = line.ViewToScreen(line.Bounds);
+					var localOrigin = ScreenToView(lineScreen.X,lineScreen.Y);
+
 					lc.AddLine(
-						new Point(splitterLine.Frame.X,splitterLine.Frame.Y),
-						splitterLine.Orientation == Orientation.Horizontal ?
-							splitterLine.Frame.Width:
-							splitterLine.Frame.Height,
-						splitterLine.Orientation,
+						localOrigin,
+						line.Orientation == Orientation.Horizontal ?
+							line.Frame.Width:
+							line.Frame.Height,
+						line.Orientation,
 						IntegratedBorder);
+					
 				}
 			}
 
@@ -217,6 +222,24 @@ namespace Terminal.Gui {
 					Driver.DrawWindowTitle (new Rect (screen.X + 1, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
 				}
 			}
+		}
+
+		private List<SplitContainerLineView> GetAllChildSplitContainerLineViewRecursively (View v)
+		{
+			var lines = new List<SplitContainerLineView>();
+
+			foreach(var sub in v.Subviews)
+			{
+				if(sub is SplitContainerLineView s)
+				{
+					lines.Add(s);
+				}
+				else {
+					lines.AddRange(GetAllChildSplitContainerLineViewRecursively(sub));
+				}
+			}
+
+			return lines;
 		}
 
 		private bool IsRootSplitContainer ()
