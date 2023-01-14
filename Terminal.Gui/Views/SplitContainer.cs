@@ -33,8 +33,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public View Panel1 { get; set; } // TODO: Should not be public set, should be helpers for this
 
-		
-		public int Panel1MinSize { get; set; }
+
+		public int Panel1MinSize { get; set; } = 1;
 		public ustring Panel1Title { get; set; } = string.Empty;
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public View Panel2 { get; set; } // TODO: Should not be public set, should be helpers for this
 
-		public int Panel2MinSize { get; set; }
+		public int Panel2MinSize { get; set; } = 1;
 		public ustring Panel2Title { get; set; } = string.Empty;
 
 		private Pos splitterDistance = Pos.Percent (50);
@@ -348,31 +348,37 @@ namespace Terminal.Gui {
 			if (!IsInitialized) {
 				return pos;
 			}
+			
+			var panel1MinSize = Panel1MinSize;
+			var panel2MinSize = Panel2MinSize;
+
+
+			// if there is a border then there is less space
+			// for the panels so we need to make size restrictions
+			// tighter.
+			if(HasBorder()) {
+				panel1MinSize++;
+				panel2MinSize++;
+			}
 
 			var availableSpace = Orientation == Orientation.Horizontal ? this.Bounds.Height : this.Bounds.Width;
 
 			var idealPosition = pos.Anchor (availableSpace);
 
 			// bad position because not enough space for Panel1
-			if (idealPosition < Panel1MinSize) {
+			if (idealPosition < panel1MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
-				return (Pos)Math.Min (Panel1MinSize, availableSpace);
-			}
-
-			// if there is a border then 2 screen units are taken occupied
-			// by the border around the edge (one on left, one on right).
-			if (HasBorder ()) {
-				availableSpace -= 2;
+				return (Pos)Math.Min (panel1MinSize, availableSpace);
 			}
 
 			// bad position because not enough space for Panel2
-			if (availableSpace - idealPosition <= Panel2MinSize) {
+			if (availableSpace - idealPosition <= panel2MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
 
 				// +1 is to allow space for the splitter
-				return (Pos)Math.Max (availableSpace - (Panel2MinSize + 1), 0);
+				return (Pos)Math.Max (availableSpace - (panel2MinSize + 1), 0);
 			}
 
 			// this splitter position is fine, there is enough space for everyone

@@ -260,7 +260,7 @@ namespace UnitTests {
 			splitContainer.SplitterDistance = 2;
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (5, splitContainer.SplitterDistance);
+			Assert.Equal (6, splitContainer.SplitterDistance);
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -348,7 +348,7 @@ namespace UnitTests {
 			splitContainer.SplitterDistance = 8;
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (3, splitContainer.SplitterDistance);
+			Assert.Equal (4, splitContainer.SplitterDistance);
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
