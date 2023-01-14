@@ -312,7 +312,7 @@ namespace Terminal.Gui {
 
 					Panel1.Width = Dim.Fill (HasBorder()? 1:0);
 					Panel1.Height = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Height));
+					splitterDistance.Anchor (bounds.Height));
 
 					Panel2.Y = Pos.Bottom (splitterLine);
 					Panel2.X = bounds.X;
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 
 					Panel1.Height = Dim.Fill();
 					Panel1.Width = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (Bounds.Width));
+					splitterDistance.Anchor (bounds.Width));
 
 					Panel2.X = Pos.Right (splitterLine);
 					Panel2.Y = bounds.Y;
