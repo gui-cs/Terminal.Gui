@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
 
@@ -174,8 +175,9 @@ namespace UICatalog.Scenarios {
 
 			panelsCreated++;
 
-			// we can split Panel1
-			SetPanelTitles (newContainer, panelsCreated);
+			// During splitting the old Title will have been migrated to Panel1 so we only need
+			// to set the Title on Panel2 (the one that gets our new TextView)
+			newContainer.Panel2Title = cbTitles.Checked ? $"Panel {panelsCreated}" : string.Empty;
 
 			// Flip orientation
 			newContainer.Orientation = newContainer.Orientation == Orientation.Vertical ?
@@ -183,12 +185,6 @@ namespace UICatalog.Scenarios {
 				Orientation.Vertical;
 			
 			newContainer.Panel2.Add (CreateTextView (panelsCreated));
-		}
-
-		private void SetPanelTitles (SplitContainer container, int containerNumber)
-		{
-			container.Panel1Title = cbTitles.Checked ? $"Panel {containerNumber}" : string.Empty;
-			container.Panel2Title = cbTitles.Checked ? $"Panel {containerNumber + 1}" : string.Empty;
 		}
 
 		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation)
@@ -200,7 +196,8 @@ namespace UICatalog.Scenarios {
 				Orientation = orientation
 			};
 
-			SetPanelTitles (toReturn, titleNumber);
+			toReturn.Panel1Title = cbTitles.Checked ? $"Panel {titleNumber}" : string.Empty;
+			toReturn.Panel2Title = cbTitles.Checked ? $"Panel {titleNumber + 1}" : string.Empty;
 
 			return toReturn;
 		}

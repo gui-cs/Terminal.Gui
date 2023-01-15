@@ -248,7 +248,8 @@ namespace Terminal.Gui {
 		/// is already a <see cref="SplitContainer"/> then returns false.
 		/// </summary>
 		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
-		/// will contain the original content (if any) while <see cref="Panel2"/> will be empty and available
+		/// will contain the original content and <see cref="Panel1Title"/> (if any) while
+		/// <see cref="Panel2"/> will be empty and available for adding to.
 		/// for adding to.</remarks>
 		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
 		/// <see cref="Panel1"/> or the existing one if it was already been converted before.</param>
@@ -257,10 +258,22 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/></returns>
 		public bool TrySplitPanel1(out SplitContainer result)
 		{
-			return TrySplit (
-				() => this.Panel1,
-				(n) => this.Panel1 = n,
+			// when splitting a panel into 2 sub panels we will need to migrate
+			// the title too
+			var title = Panel1Title;
+
+			bool returnValue = TrySplit (
+				this.Panel1,
+				(newSplitContainer) => {
+					this.Panel1 = newSplitContainer;
+					
+					// Move title to new container
+					Panel1Title = string.Empty;
+					newSplitContainer.Panel1Title = title;
+				},
 				out result);
+			
+			return returnValue;
 		}
 
 		/// <summary>
@@ -269,7 +282,8 @@ namespace Terminal.Gui {
 		/// is already a <see cref="SplitContainer"/> then returns false.
 		/// </summary>
 		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
-		/// will contain the original content (if any) while <see cref="Panel2"/> will be empty and available
+		/// will contain the original content and <see cref="Panel2Title"/> (if any) while
+		/// <see cref="Panel2"/> will be empty and available for adding to.
 		/// for adding to.</remarks>
 		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
 		/// <see cref="Panel2"/> or the existing one if it was already been converted before.</param>
@@ -278,19 +292,31 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/></returns>
 		public bool TrySplitPanel2 (out SplitContainer result)
 		{
-			return TrySplit (
-				() => this.Panel2,
-				(n) => this.Panel2 = n,
+			// when splitting a panel into 2 sub panels we will need to migrate
+			// the title too
+			var title = Panel2Title;
+
+			bool returnValue = TrySplit (
+				this.Panel2,
+				(newSplitContainer) => {
+					this.Panel2 = newSplitContainer;
+
+					// Move title to new container
+					Panel2Title = string.Empty;
+
+					// Content always goes into Panel1 of the new container
+					// so that is where the title goes too
+					newSplitContainer.Panel1Title = title;
+				},
 				out result);
+
+			return returnValue;
 		}
 		private bool TrySplit(
-			Func<View> getter,
+			View toMove,
 			Action<SplitContainer> newSplitContainerSetter,
 			out SplitContainer result)
 		{
-			// Get the current panel contents (Panel1 or Panel2)
-			var toMove = getter();
-
 			if (toMove is SplitContainer existing) {
 				result = existing;
 				return false;
