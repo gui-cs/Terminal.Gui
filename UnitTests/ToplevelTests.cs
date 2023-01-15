@@ -967,5 +967,18 @@ namespace Terminal.Gui.Core {
 
 			Application.Run ();
 		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_With_Border_Null_Not_Throws ()
+		{
+			var top = new Toplevel ();
+			Application.Begin (top);
+
+			var exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (0, 10));
+			Assert.Null (exception);
+
+			exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (10, 0));
+			Assert.Null (exception);
+		}
 	}
 }
