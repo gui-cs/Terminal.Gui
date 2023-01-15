@@ -245,6 +245,81 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Converts <see cref="Panel1"/> from a regular <see cref="View"/>
+		/// container to a new nested <see cref="SplitContainer"/>.  If <see cref="Panel1"/>
+		/// is already a <see cref="SplitContainer"/> then returns false.
+		/// </summary>
+		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
+		/// will contain the original content (if any) while <see cref="Panel2"/> will be empty and available
+		/// for adding to.</remarks>
+		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
+		/// <see cref="Panel1"/> or the existing one if it was already been converted before.</param>
+		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
+		/// <see cref="SplitContainer"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="SplitContainer"/></returns>
+		public bool TrySplitPanel1(out SplitContainer result)
+		{
+			return TrySplit (
+				() => this.Panel1,
+				(n) => this.Panel1 = n,
+				out result);
+		}
+
+		/// <summary>
+		/// Converts <see cref="Panel2"/> from a regular <see cref="View"/>
+		/// container to a new nested <see cref="SplitContainer"/>.  If <see cref="Panel2"/>
+		/// is already a <see cref="SplitContainer"/> then returns false.
+		/// </summary>
+		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
+		/// will contain the original content (if any) while <see cref="Panel2"/> will be empty and available
+		/// for adding to.</remarks>
+		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
+		/// <see cref="Panel2"/> or the existing one if it was already been converted before.</param>
+		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
+		/// <see cref="SplitContainer"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="SplitContainer"/></returns>
+		public bool TrySplitPanel2 (out SplitContainer result)
+		{
+			return TrySplit (
+				() => this.Panel2,
+				(n) => this.Panel2 = n,
+				out result);
+		}
+		private bool TrySplit(
+			Func<View> getter,
+			Action<SplitContainer> newSplitContainerSetter,
+			out SplitContainer result)
+		{
+			// Get the current panel contents (Panel1 or Panel2)
+			var toMove = getter();
+
+			if (toMove is SplitContainer existing) {
+				result = existing;
+				return false;
+			}
+
+			var newContainer = new SplitContainer {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+
+			// Replace current child contents 
+			Remove (toMove);
+			Add (newContainer);
+
+			// Set Panel (1 or 2) to the new container
+			newSplitContainerSetter(newContainer);
+
+			// Set the original content into the first panel of the new container
+			newContainer.Add (toMove);
+			newContainer.Panel1 = toMove;
+
+			result = newContainer;
+			return true;
+		}
+
+		
 		private List<SplitContainerLineView> GetAllChildSplitContainerLineViewRecursively (View v)
 		{
 			var lines = new List<SplitContainerLineView>();
@@ -371,6 +446,11 @@ namespace Terminal.Gui {
 			}
 
 			var availableSpace = Orientation == Orientation.Horizontal ? this.Bounds.Height : this.Bounds.Width;
+
+			// we probably haven't finished layout even if IsInitialized is true :(
+			if(availableSpace <= 0) {
+				return pos;
+			}
 
 			var idealPosition = pos.Anchor (availableSpace);
 

@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 
 			var root = CreateSplitContainer (1,startHorizontal ?
 					Terminal.Gui.Graphs.Orientation.Horizontal :
-					Terminal.Gui.Graphs.Orientation.Vertical, false);
+					Terminal.Gui.Graphs.Orientation.Vertical);
 
 			root.Panel1.Add (CreateTextView (1));
 			root.Panel2.Add (CreateTextView (2));
@@ -142,11 +142,11 @@ namespace UICatalog.Scenarios {
 			}
 
 			if (!(to.Panel1 is SplitContainer)) {
-				SplitLeft (to);
+				Split(to,true);
 			}
 
 			if (!(to.Panel2 is SplitContainer)) {
-				SplitRight (to);				
+				Split(to,false);				
 			}
 
 			if (to.Panel1 is SplitContainer && to.Panel2 is SplitContainer) {
@@ -156,47 +156,42 @@ namespace UICatalog.Scenarios {
 			}
 
 		}
-		private void SplitLeft(SplitContainer to)
+		private void Split(SplitContainer to, bool left)
 		{
 			if (panelsCreated == panelsToCreate) {
 				return;
 			}
+
+			SplitContainer newContainer;
+
+			if (left) {
+				to.TrySplitPanel1 (out newContainer);
+
+			}
+			else {
+				to.TrySplitPanel2 (out newContainer);
+			}
+
+			panelsCreated++;
 
 			// we can split Panel1
-			var tv = (TextView)to.Panel1.Subviews.Single ();
+			SetPanelTitles (newContainer, panelsCreated);
 
-			panelsCreated++;
-
-			var newContainer = CreateSplitContainer (panelsCreated, to.Orientation, true);
-
-			to.Remove (to.Panel1);
-			to.Add (newContainer);
-			to.Panel1 = newContainer;
-
-			newContainer.Panel1.Add (tv);
+			// Flip orientation
+			newContainer.Orientation = newContainer.Orientation == Orientation.Vertical ?
+				Orientation.Horizontal :
+				Orientation.Vertical;
+			
 			newContainer.Panel2.Add (CreateTextView (panelsCreated));
 		}
-		private void SplitRight(SplitContainer to)
+
+		private void SetPanelTitles (SplitContainer container, int containerNumber)
 		{
-			if (panelsCreated == panelsToCreate) {
-				return;
-			}
-
-			// we can split Panel2
-			var tv = (TextView)to.Panel2.Subviews.Single ();
-			panelsCreated++;
-
-			var newContainer = CreateSplitContainer (panelsCreated, to.Orientation, true);
-
-			to.Remove (to.Panel2);
-			to.Add (newContainer);
-			to.Panel2 = newContainer;
-
-			newContainer.Panel2.Add (tv);
-			newContainer.Panel1.Add (CreateTextView (panelsCreated));
+			container.Panel1Title = cbTitles.Checked ? $"Panel {containerNumber}" : string.Empty;
+			container.Panel2Title = cbTitles.Checked ? $"Panel {containerNumber + 1}" : string.Empty;
 		}
 
-		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation, bool flip)
+		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation)
 		{
 			var toReturn = new SplitContainer {
 				Width = Dim.Fill (),
@@ -205,13 +200,7 @@ namespace UICatalog.Scenarios {
 				Orientation = orientation
 			};
 
-			if (flip) {
-				toReturn.Orientation = toReturn.Orientation == Orientation.Vertical ?
-					Orientation.Horizontal :
-					Orientation.Vertical;
-			}
-			toReturn.Panel1Title = cbTitles.Checked ? $"Panel {titleNumber}" : string.Empty;
-			toReturn.Panel2Title = cbTitles.Checked ? $"Panel {titleNumber+1}" : string.Empty;
+			SetPanelTitles (toReturn, titleNumber);
 
 			return toReturn;
 		}
