@@ -174,9 +174,6 @@ namespace UICatalog {
 			}
 
 			if (Application.Top is UICatalogTopLevel) {
-				foreach (var i in __themeMenuBarItem.Children) {
-					i.Action = null;
-				}
 				__themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				__themeMenuBarItem.Children = __themeMenuItems;
 				//var checkedThemeMenu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
@@ -583,6 +580,29 @@ namespace UICatalog {
 					};
 					menuItems.Add (item);
 				}
+
+				var schemeMenuItems = new List<MenuItem> ();
+				foreach (var sc in Colors.ColorSchemes) {
+					var item = new MenuItem ();
+					item.Title = $"_{sc.Key}";
+					item.Data = sc.Key;
+					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
+					item.CheckType |= MenuItemCheckStyle.Radio;
+					item.Checked = sc.Key == _colorScheme;
+					item.Action += () => {
+						_colorScheme = (string)item.Data;
+						foreach (var schemeMenuItems in schemeMenuItems) {
+							schemeMenuItems.Checked = (string)schemeMenuItems.Data == _colorScheme;
+						}
+						ColorScheme = Colors.ColorSchemes [_colorScheme];
+						Application.Top.SetNeedsDisplay ();
+					};
+					schemeMenuItems.Add (item);
+				}
+				menuItems.Add (null);
+				var mbi = new MenuBarItem ("_Schemes", schemeMenuItems.ToArray());
+				menuItems.Add (mbi);
+
 				return menuItems.ToArray ();
 			}
 
@@ -610,27 +630,6 @@ namespace UICatalog {
 					menu.Checked = true;
 				}
 			}
-
-
-			//	foreach (var sc in Colors.ColorSchemes) {
-			//		var item = new MenuItem ();
-			//		item.Title = $"_{sc.Key}";
-			//		item.Data = sc.Key;
-			//		item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
-			//		item.CheckType |= MenuItemCheckStyle.Radio;
-			//		item.Checked = sc.Key == _colorScheme;
-			//		item.Action += () => {
-			//			_colorScheme = (string)item.Data;
-			//			foreach (var menuItem in menuItems) {
-			//				menuItem.Checked = (string)menuItem.Data == _colorScheme;
-			//			}
-			//			ColorScheme = Colors.ColorSchemes[_colorScheme];
-			//			Application.Top.SetNeedsDisplay ();
-			//		};
-			//		menuItems.Add (item);
-			//	}
-			//	return menuItems.ToArray ();
-			//}
 
 			void KeyDownHandler (View.KeyEventEventArgs a)
 			{

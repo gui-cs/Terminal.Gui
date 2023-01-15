@@ -49,6 +49,20 @@ namespace Terminal.Gui.Configuration {
 		[JsonConverter (typeof (DictionaryConverter<ColorScheme>))]
 		public Dictionary<string, ColorScheme> ColorSchemes { get; set; } = new Dictionary<string, ColorScheme> ();
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// 
+		[JsonConverter (typeof (JsonStringEnumConverter))]
+		public BorderStyle? DefaultWindowBorderStyle { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// 
+		[JsonConverter (typeof (JsonStringEnumConverter))]
+		public BorderStyle? DefaultFrameViewBorderStyle { get; set; }
+
 		/// <inheritdoc/>
 		public override void Apply ()
 		{
@@ -80,6 +94,15 @@ namespace Terminal.Gui.Configuration {
 			foreach (var updatedScheme in theme.ColorSchemes) {
 				ColorSchemes [updatedScheme.Key] = updatedScheme.Value;
 			}
+
+			if (theme.DefaultWindowBorderStyle.HasValue) {
+				Window.DefaultBorderStyle = theme.DefaultWindowBorderStyle.Value;
+			}
+
+			if (theme.DefaultFrameViewBorderStyle.HasValue) {
+				FrameView.DefaultBorderStyle = theme.DefaultFrameViewBorderStyle.Value;
+			}
+
 		}
 	}
 

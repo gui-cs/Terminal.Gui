@@ -548,6 +548,9 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
+	/// <remarks>
+	/// This property can be set in a Theme to change the default <see cref="Colors"/> for the application.
+	/// </remarks>
 	public static class Colors {
 		private class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
 			public bool Equals (string x, string y)

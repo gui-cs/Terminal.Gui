@@ -170,6 +170,25 @@ namespace Terminal.Gui {
 			Initialize (title, Rect.Empty, padding, border);
 		}
 
+		private static BorderStyle _defaultBorderStyle = BorderStyle.Single;
+		/// <summary>
+		/// The default <see cref="BorderStyle"/> for <see cref="Window"/>. The default is <see cref="BorderStyle.Single"/>.
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="FrameView"/>s. 
+		/// The setting in the config file is Theme.DefaultFrameViewBorderStyle.
+		/// </remarks>
+		public static BorderStyle DefaultBorderStyle {
+		get {
+				return _defaultBorderStyle;
+			}
+			set {
+				_defaultBorderStyle = value;
+				// TODO: Find all instances of Window and change their border??
+			}
+		}
+
+
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
 			CanFocus = true;
@@ -178,7 +197,7 @@ namespace Terminal.Gui {
 			Title = title;
 			if (border == null) {
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
+					BorderStyle = DefaultBorderStyle,
 					Padding = new Thickness (padding),
 					BorderBrush = ColorScheme.Normal.Background
 				};
