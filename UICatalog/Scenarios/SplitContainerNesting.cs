@@ -141,6 +141,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = 1,
 				Text = number.ToString ().Repeat (1000),
+				CanFocus = true,
 			};
 		}
 		private View CreateTextView (int number)

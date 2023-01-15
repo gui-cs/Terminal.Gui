@@ -486,6 +486,31 @@ namespace UnitTests {
 		public void TestNestedContainer2LeftAnd1Right_RendersNicely()
 		{
 			var splitContainer = GetNestedContainer2Left1Right (false);
+
+			Assert.Equal (20,splitContainer.Frame.Width);
+			Assert.Equal (10, splitContainer.Panel1.Frame.Width);
+			Assert.Equal (9, splitContainer.Panel2.Frame.Width);
+
+			Assert.IsType<SplitContainer> (splitContainer.Panel1);
+			var left = (SplitContainer)splitContainer.Panel1;
+
+			Assert.Equal (10, left.Panel1.Frame.Width);
+			Assert.Equal (5, left.Panel1.Frame.Height);
+			Assert.Equal (10, left.Panel2.Frame.Width);
+			Assert.Equal (4, left.Panel2.Frame.Height);
+
+			Assert.Equal(2, left.Panel1.Subviews.Count);
+			Assert.IsType<Label> (left.Panel1.Subviews [0]);
+			Assert.IsType<Label> (left.Panel1.Subviews [1]);
+			var onesTop = (Label)left.Panel1.Subviews [0];
+			var onesBottom = (Label)left.Panel1.Subviews [1];
+
+			Assert.Same (left.Panel1, onesTop.SuperView);
+			Assert.Same (left.Panel1, onesBottom.SuperView);
+
+			Assert.Equal (10, onesTop.Frame.Width);
+			Assert.Equal (10, onesBottom.Frame.Width);
+
 			splitContainer.Redraw (splitContainer.Bounds);
 
 			string looksLike =
