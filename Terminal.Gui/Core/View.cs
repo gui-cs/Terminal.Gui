@@ -1506,6 +1506,7 @@ namespace Terminal.Gui {
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
+
 				Clear ();
 				SetChildNeedsDisplay ();
 			}
