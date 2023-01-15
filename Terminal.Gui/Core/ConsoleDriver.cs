@@ -285,6 +285,20 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.GetAttribute ();
 		}
+
+		public override string ToString ()
+		{
+			return $"[Attribute: Value={Value}, Foreground={Foreground}, Background={Background}]";
+		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the Atrribute is valid (both foreground and background have valid color values).
+		/// </summary>
+		/// <returns></returns>
+		public bool IsValid ()
+		{
+			return Foreground != Color.Invalid && Background != Color.Invalid;
+		}
 	}
 
 	/// <summary>
@@ -304,10 +318,11 @@ namespace Terminal.Gui {
 		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
 		public Attribute Normal { get { return _normal; } set {
-				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+				
+				if (!value.IsValid()) {
 					return;
 				}
-				_normal = SetAttribute (value);
+				_normal = value;
 			}
 		}
 
@@ -315,10 +330,10 @@ namespace Terminal.Gui {
 		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
 		public Attribute Focus { get { return _focus; } set {
-				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+				if (!value.IsValid()) {
 					return;
 				}
-				_focus = SetAttribute (value);
+				_focus = value;
 			}
 		}
 
@@ -326,10 +341,10 @@ namespace Terminal.Gui {
 		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
 		public Attribute HotNormal { get { return _hotNormal; } set {
-				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+				if (!value.IsValid()) {
 					return;
 				}
-				_hotNormal = SetAttribute (value);
+				_hotNormal = value;
 			}
 		}
 
@@ -337,10 +352,10 @@ namespace Terminal.Gui {
 		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
 		public Attribute HotFocus { get { return _hotFocus; } set {
-				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+				if (!value.IsValid()) {
 					return;
 				}
-				_hotFocus = SetAttribute (value);
+				_hotFocus = value;
 			}
 		}
 
@@ -348,138 +363,11 @@ namespace Terminal.Gui {
 		/// The default foreground and background color for text, when the view is disabled.
 		/// </summary>
 		public Attribute Disabled { get { return _disabled; } set {
-				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+				if (!value.IsValid()) {
 					return;
 				}
-				_disabled = SetAttribute (value);
+				_disabled = value;
 			}
-		}
-
-		bool preparingScheme = false;
-
-		Attribute SetAttribute (Attribute attribute, [CallerMemberName] string callerMemberName = null)
-		{
-			if (!Application._initialized && !preparingScheme)
-				return attribute;
-
-			if (preparingScheme)
-				return attribute;
-
-			preparingScheme = true;
-
-			switch (caller) {
-			case "TopLevel":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Base":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Menu":
-				switch (callerMemberName) {
-				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				case "Disabled":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Dialog":
-				switch (callerMemberName) {
-				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					if (Normal.Foreground != attribute.Background)
-						Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Error":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-				case "HotFocus":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				}
-				break;
-			}
-			preparingScheme = false;
-			return attribute;
 		}
 
 		/// <summary>

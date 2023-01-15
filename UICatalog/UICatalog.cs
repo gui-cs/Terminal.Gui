@@ -159,6 +159,8 @@ namespace UICatalog {
 			if (Application.Top == null) {
 				return;
 			}
+
+			// TOOD: THis is a hack. Figure out how to ensure that the file is fully written before reading it.
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
 			ConfigurationManager.Config.Themes.Apply ();			
