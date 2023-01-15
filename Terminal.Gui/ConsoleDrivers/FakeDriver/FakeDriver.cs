@@ -211,8 +211,6 @@ namespace Terminal.Gui {
 			UpdateOffScreen ();
 
 			CreateColors ();
-
-			//MockConsole.Clear ();
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)

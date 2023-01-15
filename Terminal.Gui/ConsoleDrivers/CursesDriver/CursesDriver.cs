@@ -878,23 +878,6 @@ namespace Terminal.Gui {
 			ResizeScreen ();
 			UpdateOffScreen ();
 
-			//HLine = Curses.ACS_HLINE;
-			//VLine = Curses.ACS_VLINE;
-			//Stipple = Curses.ACS_CKBOARD;
-			//Diamond = Curses.ACS_DIAMOND;
-			//ULCorner = Curses.ACS_ULCORNER;
-			//LLCorner = Curses.ACS_LLCORNER;
-			//URCorner = Curses.ACS_URCORNER;
-			//LRCorner = Curses.ACS_LRCORNER;
-			//LeftTee = Curses.ACS_LTEE;
-			//RightTee = Curses.ACS_RTEE;
-			//TopTee = Curses.ACS_TTEE;
-			//BottomTee = Curses.ACS_BTEE;
-			//RightArrow = Curses.ACS_RARROW;
-			//LeftArrow = Curses.ACS_LARROW;
-			//UpArrow = Curses.ACS_UARROW;
-			//DownArrow = Curses.ACS_DARROW;
-
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
@@ -903,6 +886,8 @@ namespace Terminal.Gui {
 			} else {
 				CreateColors (false);
 
+				// BUGBUG: This is a hack to make the colors work on the Mac?
+				// The new Theme support overwrites these colors, so this is not needed?
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;

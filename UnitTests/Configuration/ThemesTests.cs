@@ -15,7 +15,18 @@ namespace Terminal.Gui.Configuration {
 				new ColorJsonConverter ()
 				}
 		};
-		
+
+		[Fact, AutoInitShutdown]
+		public void AllThemesPresent()
+		{
+			ConfigurationManager.Config.Themes.ThemeDefinitions.Clear ();
+			Assert.Empty (ConfigurationManager.Config.Themes.ThemeDefinitions);
+			ConfigurationManager.LoadConfigurationFromLibraryResource ();
+			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Default"));
+			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Dark"));
+			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Light"));
+		}
+
 		[Fact, AutoInitShutdown]
 		public void GetHardCodedDefaults_ShouldSetProperties ()
 		{

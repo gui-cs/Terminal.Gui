@@ -4,74 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration {
 
-	#region BuiltInThemes
-
-	/// <summary>
-	/// The built-in "Dark" Theme
-	/// </summary>
-	public class DarkTheme : Theme {
-		/// <summary>
-		/// 
-		/// </summary>
-		public DarkTheme ()
-		{
-			var baseColor = Color.Gray;
-			var contrastColor = Color.White;
-			var contrastColor2 = Color.BrightYellow;
-
-			ColorSchemes = new Dictionary<string, ColorScheme> () {
-				{ "TopLevel", new ColorScheme () 
-				{
-					Normal = new Attribute (baseColor, contrastColor),
-					Focus = new Attribute (baseColor, contrastColor2),
-					HotNormal = new Attribute (contrastColor2, baseColor),
-					HotFocus = new Attribute (contrastColor, baseColor),
-					Disabled = new Attribute (baseColor, baseColor)
-				}
-				},
-				{ "Base", new ColorScheme ()
-				{
-					Normal = new Attribute (baseColor, contrastColor),
-					Focus = new Attribute (baseColor, contrastColor2),
-					HotNormal = new Attribute (contrastColor2, baseColor),
-					HotFocus = new Attribute (contrastColor, baseColor),
-					Disabled = new Attribute (baseColor, baseColor)
-				}
-				},
-				{ "Dialog", new ColorScheme ()
-				{
-					Normal = new Attribute (baseColor, contrastColor),
-					Focus = new Attribute (baseColor, contrastColor2),
-					HotNormal = new Attribute (contrastColor2, baseColor),
-					HotFocus = new Attribute (contrastColor, baseColor),
-					Disabled = new Attribute (baseColor, baseColor)
-				}
-				},
-				{ "Menu", new ColorScheme ()
-				{
-					Normal = new Attribute (baseColor, contrastColor),
-					Focus = new Attribute (baseColor, contrastColor2),
-					HotNormal = new Attribute (contrastColor2, baseColor),
-					HotFocus = new Attribute (contrastColor, baseColor),
-					Disabled = new Attribute (baseColor, baseColor)
-				}
-				},
-				{ "Error", new ColorScheme()
-				{
-					Normal = new Attribute (baseColor, contrastColor),
-					Focus = new Attribute (baseColor, contrastColor2),
-					HotNormal = new Attribute (contrastColor2, baseColor),
-					HotFocus = new Attribute (contrastColor, baseColor),
-					Disabled = new Attribute (baseColor, baseColor)
-				}
-				}
-			};
-		}
-	}
-
-
-	#endregion // BuiltInThemes
-
 	/// <summary>
 	/// A Theme is a set of settings.
 	/// </summary>
@@ -229,6 +161,7 @@ namespace Terminal.Gui.Configuration {
 			if (ThemeDefinitions != null && ThemeDefinitions.ContainsKey (SelectedTheme)) {
 				ThemeDefinitions [SelectedTheme].Apply ();
 			}
+
 		}
 
 		/// <inheritdoc/>

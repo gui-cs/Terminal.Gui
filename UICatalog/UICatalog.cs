@@ -161,7 +161,7 @@ namespace UICatalog {
 			}
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
-			ConfigurationManager.Config.Themes.Apply ();
+			ConfigurationManager.Config.Themes.Apply ();			
 
 			if (Application.Top.MenuBar != null) {
 				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
@@ -174,16 +174,16 @@ namespace UICatalog {
 			}
 
 			if (Application.Top is UICatalogTopLevel) {
-				foreach (var i in _colorSchemeMenuBarItem.Children) {
+				foreach (var i in __themeMenuBarItem.Children) {
 					i.Action = null;
 				}
-				_colorSchemeMenuItems = ((UICatalogTopLevel)Application.Top).CreateColorSchemeMenuItems ();
-				_colorSchemeMenuBarItem.Children = _colorSchemeMenuItems;
-				var checkedSchemeMenu = _colorSchemeMenuItems.Where (m => m.Checked).FirstOrDefault ();
-				if (checkedSchemeMenu != null) {
-					Application.Top.ColorScheme = Colors.ColorSchemes[(string)checkedSchemeMenu.Data];
-				}
-				Application.Top.SetNeedsDisplay ();
+				__themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+				__themeMenuBarItem.Children = __themeMenuItems;
+				//var checkedThemeMenu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
+				//if (checkedThemeMenu != null) {
+				//	Application.Top.ColorScheme = Colors.ColorSchemes[(string)checkedThemeMenu.Data];
+				//}
+				((UICatalogTopLevel)Application.Top).ApplyConfiguration ();
 			}
 		}
 
@@ -225,10 +225,14 @@ namespace UICatalog {
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _heightAsBuffer = false;
 		static bool _isFirstRunning = true;
+		// The theme selected on the Themes menu. We keep track of it
+		// so after a scenario exits (and Shutdown is called) we can
+		// re-set it.
+		static private string _selectedTheme;
 		static string _colorScheme = "Base";
 
-		static MenuItem [] _colorSchemeMenuItems;
-		static MenuBarItem _colorSchemeMenuBarItem;
+		static MenuItem [] __themeMenuItems;
+		static MenuBarItem __themeMenuBarItem;
 
 		/// <summary>
 		/// This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on 
@@ -251,14 +255,13 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = Colors.ColorSchemes [_colorScheme];
-				_colorSchemeMenuItems = CreateColorSchemeMenuItems ();
-				_colorSchemeMenuBarItem = new MenuBarItem ("_Color Scheme", _colorSchemeMenuItems);
+				__themeMenuItems = CreateThemeMenuItems ();
+				__themeMenuBarItem = new MenuBarItem ("_Themes", __themeMenuItems);
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Application.QuitKey)
 					}),
-					_colorSchemeMenuBarItem,
+					__themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 					new MenuBarItem ("_Help", new MenuItem [] {
 						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
@@ -362,17 +365,19 @@ namespace UICatalog {
 			void LoadedHandler ()
 			{
 				Application.HeightAsBuffer = _heightAsBuffer;
-
-				if (string.IsNullOrEmpty (_colorScheme)) {
-					ColorScheme = Colors.ColorSchemes ["UICatalog"];
+				if (!string.IsNullOrEmpty (_selectedTheme)) {
+					ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme;
 				}
+				ApplyConfiguration ();
+				////if (string.IsNullOrEmpty (_colorScheme)) {
+				////	ColorScheme = Colors.ColorSchemes ["UICatalog"];
+				////}
 
-				foreach (var menuItem in _colorSchemeMenuItems) {
-					menuItem.Checked = (string)menuItem.Data == _colorScheme;
-				}
+				//foreach (var menuItem in __themeMenuItems) {
+				//	menuItem.Checked = (string)menuItem.Data == _colorScheme;
+				//}
 
-				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
-				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -562,28 +567,70 @@ namespace UICatalog {
 				}
 			}
 
-			public MenuItem [] CreateColorSchemeMenuItems ()
+			public MenuItem [] CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				foreach (var sc in Colors.ColorSchemes) {
+				foreach (var theme in ConfigurationManager.Config.Themes.ThemeDefinitions) {
 					var item = new MenuItem ();
-					item.Title = $"_{sc.Key}";
-					item.Data = sc.Key;
-					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
-					item.CheckType |= MenuItemCheckStyle.Radio;
-					item.Checked = sc.Key == _colorScheme;
+					item.Title = theme.Key;
+					item.Shortcut = Key.AltMask + theme.Key [0];
+					item.CheckType |= MenuItemCheckStyle.Checked;
+					item.Checked = theme.Key == ConfigurationManager.Config.Themes.SelectedTheme;
 					item.Action += () => {
-						_colorScheme = (string)item.Data;
-						foreach (var menuItem in menuItems) {
-							menuItem.Checked = (string)menuItem.Data == _colorScheme;
-						}
-						ColorScheme = Colors.ColorSchemes[_colorScheme];
-						Application.Top.SetNeedsDisplay ();
+						ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme = theme.Key;
+						ApplyConfiguration ();
+
 					};
 					menuItems.Add (item);
 				}
 				return menuItems.ToArray ();
 			}
+
+			public void ApplyConfiguration ()
+			{
+				ConfigurationManager.Config.ApplyAll ();
+
+				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
+				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+
+				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.MenuBar.SetNeedsDisplay ();
+				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.StatusBar.SetNeedsDisplay ();
+				Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+				Application.Top.SetNeedsDisplay ();
+
+				var menu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
+				if (menu != null) {
+					menu.Checked = false;
+				}
+				menu = __themeMenuItems.Where (m => m.Title == ConfigurationManager.Config.Themes.SelectedTheme).FirstOrDefault ();
+				if (menu != null) {
+					_selectedTheme = menu.Title.ToString ();
+					menu.Checked = true;
+				}
+			}
+
+
+			//	foreach (var sc in Colors.ColorSchemes) {
+			//		var item = new MenuItem ();
+			//		item.Title = $"_{sc.Key}";
+			//		item.Data = sc.Key;
+			//		item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
+			//		item.CheckType |= MenuItemCheckStyle.Radio;
+			//		item.Checked = sc.Key == _colorScheme;
+			//		item.Action += () => {
+			//			_colorScheme = (string)item.Data;
+			//			foreach (var menuItem in menuItems) {
+			//				menuItem.Checked = (string)menuItem.Data == _colorScheme;
+			//			}
+			//			ColorScheme = Colors.ColorSchemes[_colorScheme];
+			//			Application.Top.SetNeedsDisplay ();
+			//		};
+			//		menuItems.Add (item);
+			//	}
+			//	return menuItems.ToArray ();
+			//}
 
 			void KeyDownHandler (View.KeyEventEventArgs a)
 			{

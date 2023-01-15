@@ -1498,6 +1498,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			// NOTE: these are here for backwards compat; pre-Theme support
+			// These values are ignored/overwritten by the ConfigurationManager
 			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
