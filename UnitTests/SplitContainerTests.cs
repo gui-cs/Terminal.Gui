@@ -583,10 +583,10 @@ namespace UnitTests {
 
 			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
 
-			container.Panel1.Add (new Label (new string ('1', 100)));
-			container.Panel1.Add (new Label (new string ('1', 100)) { Y = 1});
-			container.Panel2.Add (new Label (new string ('2', 100)));
-			container.Panel2.Add (new Label (new string ('2', 100)) { Y = 1});
+			container.Panel1.Add (new Label (new string ('1', 100)) { Width = Dim.Fill(), Height = 1, AutoSize = false});
+			container.Panel1.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
+			container.Panel2.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Panel2.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
 
 			container.Panel1MinSize = 0;
 			container.Panel2MinSize = 0;
