@@ -28,22 +28,23 @@ namespace Terminal.Gui.Configuration {
 	/// Settings are applied using the following precedence (higher precedence settings
 	/// overwrite lower precedence settings):
 	/// <para>
-	///	1. App specific settings found in the users's home directory (~/.tui/appname.config.json). -- Highest precidence.
+	///	1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precedence 
+	///     and the default for <see cref="ConfigurationManager.Save()"/>.
 	/// </para>
 	/// <para>
-	///	2. App specific settings found in the directory the app was launched from (./.tui/appname.config.json).
+	///	2. Application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>).
 	/// </para>
 	/// <para>
-	///	3. App settings in app resources (Resources/config.json). 
+	///	3. Application configuration found in the applications's resources (<c>Resources/config.json</c>). 
 	/// </para>
 	/// <para>
-	///	4. Global settings found in the the user's home directory (~/.tui/config.json).
+	///	4. Global configuration found in the the user's home directory (<c>~/.tui/config.json</c>).
 	/// </para>
 	/// <para>
-	///	5. Global settings found in the directory the app was launched from (./.tui/config.json).
+	///	5. Global configuration found in the directory the app was launched from (<c>./.tui/config.json</c>).
 	/// </para>
 	/// <para>
-	///	6. Default settings defined in the Terminal.Gui assembly -- Lowest precedence.
+	///     6. Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precidence.
 	/// </para>
 	/// </summary>
 	public static class ConfigurationManager {
@@ -144,11 +145,54 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c>the <see cref="Config{T}"/> object. 
+		/// Describes the location of the configuration files. The constancts can be
+		/// combined (bitwise) to specify multiple locations.
 		/// </summary>
-		public static void LoadConfigurationFromLibraryResource()
+		[Flags]
+		public enum ConfigLocation {
+			/// <summary>
+			/// Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precidence 
+			/// and the default for <see cref="ConfigurationManager.Save()"/>.
+			/// </summary>
+			AppHomeDirectory,
+
+			/// <summary>
+			/// Global configuration in the directory the app was launched from (<c>./.tui/config.json</c>).
+			/// </summary>
+			GlobalAppDirectory,
+
+			/// <summary>
+			/// Global configuration in the user's home directory (<c>~/.tui/config.json</c>).
+			/// </summary>
+			GlobalHomeDirectory,
+
+			/// <summary>
+			/// Application configuration in the app's resources (<c>appname.Resources.config.json</c>).
+			/// </summary>
+			AppResources,
+
+			/// <summary>
+			/// Application configuration in the directory the app was launched from.
+			/// </summary>
+			AppDirectory,
+
+			/// <summary>
+			/// Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precidence.
+			/// </summary>
+			LibraryResources,
+
+			/// <summary>
+			/// This constant is a combination of all locations
+			/// </summary>
+			All = AppHomeDirectory | GlobalAppDirectory | GlobalHomeDirectory | AppResources | AppDirectory | LibraryResources
+
+		}
+
+		/// <summary>
+		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c> into <see cref="Config{T}"/>. 
+		/// </summary>
+		public static void LoadGlobalFromLibraryResource ()
 		{
-			// Load the default styles from the Terminal.Gui assembly - Terminal.Gui.Resources.config.json
 			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
 			using (Stream stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName))
 			using (StreamReader reader = new StreamReader (stream)) {
@@ -159,34 +203,37 @@ namespace Terminal.Gui.Configuration {
 #endif
 			}
 		}
-		
+
 		/// <summary>
-		/// Loads all settings found in the various locations into the <see cref="Config{T}"/> object. 
+		/// Loads global configuration from the directory the app was launched from (<c>./.tui/config.json</c>) into
+		/// <see cref="Config"/>.
 		/// </summary>
-		public static void LoadConfigurationFromAllSources ()
+		public static void LoadGlobalFromAppDirectory ()
 		{
-			// Styles defined in code in Terminal.Gui assembly (hard-coded) -- Lowest precidence.
-			// (We actually ignore them at runtime and depend on the embedded <c>config.json</c> resource).
-
-			LoadConfigurationFromLibraryResource ();
-
-			Debug.Assert (_config != null);
-
-			// Global Styles in local directories (./.tui/{visualStylesFilename})
 			string globalLocal = $"./.tui/{_configFilename}";
 			if (File.Exists (globalLocal)) {
-				// Load the local file
 				UpdateConfigurationFromFile (globalLocal);
 			}
+		}
 
-			// Global Styles in user home dir (~/.tui/{visualStylesFilename})
+		/// <summary>
+		/// Loads global configuration in the user's home directory (<c>~/.tui/config.json</c>) into
+		/// <see cref="Config"/>.
+		/// </summary>
+		public static void LoadGlobalFromHomeDirectory ()
+		{
 			string globalHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}";
 			if (File.Exists (globalHome)) {
-				// Load the local file
 				UpdateConfigurationFromFile (globalHome);
 			}
+		}
 
-			// App Styles in app exe resources (Resources/{visualStylesFilename})
+		/// <summary>
+		/// Loads application configuration in the app's resources (<c>appname.Resources.config.json</c>) into
+		/// <see cref="Config"/>.
+		/// </summary>
+		public static void LoadAppFromAppResources ()
+		{
 			var embeddedStylesResourceName = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
 			if (embeddedStylesResourceName != null) {
 				using (Stream stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (embeddedStylesResourceName))
@@ -198,23 +245,48 @@ namespace Terminal.Gui.Configuration {
 #endif
 				}
 			}
+		}
 
-			// Get app name
-			string appName = System.Reflection.Assembly.GetEntryAssembly ().FullName.Split (',') [0].Trim ();
+		/// <summary>
+		/// Name of the running application. By default this property is set to the application's assembly name.
+		/// </summary>
+		public static string AppName { get; set; }
+		private static string _appName = System.Reflection.Assembly.GetEntryAssembly ().FullName.Split (',') [0].Trim ();
 
-			// App Styles in the current working directory (./.tui/appname.visualstyles.json)
-			string appLocal = $"./.tui/{appName}.{_configFilename}";
+		/// <summary>
+		/// Loads application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>)
+		/// into <see cref="Config"/>.
+		/// </summary>
+		public static void LoadAppFromAppDirectory ()
+		{
+			string appLocal = $"./.tui/{AppName}.{_configFilename}";
 			if (File.Exists (appLocal)) {
-				// Load the local file
 				UpdateConfigurationFromFile (appLocal);
 			}
+		}
 
-			// App specific styles in the users's home directory (~/.tui/appname.visualstyles.json)
-			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{appName}.{_configFilename}";
-			if (File.Exists (appHome)) {
-				// Load the global file
-				UpdateConfigurationFromFile (appHome);
+		/// <summary>
+		/// Loads application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>)
+		/// into <see cref="Config"/>.
+		/// </summary>
+		public static void LoadAppFromHomeDirectory ()
+		{
+			if (File.Exists (AppName)) {
+				UpdateConfigurationFromFile (AppName);
 			}
+		}
+
+		/// <summary>
+		/// Loads all settings found in the various locations into the <see cref="Config{T}"/> object. 
+		/// </summary>
+		public static void Load (ConfigLocation locations = ConfigLocation.All)
+		{
+			if (locations.HasFlag (ConfigLocation.LibraryResources)) LoadGlobalFromLibraryResource ();
+			if (locations.HasFlag (ConfigLocation.GlobalAppDirectory)) LoadGlobalFromAppDirectory ();
+			if (locations.HasFlag (ConfigLocation.GlobalHomeDirectory)) LoadGlobalFromHomeDirectory ();
+			if (locations.HasFlag (ConfigLocation.AppResources)) LoadAppFromAppResources ();
+			if (locations.HasFlag (ConfigLocation.AppDirectory)) LoadAppFromAppDirectory ();
+			if (locations.HasFlag (ConfigLocation.AppHomeDirectory)) LoadAppFromHomeDirectory ();
 		}
 	}
 }

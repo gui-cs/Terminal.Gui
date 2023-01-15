@@ -392,7 +392,7 @@ namespace Terminal.Gui {
 			// mulitlple times. We need to do this because some settings are only
 			// valid after a Driver is loaded. In this cases we need just 
 			// `Settings` so we can determine which driver to use.
-			ConfigurationManager.LoadConfigurationFromAllSources ();
+			ConfigurationManager.Load ();
 			ConfigurationManager.Config.Settings.Apply ();
 
 			if (Driver == null) {
@@ -437,7 +437,7 @@ namespace Terminal.Gui {
 
 				// Now that the Driver is initialized, load all other configuration
 				// (ColorSchemes can't be set until a Driver is loaded).
-				ConfigurationManager.LoadConfigurationFromAllSources ();
+				ConfigurationManager.Load ();
 				ConfigurationManager.Config.ApplyAll ();
 
 			} catch (InvalidOperationException ex) {

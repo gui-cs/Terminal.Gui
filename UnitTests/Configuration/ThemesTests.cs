@@ -21,7 +21,7 @@ namespace Terminal.Gui.Configuration {
 		{
 			ConfigurationManager.Config.Themes.ThemeDefinitions.Clear ();
 			Assert.Empty (ConfigurationManager.Config.Themes.ThemeDefinitions);
-			ConfigurationManager.LoadConfigurationFromLibraryResource ();
+			ConfigurationManager.LoadGlobalFromLibraryResource ();
 			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Default"));
 			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Dark"));
 			Assert.True (ConfigurationManager.Config.Themes.ThemeDefinitions.ContainsKey ("Light"));
