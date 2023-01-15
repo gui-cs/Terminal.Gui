@@ -1,7 +1,8 @@
 ﻿using System;
+using Terminal.Gui;
 using Xunit;
 
-namespace Terminal.Gui.Types {
+namespace Terminal.Gui.Core {
 	public class RectTests {
 		[Fact]
 		public void Rect_New ()

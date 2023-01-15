@@ -7,8 +7,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
-using Microsoft.DotNet.PlatformAbstractions;
-using Rune = System.Rune;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using Terminal.Gui.Configuration;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -45,6 +47,9 @@ namespace UICatalog {
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
 	/// </summary>
 	class UICatalogApp {
+		static FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
+		static FileSystemWatcher _homeDirWatcher = new FileSystemWatcher ();
+
 		static void Main (string [] args)
 		{
 			Console.OutputEncoding = Encoding.Default;
@@ -62,6 +67,28 @@ namespace UICatalog {
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
 
+			// Setup a file system watcher for `./.tui/`
+			_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
+			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
+
+			if (!Directory.Exists (tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+			_currentDirWatcher.Path = tuiDir;
+			_currentDirWatcher.Filter = "*config.json";
+
+			// Setup a file system watcher for `~/.tui/`
+			_homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+			tuiDir = Path.Combine (f.FullName, ".tui");
+
+			if (!Directory.Exists (tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+			_homeDirWatcher.Path = tuiDir;
+			_homeDirWatcher.Filter = "*config.json";
+
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
 			if (args.Length > 0) {
@@ -69,7 +96,7 @@ namespace UICatalog {
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
-				_selectedScenario.Init (_colorScheme);
+				_selectedScenario.Init (Colors.ColorSchemes [_colorScheme]);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
 				_selectedScenario = null;
@@ -92,7 +119,7 @@ namespace UICatalog {
 			Scenario scenario;
 			while ((scenario = RunUICatalogTopLevel ()) != null) {
 				VerifyObjectsWereDisposed ();
-				scenario.Init (_colorScheme);
+				scenario.Init (Colors.ColorSchemes [_colorScheme]);
 				scenario.Setup ();
 				scenario.Run ();
 
@@ -103,6 +130,58 @@ namespace UICatalog {
 				VerifyObjectsWereDisposed ();
 			}
 			VerifyObjectsWereDisposed ();
+		}
+
+		private static void Application_NotifyStopRunState (Toplevel obj)
+		{
+			_currentDirWatcher.EnableRaisingEvents = false;
+			_currentDirWatcher.Changed -= ConfigChanged;
+			_currentDirWatcher.Created -= ConfigChanged;
+
+			_homeDirWatcher.EnableRaisingEvents = false;
+			_homeDirWatcher.Changed -= ConfigChanged;
+			_homeDirWatcher.Created -= ConfigChanged;
+		}
+
+		private static void Application_NotifyNewRunState (Application.RunState obj)
+		{
+			_currentDirWatcher.Changed += ConfigChanged;
+			_currentDirWatcher.Created += ConfigChanged;
+			_currentDirWatcher.EnableRaisingEvents = true;
+
+			_homeDirWatcher.Changed += ConfigChanged;
+			_homeDirWatcher.Created += ConfigChanged;
+			_homeDirWatcher.EnableRaisingEvents = true;
+		}
+		
+		private static void ConfigChanged (object sender, FileSystemEventArgs e)
+		{
+			if (Application.Top == null) {
+				return;
+			}
+			Thread.Sleep (500);
+			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
+			ConfigurationManager.Config.Themes.Apply ();			
+
+			if (Application.Top.MenuBar != null) {
+				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.MenuBar.SetNeedsDisplay ();
+			}
+
+			if (Application.Top.StatusBar != null) {
+				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.StatusBar.SetNeedsDisplay ();
+			}
+
+			if (Application.Top is UICatalogTopLevel) {
+				__themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+				__themeMenuBarItem.Children = __themeMenuItems;
+				//var checkedThemeMenu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
+				//if (checkedThemeMenu != null) {
+				//	Application.Top.ColorScheme = Colors.ColorSchemes[(string)checkedThemeMenu.Data];
+				//}
+				((UICatalogTopLevel)Application.Top).ApplyConfiguration ();
+			}
 		}
 
 		/// <summary>
@@ -118,6 +197,8 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
+			Application.NotifyNewRunState += Application_NotifyNewRunState;
+			Application.NotifyStopRunState += Application_NotifyStopRunState;
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -141,7 +222,14 @@ namespace UICatalog {
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _heightAsBuffer = false;
 		static bool _isFirstRunning = true;
-		static ColorScheme _colorScheme;
+		// The theme selected on the Themes menu. We keep track of it
+		// so after a scenario exits (and Shutdown is called) we can
+		// re-set it.
+		static private string _selectedTheme;
+		static string _colorScheme = "Base";
+
+		static MenuItem [] __themeMenuItems;
+		static MenuBarItem __themeMenuBarItem;
 
 		/// <summary>
 		/// This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on 
@@ -164,12 +252,13 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				__themeMenuItems = CreateThemeMenuItems ();
+				__themeMenuBarItem = new MenuBarItem ("_Themes", __themeMenuItems);
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
-						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
+						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Application.QuitKey)
 					}),
-					new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
+					__themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 					new MenuBarItem ("_Help", new MenuItem [] {
 						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
@@ -178,7 +267,7 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-				
+
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
@@ -189,7 +278,7 @@ namespace UICatalog {
 					Visible = true,
 				};
 				StatusBar.Items = new StatusItem [] {
-					new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
+					new StatusItem(Application.QuitKey, $"~{Application.QuitKey} to quit", () => {
 						if (_selectedScenario is null){
 							// This causes GetScenarioToRun to return null
 							_selectedScenario = null;
@@ -273,13 +362,19 @@ namespace UICatalog {
 			void LoadedHandler ()
 			{
 				Application.HeightAsBuffer = _heightAsBuffer;
-
-				if (_colorScheme == null) {
-					ColorScheme = _colorScheme = Colors.Base;
+				if (!string.IsNullOrEmpty (_selectedTheme)) {
+					ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme;
 				}
+				ApplyConfiguration ();
+				////if (string.IsNullOrEmpty (_colorScheme)) {
+				////	ColorScheme = Colors.ColorSchemes ["UICatalog"];
+				////}
 
-				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
-				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+				//foreach (var menuItem in __themeMenuItems) {
+				//	menuItem.Checked = (string)menuItem.Data == _colorScheme;
+				//}
+
+
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -469,25 +564,71 @@ namespace UICatalog {
 				}
 			}
 
-			MenuItem [] CreateColorSchemeMenuItems ()
+			public MenuItem [] CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				foreach (var sc in Colors.ColorSchemes) {
+				foreach (var theme in ConfigurationManager.Config.Themes.ThemeDefinitions) {
 					var item = new MenuItem ();
-					item.Title = $"_{sc.Key}";
-					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
-					item.CheckType |= MenuItemCheckStyle.Radio;
-					item.Checked = sc.Value == _colorScheme;
+					item.Title = theme.Key;
+					item.Shortcut = Key.AltMask + theme.Key [0];
+					item.CheckType |= MenuItemCheckStyle.Checked;
+					item.Checked = theme.Key == ConfigurationManager.Config.Themes.SelectedTheme;
 					item.Action += () => {
-						ColorScheme = _colorScheme = sc.Value;
-						SetNeedsDisplay ();
-						foreach (var menuItem in menuItems) {
-							menuItem.Checked = menuItem.Title.Equals ($"_{sc.Key}") && sc.Value == _colorScheme;
-						}
+						ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme = theme.Key;
+						ApplyConfiguration ();
+
 					};
 					menuItems.Add (item);
 				}
+
+				var schemeMenuItems = new List<MenuItem> ();
+				foreach (var sc in Colors.ColorSchemes) {
+					var item = new MenuItem ();
+					item.Title = $"_{sc.Key}";
+					item.Data = sc.Key;
+					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
+					item.CheckType |= MenuItemCheckStyle.Radio;
+					item.Checked = sc.Key == _colorScheme;
+					item.Action += () => {
+						_colorScheme = (string)item.Data;
+						foreach (var schemeMenuItems in schemeMenuItems) {
+							schemeMenuItems.Checked = (string)schemeMenuItems.Data == _colorScheme;
+						}
+						ColorScheme = Colors.ColorSchemes [_colorScheme];
+						Application.Top.SetNeedsDisplay ();
+					};
+					schemeMenuItems.Add (item);
+				}
+				menuItems.Add (null);
+				var mbi = new MenuBarItem ("_Schemes", schemeMenuItems.ToArray());
+				menuItems.Add (mbi);
+
 				return menuItems.ToArray ();
+			}
+
+			public void ApplyConfiguration ()
+			{
+				ConfigurationManager.Config.ApplyAll ();
+
+				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
+				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+
+				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.MenuBar.SetNeedsDisplay ();
+				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				Application.Top.StatusBar.SetNeedsDisplay ();
+				Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+				Application.Top.SetNeedsDisplay ();
+
+				var menu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
+				if (menu != null) {
+					menu.Checked = false;
+				}
+				menu = __themeMenuItems.Where (m => m.Title == ConfigurationManager.Config.Themes.SelectedTheme).FirstOrDefault ();
+				if (menu != null) {
+					_selectedTheme = menu.Title.ToString ();
+					menu.Checked = true;
+				}
 			}
 
 			void KeyDownHandler (View.KeyEventEventArgs a)

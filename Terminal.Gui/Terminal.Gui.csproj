@@ -15,6 +15,12 @@
     <InformationalVersion>1.9</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\config.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="1.0.7" />
@@ -52,6 +58,7 @@
   <!-- Enable Nuget Source Link for github -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
@@ -82,4 +89,5 @@
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
   </PropertyGroup>
+  <ProjectExtensions><VisualStudio><UserProperties resources_4config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

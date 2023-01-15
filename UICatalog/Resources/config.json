@@ -1,0 +1,32 @@
+{
+  "@schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  "Settings": {
+    "QuitKey": {
+      "Key": "Esc"
+    }
+  },
+  "ColorSchemes": {
+    "UICatalog": {
+      "Normal": {
+        "Foreground": "White",
+        "Background": "Black"
+      },
+      "Focus": {
+        "Foreground": "Black",
+        "Background": "BrightYellow"
+      },
+      "HotNormal": {
+        "Foreground": "BrightYellow",
+        "Background": "Black"
+      },
+      "HotFocus": {
+        "Foreground": "White",
+        "Background": "BrightYellow"
+      },
+      "Disabled": {
+        "Foreground": "White",
+        "Background": "Gray"
+      }
+    }
+  }
+}

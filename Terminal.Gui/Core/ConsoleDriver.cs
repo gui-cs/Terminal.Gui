@@ -8,9 +8,11 @@
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Unix.Terminal;
 
@@ -18,6 +20,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Basic colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
+	[DefaultValue(Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -82,7 +85,90 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White
+		White,
+
+		/// <summary>
+		/// Indicates an invalid color
+		/// </summary>
+		Invalid = -1
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class TrueColor {
+		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int Red { get; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int Green { get; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int Blue { get; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public TrueColor (int red, int green, int blue)
+		{
+			Red = red;
+			Green = green;
+			Blue = blue;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public Color ToConsoleColor ()
+		{
+			var trueColorMap = new Dictionary<TrueColor, Color> () {
+				{ new TrueColor (0,0,0),Color.Black},
+				{ new TrueColor (0, 0, 0x80),Color.Blue},
+				{ new TrueColor (0, 0x80, 0),Color.Green},
+				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
+				{ new TrueColor (0x80, 0, 0),Color.Red},
+				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
+				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
+				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
+				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
+				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
+				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
+				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
+				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
+				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
+				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
+				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
+				};
+			// Iterate over all colors in the map
+			var distances = trueColorMap.Select (
+							k => Tuple.Create (
+								// the candidate we are considering matching against (RGB)
+								k.Key,
+
+								CalculateDistance (k.Key, this)
+							));
+
+			// get the closest
+			var match = distances.OrderBy (t => t.Item2).First ();
+			return trueColorMap[match.Item1];
+		}
+
+		private float CalculateDistance (TrueColor color1, TrueColor color2)
+		{
+			// use RGB distance
+			return
+				Math.Abs (color1.Red - color2.Red) +
+				Math.Abs (color1.Green - color2.Green) +
+				Math.Abs (color1.Blue - color2.Blue);
+		}
 	}
 
 	/// <summary>
@@ -97,14 +183,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The color attribute value.
 		/// </summary>
-		public int Value { get; }
+		[JsonIgnore (Condition = JsonIgnoreCondition.Always)] 
+		public int Value { get; } 
+
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
 		public Color Foreground { get; }
+
 		/// <summary>
 		/// The background color.
 		/// </summary>
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
 		public Color Background { get; }
 
 		/// <summary>
@@ -210,29 +301,59 @@ namespace Terminal.Gui {
 		internal string caller = "";
 
 		/// <summary>
-		/// The default color for text, when the view is not focused.
+		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
-		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
+		public Attribute Normal { get { return _normal; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_normal = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
-		/// The color for text when the view has the focus.
+		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
-		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
+		public Attribute Focus { get { return _focus; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_focus = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
-		/// The color for the hotkey when a view is not focused
+		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
-		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
+		public Attribute HotNormal { get { return _hotNormal; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_hotNormal = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
-		/// The color for the hotkey when the view is focused.
+		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
-		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+		public Attribute HotFocus { get { return _hotFocus; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_hotFocus = SetAttribute (value);
+			}
+		}
 
 		/// <summary>
-		/// The default color for text, when the view is disabled.
+		/// The default foreground and background color for text, when the view is disabled.
 		/// </summary>
-		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
+		public Attribute Disabled { get { return _disabled; } set {
+				if (value.Foreground == Color.Invalid || value.Background == Color.Invalid) {
+					return;
+				}
+				_disabled = SetAttribute (value);
+			}
+		}
 
 		bool preparingScheme = false;
 
@@ -245,6 +366,7 @@ namespace Terminal.Gui {
 				return attribute;
 
 			preparingScheme = true;
+
 			switch (caller) {
 			case "TopLevel":
 				switch (callerMemberName) {
@@ -426,7 +548,25 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
+	/// <remarks>
+	/// This property can be set in a Theme to change the default <see cref="Colors"/> for the application.
+	/// </remarks>
 	public static class Colors {
+		private class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
+			public bool Equals (string x, string y)
+			{
+				if (x != null && y != null) {
+					return x.ToLowerInvariant () == y.ToLowerInvariant ();
+				}
+				return false;
+			}
+
+			public int GetHashCode (string obj)
+			{
+				return obj.ToLowerInvariant().GetHashCode ();
+			}
+		}
+
 		static Colors ()
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
@@ -434,7 +574,7 @@ namespace Terminal.Gui {
 			ColorSchemes = typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
 				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
-				.ToDictionary (t => t.Key, t => t.Value);
+				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase());
 		}
 
 		/// <summary>
@@ -1361,6 +1501,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			// NOTE: these are here for backwards compat; pre-Theme support
+			// These values are ignored/overwritten by the ConfigurationManager
 			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui.Types {
+namespace Terminal.Gui.Core {
 	public class SizeTests {
 		[Fact]
 		public void Size_New ()

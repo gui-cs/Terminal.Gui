@@ -171,9 +171,7 @@ namespace Terminal.Gui.Core {
 			var functionCalled = 0;
 			Func<bool> fn1 = () => {
 				functionCalled++;
-				if (functionCalled == 10) {
-					return false;
-				}
+				if (functionCalled == 10) 					return false;
 				return true;
 			};
 
@@ -181,9 +179,7 @@ namespace Terminal.Gui.Core {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 20) {
-					ml.Stop ();
-				}
+				if (stopCount == 20) 					ml.Stop ();
 				return true;
 			};
 
@@ -212,9 +208,7 @@ namespace Terminal.Gui.Core {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 10) {
-					ml.Stop ();
-				}
+				if (stopCount == 10) 					ml.Stop ();
 				return true;
 			};
 
@@ -237,9 +231,7 @@ namespace Terminal.Gui.Core {
 			var functionCalled = 0;
 			Func<bool> fn = () => {
 				functionCalled++;
-				if (functionCalled == 10) {
-					ml.Stop ();
-				}
+				if (functionCalled == 10) 					ml.Stop ();
 				return true;
 			};
 
@@ -258,7 +250,7 @@ namespace Terminal.Gui.Core {
 			var ms = 100;
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
 				return true;
 			};
@@ -279,7 +271,7 @@ namespace Terminal.Gui.Core {
 			var ms = 100;
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
 				ml.Stop ();
 				return true;
@@ -300,11 +292,9 @@ namespace Terminal.Gui.Core {
 			object token1 = null, token2 = null;
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
-				if (callbackCount == 2) {
-					ml.Stop ();
-				}
+				if (callbackCount == 2) 					ml.Stop ();
 				return true;
 			};
 
@@ -332,11 +322,9 @@ namespace Terminal.Gui.Core {
 			object token1 = null, token2 = null;
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
-				if (callbackCount == 2) {
-					ml.Stop ();
-				}
+				if (callbackCount == 2) 					ml.Stop ();
 				return true;
 			};
 
@@ -369,7 +357,7 @@ namespace Terminal.Gui.Core {
 			var watch = new System.Diagnostics.Stopwatch ();
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				watch.Stop ();
 				callbackCount++;
 				ml.Stop ();
@@ -381,7 +369,7 @@ namespace Terminal.Gui.Core {
 			ml.Run ();
 			// +/- 100ms should be good enuf
 			// https://github.com/xunit/assert.xunit/pull/25
-			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
+			Assert.Equal (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
 			Assert.True (ml.RemoveTimeout (token));
 			Assert.Equal (1, callbackCount);
@@ -395,7 +383,7 @@ namespace Terminal.Gui.Core {
 			var watch = new System.Diagnostics.Stopwatch ();
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
 				if (callbackCount == 2) {
 					watch.Stop ();
@@ -409,7 +397,7 @@ namespace Terminal.Gui.Core {
 			ml.Run ();
 			// +/- 100ms should be good enuf
 			// https://github.com/xunit/assert.xunit/pull/25
-			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
+			Assert.Equal (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
 			Assert.True (ml.RemoveTimeout (token));
 			Assert.Equal (2, callbackCount);
@@ -425,15 +413,13 @@ namespace Terminal.Gui.Core {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 10) {
-					ml.Stop ();
-				}
+				if (stopCount == 10) 					ml.Stop ();
 				return true;
 			};
 			ml.AddIdle (fnStop);
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
 				return true;
 			};
@@ -455,15 +441,13 @@ namespace Terminal.Gui.Core {
 			Func<bool> fnStop = () => {
 				Thread.Sleep (10); // Sleep to enable timer to fire
 				stopCount++;
-				if (stopCount == 10) {
-					ml.Stop ();
-				}
+				if (stopCount == 10) 					ml.Stop ();
 				return true;
 			};
 			ml.AddIdle (fnStop);
 
 			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (MainLoop loop) => {
+			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
 				return false;
 			};
@@ -541,10 +525,8 @@ namespace Terminal.Gui.Core {
 				Application.MainLoop.Invoke (() => {
 					tf.Text = $"index{r.Next ()}";
 					Interlocked.Increment (ref tbCounter);
-					if (target == tbCounter) {
-						// On last increment wake up the check
+					if (target == tbCounter) 						// On last increment wake up the check
 						_wakeUp.Set ();
-					}
 				});
 			});
 		}
@@ -554,9 +536,7 @@ namespace Terminal.Gui.Core {
 			for (int j = 0; j < numPasses; j++) {
 
 				_wakeUp.Reset ();
-				for (var i = 0; i < numIncrements; i++) {
-					Launch (r, tf, (j + 1) * numIncrements);
-				}
+				for (var i = 0; i < numIncrements; i++) 					Launch (r, tf, (j + 1) * numIncrements);
 
 
 				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
@@ -594,7 +574,7 @@ namespace Terminal.Gui.Core {
 
 			await task; // Propagate exception if any occurred
 
-			Assert.Equal ((numIncrements * numPasses), tbCounter);
+			Assert.Equal (numIncrements * numPasses, tbCounter);
 		}
 
 		private static int total;
@@ -652,9 +632,7 @@ namespace Terminal.Gui.Core {
 					Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
 					Assert.Equal (cancel, btn.Text);
 					Assert.Equal (one, total);
-				} else if (taskCompleted) {
-					Application.RequestStop ();
-				}
+				} else if (taskCompleted) 					Application.RequestStop ();
 			};
 
 			Application.Run ();

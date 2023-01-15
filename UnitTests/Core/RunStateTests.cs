@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Terminal.Gui;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -26,7 +27,7 @@ namespace Terminal.Gui.Core {
 		{
 			var rs = new Application.RunState (null);
 			Assert.Null (rs.Toplevel);
-			
+
 			var top = new Toplevel ();
 			rs = new Application.RunState (top);
 			Assert.Equal (top, rs.Toplevel);
@@ -72,9 +73,7 @@ namespace Terminal.Gui.Core {
 			Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding RunState-based instances left
-			foreach (var inst in Application.RunState.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
+			foreach (var inst in Application.RunState.Instances) 				Assert.True (inst.WasDisposed);
 #endif
 		}
 

@@ -128,7 +128,7 @@ namespace Terminal.Gui.Core {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -174,7 +174,7 @@ namespace Terminal.Gui.Core {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -221,7 +221,7 @@ namespace Terminal.Gui.Core {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -284,7 +284,7 @@ namespace Terminal.Gui.Core {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -892,9 +892,7 @@ namespace Terminal.Gui.Core {
 			};
 
 			Application.Iteration += () => {
-				while (count < 20) {
-					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
-				}
+				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
@@ -952,9 +950,7 @@ namespace Terminal.Gui.Core {
 			};
 
 			Application.Iteration += () => {
-				while (count > 0) {
-					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
-				}
+				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
