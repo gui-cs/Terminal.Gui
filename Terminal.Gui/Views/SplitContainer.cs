@@ -32,8 +32,7 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel1 { get; set; } // TODO: Should not be public set, should be helpers for this
-
+		public View Panel1 { get; private set; }
 
 		public int Panel1MinSize { get; set; } = 1;
 		public ustring Panel1Title { get; set; } = string.Empty;
@@ -45,7 +44,7 @@ namespace Terminal.Gui {
 		/// <see cref="SplitContainer"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel2 { get; set; } // TODO: Should not be public set, should be helpers for this
+		public View Panel2 { get; private set; }
 
 		public int Panel2MinSize { get; set; } = 1;
 		public ustring Panel2Title { get; set; } = string.Empty;
@@ -95,31 +94,29 @@ namespace Terminal.Gui {
 
 		public override void LayoutSubviews ()
 		{
-			if(this.IsRootSplitContainer()) {
+			var contentArea = Bounds;
 
-				var contentArea = Bounds;
+			if(HasBorder())
+			{
+				// TODO: Bound with Max/Min
+				contentArea = new Rect(
+					contentArea.X + 1,
+					contentArea.Y + 1,
+					Math.Max (0, contentArea.Width - 2),
+					Math.Max (0, contentArea.Height - 2));
+			}
+			else if(HasAnyTitles() && IsRootSplitContainer())
+			{
+				// TODO: Bound with Max/Min
+				contentArea = new Rect(
+					contentArea.X,
+					contentArea.Y + 1,
+					contentArea.Width,
+					Math.Max(0,contentArea.Height - 1));
+			}
 
-				if(HasBorder())
-				{
-					// TODO: Bound with Max/Min
-					contentArea = new Rect(
-						contentArea.X + 1,
-						contentArea.Y + 1,
-						Math.Max (0, contentArea.Width - 2),
-						Math.Max (0, contentArea.Height - 2));
-				}
-				else if(HasAnyTitles() && IsRootSplitContainer())
-				{
-					// TODO: Bound with Max/Min
-					contentArea = new Rect(
-						contentArea.X,
-						contentArea.Y + 1,
-						contentArea.Width,
-						Math.Max(0,contentArea.Height - 1));
-				}
-
-				Setup (contentArea);
-			}			
+			Setup (contentArea);
+					
 
 			base.LayoutSubviews ();
 		}
@@ -302,6 +299,7 @@ namespace Terminal.Gui {
 			var newContainer = new SplitContainer {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
+				parentSplitPanel = this,
 			};
 
 			// Replace current child contents 
@@ -328,7 +326,9 @@ namespace Terminal.Gui {
 			{
 				if(sub is SplitContainerLineView s)
 				{
-					lines.Add(s);
+					if(s.Parent.GetRootSplitContainer() == this) {
+						lines.Add (s);
+					}					
 				}
 				else {
 					lines.AddRange(GetAllChildSplitContainerLineViewRecursively(sub));
