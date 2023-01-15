@@ -260,7 +260,7 @@ class TestHelpers {
 				var userExpected = line [c];
 
 				if (colorUsed != userExpected) {
-					throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor (colorUsed)} but test expected {DescribeColor (userExpected)} (these are indexes into the expectedColors array)");
+					throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({DescribeColor (val)}) but test expected {userExpected} ({DescribeColor (expectedColors [int.Parse (userExpected.ToString ())].Value)}) (these are indexes into the expectedColors array)");
 				}
 			}
 
