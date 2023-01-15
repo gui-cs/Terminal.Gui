@@ -24,7 +24,7 @@ namespace UnitTests {
 			string looksLike =
 @"
 11111│22222
-     │
+11111│22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -66,7 +66,7 @@ namespace UnitTests {
 			string looksLike =
 @"
 11111│22222
-     ◊
+11111◊22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -77,7 +77,7 @@ namespace UnitTests {
 			looksLike =
 @"
 111111│2222
-      ◊
+111111◊2222
       │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -90,7 +90,7 @@ namespace UnitTests {
 			looksLike =
 @"
 1111│222222
-    ◊
+1111◊222222
     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -148,7 +148,7 @@ namespace UnitTests {
 			string looksLike =
 @"
 11111│22222
-     ◊
+11111◊22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -159,7 +159,7 @@ namespace UnitTests {
 			looksLike =
 @"
 111111│2222
-      ◊
+111111◊2222
       │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -175,7 +175,7 @@ namespace UnitTests {
 			looksLike =
 @"
 1111│222222
-    ◊
+1111◊222222
     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 			// Even when moving the splitter location it should stay a Percentage based one
@@ -223,7 +223,7 @@ namespace UnitTests {
 			string looksLike =
 @"
 111111│2222
-      ◊
+111111◊2222
       │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -242,7 +242,7 @@ namespace UnitTests {
 			looksLike =
 @"
 1111111│222
-       ◊
+1111111◊222
        │     ";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -312,7 +312,7 @@ namespace UnitTests {
 			string looksLike =
 @"
 1111│222222
-    ◊
+1111◊222222
     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -331,7 +331,7 @@ namespace UnitTests {
 			looksLike =
 @"
 111│2222222
-   ◊
+111◊2222222
    │     ";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -404,7 +404,7 @@ namespace UnitTests {
 			looksLike =
 @"    
 11111111111
-
+11111111111
 ─────◊─────";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -415,6 +415,7 @@ namespace UnitTests {
 			looksLike =
 @"    
 ─────◊─────
+22222222222
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -448,7 +449,7 @@ namespace UnitTests {
 			looksLike =
 @"    
 11111111111
-
+11111111111
 ─────◊─────";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -481,14 +482,57 @@ namespace UnitTests {
 			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
 		}
 
-		private LineView GetSplitContainerLineView (SplitContainer splitContainer)
+		[Fact,AutoInitShutdown]
+		public void TestNestedContainer2LeftAnd1Right_RendersNicely()
+		{
+			var splitContainer = GetNestedContainer2Left1Right (false);
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			string looksLike =
+@"    
+1111111111│22222222
+1111111111│22222222
+          │
+          │
+          │
+──────────┤
+          │
+          │
+          │
+          │";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+		}
+
+
+		/// <summary>
+		/// Creates a vertical orientation root container with left pane split into
+		/// two (with horizontal splitter line).
+		/// </summary>
+		/// <param name="withBorder"></param>
+		/// <returns></returns>
+		private SplitContainer GetNestedContainer2Left1Right(bool withBorder)
+		{
+			var container = GetSplitContainer (20, 10,withBorder);
+			Assert.True (container.TrySplitPanel1 (out var newContainer));
+			
+			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			newContainer.ColorScheme = new ColorScheme ();
+			container.ColorScheme = new ColorScheme ();
+
+			container.LayoutSubviews ();
+			return container;
+		}
+
+		private LineView GetLine (SplitContainer splitContainer)
 		{
 			return splitContainer.Subviews.OfType<LineView> ().Single ();
 		}
 
 		private void SetInputFocusLine (SplitContainer splitContainer)
 		{
-			var line = GetSplitContainerLineView (splitContainer);
+			var line = GetLine (splitContainer);
 			line.SetFocus ();
 			Assert.True (line.HasFocus);
 		}
@@ -496,23 +540,28 @@ namespace UnitTests {
 		private SplitContainer Get11By3SplitContainer(out LineView line, bool withBorder = false)
 		{
 			var split = Get11By3SplitContainer (withBorder);
-			line = GetSplitContainerLineView (split);
+			line = GetLine (split);
 			
 			return split;
 		}
-
 		private SplitContainer Get11By3SplitContainer (bool withBorder = false)
 		{
+			return GetSplitContainer (11, 3, withBorder);
+		}
+		private SplitContainer GetSplitContainer (int width, int height, bool withBorder = false)
+		{
 			var container = new SplitContainer () {
-				Width = 11,
-				Height = 3,
+				Width = width,
+				Height = height,
 			};
 
 			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
 
 			container.Panel1.Add (new Label (new string ('1', 100)));
+			container.Panel1.Add (new Label (new string ('1', 100)) { Y = 1});
 			container.Panel2.Add (new Label (new string ('2', 100)));
-			
+			container.Panel2.Add (new Label (new string ('2', 100)) { Y = 1});
+
 			container.Panel1MinSize = 0;
 			container.Panel2MinSize = 0;
 

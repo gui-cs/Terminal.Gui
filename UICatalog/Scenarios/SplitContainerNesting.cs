@@ -1,8 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Xml.Linq;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
 
@@ -17,6 +13,7 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbHorizontal;
 		private CheckBox cbBorder;
 		private CheckBox cbTitles;
+		private CheckBox cbUseLabels;
 
 		bool loaded = false;
 		int panelsCreated;
@@ -56,6 +53,11 @@ namespace UICatalog.Scenarios {
 			};
 			cbTitles.Toggled += (s) => SetupSplitContainer ();
 
+			cbUseLabels = new CheckBox ("Use Labels") {
+				X = Pos.Right (cbTitles) + 1
+			};
+			cbUseLabels.Toggled += (s) => SetupSplitContainer ();
+
 			workArea = new View {
 				X = 0,
 				Y = 1,
@@ -73,6 +75,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbHorizontal);
 			Win.Add (cbBorder);
 			Win.Add (cbTitles);
+			Win.Add (cbUseLabels);
 			Win.Add (workArea);
 
 			SetupSplitContainer ();
@@ -100,8 +103,8 @@ namespace UICatalog.Scenarios {
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
-			root.Panel1.Add (CreateTextView (1));
-			root.Panel2.Add (CreateTextView (2));
+			root.Panel1.Add (CreateContentControl (1));
+			root.Panel2.Add (CreateContentControl (2));
 			
 
 			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
@@ -125,11 +128,26 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
+		private View CreateContentControl (int number)
+		{
+			return cbUseLabels.Checked ?
+				CreateLabelView (number) :
+				CreateTextView (number);
+		}
+
+		private View CreateLabelView (int number)
+		{
+			return new Label {
+				Width = Dim.Fill (),
+				Height = 1,
+				Text = number.ToString ().Repeat (1000),
+			};
+		}
 		private View CreateTextView (int number)
 		{
 			return new TextView {
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
+				Height = Dim.Fill(),
 				Text = number.ToString ().Repeat (1000),
 				AllowsTab = false,
 				//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 panels)
@@ -184,7 +202,7 @@ namespace UICatalog.Scenarios {
 				Orientation.Horizontal :
 				Orientation.Vertical;
 			
-			newContainer.Panel2.Add (CreateTextView (panelsCreated));
+			newContainer.Panel2.Add (CreateContentControl(panelsCreated));
 		}
 
 		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation)

@@ -327,17 +327,20 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 				parentSplitPanel = this,
 			};
+			
+			// Take everything out of the Panel we are moving
+			var childViews = toMove.Subviews.ToArray();
+			toMove.RemoveAll ();
 
-			// Replace current child contents 
+			// Remove the panel itself and replace it with the new SplitContainer
 			Remove (toMove);
 			Add (newContainer);
-
-			// Set Panel (1 or 2) to the new container
 			newSplitContainerSetter(newContainer);
 
-			// Set the original content into the first panel of the new container
-			newContainer.Add (toMove);
-			newContainer.Panel1 = toMove;
+			// Add the original content into the first panel of the new container
+			foreach(var childView in childViews) {
+				newContainer.Panel1.Add (childView);
+			}
 
 			result = newContainer;
 			return true;
