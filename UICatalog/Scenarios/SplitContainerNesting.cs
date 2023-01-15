@@ -199,7 +199,7 @@ namespace UICatalog.Scenarios {
 			newContainer.Panel2Title = cbTitles.Checked ? $"Panel {panelsCreated}" : string.Empty;
 
 			// Flip orientation
-			newContainer.Orientation = newContainer.Orientation == Orientation.Vertical ?
+			newContainer.Orientation = to.Orientation == Orientation.Vertical ?
 				Orientation.Horizontal :
 				Orientation.Vertical;
 			

@@ -493,6 +493,7 @@ namespace UnitTests {
 
 			Assert.IsType<SplitContainer> (splitContainer.Panel1);
 			var left = (SplitContainer)splitContainer.Panel1;
+			Assert.Same (left.SuperView, splitContainer);
 
 			Assert.Equal (10, left.Panel1.Frame.Width);
 			Assert.Equal (5, left.Panel1.Frame.Height);
