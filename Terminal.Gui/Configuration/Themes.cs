@@ -72,6 +72,15 @@ namespace Terminal.Gui.Configuration {
 					Colors.ColorSchemes [scheme.Key] = scheme.Value;
 				}
 			}
+
+			if (DefaultWindowBorderStyle.HasValue) {
+				Window.DefaultBorderStyle = DefaultWindowBorderStyle.Value;
+			}
+
+			if (DefaultFrameViewBorderStyle.HasValue) {
+				FrameView.DefaultBorderStyle = DefaultFrameViewBorderStyle.Value;
+			}
+
 		}
 
 		/// <inheritdoc/>
@@ -96,11 +105,11 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			if (theme.DefaultWindowBorderStyle.HasValue) {
-				Window.DefaultBorderStyle = theme.DefaultWindowBorderStyle.Value;
+				DefaultWindowBorderStyle = theme.DefaultWindowBorderStyle.Value;
 			}
 
 			if (theme.DefaultFrameViewBorderStyle.HasValue) {
-				FrameView.DefaultBorderStyle = theme.DefaultFrameViewBorderStyle.Value;
+				DefaultWindowBorderStyle = theme.DefaultFrameViewBorderStyle.Value;
 			}
 
 		}
