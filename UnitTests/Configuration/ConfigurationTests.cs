@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationTests {
 		[Fact, AutoInitShutdown]
 		public void TestApplyAll_AppliesSettingsAndThemes ()
 		{
 			// Arrange
-			var config = new Configuration {
+			var config = new ConfigRoot {
 				Settings = new Settings { QuitKey = Key.Q },
 				Themes = new Themes { SelectedTheme = "Custom" }
 			};
@@ -30,11 +30,11 @@ namespace Terminal.Gui.Configuration {
 		public void TestCopyUpdatedPropertiesFrom_CopiesOnlyValidProperties ()
 		{
 			// Arrange
-			var config = new Configuration {
+			var config = new ConfigRoot {
 				Settings = new Settings { QuitKey = Key.Q },
 				Themes = new Themes { SelectedTheme = "Custom" }
 			};
-			var newConfig = new Configuration {
+			var newConfig = new ConfigRoot {
 				Settings = new Settings { QuitKey = Key.A },
 				Themes = new Themes { SelectedTheme = "Default" }
 			};
@@ -51,7 +51,7 @@ namespace Terminal.Gui.Configuration {
 		public void TestGetAllHardCodedDefaults_RetrievesDefaults ()
 		{
 			// Arrange
-			var config = new Configuration ();
+			var config = new ConfigRoot ();
 
 			// Act
 			config.GetAllHardCodedDefaults ();

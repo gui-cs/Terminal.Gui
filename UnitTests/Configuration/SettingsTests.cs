@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui.ConfigurationTests {
 	public class SettingsTests {
 		[Fact, AutoInitShutdown]
 		public void GetHardCodedDefaults_ShouldSetProperties ()

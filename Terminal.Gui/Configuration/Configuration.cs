@@ -166,7 +166,7 @@ namespace Terminal.Gui.Configuration {
 	///    },
 	///  },
 	/// </code></example>
-	public class Configuration {
+	public class ConfigRoot {
 		/// <summary>
 		/// Points to our JSON schema.
 		/// </summary>
@@ -195,12 +195,12 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Updates the internal state of <see cref="Configuration"/> from a newly read
+		/// Updates the internal state of <see cref="ConfigRoot"/> from a newly read
 		/// instance.
 		/// </summary>
 		/// <param name="newConfig"></param>
 		/// <exception cref="NotImplementedException"></exception>
-		internal void CopyUpdatedProperitesFrom (Configuration newConfig)
+		internal void CopyUpdatedProperitesFrom (ConfigRoot newConfig)
 		{
 			Settings.CopyUpdatedProperitesFrom (newConfig.Settings);
 			Themes.CopyUpdatedProperitesFrom (newConfig.Themes);

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ThemeTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {
@@ -121,7 +121,7 @@ namespace Terminal.Gui.Configuration {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerMultiThemes ()
 		{
-			var configuration = new Configuration ();
+			var configuration = new ConfigRoot ();
 			configuration.GetAllHardCodedDefaults ();
 			var newTheme = new Theme ();
 			newTheme.ColorSchemes.Add ("NewScheme", new ColorScheme () { Normal = Attribute.Make (Color.White, Color.Red) });

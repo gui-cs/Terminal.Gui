@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ColorJsonConverterTests {
 
 		[Theory]

@@ -2,10 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using Terminal.Gui.Configuration;
 using Xunit;
 
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationMangerTests {
 
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
@@ -27,7 +28,7 @@ namespace Terminal.Gui.Configuration {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerToJson ()
 		{
-			var configuration = new Configuration ();
+			var configuration = new ConfigRoot ();
 			configuration.GetAllHardCodedDefaults ();
 			var json = ConfigurationManager.ToJson (configuration);
 
@@ -39,7 +40,7 @@ namespace Terminal.Gui.Configuration {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerInitDriver ()
 		{
-			var configuration = new Configuration ();
+			var configuration = new ConfigRoot ();
 			configuration.GetAllHardCodedDefaults ();
 
 			// Change Base

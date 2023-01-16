@@ -6,14 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
-using Terminal.Gui.Views;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.TypeTests {
 	public class DimTests {
 		readonly ITestOutputHelper output;
 

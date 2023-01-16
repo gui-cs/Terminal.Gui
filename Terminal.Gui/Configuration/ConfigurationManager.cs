@@ -50,7 +50,7 @@ namespace Terminal.Gui.Configuration {
 	public static class ConfigurationManager {
 
 		private static readonly string _configFilename = "config.json";
-		private static Configuration _config = new Configuration ();
+		private static ConfigRoot _config = new ConfigRoot ();
 
 		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
@@ -69,19 +69,19 @@ namespace Terminal.Gui.Configuration {
 		};
 
 		/// <summary>
-		/// The <see cref="Configuration"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
+		/// The <see cref="ConfigRoot"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
 		/// Use <see cref="Config{T}.Apply()"/> to apply these to the running Terminal.Gui app.
 		/// </summary>
-		public static Configuration Config { get { return _config; } }
+		public static ConfigRoot Config { get { return _config; } }
 
 		/// <summary>
-		/// Loads the <see cref="Configuration"/> from a JSON document. 
+		/// Loads the <see cref="ConfigRoot"/> from a JSON document. 
 		/// </summary>
 		/// <param name="json"></param>
-		/// <returns>A <see cref="Configuration"/> object initialized by the contents of the JSON document.</returns>
-		public static Configuration LoadFromJson (string json)
+		/// <returns>A <see cref="ConfigRoot"/> object initialized by the contents of the JSON document.</returns>
+		public static ConfigRoot LoadFromJson (string json)
 		{
-			return JsonSerializer.Deserialize<Configuration> (json, serializerOptions);
+			return JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
 		}
 
 		/// <summary>
@@ -89,25 +89,25 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		/// <param name="config"></param>
 		/// <returns></returns>
-		public static string ToJson (Configuration config)
+		public static string ToJson (ConfigRoot config)
 		{
-			return JsonSerializer.Serialize<Configuration> (config, serializerOptions);
+			return JsonSerializer.Serialize<ConfigRoot> (config, serializerOptions);
 		}
 
 		/// <summary>
-		/// Updates the <see cref="Configuration"/> with the settings in a JSON string.
+		/// Updates the <see cref="ConfigRoot"/> with the settings in a JSON string.
 		/// </summary>
 		/// <param name="json"></param>
 		public static void UpdateConfiguration (string json)
 		{
 			// Deserialize the JSON into a Configuration object
-			var newConfig = JsonSerializer.Deserialize<Configuration> (json, serializerOptions);
+			var newConfig = JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
 
 			Config.CopyUpdatedProperitesFrom (newConfig);
 		}
 
 		/// <summary>
-		/// Updates the <see cref="Configuration"/> with the settings in a JSON file.
+		/// Updates the <see cref="ConfigRoot"/> with the settings in a JSON file.
 		/// </summary>
 		/// <param name="filePath"></param>
 		public static void UpdateConfigurationFromFile (string filePath)
@@ -132,7 +132,7 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		public static void SaveHardCodedDefaults (string path)
 		{
-			var config = new Configuration ();
+			var config = new ConfigRoot ();
 
 			// Get the hard coded settings
 			config.GetAllHardCodedDefaults ();
