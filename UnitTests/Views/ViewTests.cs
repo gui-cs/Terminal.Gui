@@ -4117,5 +4117,64 @@ This is a tes
 			view.Enabled = false;
 			Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
 		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void Clear_Does_Not_Spillover_Its_Parent (bool label)
+		{
+			var root = new View () { Width = 20, Height = 10 };
+
+			var v = label == true ?
+				new Label (new string ('c', 100)) {
+					Width = Dim.Fill ()
+				} :
+				(View)new TextView () {
+					Height = 1,
+					Text = new string ('c', 100),
+					Width = Dim.Fill ()
+				};
+
+			root.Add (v);
+
+			Application.Top.Add (root);
+			Application.Begin (Application.Top);
+
+			if (label) {
+				Assert.True (v.AutoSize);
+				Assert.False (v.CanFocus);
+				Assert.Equal (new Rect (0, 0, 100, 1), v.Frame);
+			} else {
+				Assert.False (v.AutoSize);
+				Assert.True (v.CanFocus);
+				Assert.Equal (new Rect (0, 0, 20, 1), v.Frame);
+			}
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+cccccccccccccccccccc", output);
+
+			var attributes = new Attribute [] {
+				Colors.TopLevel.Normal,
+				Colors.TopLevel.Focus,
+
+			};
+			if (label) {
+				TestHelpers.AssertDriverColorsAre (@"
+000000000000000000000", attributes);
+			} else {
+				TestHelpers.AssertDriverColorsAre (@"
+111111111111111111110", attributes);
+			}
+
+			if (label) {
+				root.CanFocus = true;
+				v.CanFocus = true;
+				Assert.False (v.HasFocus);
+				v.SetFocus ();
+				Application.Refresh ();
+				TestHelpers.AssertDriverColorsAre (@"
+111111111111111111110", attributes);
+			}
+		}
 	}
 }

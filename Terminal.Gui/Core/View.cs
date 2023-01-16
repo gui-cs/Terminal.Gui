@@ -1093,8 +1093,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			var h = Frame.Height;
-			var w = Frame.Width;
+			Rect containerBounds = GetContainerBounds ();
+			Rect viewBounds = Bounds;
+			if (!containerBounds.IsEmpty) {
+				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
+				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
+			}
+
+			var h = viewBounds.Height;
+			var w = viewBounds.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1511,11 +1518,7 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
-				containerBounds.X = Math.Max (containerBounds.X, Driver.Clip.X);
-				containerBounds.Y = Math.Max (containerBounds.Y, Driver.Clip.Y);
-				containerBounds.Width = Math.Min (containerBounds.Width, Driver.Clip.Width);
-				containerBounds.Height = Math.Min (containerBounds.Height, Driver.Clip.Height);
+				Rect containerBounds = GetContainerBounds ();
 				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
 				    containerBounds);
@@ -1556,6 +1559,17 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		Rect GetContainerBounds ()
+		{
+			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
+			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
+			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
+			containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
+			containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
+			return containerBounds;
 		}
 
 		/// <summary>
