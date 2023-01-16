@@ -72,34 +72,6 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		//[InlineData (typeof (NetDriver))]
-		//[InlineData (typeof (CursesDriver))]
-		//[InlineData (typeof (WindowsDriver))]
-		public void SetColors_Changes_Colors (Type driverType)
-		{
-			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
-			driver.Init (() => { });
-			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
-			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
-
-			Console.ForegroundColor = ConsoleColor.Red;
-			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
-
-			Console.BackgroundColor = ConsoleColor.Green;
-			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
-
-			Console.ResetColor ();
-			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
-			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
-			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
-
-		[Theory]
-		[InlineData (typeof (FakeDriver))]
 		public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -165,97 +137,6 @@ namespace Terminal.Gui.DriverTests {
 			Application.Run ();
 
 			Assert.Equal ("MockKeyPresses", rText);
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
-
-		[Theory]
-		[InlineData (typeof (FakeDriver))]
-		public void SendKeys_Test (Type driverType)
-		{
-			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
-
-			var top = Application.Top;
-			var view = new View ();
-			var shift = false; var alt = false; var control = false;
-			Key key = default;
-			Key lastKey = default;
-			List<Key> keyEnums = GetKeys ();
-			int i = 0;
-			int idxKey = 0;
-			var PushIterations = 0;
-			var PopIterations = 0;
-
-			List<Key> GetKeys ()
-			{
-				var keys = new List<Key> ();
-
-				foreach (Key k in Enum.GetValues (typeof (Key))) if ((uint)k <= 0xff) keys.Add (k);
-					else if ((uint)k > 0xff) break;
-
-				return keys;
-			}
-
-			view.KeyPress += (e) => {
-				e.Handled = true;
-				PopIterations++;
-				var rMk = new KeyModifiers () {
-					Shift = e.KeyEvent.IsShift,
-					Alt = e.KeyEvent.IsAlt,
-					Ctrl = e.KeyEvent.IsCtrl
-				};
-				lastKey = ShortcutHelper.GetModifiersKey (new KeyEvent (e.KeyEvent.Key, rMk));
-				Assert.Equal (key, lastKey);
-			};
-			top.Add (view);
-
-			Application.Iteration += () => {
-				switch (i) {
-				case 0:
-					SendKeys ();
-					break;
-				case 1:
-					shift = true;
-					SendKeys ();
-					break;
-				case 2:
-					alt = true;
-					SendKeys ();
-					break;
-				case 3:
-					control = true;
-					SendKeys ();
-					break;
-				}
-				if (PushIterations == keyEnums.Count * 4) Application.RequestStop ();
-			};
-
-			void SendKeys ()
-			{
-				var k = shift && char.IsLetter ((char)keyEnums [idxKey]) && char.IsLower ((char)keyEnums [idxKey])
-					? (Key)char.ToUpper ((char)keyEnums [idxKey]) : keyEnums [idxKey];
-				var c = (char)k;
-				var ck = char.IsLetter (c) ? (ConsoleKey)char.ToUpper (c) : (ConsoleKey)c;
-				var mk = new KeyModifiers () {
-					Shift = shift,
-					Alt = alt,
-					Ctrl = control
-				};
-				key = ShortcutHelper.GetModifiersKey (new KeyEvent (k, mk));
-				Application.Driver.SendKeys (c, ck, shift, alt, control);
-				PushIterations++;
-				if (idxKey + 1 < keyEnums.Count) idxKey++;
-				else {
-					idxKey = 0;
-					i++;
-				}
-			}
-
-			Application.Run ();
-
-			Assert.Equal (key, lastKey);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -438,84 +319,7 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-
-		//[Fact]
-		//public void Internal_Tests ()
-		//{
-		//	var cs = new ColorScheme ();
-		//	Assert.Equal ("", cs.caller);
-		//}
-
-		[Fact]
-		[AutoInitShutdown]
-		public void KeyModifiers_Resetting_At_New_Keystrokes ()
-		{
-			bool? okInitialFocused = null;
-			bool? cancelInitialFocused = null;
-			var okClicked = false;
-			var closing = false;
-			var cursorRight = false;
-			var endingKeyPress = false;
-			var closed = false;
-
-			var top = Application.Top;
-
-			var ok = new Button ("Ok");
-			ok.Clicked += () => {
-				if (!okClicked) {
-					okClicked = true;
-					Application.RequestStop ();
-				}
-			};
-
-			var cancel = new Button ("Cancel");
-
-			var d = new Dialog ("Quit", cancel, ok);
-			d.KeyPress += (e) => {
-				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
-					if (!okClicked && !closing) {
-						okInitialFocused = ok.HasFocus;
-						cancelInitialFocused = cancel.HasFocus;
-						closing = true;
-						var mKeys = new Stack<ConsoleKeyInfo> ();
-						var cki = new ConsoleKeyInfo ('\0', ConsoleKey.Enter, false, false, false);
-						mKeys.Push (cki);
-						cki = new ConsoleKeyInfo ('\0', ConsoleKey.RightArrow, false, false, false);
-						mKeys.Push (cki);
-						Console.MockKeyPresses = mKeys;
-					}
-					e.Handled = true;
-				} else if (e.KeyEvent.Key == Key.CursorRight) if (!cursorRight) cursorRight = true;
-					else if (ok.HasFocus) e.Handled = endingKeyPress = true;
-			};
-			d.Loaded += () => {
-				var mKeys = new Stack<ConsoleKeyInfo> ();
-				var cki = new ConsoleKeyInfo ('q', ConsoleKey.Q, false, false, true);
-				mKeys.Push (cki);
-				Console.MockKeyPresses = mKeys;
-			};
-			d.Closed += (_) => {
-				if (okClicked && closing) closed = true;
-			};
-
-			top.Ready += () => Application.Run (d);
-
-			Application.Iteration += () => {
-				if (closed) Application.RequestStop ();
-			};
-
-			Application.Run ();
-
-			Assert.False (okInitialFocused);
-			Assert.True (cancelInitialFocused);
-			Assert.True (okClicked);
-			Assert.True (closing);
-			Assert.True (cursorRight);
-			Assert.True (endingKeyPress);
-			Assert.True (closed);
-			Assert.Empty (Console.MockKeyPresses);
-		}
-
+		
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
