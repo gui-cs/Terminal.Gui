@@ -203,7 +203,7 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void EnsuresVisibilitySelectedItem_Top ()
+		public void EnsureSelectedItemVisible_Top ()
 		{
 			var source = new List<string> () { "First", "Second" };
 			ListView lv = new ListView (source) { Width = Dim.Fill (), Height = 1 };
@@ -450,6 +450,68 @@ namespace Terminal.Gui.ViewTests {
 
 			lv.SetSourceAsync (null);
 			Assert.NotNull (lv.Source);
+		}
+
+		[Fact]
+		public void ListWrapper_StartsWith ()
+		{
+			var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+
+			Assert.Equal (1, lw.StartsWith ("t"));
+			Assert.Equal (1, lw.StartsWith ("tw"));
+			Assert.Equal (2, lw.StartsWith ("th"));
+			Assert.Equal (1, lw.StartsWith ("T"));
+			Assert.Equal (1, lw.StartsWith ("TW"));
+			Assert.Equal (2, lw.StartsWith ("TH"));
+
+			lw = new ListWrapper (new List<NStack.ustring> { "One", "Two", "Three" });
+
+			Assert.Equal (1, lw.StartsWith ("t"));
+			Assert.Equal (1, lw.StartsWith ("tw"));
+			Assert.Equal (2, lw.StartsWith ("th"));
+			Assert.Equal (1, lw.StartsWith ("T"));
+			Assert.Equal (1, lw.StartsWith ("TW"));
+			Assert.Equal (2, lw.StartsWith ("TH"));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureSelectedItemVisible_SelectedItem ()
+		{
+			var source = new List<string> ();
+			for (int i = 0; i < 10; i++) {
+				source.Add ($"Item {i}");
+			}
+			var lv = new ListView (source) {
+				Width = 10,
+				Height = 5
+			};
+			Application.Top.Add (lv);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4", output);
+
+			lv.SelectedItem = 6;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4", output);
+
+			lv.EnsureSelectedItemVisible ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Item 2
+Item 3
+Item 4
+Item 5
+Item 6", output);
 		}
 	}
 }
