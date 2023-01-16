@@ -184,6 +184,8 @@ namespace Terminal.Gui.Configuration {
 			foreach (var scheme in Colors.ColorSchemes) {
 				defaultTheme.ColorSchemes.Add (scheme.Key, scheme.Value);
 			}
+			defaultTheme.DefaultFrameViewBorderStyle = FrameView.DefaultBorderStyle;
+			defaultTheme.DefaultWindowBorderStyle = Window.DefaultBorderStyle;
 			ThemeDefinitions.Add (SelectedTheme, defaultTheme);
 		}
 
