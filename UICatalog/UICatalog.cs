@@ -151,7 +151,7 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public SplitContainer ContentPane;
+			public SplitView ContentPane;
 			public ListView CategoryListView;
 			public ListView ScenarioListView;
 
@@ -207,7 +207,7 @@ namespace UICatalog {
 					OS
 				};
 
-				ContentPane = new SplitContainer () {
+				ContentPane = new SplitView () {
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),
@@ -232,8 +232,8 @@ namespace UICatalog {
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 
-				ContentPane.Panel1Title = "Categories";
-				ContentPane.Panel1.Add (CategoryListView);
+				ContentPane.View1Title = "Categories";
+				ContentPane.View1.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -246,8 +246,8 @@ namespace UICatalog {
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
 
-				ContentPane.Panel2Title = "Scenarios";
-				ContentPane.Panel2.Add (ScenarioListView);
+				ContentPane.View2Title = "Scenarios";
+				ContentPane.View2.Add (ScenarioListView);
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);

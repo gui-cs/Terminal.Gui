@@ -3,10 +3,10 @@ using Terminal.Gui;
 using Terminal.Gui.Graphs;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Split Container Nesting", Description: "Nest SplitContainers")]
+	[ScenarioMetadata (Name: "Split View Nesting", Description: "Nest SplitViews")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("LineView")]
-	public class SplitContainerNesting : Scenario {
+	public class SplitViewNesting : Scenario {
 
 		private View workArea;
 		private TextField textField;
@@ -16,8 +16,8 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbUseLabels;
 
 		bool loaded = false;
-		int panelsCreated;
-		int panelsToCreate;
+		int viewsCreated;
+		int viewsToCreate;
 
 		/// <summary>
 		/// Setup the scenario.
@@ -28,35 +28,35 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1;
 
-			var lblPanels = new Label ("Number Of Panels:");
+			var lblViews = new Label ("Number Of Views:");
 			textField = new TextField {
-				X = Pos.Right (lblPanels),
+				X = Pos.Right (lblViews),
 				Width = 10,
 				Text = "2",
 			};
 
-			textField.TextChanged += (s) => SetupSplitContainer ();
+			textField.TextChanged += (s) => SetupSplitView ();
 
 
 			cbHorizontal = new CheckBox ("Horizontal") {
 				X = Pos.Right (textField) + 1
 			};
-			cbHorizontal.Toggled += (s) => SetupSplitContainer ();
+			cbHorizontal.Toggled += (s) => SetupSplitView ();
 
 			cbBorder = new CheckBox ("Border") {
 				X = Pos.Right (cbHorizontal) + 1
 			};
-			cbBorder.Toggled += (s) => SetupSplitContainer ();
+			cbBorder.Toggled += (s) => SetupSplitView ();
 
 			cbTitles = new CheckBox ("Titles") {
 				X = Pos.Right (cbBorder) + 1
 			};
-			cbTitles.Toggled += (s) => SetupSplitContainer ();
+			cbTitles.Toggled += (s) => SetupSplitView ();
 
 			cbUseLabels = new CheckBox ("Use Labels") {
 				X = Pos.Right (cbTitles) + 1
 			};
-			cbUseLabels.Toggled += (s) => SetupSplitContainer ();
+			cbUseLabels.Toggled += (s) => SetupSplitView ();
 
 			workArea = new View {
 				X = 0,
@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 				new MenuItem ("_Quit", "", () => Quit()),
 			}) });
 
-			Win.Add (lblPanels);
+			Win.Add (lblViews);
 			Win.Add (textField);
 			Win.Add (cbHorizontal);
 			Win.Add (cbBorder);
@@ -78,16 +78,16 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbUseLabels);
 			Win.Add (workArea);
 
-			SetupSplitContainer ();
+			SetupSplitView ();
 
 			Application.Top.Add (menu);
 
 			Win.Loaded += () => loaded = true;
 		}
 
-		private void SetupSplitContainer ()
+		private void SetupSplitView ()
 		{
-			int numberOfPanels = GetNumberOfPanels ();
+			int numberOfViews = GetNumberOfViews ();
 
 			bool titles = cbTitles.Checked;
 			bool border = cbBorder.Checked;
@@ -95,16 +95,16 @@ namespace UICatalog.Scenarios {
 
 			workArea.RemoveAll ();
 			
-			if (numberOfPanels <= 0) {
+			if (numberOfViews <= 0) {
 				return;
 			}
 
-			var root = CreateSplitContainer (1,startHorizontal ?
+			var root = CreateSplitView (1,startHorizontal ?
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
-			root.Panel1.Add (CreateContentControl (1));
-			root.Panel2.Add (CreateContentControl (2));
+			root.View1.Add (CreateContentControl (1));
+			root.View2.Add (CreateContentControl (2));
 			
 
 			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
@@ -112,15 +112,15 @@ namespace UICatalog.Scenarios {
 
 			workArea.Add (root);
 
-			if (numberOfPanels == 1) {
-				root.Panel2.Visible = false;
+			if (numberOfViews == 1) {
+				root.View2.Visible = false;
 			}
 
-			if (numberOfPanels > 2) {
+			if (numberOfViews > 2) {
 
-				panelsCreated = 2;
-				panelsToCreate = numberOfPanels;
-				AddMorePanels (root);
+				viewsCreated = 2;
+				viewsToCreate = numberOfViews;
+				AddMoreViews (root);
 			}
 
 			if (loaded) {
@@ -152,81 +152,81 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill(),
 				Text = number.ToString ().Repeat (1000),
 				AllowsTab = false,
-				//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 panels)
+				//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
 			};
 		}
 
-		private void AddMorePanels (SplitContainer to)
+		private void AddMoreViews (SplitView to)
 		{
-			if (panelsCreated == panelsToCreate) {
+			if (viewsCreated == viewsToCreate) {
 				return;
 			}
 
-			if (!(to.Panel1 is SplitContainer)) {
+			if (!(to.View1 is SplitView)) {
 				Split(to,true);
 			}
 
-			if (!(to.Panel2 is SplitContainer)) {
+			if (!(to.View2 is SplitView)) {
 				Split(to,false);				
 			}
 
-			if (to.Panel1 is SplitContainer && to.Panel2 is SplitContainer) {
+			if (to.View1 is SplitView && to.View2 is SplitView) {
 
-				AddMorePanels ((SplitContainer)to.Panel1);
-				AddMorePanels ((SplitContainer)to.Panel2);
+				AddMoreViews ((SplitView)to.View1);
+				AddMoreViews ((SplitView)to.View2);
 			}
 
 		}
-		private void Split(SplitContainer to, bool left)
+		private void Split(SplitView to, bool left)
 		{
-			if (panelsCreated == panelsToCreate) {
+			if (viewsCreated == viewsToCreate) {
 				return;
 			}
 
-			SplitContainer newContainer;
+			SplitView newView;
 
 			if (left) {
-				to.TrySplitPanel1 (out newContainer);
+				to.TrySplitView1 (out newView);
 
 			}
 			else {
-				to.TrySplitPanel2 (out newContainer);
+				to.TrySplitView2 (out newView);
 			}
 
-			panelsCreated++;
+			viewsCreated++;
 
-			// During splitting the old Title will have been migrated to Panel1 so we only need
-			// to set the Title on Panel2 (the one that gets our new TextView)
-			newContainer.Panel2Title = cbTitles.Checked ? $"Panel {panelsCreated}" : string.Empty;
+			// During splitting the old Title will have been migrated to View1 so we only need
+			// to set the Title on View2 (the one that gets our new TextView)
+			newView.View2Title = cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
 
 			// Flip orientation
-			newContainer.Orientation = to.Orientation == Orientation.Vertical ?
+			newView.Orientation = to.Orientation == Orientation.Vertical ?
 				Orientation.Horizontal :
 				Orientation.Vertical;
 			
-			newContainer.Panel2.Add (CreateContentControl(panelsCreated));
+			newView.View2.Add (CreateContentControl(viewsCreated));
 		}
 
-		private SplitContainer CreateSplitContainer (int titleNumber, Orientation orientation)
+		private SplitView CreateSplitView (int titleNumber, Orientation orientation)
 		{
-			var toReturn = new SplitContainer {
+			var toReturn = new SplitView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				// flip the orientation
 				Orientation = orientation
 			};
 
-			toReturn.Panel1Title = cbTitles.Checked ? $"Panel {titleNumber}" : string.Empty;
-			toReturn.Panel2Title = cbTitles.Checked ? $"Panel {titleNumber + 1}" : string.Empty;
+			toReturn.View1Title = cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
+			toReturn.View2Title = cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
 
 			return toReturn;
 		}
 
-		private int GetNumberOfPanels ()
+		private int GetNumberOfViews ()
 		{
-			if (int.TryParse (textField.Text.ToString (), out var panels) && panels >= 0) {
+			if (int.TryParse (textField.Text.ToString (), out var views) && views >= 0) {
 
-				return panels;
+				return views;
 			} else {
 				return 0;
 			}

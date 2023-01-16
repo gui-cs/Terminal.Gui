@@ -8,19 +8,20 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// A <see cref="View"/> consisting of a moveable bar that divides
-	/// the display area into 2 resizeable panels.
+	/// the display area into 2 resizeable views.
 	/// </summary>
-	public class SplitContainer : View {
+	public class SplitView : View 
+		{
 
 		private SplitContainerLineView splitterLine;
-		SplitContainer parentSplitPanel;
+		SplitView parentSplitView;
 		
 		/// TODO: Might be able to make Border virtual and override here
 		/// To make this more API friendly
 
 		/// <summary>
 		/// Use this field instead of Border to create an integrated
-		/// Border in which lines connect with subpanels and splitters
+		/// Border in which lines connect with subviews and splitters
 		/// seamlessly
 		/// </summary>
 		public BorderStyle IntegratedBorder {get;set;}
@@ -29,25 +30,25 @@ namespace Terminal.Gui {
 		/// The <see cref="View"/> showing in the left hand pane of a
 		/// <see cref="Orientation.Vertical"/>  or top of an
 		/// <see cref="Orientation.Horizontal"/> pane.  May be another
-		/// <see cref="SplitContainer"/> if further splitter subdivisions are
+		/// <see cref="SplitView"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel1 { get; private set; }
+		public View View1 { get; private set; }
 
-		public int Panel1MinSize { get; set; } = 1;
-		public ustring Panel1Title { get; set; } = string.Empty;
+		public int View1MinSize { get; set; } = 1;
+		public ustring View1Title { get; set; } = string.Empty;
 
 		/// <summary>
 		/// The <see cref="View"/> showing in the right hand pane of a
 		/// <see cref="Orientation.Vertical"/>  or bottom of an
 		/// <see cref="Orientation.Horizontal"/> pane.  May be another
-		/// <see cref="SplitContainer"/> if further splitter subdivisions are
+		/// <see cref="SplitView"/> if further splitter subdivisions are
 		/// desired (e.g. to create a resizeable grid.
 		/// </summary>
-		public View Panel2 { get; private set; }
+		public View View2 { get; private set; }
 
-		public int Panel2MinSize { get; set; } = 1;
-		public ustring Panel2Title { get; set; } = string.Empty;
+		public int View2MinSize { get; set; } = 1;
+		public ustring View2Title { get; set; } = string.Empty;
 
 		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
@@ -55,15 +56,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of the SplitContainer class.
 		/// </summary>
-		public SplitContainer ()
+		public SplitView ()
 		{
 			splitterLine = new SplitContainerLineView (this);
-			Panel1 = new View () { Width = Dim.Fill (), Height = Dim.Fill() };
-			Panel2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			View1 = new View () { Width = Dim.Fill (), Height = Dim.Fill() };
+			View2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 
-			this.Add (Panel1);
+			this.Add (View1);
 			this.Add (splitterLine);
-			this.Add (Panel2);
+			this.Add (View2);
 
 			CanFocus = true;
 		}
@@ -123,7 +124,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <para>Distance Horizontally or Vertically to the splitter line when
-		/// neither panel is collapsed.
+		/// neither view is collapsed.
 		/// </para>
 		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
 		/// are supported for this property.</para>
@@ -215,9 +216,9 @@ namespace Terminal.Gui {
 
 			// Draw Titles over Border
 			var screen = ViewToScreen (new Rect(0,0,bounds.Width,1));
-			if (Panel1.Visible && Panel1Title.Length > 0) {
-				Driver.SetAttribute (Panel1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel1.Frame.Width, 0), Panel1Title, 0, 0, 0, 0);
+			if (View1.Visible && View1Title.Length > 0) {
+				Driver.SetAttribute (View1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View1.Frame.Width, 0), View1Title, 0, 0, 0, 0);
 			}
 
 			if (splitterLine.Visible) {
@@ -229,47 +230,47 @@ namespace Terminal.Gui {
 			}
 
 			if (Orientation == Orientation.Horizontal) {
-				if (Panel2.Visible && Panel2Title?.Length > 0) {
+				if (View2.Visible && View2Title?.Length > 0) {
 
-					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+					Driver.SetAttribute (View2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View2.Bounds.Width, 1), View2Title, 0, 0, 0, 0);
 				}
 			} else {
-				if (Panel2.Visible && Panel2Title?.Length > 0) {
-					Driver.SetAttribute (Panel2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, Panel2.Bounds.Width, 1), Panel2Title, 0, 0, 0, 0);
+				if (View2.Visible && View2Title?.Length > 0) {
+					Driver.SetAttribute (View2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View2.Bounds.Width, 1), View2Title, 0, 0, 0, 0);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Converts <see cref="Panel1"/> from a regular <see cref="View"/>
-		/// container to a new nested <see cref="SplitContainer"/>.  If <see cref="Panel1"/>
-		/// is already a <see cref="SplitContainer"/> then returns false.
+		/// Converts <see cref="View1"/> from a regular <see cref="View"/>
+		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View1"/>
+		/// is already a <see cref="SplitView"/> then returns false.
 		/// </summary>
-		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
-		/// will contain the original content and <see cref="Panel1Title"/> (if any) while
-		/// <see cref="Panel2"/> will be empty and available for adding to.
+		/// <remarks>After successful splitting, the returned container's <see cref="View1"/> 
+		/// will contain the original content and <see cref="View1Title"/> (if any) while
+		/// <see cref="View2"/> will be empty and available for adding to.
 		/// for adding to.</remarks>
-		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
-		/// <see cref="Panel1"/> or the existing one if it was already been converted before.</param>
+		/// <param name="result">The new <see cref="SplitView"/> now showing in 
+		/// <see cref="View1"/> or the existing one if it was already been converted before.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
-		/// <see cref="SplitContainer"/>.  <see langword="false"/> if it was already a nested
-		/// <see cref="SplitContainer"/></returns>
-		public bool TrySplitPanel1(out SplitContainer result)
+		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="SplitView"/></returns>
+		public bool TrySplitView1(out SplitView result)
 		{
-			// when splitting a panel into 2 sub panels we will need to migrate
+			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
-			var title = Panel1Title;
+			var title = View1Title;
 
 			bool returnValue = TrySplit (
-				this.Panel1,
+				this.View1,
 				(newSplitContainer) => {
-					this.Panel1 = newSplitContainer;
+					this.View1 = newSplitContainer;
 					
 					// Move title to new container
-					Panel1Title = string.Empty;
-					newSplitContainer.Panel1Title = title;
+					View1Title = string.Empty;
+					newSplitContainer.View1Title = title;
 				},
 				out result);
 			
@@ -277,36 +278,36 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts <see cref="Panel2"/> from a regular <see cref="View"/>
-		/// container to a new nested <see cref="SplitContainer"/>.  If <see cref="Panel2"/>
-		/// is already a <see cref="SplitContainer"/> then returns false.
+		/// Converts <see cref="View2"/> from a regular <see cref="View"/>
+		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View2"/>
+		/// is already a <see cref="SplitView"/> then returns false.
 		/// </summary>
-		/// <remarks>After successful splitting, the returned container's <see cref="Panel1"/> 
-		/// will contain the original content and <see cref="Panel2Title"/> (if any) while
-		/// <see cref="Panel2"/> will be empty and available for adding to.
+		/// <remarks>After successful splitting, the returned container's <see cref="View1"/> 
+		/// will contain the original content and <see cref="View2Title"/> (if any) while
+		/// <see cref="View2"/> will be empty and available for adding to.
 		/// for adding to.</remarks>
-		/// <param name="result">The new <see cref="SplitContainer"/> now showing in 
-		/// <see cref="Panel2"/> or the existing one if it was already been converted before.</param>
+		/// <param name="result">The new <see cref="SplitView"/> now showing in 
+		/// <see cref="View2"/> or the existing one if it was already been converted before.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
-		/// <see cref="SplitContainer"/>.  <see langword="false"/> if it was already a nested
-		/// <see cref="SplitContainer"/></returns>
-		public bool TrySplitPanel2 (out SplitContainer result)
+		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="SplitView"/></returns>
+		public bool TrySplitView2 (out SplitView result)
 		{
-			// when splitting a panel into 2 sub panels we will need to migrate
+			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
-			var title = Panel2Title;
+			var title = View2Title;
 
 			bool returnValue = TrySplit (
-				this.Panel2,
+				this.View2,
 				(newSplitContainer) => {
-					this.Panel2 = newSplitContainer;
+					this.View2 = newSplitContainer;
 
 					// Move title to new container
-					Panel2Title = string.Empty;
+					View2Title = string.Empty;
 
-					// Content always goes into Panel1 of the new container
+					// Content always goes into View1 of the new container
 					// so that is where the title goes too
-					newSplitContainer.Panel1Title = title;
+					newSplitContainer.View1Title = title;
 				},
 				out result);
 
@@ -314,32 +315,32 @@ namespace Terminal.Gui {
 		}
 		private bool TrySplit(
 			View toMove,
-			Action<SplitContainer> newSplitContainerSetter,
-			out SplitContainer result)
+			Action<SplitView> newSplitContainerSetter,
+			out SplitView result)
 		{
-			if (toMove is SplitContainer existing) {
+			if (toMove is SplitView existing) {
 				result = existing;
 				return false;
 			}
 
-			var newContainer = new SplitContainer {
+			var newContainer = new SplitView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				parentSplitPanel = this,
+				parentSplitView = this,
 			};
 			
-			// Take everything out of the Panel we are moving
+			// Take everything out of the View we are moving
 			var childViews = toMove.Subviews.ToArray();
 			toMove.RemoveAll ();
 
-			// Remove the panel itself and replace it with the new SplitContainer
+			// Remove the view itself and replace it with the new SplitContainer
 			Remove (toMove);
 			Add (newContainer);
 			newSplitContainerSetter(newContainer);
 
-			// Add the original content into the first panel of the new container
+			// Add the original content into the first view of the new container
 			foreach(var childView in childViews) {
-				newContainer.Panel1.Add (childView);
+				newContainer.View1.Add (childView);
 			}
 
 			result = newContainer;
@@ -370,14 +371,14 @@ namespace Terminal.Gui {
 		private bool IsRootSplitContainer ()
 		{
 			// TODO: don't want to layout subviews since the parent recursively lays them all out
-			return parentSplitPanel == null;
+			return parentSplitView == null;
 		}
-		private SplitContainer GetRootSplitContainer ()
+		private SplitView GetRootSplitContainer ()
 		{
-			SplitContainer root = this;
+			SplitView root = this;
 
-			while (root.parentSplitPanel != null) {
-				root = root.parentSplitPanel;
+			while (root.parentSplitView != null) {
+				root = root.parentSplitView;
 			}
 
 			return root;
@@ -385,12 +386,12 @@ namespace Terminal.Gui {
 		private void Setup (Rect bounds)
 		{
 			splitterLine.Orientation = Orientation;
-			// splitterLine.Text = Panel2.Title;
+			// splitterLine.Text = View2.Title;
 
 			// TODO: Recursion
 
-			if (!Panel1.Visible || !Panel2.Visible) {
-				View toFullSize = !Panel1.Visible ? Panel2 : Panel1;
+			if (!View1.Visible || !View2.Visible) {
+				View toFullSize = !View1.Visible ? View2 : View1;
 
 				splitterLine.Visible = false;
 
@@ -403,8 +404,8 @@ namespace Terminal.Gui {
 
 				splitterDistance = BoundByMinimumSizes (splitterDistance);
 
-				Panel1.X = bounds.X;
-				Panel1.Y = bounds.Y;
+				View1.X = bounds.X;
+				View1.Y = bounds.Y;
 
 				switch (Orientation) {
 				case Orientation.Horizontal:
@@ -414,14 +415,14 @@ namespace Terminal.Gui {
 					splitterLine.Height = 1;
 					splitterLine.LineRune = Driver.HLine;
 
-					Panel1.Width = Dim.Fill (HasBorder()? 1:0);
-					Panel1.Height = new Dim.DimFunc (() =>
+					View1.Width = Dim.Fill (HasBorder()? 1:0);
+					View1.Height = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (bounds.Height));
 
-					Panel2.Y = Pos.Bottom (splitterLine);
-					Panel2.X = bounds.X;
-					Panel2.Width = bounds.Width;
-					Panel2.Height = Dim.Fill(HasBorder () ? 1 : 0);
+					View2.Y = Pos.Bottom (splitterLine);
+					View2.X = bounds.X;
+					View2.Width = bounds.Width;
+					View2.Height = Dim.Fill(HasBorder () ? 1 : 0);
 					break;
 
 				case Orientation.Vertical:
@@ -431,14 +432,14 @@ namespace Terminal.Gui {
 					splitterLine.Height = Dim.Fill ();
 					splitterLine.LineRune = Driver.VLine;
 
-					Panel1.Height = Dim.Fill();
-					Panel1.Width = new Dim.DimFunc (() =>
+					View1.Height = Dim.Fill();
+					View1.Width = new Dim.DimFunc (() =>
 					splitterDistance.Anchor (bounds.Width));
 
-					Panel2.X = Pos.Right (splitterLine);
-					Panel2.Y = bounds.Y;
-					Panel2.Height = bounds.Height;
-					Panel2.Width = Dim.Fill(HasBorder()? 1:0);
+					View2.X = Pos.Right (splitterLine);
+					View2.Y = bounds.Y;
+					View2.Height = bounds.Height;
+					View2.Width = Dim.Fill(HasBorder()? 1:0);
 					break;
 
 				default: throw new ArgumentOutOfRangeException (nameof (orientation));
@@ -449,7 +450,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Considers <paramref name="pos"/> as a candidate for <see cref="splitterDistance"/>
 		/// then either returns (if valid) or returns adjusted if invalid with respect to the 
-		/// <see cref="SplitterPanel.MinSize"/> of the panels.
+		/// <see cref="SplitterView.MinSize"/> of the views.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
@@ -457,21 +458,21 @@ namespace Terminal.Gui {
 		{
 			// if we are not yet initialized then we don't know
 			// how big we are and therefore cannot sensibly calculate
-			// how big the panels will be with a given SplitterDistance
+			// how big the views will be with a given SplitterDistance
 			if (!IsInitialized) {
 				return pos;
 			}
 			
-			var panel1MinSize = Panel1MinSize;
-			var panel2MinSize = Panel2MinSize;
+			var view1MinSize = View1MinSize;
+			var view2MinSize = View2MinSize;
 
 
 			// if there is a border then there is less space
-			// for the panels so we need to make size restrictions
+			// for the views so we need to make size restrictions
 			// tighter.
 			if(HasBorder()) {
-				panel1MinSize++;
-				panel2MinSize++;
+				view1MinSize++;
+				view2MinSize++;
 			}
 
 			var availableSpace = Orientation == Orientation.Horizontal ? this.Bounds.Height : this.Bounds.Width;
@@ -483,33 +484,33 @@ namespace Terminal.Gui {
 
 			var idealPosition = pos.Anchor (availableSpace);
 
-			// bad position because not enough space for Panel1
-			if (idealPosition < panel1MinSize) {
+			// bad position because not enough space for View1
+			if (idealPosition < view1MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
-				return (Pos)Math.Min (panel1MinSize, availableSpace);
+				return (Pos)Math.Min (view1MinSize, availableSpace);
 			}
 
-			// bad position because not enough space for Panel2
-			if (availableSpace - idealPosition <= panel2MinSize) {
+			// bad position because not enough space for View2
+			if (availableSpace - idealPosition <= view2MinSize) {
 
 				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
 
 				// +1 is to allow space for the splitter
-				return (Pos)Math.Max (availableSpace - (panel2MinSize + 1), 0);
+				return (Pos)Math.Max (availableSpace - (view2MinSize + 1), 0);
 			}
 
 			// this splitter position is fine, there is enough space for everyone
 			return pos;
 		}
 		private class SplitContainerLineView : LineView {
-			public SplitContainer Parent { get; private set; }
+			public SplitView Parent { get; private set; }
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
 			public Point? moveRuneRenderLocation;
 
-			public SplitContainerLineView (SplitContainer parent)
+			public SplitContainerLineView (SplitView parent)
 			{
 				CanFocus = true;
 				TabStop = true;
@@ -681,7 +682,7 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// <para>
-			/// Moves <see cref="parent"/> <see cref="SplitContainer.SplitterDistance"/> to 
+			/// Moves <see cref="parent"/> <see cref="SplitView.SplitterDistance"/> to 
 			/// <see cref="Pos"/> <paramref name="newValue"/> preserving <see cref="Pos"/> format
 			/// (absolute / relative) that <paramref name="oldValue"/> had.
 			/// </para>
@@ -729,7 +730,7 @@ namespace Terminal.Gui {
 		}
 		private bool HasAnyTitles()
 		{
-			return Panel1Title.Length > 0 || Panel2Title.Length > 0;
+			return View1Title.Length > 0 || View2Title.Length > 0;
 
 		}
 
@@ -747,7 +748,7 @@ namespace Terminal.Gui {
 				{
 					var screenRect = currentLine.ViewToScreen (
 						new Rect(0,0,currentLine.Frame.Width,currentLine.Frame.Height));
-					Driver.DrawWindowTitle (screenRect, currentLine.Parent.Panel2Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (screenRect, currentLine.Parent.View2Title, 0, 0, 0, 0);
 				}
 			}
 		}
@@ -763,21 +764,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="splitContainer"></param>
 		/// <param name="splitterDistance"></param>
-		public SplitterEventArgs (SplitContainer splitContainer, Pos splitterDistance)
+		public SplitterEventArgs (SplitView splitContainer, Pos splitterDistance)
 		{
 			SplitterDistance = splitterDistance;
 			SplitContainer = splitContainer;
 		}
 
 		/// <summary>
-		/// New position of the <see cref="SplitContainer.SplitterDistance"/>
+		/// New position of the <see cref="SplitView.SplitterDistance"/>
 		/// </summary>
 		public Pos SplitterDistance { get; }
 
 		/// <summary>
 		/// Container (sender) of the event.
 		/// </summary>
-		public SplitContainer SplitContainer { get; }
+		public SplitView SplitContainer { get; }
 	}
 
 	/// <summary>
