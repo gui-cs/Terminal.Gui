@@ -126,6 +126,7 @@ namespace Terminal.Gui {
 		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
 		/// as the console scrolls. 
 		/// </para>
+		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
 		/// </remarks>
 		public static bool EnableConsoleScrolling {
 			get {
