@@ -13,12 +13,6 @@ namespace Terminal.Gui.Graphs {
 
 		
 		private List<StraightLine> lines = new List<StraightLine> ();
-		private ConsoleDriver driver;
-
-		public LineCanvas (ConsoleDriver driver)
-		{
-			this.driver = driver;
-		}
 
 		/// <summary>
 		/// Add a new line to the canvas starting at <paramref name="from"/>.
@@ -60,7 +54,7 @@ namespace Terminal.Gui.Graphs {
 						.ToArray ();
 
 					// TODO: use Driver and LineStyle to map
-					canvas [y, x] = GetRuneForIntersects (intersects);
+					canvas [y, x] = GetRuneForIntersects (Application.Driver, intersects);
 
 				}
 			}
@@ -90,7 +84,7 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
-		private Rune? GetRuneForIntersects (IntersectionDefinition [] intersects)
+		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ())
 				return null;

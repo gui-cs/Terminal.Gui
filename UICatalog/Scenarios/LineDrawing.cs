@@ -6,10 +6,10 @@ using Terminal.Gui.Graphs;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Drawing", Description: "Demonstrates LineCanvas.")]
+	[ScenarioMetadata (Name: "Line Drawing", Description: "Demonstrates LineCanvas.")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Layout")]
-	public class Drawing : Scenario {
+	public class LineDrawing : Scenario {
 
 		public override void Setup ()
 		{
@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 
 			public ToolsView (int width)
 			{
-				grid = new LineCanvas (Application.Driver);
+				grid = new LineCanvas ();
 
 				grid.AddLine (new Point (0, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
 				grid.AddLine (new Point (0, 0), width, Orientation.Horizontal, BorderStyle.Single);
@@ -139,7 +139,7 @@ namespace UICatalog.Scenarios {
 					return;
 				}
 
-				canvases.Add (new LineCanvas (Application.Driver));
+				canvases.Add (new LineCanvas ());
 				colorLayers.Add (c, canvases.Count - 1);
 				currentColor = canvases.Count - 1;
 			}
