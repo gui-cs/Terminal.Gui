@@ -252,7 +252,8 @@ namespace Terminal.Gui {
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
 			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
-				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+				return new Size (cols, rows);
 			}
 			SetConsoleOutputWindow (csbi);
 			return new Size (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
