@@ -227,26 +227,26 @@ namespace Terminal.Gui {
 			case 0:
 				if (consoleKeyInfo.Key == (ConsoleKey)64) {    // Ctrl+Space in Windows.
 					newConsoleKeyInfo = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 				}
 				break;
 			case uint n when (n >= '\u0001' && n <= '\u001a'):
 				if (consoleKeyInfo.Key == 0 && consoleKeyInfo.KeyChar == '\r') {
 					key = ConsoleKey.Enter;
 					newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
-					    key,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+						key,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 				} else if (consoleKeyInfo.Key == 0) {
 					key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
 					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
-					    key,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-					    (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-					    true);
+						key,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						true);
 				}
 				break;
 			case 27:
