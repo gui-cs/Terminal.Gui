@@ -304,7 +304,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			// MockDriver will still be 120x40
 			wasTerminalResized = false;
-			Application.HeightAsBuffer = true;
+			Application.EnableConsoleScrolling = true;
 			driver.SetWindowSize (40, 20);
 			Assert.Equal (120, Application.Driver.Cols);
 			Assert.Equal (40, Application.Driver.Rows);
@@ -319,12 +319,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero (Type driverType)
+		public void EnableConsoleScrolling_Is_False_Left_And_Top_Is_Always_Zero (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
 
@@ -337,13 +337,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (81, 25);
 			Assert.Equal (0, Console.WindowLeft);
@@ -354,13 +354,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (81, 25);
 			Assert.Equal (0, Console.WindowLeft);
@@ -394,13 +394,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (80, 26);
 			Assert.Equal (0, Console.WindowLeft);
@@ -411,13 +411,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (80, 26);
 			Assert.Equal (0, Console.WindowLeft);

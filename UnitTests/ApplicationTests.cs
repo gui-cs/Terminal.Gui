@@ -24,7 +24,7 @@ namespace Terminal.Gui.Core {
 			Assert.Null (Application.Driver);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.Current);
-			Assert.Throws<ArgumentNullException> (() => Application.HeightAsBuffer == true);
+			Assert.Throws<ArgumentNullException> (() => Application.EnableConsoleScrolling == true);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
@@ -36,7 +36,7 @@ namespace Terminal.Gui.Core {
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.Top);
 			Assert.NotNull (Application.Current);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
@@ -313,7 +313,7 @@ namespace Terminal.Gui.Core {
 		public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
 		{
 			Init ();
-			
+
 			Application.Driver = null;
 
 			Application.Iteration = () => {
@@ -333,8 +333,8 @@ namespace Terminal.Gui.Core {
 		[Fact]
 		public void Run_T_NoInit_DoesNotThrow ()
 		{
-			Application.ForceFakeConsole = true; 
-			
+			Application.ForceFakeConsole = true;
+
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
@@ -430,7 +430,7 @@ namespace Terminal.Gui.Core {
 		}
 
 		// TODO: Add tests for Run that test errorHandler
-		
+
 		#endregion
 
 		#region ShutdownTests

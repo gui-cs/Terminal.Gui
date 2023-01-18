@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 			while (true) {
 				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
 				Thread.Sleep (10);
-				if (!consoleDriver.HeightAsBuffer) {
+				if (!consoleDriver.EnableConsoleScrolling) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
 						var w = Math.Max (Console.WindowWidth, 0);
 						var h = Math.Max (Console.WindowHeight, 0);
@@ -1172,7 +1172,12 @@ namespace Terminal.Gui {
 		public override int Rows => rows;
 		public override int Left => left;
 		public override int Top => top;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public override bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
+		}
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
@@ -1321,7 +1326,7 @@ namespace Terminal.Gui {
 
 			Console.TreatControlCAsInput = true;
 
-			if (HeightAsBuffer) {
+			if (EnableConsoleScrolling) {
 				largestBufferHeight = Console.BufferHeight;
 			} else {
 				largestBufferHeight = Console.WindowHeight;
@@ -1340,7 +1345,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
@@ -1396,7 +1401,7 @@ namespace Terminal.Gui {
 			void setClip ()
 			{
 				Clip = new Rect (0, 0, Cols, Rows);
-				//if (!HeightAsBuffer) {
+				//if (!EnableConsoleScrolling) {
 				//	// ANSI ESC "[xJ" Clears part of the screen.
 				//	// If n is 0 (or missing), clear from cursor to end of screen.
 				//	// If n is 1, clear from cursor to beginning of the screen.
@@ -1444,8 +1449,8 @@ namespace Terminal.Gui {
 		public override void UpdateScreen ()
 		{
 			if (Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
-			    || (!HeightAsBuffer && Rows != Console.WindowHeight)
-			    || (HeightAsBuffer && Rows != largestBufferHeight)) {
+			    || (!EnableConsoleScrolling && Rows != Console.WindowHeight)
+			    || (EnableConsoleScrolling && Rows != largestBufferHeight)) {
 				return;
 			}
 
@@ -1828,7 +1833,7 @@ namespace Terminal.Gui {
 		void ChangeWin (Size size)
 		{
 			Size newSize;
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				largestBufferHeight = Math.Max (size.Height, 0);
 				newSize = new Size (size.Width, largestBufferHeight);
 				top = 0;

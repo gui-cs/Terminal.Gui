@@ -675,6 +675,12 @@ namespace Terminal.Gui {
 		/// as the console scrolls. 
 		/// </para>
 		/// </summary>
+		public abstract bool EnableConsoleScrolling { get; set; }
+
+		/// <summary>
+		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
+		/// </summary>
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
 		public abstract bool HeightAsBuffer { get; set; }
 
 		/// <summary>

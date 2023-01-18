@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 		public static View WantContinuousButtonPressedView { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -127,19 +127,28 @@ namespace Terminal.Gui {
 		/// as the console scrolls. 
 		/// </para>
 		/// </remarks>
-		public static bool HeightAsBuffer {
+		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				return Driver.HeightAsBuffer;
+				return Driver.EnableConsoleScrolling;
 			}
 			set {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				Driver.HeightAsBuffer = value;
+				Driver.EnableConsoleScrolling = value;
 			}
+		}
+
+		/// <summary>
+		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
+		/// </summary>
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public static bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
 		}
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
