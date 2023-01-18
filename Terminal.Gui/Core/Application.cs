@@ -375,14 +375,14 @@ namespace Terminal.Gui {
 				ResetState ();
 			}
 
-			// FakeDriver (for UnitTests)
+			// For UnitTests
 			if (driver != null) {
-				if (mainLoopDriver == null) {
-					throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
-				}
-				if (!(driver is FakeDriver)) {
-					throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
-				}
+				//if (mainLoopDriver == null) {
+				//	throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
+				//}
+				//if (!(driver is FakeDriver)) {
+				//	throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
+				//}
 				Driver = driver;
 			}
 
@@ -391,18 +391,34 @@ namespace Terminal.Gui {
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-					mainLoopDriver = new FakeMainLoop (() => FakeConsole.ReadKey (true));
 				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
-					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
-					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
-					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
+				if (Driver == null) {
+					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+				}
 			}
+
+			if (mainLoopDriver == null) {
+				// TODO: Move this logic into ConsoleDriver
+				if (Driver is FakeDriver) {
+					mainLoopDriver = new FakeMainLoop (Driver);
+				} else if (Driver is NetDriver) {
+					mainLoopDriver = new NetMainLoop (Driver);
+				} else if (Driver is WindowsDriver) {
+					mainLoopDriver = new WindowsMainLoop (Driver);
+				} else if (Driver is CursesDriver) {
+					mainLoopDriver = new UnixMainLoop (Driver);
+				}
+				if (mainLoopDriver == null) {
+					throw new InvalidOperationException ("Init could not determine the MainLoopDriver to use.");
+				}
+			}
+
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {

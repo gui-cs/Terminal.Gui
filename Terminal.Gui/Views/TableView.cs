@@ -762,6 +762,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Unions the current selected cell (and/or regions) with the provided cell and makes
+		/// it the active one.
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="row"></param>
+		private void UnionSelection (int col, int row)
+		{
+			if (!MultiSelect || TableIsNullOrInvisible()) {
+				return;
+			}
+			
+			EnsureValidSelection ();
+
+			var oldColumn = SelectedColumn;
+			var oldRow = SelectedRow;
+
+			// move us to the new cell
+			SelectedColumn = col;
+			SelectedRow = row;
+			MultiSelectedRegions.Push (
+				CreateTableSelection (col, row)
+				);
+
+			// if the old cell was not part of a rectangular select
+			// or otherwise selected we need to retain it in the selection
+
+			if (!IsSelected (oldColumn, oldRow)) {
+				MultiSelectedRegions.Push (
+					CreateTableSelection (oldColumn, oldRow)
+					);
+			}
+		}
+
+
+		/// <summary>
 		/// Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally starting a box selection (see <see cref="MultiSelect"/>)
 		/// </summary>
 		/// <param name="offsetX">Offset in number of columns</param>
@@ -794,22 +829,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves or extends the selection to the first cell in the table (0,0)
+		/// Moves or extends the selection to the first cell in the table (0,0).
+		/// If <see cref="FullRowSelect"/> is enabled then selection instead moves
+		/// to (<see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToStartOfTable (bool extend)
 		{
-			SetSelection (0, 0, extend);
+			SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend);
 			Update ();
 		}
 
 		/// <summary>
-		/// Moves or extends the selection to the final cell in the table
+		/// Moves or extends the selection to the final cell in the table (nX,nY).
+		/// If <see cref="FullRowSelect"/> is enabled then selection instead moves
+		/// to (<see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
 		/// </summary>
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToEndOfTable(bool extend)
 		{
-			SetSelection (Table.Columns.Count - 1, Table.Rows.Count - 1, extend);
+			var finalColumn = Table.Columns.Count - 1;
+
+			SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows.Count - 1, extend);
 			Update ();
 		}
 
@@ -852,6 +893,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
 		/// </summary>
+		/// <remarks>Return value is not affected by <see cref="FullRowSelect"/> (i.e. returned <see cref="Point"/>s are not expanded to 
+		/// include all points on row).</remarks>
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
@@ -914,6 +957,16 @@ namespace Terminal.Gui {
 			return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1));
 		}
 
+		/// <summary>
+		/// Returns a single point as a <see cref="TableSelection"/>
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		private TableSelection CreateTableSelection (int x, int y)
+		{
+			return CreateTableSelection (x, y, x, y);
+		}
 		/// <summary>
 		/// <para>
 		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>).
@@ -1039,7 +1092,12 @@ namespace Terminal.Gui {
 				var hit = ScreenToCell (me.X, me.Y);
 				if (hit != null) {
 
-					SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.ButtonShift));
+					if(MultiSelect && HasControlOrAlt(me)) {
+						UnionSelection(hit.Value.X, hit.Value.Y);
+					} else {
+						SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.ButtonShift));
+					}
+
 					Update ();
 				}
 			}
@@ -1053,6 +1111,11 @@ namespace Terminal.Gui {
 			}
 
 			return false;
+		}
+
+		private bool HasControlOrAlt (MouseEvent me)
+		{
+			return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl);
 		}
 
 		/// <summary>.

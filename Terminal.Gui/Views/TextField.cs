@@ -298,6 +298,7 @@ namespace Terminal.Gui {
 					}
 					return;
 				}
+				ClearAllSelection ();
 				text = TextModel.ToRunes (newText.NewText);
 
 				if (!Secret && !historyText.IsFromHistory) {

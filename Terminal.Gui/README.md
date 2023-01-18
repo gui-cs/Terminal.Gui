@@ -68,7 +68,6 @@ The PR title should be of the form "Release v2.3.4"
 git checkout develop
 git pull upstream develop
 git checkout -b v_2_3_4
-git merge develop
 git add .
 git commit -m "Release v2.3.4"
 git push
