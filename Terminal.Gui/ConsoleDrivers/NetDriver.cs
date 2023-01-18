@@ -1396,15 +1396,15 @@ namespace Terminal.Gui {
 			void setClip ()
 			{
 				Clip = new Rect (0, 0, Cols, Rows);
-				if (!HeightAsBuffer) {
-					// ANSI ESC "[xJ" Clears part of the screen.
-					// If n is 0 (or missing), clear from cursor to end of screen.
-					// If n is 1, clear from cursor to beginning of the screen.
-					// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-					// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-					Console.Out.Write ("\x1b[3J");
-					Console.Out.Flush ();
-				}
+				//if (!HeightAsBuffer) {
+				//	// ANSI ESC "[xJ" Clears part of the screen.
+				//	// If n is 0 (or missing), clear from cursor to end of screen.
+				//	// If n is 1, clear from cursor to beginning of the screen.
+				//	// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+				//	// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+				//	Console.Out.Write ("\x1b[0J");
+				//	Console.Out.Flush ();
+				//}
 			}
 		}
 
