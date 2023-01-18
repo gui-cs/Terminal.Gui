@@ -669,8 +669,8 @@ namespace Terminal.Gui {
 		/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
 		/// </para>
 		/// <para>
-		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> does not
-		/// change when the console is resized on shrinking (it only grows and never decrease). 
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> only tracks 
+		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
 		/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
 		/// as the console scrolls. 
 		/// </para>
