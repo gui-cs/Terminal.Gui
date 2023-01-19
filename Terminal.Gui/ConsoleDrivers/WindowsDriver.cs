@@ -251,7 +251,7 @@ namespace Terminal.Gui {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
-			if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
+			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				return new Size (cols, rows);
 			}
@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
 		{
-			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
@@ -773,7 +773,7 @@ namespace Terminal.Gui {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 1));
+					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 				left = 0;
 				top = 0;
 				cols = newSize.Width;

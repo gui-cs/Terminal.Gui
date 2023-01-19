@@ -226,7 +226,7 @@ namespace Terminal.Gui.Core {
 				Bounds = new Rect (0, 0, 10, 5)
 			};
 
-			var canvasCopy = canvas =  new LineCanvas (Application.Driver);
+			var canvasCopy = canvas =  new LineCanvas ();
 			v.DrawContentComplete += (r)=> canvasCopy.Draw (v, v.Bounds);
 
 			return v;
