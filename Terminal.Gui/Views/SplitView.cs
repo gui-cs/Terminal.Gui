@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 			Clear ();
 			base.Redraw (bounds);
 
-			var lc = new LineCanvas(Application.Driver);
+			var lc = new LineCanvas();
 
 			var allLines = GetAllChildSplitContainerLineViewRecursively (this);
 
@@ -450,7 +450,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Considers <paramref name="pos"/> as a candidate for <see cref="splitterDistance"/>
 		/// then either returns (if valid) or returns adjusted if invalid with respect to the 
-		/// <see cref="SplitterView.MinSize"/> of the views.
+		/// <see cref="View1MinSize"/> of the views.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
