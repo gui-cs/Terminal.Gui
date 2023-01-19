@@ -13,7 +13,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var config = new ConfigRoot {
-				Settings = new Settings { QuitKey = Key.Q },
+				//Settings = new Settings { QuitKey = Key.Q },
 				Themes = new Themes { SelectedTheme = "Custom" }
 			};
 
@@ -31,11 +31,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var config = new ConfigRoot {
-				Settings = new Settings { QuitKey = Key.Q },
+				//Settings = new Settings { QuitKey = Key.Q },
 				Themes = new Themes { SelectedTheme = "Custom" }
 			};
 			var newConfig = new ConfigRoot {
-				Settings = new Settings { QuitKey = Key.A },
+				//Settings = new Settings { QuitKey = Key.A },
 				Themes = new Themes { SelectedTheme = "Default" }
 			};
 
@@ -43,7 +43,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			config.CopyUpdatedProperitesFrom (newConfig);
 
 			// Assert
-			Assert.Equal (Key.A, config.Settings.QuitKey);
+			Assert.Equal (Key.A, ConfigurationManager._configProperties["Application.QuitKey"].PropertyValue);
 			Assert.Equal ("Default", config.Themes.SelectedTheme);
 		}
 
@@ -59,9 +59,11 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Assert
 			Assert.Equal ("https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json", config.schema);
 			Assert.Equal ("Default", config.Themes.SelectedTheme);
-			Assert.NotNull (config.Settings);
+			Assert.NotEmpty (ConfigurationManager._configProperties);
 			Assert.NotNull (config.Themes);
 		}
+
+
 	}
 
 }

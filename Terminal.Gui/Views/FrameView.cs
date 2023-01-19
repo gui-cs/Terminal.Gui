@@ -11,14 +11,49 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using NStack;
 
 namespace Terminal.Gui {
+
 	/// <summary>
 	/// The FrameView is a container frame that draws a frame around the contents. It is similar to
 	/// a GroupBox in Windows.
 	/// </summary>
 	public class FrameView : View {
+
+		//internal class FrameViewConfig : Configuration.Config<FrameViewConfig> {
+
+		//	/// <summary>
+		//	/// 
+		//	/// </summary>
+		//	/// 
+		//	[JsonConverter (typeof (JsonStringEnumConverter))]
+		//	public BorderStyle? DefaultBorderStyle { get; set; }
+
+		//	public override void Apply ()
+		//	{
+		//		if (DefaultBorderStyle.HasValue) {
+		//			FrameView.DefaultBorderStyle = DefaultBorderStyle.Value;
+		//		}
+		//	}
+
+		//	public override void CopyUpdatedProperitesFrom (FrameViewConfig changedConfig)
+		//	{
+		//		if (changedConfig.DefaultBorderStyle.HasValue) {
+		//			DefaultBorderStyle = changedConfig.DefaultBorderStyle;
+		//		}
+		//	}
+
+		//	public override void GetHardCodedDefaults ()
+		//	{
+		//		DefaultBorderStyle = FrameView.DefaultBorderStyle;
+		//	}
+		//}
+
+		//[Configuration.ConfigProperty]
+		//internal static FrameViewConfig Config { get; set; } = new FrameViewConfig ();
+
 		View contentView;
 		ustring title;
 
@@ -114,6 +149,7 @@ namespace Terminal.Gui {
 		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="FrameView"/>s. 
 		/// The setting in the config file is Theme.DefaultFrameViewBorderStyle.
 		/// </remarks>
+		[Configuration.SerializableConfigurationProperty(Scope = Configuration.SerializableConfigurationProperty.Scopes.Theme), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static BorderStyle DefaultBorderStyle {
 			get {
 				return _defaultBorderStyle;

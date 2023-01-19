@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -67,6 +68,37 @@ namespace Terminal.Gui.Configuration {
 			},
 
 		};
+
+		private static Dictionary<string, Type> _classesWithConfig = new Dictionary<string, Type> ();
+		public static Dictionary<string, ConfigProperty> _configProperties = GetAllConfigProperties ();
+
+		private static Dictionary<string, ConfigProperty> GetAllConfigProperties ()
+		{
+			var classes = typeof (Theme).Assembly.ExportedTypes
+				.Where (myType => myType.IsClass && myType.IsPublic && myType.GetProperties ()
+					.Where (prop => prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false)
+					.Count () > 0)
+				.Count () > 0);
+			foreach (Type classWithConfig in classes) {
+				_classesWithConfig.Add (classWithConfig.Name, classWithConfig);
+			}
+			_classesWithConfig.OrderBy (s => s.Key).ToList ();
+
+			Dictionary<string, ConfigProperty> configProperties = new Dictionary<string, ConfigProperty> ();
+			foreach (var p in from c in _classesWithConfig
+					  let props = c.Value.GetProperties ().Where (prop => {
+						  return prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false).Length > 0 && prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0] is SerializableConfigurationProperty;
+					  })
+					  let enumerable = props
+					  from p in enumerable
+					  select p) {
+				var configProperty = new ConfigProperty () { PropertyInfo = p };
+				configProperties.Add ($"{p.DeclaringType.Name}.{p.Name}", configProperty);
+			}
+
+			return configProperties;
+		}
+
 
 		/// <summary>
 		/// The <see cref="ConfigRoot"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
@@ -197,7 +229,9 @@ namespace Terminal.Gui.Configuration {
 			using (Stream stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName))
 			using (StreamReader reader = new StreamReader (stream)) {
 				string json = reader.ReadToEnd ();
-				_config = LoadFromJson (json);
+				if (json != null) {
+					_config = LoadFromJson (json);
+				}
 #if DEBUG
 				Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
 #endif

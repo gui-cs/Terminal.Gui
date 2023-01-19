@@ -21,6 +21,7 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using Terminal.Gui.Configuration;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui {
 
@@ -115,6 +116,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
+		/// 
+		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
@@ -135,6 +138,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
+		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -158,6 +162,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
+		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -181,6 +186,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
+		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {
@@ -393,15 +399,19 @@ namespace Terminal.Gui {
 			// valid after a Driver is loaded. In this cases we need just 
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load ();
-			ConfigurationManager.Config.Settings.Apply ();
+			ConfigurationManager.Config.ApplyAll ();
+
+			ConfigProperty usc;
+			if (ConfigurationManager._configProperties.TryGetValue ("Application.UseSystemConsole", out usc)) {
+				UseSystemConsole = (bool)usc.PropertyValue;
+			}
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-				} else if (ConfigurationManager.Config.Settings.UseSystemConsole.HasValue &&
-					ConfigurationManager.Config.Settings.UseSystemConsole.Value) {
+				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();

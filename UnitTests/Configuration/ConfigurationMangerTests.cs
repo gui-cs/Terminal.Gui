@@ -37,6 +37,25 @@ namespace Terminal.Gui.ConfigurationTests {
 			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
 
+		[Fact,AutoInitShutdown]
+		public void Prototype ()
+		{
+			var configuration = new ConfigRoot ();
+			configuration.GetAllHardCodedDefaults ();
+			ConfigurationManager._configProperties ["Application.HeightAsBuffer"].PropertyValue = true;
+			var json = ConfigurationManager.ToJson (configuration);
+
+			var readConfig = ConfigurationManager.LoadFromJson (json);
+
+			Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
+			Assert.Equal (Colors.TopLevel, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"]);
+			Assert.Equal (Colors.Error, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"]);
+			Assert.Equal (Colors.Dialog, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"]);
+			Assert.Equal (Colors.Menu, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"]);
+
+			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerInitDriver ()
 		{
@@ -232,7 +251,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			var configuration = ConfigurationManager.LoadFromJson (json);
 
-			Assert.Equal (Key.Q | Key.CtrlMask, configuration.Settings.QuitKey);
+			Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager._configProperties ["Application.QuitKey"].PropertyValue);
 
 			Assert.Equal ("Default", configuration.Themes.SelectedTheme);
 			Assert.Equal (Color.White, configuration.Themes.ThemeDefinitions [configuration.Themes.SelectedTheme].ColorSchemes ["Base"].Normal.Foreground);

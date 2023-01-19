@@ -529,6 +529,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
+		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Theme), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 

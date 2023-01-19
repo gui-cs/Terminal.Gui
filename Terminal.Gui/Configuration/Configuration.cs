@@ -1,11 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Terminal.Gui.Configuration {
+
+	[AttributeUsage (AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+	public class SerializableConfigurationProperty : System.Attribute {
+		public enum Scopes
+		{
+			Settings,
+			Theme
+		};
+
+		public Scopes Scope { get; set; }
+	}
+
+#nullable enable
+
 	/// <summary>
 	/// Classes that read/write configuration file sections (<see cref="Settings"/> and <see cref="Themes"/> are derived from this class. 
 	/// </summary>
@@ -153,6 +170,12 @@ namespace Terminal.Gui.Configuration {
 			if (updatedSettings.UseSystemConsole.HasValue) UseSystemConsole = updatedSettings.UseSystemConsole.Value;
 		}
 	}
+	public class ConfigProperty
+	{
+		public PropertyInfo PropertyInfo { get; set; }
+		public object? PropertyValue { get; set; }
+
+	}
 
 	/// <summary>
 	/// The root object of Terminal.Gui configuration settings / JSON schema.
@@ -166,31 +189,74 @@ namespace Terminal.Gui.Configuration {
 	///    },
 	///  },
 	/// </code></example>
+	[JsonConverter (typeof (ConfigRootConverter))]
 	public class ConfigRoot {
+
+		class ConfigRootConverter : JsonConverter<ConfigRoot> {
+			public override ConfigRoot Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+			{
+				//throw new NotImplementedException ()
+				while (reader.Read())
+					;
+				return new ConfigRoot ();
+			}
+
+			public override void Write (Utf8JsonWriter writer, ConfigRoot root, JsonSerializerOptions options)
+			{
+				writer.WriteStartObject ();
+
+				foreach (var p in ConfigurationManager._configProperties) {
+					if (p.Value.PropertyValue != null) {
+						writer.WritePropertyName (p.Key);
+						JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
+					}
+				}
+
+				//writer.WritePropertyName ("Settings");
+				//JsonSerializer.Serialize (writer, root.Settings, options);
+
+				writer.WritePropertyName ("Themes");
+				JsonSerializer.Serialize (writer, root.Themes, options);
+
+				writer.WriteEndObject ();
+			}
+		}
+	
+
 		/// <summary>
 		/// Points to our JSON schema.
 		/// </summary>
 		[JsonInclude, JsonPropertyName ("$schema")]
 		public string schema = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
 
-		/// <summary>
-		/// The Settings.
-		/// </summary>
-		[JsonInclude]
-		public Settings Settings = new Settings ();
+		///// <summary>
+		///// The Settings.
+		///// </summary>
+		//[JsonInclude]
+		//public Settings Settings = new Settings ();
 
-		/// <summary>
-		/// The ColorSchemes.
-		/// </summary>
+		///// <summary>
+		///// The ColorSchemes.
+		///// </summary>
 		[JsonInclude]
 		public Themes Themes = new Themes ();
-
+		
 		/// <summary>
 		/// Applies the settings in each <see cref="Config{T}"/> object to the running <see cref="Application"/>.
 		/// </summary>
 		public void ApplyAll ()
 		{
-			Settings.Apply ();
+			foreach (var p in ConfigurationManager._configProperties) {
+				var scope = ((SerializableConfigurationProperty)p.Value.PropertyInfo.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0]).Scope;
+				if (scope == SerializableConfigurationProperty.Scopes.Settings && 
+					p.Value.PropertyInfo.GetIndexParameters ().Length == 0 && p.Value.PropertyValue != null) {
+					p.Value.PropertyInfo.SetValue (null, p.Value.PropertyValue);
+				} else {
+				}
+
+			}
+
+			//Settings.Apply ();
 			Themes.Apply ();
 		}
 
@@ -202,7 +268,11 @@ namespace Terminal.Gui.Configuration {
 		/// <exception cref="NotImplementedException"></exception>
 		internal void CopyUpdatedProperitesFrom (ConfigRoot newConfig)
 		{
-			Settings.CopyUpdatedProperitesFrom (newConfig.Settings);
+			foreach (var p in ConfigurationManager._configProperties) {
+				
+			}
+			
+			//Settings.CopyUpdatedProperitesFrom (newConfig.Settings);
 			Themes.CopyUpdatedProperitesFrom (newConfig.Themes);
 		}
 
@@ -212,8 +282,19 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		internal void GetAllHardCodedDefaults ()
 		{
-			Settings = new Settings ();
-			Settings.GetHardCodedDefaults ();
+			foreach (var p in ConfigurationManager._configProperties) {
+				//var instance = Activator.CreateInstance (p.Value.PropertyInfo.DeclaringType);
+				if (p.Value.PropertyInfo.GetIndexParameters ().Length == 0) {
+					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
+				}
+				else {
+					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
+				}
+			
+			}
+
+			//Settings = new Settings ();
+			//Settings.GetHardCodedDefaults ();
 			Themes = new Themes ();
 			Themes.GetHardCodedDefaults ();
 		}
