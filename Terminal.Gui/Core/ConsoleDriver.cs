@@ -99,7 +99,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public struct Attribute {
 		/// <summary>
-		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="IsInitialized"/> is <see langword="false"/> 
+		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="Initialized"/> is <see langword="false"/> 
 		/// the value of this property is invalid (typcially because the Attribute was created before a driver was loaded)
 		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
 		/// </summary>
@@ -116,33 +116,23 @@ namespace Terminal.Gui {
 		public Color Background { get; }
 
 		/// <summary>
-		/// If <see langword="true"/> the attribute has been initialzed by a <see cref="ConsoleDriver"/> and 
-		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
-		/// and <see cref="Background"/> colors may have been set (see <see cref="Color.Invalid"/>) but
-		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value. 
-		/// </summary>
-		/// <remarks>
-		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
-		/// </remarks>
-		public bool IsInitialized { get; internal set; }
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
 		public Attribute (int value)
 		{
-			Color foreground = default;
-			Color background = default;
+			Color foreground = Color.Invalid;
+			Color background = Color.Invalid; 
 
+			Initialized = false;
 			if (Application.Driver != null) {
 				Application.Driver.GetColors (value, out foreground, out background);
+				Initialized = true;
 			}
 			Value = value;
 			Foreground = foreground;
 			Background = background;
-			IsInitialized = true;
 		}
 
 		/// <summary>
@@ -156,7 +146,7 @@ namespace Terminal.Gui {
 			Value = value;
 			Foreground = foreground;
 			Background = background;
-			IsInitialized = true;
+			Initialized = true;
 		}
 
 		/// <summary>
@@ -166,7 +156,7 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			IsInitialized = true;
+			Initialized = false;
 			Value = Make (foreground, background).Value;
 			Foreground = foreground;
 			Background = background;
@@ -186,7 +176,7 @@ namespace Terminal.Gui {
 		/// <returns>The driver-specific color value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
 		public static implicit operator int (Attribute c) {
-			Debug.WriteLineIf (!c.IsInitialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
+			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
 			//if (!c.IsInitialized) throw new InvalidOperationException ("Attributes must be initialized by driver before use.");
 			return c.Value; 
 		}
@@ -203,7 +193,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
-		/// method will return an attribute with <see cref="IsInitialized"/> set to  <see langword="false"/>.
+		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
 		/// </remarks>
 		/// <returns>The new attribute.</returns>
 		/// <param name="foreground">Foreground color to use.</param>
@@ -213,7 +203,7 @@ namespace Terminal.Gui {
 			if (Application.Driver == null) {
 				// Create the attribute, but show it's not been initialized
 				var a = new Attribute (-1, foreground, background);
-				a.IsInitialized = false;
+				a.Initialized = false;
 				return a;
 			}
 			return Application.Driver.MakeAttribute (foreground, background);
@@ -231,12 +221,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// If <see langword="true"/> the attribute has been initialzed by a <see cref="ConsoleDriver"/> and 
+		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
+		/// and <see cref="Background"/> colors may have been set (see <see cref="Color.Invalid"/>) but
+		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value. 
+		/// </summary>
+		/// <remarks>
+		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
+		/// </remarks>
+		public bool Initialized { get; internal set; }
+
+		/// <summary>
 		/// Returns <see langword="true"/> if the Atrribute is valid (both foreground and background have valid color values).
 		/// </summary>
 		/// <returns></returns>
-		public bool IsValid ()
-		{
-			return Foreground != Color.Invalid && Background != Color.Invalid;
+		public bool HasValidColors {
+			get {
+				return Foreground != Color.Invalid && Background != Color.Invalid;
+			}
 		}
 	}
 
@@ -268,7 +270,7 @@ namespace Terminal.Gui {
 			get { return _normal; }
 			set {
 
-				if (!value.IsValid ()) {
+				if (!value.HasValidColors) {
 					return;
 				}
 				_normal = value;
@@ -281,7 +283,7 @@ namespace Terminal.Gui {
 		public Attribute Focus {
 			get { return _focus; }
 			set {
-				if (!value.IsValid ()) {
+				if (!value.HasValidColors) {
 					return;
 				}
 				_focus = value;
@@ -294,7 +296,7 @@ namespace Terminal.Gui {
 		public Attribute HotNormal {
 			get { return _hotNormal; }
 			set {
-				if (!value.IsValid ()) {
+				if (!value.HasValidColors) {
 					return;
 				}
 				_hotNormal = value;
@@ -307,7 +309,7 @@ namespace Terminal.Gui {
 		public Attribute HotFocus {
 			get { return _hotFocus; }
 			set {
-				if (!value.IsValid ()) {
+				if (!value.HasValidColors) {
 					return;
 				}
 				_hotFocus = value;
@@ -320,7 +322,7 @@ namespace Terminal.Gui {
 		public Attribute Disabled {
 			get { return _disabled; }
 			set {
-				if (!value.IsValid ()) {
+				if (!value.HasValidColors) {
 					return;
 				}
 				_disabled = value;
@@ -760,7 +762,7 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public virtual void SetAttribute (Attribute c)
 		{
-			Debug.WriteLineIf(!c.IsInitialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+			Debug.WriteLineIf(!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
 		}
 
 		/// <summary>
