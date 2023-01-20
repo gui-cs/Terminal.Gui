@@ -35,5 +35,14 @@ namespace Terminal.Gui.DriverTests {
 			Application.Shutdown ();
 		}
 
+		[Fact, AutoInitShutdown]
+		public void ColorScheme_New ()
+		{
+			var scheme = new ColorScheme ();
+			var lbl = new Label ();
+			lbl.ColorScheme = scheme;
+			lbl.Redraw (lbl.Bounds);
+		}
+
 	}
 }
