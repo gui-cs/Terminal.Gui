@@ -38,6 +38,8 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
+			tabView.TabClicked += TabView_TabClicked;
+
 			tabView.Style.ShowBorder = true;
 			tabView.ApplyStyleChanges ();
 
@@ -63,6 +65,19 @@ namespace UICatalog.Scenarios {
 			New ();
 		}
 
+		private void TabView_TabClicked (object sender, TabView.TabMouseEventArgs e)
+		{
+			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Save", "", () => Save(e.Tab)),
+					new MenuItem ($"Close", "", () => Close(e.Tab)),
+				})
+			);
+
+			contextMenu.Show ();
+			e.MouseEvent.Handled = true;
+		}
+
 		private void New ()
 		{
 			Open ("", null, $"new {numbeOfNewTabs++}");
@@ -70,7 +85,11 @@ namespace UICatalog.Scenarios {
 
 		private void Close ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
+			Close (tabView.SelectedTab);
+		}
+		private void Close (TabView.Tab tabToClose)
+		{
+			var tab = tabToClose as OpenedFile;
 
 			if (tab == null) {
 				return;
@@ -156,9 +175,13 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
-		public void Save ()
+		public void Save()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
+			Save (tabView.SelectedTab);
+		}
+		public void Save (TabView.Tab tabToSave )
+		{
+			var tab = tabToSave as OpenedFile;
 
 			if (tab == null) {
 				return;
