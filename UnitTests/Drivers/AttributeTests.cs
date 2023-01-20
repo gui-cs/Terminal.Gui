@@ -85,7 +85,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		[Fact]
-		public void Make_Asserts_IfNotInit ()
+		public void Make_SetsNotInitialized_IfNotInit ()
 		{
 			var fg = new Color ();
 			fg = Color.Red;
@@ -93,7 +93,9 @@ namespace Terminal.Gui.DriverTests {
 			var bg = new Color ();
 			bg = Color.Blue;
 
-			Assert.Throws<InvalidOperationException> (() => Attribute.Make (fg, bg));
+			var a = Attribute.Make (fg, bg);
+
+			Assert.False (a.IsInitialized);
 		}
 
 		[Fact]
@@ -110,7 +112,7 @@ namespace Terminal.Gui.DriverTests {
 			bg = Color.Blue;
 
 			var attr =  Attribute.Make (fg, bg);
-
+			Assert.True (attr.IsInitialized);
 			Assert.Equal (fg, attr.Foreground);
 			Assert.Equal (bg, attr.Background);
 

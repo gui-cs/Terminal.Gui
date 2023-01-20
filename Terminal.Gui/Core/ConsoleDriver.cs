@@ -1,23 +1,23 @@
 ﻿//
-// ConsoleDriver.cs: Definition for the Console Driver API
+// ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Define this to enable diagnostics drawing for Window Frames
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Unix.Terminal;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Basic colors that can be used to set the foreground and background colors in console applications.
+	/// Colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
+	/// <remarks>
+	/// The <see cref="Color.Invalid"/> value indicates either no-color has been set or the color is invalid.
+	/// </remarks>
+	[DefaultValue(Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -82,30 +82,49 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White
+		White, 
+		/// <summary>
+		/// Indicates an invalid or un-set color value. 
+		/// </summary>
+		Invalid = -1
 	}
 
 	/// <summary>
-	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
+	/// Attributes are used as elements that contain both a foreground and a background or platform specific features.
 	/// </summary>
 	/// <remarks>
-	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors, on color
-	///   scenarios, they encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
-	///   class to define color schemes that can be used in your application.
+	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
+	///   They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
+	///   class to define color schemes that can be used in an application.
 	/// </remarks>
 	public struct Attribute {
 		/// <summary>
-		/// The color attribute value.
+		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="IsInitialized"/> is <see langword="false"/> 
+		/// the value of this property is invalid (typcially because the Attribute was created before a driver was loaded)
+		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
 		/// </summary>
 		public int Value { get; }
+
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
 		public Color Foreground { get; }
+
 		/// <summary>
 		/// The background color.
 		/// </summary>
 		public Color Background { get; }
+
+		/// <summary>
+		/// If <see langword="true"/> the attribute has been initialzed by a <see cref="ConsoleDriver"/> and 
+		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
+		/// and <see cref="Background"/> colors may have been set (see <see cref="Color.Invalid"/>) but
+		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value. 
+		/// </summary>
+		/// <remarks>
+		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
+		/// </remarks>
+		public bool IsInitialized { get; internal set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
@@ -123,6 +142,7 @@ namespace Terminal.Gui {
 			Value = value;
 			Foreground = foreground;
 			Background = background;
+			IsInitialized = true;
 		}
 
 		/// <summary>
@@ -136,6 +156,7 @@ namespace Terminal.Gui {
 			Value = value;
 			Foreground = foreground;
 			Background = background;
+			IsInitialized = true;
 		}
 
 		/// <summary>
@@ -145,6 +166,7 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
+			IsInitialized = true;
 			Value = Make (foreground, background).Value;
 			Foreground = foreground;
 			Background = background;
@@ -158,29 +180,42 @@ namespace Terminal.Gui {
 		public Attribute (Color color) : this (color, color) { }
 
 		/// <summary>
-		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
+		/// Implicit conversion from an <see cref="Attribute"/> to the underlying, driver-specific, Int32 representation
+		/// of the color.
 		/// </summary>
-		/// <returns>The integer value stored in the attribute.</returns>
+		/// <returns>The driver-specific color value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) => c.Value;
+		public static implicit operator int (Attribute c) {
+			Debug.WriteLineIf (!c.IsInitialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
+			//if (!c.IsInitialized) throw new InvalidOperationException ("Attributes must be initialized by driver before use.");
+			return c.Value; 
+		}
 
 		/// <summary>
-		/// Implicitly convert an integer value into an <see cref="Attribute"/>
+		/// Implicitly convert an driver-specific color value into an <see cref="Attribute"/>
 		/// </summary>
-		/// <returns>An attribute with the specified integer value.</returns>
+		/// <returns>An attribute with the specified driver-specific color value.</returns>
 		/// <param name="v">value</param>
 		public static implicit operator Attribute (int v) => new Attribute (v);
 
 		/// <summary>
-		/// Creates an <see cref="Attribute"/> from the specified foreground and background.
+		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
 		/// </summary>
-		/// <returns>The make.</returns>
+		/// <remarks>
+		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
+		/// method will return an attribute with <see cref="IsInitialized"/> set to  <see langword="false"/>.
+		/// </remarks>
+		/// <returns>The new attribute.</returns>
 		/// <param name="foreground">Foreground color to use.</param>
 		/// <param name="background">Background color to use.</param>
 		public static Attribute Make (Color foreground, Color background)
 		{
-			if (Application.Driver == null)
-				throw new InvalidOperationException ("The Application has not been initialized");
+			if (Application.Driver == null) {
+				// Create the attribute, but show it's not been initialized
+				var a = new Attribute (-1, foreground, background);
+				a.IsInitialized = false;
+				return a;
+			}
 			return Application.Driver.MakeAttribute (foreground, background);
 		}
 
@@ -194,45 +229,103 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.GetAttribute ();
 		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the Atrribute is valid (both foreground and background have valid color values).
+		/// </summary>
+		/// <returns></returns>
+		public bool IsValid ()
+		{
+			return Foreground != Color.Invalid && Background != Color.Invalid;
+		}
 	}
 
 	/// <summary>
-	/// Color scheme definitions, they cover some common scenarios and are used
-	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
-	/// views contained inside.
+	/// Defines the color <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>. 
+	/// Containers such as <see cref="Window"/> and <see cref="FrameView"/> use <see cref="ColorScheme"/> to determine
+	/// the colors used by sub-views.
 	/// </summary>
+	/// <remarks>
+	/// See also: <see cref="Colors.ColorSchemes"/>.
+	/// </remarks>
 	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal;
 		Attribute _focus;
 		Attribute _hotNormal;
 		Attribute _hotFocus;
 		Attribute _disabled;
-		internal string caller = "";
 
 		/// <summary>
-		/// The default color for text, when the view is not focused.
+		/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to track which ColorScheme 
+		/// is being accessed.
 		/// </summary>
-		public Attribute Normal { get { return _normal; } set { _normal = value; } }
+		internal string schemeBeingSet = "";
 
 		/// <summary>
-		/// The color for text when the view has the focus.
+		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
-		public Attribute Focus { get { return _focus; } set { _focus = value; } }
+		public Attribute Normal {
+			get { return _normal; }
+			set {
+
+				if (!value.IsValid ()) {
+					return;
+				}
+				_normal = value;
+			}
+		}
 
 		/// <summary>
-		/// The color for the hotkey when a view is not focused
+		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
-		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = value; } }
+		public Attribute Focus {
+			get { return _focus; }
+			set {
+				if (!value.IsValid ()) {
+					return;
+				}
+				_focus = value;
+			}
+		}
 
 		/// <summary>
-		/// The color for the hotkey when the view is focused.
+		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
-		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = value; } }
+		public Attribute HotNormal {
+			get { return _hotNormal; }
+			set {
+				if (!value.IsValid ()) {
+					return;
+				}
+				_hotNormal = value;
+			}
+		}
 
 		/// <summary>
-		/// The default color for text, when the view is disabled.
+		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
-		public Attribute Disabled { get { return _disabled; } set { _disabled = value; } }
+		public Attribute HotFocus {
+			get { return _hotFocus; }
+			set {
+				if (!value.IsValid ()) {
+					return;
+				}
+				_hotFocus = value;
+			}
+		}
+
+		/// <summary>
+		/// The default foreground and background color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled {
+			get { return _disabled; }
+			set {
+				if (!value.IsValid ()) {
+					return;
+				}
+				_disabled = value;
+			}
+		}
 
 		/// <summary>
 		/// Compares two <see cref="ColorScheme"/> objects for equality.
@@ -361,15 +454,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
+		static ColorScheme GetColorScheme ([CallerMemberName] string schemeBeingSet = null)
 		{
-			return ColorSchemes [callerMemberName];
+			return ColorSchemes [schemeBeingSet];
 		}
 
-		static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
+		static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string schemeBeingSet = null)
 		{
-			ColorSchemes [callerMemberName] = colorScheme;
-			colorScheme.caller = callerMemberName;
+			ColorSchemes [schemeBeingSet] = colorScheme;
+			colorScheme.schemeBeingSet = schemeBeingSet;
 		}
 
 		/// <summary>
@@ -659,13 +752,19 @@ namespace Terminal.Gui {
 		public abstract void UpdateScreen ();
 
 		/// <summary>
-		/// Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
+		/// Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.
 		/// </summary>
+		/// <remarks>
+		/// Implementations should call <c>base.SetAttribute(c)</c>.
+		/// </remarks>
 		/// <param name="c">C.</param>
-		public abstract void SetAttribute (Attribute c);
+		public virtual void SetAttribute (Attribute c)
+		{
+			Debug.WriteLineIf(!c.IsInitialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+		}
 
 		/// <summary>
-		/// Set Colors from limit sets of colors.
+		/// Set Colors from limit sets of colors. Not implemented by any driver: See Issue #2300.
 		/// </summary>
 		/// <param name="foreground">Foreground.</param>
 		/// <param name="background">Background.</param>
@@ -675,7 +774,7 @@ namespace Terminal.Gui {
 		// that independently with the R, G, B values.
 		/// <summary>
 		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		/// that independently with the R, G, B values.
+		/// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
 		/// </summary>
 		/// <param name="foregroundColorId">Foreground color identifier.</param>
 		/// <param name="backgroundColorId">Background color identifier.</param>
@@ -998,12 +1097,13 @@ namespace Terminal.Gui {
 		public abstract void StopReportingMouseMoves ();
 
 		/// <summary>
-		/// Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+		/// Disables the cooked event processing from the mouse driver. 
+		/// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
 		/// </summary>
 		public abstract void UncookMouse ();
 
 		/// <summary>
-		/// Enables the cooked event processing from the mouse driver
+		/// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
 		/// </summary>
 		public abstract void CookMouse ();
 
@@ -1222,19 +1322,23 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
 		/// </summary>
-		/// <param name="hasColors">Flag indicating if colors are supported.</param>
-		public void CreateColors (bool hasColors = true)
+		/// <param name="supportsColors">Flag indicating if colors are supported.</param>
+		public void CreateColors (bool supportsColors = true)
 		{
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
+			// BUGBUG: No need to create these instances here as they are created in constructor
+			//Colors.TopLevel = new ColorScheme ();
+			//Colors.Base = new ColorScheme ();
+			//Colors.Dialog = new ColorScheme ();
+			//Colors.Menu = new ColorScheme ();
+			//Colors.Error = new ColorScheme ();
 
-			if (!hasColors) {
+			if (!supportsColors) {
 				return;
 			}
 
+
+			// Define the default color theme only if the user has not defined one.
+			
 			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
