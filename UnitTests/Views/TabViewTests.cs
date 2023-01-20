@@ -760,6 +760,87 @@ namespace Terminal.Gui.ViewTests {
 └──────────────┘    ", output);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void MouseClick_ChangesTab ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+
+			tv.Width = 20;
+			tv.Height = 5;
+
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			var tabRow = tv.Subviews[0];
+			Assert.Equal("TabRowView",tabRow.GetType().Name);
+
+			TestHelpers.AssertDriverContentsAre (@"
+┌────┐              
+│Tab1│Tab2          
+│    └─────────────┐
+│hi                │
+└──────────────────┘
+", output);
+
+			TabView.Tab clicked = null;
+			
+
+			tv.TabClicked += (s,e)=>{
+				clicked = e.Tab;
+			};
+
+			// Waving mouse around does not trigger click
+			for(int i=0;i<100;i++)
+			{
+				tabRow.MouseEvent(new MouseEvent{
+						X = i,
+						Y = 1,
+						Flags = MouseFlags.ReportMousePosition
+				});
+
+				Assert.Null(clicked);
+				Assert.Equal(tab1, tv.SelectedTab);
+			}
+
+			tabRow.MouseEvent(new MouseEvent{
+					X = 3,
+					Y = 1,
+					Flags = MouseFlags.Button1Clicked
+			});
+
+			Assert.Equal(tab1, clicked);
+			Assert.Equal(tab1, tv.SelectedTab);
+
+
+			// Click to tab2
+			tabRow.MouseEvent(new MouseEvent{
+					X = 7,
+					Y = 1,
+					Flags = MouseFlags.Button1Clicked
+			});
+
+			Assert.Equal(tab2, clicked);
+			Assert.Equal(tab2, tv.SelectedTab);
+
+			// cancel navigation
+			tv.TabClicked += (s,e)=>{
+				clicked = e.Tab;
+				e.MouseEvent.Handled = true;
+			};
+
+			tabRow.MouseEvent(new MouseEvent{
+					X = 3,
+					Y = 1,
+					Flags = MouseFlags.Button1Clicked
+			});
+
+			// Tab 1 was clicked but event handler blocked navigation
+			Assert.Equal(tab1, clicked);
+			Assert.Equal(tab2, tv.SelectedTab);
+
+		}
+
 		private void InitFakeDriver ()
 		{
 			var driver = new FakeDriver ();
