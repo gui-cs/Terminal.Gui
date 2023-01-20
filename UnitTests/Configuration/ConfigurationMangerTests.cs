@@ -42,7 +42,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			var configuration = new ConfigRoot ();
 			configuration.GetAllHardCodedDefaults ();
-			ConfigurationManager._configProperties ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue = true;
 			var json = ConfigurationManager.ToJson (configuration);
 
 			var readConfig = ConfigurationManager.LoadFromJson (json);
@@ -251,7 +251,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			var configuration = ConfigurationManager.LoadFromJson (json);
 
-			Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager._configProperties ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.ConfigProperties ["Application.QuitKey"].PropertyValue);
 
 			Assert.Equal ("Default", configuration.Themes.SelectedTheme);
 			Assert.Equal (Color.White, configuration.Themes.ThemeDefinitions [configuration.Themes.SelectedTheme].ColorSchemes ["Base"].Normal.Foreground);

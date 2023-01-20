@@ -43,7 +43,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			config.CopyUpdatedProperitesFrom (newConfig);
 
 			// Assert
-			Assert.Equal (Key.A, ConfigurationManager._configProperties["Application.QuitKey"].PropertyValue);
+			Assert.Equal (Key.A, ConfigurationManager.ConfigProperties["Application.QuitKey"].PropertyValue);
 			Assert.Equal ("Default", config.Themes.SelectedTheme);
 		}
 
@@ -59,7 +59,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Assert
 			Assert.Equal ("https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json", config.schema);
 			Assert.Equal ("Default", config.Themes.SelectedTheme);
-			Assert.NotEmpty (ConfigurationManager._configProperties);
+			Assert.NotEmpty (ConfigurationManager.ConfigProperties);
 			Assert.NotNull (config.Themes);
 		}
 

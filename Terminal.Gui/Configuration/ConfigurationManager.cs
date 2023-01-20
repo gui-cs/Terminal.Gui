@@ -69,23 +69,23 @@ namespace Terminal.Gui.Configuration {
 
 		};
 
-		private static Dictionary<string, Type> _classesWithConfig = new Dictionary<string, Type> ();
-		public static Dictionary<string, ConfigProperty> _configProperties = GetAllConfigProperties ();
+		public static Dictionary<string, ConfigProperty> ConfigProperties = getAllConfigProperties ();
 
-		private static Dictionary<string, ConfigProperty> GetAllConfigProperties ()
+		private static Dictionary<string, ConfigProperty> getAllConfigProperties ()
 		{
+			Dictionary<string, Type> classesWithConfig = new Dictionary<string, Type> ();
 			var classes = typeof (Theme).Assembly.ExportedTypes
 				.Where (myType => myType.IsClass && myType.IsPublic && myType.GetProperties ()
 					.Where (prop => prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false)
 					.Count () > 0)
 				.Count () > 0);
 			foreach (Type classWithConfig in classes) {
-				_classesWithConfig.Add (classWithConfig.Name, classWithConfig);
+				classesWithConfig.Add (classWithConfig.Name, classWithConfig);
 			}
-			_classesWithConfig.OrderBy (s => s.Key).ToList ();
+			classesWithConfig.OrderBy (s => s.Key).ToList ();
 
 			Dictionary<string, ConfigProperty> configProperties = new Dictionary<string, ConfigProperty> ();
-			foreach (var p in from c in _classesWithConfig
+			foreach (var p in from c in classesWithConfig
 					  let props = c.Value.GetProperties ().Where (prop => {
 						  return prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false).Length > 0 && prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0] is SerializableConfigurationProperty;
 					  })

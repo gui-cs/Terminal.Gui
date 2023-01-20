@@ -402,7 +402,7 @@ namespace Terminal.Gui {
 			ConfigurationManager.Config.ApplyAll ();
 
 			ConfigProperty usc;
-			if (ConfigurationManager._configProperties.TryGetValue ("Application.UseSystemConsole", out usc)) {
+			if (ConfigurationManager.ConfigProperties.TryGetValue ("Application.UseSystemConsole", out usc)) {
 				UseSystemConsole = (bool)usc.PropertyValue;
 			}
 

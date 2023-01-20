@@ -18,7 +18,6 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public ColorJsonConverter ()
 		{
-			Debug.Assert (colorMap.Count == Enum.GetNames (typeof (Color)).Length);
 		}
 
 		/// <summary>
@@ -33,27 +32,6 @@ namespace Terminal.Gui.Configuration {
 				return instance;
 			}
 		}
-
-		private static readonly Dictionary<Color, string> colorMap = new Dictionary<Color, string>
-		{
-			{ Color.Black, "Black" },
-			{ Color.Blue, "Blue" },
-			{ Color.Green, "Green" },
-			{ Color.Cyan, "Cyan" },
-			{ Color.Red, "Red" },
-			{ Color.Magenta, "Magenta" },
-			{ Color.Brown, "Brown" },
-			{ Color.Gray, "Gray" },
-			{ Color.DarkGray, "DarkGray" },
-			{ Color.BrightBlue, "BrightBlue" },
-			{ Color.BrightGreen, "BrightGreen" },
-			{ Color.BrightCyan, "BrightCyan" },
-			{ Color.BrightRed, "BrightRed" },
-			{ Color.BrightMagenta, "BrightMagenta" },
-			{ Color.BrightYellow, "BrightYellow" },
-			{ Color.White, "White" },
-			{ Color.Invalid, "Invalid" }
-		 };
 
 		/// <summary>
 		/// 

@@ -205,7 +205,7 @@ namespace Terminal.Gui.Configuration {
 			{
 				writer.WriteStartObject ();
 
-				foreach (var p in ConfigurationManager._configProperties) {
+				foreach (var p in ConfigurationManager.ConfigProperties) {
 					if (p.Value.PropertyValue != null) {
 						writer.WritePropertyName (p.Key);
 						JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
@@ -246,7 +246,7 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public void ApplyAll ()
 		{
-			foreach (var p in ConfigurationManager._configProperties) {
+			foreach (var p in ConfigurationManager.ConfigProperties) {
 				var scope = ((SerializableConfigurationProperty)p.Value.PropertyInfo.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0]).Scope;
 				if (scope == SerializableConfigurationProperty.Scopes.Settings && 
 					p.Value.PropertyInfo.GetIndexParameters ().Length == 0 && p.Value.PropertyValue != null) {
@@ -268,7 +268,7 @@ namespace Terminal.Gui.Configuration {
 		/// <exception cref="NotImplementedException"></exception>
 		internal void CopyUpdatedProperitesFrom (ConfigRoot newConfig)
 		{
-			foreach (var p in ConfigurationManager._configProperties) {
+			foreach (var p in ConfigurationManager.ConfigProperties) {
 				
 			}
 			
@@ -282,7 +282,7 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		internal void GetAllHardCodedDefaults ()
 		{
-			foreach (var p in ConfigurationManager._configProperties) {
+			foreach (var p in ConfigurationManager.ConfigProperties) {
 				//var instance = Activator.CreateInstance (p.Value.PropertyInfo.DeclaringType);
 				if (p.Value.PropertyInfo.GetIndexParameters ().Length == 0) {
 					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
