@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 
 		public class Tile {
 			public View View { get; }
-			public int MinSize { get; }
+			public int MinSize { get; set; }
 			public string Title { get; set; }
 
 			public Tile ()

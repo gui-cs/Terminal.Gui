@@ -141,8 +141,8 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView (out var line);
 			SetInputFocusLine (splitContainer);
-			splitContainer.SplitterDistance = Pos.Percent (50);
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistance);
+			splitContainer.SetSplitterPos(0,Pos.Percent (50));
+			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt(0));
 			splitContainer.Redraw (splitContainer.Bounds);
 
 			string looksLike =
@@ -164,7 +164,7 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Even when moving the splitter location it should stay a Percentage based one
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistance);
+			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt(0));
 
 
 			// and 2 to the left
@@ -179,7 +179,7 @@ namespace UnitTests {
     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 			// Even when moving the splitter location it should stay a Percentage based one
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistance);
+			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt (0));
 		}
 
 		[Fact, AutoInitShutdown]
@@ -209,13 +209,13 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView (out var line);
 			SetInputFocusLine (splitContainer);
-			splitContainer.View1MinSize = 6;
+			splitContainer.Tiles.ElementAt(0).MinSize = 6;
 
 			// distance is too small (below 6)
-			splitContainer.SplitterDistance = 2;
+			splitContainer.SetSplitterPos(0, 2);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (6, splitContainer.SplitterDistance);
+			Assert.Equal (6, splitContainer.SplitterDistances.ElementAt (0));
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -254,13 +254,13 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView (out var line,true);
 			SetInputFocusLine (splitContainer);
-			splitContainer.View1MinSize = 5;
+			splitContainer.Tiles.ElementAt(0).MinSize = 5;
 
 			// distance is too small (below 5)
-			splitContainer.SplitterDistance = 2;
+			splitContainer.SetSplitterPos(0,2);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (6, splitContainer.SplitterDistance);
+			Assert.Equal (6, splitContainer.SplitterDistances.ElementAt(0));
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -298,13 +298,13 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView (out var line);
 			SetInputFocusLine (splitContainer);
-			splitContainer.View2MinSize = 6;
+			splitContainer.Tiles.ElementAt(1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
-			splitContainer.SplitterDistance = 8;
+			splitContainer.SetSplitterPos(0,8);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (4, splitContainer.SplitterDistance);
+			Assert.Equal (4, splitContainer.SplitterDistances.ElementAt(0));
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -342,13 +342,13 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView (out var line, true);
 			SetInputFocusLine (splitContainer);
-			splitContainer.View2MinSize = 5;
+			splitContainer.Tiles.ElementAt(1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
-			splitContainer.SplitterDistance = 8;
+			splitContainer.SetSplitterPos(0,8);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (4, splitContainer.SplitterDistance);
+			Assert.Equal (4, splitContainer.SplitterDistances.ElementAt(0));
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -428,11 +428,11 @@ namespace UnitTests {
 
 			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			SetInputFocusLine (splitContainer);
-			splitContainer.View1MinSize = 1;
+			splitContainer.Tiles.ElementAt(0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
-			splitContainer.SplitterDistance = 0;
-			Assert.Equal ((Pos)1, splitContainer.SplitterDistance);
+			splitContainer.SetSplitterPos(0,0);
+			Assert.Equal ((Pos)1, splitContainer.SplitterDistances.ElementAt(0));
 
 			splitContainer.Redraw (splitContainer.Bounds);
 
@@ -470,15 +470,15 @@ namespace UnitTests {
 		{
 			var splitContainer = Get11By3SplitView ();
 
-			var ex = Assert.Throws<ArgumentException> (() => splitContainer.SplitterDistance = Pos.Right (splitContainer));
+			var ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Right (splitContainer)));
 			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
 
 
-			ex = Assert.Throws<ArgumentException> (() => splitContainer.SplitterDistance = Pos.Function (() => 1));
+			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Function (() => 1)));
 			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosFunc", ex.Message);
 
 			// Also not allowed because this results in a PosCombine
-			ex = Assert.Throws<ArgumentException> (() => splitContainer.SplitterDistance = Pos.Percent (50) - 1);
+			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0, Pos.Percent (50) - 1));
 			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
 		}
 
@@ -488,26 +488,26 @@ namespace UnitTests {
 			var splitContainer = GetNestedContainer2Left1Right (false);
 
 			Assert.Equal (20,splitContainer.Frame.Width);
-			Assert.Equal (10, splitContainer.View1.Frame.Width);
-			Assert.Equal (9, splitContainer.View2.Frame.Width);
+			Assert.Equal (10, splitContainer.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal (9, splitContainer.Tiles.ElementAt (1).View.Frame.Width);
 
-			Assert.IsType<SplitView> (splitContainer.View1);
-			var left = (SplitView)splitContainer.View1;
+			Assert.IsType<SplitView> (splitContainer.Tiles.ElementAt (0).View);
+			var left = (SplitView)splitContainer.Tiles.ElementAt (0).View;
 			Assert.Same (left.SuperView, splitContainer);
 
-			Assert.Equal (10, left.View1.Frame.Width);
-			Assert.Equal (5, left.View1.Frame.Height);
-			Assert.Equal (10, left.View2.Frame.Width);
-			Assert.Equal (4, left.View2.Frame.Height);
+			Assert.Equal (10, left.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal (5, left.Tiles.ElementAt (0).View.Frame.Height);
+			Assert.Equal (10, left.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (4, left.Tiles.ElementAt (1).View.Frame.Height);
 
-			Assert.Equal(2, left.View1.Subviews.Count);
-			Assert.IsType<Label> (left.View1.Subviews [0]);
-			Assert.IsType<Label> (left.View1.Subviews [1]);
-			var onesTop = (Label)left.View1.Subviews [0];
-			var onesBottom = (Label)left.View1.Subviews [1];
+			Assert.Equal(2, left.Tiles.ElementAt (0).View.Subviews.Count);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [0]);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [1]);
+			var onesTop = (Label)left.Tiles.ElementAt (0).View.Subviews [0];
+			var onesBottom = (Label)left.Tiles.ElementAt (0).View.Subviews [1];
 
-			Assert.Same (left.View1, onesTop.SuperView);
-			Assert.Same (left.View1, onesBottom.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).View, onesTop.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).View, onesBottom.SuperView);
 
 			Assert.Equal (10, onesTop.Frame.Width);
 			Assert.Equal (10, onesBottom.Frame.Width);
@@ -583,13 +583,13 @@ namespace UnitTests {
 
 			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
 
-			container.View1.Add (new Label (new string ('1', 100)) { Width = Dim.Fill(), Height = 1, AutoSize = false});
-			container.View1.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
-			container.View2.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-			container.View2.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
+			container.Tiles.ElementAt(0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill(), Height = 1, AutoSize = false});
+			container.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
+			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false,Y = 1});
 
-			container.View1MinSize = 0;
-			container.View2MinSize = 0;
+			container.Tiles.ElementAt (0).MinSize = 0;
+			container.Tiles.ElementAt (1).MinSize = 0;
 
 			Application.Top.Add (container);
 			container.ColorScheme = new ColorScheme ();
