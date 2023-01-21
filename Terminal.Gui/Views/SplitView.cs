@@ -764,6 +764,7 @@ namespace Terminal.Gui {
 			}
 
 			Add (view);
+
 			View2 = view;
 			LayoutSubviews ();
 		}

@@ -46,8 +46,10 @@ namespace UICatalog.Scenarios {
 
 			// Start with only a single view but support splitting to show side by side
 			var split = new SplitView {
-				Width = Dim.Fill(),
-				Height = Dim.Fill(),
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (1),
 			};
 			split.View2.Visible = false;
 			split.SetView1 (tabView);
@@ -105,7 +107,9 @@ namespace UICatalog.Scenarios {
 				});
 			}
 
-		var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1, items);
+		((View)sender).ViewToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY,true);
+
+		var contextMenu = new ContextMenu (screenX,screenY, items);
 
 			contextMenu.Show ();
 			e.MouseEvent.Handled = true;
@@ -127,6 +131,11 @@ namespace UICatalog.Scenarios {
 		{
 			var split = (SplitView)sender.SuperView;
 
+			// TODO: How can SuperView sometimes be null?!
+			if(split == null) {
+				throw new NullReferenceException ("Much confusion, sender.SuperView is null");
+			}
+
 			split.TrySplitView1 (out var sub);
 			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
 			var newTabView = CreateNewTabView ();
@@ -136,12 +145,15 @@ namespace UICatalog.Scenarios {
 
 		private TabView CreateNewTabView ()
 		{
-			return new TabView () {
+			var tv = new TabView () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
+
+			tv.TabClicked += TabView_TabClicked;
+			return tv;
 		}
 
 		private void New ()
