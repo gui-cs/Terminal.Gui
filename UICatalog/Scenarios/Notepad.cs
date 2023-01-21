@@ -32,14 +32,7 @@ namespace UICatalog.Scenarios {
 				});
 			Application.Top.Add (menu);
 
-			tabView = new TabView () {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
-			};
-
-			tabView.TabClicked += TabView_TabClicked;
+			tabView = CreateNewTabView ();
 
 			tabView.Style.ShowBorder = true;
 			tabView.ApplyStyleChanges ();
@@ -52,7 +45,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 			split.View2.Visible = false;
-			split.SetView1 (tabView);
+			split.View1.Add (tabView);
 			split.IntegratedBorder = BorderStyle.None;
 
 			Application.Top.Add (split);
@@ -129,18 +122,13 @@ namespace UICatalog.Scenarios {
 		}
 		private void SplitRight (TabView sender, OpenedFile tab)
 		{
-			var split = (SplitView)sender.SuperView;
-
-			// TODO: How can SuperView sometimes be null?!
-			if(split == null) {
-				throw new NullReferenceException ("Much confusion, sender.SuperView is null");
-			}
+			var split = (SplitView)sender.SuperView.SuperView;
 
 			split.TrySplitView1 (out var sub);
 			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			sub.SetView2 (newTabView);
+			sub.View2.Add (newTabView);
 		}
 
 		private TabView CreateNewTabView ()

@@ -734,41 +734,6 @@ namespace Terminal.Gui {
 
 		}
 
-		/// <summary>
-		/// Replaces <see cref="View1"/> with the provided <paramref name="view"/>.
-		/// The new <paramref name="view"/> will be resized to fill available 
-		/// area and resized on <see cref="SplitterMoved"/>.
-		/// </summary>
-		/// <param name="view"></param>
-		public void SetView1 (View view)
-		{
-			if(View1 != null) {
-				Remove (View1);
-			}
-
-			Add (view);
-			View1 = view;
-			LayoutSubviews ();
-		}
-
-		/// <summary>
-		/// Replaces <see cref="View2"/> with the provided <paramref name="view"/>.
-		/// The new <paramref name="view"/> will be resized to fill available 
-		/// area and resized on <see cref="SplitterMoved"/>.
-		/// </summary>
-		/// <param name="view"></param>
-		public void SetView2 (View view)
-		{
-			if (View2 != null) {
-				Remove (View2);
-			}
-
-			Add (view);
-
-			View2 = view;
-			LayoutSubviews ();
-		}
-
 		private class ChildSplitterLine {
 
 			readonly SplitContainerLineView currentLine;
