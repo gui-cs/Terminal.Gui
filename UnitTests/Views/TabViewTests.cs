@@ -839,6 +839,17 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal(tab1, clicked);
 			Assert.Equal(tab2, tv.SelectedTab);
 
+
+			tabRow.MouseEvent (new MouseEvent {
+				X = 10,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// Clicking beyond last tab should raise event with null Tab
+			Assert.Null (clicked);
+			Assert.Equal (tab2, tv.SelectedTab);
+
 		}
 
 		private void InitFakeDriver ()

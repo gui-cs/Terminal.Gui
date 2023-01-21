@@ -67,12 +67,27 @@ namespace UICatalog.Scenarios {
 
 		private void TabView_TabClicked (object sender, TabView.TabMouseEventArgs e)
 		{
-			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
-				new MenuBarItem (new MenuItem [] {
+			// we are only interested in right clicks
+			if(!e.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
+				return;
+			}
+
+			MenuBarItem items;
+
+			if (e.Tab == null) {
+				items = new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Open", "", () => Open()),
+				});
+
+			} else {
+				items = new MenuBarItem (new MenuItem [] {
 					new MenuItem ($"Save", "", () => Save(e.Tab)),
 					new MenuItem ($"Close", "", () => Close(e.Tab)),
-				})
-			);
+				});
+			}
+
+
+			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1, items);
 
 			contextMenu.Show ();
 			e.MouseEvent.Handled = true;
@@ -175,11 +190,11 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
-		public void Save()
+		public void Save ()
 		{
 			Save (tabView.SelectedTab);
 		}
-		public void Save (TabView.Tab tabToSave )
+		public void Save (TabView.Tab tabToSave)
 		{
 			var tab = tabToSave as OpenedFile;
 

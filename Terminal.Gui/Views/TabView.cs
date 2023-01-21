@@ -679,7 +679,7 @@ namespace Terminal.Gui {
 					me.Flags.HasFlag (MouseFlags.Button2Clicked) ||
 					me.Flags.HasFlag (MouseFlags.Button3Clicked);
 
-				if (hit != null && isClick) {
+				if (isClick) {
 					host.OnTabClicked (new TabMouseEventArgs (hit, me));
 
 					// user canceled click
@@ -777,9 +777,11 @@ namespace Terminal.Gui {
 		public class TabMouseEventArgs : EventArgs {
 
 			/// <summary>
-			/// Gets the <see cref="TabView.Tab"/> that the mouse was over when the <see cref="MouseEvent"/>
-			/// occurred.
+			/// Gets the <see cref="TabView.Tab"/> (if any) that the mouse
+			/// was over when the <see cref="MouseEvent"/> occurred.
 			/// </summary>
+			/// <remarks>This will be null if the click is after last tab
+			/// or before first.</remarks>
 			public Tab Tab { get; }
 
 			/// <summary>
