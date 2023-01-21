@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 		public BorderStyle IntegratedBorder { get; set; }
 
 		public class Tile {
-			public View View { get; }
+			public View View { get; internal set; }
 			public int MinSize { get; set; }
 			public string Title { get; set; }
 
@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		/*
+		
 		/// <summary>
 		/// Converts <see cref="View1"/> from a regular <see cref="View"/>
 		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View1"/>
@@ -274,67 +274,14 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="SplitView"/></returns>
-		public bool TrySplitView1(out SplitView result)
+		public bool TrySplitView(int idx, out SplitView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
-			var title = View1Title;
+			var tile = tiles [idx];
+			var title = tile.Title;
+			View toMove = tile.View;
 
-			bool returnValue = TrySplit (
-				this.View1,
-				(newSplitContainer) => {
-					this.View1 = newSplitContainer;
-					
-					// Move title to new container
-					View1Title = string.Empty;
-					newSplitContainer.View1Title = title;
-				},
-				out result);
-			
-			return returnValue;
-		}
-
-		/// <summary>
-		/// Converts <see cref="View2"/> from a regular <see cref="View"/>
-		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View2"/>
-		/// is already a <see cref="SplitView"/> then returns false.
-		/// </summary>
-		/// <remarks>After successful splitting, the returned container's <see cref="View1"/> 
-		/// will contain the original content and <see cref="View2Title"/> (if any) while
-		/// <see cref="View2"/> will be empty and available for adding to.
-		/// for adding to.</remarks>
-		/// <param name="result">The new <see cref="SplitView"/> now showing in 
-		/// <see cref="View2"/> or the existing one if it was already been converted before.</param>
-		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
-		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
-		/// <see cref="SplitView"/></returns>
-		public bool TrySplitView2 (out SplitView result)
-		{
-			// when splitting a view into 2 sub views we will need to migrate
-			// the title too
-			var title = View2Title;
-
-			bool returnValue = TrySplit (
-				this.View2,
-				(newSplitContainer) => {
-					this.View2 = newSplitContainer;
-
-					// Move title to new container
-					View2Title = string.Empty;
-
-					// Content always goes into View1 of the new container
-					// so that is where the title goes too
-					newSplitContainer.View1Title = title;
-				},
-				out result);
-
-			return returnValue;
-		}
-		private bool TrySplit(
-			View toMove,
-			Action<SplitView> newSplitContainerSetter,
-			out SplitView result)
-		{
 			if (toMove is SplitView existing) {
 				result = existing;
 				return false;
@@ -353,16 +300,18 @@ namespace Terminal.Gui {
 			// Remove the view itself and replace it with the new SplitContainer
 			Remove (toMove);
 			Add (newContainer);
-			newSplitContainerSetter(newContainer);
 
+			tile.View = newContainer;
+
+			var newTileView1 = newContainer.tiles [0].View;
 			// Add the original content into the first view of the new container
-			foreach(var childView in childViews) {
-				newContainer.View1.Add (childView);
+			foreach (var childView in childViews) {
+				newTileView1.Add (childView);
 			}
 
 			result = newContainer;
 			return true;
-		}*/
+		}
 
 
 		private List<SplitContainerLineView> GetAllChildSplitContainerLineViewRecursively (View v)
