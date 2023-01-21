@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -43,7 +44,16 @@ namespace UICatalog.Scenarios {
 			tabView.Style.ShowBorder = true;
 			tabView.ApplyStyleChanges ();
 
-			Application.Top.Add (tabView);
+			// Start with only a single view but support splitting to show side by side
+			var split = new SplitView {
+				Width = Dim.Fill(),
+				Height = Dim.Fill(),
+			};
+			split.View2.Visible = false;
+			split.SetView1 (tabView);
+			split.IntegratedBorder = BorderStyle.None;
+
+			Application.Top.Add (split);
 
 			var lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -80,22 +90,63 @@ namespace UICatalog.Scenarios {
 				});
 
 			} else {
+
+				var tv = (TabView)sender;
+				var t = (OpenedFile)e.Tab;
+
 				items = new MenuBarItem (new MenuItem [] {
 					new MenuItem ($"Save", "", () => Save(e.Tab)),
 					new MenuItem ($"Close", "", () => Close(e.Tab)),
+					null,
+					new MenuItem ($"Split Up", "", () => SplitUp(tv,t)),
+					new MenuItem ($"Split Down", "", () => SplitDown(tv,t)),
+					new MenuItem ($"Split Right", "", () => SplitRight(tv,t)),
+					new MenuItem ($"Split Left", "", () => SplitLeft(tv,t)),
 				});
 			}
 
-
-			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1, items);
+		var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1, items);
 
 			contextMenu.Show ();
 			e.MouseEvent.Handled = true;
 		}
 
+		private void SplitUp (TabView sender, OpenedFile tab)
+		{
+			
+		}
+		private void SplitDown (TabView sender, OpenedFile tab)
+		{
+			
+		}
+		private void SplitLeft (TabView sender, OpenedFile tab)
+		{
+			
+		}
+		private void SplitRight (TabView sender, OpenedFile tab)
+		{
+			var split = (SplitView)sender.SuperView;
+
+			split.TrySplitView1 (out var sub);
+			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
+			var newTabView = CreateNewTabView ();
+			tab.CloneTo (newTabView);
+			sub.SetView2 (newTabView);
+		}
+
+		private TabView CreateNewTabView ()
+		{
+			return new TabView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+		}
+
 		private void New ()
 		{
-			Open ("", null, $"new {numbeOfNewTabs++}");
+			Open (null, $"new {numbeOfNewTabs++}");
 		}
 
 		private void Close ()
@@ -144,7 +195,7 @@ namespace UICatalog.Scenarios {
 						return;
 					}
 
-					Open (File.ReadAllText (path), new FileInfo (path), Path.GetFileName (path));
+					Open (new FileInfo (path), Path.GetFileName (path));
 				}
 			}
 		}
@@ -152,42 +203,11 @@ namespace UICatalog.Scenarios {
 		/// <summary>
 		/// Creates a new tab with initial text
 		/// </summary>
-		/// <param name="initialText"></param>
 		/// <param name="fileInfo">File that was read or null if a new blank document</param>
-		private void Open (string initialText, FileInfo fileInfo, string tabName)
+		private void Open (FileInfo fileInfo, string tabName)
 		{
-			var textView = new TextView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				Text = initialText
-			};
-
-			var tab = new OpenedFile (tabName, fileInfo, textView);
+			var tab = new OpenedFile (tabView, tabName, fileInfo);
 			tabView.AddTab (tab, true);
-
-			// when user makes changes rename tab to indicate unsaved
-			textView.KeyUp += (k) => {
-
-				// if current text doesn't match saved text
-				var areDiff = tab.UnsavedChanges;
-
-				if (areDiff) {
-					if (!tab.Text.ToString ().EndsWith ('*')) {
-
-						tab.Text = tab.Text.ToString () + '*';
-						tabView.SetNeedsDisplay ();
-					}
-				} else {
-
-					if (tab.Text.ToString ().EndsWith ('*')) {
-
-						tab.Text = tab.Text.ToString ().TrimEnd ('*');
-						tabView.SetNeedsDisplay ();
-					}
-				}
-			};
 		}
 
 		public void Save ()
@@ -243,12 +263,64 @@ namespace UICatalog.Scenarios {
 
 			public bool UnsavedChanges => !string.Equals (SavedText, View.Text.ToString ());
 
-			public OpenedFile (string name, FileInfo file, TextView control) : base (name, control)
+			public OpenedFile (TabView parent, string name, FileInfo file) 
+				: base (name, CreateTextView(file))
 			{
+
 				File = file;
-				SavedText = control.Text.ToString ();
+				SavedText = View.Text.ToString ();
+				RegisterTextViewEvents (parent);
 			}
 
+			private void RegisterTextViewEvents (TabView parent)
+			{
+				var textView = (TextView)View;
+				// when user makes changes rename tab to indicate unsaved
+				textView.KeyUp += (k) => {
+
+					// if current text doesn't match saved text
+					var areDiff = this.UnsavedChanges;
+
+					if (areDiff) {
+						if (!this.Text.ToString ().EndsWith ('*')) {
+
+							this.Text = this.Text.ToString () + '*';
+							parent.SetNeedsDisplay ();
+						}
+					} else {
+						
+						if (Text.ToString ().EndsWith ('*')) {
+
+							Text = Text.ToString ().TrimEnd ('*');
+							parent.SetNeedsDisplay ();
+						}
+					}
+				};
+			}
+
+			private static View CreateTextView (FileInfo file)
+			{
+				string initialText = string.Empty;
+				if(file != null && file.Exists) {
+					
+					initialText = System.IO.File.ReadAllText (file.FullName);
+				}
+
+				return new TextView () {
+					X = 0,
+					Y = 0,
+					Width = Dim.Fill (),
+					Height = Dim.Fill (),
+					Text = initialText,
+					AllowsTab = false,
+				};
+			}
+			public OpenedFile CloneTo(TabView other)
+			{
+				var newTab = new OpenedFile (other, base.Text.ToString(), File);
+				other.AddTab (newTab, true);
+				return newTab;
+			}
 			internal void Save ()
 			{
 				var newText = View.Text.ToString ();
