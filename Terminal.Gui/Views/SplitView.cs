@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui.Graphs;
@@ -8,14 +7,12 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// A <see cref="View"/> consisting of a moveable bar that divides
-	/// the display area into 2 resizeable views.
+	/// the display area into resizeable views.
 	/// </summary>
-	public class SplitView : View 
-		{
+	public class SplitView : View {
 
-		private SplitContainerLineView splitterLine;
 		SplitView parentSplitView;
-		
+
 		/// TODO: Might be able to make Border virtual and override here
 		/// To make this more API friendly
 
@@ -24,49 +21,49 @@ namespace Terminal.Gui {
 		/// Border in which lines connect with subviews and splitters
 		/// seamlessly
 		/// </summary>
-		public BorderStyle IntegratedBorder {get;set;}
+		public BorderStyle IntegratedBorder { get; set; }
+
+		public class Tile {
+			public View View { get; }
+			public int MinSize { get; }
+			public string Title { get; set; }
+
+			public Tile ()
+			{
+				View = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+				Title = string.Empty;
+				MinSize = 0;
+			}
+		}
+
+		List<Tile> tiles;
+		private List<Pos> splitterDistances;
+		private List<SplitContainerLineView> splitterLines;
 
 		/// <summary>
-		/// The <see cref="View"/> showing in the left hand pane of a
-		/// <see cref="Orientation.Vertical"/>  or top of an
-		/// <see cref="Orientation.Horizontal"/> pane.  May be another
-		/// <see cref="SplitView"/> if further splitter subdivisions are
-		/// desired (e.g. to create a resizeable grid.
+		/// The sub sections hosted by the view
 		/// </summary>
-		public View View1 { get; private set; }
-
-		public int View1MinSize { get; set; } = 1;
-		public ustring View1Title { get; set; } = string.Empty;
+		public IReadOnlyCollection<Tile> Tiles => tiles.AsReadOnly ();
 
 		/// <summary>
-		/// The <see cref="View"/> showing in the right hand pane of a
-		/// <see cref="Orientation.Vertical"/>  or bottom of an
-		/// <see cref="Orientation.Horizontal"/> pane.  May be another
-		/// <see cref="SplitView"/> if further splitter subdivisions are
-		/// desired (e.g. to create a resizeable grid.
+		/// The splitter locations.  Note that there will be N-1 splitters where
+		/// N is the number of <see cref="Tiles"/>.
 		/// </summary>
-		public View View2 { get; private set; }
+		public IReadOnlyCollection<Pos> SplitterDistances => splitterDistances.AsReadOnly ();
 
-		public int View2MinSize { get; set; } = 1;
-		public ustring View2Title { get; set; } = string.Empty;
-
-		private Pos splitterDistance = Pos.Percent (50);
 		private Orientation orientation = Orientation.Vertical;
 
 		/// <summary>
 		/// Creates a new instance of the SplitContainer class.
 		/// </summary>
-		public SplitView ()
+		public SplitView () : this (2)
 		{
-			splitterLine = new SplitContainerLineView (this);
-			View1 = new View () { Width = Dim.Fill (), Height = Dim.Fill() };
-			View2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+		}
 
-			this.Add (View1);
-			this.Add (splitterLine);
-			this.Add (View2);
-
+		public SplitView (int tiles)
+		{
 			CanFocus = true;
+			RebuildForTileCount (tiles);
 		}
 
 		/// <summary>
@@ -77,9 +74,46 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raises the <see cref="SplitterMoved"/> event
 		/// </summary>
-		protected virtual void OnSplitterMoved ()
+		protected virtual void OnSplitterMoved (int idx)
 		{
-			SplitterMoved?.Invoke (this, new SplitterEventArgs (this, splitterDistance));
+			SplitterMoved?.Invoke (this, new SplitterEventArgs (this, idx, splitterDistances [idx]));
+		}
+
+		/// <summary>
+		/// Scraps all <see cref="Tiles"/>  and creates <paramref name="count"/> new tiles
+		/// in orientation <see cref="Orientation"/>
+		/// </summary>
+		/// <param name="count"></param>
+		public void RebuildForTileCount (int count)
+		{
+			tiles = new List<Tile> ();
+			// TODO: keep these if growing
+			splitterDistances = new List<Pos> ();
+			splitterLines = new List<SplitContainerLineView> ();
+
+			RemoveAll ();
+			tiles.Clear ();
+			splitterDistances.Clear ();
+
+			if (count == 0) {
+				return;
+			}
+
+			for (int i = 0; i < count; i++) {
+				var tile = new Tile ();
+				tiles.Add (tile);
+				Add (tile.View);
+
+				if (i > 0) {
+					var currentPos = Pos.Percent ((100 / count) * i);
+					splitterDistances.Add (currentPos);
+					var line = new SplitContainerLineView (this, i-1);
+					Add (line);
+					splitterLines.Add (line);
+				}
+			}
+
+			LayoutSubviews ();
 		}
 
 		/// <summary>
@@ -97,27 +131,24 @@ namespace Terminal.Gui {
 		{
 			var contentArea = Bounds;
 
-			if(HasBorder())
-			{
+			if (HasBorder ()) {
 				// TODO: Bound with Max/Min
-				contentArea = new Rect(
+				contentArea = new Rect (
 					contentArea.X + 1,
 					contentArea.Y + 1,
 					Math.Max (0, contentArea.Width - 2),
 					Math.Max (0, contentArea.Height - 2));
-			}
-			else if(HasAnyTitles() && IsRootSplitContainer())
-			{
+			} else if (HasAnyTitles () && IsRootSplitContainer ()) {
 				// TODO: Bound with Max/Min
-				contentArea = new Rect(
+				contentArea = new Rect (
 					contentArea.X,
 					contentArea.Y + 1,
 					contentArea.Width,
-					Math.Max(0,contentArea.Height - 1));
+					Math.Max (0, contentArea.Height - 1));
 			}
 
 			Setup (contentArea);
-					
+
 
 			base.LayoutSubviews ();
 		}
@@ -129,20 +160,17 @@ namespace Terminal.Gui {
 		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
 		/// are supported for this property.</para>
 		/// </summary>
-		public Pos SplitterDistance {
-			get { return splitterDistance; }
-			set {
-				if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
-					throw new ArgumentException ($"Only Percent and Absolute values are supported for {nameof (SplitterDistance)} property.  Passed value was {value.GetType ().Name}");
-				}
-
-				splitterDistance = value;
-				GetRootSplitContainer ().LayoutSubviews ();
-				OnSplitterMoved ();
+		public void SetSplitterPos (int idx, Pos value)
+		{
+			if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
+				throw new ArgumentException ($"Only Percent and Absolute values are supported.  Passed value was {value.GetType ().Name}");
 			}
+
+			splitterDistances [idx] = value;
+			GetRootSplitContainer ().LayoutSubviews ();
+			OnSplitterMoved (idx);
 		}
 
-		
 
 		/// <inheritdoc/>
 		public override bool OnEnter (View view)
@@ -160,13 +188,12 @@ namespace Terminal.Gui {
 			Clear ();
 			base.Redraw (bounds);
 
-			var lc = new LineCanvas();
+			var lc = new LineCanvas ();
 
 			var allLines = GetAllChildSplitContainerLineViewRecursively (this);
 
-			if (IsRootSplitContainer())
-			{
-				if(HasBorder ()) {
+			if (IsRootSplitContainer ()) {
+				if (HasBorder ()) {
 
 					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, IntegratedBorder);
 					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, IntegratedBorder);
@@ -175,18 +202,17 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
 				}
 
-				foreach (var line in allLines.Where(l=>l.Visible))
-				{
-					bool isRoot = line == splitterLine;
+				foreach (var line in allLines.Where (l => l.Visible)) {
+					bool isRoot = splitterLines.Contains (line);
 
-					line.ViewToScreen(0,0,out var x1,out var y1);
-					var origin = ScreenToView(x1,y1);
+					line.ViewToScreen (0, 0, out var x1, out var y1);
+					var origin = ScreenToView (x1, y1);
 					var length = line.Orientation == Orientation.Horizontal ?
 							line.Frame.Width - 1 :
 							line.Frame.Height - 1;
 
-					if(!isRoot) {
-						if(line.Orientation == Orientation.Horizontal) {
+					if (!isRoot) {
+						if (line.Orientation == Orientation.Horizontal) {
 							origin.X -= 1;
 						} else {
 							origin.Y -= 1;
@@ -194,55 +220,46 @@ namespace Terminal.Gui {
 						length += 2;
 
 						childTitles.Add (
-							new ChildSplitterLine(line));
-						
+							new ChildSplitterLine (line));
+
 					}
 
-					lc.AddLine(origin,length,line.Orientation,IntegratedBorder);
+					lc.AddLine (origin, length, line.Orientation, IntegratedBorder);
 				}
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			lc.Draw(this,bounds);
+			lc.Draw (this, bounds);
 
 			// Redraw the lines so that focus/drag symbol renders
-			foreach(var line in allLines) {
+			foreach (var line in allLines) {
 				line.DrawSplitterSymbol ();
 			}
 
-			foreach(var child in childTitles) {
+			foreach (var child in childTitles) {
 				child.DrawTitles ();
 			}
 
 			// Draw Titles over Border
-			var screen = ViewToScreen (new Rect(0,0,bounds.Width,1));
-			if (View1.Visible && View1Title.Length > 0) {
-				Driver.SetAttribute (View1.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-				Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View1.Frame.Width, 0), View1Title, 0, 0, 0, 0);
-			}
 
-			if (splitterLine.Visible) {
-				screen = ViewToScreen (splitterLine.Frame);
-			} else {
-				
-				screen.X--;
-				//screen.Y--;
-			}
 
-			if (Orientation == Orientation.Horizontal) {
-				if (View2.Visible && View2Title?.Length > 0) {
+			for (int i = 0; i < tiles.Count; i++) {
 
-					Driver.SetAttribute (View2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View2.Bounds.Width, 1), View2Title, 0, 0, 0, 0);
-				}
-			} else {
-				if (View2.Visible && View2Title?.Length > 0) {
-					Driver.SetAttribute (View2.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, View2.Bounds.Width, 1), View2Title, 0, 0, 0, 0);
+				var tile = tiles [i];
+
+				if (tile.View.Visible && tile.Title.Length > 0) {
+
+					var screen = i == 0 ?
+						ViewToScreen (new Rect (0, 0, bounds.Width, 1)) :
+						ViewToScreen (splitterLines [i - 1].Frame);
+
+
+					Driver.SetAttribute (tile.View.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
+					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, tile.View.Frame.Width, 0), tile.Title, 0, 0, 0, 0);
 				}
 			}
 		}
-
+		/*
 		/// <summary>
 		/// Converts <see cref="View1"/> from a regular <see cref="View"/>
 		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View1"/>
@@ -345,23 +362,20 @@ namespace Terminal.Gui {
 
 			result = newContainer;
 			return true;
-		}
+		}*/
 
-		
+
 		private List<SplitContainerLineView> GetAllChildSplitContainerLineViewRecursively (View v)
 		{
-			var lines = new List<SplitContainerLineView>();
+			var lines = new List<SplitContainerLineView> ();
 
-			foreach(var sub in v.Subviews)
-			{
-				if(sub is SplitContainerLineView s)
-				{
-					if(s.Parent.GetRootSplitContainer() == this) {
+			foreach (var sub in v.Subviews) {
+				if (sub is SplitContainerLineView s) {
+					if (s.Parent.GetRootSplitContainer () == this) {
 						lines.Add (s);
-					}					
-				}
-				else {
-					lines.AddRange(GetAllChildSplitContainerLineViewRecursively(sub));
+					}
+				} else {
+					lines.AddRange (GetAllChildSplitContainerLineViewRecursively (sub));
 				}
 			}
 
@@ -385,100 +399,98 @@ namespace Terminal.Gui {
 		}
 		private void Setup (Rect bounds)
 		{
-			splitterLine.Orientation = Orientation;
-			// splitterLine.Text = View2.Title;
+			if (bounds.IsEmpty) {
+				return;
+			}
 
-			// TODO: Recursion
+			for (int i = 0; i < splitterLines.Count; i++) {
+				var line = splitterLines[i];
 
-			if (!View1.Visible || !View2.Visible) {
-				View toFullSize = !View1.Visible ? View2 : View1;
+				line.Orientation = Orientation;
+				line.Width = orientation == Orientation.Vertical
+					? 1 : Dim.Fill ();
+				line.Height = orientation == Orientation.Vertical
+					? Dim.Fill () : 1;
+				line.LineRune = orientation == Orientation.Vertical ?
+					Driver.VLine : Driver.HLine;
 
-				splitterLine.Visible = false;
+				if (orientation == Orientation.Vertical) {
+					line.X = splitterDistances [i];
+				}
+				else {
+					line.Y = splitterDistances [i];
+				}
 
-				toFullSize.X = bounds.X;
-				toFullSize.Y = bounds.Y;
-				toFullSize.Width = bounds.Width;
-				toFullSize.Height = bounds.Height;
-			} else {
-				splitterLine.Visible = true;
+			}
 
-				splitterDistance = BoundByMinimumSizes (splitterDistance);
+			RespectMinimumTileSizes ();
 
-				View1.X = bounds.X;
-				View1.Y = bounds.Y;
+			for (int i = 0; i < tiles.Count; i++) {
+				var tile = tiles [i];
 
-				switch (Orientation) {
-				case Orientation.Horizontal:
-					splitterLine.X = 0;
-					splitterLine.Y = splitterDistance;
-					splitterLine.Width = Dim.Fill ();
-					splitterLine.Height = 1;
-					splitterLine.LineRune = Driver.HLine;
+				// TODO: Deal with lines being Visibility false
 
-					View1.Width = Dim.Fill (HasBorder()? 1:0);
-					View1.Height = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (bounds.Height));
+				if (Orientation == Orientation.Vertical) {
+					tile.View.X = i == 0 ? 0 : Pos.Right (splitterLines [i - 1]);
+					tile.View.Y = bounds.Y;
+					tile.View.Height = bounds.Height;
 
-					View2.Y = Pos.Bottom (splitterLine);
-					View2.X = bounds.X;
-					View2.Width = bounds.Width;
-					View2.Height = Dim.Fill(HasBorder () ? 1 : 0);
-					break;
+					// Take a copy so it is const for the lamda
+					int i2 = i;
 
-				case Orientation.Vertical:
-					splitterLine.X = splitterDistance;
-					splitterLine.Y = 0;
-					splitterLine.Width = 1;
-					splitterLine.Height = Dim.Fill ();
-					splitterLine.LineRune = Driver.VLine;
+					// if it is not the last tile then fill horizontally right to next line
+					tile.View.Width = i + 1 < tiles.Count
+						? new Dim.DimFunc (
+							() => splitterDistances [i2].Anchor (bounds.Width))
+									: Dim.Fill (HasBorder () ? 1 : 0);
+				} else {
+					tile.View.X = bounds.X;
+					tile.View.Y = i == 0 ? 0 : Pos.Bottom (splitterLines [i - 1]);
+					tile.View.Width = bounds.Width;
 
-					View1.Height = Dim.Fill();
-					View1.Width = new Dim.DimFunc (() =>
-					splitterDistance.Anchor (bounds.Width));
+					// Take a copy so it is const for the lamda
+					int i2 = i;
 
-					View2.X = Pos.Right (splitterLine);
-					View2.Y = bounds.Y;
-					View2.Height = bounds.Height;
-					View2.Width = Dim.Fill(HasBorder()? 1:0);
-					break;
-
-				default: throw new ArgumentOutOfRangeException (nameof (orientation));
-				};
+					// if it is not the last tile then fill vertically down to next line
+					tile.View.Height = i + 1 < tiles.Count
+						? new Dim.DimFunc (
+							() => splitterDistances [i2].Anchor (bounds.Height))
+										: Dim.Fill (HasBorder () ? 1 : 0);
+				}
 			}
 		}
 
-		/// <summary>
-		/// Considers <paramref name="pos"/> as a candidate for <see cref="splitterDistance"/>
-		/// then either returns (if valid) or returns adjusted if invalid with respect to the 
-		/// <see cref="View1MinSize"/> of the views.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <returns></returns>
-		private Pos BoundByMinimumSizes (Pos pos)
+		private void RespectMinimumTileSizes ()
 		{
+			// TODO: implement this
+			/* 
 			// if we are not yet initialized then we don't know
 			// how big we are and therefore cannot sensibly calculate
 			// how big the views will be with a given SplitterDistance
 			if (!IsInitialized) {
 				return pos;
 			}
-			
+
 			var view1MinSize = View1MinSize;
 			var view2MinSize = View2MinSize;
 
+			// how much space is there?
+			var availableSpace = Orientation == Orientation.Horizontal 
+				? this.Bounds.Height 
+				: this.Bounds.Width;
 
 			// if there is a border then there is less space
 			// for the views so we need to make size restrictions
 			// tighter.
-			if(HasBorder()) {
+			if (HasBorder ()) {
 				view1MinSize++;
 				view2MinSize++;
 			}
 
-			var availableSpace = Orientation == Orientation.Horizontal ? this.Bounds.Height : this.Bounds.Width;
+
 
 			// we probably haven't finished layout even if IsInitialized is true :(
-			if(availableSpace <= 0) {
+			if (availableSpace <= 0) {
 				return pos;
 			}
 
@@ -501,22 +513,24 @@ namespace Terminal.Gui {
 			}
 
 			// this splitter position is fine, there is enough space for everyone
-			return pos;
+			return pos;*/
 		}
+
 		private class SplitContainerLineView : LineView {
 			public SplitView Parent { get; private set; }
+			public int Idx { get; }
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
 			public Point? moveRuneRenderLocation;
 
-			public SplitContainerLineView (SplitView parent)
+			public SplitContainerLineView (SplitView parent, int idx)
 			{
 				CanFocus = true;
 				TabStop = true;
 
 				this.Parent = parent;
-
+				Idx = idx;
 				base.AddCommand (Command.Right, () => {
 					return MoveSplitter (1, 0);
 				});
@@ -575,7 +589,7 @@ namespace Terminal.Gui {
 				DrawSplitterSymbol ();
 			}
 
-			public void DrawSplitterSymbol()
+			public void DrawSplitterSymbol ()
 			{
 				if (CanFocus && HasFocus) {
 					var location = moveRuneRenderLocation ??
@@ -619,11 +633,11 @@ namespace Terminal.Gui {
 					// how far has user dragged from original location?						
 					if (Orientation == Orientation.Horizontal) {
 						int dy = mouseEvent.Y - dragPosition.Value.Y;
-						Parent.SplitterDistance = Offset (Y, dy);
+						Parent.splitterDistances [Idx] = Offset (Y, dy);
 						moveRuneRenderLocation = new Point (mouseEvent.X, 0);
 					} else {
 						int dx = mouseEvent.X - dragPosition.Value.X;
-						Parent.SplitterDistance = Offset (X, dx);
+						Parent.splitterDistances [Idx] = Offset (X, dx);
 						moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
 					}
 
@@ -695,12 +709,12 @@ namespace Terminal.Gui {
 			{
 				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						Parent.SplitterDistance = ConvertToPosFactor (newValue, Parent.Bounds.Height);
+						Parent.splitterDistances [Idx] = ConvertToPosFactor (newValue, Parent.Bounds.Height);
 					} else {
-						Parent.SplitterDistance = ConvertToPosFactor (newValue, Parent.Bounds.Width);
+						Parent.splitterDistances [Idx] = ConvertToPosFactor (newValue, Parent.Bounds.Width);
 					}
 				} else {
-					Parent.SplitterDistance = newValue;
+					Parent.splitterDistances [Idx] = newValue;
 				}
 			}
 
@@ -728,9 +742,9 @@ namespace Terminal.Gui {
 		{
 			return IntegratedBorder != BorderStyle.None;
 		}
-		private bool HasAnyTitles()
+		private bool HasAnyTitles ()
 		{
-			return View1Title.Length > 0 || View2Title.Length > 0;
+			return tiles.Any (t => t.Title.Length > 0);
 
 		}
 
@@ -744,12 +758,13 @@ namespace Terminal.Gui {
 
 			internal void DrawTitles ()
 			{
-				if(currentLine.Orientation == Orientation.Horizontal) 
+				//TODO: Implement this
+				/*if(currentLine.Orientation == Orientation.Horizontal) 
 				{
 					var screenRect = currentLine.ViewToScreen (
 						new Rect(0,0,currentLine.Frame.Width,currentLine.Frame.Height));
 					Driver.DrawWindowTitle (screenRect, currentLine.Parent.View2Title, 0, 0, 0, 0);
-				}
+				}*/
 			}
 		}
 	}
@@ -764,10 +779,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="splitContainer"></param>
 		/// <param name="splitterDistance"></param>
-		public SplitterEventArgs (SplitView splitContainer, Pos splitterDistance)
+		public SplitterEventArgs (SplitView splitContainer, int idx, Pos splitterDistance)
 		{
 			SplitterDistance = splitterDistance;
 			SplitContainer = splitContainer;
+			Idx = idx;
 		}
 
 		/// <summary>
@@ -779,6 +795,12 @@ namespace Terminal.Gui {
 		/// Container (sender) of the event.
 		/// </summary>
 		public SplitView SplitContainer { get; }
+
+		/// <summary>
+		/// The splitter that is being moved (use when <see cref="SplitContainer"/>
+		/// has more than 2 panels).
+		/// </summary>
+		public int Idx { get; }
 	}
 
 	/// <summary>

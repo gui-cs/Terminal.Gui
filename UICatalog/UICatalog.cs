@@ -214,9 +214,9 @@ namespace UICatalog {
 					Height = Dim.Fill (1),
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
-					SplitterDistance = 25,
 					IntegratedBorder = BorderStyle.Rounded,
 				};
+				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 					
 				CategoryListView = new ListView (_categories) {
@@ -232,8 +232,8 @@ namespace UICatalog {
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 
-				ContentPane.View1Title = "Categories";
-				ContentPane.View1.Add (CategoryListView);
+				ContentPane.Tiles.ElementAt(0).Title = "Categories";
+				ContentPane.Tiles.ElementAt (0).View.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -246,8 +246,8 @@ namespace UICatalog {
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
 
-				ContentPane.View2Title = "Scenarios";
-				ContentPane.View2.Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
+				ContentPane.Tiles.ElementAt (1).View.Add (ScenarioListView);
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);

@@ -1,6 +1,7 @@
 ﻿using System;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
+using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Split View Nesting", Description: "Nest SplitViews")]
@@ -103,8 +104,8 @@ namespace UICatalog.Scenarios {
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
-			root.View1.Add (CreateContentControl (1));
-			root.View2.Add (CreateContentControl (2));
+			root.Tiles.ElementAt(0).View.Add (CreateContentControl (1));
+			root.Tiles.ElementAt (1).View.Add (CreateContentControl (2));
 			
 
 			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
@@ -113,7 +114,7 @@ namespace UICatalog.Scenarios {
 			workArea.Add (root);
 
 			if (numberOfViews == 1) {
-				root.View2.Visible = false;
+				root.Tiles.ElementAt (1).View.Visible = false;
 			}
 
 			if (numberOfViews > 2) {
@@ -161,7 +162,7 @@ namespace UICatalog.Scenarios {
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
-
+			/* TODO: Reimplement
 			if (!(to.View1 is SplitView)) {
 				Split(to,true);
 			}
@@ -174,9 +175,10 @@ namespace UICatalog.Scenarios {
 
 				AddMoreViews ((SplitView)to.View1);
 				AddMoreViews ((SplitView)to.View2);
-			}
+			}*/
 
 		}
+		/*
 		private void Split(SplitView to, bool left)
 		{
 			if (viewsCreated == viewsToCreate) {
@@ -184,7 +186,7 @@ namespace UICatalog.Scenarios {
 			}
 
 			SplitView newView;
-
+			
 			if (left) {
 				to.TrySplitView1 (out newView);
 
@@ -205,7 +207,7 @@ namespace UICatalog.Scenarios {
 				Orientation.Vertical;
 			
 			newView.View2.Add (CreateContentControl(viewsCreated));
-		}
+		}*/
 
 		private SplitView CreateSplitView (int titleNumber, Orientation orientation)
 		{
@@ -216,8 +218,8 @@ namespace UICatalog.Scenarios {
 				Orientation = orientation
 			};
 
-			toReturn.View1Title = cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
-			toReturn.View2Title = cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
+			toReturn.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
+			toReturn.Tiles.ElementAt (1).Title = cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
 
 			return toReturn;
 		}

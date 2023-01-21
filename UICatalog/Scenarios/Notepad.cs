@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -38,14 +39,13 @@ namespace UICatalog.Scenarios {
 			tabView.ApplyStyleChanges ();
 
 			// Start with only a single view but support splitting to show side by side
-			var split = new SplitView {
+			var split = new SplitView(1) {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
-			split.View2.Visible = false;
-			split.View1.Add (tabView);
+			split.Tiles.ElementAt(0).View.Add (tabView);
 			split.IntegratedBorder = BorderStyle.None;
 
 			Application.Top.Add (split);
@@ -122,13 +122,15 @@ namespace UICatalog.Scenarios {
 		}
 		private void SplitRight (TabView sender, OpenedFile tab)
 		{
+			/*
 			var split = (SplitView)sender.SuperView.SuperView;
 
+			// TODO: Implement
 			split.TrySplitView1 (out var sub);
 			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			sub.View2.Add (newTabView);
+			sub.View2.Add (newTabView);*/
 		}
 
 		private TabView CreateNewTabView ()
