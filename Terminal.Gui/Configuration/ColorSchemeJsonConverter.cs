@@ -6,32 +6,26 @@ using System.Text.Json.Serialization;
 using Terminal.Gui;
 
 namespace Terminal.Gui.Configuration {
+#if false
 	/// <summary>
-	/// 
+	/// Implements a JSON converter for <see cref="ColorScheme"/>. 
 	/// </summary>
 	public class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
 		private static ColorSchemeJsonConverter instance;
 
 		/// <summary>
-		/// 
+		/// Singleton
 		/// </summary>
 		public static ColorSchemeJsonConverter Instance {
 			get {
 				if (instance == null) {
 					instance = new ColorSchemeJsonConverter ();
 				}
-
 				return instance;
 			}
 		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <param name="typeToConvert"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		/// <exception cref="JsonException"></exception>
+		
+		/// <inheritdoc/>
 		public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartObject) {
@@ -77,12 +71,7 @@ namespace Terminal.Gui.Configuration {
 			throw new JsonException ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="value"></param>
-		/// <param name="options"></param>
+		/// <inheritdoc/>
 		public override void Write (Utf8JsonWriter writer, ColorScheme value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
@@ -103,4 +92,5 @@ namespace Terminal.Gui.Configuration {
 
 
 	}
+#endif
 }

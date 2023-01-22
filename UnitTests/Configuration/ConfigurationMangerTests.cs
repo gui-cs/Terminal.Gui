@@ -17,7 +17,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Converters = {
 				new AttributeJsonConverter (),
 				new ColorJsonConverter (),
-				new ColorSchemeJsonConverter ()
+				//new ColorSchemeJsonConverter ()
 				}
 		};
 
