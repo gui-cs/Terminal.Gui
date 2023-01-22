@@ -412,31 +412,28 @@ namespace Terminal.Gui {
 				if (Orientation == Orientation.Vertical) {
 					tile.View.X = i == 0 ? bounds.X : Pos.Right (splitterLines [i - 1]);
 					tile.View.Y = bounds.Y;
-					tile.View.Height = bounds.Height;
-
-					// Take a copy so it is const for the lamda
-					int i2 = i;
-
-					// if it is not the last tile then fill horizontally right to next line
-					tile.View.Width = i + 1 < tiles.Count
-						? new Dim.DimFunc (
-							() => splitterDistances [i2].Anchor (bounds.Width))
-									: Dim.Fill (HasBorder () ? 1 : 0);
+					tile.View.Height = bounds.Height;					
+					tile.View.Width = GetTileWidthOrHeight(i, bounds.Width);
 				} else {
 					tile.View.X = bounds.X;
 					tile.View.Y = i == 0 ? 0 : Pos.Bottom (splitterLines [i - 1]);
 					tile.View.Width = bounds.Width;
-
-					// Take a copy so it is const for the lamda
-					int i2 = i;
-
-					// if it is not the last tile then fill vertically down to next line
-					tile.View.Height = i + 1 < tiles.Count
-						? new Dim.DimFunc (
-							() => splitterDistances [i2].Anchor (bounds.Height))
-										: Dim.Fill (HasBorder () ? 1 : 0);
+					tile.View.Height = GetTileWidthOrHeight(i, bounds.Height);
 				}
 			}
+		}
+
+		private Dim GetTileWidthOrHeight (int i, int space)
+		{
+			// last tile
+			if(i + 1 >= tiles.Count)
+			{
+				return Dim.Fill (HasBorder () ? 1 : 0);
+			}
+			var nextSplitter = splitterDistances [i].Anchor (space);
+			var lastSplitter = i >= 1 ? splitterDistances [i-1].Anchor (space) : 0;
+
+			return nextSplitter - lastSplitter;
 		}
 
 		private void RespectMinimumTileSizes ()
