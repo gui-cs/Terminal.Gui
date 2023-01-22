@@ -112,21 +112,44 @@ namespace Terminal.Gui {
 		public static View WantContinuousButtonPressedView { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
-		public static bool HeightAsBuffer {
+		/// <remarks>
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> only tracks 
+		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
+		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
+		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
+		/// </remarks>
+		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				return Driver.HeightAsBuffer;
+				return Driver.EnableConsoleScrolling;
 			}
 			set {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				Driver.HeightAsBuffer = value;
+				Driver.EnableConsoleScrolling = value;
 			}
+		}
+
+		/// <summary>
+		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
+		/// </summary>
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public static bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
 		}
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;

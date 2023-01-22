@@ -732,7 +732,12 @@ namespace Terminal.Gui {
 		public override int Rows => rows;
 		public override int Left => left;
 		public override int Top => top;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public override bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
+		}
 		public override IClipboard Clipboard => clipboard;
 		public override int [,,] Contents => contents;
 
@@ -767,7 +772,7 @@ namespace Terminal.Gui {
 
 		private void ChangeWin (Size e)
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				var w = e.Width;
 				if (w == cols - 3 && e.Height < rows) {
 					w += 3;
@@ -908,8 +913,12 @@ namespace Terminal.Gui {
 				left = pos.X;
 				top = pos.Y;
 				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y;
-				//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
+				if (EnableConsoleScrolling) {
+					rows = Math.Max (inputEvent.WindowBufferSizeEvent.size.Y, rows);
+				} else {
+					rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				}
+				//System.Diagnostics.Debug.WriteLine ($"{EnableConsoleScrolling},{cols},{rows}");
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
@@ -1478,13 +1487,6 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
-			// ANSI ESC "[xJ" Clears part of the screen.
-			// If n is 0 (or missing), clear from cursor to end of screen.
-			// If n is 1, clear from cursor to beginning of the screen.
-			// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-			Console.Out.Write ("\x1b[0J");
-			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
@@ -1630,7 +1632,7 @@ namespace Terminal.Gui {
 			if (damageRegion.Left == -1)
 				return;
 
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
 				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
 					return;
@@ -1879,9 +1881,9 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				Thread.Sleep (100);
-				if (!consoleDriver.HeightAsBuffer) {
+				if (!consoleDriver.EnableConsoleScrolling) {
 					windowSize = winConsole.GetConsoleBufferWindow (out _);
-					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.HeightAsBuffer},{windowSize.Width},{windowSize.Height}");
+					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.EnableConsoleScrolling},{windowSize.Width},{windowSize.Height}");
 					if (windowSize != Size.Empty && windowSize.Width != consoleDriver.Cols
 						|| windowSize.Height != consoleDriver.Rows) {
 						return;

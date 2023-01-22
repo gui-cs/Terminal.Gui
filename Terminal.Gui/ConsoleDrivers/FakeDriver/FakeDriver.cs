@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 				UseFakeClipboard = useFakeClipboard;
 				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
 				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-				
+
 				// double check usage is correct
 				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
 				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
@@ -48,7 +48,12 @@ namespace Terminal.Gui {
 		// Only handling left here because not all terminals has a horizontal scroll bar.
 		public override int Left => 0;
 		public override int Top => 0;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public override bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
+		}
 		private IClipboard clipboard = null;
 		public override IClipboard Clipboard => clipboard;
 
@@ -521,7 +526,7 @@ namespace Terminal.Gui {
 			FakeConsole.SetBufferSize (width, height);
 			cols = width;
 			rows = height;
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
 			}
 			ProcessResize ();
@@ -530,7 +535,7 @@ namespace Terminal.Gui {
 		public void SetWindowSize (int width, int height)
 		{
 			FakeConsole.SetWindowSize (width, height);
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (width != cols || height != rows) {
 					SetBufferSize (width, height);
 					cols = width;
@@ -542,7 +547,7 @@ namespace Terminal.Gui {
 
 		public void SetWindowPosition (int left, int top)
 		{
-			if (HeightAsBuffer) {
+			if (EnableConsoleScrolling) {
 				this.left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
 				this.top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
 			} else if (this.left > 0 || this.top > 0) {
@@ -561,7 +566,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (FakeConsole.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
