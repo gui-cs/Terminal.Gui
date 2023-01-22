@@ -59,10 +59,10 @@ namespace Terminal.Gui.Configuration {
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			WriteIndented = true,
 			Converters = {
-				new AttributeJsonConverter (),
-				new ColorJsonConverter (),
-				new ColorSchemeJsonConverter (),
-				new KeyJsonConverter (),
+				//new AttributeJsonConverter (),
+				//new ColorJsonConverter (),
+				//new ColorSchemeJsonConverter (),
+				//new KeyJsonConverter (),
 				//new DictionaryConverter<Theme> ()
 			},
 

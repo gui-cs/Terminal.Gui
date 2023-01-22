@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter(typeof(KeyJsonConverter))]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {

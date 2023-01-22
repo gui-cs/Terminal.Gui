@@ -215,29 +215,22 @@ namespace Terminal.Gui.Configuration {
 					var propertyName = reader.GetString ();
 					reader.Read ();
 
-					if (propertyName == "$schema") {
-						configRoot.schema = reader.GetString ();
-					} else {
-						// find property in dict
-						if (ConfigurationManager.ConfigProperties.TryGetValue (propertyName, out var configProp)) {
-							object propValue = null;
-							if (configProp.PropertyInfo.GetCustomAttribute (typeof (JsonConverterAttribute)) is JsonConverterAttribute jca) {
-								var readHelperType = typeof (ReadHelper<>).MakeGenericType (configProp.PropertyInfo.PropertyType);
-								var readHelper = Activator.CreateInstance (readHelperType, Activator.CreateInstance (jca.ConverterType)) as ReadHelper;
-								propValue = readHelper.Read (ref reader, configProp.PropertyInfo.PropertyType, options);
-							} else {
-								propValue = JsonSerializer.Deserialize (ref reader, configProp.PropertyInfo.PropertyType, options);
-							}
-
-
-							ConfigurationManager.ConfigProperties [propertyName].PropertyValue = propValue;
+					if (ConfigurationManager.ConfigProperties.TryGetValue (propertyName, out var configProp)) {
+						if (configProp.PropertyInfo.GetCustomAttribute (typeof (JsonConverterAttribute)) is JsonConverterAttribute jca) {
+							var readHelperType = typeof (ReadHelper<>).MakeGenericType (configProp.PropertyInfo.PropertyType);
+							var readHelper = Activator.CreateInstance (readHelperType, Activator.CreateInstance (jca.ConverterType)) as ReadHelper;
+							ConfigurationManager.ConfigProperties [propertyName].PropertyValue = readHelper.Read (ref reader, configProp.PropertyInfo.PropertyType, options);
 						} else {
-							// throw new JsonException ($"Unknown property {propertyName}");
+							ConfigurationManager.ConfigProperties [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, configProp.PropertyInfo.PropertyType, options);
+						}
+					} else {
+						if (propertyName == "$schema") {
+							configRoot.schema = reader.GetString ();
+						} else {
 							reader.Skip ();
 						}
 					}
 				}
-
 				throw new JsonException ();
 			}
 

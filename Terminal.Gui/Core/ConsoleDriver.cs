@@ -239,8 +239,9 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			Initialized = false;
-			Value = Make (foreground, background).Value;
+			var make = Make (foreground, background);
+			Initialized = make.Initialized;
+			Value = make.Value;
 			Foreground = foreground;
 			Background = background;
 		}

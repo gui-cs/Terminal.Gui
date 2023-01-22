@@ -16,7 +16,8 @@ namespace Terminal.Gui.ConfigurationTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {
 				new AttributeJsonConverter (),
-				new ColorJsonConverter ()
+				new ColorJsonConverter (),
+				new ColorSchemeJsonConverter ()
 				}
 		};
 
