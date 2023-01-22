@@ -162,23 +162,22 @@ namespace UICatalog.Scenarios {
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
-			/* TODO: Reimplement
-			if (!(to.View1 is SplitView)) {
+			if (!(to.Tiles.ElementAt(0).View is SplitView)) {
 				Split(to,true);
 			}
 
-			if (!(to.View2 is SplitView)) {
+			if (!(to.Tiles.ElementAt (1).View is SplitView)) {
 				Split(to,false);				
 			}
 
-			if (to.View1 is SplitView && to.View2 is SplitView) {
+			if (to.Tiles.ElementAt (0).View is SplitView && to.Tiles.ElementAt (1).View is SplitView) {
 
-				AddMoreViews ((SplitView)to.View1);
-				AddMoreViews ((SplitView)to.View2);
-			}*/
+				AddMoreViews ((SplitView)to.Tiles.ElementAt (0).View);
+				AddMoreViews ((SplitView)to.Tiles.ElementAt (1).View);
+			}
 
 		}
-		/*
+		
 		private void Split(SplitView to, bool left)
 		{
 			if (viewsCreated == viewsToCreate) {
@@ -188,26 +187,26 @@ namespace UICatalog.Scenarios {
 			SplitView newView;
 			
 			if (left) {
-				to.TrySplitView1 (out newView);
+				to.TrySplitView(0,out newView);
 
 			}
 			else {
-				to.TrySplitView2 (out newView);
+				to.TrySplitView (1,out newView);
 			}
 
 			viewsCreated++;
 
 			// During splitting the old Title will have been migrated to View1 so we only need
 			// to set the Title on View2 (the one that gets our new TextView)
-			newView.View2Title = cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
+			newView.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
 
 			// Flip orientation
 			newView.Orientation = to.Orientation == Orientation.Vertical ?
 				Orientation.Horizontal :
 				Orientation.Vertical;
-			
-			newView.View2.Add (CreateContentControl(viewsCreated));
-		}*/
+
+			newView.Tiles.ElementAt (1).View.Add (CreateContentControl(viewsCreated));
+		}
 
 		private SplitView CreateSplitView (int titleNumber, Orientation orientation)
 		{
