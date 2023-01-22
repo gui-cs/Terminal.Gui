@@ -399,6 +399,44 @@ namespace UnitTests {
 └──┴───┴──┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+		
+		[Fact, AutoInitShutdown]
+		public void TestSplitView_InsertPanelMiddle()
+		{
+			var splitContainer = Get11By3SplitView (out var line, true);
+			SetInputFocusLine (splitContainer);
+
+			splitContainer.InsertTile (1);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			// so should ignore the 2 distance and stick to 6
+			string looksLike =
+@"
+┌──┬───┬──┐
+│11│   │22│
+└──┴───┴──┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestSplitView_InsertPanelAtEnd ()
+		{
+			var splitContainer = Get11By3SplitView (out var line, true);
+			SetInputFocusLine (splitContainer);
+
+			splitContainer.InsertTile (2);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			// so should ignore the 2 distance and stick to 6
+			string looksLike =
+@"
+┌──┬───┬──┐
+│11│222│  │
+└──┴───┴──┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void TestSplitView_Horizontal_Focused ()
