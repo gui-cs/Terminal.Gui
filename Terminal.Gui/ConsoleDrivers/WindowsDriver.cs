@@ -1461,6 +1461,11 @@ namespace Terminal.Gui {
 			TerminalResized = terminalResized;
 
 			try {
+				// Needed for Windows Terminal
+				//Enable alternative screen buffer.
+				Console.Out.Write ("\x1b[?1049h");
+				Console.Out.Flush ();
+
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
@@ -1487,6 +1492,16 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
+			if (!EnableConsoleScrolling) {
+				// ANSI ESC "[xJ" Clears part of the screen.
+				// If n is 0 (or missing), clear from cursor to end of screen.
+				// If n is 1, clear from cursor to beginning of the screen.
+				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+				// Needed for Windows Terminal
+				Console.Out.Write ("\x1b[3J");
+				Console.Out.Flush ();
+			}
 		}
 
 		public override void UpdateOffScreen ()
@@ -1679,6 +1694,11 @@ namespace Terminal.Gui {
 		{
 			WinConsole.Cleanup ();
 			WinConsole = null;
+
+			// Needed for Windows Terminal
+			//Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1049l");
+			Console.Out.Flush ();
 		}
 
 		public override Attribute GetAttribute ()
