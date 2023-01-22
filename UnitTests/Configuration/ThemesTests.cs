@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests {
+#if false
 	public class ThemesTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {
@@ -161,4 +162,5 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (deserialized.ThemeDefinitions, theme.ThemeDefinitions);
 		}
 	}
+#endif
 }

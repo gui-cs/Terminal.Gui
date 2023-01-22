@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -18,7 +19,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// The <see cref="Color.Invalid"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
-	[DefaultValue(Invalid)]
+	[DefaultValue (Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -83,7 +84,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White, 
+		White,
 		/// <summary>
 		/// Indicates an invalid or un-set color value. 
 		/// </summary>
@@ -155,7 +156,7 @@ namespace Terminal.Gui {
 
 			// get the closest
 			var match = distances.OrderBy (t => t.Item2).First ();
-			return trueColorMap[match.Item1];
+			return trueColorMap [match.Item1];
 		}
 
 		private float CalculateDistance (TrueColor color1, TrueColor color2)
@@ -182,19 +183,19 @@ namespace Terminal.Gui {
 		/// the value of this property is invalid (typcially because the Attribute was created before a driver was loaded)
 		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
 		/// </summary>
-		[JsonIgnore (Condition = JsonIgnoreCondition.Always)] 
-		public int Value { get; } 
+		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
+		public int Value { get; }
 
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color Foreground { get; }
 
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		[JsonConverter (typeof (Configuration.ColorJsonConverter))] 
+		[JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color Background { get; }
 
 		/// <summary>
@@ -205,7 +206,7 @@ namespace Terminal.Gui {
 		public Attribute (int value)
 		{
 			Color foreground = Color.Invalid;
-			Color background = Color.Invalid; 
+			Color background = Color.Invalid;
 
 			Initialized = false;
 			if (Application.Driver != null) {
@@ -257,10 +258,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The driver-specific color value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) {
+		public static implicit operator int (Attribute c)
+		{
 			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
 			//if (!c.IsInitialized) throw new InvalidOperationException ("Attributes must be initialized by driver before use.");
-			return c.Value; 
+			return c.Value;
 		}
 
 		/// <summary>
@@ -494,7 +496,7 @@ namespace Terminal.Gui {
 
 			public int GetHashCode (string obj)
 			{
-				return obj.ToLowerInvariant().GetHashCode ();
+				return obj.ToLowerInvariant ().GetHashCode ();
 			}
 		}
 
@@ -505,7 +507,7 @@ namespace Terminal.Gui {
 			ColorSchemes = typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
 				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
-				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase());
+				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase ());
 		}
 
 		/// <summary>
@@ -572,7 +574,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
-		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Theme), JsonConverter (typeof (JsonStringEnumConverter))]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Theme, OmitClassName = true), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
@@ -865,7 +867,7 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public virtual void SetAttribute (Attribute c)
 		{
-			Debug.WriteLineIf(!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
 		}
 
 		/// <summary>

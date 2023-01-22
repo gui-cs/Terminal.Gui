@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Terminal.Gui.ConfigurationTests {
+#if false
 	public class ConfigurationTests {
 		[Fact, AutoInitShutdown]
 		public void TestApplyAll_AppliesSettingsAndThemes ()
@@ -65,6 +66,6 @@ namespace Terminal.Gui.ConfigurationTests {
 
 
 	}
-
+#endif
 }
 

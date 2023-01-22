@@ -6,22 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.Configuration {
-
-	[AttributeUsage (AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-	public class SerializableConfigurationProperty : System.Attribute {
-		public enum Scopes
-		{
-			Settings,
-			Theme
-		};
-
-		public Scopes Scope { get; set; }
-	}
-
-#nullable enable
 
 	/// <summary>
 	/// Classes that read/write configuration file sections (<see cref="Settings"/> and <see cref="Themes"/> are derived from this class. 
@@ -170,22 +157,16 @@ namespace Terminal.Gui.Configuration {
 			if (updatedSettings.UseSystemConsole.HasValue) UseSystemConsole = updatedSettings.UseSystemConsole.Value;
 		}
 	}
-	public class ConfigProperty
-	{
-		public PropertyInfo PropertyInfo { get; set; }
-		public object? PropertyValue { get; set; }
-
-	}
 
 	/// <summary>
 	/// The root object of Terminal.Gui configuration settings / JSON schema.
 	/// </summary>
 	/// <example><code>
 	///  {
-	///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-	///    "Settings": {
-	///    },
-	///    "Themes": {
+	///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",dddddddddd
+	///    "Application.UseSystemConsole" : true,
+	///    "Themes.SelectedTheme" : "Default",
+	///    "Themes.Definitions": {
 	///    },
 	///  },
 	/// </code></example>
@@ -193,35 +174,99 @@ namespace Terminal.Gui.Configuration {
 	public class ConfigRoot {
 
 		class ConfigRootConverter : JsonConverter<ConfigRoot> {
+			private readonly static JsonConverter<ConfigRoot> s_defaultConverter = (JsonConverter<ConfigRoot>)JsonSerializerOptions.Default.GetConverter (typeof (ConfigRoot));
+
+			// See: https://stackoverflow.com/questions/60830084/how-to-pass-an-argument-by-reference-using-reflection
+			internal abstract class ReadHelper {
+				public abstract object Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
+			}
+
+			internal class ReadHelper<T> : ReadHelper {
+				private readonly ReadDelegate _readDelegate;
+
+				private delegate T ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
+
+				public ReadHelper (object converter)
+				{
+					_readDelegate = Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read") as ReadDelegate;
+				}
+
+				public override object Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+				    => _readDelegate.Invoke (ref reader, type, options);
+			}
+
 			public override ConfigRoot Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
-				//throw new NotImplementedException ()
-				while (reader.Read())
-					;
-				return new ConfigRoot ();
+				if (reader.TokenType != JsonTokenType.StartObject) {
+					throw new JsonException ();
+				}
+
+				var configRoot = new ConfigRoot ();
+
+				while (reader.Read ()) {
+					if (reader.TokenType == JsonTokenType.EndObject) {
+						return configRoot;
+					}
+
+					if (reader.TokenType != JsonTokenType.PropertyName) {
+						throw new JsonException ();
+					}
+
+					var propertyName = reader.GetString ();
+					reader.Read ();
+
+					if (propertyName == "$schema") {
+						configRoot.schema = reader.GetString ();
+					} else {
+						// find property in dict
+						if (ConfigurationManager.ConfigProperties.TryGetValue (propertyName, out var configProp)) {
+							object propValue = null;
+							if (configProp.PropertyInfo.GetCustomAttribute (typeof (JsonConverterAttribute)) is JsonConverterAttribute jca) {
+								var readHelperType = typeof (ReadHelper<>).MakeGenericType (configProp.PropertyInfo.PropertyType);
+								var readHelper = Activator.CreateInstance (readHelperType, Activator.CreateInstance (jca.ConverterType)) as ReadHelper;
+								propValue = readHelper.Read (ref reader, configProp.PropertyInfo.PropertyType, options);
+							} else {
+								propValue = JsonSerializer.Deserialize (ref reader, configProp.PropertyInfo.PropertyType, options);
+							}
+
+
+							ConfigurationManager.ConfigProperties [propertyName].PropertyValue = propValue;
+						} else {
+							// throw new JsonException ($"Unknown property {propertyName}");
+							reader.Skip ();
+						}
+					}
+				}
+
+				throw new JsonException ();
 			}
 
 			public override void Write (Utf8JsonWriter writer, ConfigRoot root, JsonSerializerOptions options)
 			{
 				writer.WriteStartObject ();
 
-				foreach (var p in ConfigurationManager.ConfigProperties) {
+				writer.WriteString ("$schema", root.schema);
+
+				foreach (var p in ConfigurationManager.ConfigProperties
+					.Where (cp =>
+						cp.Value.PropertyInfo.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is
+						SerializableConfigurationProperty scp && scp.Scope == SerializableConfigurationProperty.Scopes.Settings)) {
 					if (p.Value.PropertyValue != null) {
 						writer.WritePropertyName (p.Key);
-						JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
+						if (p.Value.PropertyInfo.GetCustomAttribute (typeof (JsonConverterAttribute)) is JsonConverterAttribute jca) {
+							var converter = Activator.CreateInstance (jca.ConverterType);
+							var method = jca.ConverterType.GetMethod ("Write");
+							method.Invoke (converter, new object [] { writer, p.Value.PropertyValue, options });
+						} else {
+							JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
+						}
 					}
 				}
-
-				//writer.WritePropertyName ("Settings");
-				//JsonSerializer.Serialize (writer, root.Settings, options);
-
-				writer.WritePropertyName ("Themes");
-				JsonSerializer.Serialize (writer, root.Themes, options);
 
 				writer.WriteEndObject ();
 			}
 		}
-	
+
 
 		/// <summary>
 		/// Points to our JSON schema.
@@ -229,27 +274,18 @@ namespace Terminal.Gui.Configuration {
 		[JsonInclude, JsonPropertyName ("$schema")]
 		public string schema = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
 
-		///// <summary>
-		///// The Settings.
-		///// </summary>
-		//[JsonInclude]
-		//public Settings Settings = new Settings ();
+		//[JsonIgnore]
+		//public Dictionary<string, ConfigProperty> ConfigProperties { get; set; }
 
-		///// <summary>
-		///// The ColorSchemes.
-		///// </summary>
-		[JsonInclude]
-		public Themes Themes = new Themes ();
-		
 		/// <summary>
 		/// Applies the settings in each <see cref="Config{T}"/> object to the running <see cref="Application"/>.
 		/// </summary>
 		public void ApplyAll ()
 		{
-			foreach (var p in ConfigurationManager.ConfigProperties) {
-				var scope = ((SerializableConfigurationProperty)p.Value.PropertyInfo.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0]).Scope;
-				if (scope == SerializableConfigurationProperty.Scopes.Settings && 
-					p.Value.PropertyInfo.GetIndexParameters ().Length == 0 && p.Value.PropertyValue != null) {
+			foreach (var p in ConfigProperties) {
+				if (p.Value.PropertyValue != null && p.Value.PropertyInfo != null &&
+					p.Value.PropertyInfo.GetIndexParameters ().Length == 0 &&
+					((SerializableConfigurationProperty)p.Value.PropertyInfo.GetCustomAttribute (typeof (SerializableConfigurationProperty))).Scope == SerializableConfigurationProperty.Scopes.Settings) {
 					p.Value.PropertyInfo.SetValue (null, p.Value.PropertyValue);
 				} else {
 				}
@@ -257,7 +293,7 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			//Settings.Apply ();
-			Themes.Apply ();
+			//Themes.Apply ();
 		}
 
 		/// <summary>
@@ -269,11 +305,11 @@ namespace Terminal.Gui.Configuration {
 		internal void CopyUpdatedProperitesFrom (ConfigRoot newConfig)
 		{
 			foreach (var p in ConfigurationManager.ConfigProperties) {
-				
+
 			}
-			
+
 			//Settings.CopyUpdatedProperitesFrom (newConfig.Settings);
-			Themes.CopyUpdatedProperitesFrom (newConfig.Themes);
+			//Themes.CopyUpdatedProperitesFrom (newConfig.Themes);
 		}
 
 		/// <summary>
@@ -284,19 +320,19 @@ namespace Terminal.Gui.Configuration {
 		{
 			foreach (var p in ConfigurationManager.ConfigProperties) {
 				//var instance = Activator.CreateInstance (p.Value.PropertyInfo.DeclaringType);
-				if (p.Value.PropertyInfo.GetIndexParameters ().Length == 0) {
+				if (p.Value.PropertyInfo != null && p.Value.PropertyValue != null &&
+					p.Value.PropertyInfo.GetIndexParameters ().Length == 0) {
 					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
+				} else {
+					//p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
 				}
-				else {
-					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
-				}
-			
+
 			}
 
 			//Settings = new Settings ();
 			//Settings.GetHardCodedDefaults ();
-			Themes = new Themes ();
-			Themes.GetHardCodedDefaults ();
+			//Themes = new Themes ();
+			//Themes.GetHardCodedDefaults ();
 		}
 	}
 }

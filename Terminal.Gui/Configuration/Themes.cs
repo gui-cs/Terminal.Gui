@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.Configuration {
 
@@ -168,34 +169,35 @@ namespace Terminal.Gui.Configuration {
 		/// <summary>
 		/// The currenlty selected theme. 
 		/// </summary>
-		[JsonInclude]
-		public string SelectedTheme = string.Empty;
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings, OmitClassName = true)]
+		public static string Theme { get; set; } = string.Empty;
 
 		/// <summary>
-		/// The <see cref="Theme"/> definitions. 
+		/// The <see cref="Configuration.Theme"/> definitions. 
 		/// </summary>
 		[JsonInclude]
 		[JsonConverter (typeof (DictionaryConverter<Theme>))]
-		public Dictionary<string, Theme> ThemeDefinitions { get; set; } = new Dictionary<string, Theme> ();
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings, OmitClassName = true)]
+		public static Dictionary<string, Theme> ThemeDefinitions { get; set; } = new Dictionary<string, Theme> ();
 
 		/// <inheritdoc/>
 		public override void GetHardCodedDefaults ()
 		{
-			SelectedTheme = "Default";
+			Theme = "Default";
 			var defaultTheme = new Theme () { };
 			foreach (var scheme in Colors.ColorSchemes) {
 				defaultTheme.ColorSchemes.Add (scheme.Key, scheme.Value);
 			}
 			defaultTheme.DefaultFrameViewBorderStyle = FrameView.DefaultBorderStyle;
 			defaultTheme.DefaultWindowBorderStyle = Window.DefaultBorderStyle;
-			ThemeDefinitions.Add (SelectedTheme, defaultTheme);
+			ThemeDefinitions.Add (Theme, defaultTheme);
 		}
 
 		/// <inheritdoc/>
 		public override void Apply ()
 		{
-			if (ThemeDefinitions != null && ThemeDefinitions.ContainsKey (SelectedTheme)) {
-				ThemeDefinitions [SelectedTheme].Apply ();
+			if (ThemeDefinitions != null && ThemeDefinitions.ContainsKey (Theme)) {
+				ThemeDefinitions [Theme].Apply ();
 			}
 
 		}
@@ -204,7 +206,7 @@ namespace Terminal.Gui.Configuration {
 		public override void CopyUpdatedProperitesFrom (Themes updatedThemes)
 		{
 			if (ThemeDefinitions != null && updatedThemes != null) {
-				foreach (var theme in updatedThemes.ThemeDefinitions) {
+				foreach (var theme in ThemeDefinitions) {
 					if (ThemeDefinitions.ContainsKey (theme.Key)) {
 						ThemeDefinitions [theme.Key].CopyUpdatedProperitesFrom (theme.Value);
 					} else {
@@ -213,8 +215,8 @@ namespace Terminal.Gui.Configuration {
 				}
 			}
 
-			if (!string.IsNullOrEmpty (updatedThemes.SelectedTheme)) {
-				SelectedTheme = updatedThemes.SelectedTheme;
+			if (!string.IsNullOrEmpty (Themes.Theme)) {
+				Theme = Themes.Theme;
 			}
 		}
 

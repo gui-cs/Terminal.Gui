@@ -63,40 +63,125 @@ namespace Terminal.Gui.Configuration {
 				new ColorJsonConverter (),
 				new ColorSchemeJsonConverter (),
 				new KeyJsonConverter (),
-				//new DictionaryAsArrayConverter <string, ColorScheme> (),
-				//new DictionaryAsArrayConverter <string, Theme> ()
+				//new DictionaryConverter<Theme> ()
 			},
 
 		};
 
-		public static Dictionary<string, ConfigProperty> ConfigProperties = getAllConfigProperties ();
+		/// <summary>
+		/// An attribute that can be applied to a property to indicate that it should included in the configuration file.
+		/// </summary>
+		[AttributeUsage (AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+		public class SerializableConfigurationProperty : System.Attribute {
+			/// <summary>
+			/// Defines the scopes that a property can be serialized to.
+			/// </summary>
+			public enum Scopes {
+				/// <summary>
+				/// The property belongs to the global settings scope and does not apply to a <see cref="Theme"/>.
+				/// </summary>
+				/// <remarks>
+				/// Properties in the <see cref="Settings"/> scope are applied to all applications.
+				/// They are serialized to the <c>config.json</c> file at the root of the JSON DOM (defined by <see cref="ConfigRoot"/>.
+				/// </remarks>
+				Settings,
 
-		private static Dictionary<string, ConfigProperty> getAllConfigProperties ()
+				/// <summary>
+				/// The property should be applied as part of a <see cref="Theme"/>.
+				/// </summary>
+				/// <remarks>
+				/// Theme properties are serialized within the <c>{ "ThemeDefinitions" : [] }</c> property of the JSON DOM.
+				/// </remarks>
+				Theme
+			};
+
+			/// <summary>
+			/// Specifies the scope of the property.
+			/// </summary>
+			public Scopes Scope { get; set; }
+
+			/// <summary>
+			/// If <see langword="true"/>, the property will be serialized to the configuration file using only the property name
+			/// as the key. If <see langword="false"/>, the property will be serialized to the configuration file using the
+			/// property name pre-pended with the classname (e.g. <c>Application.UseSystemConsole</c>).
+			/// </summary>
+			public bool OmitClassName { get; set; }
+		}
+
+#nullable enable
+
+		/// <summary>
+		/// Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
+		/// </summary>
+		/// <remarks>
+		/// Configuration properties must be <see langword="public"/>. a <see langword="static"/>, and have the <see cref="SerializableConfigurationProperty"/>
+		/// attribute. If the type of the property requires specialized JSON serialization, a custom <see cref="JsonConverter"/> must be provided and the 
+		/// property must be decorated with the <see cref="JsonConverterAttribute"/> attribute.
+		/// </remarks>
+		public class ConfigProperty {
+			/// <summary>
+			/// Describes the property.
+			/// </summary>
+			public PropertyInfo? PropertyInfo { get; set; }
+
+			/// <summary>
+			/// Holds the property's value as it was either read from the class's implementation or from a config file. 
+			/// If the proeprty has not been set (e.g. because no configuration file specified a value), this will be <see langword="null"/>.
+			/// </summary>
+			public object? PropertyValue { get; set; }
+
+		}
+
+		/// <summary>
+		/// A dictionary of all properties in the Terminal.Gui project that are decorated with the <see cref="SerializableConfigurationProperty"/> attribute.
+		/// The keys are the property names pre-pended with the class that implements the property (e.g. <c>Application.UseSystemConsole</c>).
+		/// The values are instances of <see cref="ConfigProperty"/> which hold the property's value and the
+		/// <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
+		/// </summary>
+		public static Dictionary<string, ConfigProperty> ConfigProperties = getConfigProperties ();
+
+		private static Dictionary<string, ConfigProperty> getConfigProperties ()
 		{
-			Dictionary<string, Type> classesWithConfig = new Dictionary<string, Type> ();
-			var classes = typeof (Theme).Assembly.ExportedTypes
+			Dictionary<string, Type> classesWithConfigProps = new Dictionary<string, Type> ();
+			foreach (Type classWithConfig in typeof (Theme).Assembly.ExportedTypes
 				.Where (myType => myType.IsClass && myType.IsPublic && myType.GetProperties ()
 					.Where (prop => prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false)
 					.Count () > 0)
-				.Count () > 0);
-			foreach (Type classWithConfig in classes) {
-				classesWithConfig.Add (classWithConfig.Name, classWithConfig);
+				.Count () > 0)) {
+				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
-			classesWithConfig.OrderBy (s => s.Key).ToList ();
 
 			Dictionary<string, ConfigProperty> configProperties = new Dictionary<string, ConfigProperty> ();
-			foreach (var p in from c in classesWithConfig
+			foreach (var p in from c in classesWithConfigProps
 					  let props = c.Value.GetProperties ().Where (prop => {
-						  return prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false).Length > 0 && prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false) [0] is SerializableConfigurationProperty;
+						  return prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty;
 					  })
 					  let enumerable = props
 					  from p in enumerable
 					  select p) {
-				var configProperty = new ConfigProperty () { PropertyInfo = p };
-				configProperties.Add ($"{p.DeclaringType.Name}.{p.Name}", configProperty);
+				if (p.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp) {
+					if (p.GetGetMethod ().IsStatic) {
+						configProperties.Add (scp.OmitClassName ? p.Name : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
+							PropertyInfo = p,
+							PropertyValue = p.GetValue (null)
+						});
+					} else {
+						throw new Exception ($"Property {p.Name} in class {p.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
+					}	
+
+					var configProperty = new ConfigProperty () {
+						PropertyInfo = p,
+						PropertyValue = p.GetValue (null)
+					};
+					if (scp.OmitClassName) {
+						configProperties [p.Name] = configProperty;
+					} else {
+						configProperties [p.DeclaringType?.Name + "." + p.Name] = configProperty;
+					}
+				}
 			}
 
-			return configProperties;
+			return configProperties.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value);
 		}
 
 

@@ -163,7 +163,7 @@ namespace UICatalog {
 			// TOOD: THis is a hack. Figure out how to ensure that the file is fully written before reading it.
 			Thread.Sleep (500);
 			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
-			ConfigurationManager.Config.Themes.Apply ();			
+			//ConfigurationManager.Config.Themes.Apply ();			
 
 			if (Application.Top.MenuBar != null) {
 				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
@@ -365,7 +365,7 @@ namespace UICatalog {
 			{
 				Application.HeightAsBuffer = _heightAsBuffer;
 				if (!string.IsNullOrEmpty (_selectedTheme)) {
-					ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme;
+					//ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme;
 				}
 				ApplyConfiguration ();
 				////if (string.IsNullOrEmpty (_colorScheme)) {
@@ -569,19 +569,19 @@ namespace UICatalog {
 			public MenuItem [] CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				foreach (var theme in ConfigurationManager.Config.Themes.ThemeDefinitions) {
-					var item = new MenuItem ();
-					item.Title = theme.Key;
-					item.Shortcut = Key.AltMask + theme.Key [0];
-					item.CheckType |= MenuItemCheckStyle.Checked;
-					item.Checked = theme.Key == ConfigurationManager.Config.Themes.SelectedTheme;
-					item.Action += () => {
-						ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme = theme.Key;
-						ApplyConfiguration ();
+				//foreach (var theme in ConfigurationManager.Config.Themes.ThemeDefinitions) {
+				//	var item = new MenuItem ();
+				//	item.Title = theme.Key;
+				//	item.Shortcut = Key.AltMask + theme.Key [0];
+				//	item.CheckType |= MenuItemCheckStyle.Checked;
+				//	item.Checked = theme.Key == ConfigurationManager.Config.Themes.SelectedTheme;
+				//	item.Action += () => {
+				//		ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme = theme.Key;
+				//		ApplyConfiguration ();
 
-					};
-					menuItems.Add (item);
-				}
+				//	};
+				//	menuItems.Add (item);
+				//}
 
 				var schemeMenuItems = new List<MenuItem> ();
 				foreach (var sc in Colors.ColorSchemes) {
@@ -626,11 +626,11 @@ namespace UICatalog {
 				if (menu != null) {
 					menu.Checked = false;
 				}
-				menu = __themeMenuItems.Where (m => m.Title == ConfigurationManager.Config.Themes.SelectedTheme).FirstOrDefault ();
-				if (menu != null) {
-					_selectedTheme = menu.Title.ToString ();
-					menu.Checked = true;
-				}
+				//menu = __themeMenuItems.Where (m => m.Title == ConfigurationManager.Config.Themes.SelectedTheme).FirstOrDefault ();
+				//if (menu != null) {
+				//	_selectedTheme = menu.Title.ToString ();
+				//	menu.Checked = true;
+				//}
 			}
 
 			void KeyDownHandler (View.KeyEventEventArgs a)

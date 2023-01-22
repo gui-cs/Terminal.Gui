@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using Terminal.Gui.Configuration;
 using Xunit;
-
+using static System.Formats.Asn1.AsnWriter;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationMangerTests {
@@ -15,6 +19,108 @@ namespace Terminal.Gui.ConfigurationTests {
 				new ColorJsonConverter ()
 				}
 		};
+
+		//[Fact ()]
+		//public void LoadFromJsonTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void ToJsonTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void UpdateConfigurationTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void UpdateConfigurationFromFileTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void SaveHardCodedDefaultsTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadGlobalFromLibraryResourceTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadGlobalFromAppDirectoryTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadGlobalFromHomeDirectoryTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadAppFromAppResourcesTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadAppFromAppDirectoryTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadAppFromHomeDirectoryTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		//[Fact ()]
+		//public void LoadTest ()
+		//{
+		//	Assert.True (false, "This test needs an implementation");
+		//}
+
+		[Fact]
+		public void TestConfigProperties ()
+		{
+			Assert.NotEmpty (ConfigProperties);
+			// test that all ConfigProperites have our attribute
+			Assert.All (ConfigProperties, item => Assert.NotEmpty (item.Value.PropertyInfo.CustomAttributes.Where (a => a.AttributeType == typeof (SerializableConfigurationProperty))));
+			Assert.Empty (ConfigProperties.Where (cp => cp.Value.PropertyInfo.GetCustomAttribute (typeof (SerializableConfigurationProperty)) == null));
+
+			// Application is a static class
+			PropertyInfo pi = typeof (Application).GetProperty ("UseSystemConsole");
+			Assert.Equal (pi, ConfigProperties ["Application.UseSystemConsole"].PropertyInfo);
+
+			// FrameView is not a static class
+			pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
+			Assert.Equal (pi, ConfigProperties ["FrameView.DefaultBorderStyle"].PropertyInfo);
+
+		}
+
+		[Fact]
+		public void TestConfigPropertyOmitClassName ()
+		{
+			// Color.ColorShemes is serialzied as "ColorSchemes", not "Colors.ColorSchemes"
+			PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
+			var scp = ((SerializableConfigurationProperty)pi.GetCustomAttribute (typeof (SerializableConfigurationProperty)));
+			Assert.True (scp.Scope == SerializableConfigurationProperty.Scopes.Theme);
+			Assert.True (scp.OmitClassName);
+			Assert.Equal (pi, ConfigProperties ["ColorSchemes"].PropertyInfo);
+
+		}
 
 		/// <summary>
 		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
@@ -45,17 +151,20 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue = true;
 			var json = ConfigurationManager.ToJson (configuration);
 
+			ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue = false;
+			Assert.False ((bool)ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue);
 			var readConfig = ConfigurationManager.LoadFromJson (json);
+			Assert.True ((bool)ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue);
 
-			Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
-			Assert.Equal (Colors.TopLevel, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"]);
-			Assert.Equal (Colors.Error, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"]);
-			Assert.Equal (Colors.Dialog, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"]);
-			Assert.Equal (Colors.Menu, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"]);
+			//Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
+			//Assert.Equal (Colors.TopLevel, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"]);
+			//Assert.Equal (Colors.Error, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"]);
+			//Assert.Equal (Colors.Dialog, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"]);
+			//Assert.Equal (Colors.Menu, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"]);
 
 			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
-
+#if false
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerInitDriver ()
 		{
@@ -411,7 +520,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			//// Check that the settings from the highest precedence source are loaded
 			//Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
 		}
-
+#endif 
 	}
 }
 

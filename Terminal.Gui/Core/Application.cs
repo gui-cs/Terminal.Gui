@@ -22,6 +22,7 @@ using System.Reflection;
 using System.IO;
 using Terminal.Gui.Configuration;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 
@@ -113,23 +114,26 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
+		private static bool _heightAsBuffer = false;
+
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
 		/// 
-		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					return _heightAsBuffer;
 				}
 				return Driver.HeightAsBuffer;
 			}
 			set {
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					_heightAsBuffer = value;
+					return;
 				}
-				Driver.HeightAsBuffer = value;
+				Driver.HeightAsBuffer = _heightAsBuffer = value;
 			}
 		}
 
@@ -138,7 +142,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -162,7 +166,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -186,7 +190,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		[Configuration.SerializableConfigurationProperty (Scope = Configuration.SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {
@@ -314,7 +318,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
-		public static bool UseSystemConsole;
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
+		public static bool UseSystemConsole { get; set; }
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool ForceFakeConsole;
@@ -402,7 +407,7 @@ namespace Terminal.Gui {
 			ConfigurationManager.Config.ApplyAll ();
 
 			ConfigProperty usc;
-			if (ConfigurationManager.ConfigProperties.TryGetValue ("Application.UseSystemConsole", out usc)) {
+			if (ConfigurationManager.ConfigProperties.TryGetValue ("Application.UseSystemConsole", out usc) && usc.PropertyValue != null) {
 				UseSystemConsole = (bool)usc.PropertyValue;
 			}
 
@@ -443,6 +448,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
+				Driver.HeightAsBuffer = _heightAsBuffer;
 				Driver.Init (TerminalResized);
 
 				// Now that the Driver is initialized, load all other configuration

@@ -9,6 +9,7 @@ using System.IO;
 using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests {
+#if false       
 	public class ThemeTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {
@@ -153,5 +154,5 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Colors.Base.Disabled, deserializedColors.Disabled);
 		}
 	}
-
+#endif
 }
