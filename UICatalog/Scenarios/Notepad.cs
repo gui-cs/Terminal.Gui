@@ -122,15 +122,14 @@ namespace UICatalog.Scenarios {
 		}
 		private void SplitRight (TabView sender, OpenedFile tab)
 		{
-			/*
 			var split = (SplitView)sender.SuperView.SuperView;
 
 			// TODO: Implement
-			split.TrySplitView1 (out var sub);
+			split.TrySplitView (0, out var sub);
 			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			sub.View2.Add (newTabView);*/
+			sub.Tiles.ElementAt (1).View.Add (newTabView);
 		}
 
 		private TabView CreateNewTabView ()
