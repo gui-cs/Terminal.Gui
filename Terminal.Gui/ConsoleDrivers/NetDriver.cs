@@ -1460,25 +1460,27 @@ namespace Terminal.Gui {
 			int cols = Cols;
 			System.Text.StringBuilder output = new System.Text.StringBuilder ();
 			var lastCol = -1;
+			var successSetCurPos = true;
 
 			Console.CursorVisible = false;
 			if (IsWinPlatform) {
-				Console.CursorTop = 0;
-				Console.CursorLeft = 0;
+				successSetCurPos = SetCursorPosition (0, 0);
 			} else {
 				SetVirtualCursorPosition (0, 0);
 			}
 
 			for (int row = top; row < rows; row++) {
+				if (Console.WindowHeight < 1) {
+					return;
+				}
 				if (!dirtyLine [row]) {
 					continue;
 				}
-				dirtyLine [row] = false;
+				if (successSetCurPos) {
+					dirtyLine [row] = false;
+				}
 				output.Clear ();
 				for (int col = left; col < cols; col++) {
-					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
-						return;
-					}
 					lastCol = -1;
 					var outputWidth = 0;
 					for (; col < cols; col++) {
@@ -1514,7 +1516,9 @@ namespace Terminal.Gui {
 						} else {
 							output.Append ((char)rune);
 						}
-						contents [row, col, 2] = 0;
+						if (successSetCurPos) {
+							contents [row, col, 2] = 0;
+						}
 					}
 				}
 				if (output.Length > 0) {
