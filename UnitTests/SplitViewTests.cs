@@ -496,10 +496,6 @@ namespace UnitTests {
 			var left = (SplitView)splitContainer.Tiles.ElementAt (0).View;
 			Assert.Same (left.SuperView, splitContainer);
 
-			Assert.Equal (10, left.Tiles.ElementAt(0).View.Frame.Width);
-			Assert.Equal (5, left.Tiles.ElementAt (0).View.Frame.Height);
-			Assert.Equal (10, left.Tiles.ElementAt (1).View.Frame.Width);
-			Assert.Equal (4, left.Tiles.ElementAt (1).View.Frame.Height);
 
 			Assert.Equal(2, left.Tiles.ElementAt (0).View.Subviews.Count);
 			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [0]);

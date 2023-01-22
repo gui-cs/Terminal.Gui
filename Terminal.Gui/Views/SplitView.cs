@@ -352,6 +352,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			RespectMinimumTileSizes ();
+
 			for (int i = 0; i < splitterLines.Count; i++) {
 				var line = splitterLines[i];
 
@@ -373,8 +375,6 @@ namespace Terminal.Gui {
 				}
 
 			}
-
-			RespectMinimumTileSizes ();
 
 			for (int i = 0; i < tiles.Count; i++) {
 				var tile = tiles [i];
@@ -413,58 +413,65 @@ namespace Terminal.Gui {
 
 		private void RespectMinimumTileSizes ()
 		{
-			// TODO: implement this
-			/* 
 			// if we are not yet initialized then we don't know
 			// how big we are and therefore cannot sensibly calculate
 			// how big the views will be with a given SplitterDistance
 			if (!IsInitialized) {
-				return pos;
+				return;
 			}
-
-			var view1MinSize = View1MinSize;
-			var view2MinSize = View2MinSize;
 
 			// how much space is there?
 			var availableSpace = Orientation == Orientation.Horizontal 
 				? this.Bounds.Height 
 				: this.Bounds.Width;
+			
+			var fullSpace = availableSpace;
 
-			// if there is a border then there is less space
-			// for the views so we need to make size restrictions
-			// tighter.
-			if (HasBorder ()) {
-				view1MinSize++;
-				view2MinSize++;
+			var lastSplitterLocation = 0;
+
+			for(int i=0;i< splitterDistances.Count; i++) {
+				var splitterLocation = splitterDistances [i].Anchor(fullSpace);
+
+				var availableLeft = splitterLocation - lastSplitterLocation;
+				// Border steals space
+				availableLeft -= HasBorder () && i == 0 ? 1 : 0;
+
+				var availableRight = fullSpace - splitterLocation;
+				// Border steals space
+				availableRight -= HasBorder () && i == 0 ? 1 : 0;
+				// Splitter line steals space
+				availableRight--;
+
+				// TODO: Test 3+ panel max/mins because this calculation is probably wrong
+
+				var requiredLeft = tiles [i].MinSize;
+				var requiredRight = tiles [i+1].MinSize;
+
+				if (availableLeft < requiredLeft) {
+
+					// There is not enough space for panel on left
+					var insteadTake = requiredLeft + (HasBorder() ? 1 :0);
+
+					// Don't take more than the available space in view
+					insteadTake = Math.Max(0,Math.Min (fullSpace, insteadTake));
+					splitterDistances [i] = insteadTake;
+					splitterLocation = insteadTake;
+				}
+				else if (availableRight < requiredRight) {
+					// There is not enough space for panel on right
+					var insteadTake = fullSpace - (requiredRight + (HasBorder()?1:0));
+
+					// leave 1 space for the splitter
+					insteadTake --;
+
+					insteadTake = Math.Max (0, Math.Min (fullSpace, insteadTake));
+					splitterDistances [i] = insteadTake;
+					splitterLocation = insteadTake;
+				}
+
+				availableSpace -= splitterLocation;
+				lastSplitterLocation = splitterLocation;
 			}
-
-
-
-			// we probably haven't finished layout even if IsInitialized is true :(
-			if (availableSpace <= 0) {
-				return pos;
-			}
-
-			var idealPosition = pos.Anchor (availableSpace);
-
-			// bad position because not enough space for View1
-			if (idealPosition < view1MinSize) {
-
-				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
-				return (Pos)Math.Min (view1MinSize, availableSpace);
-			}
-
-			// bad position because not enough space for View2
-			if (availableSpace - idealPosition <= view2MinSize) {
-
-				// TODO: we should preserve Absolute/Percent status here not just force it to absolute
-
-				// +1 is to allow space for the splitter
-				return (Pos)Math.Max (availableSpace - (view2MinSize + 1), 0);
-			}
-
-			// this splitter position is fine, there is enough space for everyone
-			return pos;*/
 		}
 
 		private class SplitContainerLineView : LineView {
