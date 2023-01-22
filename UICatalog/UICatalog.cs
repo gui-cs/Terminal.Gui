@@ -118,6 +118,9 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
+			
+			Application.EnableConsoleScrolling = true;
+			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -139,7 +142,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		static bool _heightAsBuffer = false;
+		static bool _enableConsoleScrolling = true;
 		static bool _isFirstRunning = true;
 		static ColorScheme _colorScheme;
 
@@ -272,7 +275,7 @@ namespace UICatalog {
 
 			void LoadedHandler ()
 			{
-				Application.EnableConsoleScrolling = _heightAsBuffer;
+				Application.EnableConsoleScrolling = _enableConsoleScrolling;
 
 				if (_colorScheme == null) {
 					ColorScheme = _colorScheme = Colors.Base;
