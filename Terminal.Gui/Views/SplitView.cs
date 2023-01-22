@@ -365,9 +365,11 @@ namespace Terminal.Gui {
 
 				if (orientation == Orientation.Vertical) {
 					line.X = splitterDistances [i];
+					line.Y = 0;
 				}
 				else {
 					line.Y = splitterDistances [i];
+					line.X = 0;
 				}
 
 			}
@@ -380,7 +382,7 @@ namespace Terminal.Gui {
 				// TODO: Deal with lines being Visibility false
 
 				if (Orientation == Orientation.Vertical) {
-					tile.View.X = i == 0 ? 0 : Pos.Right (splitterLines [i - 1]);
+					tile.View.X = i == 0 ? bounds.X : Pos.Right (splitterLines [i - 1]);
 					tile.View.Y = bounds.Y;
 					tile.View.Height = bounds.Height;
 
@@ -658,12 +660,12 @@ namespace Terminal.Gui {
 			{
 				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						Parent.splitterDistances [Idx] = ConvertToPosFactor (newValue, Parent.Bounds.Height);
+						Parent.SetSplitterPos(Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
 					} else {
-						Parent.splitterDistances [Idx] = ConvertToPosFactor (newValue, Parent.Bounds.Width);
+						Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
 					}
 				} else {
-					Parent.splitterDistances [Idx] = newValue;
+					Parent.SetSplitterPos (Idx, newValue);
 				}
 			}
 

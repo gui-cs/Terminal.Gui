@@ -400,6 +400,7 @@ namespace UnitTests {
 
 			// Now move splitter line down
 			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+
 			splitContainer.Redraw (splitContainer.Bounds);
 			looksLike =
 @"    
@@ -471,15 +472,15 @@ namespace UnitTests {
 			var splitContainer = Get11By3SplitView ();
 
 			var ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Right (splitContainer)));
-			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
 
 
 			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Function (() => 1)));
-			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosFunc", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosFunc", ex.Message);
 
 			// Also not allowed because this results in a PosCombine
 			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0, Pos.Percent (50) - 1));
-			Assert.Equal ("Only Percent and Absolute values are supported for SplitterDistance property.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
 		}
 
 		[Fact,AutoInitShutdown]
