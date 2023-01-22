@@ -122,10 +122,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="idx"></param>
 		/// <exception cref="NotImplementedException"></exception>
-		internal void InsertTile (int idx)
+		public Tile InsertTile (int idx)
 		{
 			var oldTiles = Tiles.ToArray ();
 			RebuildForTileCount (oldTiles.Length + 1);
+
+			Tile toReturn = null;
 
 			for(int i=0;i<tiles.Count;i++) {
 				
@@ -139,9 +141,25 @@ namespace Terminal.Gui {
 					tiles [i] = oldTile;
 					Add (tiles [i].View);
 				}
+				else
+				{
+					toReturn = tiles[i];
+				}
 			}
 			SetNeedsDisplay ();
 			LayoutSubviews ();
+
+			return toReturn;
+		}
+
+		///<summary>
+		/// Returns the index of the first <see cref="Tile"/> in
+		/// <see cref="Tiles"/> which contains <paramref name="view"/>.
+		///</summary>
+		public int IndexOf(View view)
+		{
+			// TODO: Could be recursive (i.e. search nested Subviews)
+			return tiles.IndexOf((t)=>t.View == view || t.View.Subviews.Contains(view));
 		}
 
 		/// <summary>
@@ -302,7 +320,7 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="SplitView"/></returns>
-		public bool TrySplitView(int idx, out SplitView result)
+		public bool TrySplitView(int idx, int panels, out SplitView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
@@ -315,7 +333,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var newContainer = new SplitView {
+			var newContainer = new SplitView(panels) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				parentSplitView = this,

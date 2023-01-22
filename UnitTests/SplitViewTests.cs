@@ -595,7 +595,7 @@ namespace UnitTests {
 		private SplitView GetNestedContainer2Left1Right(bool withBorder)
 		{
 			var container = GetSplitView (20, 10,withBorder);
-			Assert.True (container.TrySplitView (0, out var newContainer));
+			Assert.True (container.TrySplitView (0,2, out var newContainer));
 			
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();

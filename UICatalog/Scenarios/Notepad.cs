@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Graphs;
 
 namespace UICatalog.Scenarios {
 
@@ -110,26 +111,48 @@ namespace UICatalog.Scenarios {
 
 		private void SplitUp (TabView sender, OpenedFile tab)
 		{
-			
+			Split(0, Orientation.Horizontal,sender,tab);			
 		}
 		private void SplitDown (TabView sender, OpenedFile tab)
 		{
+			Split(1, Orientation.Horizontal,sender,tab);
 			
 		}
 		private void SplitLeft (TabView sender, OpenedFile tab)
 		{
-			
+			Split(0, Orientation.Vertical,sender,tab);
 		}
 		private void SplitRight (TabView sender, OpenedFile tab)
 		{
-			var split = (SplitView)sender.SuperView.SuperView;
+			Split(1, Orientation.Vertical,sender,tab);
+		}
 
-			// TODO: Implement
-			split.TrySplitView (0, out var sub);
-			sub.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
+		private void Split (int offset, Orientation orientation,TabView sender, OpenedFile tab)
+		{
+			
+			var split = (SplitView)sender.SuperView.SuperView;
+			var tileIndex = split.IndexOf(sender);
+
+			if(tileIndex == -1)
+			{
+				return;
+			}
+
+			if(orientation != split.Orientation)
+			{
+				split.TrySplitView(tileIndex,1,out split);
+				split.Orientation = orientation;
+				tileIndex = 0;
+			}
+
+			var newTile = split.InsertTile(tileIndex + offset);
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			sub.Tiles.ElementAt (1).View.Add (newTabView);
+			newTile.View.Add(newTabView);
+
+			newTabView.EnsureFocus();
+			newTabView.FocusFirst();
+			newTabView.FocusNext();
 		}
 
 		private TabView CreateNewTabView ()
