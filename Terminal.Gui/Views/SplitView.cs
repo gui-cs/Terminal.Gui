@@ -117,6 +117,34 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Adds a new <see cref="Tile"/> to the collection at <paramref name="idx"/>.
+		/// This will also add another splitter line
+		/// </summary>
+		/// <param name="idx"></param>
+		/// <exception cref="NotImplementedException"></exception>
+		internal void InsertTile (int idx)
+		{
+			var oldTiles = Tiles.ToArray ();
+			RebuildForTileCount (oldTiles.Length + 1);
+
+			for(int i=0;i<tiles.Count;i++) {
+				
+				if(i != idx) {
+					var oldTile = oldTiles [i > idx ? i - 1 : i];
+
+					// remove the new empty View
+					Remove (tiles [i].View);
+					
+					// restore old Tile and View
+					tiles [i] = oldTile;
+					Add (tiles [i].View);
+				}
+			}
+			SetNeedsDisplay ();
+			LayoutSubviews ();
+		}
+
+		/// <summary>
 		/// Orientation of the dividing line (Horizontal or Vertical).
 		/// </summary>
 		public Orientation Orientation {
