@@ -148,19 +148,6 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
-
-			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
-			// Clear and reset entire screen.
-			//Console.Out.Write ("\x1b[2J");
-			//Console.Out.Flush ();
-
-			// Set top and bottom lines of a window.
-			//Console.Out.Write ("\x1b[1;25r");
-			//Console.Out.Flush ();
-
-			//Set cursor key to cursor.
-			//Console.Out.Write ("\x1b[?1l");
-			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -826,9 +813,6 @@ namespace Terminal.Gui {
 
 			try {
 				//Set cursor key to application.
-				//Console.Out.Write ("\x1b[?1h");
-				//Console.Out.Flush ();
-
 				window = Curses.initscr ();
 				Curses.set_escdelay (10);
 			} catch (Exception e) {
@@ -939,8 +923,7 @@ namespace Terminal.Gui {
 		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
-			Console.Out.Write ("\x1b[3J");
-			Console.Out.Flush ();
+			Curses.refresh ();
 		}
 
 		public override void UpdateOffScreen ()
@@ -1072,13 +1055,11 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003h");
-			Console.Out.Flush ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003l");
-			Console.Out.Flush ();
 		}
 
 		//int lastMouseInterval;
@@ -1126,7 +1107,6 @@ namespace Terminal.Gui {
 
 			if (visibility != CursorVisibility.Invisible) {
 				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
-				Console.Out.Flush ();
 			}
 
 			currentCursorVisibility = visibility;
