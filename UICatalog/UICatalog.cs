@@ -142,7 +142,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		static bool _enableConsoleScrolling = true;
+		static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static ColorScheme _colorScheme;
 
