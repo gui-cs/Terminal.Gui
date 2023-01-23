@@ -1290,11 +1290,10 @@ namespace Terminal.Gui {
 
 			//Disable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1049l");
-			Console.Out.Flush ();
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 
 			//Set cursor key to cursor.
 			Console.Out.Write ("\x1b[?25h");
-			Console.Out.Flush ();
 		}
 
 		public override Attribute MakeColor (Color foreground, Color background)
@@ -1318,11 +1317,9 @@ namespace Terminal.Gui {
 
 			//Enable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1049h");
-			Console.Out.Flush ();
 
 			//Set cursor key to application.
 			Console.Out.Write ("\x1b[?25l");
-			Console.Out.Flush ();
 
 			Console.TreatControlCAsInput = true;
 
@@ -1408,7 +1405,6 @@ namespace Terminal.Gui {
 				//	// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
 				//	// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
 				//	Console.Out.Write ("\x1b[0J");
-				//	Console.Out.Flush ();
 				//}
 			}
 		}
@@ -1533,7 +1529,6 @@ namespace Terminal.Gui {
 		void SetVirtualCursorPosition (int col, int row)
 		{
 			Console.Out.Write ($"\x1b[{row + 1};{col + 1}H");
-			Console.Out.Flush ();
 		}
 
 		System.Text.StringBuilder WriteAttributes (int attr)
@@ -1628,13 +1623,11 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003h\x1b[?1015h\x1b[?1006h");
-			Console.Out.Flush ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003l\x1b[?1015l\x1b[?1006l");
-			Console.Out.Flush ();
 		}
 
 		public override void Suspend ()
