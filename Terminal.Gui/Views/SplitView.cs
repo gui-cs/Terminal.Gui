@@ -100,17 +100,19 @@ namespace Terminal.Gui {
 			}
 
 			for (int i = 0; i < count; i++) {
-				var tile = new Tile ();
-				tiles.Add (tile);
-				Add (tile.View);
+
 
 				if (i > 0) {
 					var currentPos = Pos.Percent ((100 / count) * i);
 					splitterDistances.Add (currentPos);
-					var line = new SplitContainerLineView (this, i-1);
+					var line = new SplitContainerLineView (this, i - 1);
 					Add (line);
 					splitterLines.Add (line);
 				}
+
+				var tile = new Tile ();
+				tiles.Add (tile);
+				Add (tile.View);
 			}
 
 			LayoutSubviews ();
