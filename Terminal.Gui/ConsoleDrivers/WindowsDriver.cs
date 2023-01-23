@@ -1463,8 +1463,8 @@ namespace Terminal.Gui {
 			try {
 				// Needed for Windows Terminal
 				//Enable alternative screen buffer.
-				Console.Out.Write ("\x1b[?1049h");
-				Console.Out.Flush ();
+				Console.Out.Write ("\x1b[?1047h");
+				//Console.Out.Flush ();
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1499,8 +1499,8 @@ namespace Terminal.Gui {
 				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
 				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
 				// Needed for Windows Terminal
-				Console.Out.Write ("\x1b[3J");
-				Console.Out.Flush ();
+				//Console.Out.Write ("\x1b[3J");
+				//Console.Out.Flush ();
 			}
 		}
 
@@ -1697,8 +1697,8 @@ namespace Terminal.Gui {
 
 			// Needed for Windows Terminal
 			//Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1049l");
-			Console.Out.Flush ();
+			Console.Out.Write ("\x1b[?1047l");
+			//Console.Out.Flush ();
 		}
 
 		public override Attribute GetAttribute ()
