@@ -1,7 +1,7 @@
 {
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "Application.QuitKey": {
-    "Key": "Q",
+  "Application.AlternateBackwardKey": {
+    "Key": "PageUp",
     "Modifiers": [
       "Ctrl"
     ]
@@ -12,17 +12,16 @@
       "Ctrl"
     ]
   },
-  "Application.AlternateBackwardKey": {
-    "Key": "PageUp",
+  "Application.HeightAsBuffer": false,
+  "Application.QuitKey": {
+    "Key": "Q",
     "Modifiers": [
       "Ctrl"
     ]
   },
-  "Application.ThemesUseSystemConsole": false,
-  "Application.IsMouseDisabled": false,
-  "Application.HeightAsBuffer": false,
+  "Application.UseSystemConsole": false,
   "Theme": "Default",
-  "ThemeDefinitions": [
+  "Themes": [
     {
       "Default": {
         "ColorSchemes": [

@@ -96,7 +96,7 @@ namespace UICatalog {
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
-				_selectedScenario.Init (Colors.ColorSchemes [_colorScheme]);
+				_selectedScenario.Init (Colors.ColorSchemes [_topLevelColorScheme]);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
 				_selectedScenario = null;
@@ -119,7 +119,7 @@ namespace UICatalog {
 			Scenario scenario;
 			while ((scenario = RunUICatalogTopLevel ()) != null) {
 				VerifyObjectsWereDisposed ();
-				scenario.Init (Colors.ColorSchemes [_colorScheme]);
+				scenario.Init (Colors.ColorSchemes [_topLevelColorScheme]);
 				scenario.Setup ();
 				scenario.Run ();
 
@@ -176,12 +176,12 @@ namespace UICatalog {
 			}
 
 			if (Application.Top is UICatalogTopLevel) {
-				__themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
-				__themeMenuBarItem.Children = __themeMenuItems;
-				//var checkedThemeMenu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
-				//if (checkedThemeMenu != null) {
-				//	Application.Top.ColorScheme = Colors.ColorSchemes[(string)checkedThemeMenu.Data];
-				//}
+				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+				_themeMenuBarItem.Children = _themeMenuItems;
+				var checkedThemeMenu = _themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
+				if (checkedThemeMenu != null) {
+					ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = checkedThemeMenu.Title.ToString ();
+				}
 				((UICatalogTopLevel)Application.Top).ApplyConfiguration ();
 			}
 		}
@@ -227,11 +227,11 @@ namespace UICatalog {
 		// The theme selected on the Themes menu. We keep track of it
 		// so after a scenario exits (and Shutdown is called) we can
 		// re-set it.
-		static private string _selectedTheme;
-		static string _colorScheme = "Base";
+		//static private string _theme;
+		static string _topLevelColorScheme;
 
-		static MenuItem [] __themeMenuItems;
-		static MenuBarItem __themeMenuBarItem;
+		static MenuItem [] _themeMenuItems;
+		static MenuBarItem _themeMenuBarItem;
 
 		/// <summary>
 		/// This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on 
@@ -254,13 +254,13 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				__themeMenuItems = CreateThemeMenuItems ();
-				__themeMenuBarItem = new MenuBarItem ("_Themes", __themeMenuItems);
+				_themeMenuItems = CreateThemeMenuItems ();
+				_themeMenuBarItem = new MenuBarItem ("_Themes", _themeMenuItems);
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Application.QuitKey)
 					}),
-					__themeMenuBarItem,
+					_themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 					new MenuBarItem ("_Help", new MenuItem [] {
 						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
@@ -363,20 +363,8 @@ namespace UICatalog {
 
 			void LoadedHandler ()
 			{
-				Application.HeightAsBuffer = _heightAsBuffer;
-				if (!string.IsNullOrEmpty (_selectedTheme)) {
-					//ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme;
-				}
 				ApplyConfiguration ();
-				////if (string.IsNullOrEmpty (_colorScheme)) {
-				////	ColorScheme = Colors.ColorSchemes ["UICatalog"];
-				////}
-
-				//foreach (var menuItem in __themeMenuItems) {
-				//	menuItem.Checked = (string)menuItem.Data == _colorScheme;
-				//}
-
-
+	
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -569,40 +557,39 @@ namespace UICatalog {
 			public MenuItem [] CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				//foreach (var theme in ConfigurationManager.Config.Themes.ThemeDefinitions) {
-				//	var item = new MenuItem ();
-				//	item.Title = theme.Key;
-				//	item.Shortcut = Key.AltMask + theme.Key [0];
-				//	item.CheckType |= MenuItemCheckStyle.Checked;
-				//	item.Checked = theme.Key == ConfigurationManager.Config.Themes.SelectedTheme;
-				//	item.Action += () => {
-				//		ConfigurationManager.Config.Themes.SelectedTheme = _selectedTheme = theme.Key;
-				//		ApplyConfiguration ();
+				foreach (var theme in ThemeManager.Themes) {
+					var item = new MenuItem ();
+					item.Title = theme.Key;
+					item.Shortcut = Key.AltMask + theme.Key [0];
+					item.CheckType |= MenuItemCheckStyle.Checked;
+					item.Checked = theme.Key == ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string;
+					item.Action += () => {
+						ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = theme.Key;
+						ApplyConfiguration ();
+					};
+					menuItems.Add (item);
+				}
 
-				//	};
-				//	menuItems.Add (item);
-				//}
-
-				var schemeMenuItems = new List<MenuItem> ();
+				var schemeMenuItems = new List<MenuItem> ();	
 				foreach (var sc in Colors.ColorSchemes) {
 					var item = new MenuItem ();
 					item.Title = $"_{sc.Key}";
 					item.Data = sc.Key;
 					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
 					item.CheckType |= MenuItemCheckStyle.Radio;
-					item.Checked = sc.Key == _colorScheme;
+					item.Checked = sc.Key == _topLevelColorScheme;
 					item.Action += () => {
-						_colorScheme = (string)item.Data;
-						foreach (var schemeMenuItems in schemeMenuItems) {
-							schemeMenuItems.Checked = (string)schemeMenuItems.Data == _colorScheme;
+						_topLevelColorScheme = (string)item.Data;
+						foreach (var schemeMenuItem in schemeMenuItems) {
+							schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
 						}
-						ColorScheme = Colors.ColorSchemes [_colorScheme];
+						ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 						Application.Top.SetNeedsDisplay ();
 					};
 					schemeMenuItems.Add (item);
 				}
 				menuItems.Add (null);
-				var mbi = new MenuBarItem ("_Schemes", schemeMenuItems.ToArray());
+				var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray());
 				menuItems.Add (mbi);
 
 				return menuItems.ToArray ();
@@ -610,7 +597,34 @@ namespace UICatalog {
 
 			public void ApplyConfiguration ()
 			{
-				ConfigurationManager.Config.ApplyAll ();
+				ConfigurationManager.Apply ();
+
+				if (ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
+					_topLevelColorScheme = "UI Catalog Scheme";
+				}
+				
+				if (!Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
+					_topLevelColorScheme = "Base";
+				} 
+
+				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+				_themeMenuBarItem.Children = _themeMenuItems;
+
+				var checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Checked).FirstOrDefault ();
+				if (checkedThemeMenu != null) {
+					checkedThemeMenu.Checked = false;
+				}
+				checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Title == ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string).FirstOrDefault ();
+				if (checkedThemeMenu != null) {
+					ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = checkedThemeMenu.Title.ToString ();
+					checkedThemeMenu.Checked = true;
+				}
+				var schemeMenuItems = ((MenuBarItem)_themeMenuItems.Where (i => i is MenuBarItem).FirstOrDefault()).Children;
+				foreach (var schemeMenuItem in schemeMenuItems) {
+					schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
+				}
+
+				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
@@ -619,18 +633,7 @@ namespace UICatalog {
 				Application.Top.MenuBar.SetNeedsDisplay ();
 				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
 				Application.Top.StatusBar.SetNeedsDisplay ();
-				Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 				Application.Top.SetNeedsDisplay ();
-
-				var menu = __themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
-				if (menu != null) {
-					menu.Checked = false;
-				}
-				//menu = __themeMenuItems.Where (m => m.Title == ConfigurationManager.Config.Themes.SelectedTheme).FirstOrDefault ();
-				//if (menu != null) {
-				//	_selectedTheme = menu.Title.ToString ();
-				//	menu.Checked = true;
-				//}
 			}
 
 			void KeyDownHandler (View.KeyEventEventArgs a)

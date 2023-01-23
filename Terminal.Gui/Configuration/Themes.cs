@@ -45,12 +45,41 @@ namespace Terminal.Gui.Configuration {
 	/// 		}
 	/// 	}
 	/// </code></example> 
-	public class Theme : Config<Theme> {
+	public class Theme : Config {
+		private Dictionary<string, ColorScheme> colorSchemes;
+
 		/// <summary>
 		/// The ColorScheme for the Theme
 		/// </summary>
 		[JsonConverter (typeof (DictionaryConverter<ColorScheme>))]
-		public Dictionary<string, ColorScheme> ColorSchemes { get; set; } = new Dictionary<string, ColorScheme> ();
+		public Dictionary<string, ColorScheme> ColorSchemes {
+			get => colorSchemes;
+			set {
+				if (colorSchemes == null) {
+					colorSchemes = new Dictionary<string, ColorScheme> ();
+				}
+				// TODO: If a Theme doesn't specify the built-in ColorSchemes (e.g. Base)
+				// the behavior is indeterminte. The commented code below is one solution; 
+				// it makes the ne Theme "inherit" from Default (assuming default) exists.
+				//
+				if (ThemeManager.Themes != null && ThemeManager.Themes.ContainsKey ("Default")) {
+					foreach (var s in ThemeManager.Themes ["Default"].ColorSchemes) {
+						colorSchemes [s.Key] = s.Value;
+					}
+				}
+				//
+				// Another solution is to have a Theme that doesn't specify all core Schemes 
+				// "inherit" from whatever ConsoleDriver sets (which is currenlty Black/White for all Schemes).
+				//
+				//foreach (var s in Colors.ColorSchemes) {
+				//	colorSchemes [s.Key] = s.Value;
+				//}
+
+				foreach (var newScheme in value) {
+					colorSchemes [newScheme.Key] = newScheme.Value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// 
@@ -74,6 +103,9 @@ namespace Terminal.Gui.Configuration {
 				foreach (var scheme in ColorSchemes) {
 					Colors.ColorSchemes [scheme.Key] = scheme.Value;
 				}
+				// If a driver is set, call CreateColors to ensure the attributes in the loaded
+				// scheme are set.
+				Application.Driver?.InitalizeColorSchemes ();
 			}
 
 			if (DefaultWindowBorderStyle.HasValue) {
@@ -82,37 +114,6 @@ namespace Terminal.Gui.Configuration {
 
 			if (DefaultFrameViewBorderStyle.HasValue) {
 				FrameView.DefaultBorderStyle = DefaultFrameViewBorderStyle.Value;
-			}
-
-		}
-
-		/// <inheritdoc/>
-		public override void GetHardCodedDefaults ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		/// <summary>
-		/// Performs a sparse copy of a <see cref="Theme"/> (only copies ColorSchemes that are valid/set in the source;
-		/// leveraging the fact that <see cref="Attribute.Make(Color, Color)"/> only copies Colors that are not
-		/// <see cref="Color.Invalid"/>).
-		/// </summary>
-		/// <param name="theme"></param>
-		public override void CopyUpdatedProperitesFrom (Theme theme)
-		{
-			if (theme == null) {
-				return;
-			}
-			foreach (var updatedScheme in theme.ColorSchemes) {
-				ColorSchemes [updatedScheme.Key] = updatedScheme.Value;
-			}
-
-			if (theme.DefaultWindowBorderStyle.HasValue) {
-				DefaultWindowBorderStyle = theme.DefaultWindowBorderStyle.Value;
-			}
-
-			if (theme.DefaultFrameViewBorderStyle.HasValue) {
-				DefaultWindowBorderStyle = theme.DefaultFrameViewBorderStyle.Value;
 			}
 
 		}
@@ -130,9 +131,7 @@ namespace Terminal.Gui.Configuration {
 	/// </para>
 	/// </remarks>
 	/// <example><code>
-	/// "Themes": {
-	/// 	"SelectedTheme" : "Default",
-	/// 	"ThemeDefinitions": [
+	/// 	"Themes": [
 	/// 	{
 	/// 		"Default": {
 	/// 			"ColorSchemes": [
@@ -163,14 +162,22 @@ namespace Terminal.Gui.Configuration {
 	/// 			}
 	/// 		}
 	/// 	}
-	/// }
 	/// </code></example> 
-	public class Themes : Config<Themes> {
+	public static class ThemeManager {
+
+		private static string theme = string.Empty;
+		private static Dictionary<string, Theme> themes;// = new Dictionary<string, Theme> ();
+
 		/// <summary>
-		/// The currenlty selected theme. 
+		/// The currently selected theme. 
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings, OmitClassName = true)]
-		public static string Theme { get; set; } = string.Empty;
+		public static string Theme {
+			get => theme;
+			set {
+				theme = value;
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="Configuration.Theme"/> definitions. 
@@ -178,47 +185,31 @@ namespace Terminal.Gui.Configuration {
 		[JsonInclude]
 		[JsonConverter (typeof (DictionaryConverter<Theme>))]
 		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings, OmitClassName = true)]
-		public static Dictionary<string, Theme> ThemeDefinitions { get; set; } = new Dictionary<string, Theme> ();
-
-		/// <inheritdoc/>
-		public override void GetHardCodedDefaults ()
-		{
-			Theme = "Default";
-			var defaultTheme = new Theme () { };
-			foreach (var scheme in Colors.ColorSchemes) {
-				defaultTheme.ColorSchemes.Add (scheme.Key, scheme.Value);
-			}
-			defaultTheme.DefaultFrameViewBorderStyle = FrameView.DefaultBorderStyle;
-			defaultTheme.DefaultWindowBorderStyle = Window.DefaultBorderStyle;
-			ThemeDefinitions.Add (Theme, defaultTheme);
-		}
-
-		/// <inheritdoc/>
-		public override void Apply ()
-		{
-			if (ThemeDefinitions != null && ThemeDefinitions.ContainsKey (Theme)) {
-				ThemeDefinitions [Theme].Apply ();
-			}
-
-		}
-
-		/// <inheritdoc/>
-		public override void CopyUpdatedProperitesFrom (Themes updatedThemes)
-		{
-			if (ThemeDefinitions != null && updatedThemes != null) {
-				foreach (var theme in ThemeDefinitions) {
-					if (ThemeDefinitions.ContainsKey (theme.Key)) {
-						ThemeDefinitions [theme.Key].CopyUpdatedProperitesFrom (theme.Value);
-					} else {
-						ThemeDefinitions.Add (theme.Key, theme.Value);
+		public static Dictionary<string, Theme> Themes {
+			get => themes;
+			set {
+				if (themes == null) {
+					themes = value;
+				} else {
+					foreach (var theme in value.Where (t => t.Value != null)) {
+						themes [theme.Key].CopyPropertiesFrom (theme.Value);
 					}
 				}
 			}
-
-			if (!string.IsNullOrEmpty (Themes.Theme)) {
-				Theme = Themes.Theme;
-			}
 		}
 
+		public static void Apply ()
+		{
+			if (Themes != null && Themes.ContainsKey (Theme)) {
+				// Reset Colors.ColorSchemes
+				Colors.Init ();
+				Themes [Theme].Apply ();
+			}
+
+			if (Themes != null && Themes.ContainsKey (Theme)) {
+				Themes [Theme].Apply ();
+			}
+
+		}
 	}
 }

@@ -134,7 +134,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var readConfig = ConfigurationManager.LoadFromJson (json);
 			File.WriteAllText ("config-newtheme.json", json);
 
-			ConfigurationManager.Config.ApplyAll ();
+			ConfigurationManager.Apply ();
 
 			Assert.Equal ("NewTheme", configuration.Themes.SelectedTheme);
 			Assert.Equal (Color.White, configuration.Themes.ThemeDefinitions [configuration.Themes.SelectedTheme].ColorSchemes ["NewScheme"].Normal.Foreground);

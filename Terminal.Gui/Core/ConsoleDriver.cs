@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
@@ -19,6 +20,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// The <see cref="Color.Invalid"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
+	[JsonConverter (typeof (ColorJsonConverter))]
 	[DefaultValue (Invalid)]
 	public enum Color {
 		/// <summary>
@@ -177,6 +179,7 @@ namespace Terminal.Gui {
 	///   They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in an application.
 	/// </remarks>
+	[JsonConverter (typeof (AttributeJsonConverter))]
 	public struct Attribute {
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="Initialized"/> is <see langword="false"/> 
@@ -261,8 +264,7 @@ namespace Terminal.Gui {
 		/// <param name="c">The attribute to convert</param>
 		public static implicit operator int (Attribute c)
 		{
-			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
-			//if (!c.IsInitialized) throw new InvalidOperationException ("Attributes must be initialized by driver before use.");
+			if (!c.Initialized) throw new InvalidOperationException ("Attribute: Attributes must be initialized by a driver before use.");
 			return c.Value;
 		}
 
@@ -314,12 +316,14 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
 		/// </remarks>
+		[JsonIgnore]
 		public bool Initialized { get; internal set; }
 
 		/// <summary>
 		/// Returns <see langword="true"/> if the Atrribute is valid (both foreground and background have valid color values).
 		/// </summary>
 		/// <returns></returns>
+		[JsonIgnore]
 		public bool HasValidColors {
 			get {
 				return Foreground != Color.Invalid && Background != Color.Invalid;
@@ -335,12 +339,13 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// See also: <see cref="Colors.ColorSchemes"/>.
 	/// </remarks>
+	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal;
-		Attribute _focus;
-		Attribute _hotNormal;
-		Attribute _hotFocus;
-		Attribute _disabled;
+		Attribute _normal = new Attribute(Color.White, Color.Black);
+		Attribute _focus = new Attribute (Color.White, Color.Black);
+		Attribute _hotNormal = new Attribute (Color.White, Color.Black);
+		Attribute _hotFocus = new Attribute (Color.White, Color.Black);
+		Attribute _disabled = new Attribute (Color.White, Color.Black);
 
 		/// <summary>
 		/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to track which ColorScheme 
@@ -348,15 +353,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal string schemeBeingSet = "";
 
-
-
 		/// <summary>
 		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
 		public Attribute Normal {
 			get { return _normal; }
 			set {
-
 				if (!value.HasValidColors) {
 					return;
 				}
@@ -477,6 +479,27 @@ namespace Terminal.Gui {
 		{
 			return !(left == right);
 		}
+
+		internal void Initialize ()
+		{
+			// If the new scheme was created before a driver was loaded, we need to re-make
+			// the attributes
+			if (!_normal.Initialized) {
+				_normal = new Attribute (_normal.Foreground, _normal.Background);
+			}
+			if (!_focus.Initialized) {
+				_focus = new Attribute (_focus.Foreground, _focus.Background);
+			}
+			if (!_hotNormal.Initialized) {
+				_hotNormal = new Attribute (_hotNormal.Foreground, _hotNormal.Background);
+			}
+			if (!_hotFocus.Initialized) {
+				_hotFocus = new Attribute (_hotFocus.Foreground, _hotFocus.Background);
+			}
+			if (!_disabled.Initialized) {
+				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
+			}
+		}
 	}
 
 	/// <summary>
@@ -502,6 +525,11 @@ namespace Terminal.Gui {
 		}
 
 		static Colors ()
+		{
+			Init ();
+		}
+
+		public static void Init ()
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
@@ -575,8 +603,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Theme, OmitClassName = true), JsonConverter (typeof (JsonStringEnumConverter))]
-		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
+		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Theme, OmitClassName = true)]
+		public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; }
 	}
 
 	/// <summary>
@@ -868,7 +896,7 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public virtual void SetAttribute (Attribute c)
 		{
-			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+			if (!c.Initialized) Debug.WriteLine("ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
 		}
 
 		/// <summary>
@@ -1428,53 +1456,25 @@ namespace Terminal.Gui {
 		public abstract Attribute MakeColor (Color foreground, Color background);
 
 		/// <summary>
-		/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
+		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correclty 
+		/// initalized by the driver.
 		/// </summary>
-		/// <param name="supportsColors">Flag indicating if colors are supported.</param>
-		public void CreateColors (bool supportsColors = true)
+		/// <remarks>
+		/// This method was previsouly named CreateColors. It was reanmed to InitalizeColorSchemes when
+		/// <see cref="ConfigurationManager"/> was enabled.
+		/// </remarks>
+		/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
+		public void InitalizeColorSchemes (bool supportsColors = true)
 		{
-			// BUGBUG: No need to create these instances here as they are created in constructor
-			//Colors.TopLevel = new ColorScheme ();
-			//Colors.Base = new ColorScheme ();
-			//Colors.Dialog = new ColorScheme ();
-			//Colors.Menu = new ColorScheme ();
-			//Colors.Error = new ColorScheme ();
+			// Ensure all Attributes are initlaized by the driver
+			foreach (var s in Colors.ColorSchemes) {
+				s.Value.Initialize ();
+			}
 
 			if (!supportsColors) {
 				return;
 			}
 
-			// NOTE: these are here for backwards compat; pre-Theme support
-			// These values are ignored/overwritten by the ConfigurationManager
-			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
-			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
-			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
-			Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
-			Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
-
-			Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
-			Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
-			Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
-			Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
-			Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
-
-			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
-			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
-			Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
-			Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
-
-			Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
-			Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
-			Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
-			Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
-
-			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
-			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
-			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
-			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
 		}
 	}
 

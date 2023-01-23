@@ -404,7 +404,7 @@ namespace Terminal.Gui {
 			// valid after a Driver is loaded. In this cases we need just 
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load ();
-			ConfigurationManager.Config.ApplyAll ();
+			ConfigurationManager.Apply ();
 
 			ConfigProperty usc;
 			if (ConfigurationManager.ConfigProperties.TryGetValue ("Application.UseSystemConsole", out usc) && usc.PropertyValue != null) {
@@ -450,12 +450,6 @@ namespace Terminal.Gui {
 			try {
 				Driver.HeightAsBuffer = _heightAsBuffer;
 				Driver.Init (TerminalResized);
-
-				// Now that the Driver is initialized, load all other configuration
-				// (ColorSchemes can't be set until a Driver is loaded).
-				ConfigurationManager.Load ();
-				ConfigurationManager.Config.ApplyAll ();
-
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or

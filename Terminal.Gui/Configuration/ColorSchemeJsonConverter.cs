@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 using Terminal.Gui;
 
 namespace Terminal.Gui.Configuration {
-#if false
 	/// <summary>
 	/// Implements a JSON converter for <see cref="ColorScheme"/>. 
 	/// </summary>
@@ -92,5 +91,4 @@ namespace Terminal.Gui.Configuration {
 
 
 	}
-#endif
 }

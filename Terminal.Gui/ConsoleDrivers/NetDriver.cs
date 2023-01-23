@@ -1340,12 +1340,14 @@ namespace Terminal.Gui {
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
+			currentAttribute = MakeColor (Color.White, Color.Black);
+			InitalizeColorSchemes ();
+
 			ResizeScreen ();
 			UpdateOffScreen ();
 
 			StartReportingMouseMoves ();
 
-			CreateColors ();
 
 			Clear ();
 		}
@@ -1613,7 +1615,7 @@ namespace Terminal.Gui {
 		{
 		}
 
-		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
+		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{

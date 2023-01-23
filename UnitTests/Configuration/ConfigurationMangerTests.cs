@@ -7,7 +7,6 @@ using System.Reflection.Metadata;
 using System.Text.Json;
 using Terminal.Gui.Configuration;
 using Xunit;
-using static System.Formats.Asn1.AsnWriter;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests {
@@ -19,6 +18,92 @@ namespace Terminal.Gui.ConfigurationTests {
 				new ColorJsonConverter (),
 				}
 		};
+
+		[Fact ()]
+		public void DeepMemberwiseCopyTest ()
+		{
+			// Value types
+			var stringDest = "Destination";
+			var stringSrc = "Source";
+			var stringCopy = ConfigProperty.DeepMemberwiseCopy (stringSrc, stringDest);
+			Assert.Equal (stringSrc, stringCopy);
+
+			stringDest = "Destination";
+			stringSrc = "Destination";
+			stringCopy = ConfigProperty.DeepMemberwiseCopy (stringSrc, stringDest);
+			Assert.Equal (stringSrc, stringCopy);
+			
+			stringDest = "Destination";
+			stringSrc = null;
+			stringCopy = ConfigProperty.DeepMemberwiseCopy (stringSrc, stringDest);
+			Assert.Equal (stringSrc, stringCopy);
+
+			stringDest = "Destination";
+			stringSrc = string.Empty;
+			stringCopy = ConfigProperty.DeepMemberwiseCopy (stringSrc, stringDest);
+			Assert.Equal (stringSrc, stringCopy);
+
+			var boolDest = true;
+			var boolSrc = false;
+			var boolCopy = ConfigProperty.DeepMemberwiseCopy (boolSrc, boolDest);
+			Assert.Equal (boolSrc, boolCopy);
+			
+			boolDest = false;
+			boolSrc = true;
+			boolCopy = ConfigProperty.DeepMemberwiseCopy (boolSrc, boolDest);
+			Assert.Equal (boolSrc, boolCopy);
+
+			boolDest = true;
+			boolSrc = true;
+			boolCopy = ConfigProperty.DeepMemberwiseCopy (boolSrc, boolDest);
+			Assert.Equal (boolSrc, boolCopy);
+
+			boolDest = false ;
+			boolSrc = false;
+			boolCopy = ConfigProperty.DeepMemberwiseCopy (boolSrc, boolDest);
+			Assert.Equal (boolSrc, boolCopy);
+
+			// Structs
+			var attrDest = new Attribute (1);
+			var attrSrc = new Attribute (2);
+			var attrCopy = ConfigProperty.DeepMemberwiseCopy (attrSrc, attrDest);
+			Assert.Equal (attrSrc, attrCopy);
+
+			// Classes
+			var colorschemeDest = new ColorScheme () { Disabled = new Attribute (1) };
+			var colorschemeSrc = new ColorScheme () { Disabled = new Attribute (2) };
+			var colorschemeCopy = ConfigProperty.DeepMemberwiseCopy (colorschemeSrc, colorschemeDest);
+			Assert.Equal (colorschemeSrc, colorschemeCopy);
+
+			// Dictionaries
+			var dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) } };
+			var dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) } };
+			var dictCopy = (Dictionary<string, Attribute>)ConfigProperty.DeepMemberwiseCopy (dictSrc, dictDest);
+			Assert.Equal (dictSrc, dictCopy);
+
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) } };
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) }, { "Normal", new Attribute (3) } };
+			dictCopy = (Dictionary<string, Attribute>)ConfigProperty.DeepMemberwiseCopy (dictSrc, dictDest);
+			Assert.Equal (dictSrc, dictCopy);
+
+			// src adds an item
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) }};
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) }, { "Normal", new Attribute (3) } };
+			dictCopy = (Dictionary<string, Attribute>)ConfigProperty.DeepMemberwiseCopy (dictSrc, dictDest);
+			Assert.Equal (2, dictCopy.Count);
+			Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
+			Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
+			
+			// src updates only one item
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) }, { "Normal", new Attribute (2) } };
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (3) }  };
+			dictCopy = (Dictionary<string, Attribute>)ConfigProperty.DeepMemberwiseCopy (dictSrc, dictDest);
+			Assert.Equal (2, dictCopy.Count);
+			Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
+			Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
+
+
+		}
 
 		//[Fact ()]
 		//public void LoadFromJsonTest ()
@@ -104,7 +189,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			PropertyInfo pi = typeof (Application).GetProperty ("UseSystemConsole");
 			Assert.Equal (pi, ConfigProperties ["Application.UseSystemConsole"].PropertyInfo);
 
-			// FrameView is not a static class
+			// FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
 			pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
 			Assert.Equal (pi, ConfigProperties ["FrameView.DefaultBorderStyle"].PropertyInfo);
 
@@ -134,11 +219,10 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerToJson ()
 		{
-			var configuration = new ConfigRoot ();
-			configuration.GetAllHardCodedDefaults ();
-			var json = ConfigurationManager.ToJson (configuration);
+			ConfigurationManager.GetHardCodedDefaults ();
+			var json = ConfigurationManager.ToJson ();
 
-			var readConfig = ConfigurationManager.LoadFromJson (json);
+			ConfigurationManager.LoadFromJson (json);
 
 			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
@@ -146,14 +230,14 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact,AutoInitShutdown]
 		public void Prototype ()
 		{
-			var configuration = new ConfigRoot ();
-			configuration.GetAllHardCodedDefaults ();
+			ConfigurationManager.GetHardCodedDefaults ();
 			ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue = true;
-			var json = ConfigurationManager.ToJson (configuration);
+			Assert.True ((bool)ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue);
+			var json = ConfigurationManager.ToJson ();
 
 			ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue = false;
 			Assert.False ((bool)ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue);
-			var readConfig = ConfigurationManager.LoadFromJson (json);
+			ConfigurationManager.LoadFromJson (json);
 			Assert.True ((bool)ConfigurationManager.ConfigProperties ["Application.HeightAsBuffer"].PropertyValue);
 
 			//Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
@@ -164,36 +248,36 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
-#if false
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerInitDriver ()
 		{
-			var configuration = new ConfigRoot ();
-			configuration.GetAllHardCodedDefaults ();
+			ConfigurationManager.GetHardCodedDefaults ();
 
 			// Change Base
-			var json = ConfigurationManager.ToJson (configuration);
+			var json = ConfigurationManager.ToJson ();
 
-			var readConfig = ConfigurationManager.LoadFromJson (json);
-			Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
-			Assert.Equal (Colors.TopLevel, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"]);
-			Assert.Equal (Colors.Error, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"]);
-			Assert.Equal (Colors.Dialog, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"]);
-			Assert.Equal (Colors.Menu, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"]);
+			ConfigurationManager.LoadFromJson (json);
+			
+			//Assert.Equal (Colors.Base, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"]);
+			//Assert.Equal (Colors.TopLevel, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"]);
+			//Assert.Equal (Colors.Error, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"]);
+			//Assert.Equal (Colors.Dialog, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"]);
+			//Assert.Equal (Colors.Menu, readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"]);
 
-			Colors.Base = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"];
-			Colors.TopLevel = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"];
-			Colors.Error = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"];
-			Colors.Dialog = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"];
-			Colors.Menu = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"];
+			//Colors.Base = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"];
+			//Colors.TopLevel = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"];
+			//Colors.Error = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"];
+			//Colors.Dialog = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"];
+			//Colors.Menu = readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"];
 
-			Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"], Colors.Base);
-			Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"], Colors.TopLevel);
-			Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"], Colors.Error);
-			Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"], Colors.Dialog);
-			Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"], Colors.Menu);
+			//Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Base"], Colors.Base);
+			//Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["TopLevel"], Colors.TopLevel);
+			//Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Error"], Colors.Error);
+			//Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Dialog"], Colors.Dialog);
+			//Assert.Equal (readConfig.Themes.ThemeDefinitions [readConfig.Themes.SelectedTheme].ColorSchemes ["Menu"], Colors.Menu);
 		}
 
+#if false
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerLoadsFromJson ()
 		{
@@ -454,7 +538,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Config.GetAllHardCodedDefaults ();
 			
 			// Apply default styles
-			ConfigurationManager.Config.ApplyAll ();
+			ConfigurationManager.Apply ();
 
 			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
@@ -520,7 +604,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			//// Check that the settings from the highest precedence source are loaded
 			//Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
 		}
-#endif 
+#endif
 	}
 }
 

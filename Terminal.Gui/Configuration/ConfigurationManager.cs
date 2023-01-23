@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -51,7 +52,7 @@ namespace Terminal.Gui.Configuration {
 	public static class ConfigurationManager {
 
 		private static readonly string _configFilename = "config.json";
-		private static ConfigRoot _config = new ConfigRoot ();
+		private static ConfigRoot _configRoot = new ConfigRoot ();
 
 		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
@@ -59,6 +60,9 @@ namespace Terminal.Gui.Configuration {
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			WriteIndented = true,
 			Converters = {
+				// No need to set converterss - the ConfigRootConverter uses property attributes apply the correct
+				// Converter.
+
 				//new AttributeJsonConverter (),
 				//new ColorJsonConverter (),
 				//new ColorSchemeJsonConverter (),
@@ -90,7 +94,8 @@ namespace Terminal.Gui.Configuration {
 				/// The property should be applied as part of a <see cref="Theme"/>.
 				/// </summary>
 				/// <remarks>
-				/// Theme properties are serialized within the <c>{ "ThemeDefinitions" : [] }</c> property of the JSON DOM.
+				/// Theme properties are serialized within the <c>{ "Themes" : [] }</c> property of the JSON DOM. Theme
+				/// settings are managed by <see cref="ThemeManager"/>.
 				/// </remarks>
 				Theme
 			};
@@ -119,6 +124,8 @@ namespace Terminal.Gui.Configuration {
 		/// property must be decorated with the <see cref="JsonConverterAttribute"/> attribute.
 		/// </remarks>
 		public class ConfigProperty {
+			private object? propertyValue;
+
 			/// <summary>
 			/// Describes the property.
 			/// </summary>
@@ -126,10 +133,117 @@ namespace Terminal.Gui.Configuration {
 
 			/// <summary>
 			/// Holds the property's value as it was either read from the class's implementation or from a config file. 
-			/// If the proeprty has not been set (e.g. because no configuration file specified a value), this will be <see langword="null"/>.
+			/// If the property has not been set (e.g. because no configuration file specified a value), 
+			/// this will be <see langword="null"/>.
 			/// </summary>
-			public object? PropertyValue { get; set; }
+			/// <remarks>
+			/// On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements of 
+			/// the object that are non-null).
+			/// </remarks>
+			public object? PropertyValue {
+				get => propertyValue;
+				set {
+					if (PropertyValue == null) {
+						propertyValue = value;
+					} else {
+						propertyValue = DeepMemberwiseCopy (value, PropertyValue);
+					}
 
+					//if (value != null && PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp) {
+					//	PropertyValue = DeepMemberwiseClone (value, PropertyValue);
+					//	switch (scp.Scope = SerializableConfigurationProperty.Scopes.Settings) {
+					//	case SerializableConfigurationProperty.Scopes.Settings:
+					//		if (value != null && propertyValue != null && propertyValue is Config val) {
+					//			val.CopyPropertiesFrom ((Config)value);
+					//		} else {
+					//			propertyValue = value;
+					//		}
+					//		break;
+
+					//	case SerializableConfigurationProperty.Scopes.Theme:
+					//		ThemeManager.Equals..
+					//		break;
+					//	}
+					//}
+
+
+					//propertyValue != null && value is Dictionary<string, Theme> newDict &&
+					//propertyValue is Dictionary<string, Theme> oldDict) {
+					//	foreach (var i in newDict) {
+					//		if (!oldDict.ContainsKey (i.Key)) {
+					//			oldDict.Add (i.Key, i.Value);
+					//		} else {
+					//			oldDict [i.Key].CopyPropertiesFrom (i.Value);
+					//		}
+					//	}
+					//} else if (value != null && propertyValue != null && propertyValue is Config val) {
+					//	val.CopyPropertiesFrom ((Config)value);
+					//} else {
+					//	propertyValue = value;
+					//}
+				}
+			}
+
+			/// <summary>
+			/// System.Text.Json does not support copying a deserialized object to an existing instance.
+			/// To work around this, implement a 'deep, memberwise clone' method. 
+			/// `Named CopyPropertiesFrom` to make it clear what it does. 
+			/// TOOD: When System.Text.Json implements `PopulateObject` revisit
+			/// https://github.com/dotnet/corefx/issues/37627
+			/// </summary>
+			/// <param name="source"></param>
+			/// <param name="destination"></param>
+			public static object? DeepMemberwiseCopy (object? source, object destination)
+			{
+				if (destination == null) {
+					throw new ArgumentNullException ();
+				}
+
+				if (source == null) {
+					return null;
+				}
+
+				if (source.GetType ().IsGenericType && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>))) {
+					foreach (var srcKey in ((IDictionary)source).Keys) {
+						if (((IDictionary)destination).Contains (srcKey))
+							((IDictionary)destination)[srcKey] = DeepMemberwiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
+						else {
+							((IDictionary)destination).Add(srcKey, ((IDictionary)source) [srcKey]) ;
+						}
+					}
+					return destination;
+				}
+
+				// If value type, just use copy constructor.
+				if (source.GetType().IsValueType || source.GetType () == typeof (string)) {
+					return source;
+				}
+
+				var sourceProps = source?.GetType ().GetProperties ().Where (x => x.CanRead).ToList ();
+				var destProps = destination?.GetType ().GetProperties ().Where (x => x.CanWrite).ToList ();
+				foreach (var (sourceProp, destProp) in
+					// check if the property can be set or no.
+					from sourceProp in sourceProps
+					where destProps.Any (x => x.Name == sourceProp.Name)
+					let destProp = destProps.First (x => x.Name == sourceProp.Name)
+					where destProp.CanWrite
+					select (sourceProp, destProp)) {
+
+					//if (sourceProp.PropertyType.IsSubclassOf (typeof (Config)))
+					//	// Property is subclass of Config - Recurse through sub-objects
+					//	((Config)destProp.GetValue (destination)).CopyPropertiesFrom ((Config)sourceProp.GetValue (source, null));
+					//else
+					var sourceVal = sourceProp.GetValue (source);
+					var destVal = destProp.GetValue (destination);
+					if (destVal != null) {
+						destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
+					} else {
+						destProp.SetValue (destination, sourceVal);
+					}
+
+				}
+				return destination;
+			}
 		}
 
 		/// <summary>
@@ -143,11 +257,11 @@ namespace Terminal.Gui.Configuration {
 		private static Dictionary<string, ConfigProperty> getConfigProperties ()
 		{
 			Dictionary<string, Type> classesWithConfigProps = new Dictionary<string, Type> ();
-			foreach (Type classWithConfig in typeof (Theme).Assembly.ExportedTypes
-				.Where (myType => myType.IsClass && myType.IsPublic && myType.GetProperties ()
-					.Where (prop => prop.GetCustomAttributes (typeof (SerializableConfigurationProperty), false)
-					.Count () > 0)
-				.Count () > 0)) {
+			foreach (Type classWithConfig in typeof (ConfigurationManager).Assembly.ExportedTypes
+				.Where (myType => myType.IsClass &&
+					myType.IsPublic &&
+					(myType.GetProperties ()
+					.Count (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null) > 0))) {
 				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
 
@@ -167,16 +281,6 @@ namespace Terminal.Gui.Configuration {
 						});
 					} else {
 						throw new Exception ($"Property {p.Name} in class {p.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
-					}	
-
-					var configProperty = new ConfigProperty () {
-						PropertyInfo = p,
-						PropertyValue = p.GetValue (null)
-					};
-					if (scp.OmitClassName) {
-						configProperties [p.Name] = configProperty;
-					} else {
-						configProperties [p.DeclaringType?.Name + "." + p.Name] = configProperty;
 					}
 				}
 			}
@@ -186,19 +290,13 @@ namespace Terminal.Gui.Configuration {
 
 
 		/// <summary>
-		/// The <see cref="ConfigRoot"/> that has  been loaded by the <see cref="ConfigurationManager"/>.
-		/// Use <see cref="Config{T}.Apply()"/> to apply these to the running Terminal.Gui app.
-		/// </summary>
-		public static ConfigRoot Config { get { return _config; } }
-
-		/// <summary>
 		/// Loads the <see cref="ConfigRoot"/> from a JSON document. 
 		/// </summary>
 		/// <param name="json"></param>
 		/// <returns>A <see cref="ConfigRoot"/> object initialized by the contents of the JSON document.</returns>
-		public static ConfigRoot LoadFromJson (string json)
+		public static void LoadFromJson (string json)
 		{
-			return JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
+			_configRoot = JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
 		}
 
 		/// <summary>
@@ -206,9 +304,9 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		/// <param name="config"></param>
 		/// <returns></returns>
-		public static string ToJson (ConfigRoot config)
+		public static string ToJson ()
 		{
-			return JsonSerializer.Serialize<ConfigRoot> (config, serializerOptions);
+			return JsonSerializer.Serialize<ConfigRoot> (_configRoot, serializerOptions);
 		}
 
 		/// <summary>
@@ -218,9 +316,9 @@ namespace Terminal.Gui.Configuration {
 		public static void UpdateConfiguration (string json)
 		{
 			// Deserialize the JSON into a Configuration object
-			var newConfig = JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
+			_configRoot = JsonSerializer.Deserialize<ConfigRoot> (json, serializerOptions);
 
-			Config.CopyUpdatedProperitesFrom (newConfig);
+			//Config.CopyUpdatedProperitesFrom (newConfig);
 		}
 
 		/// <summary>
@@ -238,6 +336,28 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
+		/// Retrieves the hard coded default settings from the Terminal.Gui library implementation. Used in development of
+		/// the library to generate the default configuration file.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This method is only really useful when using <see cref="ConfigurationManager.SaveHardCodedDefaults(string)"/>
+		/// to generate the JSON doc that is embedded into Terminal.Gui (during development). 
+		/// </para>
+		/// </remarks>
+		public static void GetHardCodedDefaults ()
+		{
+			foreach (var p in ConfigProperties) {
+				if (p.Value.PropertyInfo != null && p.Value.PropertyValue != null &&
+					p.Value.PropertyInfo.GetIndexParameters ().Length == 0) {
+					p.Value.PropertyValue = p.Value.PropertyInfo.GetValue (null);
+				} else {
+					throw new InvalidOperationException ("A property in the ConfigurationManager.ConfigProperties dictionary is null or has an index parameter.");
+				}
+			}
+		}
+
+		/// <summary>
 		/// Writes the configuration settings hard-coded into the libary to a JSON file. Used
 		/// to create the <c>Terminal.Gui.Resources.config.json</c> resource during development. See the 
 		/// TestConfigurationManagerSaveDefaults unit test in <c>ConfigurationManagerTests.cs</c>.
@@ -249,16 +369,32 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		public static void SaveHardCodedDefaults (string path)
 		{
-			var config = new ConfigRoot ();
-
 			// Get the hard coded settings
-			config.GetAllHardCodedDefaults ();
+			GetHardCodedDefaults ();
 
 			// Serialize to a JSON string
-			string json = ConfigurationManager.ToJson (config);
+			string json = ToJson ();
 
 			// Write the JSON string to the file specified by filePath
 			File.WriteAllText (path, json);
+		}
+
+
+		/// <summary>
+		/// Applies the settings in <see cref="ConfigProperties"/> to the running <see cref="Application"/> instance.
+		/// </summary>
+		public static void Apply ()
+		{
+			// This just applies global Settings (Scopes.Settings).
+			foreach (var p in ConfigProperties.Where (cp =>
+				cp.Value.PropertyValue != null &&
+				cp.Value.PropertyInfo != null &&
+				((SerializableConfigurationProperty)cp.Value.PropertyInfo.GetCustomAttribute (
+					typeof (SerializableConfigurationProperty))).Scope == SerializableConfigurationProperty.Scopes.Settings)) {
+				p.Value?.PropertyInfo?.SetValue (null, p.Value.PropertyValue);
+			}
+
+			ThemeManager.Apply ();
 		}
 
 		/// <summary>
@@ -315,7 +451,7 @@ namespace Terminal.Gui.Configuration {
 			using (StreamReader reader = new StreamReader (stream)) {
 				string json = reader.ReadToEnd ();
 				if (json != null) {
-					_config = LoadFromJson (json);
+					LoadFromJson (json);
 				}
 #if DEBUG
 				Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
@@ -353,9 +489,9 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public static void LoadAppFromAppResources ()
 		{
-			var embeddedStylesResourceName = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
+			var embeddedStylesResourceName = Assembly.GetEntryAssembly ().GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
 			if (embeddedStylesResourceName != null) {
-				using (Stream stream = System.Reflection.Assembly.GetEntryAssembly ().GetManifestResourceStream (embeddedStylesResourceName))
+				using (Stream stream = Assembly.GetEntryAssembly ().GetManifestResourceStream (embeddedStylesResourceName))
 				using (StreamReader reader = new StreamReader (stream)) {
 					string json = reader.ReadToEnd ();
 					UpdateConfiguration (json);
@@ -369,8 +505,7 @@ namespace Terminal.Gui.Configuration {
 		/// <summary>
 		/// Name of the running application. By default this property is set to the application's assembly name.
 		/// </summary>
-		public static string AppName { get; set; }
-		private static string _appName = System.Reflection.Assembly.GetEntryAssembly ().FullName.Split (',') [0].Trim ();
+		public static string AppName { get; set; } = Assembly.GetEntryAssembly ().FullName.Split (',') [0].Trim ();
 
 		/// <summary>
 		/// Loads application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>)
@@ -390,8 +525,9 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public static void LoadAppFromHomeDirectory ()
 		{
-			if (File.Exists (AppName)) {
-				UpdateConfigurationFromFile (AppName);
+			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}";
+			if (File.Exists (appHome)) {
+				UpdateConfigurationFromFile (appHome);
 			}
 		}
 

@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
+		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
@@ -878,16 +878,15 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			ResizeScreen ();
-			UpdateOffScreen ();
+			currentAttribute = MakeColor (Color.White, Color.Black);
 
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				CreateColors ();
+				InitalizeColorSchemes ();
 			} else {
-				CreateColors (false);
+				InitalizeColorSchemes (false);
 
 				// BUGBUG: This is a hack to make the colors work on the Mac?
 				// The new Theme support overwrites these colors, so this is not needed?
@@ -917,6 +916,10 @@ namespace Terminal.Gui {
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
+
+			ResizeScreen ();
+			UpdateOffScreen ();
+
 		}
 
 		public override void ResizeScreen ()

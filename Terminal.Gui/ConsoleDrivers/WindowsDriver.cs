@@ -1455,13 +1455,13 @@ namespace Terminal.Gui {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
-
 				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
+				currentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
+				
 				ResizeScreen ();
 				UpdateOffScreen ();
-
-				CreateColors ();
 			} catch (Win32Exception e) {
 				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
 			}
@@ -1568,7 +1568,7 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
+		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
