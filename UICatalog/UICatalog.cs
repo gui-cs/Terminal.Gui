@@ -119,7 +119,7 @@ namespace UICatalog {
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
 			
-			Application.EnableConsoleScrolling = true;
+			Application.EnableConsoleScrolling = _enableConsoleScrolling;
 			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
@@ -275,8 +275,6 @@ namespace UICatalog {
 
 			void LoadedHandler ()
 			{
-				Application.EnableConsoleScrolling = _enableConsoleScrolling;
-
 				if (_colorScheme == null) {
 					ColorScheme = _colorScheme = Colors.Base;
 				}
