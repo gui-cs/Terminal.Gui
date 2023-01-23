@@ -33,6 +33,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Terminal.Gui {
 
@@ -1462,9 +1463,18 @@ namespace Terminal.Gui {
 
 			try {
 				// Needed for Windows Terminal
-				//Enable alternative screen buffer.
+				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
+				// ESC [ ? 1048 h  Save cursor position
+				// ESC [ ? 1048 l  Restore cursor position
+				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
+				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+				// wipe out the backscroll buffer when the application exits.
 				Console.Out.Write ("\x1b[?1047h");
-				//Console.Out.Flush ();
+
+				// TODO: Figure out if calling flush is really needed here
+				Console.Out.Flush ();
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1498,9 +1508,11 @@ namespace Terminal.Gui {
 				// If n is 1, clear from cursor to beginning of the screen.
 				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
 				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-				// Needed for Windows Terminal
-				//Console.Out.Write ("\x1b[3J");
-				//Console.Out.Flush ();
+				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
+				Console.Out.Write ("\x1b[0J");
+				
+				// TODO: Figure out if calling flush is really needed here
+				Console.Out.Flush ();
 			}
 		}
 
@@ -1696,9 +1708,16 @@ namespace Terminal.Gui {
 			WinConsole = null;
 
 			// Needed for Windows Terminal
-			//Disable alternative screen buffer.
+			// Clear the alternative screen buffer from the cursor to the
+			// end of the screen.
+			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
+			// backbuffer! So we need to use [0J instead.
+			Console.Out.Write ("\x1b[0J");
+
+			// Disable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1047l");
-			//Console.Out.Flush ();
+
+			Console.Out.Flush ();
 		}
 
 		public override Attribute GetAttribute ()

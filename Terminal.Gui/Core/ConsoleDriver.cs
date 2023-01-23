@@ -675,6 +675,9 @@ namespace Terminal.Gui {
 		/// as the console scrolls. 
 		/// </para>
 		/// </summary>
+		/// <remarks>
+		/// NOTE: This functionaliy is currently broken on Windows Terminal.
+		/// </remarks>
 		public abstract bool EnableConsoleScrolling { get; set; }
 
 		/// <summary>
