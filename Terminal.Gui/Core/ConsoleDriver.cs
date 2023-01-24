@@ -1,10 +1,6 @@
 ﻿//
 // ConsoleDriver.cs: Definition for the Console Driver API
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Define this to enable diagnostics drawing for Window Frames
 using NStack;
 using System;
 using System.Collections.Generic;
@@ -12,7 +8,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Unix.Terminal;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -561,72 +556,7 @@ namespace Terminal.Gui {
 		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 		BoxFix = 0x02020164,
 	}
-
-	///// <summary>
-	///// Special characters that can be drawn with 
-	///// </summary>
-	//public enum SpecialChar {
-	//	/// <summary>
-	//	/// Horizontal line character.
-	//	/// </summary>
-	//	HLine,
-
-	//	/// <summary>
-	//	/// Vertical line character.
-	//	/// </summary>
-	//	VLine,
-
-	//	/// <summary>
-	//	/// Stipple pattern
-	//	/// </summary>
-	//	Stipple,
-
-	//	/// <summary>
-	//	/// Diamond character
-	//	/// </summary>
-	//	Diamond,
-
-	//	/// <summary>
-	//	/// Upper left corner
-	//	/// </summary>
-	//	ULCorner,
-
-	//	/// <summary>
-	//	/// Lower left corner
-	//	/// </summary>
-	//	LLCorner,
-
-	//	/// <summary>
-	//	/// Upper right corner
-	//	/// </summary>
-	//	URCorner,
-
-	//	/// <summary>
-	//	/// Lower right corner
-	//	/// </summary>
-	//	LRCorner,
-
-	//	/// <summary>
-	//	/// Left tee
-	//	/// </summary>
-	//	LeftTee,
-
-	//	/// <summary>
-	//	/// Right tee
-	//	/// </summary>
-	//	RightTee,
-
-	//	/// <summary>
-	//	/// Top tee
-	//	/// </summary>
-	//	TopTee,
-
-	//	/// <summary>
-	//	/// The bottom tee.
-	//	/// </summary>
-	//	BottomTee,
-	//}
-
+	
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
