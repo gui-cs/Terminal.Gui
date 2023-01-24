@@ -1,9 +1,6 @@
 ﻿//
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
-// Authors:
-//   Charlie Kindel (github.com/tig)
-//
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -230,8 +227,8 @@ namespace Terminal.Gui {
 		{
 			redrawColor = color;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (color & 0xffff)) {
 				FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
 			}
@@ -620,8 +617,8 @@ namespace Terminal.Gui {
 			foreground = default;
 			background = default;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (value & 0xffff)) {
 				hasColor = true;
 				background = (Color)(ConsoleColor)(value & 0xffff);
