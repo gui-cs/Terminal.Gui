@@ -187,7 +187,7 @@ namespace Terminal.Gui {
 				} else {
 					largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
-					    || Console.WindowHeight != lastWindowHeight) {
+						|| Console.WindowHeight != lastWindowHeight) {
 						lastWindowHeight = Math.Max (Console.WindowHeight, 0);
 						GetWindowSizeEvent (new Size (Console.BufferWidth, largestWindowHeight));
 						return;
@@ -225,7 +225,7 @@ namespace Terminal.Gui {
 			var keyChar = consoleKeyInfo.KeyChar;
 			switch ((uint)keyChar) {
 			case 0:
-				if (consoleKeyInfo.Key == (ConsoleKey)64) {    // Ctrl+Space in Windows.
+				if (consoleKeyInfo.Key == (ConsoleKey)64) {	// Ctrl+Space in Windows.
 					newConsoleKeyInfo = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar,
 						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
 						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
@@ -270,9 +270,9 @@ namespace Terminal.Gui {
 				return;
 			case 127:
 				newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar, ConsoleKey.Backspace,
-				    (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-				    (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-				    (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 				break;
 			default:
 				newConsoleKeyInfo = consoleKeyInfo;
@@ -366,10 +366,10 @@ namespace Terminal.Gui {
 				if ((uint)cki [1].KeyChar >= 1 && (uint)cki [1].KeyChar <= 26) {
 					key = (ConsoleKey)(char)(cki [1].KeyChar + (uint)ConsoleKey.A - 1);
 					newConsoleKeyInfo = new ConsoleKeyInfo (cki [1].KeyChar,
-					    key,
-					    false,
-					    true,
-					    true);
+						key,
+						false,
+						true,
+						true);
 				} else {
 					if (cki [1].KeyChar >= 97 && cki [1].KeyChar <= 122) {
 						key = (ConsoleKey)cki [1].KeyChar.ToString ().ToUpper () [0];
@@ -377,10 +377,10 @@ namespace Terminal.Gui {
 						key = (ConsoleKey)cki [1].KeyChar;
 					}
 					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
-					    (ConsoleKey)Math.Min ((uint)key, 255),
-					    false,
-					    true,
-					    false);
+						(ConsoleKey)Math.Min ((uint)key, 255),
+						false,
+						true,
+						false);
 				}
 				break;
 			case 3:
@@ -388,34 +388,34 @@ namespace Terminal.Gui {
 					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
 				}
 				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
-				    key,
-				    (mod & ConsoleModifiers.Shift) != 0,
-				    (mod & ConsoleModifiers.Alt) != 0,
-				    (mod & ConsoleModifiers.Control) != 0);
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
 				break;
 			case 4:
 				if (cki [1].KeyChar == '[' && cki [3].KeyChar == 126) {
 					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
 					newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
-					    key,
-					    (mod & ConsoleModifiers.Shift) != 0,
-					    (mod & ConsoleModifiers.Alt) != 0,
-					    (mod & ConsoleModifiers.Control) != 0);
+						key,
+						(mod & ConsoleModifiers.Shift) != 0,
+						(mod & ConsoleModifiers.Alt) != 0,
+						(mod & ConsoleModifiers.Control) != 0);
 				}
 				break;
 			case 5:
 				if (cki [1].KeyChar == '[' && (cki [2].KeyChar == 49 || cki [2].KeyChar == 50)
-				    && cki [4].KeyChar == 126) {
+					&& cki [4].KeyChar == 126) {
 					key = GetConsoleKey (cki [3].KeyChar, ref mod, cki.Length);
 				} else if (cki [1].KeyChar == 49 && cki [2].KeyChar == ';') { // For WSL
 					mod |= GetConsoleModifiers (cki [3].KeyChar);
 					key = ConsoleKey.End;
 				}
 				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
-				    key,
-				    (mod & ConsoleModifiers.Shift) != 0,
-				    (mod & ConsoleModifiers.Alt) != 0,
-				    (mod & ConsoleModifiers.Control) != 0);
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
 				break;
 			case 6:
 				if (cki [1].KeyChar == '[' && cki [2].KeyChar == 49 && cki [3].KeyChar == ';') {
@@ -426,10 +426,10 @@ namespace Terminal.Gui {
 					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
 				}
 				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
-				    key,
-				    (mod & ConsoleModifiers.Shift) != 0,
-				    (mod & ConsoleModifiers.Alt) != 0,
-				    (mod & ConsoleModifiers.Control) != 0);
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
 				break;
 			case 7:
 				GetRequestEvent (GetKeyCharArray (cki));
@@ -561,7 +561,7 @@ namespace Terminal.Gui {
 					case 48:
 					case 56:
 						buttonState = c == 'M' ? MouseButtonState.Button1Pressed
-						    : MouseButtonState.Button1Released;
+							: MouseButtonState.Button1Released;
 						break;
 					case 1:
 					case 9:
@@ -576,7 +576,7 @@ namespace Terminal.Gui {
 					case 57:
 					case 61:
 						buttonState = c == 'M' ? MouseButtonState.Button2Pressed
-						    : MouseButtonState.Button2Released;
+							: MouseButtonState.Button2Released;
 						break;
 					case 2:
 					case 10:
@@ -593,7 +593,7 @@ namespace Terminal.Gui {
 					case 58:
 					case 62:
 						buttonState = c == 'M' ? MouseButtonState.Button3Pressed
-						    : MouseButtonState.Button3Released;
+							: MouseButtonState.Button3Released;
 						break;
 					case 35:
 					case 39:
@@ -613,12 +613,12 @@ namespace Terminal.Gui {
 					case 68:
 					case 72:
 					case 80:
-						buttonState = MouseButtonState.ButtonWheeledLeft;       // Shift/Ctrl+ButtonWheeledUp
+						buttonState = MouseButtonState.ButtonWheeledLeft;	   // Shift/Ctrl+ButtonWheeledUp
 						break;
 					case 69:
 					case 73:
 					case 81:
-						buttonState = MouseButtonState.ButtonWheeledRight;      // Shift/Ctrl+ButtonWheeledDown
+						buttonState = MouseButtonState.ButtonWheeledRight;	  // Shift/Ctrl+ButtonWheeledDown
 						break;
 					}
 					// Modifiers.
@@ -710,8 +710,8 @@ namespace Terminal.Gui {
 			}
 
 			if ((buttonState & MouseButtonState.Button1Pressed) != 0
-			    || (buttonState & MouseButtonState.Button2Pressed) != 0
-			    || (buttonState & MouseButtonState.Button3Pressed) != 0) {
+				|| (buttonState & MouseButtonState.Button2Pressed) != 0
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0) {
 
 				if ((buttonState & MouseButtonState.ReportMousePosition) == 0) {
 					buttonPressedCount++;
@@ -726,18 +726,18 @@ namespace Terminal.Gui {
 			}
 
 			if (buttonPressedCount == 2 && !isButtonDoubleClicked
-			    && (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
-			    || lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
-			    || lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
+				&& (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
+				|| lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
+				|| lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
 
 				isButtonDoubleClicked = true;
 				ProcessButtonDoubleClicked (mouseEvent);
 				inputReady.Set ();
 				return;
 			} else if (buttonPressedCount == 3 && isButtonDoubleClicked
-			       && (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
-			       || lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
-			       || lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
+				   && (lastMouseEvent.ButtonState == MouseButtonState.Button1Pressed
+				   || lastMouseEvent.ButtonState == MouseButtonState.Button2Pressed
+				   || lastMouseEvent.ButtonState == MouseButtonState.Button3Pressed)) {
 
 				isButtonDoubleClicked = false;
 				isButtonTripleClicked = true;
@@ -750,9 +750,9 @@ namespace Terminal.Gui {
 
 			//System.Diagnostics.Debug.WriteLine ($"isButtonClicked: {isButtonClicked} isButtonDoubleClicked: {isButtonDoubleClicked} isButtonTripleClicked: {isButtonTripleClicked}");
 			if ((isButtonClicked || isButtonDoubleClicked || isButtonTripleClicked)
-			    && ((buttonState & MouseButtonState.Button1Released) != 0
-			    || (buttonState & MouseButtonState.Button2Released) != 0
-			    || (buttonState & MouseButtonState.Button3Released) != 0)) {
+				&& ((buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 
 				//isButtonClicked = false;
 				//isButtonDoubleClicked = false;
@@ -762,12 +762,12 @@ namespace Terminal.Gui {
 			}
 
 			if (isButtonClicked && !isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
-			    && ((buttonState & MouseButtonState.Button1Pressed) != 0
-			    || (buttonState & MouseButtonState.Button2Pressed) != 0
-			    || (buttonState & MouseButtonState.Button3Pressed) != 0
-			    || (buttonState & MouseButtonState.Button1Released) != 0
-			    || (buttonState & MouseButtonState.Button2Released) != 0
-			    || (buttonState & MouseButtonState.Button3Released) != 0)) {
+				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
+				|| (buttonState & MouseButtonState.Button2Pressed) != 0
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 
 				isButtonClicked = false;
 				isButtonDoubleClicked = true;
@@ -783,12 +783,12 @@ namespace Terminal.Gui {
 				return;
 			}
 			if (isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
-			    && ((buttonState & MouseButtonState.Button1Pressed) != 0
-			    || (buttonState & MouseButtonState.Button2Pressed) != 0
-			    || (buttonState & MouseButtonState.Button3Pressed) != 0
-			    || (buttonState & MouseButtonState.Button1Released) != 0
-			    || (buttonState & MouseButtonState.Button2Released) != 0
-			    || (buttonState & MouseButtonState.Button3Released) != 0)) {
+				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
+				|| (buttonState & MouseButtonState.Button2Pressed) != 0
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0
+				|| (buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 
 				isButtonDoubleClicked = false;
 				isButtonTripleClicked = true;
@@ -813,10 +813,10 @@ namespace Terminal.Gui {
 			});
 
 			if (!isButtonClicked && !lastMouseEvent.ButtonState.HasFlag (MouseButtonState.ReportMousePosition)
-			    && lastMouseEvent.Position != default && lastMouseEvent.Position == point
-			    && ((buttonState & MouseButtonState.Button1Released) != 0
-			    || (buttonState & MouseButtonState.Button2Released) != 0
-			    || (buttonState & MouseButtonState.Button3Released) != 0)) {
+				&& lastMouseEvent.Position != default && lastMouseEvent.Position == point
+				&& ((buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
 				isButtonClicked = true;
 				ProcessButtonClicked (mouseEvent);
 				Application.MainLoop.AddIdle (() => {
@@ -1232,12 +1232,12 @@ namespace Terminal.Gui {
 
 			if (validClip) {
 				if (runeWidth < 2 && ccol > 0
-				    && Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-				    && Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 					contents [crow, ccol + 1, 2] = 1;
@@ -1304,10 +1304,10 @@ namespace Terminal.Gui {
 		{
 			// Encode the colors into the int value.
 			return new Attribute (
-			    value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
-			    foreground: (Color)f,
-			    background: (Color)b
-			    );
+				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
+				foreground: (Color)f,
+				background: (Color)b
+				);
 		}
 
 		public override void Init (Action terminalResized)
@@ -1360,7 +1360,7 @@ namespace Terminal.Gui {
 						} else {
 							//Console.Out.Write ($"\x1b[8;{Console.WindowHeight};{Console.WindowWidth}t");
 							Console.Out.Write ($"\x1b[0;0" +
-							    $";{Rows};{Cols}w");
+								$";{Rows};{Cols}w");
 						}
 					} catch (System.IO.IOException) {
 						setClip ();
@@ -1389,7 +1389,7 @@ namespace Terminal.Gui {
 					}
 				} else {
 					Console.Out.Write ($"\x1b[{top};{Console.WindowLeft}" +
-					    $";{Rows};{Cols}w");
+						$";{Rows};{Cols}w");
 				}
 			}
 			setClip ();
@@ -1444,8 +1444,8 @@ namespace Terminal.Gui {
 		public override void UpdateScreen ()
 		{
 			if (Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
-			    || (!EnableConsoleScrolling && Rows != Console.WindowHeight)
-			    || (EnableConsoleScrolling && Rows != largestBufferHeight)) {
+				|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
+				|| (EnableConsoleScrolling && Rows != largestBufferHeight)) {
 				return;
 			}
 
@@ -1539,8 +1539,8 @@ namespace Terminal.Gui {
 
 			redrawAttr = attr;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				  .OfType<ConsoleColor> ()
+				  .Select (s => (int)s);
 			if (values.Contains (attr & 0xffff)) {
 				bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
 			}
@@ -1994,8 +1994,8 @@ namespace Terminal.Gui {
 			foreground = default;
 			background = default;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				  .OfType<ConsoleColor> ()
+				  .Select (s => (int)s);
 			if (values.Contains (value & 0xffff)) {
 				hasColor = true;
 				background = (Color)(ConsoleColor)(value & 0xffff);
