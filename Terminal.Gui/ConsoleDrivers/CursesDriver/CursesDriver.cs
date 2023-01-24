@@ -923,7 +923,12 @@ namespace Terminal.Gui {
 		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
+<<<<<<< Updated upstream
 			Curses.refresh ();
+=======
+			Console.Out.Write ("\x1b[3J");
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+>>>>>>> Stashed changes
 		}
 
 		public override void UpdateOffScreen ()
@@ -1055,11 +1060,19 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003h");
+<<<<<<< Updated upstream
+=======
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+>>>>>>> Stashed changes
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003l");
+<<<<<<< Updated upstream
+=======
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+>>>>>>> Stashed changes
 		}
 
 		//int lastMouseInterval;
@@ -1107,6 +1120,10 @@ namespace Terminal.Gui {
 
 			if (visibility != CursorVisibility.Invisible) {
 				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
+<<<<<<< Updated upstream
+=======
+				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+>>>>>>> Stashed changes
 			}
 
 			currentCursorVisibility = visibility;

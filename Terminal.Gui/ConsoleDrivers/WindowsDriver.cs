@@ -1473,8 +1473,7 @@ namespace Terminal.Gui {
 				// wipe out the backscroll buffer when the application exits.
 				Console.Out.Write ("\x1b[?1047h");
 
-				// TODO: Figure out if calling flush is really needed here
-				Console.Out.Flush ();
+				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1510,9 +1509,8 @@ namespace Terminal.Gui {
 				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
 				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
 				Console.Out.Write ("\x1b[0J");
-				
-				// TODO: Figure out if calling flush is really needed here
-				Console.Out.Flush ();
+
+				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 			}
 		}
 
@@ -1717,7 +1715,7 @@ namespace Terminal.Gui {
 			// Disable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1047l");
 
-			Console.Out.Flush ();
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 		}
 
 		public override Attribute GetAttribute ()
