@@ -615,7 +615,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-#if false	// Not needed on the constructor. Perhaps could be used on resizing. To study.
+#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.                                                                                     
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		static extern IntPtr GetConsoleWindow ();
 
