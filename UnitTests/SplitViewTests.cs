@@ -586,6 +586,135 @@ namespace UnitTests {
 		}
 
 
+		[Fact,AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_RendersNicely()
+		{
+			var splitContainer = GetNestedContainer3Right1Down (false);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			string looksLike =
+@"
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222├──────
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+						// It looks good but lets double check the measurements incase
+			// anything is sticking out but drawn over
+
+			// 3 panels + 2 splitters
+			Assert.Equal(5,splitContainer.Subviews.Count);
+
+
+			// Check X and Widths of Tiles
+			Assert.Equal(0,splitContainer.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(6,splitContainer.Tiles.ElementAt(0).View.Frame.Width);
+
+			Assert.Equal(7,splitContainer.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(6,splitContainer.Tiles.ElementAt(1).View.Frame.Width);
+
+			Assert.Equal(14,splitContainer.Tiles.ElementAt(2).View.Frame.X);
+			Assert.Equal(6,splitContainer.Tiles.ElementAt(2).View.Frame.Width);
+			
+
+			// Check Y and Heights of Tiles
+			Assert.Equal(0,splitContainer.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(10,splitContainer.Tiles.ElementAt(0).View.Frame.Height);
+
+			Assert.Equal(0,splitContainer.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(10,splitContainer.Tiles.ElementAt(1).View.Frame.Height);
+
+			Assert.Equal(0,splitContainer.Tiles.ElementAt(2).View.Frame.Y);
+			Assert.Equal(10,splitContainer.Tiles.ElementAt(2).View.Frame.Height);
+			
+			// Check Sub containers in last panel
+			var subSplit = (SplitView)splitContainer.Tiles.ElementAt(2).View;
+			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(6,subSplit.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(5,subSplit.Tiles.ElementAt(0).View.Frame.Height);
+			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(0).View.Subviews.Single());
+
+			Assert.Equal(0,subSplit.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(6,subSplit.Tiles.ElementAt(1).View.Frame.Width);
+			Assert.Equal(6,subSplit.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(4,subSplit.Tiles.ElementAt(1).View.Frame.Height);
+			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(1).View.Subviews.Single());
+		}
+
+		[Fact,AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_WithBorder_RendersNicely()
+		{
+			var splitContainer = GetNestedContainer3Right1Down (true);
+
+			splitContainer.Redraw (splitContainer.Bounds);
+
+			string looksLike =
+@"
+┌─────┬──────┬─────┐
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222├─────┤
+│11111│222222│44444│
+│11111│222222│44444│
+│11111│222222│44444│
+└─────┴──────┴─────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// It looks good but lets double check the measurements incase
+			// anything is sticking out but drawn over
+
+			// 3 panels + 2 splitters
+			Assert.Equal(5,splitContainer.Subviews.Count);
+
+			// Check X and Widths of Tiles
+			Assert.Equal(1,splitContainer.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(5,splitContainer.Tiles.ElementAt(0).View.Frame.Width);
+
+			Assert.Equal(7,splitContainer.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(6,splitContainer.Tiles.ElementAt(1).View.Frame.Width);
+
+			Assert.Equal(14,splitContainer.Tiles.ElementAt(2).View.Frame.X);
+			Assert.Equal(5,splitContainer.Tiles.ElementAt(2).View.Frame.Width);
+			
+
+			// Check Y and Heights of Tiles
+			Assert.Equal(1,splitContainer.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(8,splitContainer.Tiles.ElementAt(0).View.Frame.Height);
+
+			Assert.Equal(1,splitContainer.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(8,splitContainer.Tiles.ElementAt(1).View.Frame.Height);
+
+			Assert.Equal(1,splitContainer.Tiles.ElementAt(2).View.Frame.Y);
+			Assert.Equal(8,splitContainer.Tiles.ElementAt(2).View.Frame.Height);
+			
+			// Check Sub containers in last panel
+			var subSplit = (SplitView)splitContainer.Tiles.ElementAt(2).View;
+			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(5,subSplit.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(4,subSplit.Tiles.ElementAt(0).View.Frame.Height);
+			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(0).View.Subviews.Single());
+
+			Assert.Equal(0,subSplit.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(5,subSplit.Tiles.ElementAt(1).View.Frame.Width);
+			Assert.Equal(5,subSplit.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(3,subSplit.Tiles.ElementAt(1).View.Frame.Height);
+			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(1).View.Subviews.Single());
+		}
+
+
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
 		/// two (with horizontal splitter line).
@@ -601,6 +730,49 @@ namespace UnitTests {
 			newContainer.ColorScheme = new ColorScheme ();
 			container.ColorScheme = new ColorScheme ();
 
+			container.LayoutSubviews ();
+			return container;
+		}
+
+		/// <summary>
+		/// Creates a vertical orientation root container with 3 tiles.
+		/// The rightmost is split horizontally
+		/// </summary>
+		/// <param name="withBorder"></param>
+		/// <returns></returns>
+		private SplitView GetNestedContainer3Right1Down(bool withBorder)
+		{
+			var container = 
+			new SplitView (3)
+			{
+				Width = 20,
+				Height = 10,
+				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
+			};
+
+			Assert.True (container.TrySplitView (2,2, out var newContainer));
+			
+			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			
+			int i=0;
+			foreach(var tile in container.Tiles.Take(2).Union(newContainer.Tiles))
+			{
+				i++;
+
+				tile.View.Add(new TextView{
+					Width = Dim.Fill(),
+					Height = Dim.Fill(),
+					Text = 
+						string.Join('\n',
+						Enumerable.Repeat(
+							new string(i.ToString()[0],100)
+							,10).ToArray()),
+					WordWrap = false
+				});
+			}
+
+			newContainer.ColorScheme = new ColorScheme ();
+			container.ColorScheme = new ColorScheme ();
 			container.LayoutSubviews ();
 			return container;
 		}
