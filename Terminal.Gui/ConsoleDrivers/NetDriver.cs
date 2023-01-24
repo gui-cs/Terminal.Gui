@@ -225,7 +225,7 @@ namespace Terminal.Gui {
 			var keyChar = consoleKeyInfo.KeyChar;
 			switch ((uint)keyChar) {
 			case 0:
-				if (consoleKeyInfo.Key == (ConsoleKey)64) {	// Ctrl+Space in Windows.
+				if (consoleKeyInfo.Key == (ConsoleKey)64) {     // Ctrl+Space in Windows.
 					newConsoleKeyInfo = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar,
 						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
 						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
@@ -613,12 +613,12 @@ namespace Terminal.Gui {
 					case 68:
 					case 72:
 					case 80:
-						buttonState = MouseButtonState.ButtonWheeledLeft;	   // Shift/Ctrl+ButtonWheeledUp
+						buttonState = MouseButtonState.ButtonWheeledLeft;          // Shift/Ctrl+ButtonWheeledUp
 						break;
 					case 69:
 					case 73:
 					case 81:
-						buttonState = MouseButtonState.ButtonWheeledRight;	  // Shift/Ctrl+ButtonWheeledDown
+						buttonState = MouseButtonState.ButtonWheeledRight;        // Shift/Ctrl+ButtonWheeledDown
 						break;
 					}
 					// Modifiers.
