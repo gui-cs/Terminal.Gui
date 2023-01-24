@@ -1,9 +1,6 @@
 ﻿//
 // Driver.cs: Curses-based Driver
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -342,9 +339,9 @@ namespace Terminal.Gui {
 				cancelButtonClicked = true;
 
 			} else if (buttonPressedCount == 3
-			       && (cev.ButtonState == Curses.Event.Button1Pressed
-			       || cev.ButtonState == Curses.Event.Button2Pressed
-			       || cev.ButtonState == Curses.Event.Button3Pressed)) {
+				&& (cev.ButtonState == Curses.Event.Button1Pressed
+				|| cev.ButtonState == Curses.Event.Button2Pressed
+				|| cev.ButtonState == Curses.Event.Button3Pressed)) {
 
 				switch (cev.ButtonState) {
 				case Curses.Event.Button1Pressed:
@@ -362,8 +359,8 @@ namespace Terminal.Gui {
 				buttonPressedCount = 0;
 
 			} else if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
-			       cev.ButtonState == Curses.Event.Button3Clicked) &&
-			       lastMouseButtonPressed == null) {
+				cev.ButtonState == Curses.Event.Button3Clicked) &&
+				lastMouseButtonPressed == null) {
 
 				isButtonPressed = false;
 				mouseFlag = ProcessButtonClickedEvent (cev);
@@ -923,12 +920,7 @@ namespace Terminal.Gui {
 		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
-<<<<<<< Updated upstream
 			Curses.refresh ();
-=======
-			Console.Out.Write ("\x1b[3J");
-			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
->>>>>>> Stashed changes
 		}
 
 		public override void UpdateOffScreen ()
@@ -1060,19 +1052,11 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003h");
-<<<<<<< Updated upstream
-=======
-			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
->>>>>>> Stashed changes
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write ("\x1b[?1003l");
-<<<<<<< Updated upstream
-=======
-			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
->>>>>>> Stashed changes
 		}
 
 		//int lastMouseInterval;
@@ -1120,10 +1104,6 @@ namespace Terminal.Gui {
 
 			if (visibility != CursorVisibility.Invisible) {
 				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
-<<<<<<< Updated upstream
-=======
-				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
->>>>>>> Stashed changes
 			}
 
 			currentCursorVisibility = visibility;
@@ -1188,8 +1168,8 @@ namespace Terminal.Gui {
 			background = default;
 			int back = -1;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains ((value >> 12) & 0xffff)) {
 				hasColor = true;
 				back = (value >> 12) & 0xffff;
