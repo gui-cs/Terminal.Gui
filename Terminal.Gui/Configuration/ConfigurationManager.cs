@@ -195,7 +195,7 @@ namespace Terminal.Gui.Configuration {
 
 				var root = (rootT)Activator.CreateInstance (typeof (rootT))!;
 				// Get ConfigProperty store for this Scope type
-				var scopeProperties = typeToConvert!.GetProperty ("ScopeProperties")?.GetValue (root) as Dictionary<string, ConfigProperty>;
+				var scopeProperties = typeToConvert!.GetProperty ("Properties")?.GetValue (root) as Dictionary<string, ConfigProperty>;
 				while (reader.Read ()) {
 					if (reader.TokenType == JsonTokenType.EndObject) {
 						return root;
@@ -265,7 +265,7 @@ namespace Terminal.Gui.Configuration {
 
 				}
 
-				var configStore = (Dictionary<string, ConfigProperty>)typeof (rootT).GetProperty ("ScopeProperties")?.GetValue (root)!;
+				var configStore = (Dictionary<string, ConfigProperty>)typeof (rootT).GetProperty ("Properties")?.GetValue (root)!;
 				foreach (var p in from p in configStore
 						  .Where (cp =>
 							cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is
