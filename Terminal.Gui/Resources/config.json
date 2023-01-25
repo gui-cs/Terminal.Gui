@@ -24,6 +24,11 @@
   "Themes": [
     {
       "Default": {
+        "Dialog.DefaultBorderStyle": "Single",
+        "Dialog.DefaultButtonAlignment": "Center",
+        "Dialog.DefaultEffect3D": true,
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
         "ColorSchemes": [
           {
             "TopLevel": {

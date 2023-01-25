@@ -152,7 +152,7 @@
             }
           }
         ],
-        "FrameView.DefaultBorderStyle": "Double"
+        "FrameView.DefaultBorderStyle": "Single"
       }
     }
   ]
