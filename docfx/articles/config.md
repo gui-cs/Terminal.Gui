@@ -94,7 +94,11 @@ Themes support defining ColorSchemes as well as various default settings for Vie
             }
           }
         ],
-        "FrameView.DefaultBorderStyle": "Double"
+        "Dialog.DefaultBorderStyle": "Double",
+        "Dialog.DefaultButtonAlignment": "Right",
+        "Dialog.DefaultEffect3D": false,
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Double",      
       }
     }
   ]

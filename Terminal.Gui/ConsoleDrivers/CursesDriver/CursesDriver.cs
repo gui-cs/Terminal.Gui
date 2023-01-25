@@ -65,7 +65,7 @@ namespace Terminal.Gui {
 				if (runeWidth < 2 && ccol > 0
 					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-					var curAtttib = currentAttribute;
+					var curAtttib = CurrentAttribute;
 					Curses.attrset (contents [crow, ccol - 1, 1]);
 					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
 					contents [crow, ccol - 1, 0] = (int)(uint)' ';
@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
 					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
-					var curAtttib = currentAttribute;
+					var curAtttib = CurrentAttribute;
 					Curses.attrset (contents [crow, ccol + 1, 1]);
 					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
 					contents [crow, ccol + 1, 0] = (int)(uint)' ';
@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 					Curses.addch ((int)(uint)rune);
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
-				contents [crow, ccol, 1] = currentAttribute;
+				contents [crow, ccol, 1] = CurrentAttribute;
 				contents [crow, ccol, 2] = 1;
 			} else
 				needMove = true;
@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 			ccol++;
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -160,13 +160,10 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
-			currentAttribute = c;
-			Curses.attrset (currentAttribute);
+			Curses.attrset (CurrentAttribute);
 		}
 
 		public Curses.Window window;
@@ -878,7 +875,7 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			currentAttribute = MakeColor (Color.White, Color.Black);
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
 
 			if (Curses.HasColors) {
 				Curses.StartColor ();
@@ -1088,7 +1085,7 @@ namespace Terminal.Gui {
 
 		public override Attribute GetAttribute ()
 		{
-			return currentAttribute;
+			return CurrentAttribute;
 		}
 
 		/// <inheritdoc/>

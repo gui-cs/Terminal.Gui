@@ -1258,7 +1258,7 @@ namespace Terminal.Gui {
 				} else {
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
-				contents [crow, ccol, 1] = currentAttribute;
+				contents [crow, ccol, 1] = CurrentAttribute;
 				contents [crow, ccol, 2] = 1;
 
 				dirtyLine [crow] = true;
@@ -1267,7 +1267,7 @@ namespace Terminal.Gui {
 			ccol++;
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -1340,7 +1340,7 @@ namespace Terminal.Gui {
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
-			currentAttribute = MakeColor (Color.White, Color.Black);
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
 			InitalizeColorSchemes ();
 
 			ResizeScreen ();
@@ -1615,12 +1615,10 @@ namespace Terminal.Gui {
 		{
 		}
 
-		Attribute currentAttribute;
 
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
-			currentAttribute = c;
 		}
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -1940,7 +1938,7 @@ namespace Terminal.Gui {
 
 		public override Attribute GetAttribute ()
 		{
-			return currentAttribute;
+			return CurrentAttribute;
 		}
 
 		/// <inheritdoc/>

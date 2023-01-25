@@ -152,7 +152,11 @@
             }
           }
         ],
-        "FrameView.DefaultBorderStyle": "Single"
+        "Dialog.DefaultBorderStyle": "Double",
+        "Dialog.DefaultButtonAlignment": "Right",
+        "Dialog.DefaultEffect3D": false,
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Double"
       }
     }
   ]

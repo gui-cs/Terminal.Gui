@@ -1457,7 +1457,7 @@ namespace Terminal.Gui {
 				rows = winSize.Height;
 				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
-				currentAttribute = MakeColor (Color.White, Color.Black);
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
 				InitalizeColorSchemes ();
 				
 				ResizeScreen ();
@@ -1539,8 +1539,8 @@ namespace Terminal.Gui {
 					OutputBuffer [position].Char.UnicodeChar = (char)rune;
 					contents [crow, ccol, 0] = (int)(uint)rune;
 				}
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				contents [crow, ccol, 1] = currentAttribute;
+				OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
+				contents [crow, ccol, 1] = CurrentAttribute;
 				contents [crow, ccol, 2] = 1;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
@@ -1549,10 +1549,10 @@ namespace Terminal.Gui {
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -1568,12 +1568,9 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
-			currentAttribute = c;
 		}
 
 		public override Attribute MakeColor (Color foreground, Color background)
@@ -1677,7 +1674,7 @@ namespace Terminal.Gui {
 
 		public override Attribute GetAttribute ()
 		{
-			return currentAttribute;
+			return CurrentAttribute;
 		}
 
 		/// <inheritdoc/>

@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 			Modal = true;
 			Border.Effect3D = DefaultEffect3D;
 			Border.BorderStyle = DefaultBorderStyle;
-			Border.Effect3DBrush = new Attribute (Color.Red, Color.White);
+			Border.Effect3DBrush = DefaultBorder?.Effect3DBrush;
 			ButtonAlignment = DefaultButtonAlignment;
 
 			if (buttons != null) {
@@ -78,7 +78,14 @@ namespace Terminal.Gui {
 		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static Border DefaultBorder { get; set; }
+		public static Border DefaultBorder { get; set; } = new Border () { 
+			Effect3D = DefaultEffect3D,
+			Effect3DBrush = new Attribute(Color.White, Color.Black),
+			BorderStyle = BorderStyle.Single,
+			BorderThickness = new Thickness(2),
+			DrawMarginFrame = false,
+			BorderBrush = Color.White,
+		};
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>.

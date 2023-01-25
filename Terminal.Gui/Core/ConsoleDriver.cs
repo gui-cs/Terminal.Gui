@@ -884,6 +884,22 @@ namespace Terminal.Gui {
 		public abstract void UpdateScreen ();
 
 		/// <summary>
+		/// The current attribute the driver is using. 
+		/// </summary>
+		public virtual Attribute CurrentAttribute {
+			get => currentAttribute; 
+			set {
+				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
+					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+					return;
+				}
+				if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
+
+				currentAttribute = value;
+			}
+		}
+
+		/// <summary>
 		/// Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.
 		/// </summary>
 		/// <remarks>
@@ -892,7 +908,7 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public virtual void SetAttribute (Attribute c)
 		{
-			if (!c.Initialized) Debug.WriteLine("ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+			CurrentAttribute = c;
 		}
 
 		/// <summary>
@@ -1428,6 +1444,7 @@ namespace Terminal.Gui {
 		/// Lower right rounded corner
 		/// </summary>
 		public Rune LRRCorner = '\u256f';
+		private Attribute currentAttribute;
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
