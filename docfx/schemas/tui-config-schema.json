@@ -3,52 +3,38 @@
   "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json).",
   "type": "object",
   "properties": {
-    "Settings": {
-      "description": "Configuration settings for Terminal.Gui applications.",
-      "type": "object",
-      "properties": {
-        "HeightAsBuffer": {
-          "description": "See HeightAsBuffer API documentation.",
-          "type": "boolean"
-        },
-        "AlternateForwardKey": {
-          "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
-          "$ref": "#/definitions/Key"
-        },
-        "AlternateBackwardKey": {
-          "description": "Alternative key for navigating backwards through views. Shift+Ctrl+Tab is the primary key.",
-          "$ref": "#/definitions/Key"
-        },
-        "QuitKey": {
-          "description": "The key to quit the application. Ctrl+Q is the default.",
-          "$ref": "#/definitions/Key"
-        },
-        "IsMouseDisabled": {
-          "description": "Disable or enable the mouse. The mouse is enabled by default.",
-          "type": "boolean"
-        },
-        "UseSystemConsole": {
-          "description": "If true, forces the use of the System.Console-based (aka NetDriver) driver. The default is false.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "HeightAsBuffer",
-        "AlternateForwardKey",
-        "AlternateBackwardKey",
-        "QuitKey",
-        "IsMouseDisabled",
-        "UseSystemConsole"
-      ]
+    "Application.HeightAsBuffer": {
+      "description": "See HeightAsBuffer API documentation.",
+      "type": "boolean"
     },
-    "ThemeDefinitions": {
-      "description": "A list of Theme objects. Each Theme specifies a set of settings for an application. Set SelectedTheme to the name of the active theme.",
-      "type": "object",
+    "Application.AlternateForwardKey": {
+      "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.AlternateBackwardKey": {
+      "description": "Alternative key for navigating backwards through views. Shift+Ctrl+Tab is the primary key.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.QuitKey": {
+      "description": "The key to quit the application. Ctrl+Q is the default.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.IsMouseDisabled": {
+      "description": "Disable or enable the mouse. The mouse is enabled by default.",
+      "type": "boolean"
+    },
+    "Application.UseSystemConsole": {
+      "description": "If true, forces the use of the System.Console-based (aka NetDriver) driver. The default is false.",
+      "type": "boolean"
+    },
+    "Theme": {
+      "description": "The currently selected theme. The default is 'Default'.",
+      "type": "string"
+    },
+    "Themes": {
+      "description": "An array of Theme objects. Each Theme specifies a set of settings for an application. Set Theme to the name of the active theme.",
+      "type": "array",
       "properties": {
-        "SelectedTheme": {
-          "type": "string",
-          "description": "The currently selected theme. The default is 'Default'."
-        },
         "Themes": {
           "$ref": "#/definitions/Theme"
         }
@@ -68,7 +54,7 @@
           "$ref": "#/definitions/ColorSchemes"
         }
       }
-    },    
+    },
     "ColorSchemes": {
       "description": "A list of ColorSchemes. Each ColorScheme specifies a set of Attributes (Foreground & Background).",
       "type": "array",
@@ -92,7 +78,7 @@
       "additionalProperties": {
         "$ref": "#/definitions/ColorScheme"
       }
-    } ,   
+    },
     "ColorScheme": {
       "description": "A Terminal.Gui ColorScheme. Specifies the Foreground & Background colors for modes of an Terminal.Gui app.",
       "type": "object",

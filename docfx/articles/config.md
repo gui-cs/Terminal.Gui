@@ -1,10 +1,12 @@
 # Configuration Management
 
-Terminal.Gui provides settings and configuration management for Terminal.Gui applications.
+Terminal.Gui provides configuration and theme management for Terminal.Gui applications.
 
-The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml)  class provides a simple way to load and save configuration files. The configuration files are simple JSON files. The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class provides a simple way to load and save configuration files. The configuration files are simple JSON files.
+The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class loads and saves Json-formatted configuration files. 
 
-Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files. 
+Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files. There are two types, or scopes, of settings: Setting scope and Theme scope. Setting scope settings are generally applied to the [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml) class. Theme scope settings are applied to various classes such as [`FrameView`](~/api/Terminal.Gui/Terminal.Gui.FrameView.yml) and [`Window`](~/api/Terminal.Gui/Terminal.Gui.Window.yml).
+
+See below for more information on [`ThemeManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ThemeManager.yml).
 
 The The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) will look for configuration files in the `.tui` folder in the user's home directory (e.g. `C:/Users/username/.tui` or `/usr/username/.tui`), the folder where the Terminal.Gui application was launched from (e.g. `./.tui`), or as a resource within the Terminal.Gui application's main assembly.
 
@@ -24,7 +26,7 @@ Settings are applied using the following precedence (higher precedence settings 
 
 6. Default settings defined in the Terminal.Gui assembly -- Lowest precedence.
 
-The `UI Catalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files and reload them, allowing users to change settings without having to restart the application.
+The `UI Catalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) to reaload them; allowing users to change settings without having to restart the application.
 
 # What Can Be Configured
 
@@ -40,85 +42,62 @@ Settings for the [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml
 
 ## Themes
 
-A Theme is a collection of settings that are named. The default theme is named "Default". Additional themes can be defined in the configuration file. 
+A Theme is a collection of settings that are named. The default theme is named "Default". The built-in configuration stored within the Terminal.Gui library defines two additional themes: "Dark", and "Light". Additional themes can be defined in the configuration files. 
 
-The property `SelectedTheme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
+The Json property `Theme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
 
-Currently Themes only support defining ColorSchemes - Both the default color schemes and user defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui/Terminal.Gui.Colors.yml) for more information.
+Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui/Terminal.Gui.Colors.yml) for more information.
 
 # Example Configuration File
 
 ```json
 {
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "Settings": {
-    "QuitKey": {
-      "Key": "End",
-      "Modifiers": [     
-        "Ctrl"
-      ]
-    }    
-    "UseSystemConsole": true
+  "Application.QuitKey": {
+    "Key": "Esc"
   },
-  "Themes": {
-    "ThemeDefinitions": [
-      {
-        "My Theme": {
-          "ColorSchemes": [
-            {
-              "Base": {
-                "Normal": {
-                  "Foreground": "White",
-                  "Background": "Blue"
-                },
-                "Focus": {
-                  "Foreground": "Black",
-                  "Background": "Gray"
-                },
-                "HotNormal": {
-                  "Foreground": "BrightCyan",
-                  "Background": "Blue"
-                },
-                "HotFocus": {
-                  "Foreground": "BrightBlue",
-                  "Background": "Gray"
-                },
-                "Disabled": {
-                  "Foreground": "DarkGray",
-                  "Background": "Blue"
-                }
-              }
-            },
-            {
-              "MyColorScheme": {
-                "Normal": {
-                  "Foreground": "Black",
-                  "Background": "Gray"
-                },
-                "Focus": {
-                  "Foreground": "White",
-                  "Background": "DarkGray"
-                },
-                "HotNormal": {
-                  "Foreground": "Blue",
-                  "Background": "Gray"
-                },
-                "HotFocus": {
-                  "Foreground": "BrightYellow",
-                  "Background": "DarkGray"
-                },
-                "Disabled": {
-                  "Foreground": "Gray",
-                  "Background": "DarkGray"
-                }
+  "Themes": [
+    {
+      "UI Catalog Theme": {
+        "ColorSchemes": [
+          {
+            "UI Catalog Scheme": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Green"
+              },
+              "Focus": {
+                "Foreground": "Green",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Blue",
+                "Background": "Green"
+              },
+              "HotFocus": {
+                "Foreground": "BrightRed",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "BrightGreen",
+                "Background": "Gray"
               }
             }
-          ]
-        }
+          },
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "DarkGray",
+                "Background": "White"
+              ...
+              }
+            }
+          }
+        ],
+        "FrameView.DefaultBorderStyle": "Double"
       }
-    ],
-    "SelectedTheme": "MyTheme"
-  }
+    }
+  ]
 }
 ```
 

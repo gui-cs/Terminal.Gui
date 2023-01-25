@@ -7,7 +7,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using NStack;
+using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -54,7 +57,10 @@ namespace Terminal.Gui {
 
 			ColorScheme = Colors.Dialog;
 			Modal = true;
-			Border.Effect3D = true;
+			Border.Effect3D = DefaultEffect3D;
+			Border.BorderStyle = DefaultBorderStyle;
+			Border.Effect3DBrush = new Attribute (Color.Red, Color.White);
+			ButtonAlignment = DefaultButtonAlignment;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {
@@ -67,6 +73,12 @@ namespace Terminal.Gui {
 				LayoutStartedHandler ();
 			};
 		}
+
+		/// <summary>
+		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static Border DefaultBorder { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>.
@@ -117,6 +129,7 @@ namespace Terminal.Gui {
 			}
 			return buttons.Select (b => b.Bounds.Width).Sum ();
 		}
+
 		/// <summary>
 		/// Determines the horizontal alignment of the Dialog buttons.
 		/// </summary>
@@ -142,13 +155,12 @@ namespace Terminal.Gui {
 			Right
 		}
 
-		private ButtonAlignments buttonAlignment = Dialog.ButtonAlignments.Center;
 
 		/// <summary>
 		/// Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the 
 		/// bottom of the dialog. 
 		/// </summary>
-		public ButtonAlignments ButtonAlignment { get => buttonAlignment; set => buttonAlignment = value; }
+		public ButtonAlignments ButtonAlignment { get; set; }
 
 		void LayoutStartedHandler ()
 		{
@@ -235,5 +247,32 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
+
+		/// <summary>
+		/// The default <see cref="BorderStyle"/> for <see cref="Dialog"/>. The default is <see cref="BorderStyle.Double"/>.
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Dialog"/>s. 
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static new BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
+
+		/// <summary>
+		/// The default <see cref="Border.Effect3D"/> for <see cref="Dialog"/>. The default is <see langword="true"/>.
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme.
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope))]
+		public static bool DefaultEffect3D { get; set; } = true;
+
+		/// <summary>
+		/// The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>. 
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme.
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
 	}
 }

@@ -1,27 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace Terminal.Gui.Configuration {
 	/// <summary>
-	/// 
+	/// Json converter for the <see cref="Color"/> class.
 	/// </summary>
 	public class ColorJsonConverter : JsonConverter<Color> {
 		private static ColorJsonConverter instance;
 
 		/// <summary>
-		/// 
-		/// </summary>
-		public ColorJsonConverter ()
-		{
-		}
-
-		/// <summary>
-		/// 
+		/// Singleton
 		/// </summary>
 		public static ColorJsonConverter Instance {
 			get {
@@ -33,14 +23,7 @@ namespace Terminal.Gui.Configuration {
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <param name="typeToConvert"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		/// <exception cref="JsonException"></exception>
+		/// <inheritdoc/>
 		public override Color Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			// Check if the value is a string
@@ -69,13 +52,7 @@ namespace Terminal.Gui.Configuration {
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="value"></param>
-		/// <param name="options"></param>
-		/// <exception cref="JsonException"></exception>
+		/// <inheritdoc/>
 		public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
 		{
 			// Try to get the human readable color name from the map

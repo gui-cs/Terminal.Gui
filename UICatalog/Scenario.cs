@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog {
 	/// <summary>
@@ -71,9 +72,30 @@ namespace UICatalog {
 		/// </remarks>
 		public virtual void Init (ColorScheme colorScheme)
 		{
+			ConfigurationManager.Applied += (a) => {
+			};
+
+			ThemeManager.Applied += (a) => {
+				//if (Application.Top == null) {
+				//	return;
+				//}
+
+				////// Apply changes that apply to either UICatalogTopLevel or a Scenario
+				////if (Application.Top.MenuBar != null) {
+				////	Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				////	Application.Top.MenuBar.SetNeedsDisplay ();
+				////}
+
+				////if (Application.Top.StatusBar != null) {
+				////	Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+				////	Application.Top.StatusBar.SetNeedsDisplay ();
+				////}
+				////Application.Top.SetNeedsDisplay ();
+			};
+			
 			Application.Init ();
 
-			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
+			Win = new Window ($"{Application.QuitKey} to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),

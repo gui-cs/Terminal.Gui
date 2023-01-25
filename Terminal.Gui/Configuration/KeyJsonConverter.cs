@@ -5,25 +5,19 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration {
 	/// <summary>
-	/// 
+	/// Json converter for the <see cref="Key"/> class.
 	/// </summary>
 	public class KeyJsonConverter : JsonConverter<Key> {
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <param name="typeToConvert"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		/// <exception cref="JsonException"></exception>
+		/// <inheritdoc/>
 		public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType == JsonTokenType.StartObject) {
 				Key key = Key.Unknown;;
-				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> ();
-				modifierDict.Add ("Shift", Key.ShiftMask);
-				modifierDict.Add ("Ctrl", Key.CtrlMask);
-				modifierDict.Add ("Alt", Key.AltMask);
+				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> {
+					{ "Shift", Key.ShiftMask },
+					{ "Ctrl", Key.CtrlMask },
+					{ "Alt", Key.AltMask }
+				};
 
 				List<Key> modifiers = new List<Key> ();
 
@@ -81,12 +75,7 @@ namespace Terminal.Gui.Configuration {
 			throw new JsonException ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="value"></param>
-		/// <param name="options"></param>
+		/// <inheritdoc/>
 		public override void Write (Utf8JsonWriter writer, Key value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
@@ -123,6 +112,5 @@ namespace Terminal.Gui.Configuration {
 
 			writer.WriteEndObject ();
 		}
-
 	}
 }

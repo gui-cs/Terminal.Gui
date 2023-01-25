@@ -11,7 +11,9 @@
 
 using System;
 using System.Collections;
+using System.Text.Json.Serialization;
 using NStack;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -170,24 +172,14 @@ namespace Terminal.Gui {
 			Initialize (title, Rect.Empty, padding, border);
 		}
 
-		private static BorderStyle _defaultBorderStyle = BorderStyle.Single;
 		/// <summary>
-		/// The default <see cref="BorderStyle"/> for <see cref="Window"/>. The default is <see cref="BorderStyle.Single"/>.
+		/// The default <see cref="BorderStyle"/> for <see cref="FrameView"/>. The default is <see cref="BorderStyle.Single"/>.
 		/// </summary>
 		/// <remarks>
-		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="FrameView"/>s. 
-		/// The setting in the config file is Theme.DefaultFrameViewBorderStyle.
+		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Window"/>s. 
 		/// </remarks>
-		public static BorderStyle DefaultBorderStyle {
-		get {
-				return _defaultBorderStyle;
-			}
-			set {
-				_defaultBorderStyle = value;
-				// TODO: Find all instances of Window and change their border??
-			}
-		}
-
+		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
 
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
 		{

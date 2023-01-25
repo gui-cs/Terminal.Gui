@@ -11,6 +11,7 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
+using Terminal.Gui.Configuration;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -36,11 +37,14 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
 	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will 
+	/// load from.</param>
 	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
 		Type consoleDriverType = null,
 		bool useFakeClipboard = false,
 		bool fakeClipboardAlwaysThrowsNotSupportedException = false,
-		bool fakeClipboardIsSupportedAlwaysTrue = false)
+		bool fakeClipboardIsSupportedAlwaysTrue = false,
+		ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.LibraryResources)
 	{
 		//Assert.True (autoInit == false && consoleDriverType == null);
 
@@ -50,6 +54,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
 		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
 		FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+		ConfigurationManager.Locations = configLocation;
 	}
 
 	static bool _init = false;

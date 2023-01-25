@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -329,6 +330,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof(JsonStringEnumConverter))]
 		public BorderStyle BorderStyle {
 			get => borderStyle;
 			set {
@@ -361,6 +363,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the relative <see cref="Thickness"/> of a <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude]
 		public Thickness BorderThickness {
 			get => borderThickness;
 			set {
@@ -372,6 +375,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that draws the outer border color.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color BorderBrush {
 			get => borderBrush;
 			set {
@@ -383,6 +387,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that fills the area between the bounds of a <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color Background {
 			get => background;
 			set {
@@ -395,6 +400,7 @@ namespace Terminal.Gui {
 		/// Gets or sets a <see cref="Thickness"/> value that describes the amount of space between a
 		///  <see cref="Border"/> and its child element.
 		/// </summary>
+		[JsonInclude]
 		public Thickness Padding {
 			get => padding;
 			set {
@@ -448,6 +454,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the 3D effect around the <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude]
 		public bool Effect3D {
 			get => effect3D;
 			set {
@@ -459,6 +466,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get or sets the offset start position for the <see cref="Effect3D"/>
 		/// </summary>
+		[JsonInclude]
 		public Point Effect3DOffset {
 			get => effect3DOffset;
 			set {
@@ -469,6 +477,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Attribute? Effect3DBrush {
 			get => effect3DBrush;
 			set {

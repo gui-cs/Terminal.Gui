@@ -67,27 +67,7 @@ namespace UICatalog {
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
 
-			// Setup a file system watcher for `./.tui/`
-			_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
-			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
-
-			if (!Directory.Exists (tuiDir)) {
-				Directory.CreateDirectory (tuiDir);
-			}
-			_currentDirWatcher.Path = tuiDir;
-			_currentDirWatcher.Filter = "*config.json";
-
-			// Setup a file system watcher for `~/.tui/`
-			_homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-			f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
-			tuiDir = Path.Combine (f.FullName, ".tui");
-
-			if (!Directory.Exists (tuiDir)) {
-				Directory.CreateDirectory (tuiDir);
-			}
-			_homeDirWatcher.Path = tuiDir;
-			_homeDirWatcher.Filter = "*config.json";
+			StartConfigFileWatcher ();
 
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
@@ -129,32 +109,55 @@ namespace UICatalog {
 
 				VerifyObjectsWereDisposed ();
 			}
+
+			StopConfigFileWatcher ();
 			VerifyObjectsWereDisposed ();
 		}
 
-		private static void Application_NotifyStopRunState (Toplevel obj)
-		{
+		private static void StopConfigFileWatcher() {
 			_currentDirWatcher.EnableRaisingEvents = false;
-			_currentDirWatcher.Changed -= ConfigChanged;
-			_currentDirWatcher.Created -= ConfigChanged;
+			_currentDirWatcher.Changed -= ConfigFileChanged;
+			_currentDirWatcher.Created -= ConfigFileChanged;
 
 			_homeDirWatcher.EnableRaisingEvents = false;
-			_homeDirWatcher.Changed -= ConfigChanged;
-			_homeDirWatcher.Created -= ConfigChanged;
+			_homeDirWatcher.Changed -= ConfigFileChanged;
+			_homeDirWatcher.Created -= ConfigFileChanged;
 		}
 
-		private static void Application_NotifyNewRunState (Application.RunState obj)
+		private static void StartConfigFileWatcher()
 		{
-			_currentDirWatcher.Changed += ConfigChanged;
-			_currentDirWatcher.Created += ConfigChanged;
+			// Setup a file system watcher for `./.tui/`
+			_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
+			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
+
+			if (!Directory.Exists (tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+			_currentDirWatcher.Path = tuiDir;
+			_currentDirWatcher.Filter = "*config.json";
+
+			// Setup a file system watcher for `~/.tui/`
+			_homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+			tuiDir = Path.Combine (f.FullName, ".tui");
+
+			if (!Directory.Exists (tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+			_homeDirWatcher.Path = tuiDir;
+			_homeDirWatcher.Filter = "*config.json";
+
+			_currentDirWatcher.Changed += ConfigFileChanged;
+			_currentDirWatcher.Created += ConfigFileChanged;
 			_currentDirWatcher.EnableRaisingEvents = true;
 
-			_homeDirWatcher.Changed += ConfigChanged;
-			_homeDirWatcher.Created += ConfigChanged;
+			_homeDirWatcher.Changed += ConfigFileChanged;
+			_homeDirWatcher.Created += ConfigFileChanged;
 			_homeDirWatcher.EnableRaisingEvents = true;
 		}
-		
-		private static void ConfigChanged (object sender, FileSystemEventArgs e)
+
+		private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
 		{
 			if (Application.Top == null) {
 				return;
@@ -162,28 +165,9 @@ namespace UICatalog {
 
 			// TOOD: THis is a hack. Figure out how to ensure that the file is fully written before reading it.
 			Thread.Sleep (500);
-			ConfigurationManager.UpdateConfigurationFromFile (e.FullPath);
-			//ConfigurationManager.Config.Themes.Apply ();			
-
-			if (Application.Top.MenuBar != null) {
-				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				Application.Top.MenuBar.SetNeedsDisplay ();
-			}
-
-			if (Application.Top.StatusBar != null) {
-				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				Application.Top.StatusBar.SetNeedsDisplay ();
-			}
-
-			if (Application.Top is UICatalogTopLevel) {
-				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
-				_themeMenuBarItem.Children = _themeMenuItems;
-				var checkedThemeMenu = _themeMenuItems.Where (m => m.Checked).FirstOrDefault ();
-				if (checkedThemeMenu != null) {
-					ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = checkedThemeMenu.Title.ToString ();
-				}
-				((UICatalogTopLevel)Application.Top).ApplyConfiguration ();
-			}
+			ConfigurationManager.Load ();
+			ConfigurationManager.Apply ();
+			ThemeManager.Apply ();
 		}
 
 		/// <summary>
@@ -199,8 +183,6 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
-			Application.NotifyNewRunState += Application_NotifyNewRunState;
-			Application.NotifyStopRunState += Application_NotifyStopRunState;
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -222,12 +204,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		static bool _heightAsBuffer = false;
 		static bool _isFirstRunning = true;
-		// The theme selected on the Themes menu. We keep track of it
-		// so after a scenario exits (and Shutdown is called) we can
-		// re-set it.
-		//static private string _theme;
 		static string _topLevelColorScheme;
 
 		static MenuItem [] _themeMenuItems;
@@ -258,7 +235,7 @@ namespace UICatalog {
 				_themeMenuBarItem = new MenuBarItem ("_Themes", _themeMenuItems);
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
-						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Application.QuitKey)
+						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null)
 					}),
 					_themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
@@ -355,16 +332,19 @@ namespace UICatalog {
 				Add (StatusBar);
 
 				Loaded += LoadedHandler;
+				Unloaded += UnloadedHandler;
 
 				// Restore previous selections
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
+
+				ThemeManager.Applied += ThemeAppliedHandler;
 			}
 
 			void LoadedHandler ()
 			{
-				ApplyConfiguration ();
-	
+				ConfigChanged ();
+
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -376,6 +356,17 @@ namespace UICatalog {
 					RightPane.SetFocus ();
 				}
 				Loaded -= LoadedHandler;
+			}
+
+			private void UnloadedHandler ()
+			{
+				ThemeManager.Applied -= ThemeAppliedHandler;
+				Unloaded -= UnloadedHandler;
+			}
+
+			void ThemeAppliedHandler (ThemeManager.ThemeScopeEventArgs a)
+			{
+				ConfigChanged ();
 			}
 
 			/// <summary>
@@ -562,15 +553,14 @@ namespace UICatalog {
 					item.Title = theme.Key;
 					item.Shortcut = Key.AltMask + theme.Key [0];
 					item.CheckType |= MenuItemCheckStyle.Checked;
-					item.Checked = theme.Key == ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string;
+					item.Checked = theme.Key == ThemeManager.Theme;
 					item.Action += () => {
-						ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = theme.Key;
-						ApplyConfiguration ();
+						ThemeManager.Theme = theme.Key;
 					};
 					menuItems.Add (item);
 				}
 
-				var schemeMenuItems = new List<MenuItem> ();	
+				var schemeMenuItems = new List<MenuItem> ();
 				foreach (var sc in Colors.ColorSchemes) {
 					var item = new MenuItem ();
 					item.Title = $"_{sc.Key}";
@@ -589,23 +579,21 @@ namespace UICatalog {
 					schemeMenuItems.Add (item);
 				}
 				menuItems.Add (null);
-				var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray());
+				var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray ());
 				menuItems.Add (mbi);
 
 				return menuItems.ToArray ();
 			}
 
-			public void ApplyConfiguration ()
+			public void ConfigChanged ()
 			{
-				ConfigurationManager.Apply ();
+				//if (ThemeManager.Theme == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
+				//	_topLevelColorScheme = "UI Catalog Scheme";
+				//}
 
-				if (ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
-					_topLevelColorScheme = "UI Catalog Scheme";
-				}
-				
-				if (!Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
+				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
-				} 
+				}
 
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem.Children = _themeMenuItems;
@@ -614,25 +602,33 @@ namespace UICatalog {
 				if (checkedThemeMenu != null) {
 					checkedThemeMenu.Checked = false;
 				}
-				checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Title == ConfigurationManager.ConfigProperties ["Theme"].PropertyValue as string).FirstOrDefault ();
+				checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Title == ThemeManager.Theme).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
-					ConfigurationManager.ConfigProperties ["Theme"].PropertyValue = checkedThemeMenu.Title.ToString ();
+					ThemeManager.Theme = checkedThemeMenu.Title.ToString ();
 					checkedThemeMenu.Checked = true;
 				}
-				var schemeMenuItems = ((MenuBarItem)_themeMenuItems.Where (i => i is MenuBarItem).FirstOrDefault()).Children;
+				var schemeMenuItems = ((MenuBarItem)_themeMenuItems.Where (i => i is MenuBarItem).FirstOrDefault ()).Children;
 				foreach (var schemeMenuItem in schemeMenuItems) {
 					schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
 				}
 
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
+				LeftPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
+				LeftPane.SetNeedsDisplay ();
+
+				RightPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
+				RightPane.SetNeedsDisplay ();
+
+				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
+				StatusBar.Items [0].Shortcut = Application.QuitKey;
+				StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
+
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 
-				Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				Application.Top.MenuBar.SetNeedsDisplay ();
-				Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				Application.Top.StatusBar.SetNeedsDisplay ();
+				
+
 				Application.Top.SetNeedsDisplay ();
 			}
 

@@ -2,9 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
@@ -73,7 +70,7 @@ namespace UICatalog.Scenarios {
 					}
 
 					// Create empty config file
-					json = ConfigurationManager.ToJson ();
+					json = ConfigurationManager.GetEmptyJson ();
 				} else {
 					json = File.ReadAllText (fileInfo.FullName);
 				}

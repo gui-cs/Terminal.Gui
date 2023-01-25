@@ -526,11 +526,6 @@ namespace Terminal.Gui {
 
 		static Colors ()
 		{
-			Init ();
-		}
-
-		public static void Init ()
-		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
 			ColorSchemes = typeof (Colors).GetProperties ()
@@ -603,7 +598,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Theme, OmitClassName = true)]
+		[SerializableConfigurationProperty (Scope = typeof(Configuration.ThemeManager.ThemeScope), OmitClassName = true)]
+		[JsonConverter(typeof(DictionaryConverter<ColorScheme>))]
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; }
 	}
 

@@ -114,26 +114,27 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		private static bool _heightAsBuffer = false;
+		private static bool? _heightAsBuffer;
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
 		/// 
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
-					return _heightAsBuffer;
+					return _heightAsBuffer.HasValue && _heightAsBuffer.Value;
 				}
 				return Driver.HeightAsBuffer;
 			}
 			set {
+				_heightAsBuffer = value;
 				if (Driver == null) {
-					_heightAsBuffer = value;
 					return;
 				}
-				Driver.HeightAsBuffer = _heightAsBuffer = value;
+
+				Driver.HeightAsBuffer = _heightAsBuffer.Value;
 			}
 		}
 
@@ -142,7 +143,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter(typeof(KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter(typeof(KeyJsonConverter))]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -166,7 +167,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -190,7 +191,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {
@@ -318,8 +319,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = SerializableConfigurationProperty.Scopes.Settings)]
-		public static bool UseSystemConsole { get; set; }
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool ForceFakeConsole;
@@ -405,11 +406,7 @@ namespace Terminal.Gui {
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load ();
 			ConfigurationManager.Apply ();
-
-			ConfigProperty usc;
-			if (ConfigurationManager.ConfigProperties.TryGetValue ("Application.UseSystemConsole", out usc) && usc.PropertyValue != null) {
-				UseSystemConsole = (bool)usc.PropertyValue;
-			}
+			ThemeManager.Apply ();
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
@@ -427,7 +424,6 @@ namespace Terminal.Gui {
 					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
 				}
 			}
-
 
 			if (mainLoopDriver == null) {
 				// TODO: Move this logic into ConsoleDriver
@@ -448,7 +444,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.HeightAsBuffer = _heightAsBuffer;
+				Driver.HeightAsBuffer = HeightAsBuffer;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.

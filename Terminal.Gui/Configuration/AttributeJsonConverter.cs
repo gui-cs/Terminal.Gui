@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace Terminal.Gui.Configuration {
 	/// <summary>
-	/// 
+	/// Json converter fro the <see cref="Attribute"/> class.
 	/// </summary>
 	public class AttributeJsonConverter : JsonConverter<Attribute> {
 		private static AttributeJsonConverter instance;
@@ -23,14 +23,7 @@ namespace Terminal.Gui.Configuration {
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <param name="typeToConvert"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		/// <exception cref="JsonException"></exception>
+		/// <inheritdoc/>
 		public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartObject) {
@@ -81,12 +74,7 @@ namespace Terminal.Gui.Configuration {
 			throw new JsonException ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="value"></param>
-		/// <param name="options"></param>
+		/// <inheritdoc/>
 		public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
