@@ -23,6 +23,26 @@ namespace Terminal.Gui {
 	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
 	public class Dialog : Window {
+		/// <summary>
+		/// The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>. 
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme.
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
+
+		/// <summary>
+		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (ThemeManager.ThemeScope))]
+		public static Border DefaultBorder { get; set; } = new Border () {
+			BorderStyle = BorderStyle.Double,
+			DrawMarginFrame = false,
+			Effect3D = true,
+			Effect3DOffset = new Point (1, 1),
+		};
+
 		internal List<Button> buttons = new List<Button> ();
 		const int padding = 0;
 
@@ -57,10 +77,8 @@ namespace Terminal.Gui {
 
 			ColorScheme = Colors.Dialog;
 			Modal = true;
-			Border.Effect3D = DefaultEffect3D;
-			Border.BorderStyle = DefaultBorderStyle;
-			Border.Effect3DBrush = DefaultBorder?.Effect3DBrush;
 			ButtonAlignment = DefaultButtonAlignment;
+			Border = DefaultBorder;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {
@@ -73,19 +91,6 @@ namespace Terminal.Gui {
 				LayoutStartedHandler ();
 			};
 		}
-
-		/// <summary>
-		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static Border DefaultBorder { get; set; } = new Border () { 
-			Effect3D = DefaultEffect3D,
-			Effect3DBrush = new Attribute(Color.White, Color.Black),
-			BorderStyle = BorderStyle.Single,
-			BorderThickness = new Thickness(2),
-			DrawMarginFrame = false,
-			BorderBrush = Color.White,
-		};
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>.
@@ -254,32 +259,5 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
-
-		/// <summary>
-		/// The default <see cref="BorderStyle"/> for <see cref="Dialog"/>. The default is <see cref="BorderStyle.Double"/>.
-		/// </summary>
-		/// <remarks>
-		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Dialog"/>s. 
-		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-		public static new BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
-
-		/// <summary>
-		/// The default <see cref="Border.Effect3D"/> for <see cref="Dialog"/>. The default is <see langword="true"/>.
-		/// </summary>
-		/// <remarks>
-		/// This property can be set in a Theme.
-		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope))]
-		public static bool DefaultEffect3D { get; set; } = true;
-
-		/// <summary>
-		/// The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>. 
-		/// </summary>
-		/// <remarks>
-		/// This property can be set in a Theme.
-		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
 	}
 }

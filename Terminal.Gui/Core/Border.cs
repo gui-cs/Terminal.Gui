@@ -34,18 +34,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the width, in integers, of the left side of the bounding rectangle.
 		/// </summary>
+		[JsonInclude]
 		public int Left;
 		/// <summary>
 		/// Gets or sets the width, in integers, of the upper side of the bounding rectangle.
 		/// </summary>
+		[JsonInclude]
 		public int Top;
 		/// <summary>
 		/// Gets or sets the width, in integers, of the right side of the bounding rectangle.
 		/// </summary>
+		[JsonInclude]
 		public int Right;
 		/// <summary>
 		/// Gets or sets the width, in integers, of the lower side of the bounding rectangle.
 		/// </summary>
+		[JsonInclude]
 		public int Bottom;
 
 		/// <summary>
@@ -413,6 +417,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rendered width of this element.
 		/// </summary>
+		[JsonIgnore]
 		public int ActualWidth {
 			get {
 				var driver = Application.Driver;
@@ -426,6 +431,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rendered height of this element.
 		/// </summary>
+		[JsonIgnore]
 		public int ActualHeight {
 			get {
 				var driver = Application.Driver;
