@@ -459,7 +459,7 @@ namespace Terminal.Gui {
 				return distance - 1;
 			}
 
-			return distance;
+			return distance - (HasBorder() ? 1 : 0);
 		}
 
 		private void RespectMinimumTileSizes ()
