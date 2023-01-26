@@ -192,7 +192,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
 			pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
 			Assert.False (ConfigurationManager.Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-			Assert.True (ThemeManager.Themes ["Default"].Properties.ContainsKey ("FrameView.DefaultBorderStyle"));
+			Assert.True (ConfigurationManager.Themes ["Default"].Properties.ContainsKey ("FrameView.DefaultBorderStyle"));
 		}
 
 		[Fact]
@@ -201,9 +201,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Color.ColorShemes is serialzied as "ColorSchemes", not "Colors.ColorSchemes"
 			PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
 			var scp = ((SerializableConfigurationProperty)pi.GetCustomAttribute (typeof (SerializableConfigurationProperty)));
-			Assert.True (scp.Scope == typeof (ThemeManager.ThemeScope));
+			Assert.True (scp.Scope == typeof (ThemeScope));
 			Assert.True (scp.OmitClassName);
-			Assert.Equal (pi, ThemeManager.Themes ["Default"].Properties ["ColorSchemes"].PropertyInfo);
+			Assert.Equal (pi, ConfigurationManager.Themes ["Default"] ["ColorSchemes"].PropertyInfo);
 
 		}
 
@@ -268,10 +268,10 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Change Base
 			var json = ConfigurationManager.ToJson ();
-
+			
 			ConfigurationManager.LoadFromJson (json);
 
-			var colorSchemes = ((Dictionary<string, ColorScheme>)ThemeManager.Themes [ThemeManager.Theme].Properties ["ColorSchemes"].PropertyValue);
+			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme].Properties ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Colors.Base, colorSchemes ["Base"]);
 			Assert.Equal (Colors.TopLevel, colorSchemes ["TopLevel"]);
 			Assert.Equal (Colors.Error, colorSchemes ["Error"]);
@@ -445,9 +445,9 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 
-			Assert.Equal ("Default", ThemeManager.Theme);
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			var colorSchemes = ((Dictionary<string, ColorScheme>)ThemeManager.Themes [ThemeManager.Theme].Properties ["ColorSchemes"].PropertyValue);
+			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme].Properties ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Color.White, colorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, colorSchemes ["Base"].Normal.Background);
 		}
@@ -537,7 +537,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void TestConfigurationManagerAllHardCodedDefaults ()
 		{
 			ConfigurationManager.GetHardCodedDefaults ();
-			
+
 			// Apply default styles
 			ConfigurationManager.Apply ();
 
@@ -572,7 +572,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Disabled.Background);
 		}
 
-		[Fact,AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
 		{
 			//var _configFilename = "config.json";

@@ -29,18 +29,18 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This property can be set in a Theme.
 		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
 
 		/// <summary>
 		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (ThemeManager.ThemeScope))]
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static Border DefaultBorder { get; set; } = new Border () {
-			BorderStyle = BorderStyle.Double,
-			DrawMarginFrame = false,
-			Effect3D = true,
-			Effect3DOffset = new Point (1, 1),
+			BorderStyle = BorderStyle.Single,
+			//DrawMarginFrame = false,
+			//Effect3D = true,
+			//Effect3DOffset = new Point (1, 1),
 		};
 
 		internal List<Button> buttons = new List<Button> ();

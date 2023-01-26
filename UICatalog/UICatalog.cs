@@ -167,7 +167,7 @@ namespace UICatalog {
 			Thread.Sleep (500);
 			ConfigurationManager.Load ();
 			ConfigurationManager.Apply ();
-			ThemeManager.Apply ();
+			ConfigurationManager.Themes.Apply ();
 		}
 
 		/// <summary>
@@ -338,7 +338,7 @@ namespace UICatalog {
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
 
-				ThemeManager.Applied += ThemeAppliedHandler;
+				ConfigurationManager.Themes.Applied += ThemeAppliedHandler;
 			}
 
 			void LoadedHandler ()
@@ -360,11 +360,11 @@ namespace UICatalog {
 
 			private void UnloadedHandler ()
 			{
-				ThemeManager.Applied -= ThemeAppliedHandler;
+				ConfigurationManager.Themes.Applied -= ThemeAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
-
-			void ThemeAppliedHandler (ThemeManager.ThemeScopeEventArgs a)
+			
+			void ThemeAppliedHandler (ConfigurationManager.ThemeScope.EventArgs a)
 			{
 				ConfigChanged ();
 			}
@@ -548,14 +548,14 @@ namespace UICatalog {
 			public MenuItem [] CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				foreach (var theme in ThemeManager.Themes) {
+				foreach (var theme in ConfigurationManager.Themes) {
 					var item = new MenuItem ();
 					item.Title = theme.Key;
 					item.Shortcut = Key.AltMask + theme.Key [0];
 					item.CheckType |= MenuItemCheckStyle.Checked;
-					item.Checked = theme.Key == ThemeManager.Theme;
+					item.Checked = theme.Key == ConfigurationManager.Themes.Theme;
 					item.Action += () => {
-						ThemeManager.Theme = theme.Key;
+						ConfigurationManager.Themes.Theme = theme.Key;
 					};
 					menuItems.Add (item);
 				}
@@ -587,7 +587,7 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
-				//if (ThemeManager.Theme == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
+				//if (ConfigurationManager.Themes.Theme == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
 				//	_topLevelColorScheme = "UI Catalog Scheme";
 				//}
 
@@ -602,9 +602,9 @@ namespace UICatalog {
 				if (checkedThemeMenu != null) {
 					checkedThemeMenu.Checked = false;
 				}
-				checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Title == ThemeManager.Theme).FirstOrDefault ();
+				checkedThemeMenu = _themeMenuItems.Where (m => m != null && m.Title == ConfigurationManager.Themes.Theme).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
-					ThemeManager.Theme = checkedThemeMenu.Title.ToString ();
+					ConfigurationManager.Themes.Theme = checkedThemeMenu.Title.ToString ();
 					checkedThemeMenu.Checked = true;
 				}
 				var schemeMenuItems = ((MenuBarItem)_themeMenuItems.Where (i => i is MenuBarItem).FirstOrDefault ()).Children;

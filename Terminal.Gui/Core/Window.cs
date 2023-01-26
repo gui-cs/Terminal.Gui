@@ -13,6 +13,7 @@ using System;
 using System.Collections;
 using System.Text.Json.Serialization;
 using NStack;
+using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
@@ -178,7 +179,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Window"/>s. 
 		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		///[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
 
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)

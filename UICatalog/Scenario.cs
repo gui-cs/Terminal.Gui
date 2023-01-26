@@ -75,7 +75,7 @@ namespace UICatalog {
 			ConfigurationManager.Applied += (a) => {
 			};
 
-			ThemeManager.Applied += (a) => {
+			ConfigurationManager.Themes.Applied += (a) => {
 				//if (Application.Top == null) {
 				//	return;
 				//}

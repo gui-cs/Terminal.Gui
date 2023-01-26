@@ -9,6 +9,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using static Terminal.Gui.Configuration.ConfigurationManager;
+using System.Xml;
+
 
 
 #nullable enable
@@ -53,15 +55,21 @@ namespace Terminal.Gui.Configuration {
 	///     6. Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precidence.
 	/// </para>
 	/// </summary>
-	public static class ConfigurationManager {
+	public static partial class ConfigurationManager {
 
 		private static readonly string _configFilename = "config.json";
-		private static SettingsScope? _settingsScope = new SettingsScope ();
 
 		/// <summary>
-		/// Gets the <see cref="SettingsScope"/> settings that have been read from the configuration files.
+		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the <see cref="SettingsScope"/>
+		/// attribute value.
 		/// </summary>
-		internal static Dictionary<string, ConfigProperty>? Settings { get => _settingsScope!.Properties; } 
+		public static SettingsScope? Settings;
+
+		/// <summary>
+		/// The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
+		/// attribute value.
+		/// </summary>
+		public static ThemeManager? Themes = ThemeManager.Instance;
 
 		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
@@ -72,39 +80,7 @@ namespace Terminal.Gui.Configuration {
 				// No need to set converterss - the ConfigRootConverter uses property attributes apply the correct
 				// Converter.
 			},
-
 		};
-
-		/// <summary>
-		/// Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
-		/// scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
-		/// </summary>
-		public abstract class Scope {
-			/// <summary>
-			/// Crates a new instance.
-			/// </summary>
-			public Scope ()
-			{
-				ConfigurationManager._allConfigProperties ??= getConfigProperties ();
-				var props = ConfigurationManager._allConfigProperties.Where (cp =>
-					(cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty))
-					as SerializableConfigurationProperty)?.Scope == this.GetType ());
-				Properties = props.ToDictionary (dict => dict.Key,
-					dict => new ConfigProperty () { PropertyInfo = dict.Value.PropertyInfo, PropertyValue = null }, StringComparer.InvariantCultureIgnoreCase);
-			}
-
-			/// <summary>
-			/// Gets the dictionary of <see cref="ConfigProperty"/> objects for this scope.
-			/// </summary>
-			/// <remarks>
-			/// This dictionary is populated in the constructor of the <see cref="Scope"/> class with the properties
-			/// attributed with the <see cref="SerializableConfigurationProperty"/> attribute 
-			/// and whose <see cref="SerializableConfigurationProperty.Scope"/> 
-			/// is the same as the type of this scope.
-			/// </remarks>
-			[JsonIgnore]
-			public Dictionary<string, ConfigProperty> Properties { get; set; }
-		}
 
 		/// <summary>
 		/// An attribute that can be applied to a property to indicate that it should included in the configuration file.
@@ -144,6 +120,18 @@ namespace Terminal.Gui.Configuration {
 			/// Describes the property.
 			/// </summary>
 			public PropertyInfo? PropertyInfo { get; set; }
+
+			/// <summary>
+			/// Helper to get either the Json property named (specified by [JsonPropertyName(name)]
+			/// or the actual property name.
+			/// </summary>
+			/// <param name="pi"></param>
+			/// <returns></returns>
+			public static string GetJsonPropertyName (PropertyInfo pi)
+			{
+				var jpna = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
+				return jpna?.Name ?? pi.Name;
+			}
 
 			/// <summary>
 			/// Holds the property's value as it was either read from the class's implementation or from a config file. 
@@ -255,14 +243,8 @@ namespace Terminal.Gui.Configuration {
 
 				var properties = root!.GetType ().GetProperties ().Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute)) != null);
 				foreach (var p in properties) {
-					var propertyName = p.Name;
-					var attr = p.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
-					if (attr != null) {
-						propertyName = attr.Name;
-					}
-					writer.WritePropertyName (propertyName);
+					writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
 					JsonSerializer.Serialize (writer, root.GetType ().GetProperty (p.Name)?.GetValue (root), options);
-
 				}
 
 				var configStore = (Dictionary<string, ConfigProperty>)typeof (rootT).GetProperty ("Properties")?.GetValue (root)!;
@@ -272,6 +254,7 @@ namespace Terminal.Gui.Configuration {
 							SerializableConfigurationProperty scp && scp?.Scope == typeof (rootT))
 						  where p.Value.PropertyValue != null
 						  select p) {
+
 					writer.WritePropertyName (p.Key);
 					var propertyType = p.Value.PropertyInfo?.PropertyType;
 
@@ -301,29 +284,33 @@ namespace Terminal.Gui.Configuration {
 		/// The values are instances of <see cref="ConfigProperty"/> which hold the property's value and the
 		/// <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
 		/// </summary>
-		private static Dictionary<string, ConfigProperty> _allConfigProperties = getConfigProperties ();
+		private static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
 		private static Dictionary<string, ConfigProperty> getConfigProperties ()
 		{
 			Dictionary<string, Type> classesWithConfigProps = new Dictionary<string, Type> (StringComparer.InvariantCultureIgnoreCase);
 			foreach (Type classWithConfig in typeof (ConfigurationManager).Assembly.ExportedTypes
 				.Where (myType => myType.IsClass &&
-					myType.IsPublic &&
+					(myType.IsPublic || myType.IsNestedPublic) &&
 					(myType.GetProperties ()
 					.Count (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null) > 0))) {
 				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
 
+			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} clases:");
+			classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
+
 			Dictionary<string, ConfigProperty> configProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
 			foreach (var p in from c in classesWithConfigProps
-					  let props = c.Value.GetProperties ().Where (prop =>
+					  let props = c.Value.GetProperties (BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where (prop =>
 						prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
 					  let enumerable = props
 					  from p in enumerable
 					  select p) {
 				if (p.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp) {
-					if (p.GetGetMethod ()!.IsStatic) {
-						configProperties.Add (scp.OmitClassName ? p.Name : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
+					if (p.GetGetMethod (true)!.IsStatic) {
+						// If the class name is ommited, JsonPropertyName is allowed. 
+						configProperties.Add (scp.OmitClassName ? ConfigProperty.GetJsonPropertyName (p) : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
 							PropertyInfo = p,
 							PropertyValue = p.GetValue (null)
 						});
@@ -333,34 +320,12 @@ namespace Terminal.Gui.Configuration {
 				}
 			}
 
-			return configProperties.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
-		}
+			configProperties = configProperties.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
 
-		/// <summary>
-		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties 
-		/// attributed with  <see cref="SettingsScope"/>.
-		/// </summary>
-		/// <example><code>
-		///  {
-		///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-		///    "Application.UseSystemConsole" : true,
-		///    "Theme" : "Default",
-		///    "Themes": {
-		///    },
-		///  },
-		/// </code></example>
-		/// <remarks>
-		/// The nested class <see cref="ConfigScopeConverter{rootT}"/> Does all the heavy lifting for serialization 
-		/// of the <see cref="SettingsScope"/> object. Uses reflection to determine
-		/// how to serialize properties based on their type (and [JsonConverter] attributes). 
-		/// </remarks>
-		[JsonConverter (typeof (ConfigScopeConverter<SettingsScope>))]
-		public class SettingsScope : Scope {
-			/// <summary>
-			/// Points to our JSON schema.
-			/// </summary>
-			[JsonInclude, JsonPropertyName ("$schema")]
-			public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
+			Debug.WriteLine ($"ConfigManager.getConfigProperties found {configProperties.Count} properties:");
+			configProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
+
+			return configProperties;
 		}
 
 		/// <summary>
@@ -370,7 +335,8 @@ namespace Terminal.Gui.Configuration {
 		/// <returns>A <see cref="SettingsScope"/> object initialized by the contents of the JSON document.</returns>
 		internal static void LoadFromJson (string json)
 		{
-			_settingsScope = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
+			Debug.WriteLine ($"ConfigurationManager.LoadFromJson()");
+			Settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
 		}
 
 		/// <summary>
@@ -379,7 +345,8 @@ namespace Terminal.Gui.Configuration {
 		/// <returns></returns>
 		internal static string ToJson ()
 		{
-			return JsonSerializer.Serialize<SettingsScope> (_settingsScope!, serializerOptions);
+			Debug.WriteLine ($"ConfigurationManager.ToJson()");
+			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
 		}
 
 		/// <summary>
@@ -388,9 +355,10 @@ namespace Terminal.Gui.Configuration {
 		/// <param name="json"></param>
 		internal static void UpdateConfiguration (string json)
 		{
+			Debug.WriteLine ($"ConfigurationManager.UpdateConfiguration()");
 			// Deserialize the JSON into a Configuration object
 			var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
-			_settingsScope = DeepMemberwiseCopy (settings, _settingsScope) as SettingsScope;
+			Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
 		}
 
 		/// <summary>
@@ -402,9 +370,7 @@ namespace Terminal.Gui.Configuration {
 			// Read the JSON file
 			string json = File.ReadAllText (filePath);
 			UpdateConfiguration (json);
-#if DEBUG
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {filePath}");
-#endif
 		}
 
 		/// <summary>
@@ -425,9 +391,11 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		internal static void GetHardCodedDefaults ()
 		{
-			ThemeManager.GetHardCodedDefaults ();
-			foreach (var p in _settingsScope!.Properties.Where (cp => cp.Value.PropertyInfo != null)) {
-				_settingsScope.Properties[p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
+			Debug.WriteLine ($"ConfigurationManager.GetHardCodedDefaults()");
+			Settings = new SettingsScope ();
+			Themes?.GetHardCodedDefaults ();
+			foreach (var p in Settings!.Where (cp => cp.Value.PropertyInfo != null)) {
+				Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
 			}
 		}
 
@@ -440,10 +408,14 @@ namespace Terminal.Gui.Configuration {
 		public static void Apply ()
 		{
 			// This just applies global Settings (SettingsScope).
-			foreach (var p in _settingsScope!.Properties.Where (t => t.Value != null && t.Value.PropertyValue != null)) {
+			bool set = false;
+			foreach (var p in Settings!.Where (t => t.Value != null && t.Value.PropertyValue != null)) {
 				p.Value?.PropertyInfo?.SetValue (null, DeepMemberwiseCopy (p.Value?.PropertyValue, p.Value?.PropertyInfo?.GetValue (null)));
+				set = true;
 			}
-			OnApplied ();
+			if (set) {
+				OnApplied ();
+			}
 		}
 
 		/// <summary>
@@ -452,14 +424,15 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public static void OnApplied ()
 		{
-			Applied?.Invoke (new SettingScopeEventArgs ());
+			Debug.WriteLine ($"ConfigurationManager.OnApplied()");
+			Applied?.Invoke (new SettingsScope.EventArgs ());
 		}
 
 		/// <summary>
 		/// Event fired when an updated configuration has been applied to the  
 		/// application.
 		/// </summary>
-		public static event Action<SettingScopeEventArgs>? Applied;
+		public static event Action<SettingsScope.EventArgs>? Applied;
 
 		/// <summary>
 		/// Describes the location of the configuration files. The constancts can be
@@ -521,9 +494,7 @@ namespace Terminal.Gui.Configuration {
 			if (json != null) {
 				LoadFromJson (json);
 			}
-#if DEBUG
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
-#endif
 		}
 
 		/// <summary>
@@ -562,9 +533,7 @@ namespace Terminal.Gui.Configuration {
 				using StreamReader reader = new StreamReader (stream!);
 				string json = reader.ReadToEnd ();
 				UpdateConfiguration (json);
-#if DEBUG
 				Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
-#endif
 			}
 		}
 
@@ -611,6 +580,13 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		public static void Load ()
 		{
+			Debug.WriteLine ($"ConfigurationManager.Load()");
+			if (_allConfigProperties == null) {
+				_allConfigProperties = getConfigProperties ();
+			}
+
+			GetHardCodedDefaults ();
+
 			if (Locations.HasFlag (ConfigLocations.LibraryResources)) LoadGlobalFromLibraryResource ();
 			if (Locations.HasFlag (ConfigLocations.GlobalAppDirectory)) LoadGlobalFromAppDirectory ();
 			if (Locations.HasFlag (ConfigLocations.GlobalHomeDirectory)) LoadGlobalFromHomeDirectory ();
@@ -626,22 +602,10 @@ namespace Terminal.Gui.Configuration {
 		public static string GetEmptyJson ()
 		{
 			var emptyScope = new SettingsScope ();
-			emptyScope.Properties.Clear ();
+			emptyScope.Clear ();
 			return JsonSerializer.Serialize<SettingsScope> (emptyScope, serializerOptions);
 		}
 
-		/// <summary>
-		/// Event arguments for the <see cref="ConfigurationManager"/> events.
-		/// </summary>
-		public class SettingScopeEventArgs {
-
-			/// <summary>
-			/// Initializes a new instance of <see cref="SettingScopeEventArgs"/>
-			/// </summary>
-			public SettingScopeEventArgs ()
-			{
-			}
-		}
 
 		/// <summary>
 		/// System.Text.Json does not support copying a deserialized object to an existing instance.
@@ -670,6 +634,17 @@ namespace Terminal.Gui.Configuration {
 						((IDictionary)destination) [srcKey] = DeepMemberwiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
 					else {
 						((IDictionary)destination).Add (srcKey, ((IDictionary)source) [srcKey]);
+					}
+				}
+				return destination;
+			}
+
+			if (source.GetType ().BaseType == typeof (Scope)) {
+				foreach (var srcKey in ((Scope)source).Keys) {
+					if (((Scope)destination).ContainsKey (srcKey))
+						((Scope)destination) [srcKey] = (ConfigProperty)DeepMemberwiseCopy (((Scope)source) [srcKey], ((Scope)destination) [srcKey]);
+					else {
+						((Scope)destination).Add (srcKey, ((Scope)source) [srcKey]);
 					}
 				}
 				return destination;

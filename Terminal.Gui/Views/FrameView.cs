@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="FrameView"/>s. 
 		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		//[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
 
 		void Initialize (Rect frame, ustring title, View [] views = null, Border border = null)
