@@ -433,12 +433,12 @@ namespace Terminal.Gui {
 					tile.View.X = i == 0 ? bounds.X : Pos.Right (splitterLines [i - 1]);
 					tile.View.Y = bounds.Y;
 					tile.View.Height = bounds.Height;					
-					tile.View.Width = GetTileWidthOrHeight(i, bounds.Width);
+					tile.View.Width = GetTileWidthOrHeight(i, Bounds.Width);
 				} else {
 					tile.View.X = bounds.X;
 					tile.View.Y = i == 0 ? 0 : Pos.Bottom (splitterLines [i - 1]);
 					tile.View.Width = bounds.Width;
-					tile.View.Height = GetTileWidthOrHeight(i, bounds.Height);
+					tile.View.Height = GetTileWidthOrHeight(i, Bounds.Height);
 				}
 			}
 		}
@@ -453,7 +453,13 @@ namespace Terminal.Gui {
 			var nextSplitter = splitterDistances [i].Anchor (space);
 			var lastSplitter = i >= 1 ? splitterDistances [i-1].Anchor (space) : 0;
 
-			return nextSplitter - lastSplitter;
+			var distance = nextSplitter - lastSplitter;
+
+			if(i>0) {
+				return distance - 1;
+			}
+
+			return distance;
 		}
 
 		private void RespectMinimumTileSizes ()
