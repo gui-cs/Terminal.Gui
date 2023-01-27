@@ -714,6 +714,93 @@ namespace UnitTests {
 			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(1).View.Subviews.Single());
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_WithBorder_RemovingTiles ()
+		{
+			var tileView = GetNestedContainer3Right1Down (true);
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌─────┬──────┬─────┐
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222├─────┤
+│11111│222222│44444│
+│11111│222222│44444│
+│11111│222222│44444│
+└─────┴──────┴─────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			var toRemove = tileView.Tiles.ElementAt(1);
+			var removed = tileView.RemoveTile (1);
+			Assert.Same(toRemove, removed);
+			Assert.DoesNotContain(removed,tileView.Tiles);
+
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+┌─────────┬────────┐
+│111111111│33333333│
+│111111111│33333333│
+│111111111│33333333│
+│111111111│33333333│
+│111111111├────────┤
+│111111111│44444444│
+│111111111│44444444│
+│111111111│44444444│
+└─────────┴────────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// cannot remove at this index because there is only one horizontal tile left
+			Assert.Null (tileView.RemoveTile (2));
+			tileView.RemoveTile (0);
+
+
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+┌──────────────────┐
+│333333333333333333│
+│333333333333333333│
+│333333333333333333│
+│333333333333333333│
+├──────────────────┤
+│444444444444444444│
+│444444444444444444│
+│444444444444444444│
+└──────────────────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			Assert.NotNull(tileView.RemoveTile (0));
+
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			// cannot remove
+			Assert.Null (tileView.RemoveTile (0));
+		}
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into

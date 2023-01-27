@@ -153,13 +153,22 @@ namespace Terminal.Gui {
 
 			return toReturn;
 		}
-		public void RemoveTile (int idx)
+
+		/// <summary>
+		/// Removes a <see cref="Tiles"/> at the provided <paramref name="idx"/> from
+		/// the view.  Returns the removed tile or null if already empty.
+		/// </summary>
+		/// <param name="idx"></param>
+		/// <returns></returns>
+		public Tile RemoveTile (int idx)
 		{
 			var oldTiles = Tiles.ToArray ();
 			
 			if (idx < 0 || idx >= oldTiles.Length) {
-				return;
+				return null;
 			}
+			
+			var removed = Tiles.ElementAt (idx);
 
 			RebuildForTileCount (oldTiles.Length - 1);
 
@@ -178,6 +187,8 @@ namespace Terminal.Gui {
 			}
 			SetNeedsDisplay ();
 			LayoutSubviews ();
+
+			return removed;
 		}
 
 		///<summary>
