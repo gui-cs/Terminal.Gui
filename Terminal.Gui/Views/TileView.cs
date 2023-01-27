@@ -23,12 +23,36 @@ namespace Terminal.Gui {
 		/// </summary>
 		public BorderStyle IntegratedBorder { get; set; }
 
+		/// <summary>
+		/// A single <see cref="View"/> presented in a <see cref="TileView"/>.  To create
+		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
+		/// or <see cref="TileView.InsertTile(int)"/>.
+		/// </summary>
 		public class Tile {
+			/// <summary>
+			/// The <see cref="View"/> that is showing in this <see cref="TileView"/>.
+			/// You should add new child views to this member if you want multiple 
+			/// <see cref="View"/> within the <see cref="Tile"/>.
+			/// </summary>
 			public View View { get; internal set; }
+
+			/// <summary>
+			/// Gets or Sets the minimum size you to allow when splitter resizing along
+			/// parent <see cref="TileView.Orientation"/> direction.
+			/// </summary>
 			public int MinSize { get; set; }
+
+			/// <summary>
+			/// The text that should be displayed above the <see cref="View"/>.  This will
+			/// either appear as content above <see cref="View"/> or superimposed over the
+			/// the parent <see cref="TileView.IntegratedBorder"/> (if it has one).
+			/// </summary>
 			public string Title { get; set; }
 
-			public Tile ()
+			/// <summary>
+			/// Creates a new instance of the <see cref="Tile"/> class.
+			/// </summary>
+			internal Tile ()
 			{
 				View = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 				Title = string.Empty;
@@ -54,12 +78,18 @@ namespace Terminal.Gui {
 		private Orientation orientation = Orientation.Vertical;
 
 		/// <summary>
-		/// Creates a new instance of the TileView class.
+		/// Creates a new instance of the <see cref="TileView"/> class with 
+		/// 2 tiles (i.e. left and right).
 		/// </summary>
 		public TileView () : this (2)
 		{
 		}
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="TileView"/> class with 
+		/// <paramref name="tiles"/> number of tiles.
+		/// </summary>
+		/// <param name="tiles"></param>
 		public TileView (int tiles)
 		{
 			CanFocus = true;
@@ -67,7 +97,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when the <see cref="SplitterDistance"/> is changed
+		/// Invoked when any of the <see cref="SplitterDistances"/> is changed.
 		/// </summary>
 		public event SplitterEventHandler SplitterMoved;
 
@@ -211,7 +241,7 @@ namespace Terminal.Gui {
 				LayoutSubviews ();
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void LayoutSubviews ()
 		{
 			var contentArea = Bounds;
@@ -344,18 +374,17 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		
+
 		/// <summary>
-		/// Converts <see cref="View1"/> from a regular <see cref="View"/>
-		/// container to a new nested <see cref="TileView"/>.  If <see cref="View1"/>
-		/// is already a <see cref="TileView"/> then returns false.
+		/// Converts <see cref="Tile.View"/> of <see cref="Tiles"/> element <paramref name="idx"/>
+		/// from a regular <see cref="View"/> to a new nested <see cref="TileView"/> with <paramref name="panels"/>
+		/// number of panels.  Returns false if the element already contains a nested view.
 		/// </summary>
-		/// <remarks>After successful splitting, the returned container's <see cref="View1"/> 
-		/// will contain the original content and <see cref="View1Title"/> (if any) while
-		/// <see cref="View2"/> will be empty and available for adding to.
-		/// for adding to.</remarks>
-		/// <param name="result">The new <see cref="TileView"/> now showing in 
-		/// <see cref="View1"/> or the existing one if it was already been converted before.</param>
+		/// <remarks>After successful splitting, the <paramref name="result"/> <see cref="TileView"/>
+		/// will contain the previous (replaced) <see cref="Tile.View"/> at element 0.</remarks>
+		/// <param name="idx">The element of <see cref="Tiles"/> that is to be subdivided.</param>
+		/// <param name="panels">The number of panels that the <see cref="Tile"/> should be split into</param>
+		/// <param name="result">The new nested <see cref="TileView"/>.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="TileView"/></returns>
@@ -364,6 +393,8 @@ namespace Terminal.Gui {
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
 			var tile = tiles [idx];
+
+			// TODO: migrate the title too right?
 			var title = tile.Title;
 			View toMove = tile.View;
 
@@ -432,6 +463,16 @@ namespace Terminal.Gui {
 			return parentTileView == null;
 		}
 
+		/// <summary>
+		/// Returns the immediate parent <see cref="TileView"/> of this.  Note that in case
+		/// of deep nesting this might not be the root <see cref="TileView"/>.  Returns null
+		/// if this instance is not a nested child (created with 
+		/// <see cref="TrySplitTile(int, int, out TileView)"/>)
+		/// </summary>
+		/// <remarks>
+		/// Use <see cref="IsRootTileView"/> to determine if the returned value is the root.
+		/// </remarks>
+		/// <returns></returns>
 		public TileView GetParentTileView ()
 		{
 			return this.parentTileView;
@@ -757,7 +798,7 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// <para>
-			/// Moves <see cref="Parent"/> <see cref="TileView.SplitterDistance"/> to 
+			/// Moves <see cref="Parent"/> <see cref="TileView.SplitterDistances"/> to 
 			/// <see cref="Pos"/> <paramref name="newValue"/> preserving <see cref="Pos"/> format
 			/// (absolute / relative) that <paramref name="oldValue"/> had.
 			/// </para>
@@ -839,8 +880,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of the <see cref="SplitterEventArgs"/> class.
 		/// </summary>
-		/// <param name="tileView"></param>
-		/// <param name="splitterDistance"></param>
+		/// <param name="tileView"><see cref="TileView"/> in which splitter is being moved.</param>
+		/// <param name="idx">Index of the splitter being moved in <see cref="TileView.SplitterDistances"/>.</param>
+		/// <param name="splitterDistance">The new <see cref="Pos"/> of the splitter line.</param>
 		public SplitterEventArgs (TileView tileView, int idx, Pos splitterDistance)
 		{
 			SplitterDistance = splitterDistance;
@@ -849,7 +891,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// New position of the <see cref="TileView.SplitterDistance"/>
+		/// New position of the splitter line (see <see cref="TileView.SplitterDistances"/>).
 		/// </summary>
 		public Pos SplitterDistance { get; }
 
@@ -859,8 +901,8 @@ namespace Terminal.Gui {
 		public TileView TileView { get; }
 
 		/// <summary>
-		/// The splitter that is being moved (use when <see cref="TileView"/>
-		/// has more than 2 panels).
+		/// Gets the index of the splitter that is being moved. This can be
+		/// used to index <see cref="TileView.SplitterDistances"/>
 		/// </summary>
 		public int Idx { get; }
 	}
