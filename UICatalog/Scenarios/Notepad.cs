@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 			tabView.ApplyStyleChanges ();
 
 			// Start with only a single view but support splitting to show side by side
-			var split = new SplitView(1) {
+			var split = new TileView(1) {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
@@ -130,7 +130,7 @@ namespace UICatalog.Scenarios {
 		private void Split (int offset, Orientation orientation,TabView sender, OpenedFile tab)
 		{
 			
-			var split = (SplitView)sender.SuperView.SuperView;
+			var split = (TileView)sender.SuperView.SuperView;
 			var tileIndex = split.IndexOf(sender);
 
 			if(tileIndex == -1)
@@ -140,7 +140,7 @@ namespace UICatalog.Scenarios {
 
 			if(orientation != split.Orientation)
 			{
-				split.TrySplitView(tileIndex,1,out split);
+				split.TryTileView(tileIndex,1,out split);
 				split.Orientation = orientation;
 				tileIndex = 0;
 			}
@@ -207,7 +207,7 @@ namespace UICatalog.Scenarios {
 
 			if(tv.Tabs.Count == 0) {
 
-				var split = (SplitView)tv.SuperView.SuperView;
+				var split = (TileView)tv.SuperView.SuperView;
 				var tileIndex = split.IndexOf (tv);
 				split.RemoveTile (tileIndex);
 			}

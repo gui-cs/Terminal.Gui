@@ -4,10 +4,10 @@ using Terminal.Gui.Graphs;
 using System.Linq;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Split View Nesting", Description: "Nest SplitViews")]
+	[ScenarioMetadata (Name: "Split View Nesting", Description: "Nest TileViews")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("LineView")]
-	public class SplitViewNesting : Scenario {
+	public class TileViewNesting : Scenario {
 
 		private View workArea;
 		private TextField textField;
@@ -36,28 +36,28 @@ namespace UICatalog.Scenarios {
 				Text = "2",
 			};
 
-			textField.TextChanged += (s) => SetupSplitView ();
+			textField.TextChanged += (s) => SetupTileView ();
 
 
 			cbHorizontal = new CheckBox ("Horizontal") {
 				X = Pos.Right (textField) + 1
 			};
-			cbHorizontal.Toggled += (s) => SetupSplitView ();
+			cbHorizontal.Toggled += (s) => SetupTileView ();
 
 			cbBorder = new CheckBox ("Border") {
 				X = Pos.Right (cbHorizontal) + 1
 			};
-			cbBorder.Toggled += (s) => SetupSplitView ();
+			cbBorder.Toggled += (s) => SetupTileView ();
 
 			cbTitles = new CheckBox ("Titles") {
 				X = Pos.Right (cbBorder) + 1
 			};
-			cbTitles.Toggled += (s) => SetupSplitView ();
+			cbTitles.Toggled += (s) => SetupTileView ();
 
 			cbUseLabels = new CheckBox ("Use Labels") {
 				X = Pos.Right (cbTitles) + 1
 			};
-			cbUseLabels.Toggled += (s) => SetupSplitView ();
+			cbUseLabels.Toggled += (s) => SetupTileView ();
 
 			workArea = new View {
 				X = 0,
@@ -79,14 +79,14 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbUseLabels);
 			Win.Add (workArea);
 
-			SetupSplitView ();
+			SetupTileView ();
 
 			Application.Top.Add (menu);
 
 			Win.Loaded += () => loaded = true;
 		}
 
-		private void SetupSplitView ()
+		private void SetupTileView ()
 		{
 			int numberOfViews = GetNumberOfViews ();
 
@@ -100,7 +100,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var root = CreateSplitView (1,startHorizontal ?
+			var root = CreateTileView (1,startHorizontal ?
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
@@ -157,41 +157,41 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
-		private void AddMoreViews (SplitView to)
+		private void AddMoreViews (TileView to)
 		{
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
-			if (!(to.Tiles.ElementAt(0).View is SplitView)) {
+			if (!(to.Tiles.ElementAt(0).View is TileView)) {
 				Split(to,true);
 			}
 
-			if (!(to.Tiles.ElementAt (1).View is SplitView)) {
+			if (!(to.Tiles.ElementAt (1).View is TileView)) {
 				Split(to,false);				
 			}
 
-			if (to.Tiles.ElementAt (0).View is SplitView && to.Tiles.ElementAt (1).View is SplitView) {
+			if (to.Tiles.ElementAt (0).View is TileView && to.Tiles.ElementAt (1).View is TileView) {
 
-				AddMoreViews ((SplitView)to.Tiles.ElementAt (0).View);
-				AddMoreViews ((SplitView)to.Tiles.ElementAt (1).View);
+				AddMoreViews ((TileView)to.Tiles.ElementAt (0).View);
+				AddMoreViews ((TileView)to.Tiles.ElementAt (1).View);
 			}
 
 		}
 		
-		private void Split(SplitView to, bool left)
+		private void Split(TileView to, bool left)
 		{
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
 
-			SplitView newView;
+			TileView newView;
 			
 			if (left) {
-				to.TrySplitView(0,2,out newView);
+				to.TryTileView(0,2,out newView);
 
 			}
 			else {
-				to.TrySplitView (1,2,out newView);
+				to.TryTileView (1,2,out newView);
 			}
 
 			viewsCreated++;
@@ -208,9 +208,9 @@ namespace UICatalog.Scenarios {
 			newView.Tiles.ElementAt (1).View.Add (CreateContentControl(viewsCreated));
 		}
 
-		private SplitView CreateSplitView (int titleNumber, Orientation orientation)
+		private TileView CreateTileView (int titleNumber, Orientation orientation)
 		{
-			var toReturn = new SplitView {
+			var toReturn = new TileView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				// flip the orientation

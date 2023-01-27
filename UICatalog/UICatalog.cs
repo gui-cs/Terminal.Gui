@@ -151,7 +151,7 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public SplitView ContentPane;
+			public TileView ContentPane;
 			public ListView CategoryListView;
 			public ListView ScenarioListView;
 
@@ -207,7 +207,7 @@ namespace UICatalog {
 					OS
 				};
 
-				ContentPane = new SplitView () {
+				ContentPane = new TileView () {
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),

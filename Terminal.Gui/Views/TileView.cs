@@ -7,11 +7,11 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// A <see cref="View"/> consisting of a moveable bar that divides
-	/// the display area into resizeable views.
+	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
-	public class SplitView : View {
+	public class TileView : View {
 
-		SplitView parentSplitView;
+		TileView parentTileView;
 
 		/// TODO: Might be able to make Border virtual and override here
 		/// To make this more API friendly
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 
 		List<Tile> tiles;
 		private List<Pos> splitterDistances;
-		private List<SplitContainerLineView> splitterLines;
+		private List<TileViewLineView> splitterLines;
 
 		/// <summary>
 		/// The sub sections hosted by the view
@@ -54,13 +54,13 @@ namespace Terminal.Gui {
 		private Orientation orientation = Orientation.Vertical;
 
 		/// <summary>
-		/// Creates a new instance of the SplitContainer class.
+		/// Creates a new instance of the TileView class.
 		/// </summary>
-		public SplitView () : this (2)
+		public TileView () : this (2)
 		{
 		}
 
-		public SplitView (int tiles)
+		public TileView (int tiles)
 		{
 			CanFocus = true;
 			RebuildForTileCount (tiles);
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 			tiles = new List<Tile> ();
 			// TODO: keep these if growing
 			splitterDistances = new List<Pos> ();
-			splitterLines = new List<SplitContainerLineView> ();
+			splitterLines = new List<TileViewLineView> ();
 
 			RemoveAll ();
 			tiles.Clear ();
@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 				if (i > 0) {
 					var currentPos = Pos.Percent ((100 / count) * i);
 					splitterDistances.Add (currentPos);
-					var line = new SplitContainerLineView (this, i - 1);
+					var line = new TileViewLineView (this, i - 1);
 					Add (line);
 					splitterLines.Add (line);
 				}
@@ -212,7 +212,7 @@ namespace Terminal.Gui {
 					contentArea.Y + 1,
 					Math.Max (0, contentArea.Width - 2),
 					Math.Max (0, contentArea.Height - 2));
-			} else if (HasAnyTitles () && IsRootSplitContainer ()) {
+			} else if (HasAnyTitles () && IsRootTileView ()) {
 				// TODO: Bound with Max/Min
 				contentArea = new Rect (
 					contentArea.X,
@@ -241,7 +241,7 @@ namespace Terminal.Gui {
 			}
 
 			splitterDistances [idx] = value;
-			GetRootSplitContainer ().LayoutSubviews ();
+			GetRootTileView ().LayoutSubviews ();
 			OnSplitterMoved (idx);
 		}
 
@@ -264,9 +264,9 @@ namespace Terminal.Gui {
 
 			var lc = new LineCanvas ();
 
-			var allLines = GetAllChildSplitContainerLineViewRecursively (this);
+			var allLines = GetAllChildTileViewLineViewRecursively (this);
 
-			if (IsRootSplitContainer ()) {
+			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
 					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, IntegratedBorder);
@@ -336,19 +336,19 @@ namespace Terminal.Gui {
 		
 		/// <summary>
 		/// Converts <see cref="View1"/> from a regular <see cref="View"/>
-		/// container to a new nested <see cref="SplitView"/>.  If <see cref="View1"/>
-		/// is already a <see cref="SplitView"/> then returns false.
+		/// container to a new nested <see cref="TileView"/>.  If <see cref="View1"/>
+		/// is already a <see cref="TileView"/> then returns false.
 		/// </summary>
 		/// <remarks>After successful splitting, the returned container's <see cref="View1"/> 
 		/// will contain the original content and <see cref="View1Title"/> (if any) while
 		/// <see cref="View2"/> will be empty and available for adding to.
 		/// for adding to.</remarks>
-		/// <param name="result">The new <see cref="SplitView"/> now showing in 
+		/// <param name="result">The new <see cref="TileView"/> now showing in 
 		/// <see cref="View1"/> or the existing one if it was already been converted before.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
-		/// <see cref="SplitView"/>.  <see langword="false"/> if it was already a nested
-		/// <see cref="SplitView"/></returns>
-		public bool TrySplitView(int idx, int panels, out SplitView result)
+		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="TileView"/></returns>
+		public bool TryTileView(int idx, int panels, out TileView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
@@ -356,22 +356,22 @@ namespace Terminal.Gui {
 			var title = tile.Title;
 			View toMove = tile.View;
 
-			if (toMove is SplitView existing) {
+			if (toMove is TileView existing) {
 				result = existing;
 				return false;
 			}
 
-			var newContainer = new SplitView(panels) {
+			var newContainer = new TileView(panels) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				parentSplitView = this,
+				parentTileView = this,
 			};
 			
 			// Take everything out of the View we are moving
 			var childViews = toMove.Subviews.ToArray();
 			toMove.RemoveAll ();
 
-			// Remove the view itself and replace it with the new SplitContainer
+			// Remove the view itself and replace it with the new TileView
 			Remove (toMove);
 			Add (newContainer);
 
@@ -388,34 +388,34 @@ namespace Terminal.Gui {
 		}
 
 
-		private List<SplitContainerLineView> GetAllChildSplitContainerLineViewRecursively (View v)
+		private List<TileViewLineView> GetAllChildTileViewLineViewRecursively (View v)
 		{
-			var lines = new List<SplitContainerLineView> ();
+			var lines = new List<TileViewLineView> ();
 
 			foreach (var sub in v.Subviews) {
-				if (sub is SplitContainerLineView s) {
-					if (s.Parent.GetRootSplitContainer () == this) {
+				if (sub is TileViewLineView s) {
+					if (s.Parent.GetRootTileView () == this) {
 						lines.Add (s);
 					}
 				} else {
-					lines.AddRange (GetAllChildSplitContainerLineViewRecursively (sub));
+					lines.AddRange (GetAllChildTileViewLineViewRecursively (sub));
 				}
 			}
 
 			return lines;
 		}
 
-		private bool IsRootSplitContainer ()
+		private bool IsRootTileView ()
 		{
 			// TODO: don't want to layout subviews since the parent recursively lays them all out
-			return parentSplitView == null;
+			return parentTileView == null;
 		}
-		private SplitView GetRootSplitContainer ()
+		private TileView GetRootTileView ()
 		{
-			SplitView root = this;
+			TileView root = this;
 
-			while (root.parentSplitView != null) {
-				root = root.parentSplitView;
+			while (root.parentTileView != null) {
+				root = root.parentTileView;
 			}
 
 			return root;
@@ -551,15 +551,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private class SplitContainerLineView : LineView {
-			public SplitView Parent { get; private set; }
+		private class TileViewLineView : LineView {
+			public TileView Parent { get; private set; }
 			public int Idx { get; }
 
 			Point? dragPosition;
 			Pos dragOrignalPos;
 			public Point? moveRuneRenderLocation;
 
-			public SplitContainerLineView (SplitView parent, int idx)
+			public TileViewLineView (TileView parent, int idx)
 			{
 				CanFocus = true;
 				TabStop = true;
@@ -731,7 +731,7 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// <para>
-			/// Moves <see cref="Parent"/> <see cref="SplitView.SplitterDistance"/> to 
+			/// Moves <see cref="Parent"/> <see cref="TileView.SplitterDistance"/> to 
 			/// <see cref="Pos"/> <paramref name="newValue"/> preserving <see cref="Pos"/> format
 			/// (absolute / relative) that <paramref name="oldValue"/> had.
 			/// </para>
@@ -785,8 +785,8 @@ namespace Terminal.Gui {
 
 		private class ChildSplitterLine {
 
-			readonly SplitContainerLineView currentLine;
-			internal ChildSplitterLine (SplitContainerLineView currentLine)
+			readonly TileViewLineView currentLine;
+			internal ChildSplitterLine (TileViewLineView currentLine)
 			{
 				this.currentLine = currentLine;
 			}
@@ -805,34 +805,34 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///  Provides data for <see cref="SplitContainer"/> events.
+	///  Provides data for <see cref="TileView"/> events.
 	/// </summary>
 	public class SplitterEventArgs : EventArgs {
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="SplitterEventArgs"/> class.
 		/// </summary>
-		/// <param name="splitContainer"></param>
+		/// <param name="tileView"></param>
 		/// <param name="splitterDistance"></param>
-		public SplitterEventArgs (SplitView splitContainer, int idx, Pos splitterDistance)
+		public SplitterEventArgs (TileView tileView, int idx, Pos splitterDistance)
 		{
 			SplitterDistance = splitterDistance;
-			SplitContainer = splitContainer;
+			TileView = tileView;
 			Idx = idx;
 		}
 
 		/// <summary>
-		/// New position of the <see cref="SplitView.SplitterDistance"/>
+		/// New position of the <see cref="TileView.SplitterDistance"/>
 		/// </summary>
 		public Pos SplitterDistance { get; }
 
 		/// <summary>
 		/// Container (sender) of the event.
 		/// </summary>
-		public SplitView SplitContainer { get; }
+		public TileView TileView { get; }
 
 		/// <summary>
-		/// The splitter that is being moved (use when <see cref="SplitContainer"/>
+		/// The splitter that is being moved (use when <see cref="TileView"/>
 		/// has more than 2 panels).
 		/// </summary>
 		public int Idx { get; }

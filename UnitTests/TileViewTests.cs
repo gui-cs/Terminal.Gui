@@ -5,21 +5,21 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests {
-	public class SplitViewTests {
+	public class TileViewTests {
 
 		readonly ITestOutputHelper output;
 
-		public SplitViewTests (ITestOutputHelper output)
+		public TileViewTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
 
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical ()
+		public void TestTileView_Vertical ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			splitContainer.Redraw (splitContainer.Bounds);
+			var tileView = Get11By3TileView (out var line);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -30,16 +30,16 @@ namespace UnitTests {
 
 			// Keyboard movement on splitter should have no effect if it is not focused
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 		}
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_WithBorder ()
+		public void TestTileView_Vertical_WithBorder ()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			splitContainer.Redraw (splitContainer.Bounds);
+			var tileView = Get11By3TileView (out var line, true);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -50,18 +50,18 @@ namespace UnitTests {
 
 			// Keyboard movement on splitter should have no effect if it is not focused
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 		}
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_Focused ()
+		public void TestTileView_Vertical_Focused ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			SetInputFocusLine (splitContainer);
+			var tileView = Get11By3TileView (out var line);
+			SetInputFocusLine (tileView);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -72,7 +72,7 @@ namespace UnitTests {
 
 			// Now while focused move the splitter 1 unit right
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -85,7 +85,7 @@ namespace UnitTests {
 			// and 2 to the left
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -96,12 +96,12 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_Focused_WithBorder ()
+		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			SetInputFocusLine (splitContainer);
+			var tileView = Get11By3TileView (out var line, true);
+			SetInputFocusLine (tileView);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -112,7 +112,7 @@ namespace UnitTests {
 
 			// Now while focused move the splitter 1 unit right
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -125,7 +125,7 @@ namespace UnitTests {
 			// and 2 to the left
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -137,13 +137,13 @@ namespace UnitTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_Focused_50PercentSplit ()
+		public void TestTileView_Vertical_Focused_50PercentSplit ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			SetInputFocusLine (splitContainer);
-			splitContainer.SetSplitterPos(0,Pos.Percent (50));
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt(0));
-			splitContainer.Redraw (splitContainer.Bounds);
+			var tileView = Get11By3TileView (out var line);
+			SetInputFocusLine (tileView);
+			tileView.SetSplitterPos(0,Pos.Percent (50));
+			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt(0));
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -154,7 +154,7 @@ namespace UnitTests {
 
 			// Now while focused move the splitter 1 unit right
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -164,13 +164,13 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Even when moving the splitter location it should stay a Percentage based one
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt(0));
+			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt(0));
 
 
 			// and 2 to the left
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -179,15 +179,15 @@ namespace UnitTests {
     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 			// Even when moving the splitter location it should stay a Percentage based one
-			Assert.IsType<Pos.PosFactor> (splitContainer.SplitterDistances.ElementAt (0));
+			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Horizontal ()
+		public void TestTileView_Horizontal ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			splitContainer.Redraw (splitContainer.Bounds);
+			var tileView = Get11By3TileView (out var line);
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"    
@@ -198,26 +198,26 @@ namespace UnitTests {
 
 			// Keyboard movement on splitter should have no effect if it is not focused
 			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_View1MinSize_Absolute ()
+		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			SetInputFocusLine (splitContainer);
-			splitContainer.Tiles.ElementAt(0).MinSize = 6;
+			var tileView = Get11By3TileView (out var line);
+			SetInputFocusLine (tileView);
+			tileView.Tiles.ElementAt(0).MinSize = 6;
 
 			// distance is too small (below 6)
-			splitContainer.SetSplitterPos(0, 2);
+			tileView.SetSplitterPos(0, 2);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (6, splitContainer.SplitterDistances.ElementAt (0));
+			Assert.Equal (6, tileView.SplitterDistances.ElementAt (0));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -230,14 +230,14 @@ namespace UnitTests {
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -250,19 +250,19 @@ namespace UnitTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_View1MinSize_Absolute_WithBorder ()
+		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
-			var splitContainer = Get11By3SplitView (out var line,true);
-			SetInputFocusLine (splitContainer);
-			splitContainer.Tiles.ElementAt(0).MinSize = 5;
+			var tileView = Get11By3TileView (out var line,true);
+			SetInputFocusLine (tileView);
+			tileView.Tiles.ElementAt(0).MinSize = 5;
 
 			// distance is too small (below 5)
-			splitContainer.SetSplitterPos(0,2);
+			tileView.SetSplitterPos(0,2);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (6, splitContainer.SplitterDistances.ElementAt(0));
+			Assert.Equal (6, tileView.SplitterDistances.ElementAt(0));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 5
 			string looksLike =
@@ -275,14 +275,14 @@ namespace UnitTests {
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -294,19 +294,19 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_View2MinSize_Absolute ()
+		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
-			SetInputFocusLine (splitContainer);
-			splitContainer.Tiles.ElementAt(1).MinSize = 6;
+			var tileView = Get11By3TileView (out var line);
+			SetInputFocusLine (tileView);
+			tileView.Tiles.ElementAt(1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
-			splitContainer.SetSplitterPos(0,8);
+			tileView.SetSplitterPos(0,8);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (4, splitContainer.SplitterDistances.ElementAt(0));
+			Assert.Equal (4, tileView.SplitterDistances.ElementAt(0));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -319,14 +319,14 @@ namespace UnitTests {
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -338,19 +338,19 @@ namespace UnitTests {
 
 		}
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Vertical_View2MinSize_Absolute_WithBorder ()
+		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			SetInputFocusLine (splitContainer);
-			splitContainer.Tiles.ElementAt(1).MinSize = 5;
+			var tileView = Get11By3TileView (out var line, true);
+			SetInputFocusLine (tileView);
+			tileView.Tiles.ElementAt(1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
-			splitContainer.SetSplitterPos(0,8);
+			tileView.SetSplitterPos(0,8);
 
 			// Should bound the value to the minimum distance
-			Assert.Equal (4, splitContainer.SplitterDistances.ElementAt(0));
+			Assert.Equal (4, tileView.SplitterDistances.ElementAt(0));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -363,14 +363,14 @@ namespace UnitTests {
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
 			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
 			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			splitContainer.SetNeedsDisplay ();
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.SetNeedsDisplay ();
+			tileView.Redraw (tileView.Bounds);
 
 			looksLike =
 @"
@@ -382,14 +382,14 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_InsertPanelAtStart ()
+		public void TestTileView_InsertPanelAtStart ()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			SetInputFocusLine (splitContainer);
+			var tileView = Get11By3TileView (out var line, true);
+			SetInputFocusLine (tileView);
 
-			splitContainer.InsertTile (0);
+			tileView.InsertTile (0);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -401,14 +401,14 @@ namespace UnitTests {
 		}
 		
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_InsertPanelMiddle()
+		public void TestTileView_InsertPanelMiddle()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			SetInputFocusLine (splitContainer);
+			var tileView = Get11By3TileView (out var line, true);
+			SetInputFocusLine (tileView);
 
-			splitContainer.InsertTile (1);
+			tileView.InsertTile (1);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -420,14 +420,14 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_InsertPanelAtEnd ()
+		public void TestTileView_InsertPanelAtEnd ()
 		{
-			var splitContainer = Get11By3SplitView (out var line, true);
-			SetInputFocusLine (splitContainer);
+			var tileView = Get11By3TileView (out var line, true);
+			SetInputFocusLine (tileView);
 
-			splitContainer.InsertTile (2);
+			tileView.InsertTile (2);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
@@ -439,14 +439,14 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Horizontal_Focused ()
+		public void TestTileView_Horizontal_Focused ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
+			var tileView = Get11By3TileView (out var line);
 
-			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (splitContainer);
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			SetInputFocusLine (tileView);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"    
@@ -458,7 +458,7 @@ namespace UnitTests {
 			// Now move splitter line down
 			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
 11111111111
@@ -469,7 +469,7 @@ namespace UnitTests {
 			// And 2 up
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
 ─────◊─────
@@ -480,19 +480,19 @@ namespace UnitTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_Horizontal_View1MinSize_Absolute ()
+		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
-			var splitContainer = Get11By3SplitView (out var line);
+			var tileView = Get11By3TileView (out var line);
 
-			splitContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (splitContainer);
-			splitContainer.Tiles.ElementAt(0).MinSize = 1;
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			SetInputFocusLine (tileView);
+			tileView.Tiles.ElementAt(0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
-			splitContainer.SetSplitterPos(0,0);
-			Assert.Equal ((Pos)1, splitContainer.SplitterDistances.ElementAt(0));
+			tileView.SetSplitterPos(0,0);
+			Assert.Equal ((Pos)1, tileView.SplitterDistances.ElementAt(0));
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"    
@@ -503,7 +503,7 @@ namespace UnitTests {
 
 			// Now move splitter line down (allowed
 			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
 11111111111
@@ -514,7 +514,7 @@ namespace UnitTests {
 			// And up 2 (only 1 is allowed because of minimum size of 1 on view1)
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
 11111111111
@@ -524,34 +524,34 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestSplitView_CannotSetSplitterPosToFuncEtc ()
+		public void TestTileView_CannotSetSplitterPosToFuncEtc ()
 		{
-			var splitContainer = Get11By3SplitView ();
+			var tileView = Get11By3TileView ();
 
-			var ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Right (splitContainer)));
+			var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos(0,Pos.Right (tileView)));
 			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
 
 
-			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0,Pos.Function (() => 1)));
+			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos(0,Pos.Function (() => 1)));
 			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosFunc", ex.Message);
 
 			// Also not allowed because this results in a PosCombine
-			ex = Assert.Throws<ArgumentException> (() => splitContainer.SetSplitterPos(0, Pos.Percent (50) - 1));
+			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos(0, Pos.Percent (50) - 1));
 			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
 		}
 
 		[Fact,AutoInitShutdown]
 		public void TestNestedContainer2LeftAnd1Right_RendersNicely()
 		{
-			var splitContainer = GetNestedContainer2Left1Right (false);
+			var tileView = GetNestedContainer2Left1Right (false);
 
-			Assert.Equal (20,splitContainer.Frame.Width);
-			Assert.Equal (10, splitContainer.Tiles.ElementAt(0).View.Frame.Width);
-			Assert.Equal (9, splitContainer.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (20,tileView.Frame.Width);
+			Assert.Equal (10, tileView.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal (9, tileView.Tiles.ElementAt (1).View.Frame.Width);
 
-			Assert.IsType<SplitView> (splitContainer.Tiles.ElementAt (0).View);
-			var left = (SplitView)splitContainer.Tiles.ElementAt (0).View;
-			Assert.Same (left.SuperView, splitContainer);
+			Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).View);
+			var left = (TileView)tileView.Tiles.ElementAt (0).View;
+			Assert.Same (left.SuperView, tileView);
 
 
 			Assert.Equal(2, left.Tiles.ElementAt (0).View.Subviews.Count);
@@ -566,7 +566,7 @@ namespace UnitTests {
 			Assert.Equal (10, onesTop.Frame.Width);
 			Assert.Equal (10, onesBottom.Frame.Width);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"    
@@ -589,9 +589,9 @@ namespace UnitTests {
 		[Fact,AutoInitShutdown]
 		public void TestNestedContainer3RightAnd1Down_RendersNicely()
 		{
-			var splitContainer = GetNestedContainer3Right1Down (false);
+			var tileView = GetNestedContainer3Right1Down (false);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -612,32 +612,32 @@ namespace UnitTests {
 			// anything is sticking out but drawn over
 
 			// 3 panels + 2 splitters
-			Assert.Equal(5,splitContainer.Subviews.Count);
+			Assert.Equal(5,tileView.Subviews.Count);
 
 
 			// Check X and Widths of Tiles
-			Assert.Equal(0,splitContainer.Tiles.ElementAt(0).View.Frame.X);
-			Assert.Equal(6,splitContainer.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal(0,tileView.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(6,tileView.Tiles.ElementAt(0).View.Frame.Width);
 
-			Assert.Equal(7,splitContainer.Tiles.ElementAt(1).View.Frame.X);
-			Assert.Equal(6,splitContainer.Tiles.ElementAt(1).View.Frame.Width);
+			Assert.Equal(7,tileView.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(6,tileView.Tiles.ElementAt(1).View.Frame.Width);
 
-			Assert.Equal(14,splitContainer.Tiles.ElementAt(2).View.Frame.X);
-			Assert.Equal(6,splitContainer.Tiles.ElementAt(2).View.Frame.Width);
+			Assert.Equal(14,tileView.Tiles.ElementAt(2).View.Frame.X);
+			Assert.Equal(6,tileView.Tiles.ElementAt(2).View.Frame.Width);
 			
 
 			// Check Y and Heights of Tiles
-			Assert.Equal(0,splitContainer.Tiles.ElementAt(0).View.Frame.Y);
-			Assert.Equal(10,splitContainer.Tiles.ElementAt(0).View.Frame.Height);
+			Assert.Equal(0,tileView.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(10,tileView.Tiles.ElementAt(0).View.Frame.Height);
 
-			Assert.Equal(0,splitContainer.Tiles.ElementAt(1).View.Frame.Y);
-			Assert.Equal(10,splitContainer.Tiles.ElementAt(1).View.Frame.Height);
+			Assert.Equal(0,tileView.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(10,tileView.Tiles.ElementAt(1).View.Frame.Height);
 
-			Assert.Equal(0,splitContainer.Tiles.ElementAt(2).View.Frame.Y);
-			Assert.Equal(10,splitContainer.Tiles.ElementAt(2).View.Frame.Height);
+			Assert.Equal(0,tileView.Tiles.ElementAt(2).View.Frame.Y);
+			Assert.Equal(10,tileView.Tiles.ElementAt(2).View.Frame.Height);
 			
 			// Check Sub containers in last panel
-			var subSplit = (SplitView)splitContainer.Tiles.ElementAt(2).View;
+			var subSplit = (TileView)tileView.Tiles.ElementAt(2).View;
 			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.X);
 			Assert.Equal(6,subSplit.Tiles.ElementAt(0).View.Frame.Width);
 			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.Y);
@@ -654,9 +654,9 @@ namespace UnitTests {
 		[Fact,AutoInitShutdown]
 		public void TestNestedContainer3RightAnd1Down_WithBorder_RendersNicely()
 		{
-			var splitContainer = GetNestedContainer3Right1Down (true);
+			var tileView = GetNestedContainer3Right1Down (true);
 
-			splitContainer.Redraw (splitContainer.Bounds);
+			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
@@ -676,31 +676,31 @@ namespace UnitTests {
 			// anything is sticking out but drawn over
 
 			// 3 panels + 2 splitters
-			Assert.Equal(5,splitContainer.Subviews.Count);
+			Assert.Equal(5,tileView.Subviews.Count);
 
 			// Check X and Widths of Tiles
-			Assert.Equal(1,splitContainer.Tiles.ElementAt(0).View.Frame.X);
-			Assert.Equal(5,splitContainer.Tiles.ElementAt(0).View.Frame.Width);
+			Assert.Equal(1,tileView.Tiles.ElementAt(0).View.Frame.X);
+			Assert.Equal(5,tileView.Tiles.ElementAt(0).View.Frame.Width);
 
-			Assert.Equal(7,splitContainer.Tiles.ElementAt(1).View.Frame.X);
-			Assert.Equal(6,splitContainer.Tiles.ElementAt(1).View.Frame.Width);
+			Assert.Equal(7,tileView.Tiles.ElementAt(1).View.Frame.X);
+			Assert.Equal(6,tileView.Tiles.ElementAt(1).View.Frame.Width);
 
-			Assert.Equal(14,splitContainer.Tiles.ElementAt(2).View.Frame.X);
-			Assert.Equal(5,splitContainer.Tiles.ElementAt(2).View.Frame.Width);
+			Assert.Equal(14,tileView.Tiles.ElementAt(2).View.Frame.X);
+			Assert.Equal(5,tileView.Tiles.ElementAt(2).View.Frame.Width);
 			
 
 			// Check Y and Heights of Tiles
-			Assert.Equal(1,splitContainer.Tiles.ElementAt(0).View.Frame.Y);
-			Assert.Equal(8,splitContainer.Tiles.ElementAt(0).View.Frame.Height);
+			Assert.Equal(1,tileView.Tiles.ElementAt(0).View.Frame.Y);
+			Assert.Equal(8,tileView.Tiles.ElementAt(0).View.Frame.Height);
 
-			Assert.Equal(1,splitContainer.Tiles.ElementAt(1).View.Frame.Y);
-			Assert.Equal(8,splitContainer.Tiles.ElementAt(1).View.Frame.Height);
+			Assert.Equal(1,tileView.Tiles.ElementAt(1).View.Frame.Y);
+			Assert.Equal(8,tileView.Tiles.ElementAt(1).View.Frame.Height);
 
-			Assert.Equal(1,splitContainer.Tiles.ElementAt(2).View.Frame.Y);
-			Assert.Equal(8,splitContainer.Tiles.ElementAt(2).View.Frame.Height);
+			Assert.Equal(1,tileView.Tiles.ElementAt(2).View.Frame.Y);
+			Assert.Equal(8,tileView.Tiles.ElementAt(2).View.Frame.Height);
 			
 			// Check Sub containers in last panel
-			var subSplit = (SplitView)splitContainer.Tiles.ElementAt(2).View;
+			var subSplit = (TileView)tileView.Tiles.ElementAt(2).View;
 			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.X);
 			Assert.Equal(5,subSplit.Tiles.ElementAt(0).View.Frame.Width);
 			Assert.Equal(0,subSplit.Tiles.ElementAt(0).View.Frame.Y);
@@ -721,10 +721,10 @@ namespace UnitTests {
 		/// </summary>
 		/// <param name="withBorder"></param>
 		/// <returns></returns>
-		private SplitView GetNestedContainer2Left1Right(bool withBorder)
+		private TileView GetNestedContainer2Left1Right(bool withBorder)
 		{
-			var container = GetSplitView (20, 10,withBorder);
-			Assert.True (container.TrySplitView (0,2, out var newContainer));
+			var container = GetTileView (20, 10,withBorder);
+			Assert.True (container.TryTileView (0,2, out var newContainer));
 			
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();
@@ -740,17 +740,17 @@ namespace UnitTests {
 		/// </summary>
 		/// <param name="withBorder"></param>
 		/// <returns></returns>
-		private SplitView GetNestedContainer3Right1Down(bool withBorder)
+		private TileView GetNestedContainer3Right1Down(bool withBorder)
 		{
 			var container = 
-			new SplitView (3)
+			new TileView (3)
 			{
 				Width = 20,
 				Height = 10,
 				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
 			};
 
-			Assert.True (container.TrySplitView (2,2, out var newContainer));
+			Assert.True (container.TryTileView (2,2, out var newContainer));
 			
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			
@@ -777,32 +777,32 @@ namespace UnitTests {
 			return container;
 		}
 
-		private LineView GetLine (SplitView splitContainer)
+		private LineView GetLine (TileView tileView)
 		{
-			return splitContainer.Subviews.OfType<LineView> ().Single ();
+			return tileView.Subviews.OfType<LineView> ().Single ();
 		}
 
-		private void SetInputFocusLine (SplitView splitContainer)
+		private void SetInputFocusLine (TileView tileView)
 		{
-			var line = GetLine (splitContainer);
+			var line = GetLine (tileView);
 			line.SetFocus ();
 			Assert.True (line.HasFocus);
 		}
 
-		private SplitView Get11By3SplitView(out LineView line, bool withBorder = false)
+		private TileView Get11By3TileView(out LineView line, bool withBorder = false)
 		{
-			var split = Get11By3SplitView (withBorder);
+			var split = Get11By3TileView (withBorder);
 			line = GetLine (split);
 			
 			return split;
 		}
-		private SplitView Get11By3SplitView (bool withBorder = false)
+		private TileView Get11By3TileView (bool withBorder = false)
 		{
-			return GetSplitView (11, 3, withBorder);
+			return GetTileView (11, 3, withBorder);
 		}
-		private SplitView GetSplitView (int width, int height, bool withBorder = false)
+		private TileView GetTileView (int width, int height, bool withBorder = false)
 		{
-			var container = new SplitView () {
+			var container = new TileView () {
 				Width = width,
 				Height = height,
 			};
