@@ -10,6 +10,8 @@ using System.Text.Json.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using System.Xml;
+using Terminal.Gui.Resources;
+
 
 
 
@@ -63,7 +65,15 @@ namespace Terminal.Gui.Configuration {
 		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the <see cref="SettingsScope"/>
 		/// attribute value.
 		/// </summary>
-		public static SettingsScope? Settings;
+		public static SettingsScope? Settings {
+			get => _settings ?? new SettingsScope ();
+			set {
+				_settings = value!;
+
+				// Update the other scopes
+				ThemeManager.Themes = (Dictionary<string,ThemeScope>)_settings.Properties ["Themes"]!.PropertyValue!;
+			}
+		}
 
 		/// <summary>
 		/// The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
@@ -145,12 +155,54 @@ namespace Terminal.Gui.Configuration {
 			public object? PropertyValue {
 				get => propertyValue;
 				set {
-					if (PropertyValue == null) {
-						propertyValue = value;
-					} else {
-						propertyValue = DeepMemberwiseCopy (value, PropertyValue);
-					}
+					propertyValue = value;
+
+					//if (PropertyValue == null) {
+					//	propertyValue = value;
+					//} else {
+					//	propertyValue = DeepMemberwiseCopy (value, PropertyValue);
+					//}
 				}
+			}
+
+			internal object? UpdateValueFrom (object source)
+			{
+				if (source == null) {
+					return PropertyValue;
+				}
+
+				if (source.GetType () != PropertyInfo!.PropertyType) {
+					throw new ArgumentException ($"The source object is not of type {PropertyInfo!.PropertyType}.");
+				}
+				if (PropertyValue != null && source != null) {
+					PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
+				} else {
+					PropertyValue = source;
+				}
+				
+				return PropertyValue;
+			}
+
+			/// <summary>
+			/// Retrieves (using reflection) the value of the static property described in <see cref="PropertyInfo"/>
+			/// into <see cref="PropertyValue"/>.
+			/// </summary>
+			/// <returns></returns>
+			public object RetrieveValue()
+			{
+				return PropertyValue = PropertyInfo!.GetValue (null);
+			}
+
+			/// <summary>
+			/// Applies the <see cref="PropertyValue"/> to the property described by <see cref="PropertyInfo"/>.
+			/// </summary>
+			/// <returns></returns>
+			public bool Apply()
+			{
+				if (PropertyValue != null) {
+					PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+				}
+				return PropertyValue != null;
 			}
 		}
 
@@ -158,8 +210,8 @@ namespace Terminal.Gui.Configuration {
 		/// Converts <see cref="Scope"/> instances to/from JSON. Does all the heavy lifting of reading/writing
 		/// config data to/from <see cref="ConfigurationManager"/> JSON documents.
 		/// </summary>
-		/// <typeparam name="rootT"></typeparam>
-		public class ConfigScopeConverter<rootT> : JsonConverter<rootT> {
+		/// <typeparam name="Tscope"></typeparam>
+		public class ConfigScopeConverter<Tscope> : JsonConverter<Tscope> {
 			// See: https://stackoverflow.com/questions/60830084/how-to-pass-an-argument-by-reference-using-reflection
 			internal abstract class ReadHelper {
 				public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
@@ -175,18 +227,19 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <inheritdoc/>
-			public override rootT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+			public override Tscope Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
 				if (reader.TokenType != JsonTokenType.StartObject) {
 					throw new JsonException ();
 				}
 
-				var root = (rootT)Activator.CreateInstance (typeof (rootT))!;
+				var scope = Activator.CreateInstance (typeof (Tscope)) as Scope;
 				// Get ConfigProperty store for this Scope type
-				var scopeProperties = typeToConvert!.GetProperty ("Properties")?.GetValue (root) as Dictionary<string, ConfigProperty>;
+			
+				//var scopeProperties = typeToConvert!.GetProperty ("Properties")?.GetValue (scope) as Dictionary<string, ConfigProperty>;
 				while (reader.Read ()) {
 					if (reader.TokenType == JsonTokenType.EndObject) {
-						return root;
+						return (Tscope)(object)scope!;
 					}
 					if (reader.TokenType != JsonTokenType.PropertyName) {
 						throw new JsonException ();
@@ -194,7 +247,7 @@ namespace Terminal.Gui.Configuration {
 					var propertyName = reader.GetString ();
 					reader.Read ();
 
-					if (propertyName != null && scopeProperties != null && scopeProperties.TryGetValue (propertyName, out var configProp)) {
+					if (propertyName != null && scope!.TryGetValue (propertyName, out var configProp)) {
 						// This property name was found in the Scope's ScopeProperties dictionary
 						// Figure out if it needs a JsonConverter and if so, create one
 						var propertyType = configProp?.PropertyInfo?.PropertyType!;
@@ -206,28 +259,30 @@ namespace Terminal.Gui.Configuration {
 									converter = factory.CreateConverter (propertyType, options);
 								}
 							}
-							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (rootT), propertyType!)!, converter) as ReadHelper;
-							if (scopeProperties [propertyName].PropertyValue == null) {
-								scopeProperties [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
+							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (Tscope), propertyType!)!, converter) as ReadHelper;
+							if (scope! [propertyName].PropertyValue == null) {
+								scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
 							} else {
-								scopeProperties [propertyName].PropertyValue = DeepMemberwiseCopy (readHelper?.Read (ref reader, propertyType!, options), scopeProperties [propertyName].PropertyValue);
+								throw new InvalidOperationException ("This is stupid here; will never be called");
+								scope! [propertyName].PropertyValue = DeepMemberwiseCopy (readHelper?.Read (ref reader, propertyType!, options), scope! [propertyName].PropertyValue);
 
 							}
 						} else {
-							if (scopeProperties [propertyName].PropertyValue == null) {
-								scopeProperties [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
+							if (scope! [propertyName].PropertyValue == null) {
+								scope![propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
 							} else {
-								scopeProperties [propertyName].PropertyValue = DeepMemberwiseCopy (JsonSerializer.Deserialize (ref reader, propertyType!, options), scopeProperties [propertyName].PropertyValue);
+								throw new InvalidOperationException ("This is stupid here; will never be called");
+								scope! [propertyName].PropertyValue = DeepMemberwiseCopy (JsonSerializer.Deserialize (ref reader, propertyType!, options), scope! [propertyName].PropertyValue);
 
 							}
 						}
 					} else {
-						if (root.GetType ().GetCustomAttribute (typeof (JsonIncludeAttribute)) != null) {
-							if (root.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute)) != null) {
-								propertyName = root.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute))?.ToString ();
+						if (scope!.GetType ().GetCustomAttribute (typeof (JsonIncludeAttribute)) != null) {
+							if (scope.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute)) != null) {
+								propertyName = scope.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute))?.ToString ();
 							}
-							var prop = root.GetType ().GetProperty (propertyName!)!;
-							prop.SetValue (root, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
+							var prop = scope.GetType ().GetProperty (propertyName!)!;
+							prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
 						} else {
 							reader.Skip ();
 						}
@@ -237,7 +292,7 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <inheritdoc/>
-			public override void Write (Utf8JsonWriter writer, rootT root, JsonSerializerOptions options)
+			public override void Write (Utf8JsonWriter writer, Tscope root, JsonSerializerOptions options)
 			{
 				writer.WriteStartObject ();
 
@@ -247,11 +302,11 @@ namespace Terminal.Gui.Configuration {
 					JsonSerializer.Serialize (writer, root.GetType ().GetProperty (p.Name)?.GetValue (root), options);
 				}
 
-				var configStore = (Dictionary<string, ConfigProperty>)typeof (rootT).GetProperty ("Properties")?.GetValue (root)!;
+				var configStore = (Dictionary<string, ConfigProperty>)typeof (Tscope).GetProperty ("Properties")?.GetValue (root)!;
 				foreach (var p in from p in configStore
 						  .Where (cp =>
 							cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is
-							SerializableConfigurationProperty scp && scp?.Scope == typeof (rootT))
+							SerializableConfigurationProperty scp && scp?.Scope == typeof (Tscope))
 						  where p.Value.PropertyValue != null
 						  select p) {
 
@@ -285,6 +340,7 @@ namespace Terminal.Gui.Configuration {
 		/// <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
 		/// </summary>
 		private static Dictionary<string, ConfigProperty>? _allConfigProperties;
+		private static SettingsScope? _settings;
 
 		private static Dictionary<string, ConfigProperty> getConfigProperties ()
 		{
@@ -312,7 +368,7 @@ namespace Terminal.Gui.Configuration {
 						// If the class name is ommited, JsonPropertyName is allowed. 
 						configProperties.Add (scp.OmitClassName ? ConfigProperty.GetJsonPropertyName (p) : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
 							PropertyInfo = p,
-							PropertyValue = p.GetValue (null)
+							PropertyValue = null
 						});
 					} else {
 						throw new Exception ($"Property {p.Name} in class {p.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
@@ -329,17 +385,6 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Loads the <see cref="SettingsScope"/> from a JSON document, overwriting any existing settings.
-		/// </summary>
-		/// <param name="json"></param>
-		/// <returns>A <see cref="SettingsScope"/> object initialized by the contents of the JSON document.</returns>
-		internal static void LoadFromJson (string json)
-		{
-			Debug.WriteLine ($"ConfigurationManager.LoadFromJson()");
-			Settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
-		}
-
-		/// <summary>
 		/// Creates a JSON document with the configuration specified. 
 		/// </summary>
 		/// <returns></returns>
@@ -353,10 +398,10 @@ namespace Terminal.Gui.Configuration {
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 		/// </summary>
 		/// <param name="json"></param>
-		internal static void UpdateConfiguration (string json)
+		internal static void Update (string json)
 		{
 			Debug.WriteLine ($"ConfigurationManager.UpdateConfiguration()");
-			// Deserialize the JSON into a Configuration object
+			// Update the existing settings with the new settings.
 			var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
 			Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
 		}
@@ -365,12 +410,33 @@ namespace Terminal.Gui.Configuration {
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON file.
 		/// </summary>
 		/// <param name="filePath"></param>
-		internal static void UpdateConfigurationFromFile (string filePath)
+		internal static void UpdateFromFile (string filePath)
 		{
 			// Read the JSON file
 			string json = File.ReadAllText (filePath);
-			UpdateConfiguration (json);
+			Update (json);
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {filePath}");
+		}
+
+		/// <summary>
+		/// Resets the state of <see cref="ConfigurationManager"/>. 
+		/// </summary>
+		internal static void Reset ()
+		{
+			Debug.WriteLine ($"ConfigurationManager.Reset()");
+			Settings = new SettingsScope ();
+			ThemeManager.Reset ();
+
+			if (_allConfigProperties == null) {
+				_allConfigProperties = getConfigProperties ();
+			}
+
+			// To enable some unit tests, we only load from resources if the flag is set
+			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
+
+			Apply ();
+			Themes?.Apply ();
+
 		}
 
 		/// <summary>
@@ -391,9 +457,8 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		internal static void GetHardCodedDefaults ()
 		{
-			Debug.WriteLine ($"ConfigurationManager.GetHardCodedDefaults()");
 			Settings = new SettingsScope ();
-			Themes?.GetHardCodedDefaults ();
+			ThemeManager.GetHardCodedDefaults ();
 			foreach (var p in Settings!.Where (cp => cp.Value.PropertyInfo != null)) {
 				Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
 			}
@@ -407,13 +472,7 @@ namespace Terminal.Gui.Configuration {
 		/// current theme.</remarks>
 		public static void Apply ()
 		{
-			// This just applies global Settings (SettingsScope).
-			bool set = false;
-			foreach (var p in Settings!.Where (t => t.Value != null && t.Value.PropertyValue != null)) {
-				p.Value?.PropertyInfo?.SetValue (null, DeepMemberwiseCopy (p.Value?.PropertyValue, p.Value?.PropertyInfo?.GetValue (null)));
-				set = true;
-			}
-			if (set) {
+			if (Settings!.Apply()) {
 				OnApplied ();
 			}
 		}
@@ -435,18 +494,107 @@ namespace Terminal.Gui.Configuration {
 		public static event Action<SettingsScope.EventArgs>? Applied;
 
 		/// <summary>
+		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c> into <see cref="ConfigurationManager"/>. 
+		/// </summary>
+		internal static void ResetFromLibraryResource ()
+		{
+			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
+			using Stream? stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName)!;
+			using StreamReader reader = new StreamReader (stream);
+			string json = reader.ReadToEnd ();
+			if (json != null) {
+				Settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
+			}
+			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
+		}
+
+		/// <summary>
+		/// Loads global configuration from the directory the app was launched from (<c>./.tui/config.json</c>) into
+		/// <see cref="ConfigurationManager"/>.
+		/// </summary>
+		internal static void LoadGlobalAppDirectory ()
+		{
+			string globalLocal = $"./.tui/{_configFilename}";
+			if (File.Exists (globalLocal)) {
+				UpdateFromFile (globalLocal);
+			}
+		}
+
+		/// <summary>
+		/// Loads global configuration in the user's home directory (<c>~/.tui/config.json</c>) into
+		/// <see cref="ConfigurationManager"/>.
+		/// </summary>
+		internal static void LoadGlobalHomeDirectory ()
+		{
+			string globalHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}";
+			if (File.Exists (globalHome)) {
+				UpdateFromFile (globalHome);
+			}
+		}
+
+		/// <summary>
+		/// Loads application configuration in the app's resources (<c>appname.Resources.config.json</c>) into
+		/// <see cref="ConfigurationManager"/>.
+		/// </summary>
+		internal static void LoadAppResources ()
+		{
+			var embeddedStylesResourceName = Assembly.GetEntryAssembly ()?.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
+			if (embeddedStylesResourceName != null) {
+				using Stream? stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (embeddedStylesResourceName);
+				using StreamReader reader = new StreamReader (stream!);
+				string json = reader.ReadToEnd ();
+				Update (json);
+				Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
+			}
+		}
+
+		/// <summary>
+		/// Name of the running application. By default this property is set to the application's assembly name.
+		/// </summary>
+		public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
+
+		/// <summary>
+		/// Loads application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>)
+		/// into <see cref="ConfigurationManager"/>.
+		/// </summary>
+		internal static void LoadAppDirectory ()
+		{
+			string appLocal = $"./.tui/{AppName}.{_configFilename}";
+			if (File.Exists (appLocal)) {
+				UpdateFromFile (appLocal);
+			}
+		}
+
+		/// <summary>
+		/// Loads application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>)
+		/// into <see cref="ConfigurationManager"/>.
+		/// </summary>
+		internal static void LoadAppHomeDirectory ()
+		{
+			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}";
+			if (File.Exists (appHome)) {
+				UpdateFromFile (appHome);
+			}
+		}
+
+
+		/// <summary>
 		/// Describes the location of the configuration files. The constancts can be
 		/// combined (bitwise) to specify multiple locations.
 		/// </summary>
 		[Flags]
 		public enum ConfigLocations {
 			/// <summary>
-			/// No configuration will be loaded. Used for development and testing.
+			/// No configuration will be loaded.
 			/// </summary>
+			/// <remarks>
+			///  Used for development and testing only. For Terminal,Gui to function properly, at least
+			///  <see cref="LibraryResources"/> should be set.
+			/// </remarks>
 			None = 0,
 
 			/// <summary>
-			/// Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precidence 
+			/// Application configuration found in the user's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precidence 
 			/// </summary>
 			AppHomeDirectory,
 
@@ -483,90 +631,6 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c> into <see cref="ConfigurationManager"/>. 
-		/// </summary>
-		internal static void LoadGlobalFromLibraryResource ()
-		{
-			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
-			using Stream? stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName)!;
-			using StreamReader reader = new StreamReader (stream);
-			string json = reader.ReadToEnd ();
-			if (json != null) {
-				LoadFromJson (json);
-			}
-			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
-		}
-
-		/// <summary>
-		/// Loads global configuration from the directory the app was launched from (<c>./.tui/config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadGlobalFromAppDirectory ()
-		{
-			string globalLocal = $"./.tui/{_configFilename}";
-			if (File.Exists (globalLocal)) {
-				UpdateConfigurationFromFile (globalLocal);
-			}
-		}
-
-		/// <summary>
-		/// Loads global configuration in the user's home directory (<c>~/.tui/config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadGlobalFromHomeDirectory ()
-		{
-			string globalHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}";
-			if (File.Exists (globalHome)) {
-				UpdateConfigurationFromFile (globalHome);
-			}
-		}
-
-		/// <summary>
-		/// Loads application configuration in the app's resources (<c>appname.Resources.config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppFromAppResources ()
-		{
-			var embeddedStylesResourceName = Assembly.GetEntryAssembly ()?.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
-			if (embeddedStylesResourceName != null) {
-				using Stream? stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (embeddedStylesResourceName);
-				using StreamReader reader = new StreamReader (stream!);
-				string json = reader.ReadToEnd ();
-				UpdateConfiguration (json);
-				Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
-			}
-		}
-
-		/// <summary>
-		/// Name of the running application. By default this property is set to the application's assembly name.
-		/// </summary>
-		public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
-
-		/// <summary>
-		/// Loads application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>)
-		/// into <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppFromAppDirectory ()
-		{
-			string appLocal = $"./.tui/{AppName}.{_configFilename}";
-			if (File.Exists (appLocal)) {
-				UpdateConfigurationFromFile (appLocal);
-			}
-		}
-
-		/// <summary>
-		/// Loads application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>)
-		/// into <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppFromHomeDirectory ()
-		{
-			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}";
-			if (File.Exists (appHome)) {
-				UpdateConfigurationFromFile (appHome);
-			}
-		}
-
-		/// <summary>
 		/// Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files.
 		/// The value is <see cref="ConfigLocations.All"/>.
 		/// </summary>
@@ -581,18 +645,16 @@ namespace Terminal.Gui.Configuration {
 		public static void Load ()
 		{
 			Debug.WriteLine ($"ConfigurationManager.Load()");
-			if (_allConfigProperties == null) {
-				_allConfigProperties = getConfigProperties ();
-			}
 
-			GetHardCodedDefaults ();
+			Reset ();
 
-			if (Locations.HasFlag (ConfigLocations.LibraryResources)) LoadGlobalFromLibraryResource ();
-			if (Locations.HasFlag (ConfigLocations.GlobalAppDirectory)) LoadGlobalFromAppDirectory ();
-			if (Locations.HasFlag (ConfigLocations.GlobalHomeDirectory)) LoadGlobalFromHomeDirectory ();
-			if (Locations.HasFlag (ConfigLocations.AppResources)) LoadAppFromAppResources ();
-			if (Locations.HasFlag (ConfigLocations.AppDirectory)) LoadAppFromAppDirectory ();
-			if (Locations.HasFlag (ConfigLocations.AppHomeDirectory)) LoadAppFromHomeDirectory ();
+			// LibraryResoruces is always loaded by Reset
+
+			if (Locations.HasFlag (ConfigLocations.GlobalAppDirectory)) LoadGlobalAppDirectory ();
+			if (Locations.HasFlag (ConfigLocations.GlobalHomeDirectory)) LoadGlobalHomeDirectory ();
+			if (Locations.HasFlag (ConfigLocations.AppResources)) LoadAppResources ();
+			if (Locations.HasFlag (ConfigLocations.AppDirectory)) LoadAppDirectory ();
+			if (Locations.HasFlag (ConfigLocations.AppHomeDirectory)) LoadAppHomeDirectory ();
 		}
 
 		/// <summary>
@@ -640,14 +702,8 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			if (source.GetType ().BaseType == typeof (Scope)) {
-				foreach (var srcKey in ((Scope)source).Keys) {
-					if (((Scope)destination).ContainsKey (srcKey))
-						((Scope)destination) [srcKey] = (ConfigProperty)DeepMemberwiseCopy (((Scope)source) [srcKey], ((Scope)destination) [srcKey]);
-					else {
-						((Scope)destination).Add (srcKey, ((Scope)source) [srcKey]);
-					}
-				}
-				return destination;
+				return ((Scope)destination).UpdateFrom ((Scope)source);
+
 			}
 
 			// If value type, just use copy constructor.

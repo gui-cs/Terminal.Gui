@@ -556,6 +556,7 @@ namespace UICatalog {
 					item.Checked = theme.Key == ConfigurationManager.Themes.Theme;
 					item.Action += () => {
 						ConfigurationManager.Themes.Theme = theme.Key;
+						ConfigurationManager.Themes.Apply ();
 					};
 					menuItems.Add (item);
 				}

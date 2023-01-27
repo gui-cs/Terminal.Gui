@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests {
-#if false       
 	public class ThemeTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {
@@ -18,17 +18,31 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 		};
 
-		[Fact,AutoInitShutdown]
+		[Fact]
 		public void TestApply_UpdatesColors ()
 		{
 			// Arrange
-			var theme = new Theme ();
+			ConfigurationManager.Reset ();
+
+			Assert.False (Colors.ColorSchemes.ContainsKey ("test"));
+
+			var theme = new ThemeScope ();
+			Assert.NotEmpty (theme);
+
+			Themes.Add ("testTheme", theme);
+
 			var colorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) };
-			theme.ColorSchemes ["test"] = colorScheme;
-			Colors.ColorSchemes ["test"] = new ColorScheme ();
+
+			theme ["ColorSchemes"].PropertyValue = new Dictionary<string, ColorScheme> () {
+				{ "test",  colorScheme }
+			};
+
+			Assert.Equal (Color.Red, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
+			Assert.Equal (Color.Green, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
 
 			// Act
-			theme.Apply ();
+			Themes.Theme = "testTheme";
+			Themes.Apply ();
 
 			// Assert
 			var updatedScheme = Colors.ColorSchemes ["test"];
@@ -36,17 +50,31 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Color.Green, updatedScheme.Normal.Background);
 		}
 
-		[Fact, AutoInitShutdown]
+		[Fact]
 		public void TestApply ()
 		{
-			var theme = new Theme ();
-			var colorScheme = new ColorScheme ();
-			colorScheme.Normal = new Attribute (Color.Red, Color.Green);
-			theme.ColorSchemes.Add ("Test", colorScheme);
-			theme.Apply ();
-			Assert.Equal (Colors.ColorSchemes ["Test"].Normal, colorScheme.Normal);
-		}
+			ConfigurationManager.Reset ();
 
+			var theme = new ThemeScope ();
+			Assert.NotEmpty (theme);
+
+			Themes.Add ("testTheme", theme);
+
+			Assert.True (Dialog.DefaultBorder.Effect3D);
+			Assert.Equal (typeof (Border), theme ["Dialog.DefaultBorder"].PropertyInfo.PropertyType);
+			theme ["Dialog.DefaultBorder"].PropertyValue = new Border () { Effect3D = false }; // default is true
+
+			//var colorScheme = new ColorScheme ();
+			//colorScheme.Normal = new Attribute (Color.Red, Color.Green);
+			//((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) = colorScheme;
+			Themes.Theme = "testTheme";
+			Themes.Apply ();
+
+			Assert.False (Dialog.DefaultBorder.Effect3D);
+
+			//Assert.Equal (Colors.ColorSchemes ["Test"].Normal, colorScheme.Normal);
+		}
+#if false
 		[Fact, AutoInitShutdown]
 		public void TestCopyUpdatedProperties ()
 		{
@@ -153,6 +181,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Colors.Base.HotFocus, deserializedColors.HotFocus);
 			Assert.Equal (Colors.Base.Disabled, deserializedColors.Disabled);
 		}
-	}
 #endif
+	}
 }

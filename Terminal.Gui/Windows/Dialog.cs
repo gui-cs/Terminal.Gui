@@ -38,9 +38,9 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static Border DefaultBorder { get; set; } = new Border () {
 			BorderStyle = BorderStyle.Single,
-			//DrawMarginFrame = false,
-			//Effect3D = true,
-			//Effect3DOffset = new Point (1, 1),
+			DrawMarginFrame = false,
+			Effect3D = true,
+			Effect3DOffset = new Point (1, 1),
 		};
 
 		internal List<Button> buttons = new List<Button> ();

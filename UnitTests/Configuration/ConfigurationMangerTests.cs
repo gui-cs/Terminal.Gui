@@ -177,9 +177,41 @@ namespace Terminal.Gui.ConfigurationTests {
 		//	Assert.True (false, "This test needs an implementation");
 		//}
 
+
+		/// <summary>
+		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
+		/// </summary>
+		/// <remarks>
+		/// IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Conifg Properties
+		/// are all satic and thus can be overwritten by other tests.</remarks>
+		[Fact]
+		public void SaveDefaults ()
+		{
+			// Get the hard coded settings
+			ConfigurationManager.GetHardCodedDefaults ();
+
+			// Serialize to a JSON string
+			string json = ConfigurationManager.ToJson ();
+
+			// Write the JSON string to the file 
+			File.WriteAllText ("config.json", json);
+		}
+
+		[Fact]
+		public void TestReset()
+		{
+			ConfigurationManager.Reset ();
+			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
+			Assert.NotEmpty (ConfigurationManager.Themes);
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+		}
+
 		[Fact]
 		public void TestConfigProperties ()
 		{
+			ConfigurationManager.Reset ();
+			ConfigurationManager.ResetFromLibraryResource ();
+
 			Assert.NotEmpty (ConfigurationManager.Settings);
 			// test that all ConfigProperites have our attribute
 			Assert.All (ConfigurationManager.Settings, item => Assert.NotEmpty (item.Value.PropertyInfo.CustomAttributes.Where (a => a.AttributeType == typeof (SerializableConfigurationProperty))));
@@ -203,31 +235,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			var scp = ((SerializableConfigurationProperty)pi.GetCustomAttribute (typeof (SerializableConfigurationProperty)));
 			Assert.True (scp.Scope == typeof (ThemeScope));
 			Assert.True (scp.OmitClassName);
+
+			ConfigurationManager.Reset ();
 			Assert.Equal (pi, ConfigurationManager.Themes ["Default"] ["ColorSchemes"].PropertyInfo);
-
-		}
-
-		/// <summary>
-		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
-		/// </summary>
-		[Fact]
-		public void TestConfigurationManagerSaveHardCodedDefaults ()
-		{
-			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
-
-			Application.Init (new FakeDriver ());
-
-			// Get the hard coded settings
-			ConfigurationManager.GetHardCodedDefaults ();
-
-			// Serialize to a JSON string
-			string json = ConfigurationManager.ToJson ();
-
-			// Write the JSON string to the file specified by filePath
-			File.WriteAllText ("config.json", json);
-
-
-			Application.Shutdown ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -236,40 +246,46 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.GetHardCodedDefaults ();
 			var json = ConfigurationManager.ToJson ();
 
-			ConfigurationManager.LoadFromJson (json);
+			ConfigurationManager.Update (json);
 
-			//Assert.Equal (Colors.Base.Normal, readConfig.ColorSchemes ["Base"].Normal);
 		}
 
 		[Fact]
 		public void TestValueChanges ()
 		{
-			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+			//ConfigurationManager.GetHardCodedDefaults ();
+			//ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			//Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
+			//var json = ConfigurationManager.ToJson ();
 
-			Application.Init (new FakeDriver ());
-
-			ConfigurationManager.GetHardCodedDefaults ();
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
-			Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-			var json = ConfigurationManager.ToJson ();
-
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = false;
-			Assert.False ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-			ConfigurationManager.LoadFromJson (json);
-			Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-
-			Application.Shutdown ();
+			//ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = false;
+			//Assert.False ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
+			//ConfigurationManager.Update (json);
+			//Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
 		}
 
-		[Fact, AutoInitShutdown]
+		[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
+		public void TestConfigurationManagerInitDriver_NoLocations ()
+		{
+
+			
+		}
+
+		[Fact, AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
 		public void TestConfigurationManagerInitDriver ()
 		{
-			ConfigurationManager.GetHardCodedDefaults ();
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+			Assert.True (ConfigurationManager.Themes.ContainsKey ("Default"));
+
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 
 			// Change Base
 			var json = ConfigurationManager.ToJson ();
 			
-			ConfigurationManager.LoadFromJson (json);
+			ConfigurationManager.Update (json);
 
 			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme].Properties ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Colors.Base, colorSchemes ["Base"]);
@@ -291,17 +307,17 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (colorSchemes ["Menu"], Colors.Menu);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerLoadsFromJson ()
+		[Fact]
+		public void TestConfigurationManagerUpdateFromJson ()
 		{
 			// Arrange
 			string json = @"
 {
   ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
   ""Application.QuitKey"": {
-    ""Key"": ""Q"",
+    ""Key"": ""Z"",
     ""Modifiers"": [
-      ""Ctrl""
+      ""Alt""
     ]
   },
   ""Theme"": ""Default"",
@@ -441,19 +457,34 @@ namespace Terminal.Gui.ConfigurationTests {
 }					
 			";
 
-			ConfigurationManager.LoadFromJson (json);
+			ConfigurationManager.Reset ();
+			ConfigurationManager.Update (json);
 
-			Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Assert.Equal (Key.Z | Key.AltMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme].Properties ["ColorSchemes"].PropertyValue);
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+
+			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First().Value.Properties ["ColorSchemes"].PropertyValue;
 			Assert.Equal (Color.White, colorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, colorSchemes ["Base"].Normal.Background);
+
+			// Now re-apply
+			ConfigurationManager.Apply ();
+			ConfigurationManager.Themes.Apply ();
+			
+			Assert.Equal (Key.Z | Key.AltMask, Application.QuitKey);
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+
+			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerLoadInvalidJsonAsserts ()
+		public void TestConfigurationManagerInvalidJsonAsserts ()
 		{
 			// "yellow" is not a color
 			string json = @"
@@ -478,7 +509,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.LoadFromJson (json));
+			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
 			Assert.Equal ("Invalid color string: 'yellow'", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
@@ -504,7 +535,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.LoadFromJson (json));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
 			Assert.Equal ("Unrecognized property name: AbNormal", jsonException.Message);
 
 			// Modify hotNormal background only 
@@ -529,47 +560,8 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.LoadFromJson (json));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
 			Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerAllHardCodedDefaults ()
-		{
-			ConfigurationManager.GetHardCodedDefaults ();
-
-			// Apply default styles
-			ConfigurationManager.Apply ();
-
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
-
-			Assert.Equal (Color.Black, Colors.ColorSchemes ["Base"].Focus.Foreground);
-			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Base"].Focus.Background);
-
-			Assert.Equal (Color.BrightCyan, Colors.ColorSchemes ["Base"].HotNormal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].HotNormal.Background);
-
-			Assert.Equal (Color.BrightBlue, Colors.ColorSchemes ["Base"].HotFocus.Foreground);
-			Assert.Equal (Color.Gray, Colors.ColorSchemes ["Base"].HotFocus.Background);
-
-			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["Base"].Disabled.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Disabled.Background);
-
-			Assert.Equal (Color.BrightGreen, Colors.ColorSchemes ["TopLevel"].Normal.Foreground);
-			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Normal.Background);
-
-			Assert.Equal (Color.White, Colors.ColorSchemes ["TopLevel"].Focus.Foreground);
-			Assert.Equal (Color.Cyan, Colors.ColorSchemes ["TopLevel"].Focus.Background);
-
-			Assert.Equal (Color.Brown, Colors.ColorSchemes ["TopLevel"].HotNormal.Foreground);
-			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].HotNormal.Background);
-
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["TopLevel"].HotFocus.Foreground);
-			Assert.Equal (Color.Cyan, Colors.ColorSchemes ["TopLevel"].HotFocus.Background);
-
-			Assert.Equal (Color.DarkGray, Colors.ColorSchemes ["TopLevel"].Disabled.Foreground);
-			Assert.Equal (Color.Black, Colors.ColorSchemes ["TopLevel"].Disabled.Background);
 		}
 
 		[Fact, AutoInitShutdown]

@@ -526,6 +526,14 @@ namespace Terminal.Gui {
 
 		static Colors ()
 		{
+			Init ();
+		}
+
+		/// <summary>
+		/// Initializes the color schemes to their initial defaults.
+		/// </summary>
+		public static void Init() 
+		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
 			ColorSchemes = typeof (Colors).GetProperties ()

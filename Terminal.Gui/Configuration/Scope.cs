@@ -28,6 +28,39 @@ namespace Terminal.Gui.Configuration {
 					dict => new ConfigProperty () { PropertyInfo = dict.Value.PropertyInfo, PropertyValue = null }, StringComparer.InvariantCultureIgnoreCase);
 			}
 
+			internal object? UpdateFrom (Scope source)
+			{
+				foreach (var prop in source) {
+					if (ContainsKey (prop.Key))
+						this [prop.Key].PropertyValue = this [prop.Key].UpdateValueFrom (prop.Value.PropertyValue!);
+					else {
+						this [prop.Key].PropertyValue = prop.Value.PropertyValue;
+					}
+				}
+				return this;
+			}
+
+			internal void RetrieveValues ()
+			{
+				foreach (var p in this.Where (cp => cp.Value.PropertyInfo != null)) {
+					p.Value.RetrieveValue ();
+				}
+
+			}
+
+			/// <summary>
+			/// Applies all congiguration properties of this scope that have a non-null <see cref="ConfigProperty.PropertyValue"/>.
+			/// </summary>
+			/// <returns><see langword="true"/> if any property was non-null and was set.</returns>
+			internal bool Apply()
+			{
+				bool set = false;
+				foreach (var p in this.Where (t => t.Value != null && t.Value.PropertyValue != null)) {
+					set = p.Value.Apply ();
+				}
+				return set;
+			}
+
 			/// <summary>
 			/// Gets the dictionary of <see cref="ConfigProperty"/> objects for this scope.
 			/// </summary>
@@ -118,6 +151,7 @@ namespace Terminal.Gui.Configuration {
 			{
 				return ((IEnumerable)Properties).GetEnumerator ();
 			}
+
 			#endregion
 		}
 	}

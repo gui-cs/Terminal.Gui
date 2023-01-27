@@ -446,16 +446,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the single child element of a <see cref="View"/>.
 		/// </summary>
+		[JsonIgnore]
 		public View Child { get; set; }
 
 		/// <summary>
 		/// Gets the parent <see cref="Child"/> parent if any.
 		/// </summary>
+		[JsonIgnore]
 		public View Parent { get => Child?.SuperView; }
 
 		/// <summary>
 		/// Gets or private sets by the <see cref="ToplevelContainer"/>
 		/// </summary>
+		[JsonIgnore]
 		public ToplevelContainer ChildContainer { get; private set; }
 
 		/// <summary>

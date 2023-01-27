@@ -125,21 +125,22 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			public static ThemeManager Instance { get { return _instance; } }
 
-			private static string theme = "Default";
+			private static string theme = string.Empty;
 			private static Dictionary<string, ThemeScope>? themes;
 
 			/// <summary>
 			/// The currently selected theme. 
 			/// </summary>
 			[JsonInclude, SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("Theme")]
-			internal static string ThemeProperty {
+			internal static string SelectedTheme {
 				get => theme;
 				set {
 					var oldTheme = theme;
 					theme = value;
 					if (oldTheme != theme && themes != null && themes.ContainsKey (theme)) {
+						ConfigurationManager.Settings ["Theme"].PropertyValue = theme;
 						Instance.OnThemeChanged (oldTheme);
-						Instance.Apply ();
+						//Instance.Apply ();
 					}
 				}
 			}
@@ -149,9 +150,9 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			[JsonIgnore]
 			public string Theme {
-				get => ThemeProperty;
+				get => SelectedTheme;
 				set {
-					ThemeProperty = value;
+					SelectedTheme = value;
 				}
 			}
 
@@ -176,8 +177,8 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			[JsonInclude, JsonConverter (typeof (DictionaryConverter<ThemeScope>))]
 			[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-			public static Dictionary<string, ThemeScope> Themes {
-				get => themes!;
+			public static Dictionary<string, ThemeScope>? Themes {
+				get => themes ?? new Dictionary<string, ThemeScope> ();
 				set {
 					if (themes == null || value == null) {
 						themes = value;
@@ -196,18 +197,13 @@ namespace Terminal.Gui.Configuration {
 			/// global settings.</remarks>
 			public void Apply ()
 			{
-				if (Themes.ContainsKey (ThemeProperty)) {
-					foreach (var prop in Themes [ThemeProperty].Where (t => t.Value != null && t.Value.PropertyValue != null)) {
-						if (prop.Key == "Dialog.DefaultBorder") {
-							Debug.WriteLine (prop.Value);
-							if (((Border) prop.Value.PropertyValue).BorderStyle == BorderStyle.Double) {
-								throw new Exception ("Fuck");
-							}
-						}
-						prop.Value.PropertyInfo?.SetValue (null, DeepMemberwiseCopy (prop.Value.PropertyValue, prop.Value.PropertyInfo?.GetValue (null)));
+				if (Themes!.ContainsKey (SelectedTheme)) {
+					if (Themes [SelectedTheme].Apply ()) {
+						// If there's a driver, make sure the color schemes are properly
+						// initialized.
+						Application.Driver?.InitalizeColorSchemes ();
+						OnApplied ();
 					}
-					Application.Driver?.InitalizeColorSchemes ();
-					OnApplied ();
 				}
 			}
 
@@ -227,18 +223,26 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			public event Action<ThemeScope.EventArgs>? Applied;
 
-			internal void GetHardCodedDefaults ()
+			internal static void Reset ()
+			{
+				Debug.WriteLine ($"Themes.Reset()");
+
+				Themes?.Clear ();
+				SelectedTheme = string.Empty;
+			}
+
+			internal static void GetHardCodedDefaults ()
 			{
 				Debug.WriteLine ($"Themes.GetHardCodedDefaults()");
-				Themes?.Clear ();
 				var theme = new ThemeScope ();
-				foreach (var p in theme.Where (cp => cp.Value.PropertyInfo != null)) {
-					theme [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
-				}
+				theme.RetrieveValues ();
+
 				Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase) { { "Default", theme } };
+				SelectedTheme = "Default";
 			}
 
 			#region IDictionary
+			/// <inheritdoc/>
 			public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes).Keys;
 			/// <inheritdoc/>
 			public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes).Values;
