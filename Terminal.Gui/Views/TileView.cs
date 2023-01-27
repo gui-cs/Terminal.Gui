@@ -348,7 +348,7 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="TileView"/></returns>
-		public bool TryTileView(int idx, int panels, out TileView result)
+		public bool TrySplitTile(int idx, int panels, out TileView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
@@ -405,10 +405,25 @@ namespace Terminal.Gui {
 			return lines;
 		}
 
-		private bool IsRootTileView ()
+		/// <summary>
+		/// <para>
+		/// <see langword="true"/> if <see cref="TileView"/> is nested within a parent <see cref="TileView"/>
+		/// e.g. via the <see cref="TrySplitTile"/>.  <see langword="false"/> if it is a root level <see cref="TileView"/>.
+		/// </para>
+		/// </summary>
+		/// <remarks>Note that manually adding one <see cref="TileView"/> to another will not result in a parent/child
+		/// relationship and both will still be considered 'root' containers.  Always use
+		/// <see cref="TrySplitTile(int, int, out TileView)"/> if you want to subdivide a <see cref="TileView"/>.</remarks>
+		/// <returns></returns>
+		public bool IsRootTileView ()
 		{
 			// TODO: don't want to layout subviews since the parent recursively lays them all out
 			return parentTileView == null;
+		}
+
+		public TileView GetParentTileView ()
+		{
+			return this.parentTileView;
 		}
 		private TileView GetRootTileView ()
 		{
@@ -782,6 +797,7 @@ namespace Terminal.Gui {
 			return tiles.Any (t => t.Title.Length > 0);
 
 		}
+
 
 		private class ChildSplitterLine {
 

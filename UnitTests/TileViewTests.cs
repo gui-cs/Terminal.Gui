@@ -724,7 +724,7 @@ namespace UnitTests {
 		private TileView GetNestedContainer2Left1Right(bool withBorder)
 		{
 			var container = GetTileView (20, 10,withBorder);
-			Assert.True (container.TryTileView (0,2, out var newContainer));
+			Assert.True (container.TrySplitTile (0,2, out var newContainer));
 			
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();
@@ -750,7 +750,7 @@ namespace UnitTests {
 				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
 			};
 
-			Assert.True (container.TryTileView (2,2, out var newContainer));
+			Assert.True (container.TrySplitTile (2,2, out var newContainer));
 			
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			

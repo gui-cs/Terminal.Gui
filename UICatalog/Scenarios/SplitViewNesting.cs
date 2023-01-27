@@ -187,11 +187,11 @@ namespace UICatalog.Scenarios {
 			TileView newView;
 			
 			if (left) {
-				to.TryTileView(0,2,out newView);
+				to.TrySplitTile(0,2,out newView);
 
 			}
 			else {
-				to.TryTileView (1,2,out newView);
+				to.TrySplitTile (1,2,out newView);
 			}
 
 			viewsCreated++;

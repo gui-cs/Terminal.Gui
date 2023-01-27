@@ -12,6 +12,8 @@ namespace UICatalog.Scenarios {
 		TabView tabView;
 
 		private int numbeOfNewTabs = 1;
+		private TabView focusedTabView;
+		private StatusItem lenStatusItem;
 
 		// Don't create a Window, just return the top-level view
 		public override void Init (ColorScheme colorScheme)
@@ -51,7 +53,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (split);
 
-			var lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
+			lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 
@@ -63,12 +65,18 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.W, "~^W~ Close", () => Close()),
 				lenStatusItem,
 			});
-
-			tabView.SelectedTabChanged += (s, e) => lenStatusItem.Title = $"Len:{(e.NewTab?.View?.Text?.Length ?? 0)}";
+			focusedTabView = tabView;
+			tabView.SelectedTabChanged += TabView_SelectedTabChanged;
+			tabView.Enter += (e) => focusedTabView = tabView;
 
 			Application.Top.Add (statusBar);
 
 			New ();
+		}
+
+		private void TabView_SelectedTabChanged (object sender, TabView.TabChangedEventArgs e)
+		{
+			lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
 		}
 
 		private void TabView_TabClicked (object sender, TabView.TabMouseEventArgs e)
@@ -91,7 +99,7 @@ namespace UICatalog.Scenarios {
 				var t = (OpenedFile)e.Tab;
 
 				items = new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Save", "", () => Save(e.Tab)),
+					new MenuItem ($"Save", "", () => Save(focusedTabView, e.Tab)),
 					new MenuItem ($"Close", "", () => Close(tv, e.Tab)),
 					null,
 					new MenuItem ($"Split Up", "", () => SplitUp(tv,t)),
@@ -140,7 +148,7 @@ namespace UICatalog.Scenarios {
 
 			if(orientation != split.Orientation)
 			{
-				split.TryTileView(tileIndex,1,out split);
+				split.TrySplitTile(tileIndex,1,out split);
 				split.Orientation = orientation;
 				tileIndex = 0;
 			}
@@ -165,6 +173,8 @@ namespace UICatalog.Scenarios {
 			};
 
 			tv.TabClicked += TabView_TabClicked;
+			tv.SelectedTabChanged += TabView_SelectedTabChanged;
+			tv.Enter += (e) => focusedTabView = tv;
 			return tv;
 		}
 
@@ -175,8 +185,7 @@ namespace UICatalog.Scenarios {
 
 		private void Close ()
 		{
-			// TODO: Should be the tab view with focus not the root (first) one.
-			Close (tabView, tabView.SelectedTab);
+			Close (focusedTabView, focusedTabView.SelectedTab);
 		}
 		private void Close (TabView tv, TabView.Tab tabToClose)
 		{
@@ -185,6 +194,8 @@ namespace UICatalog.Scenarios {
 			if (tab == null) {
 				return;
 			}
+
+			focusedTabView = tv;
 
 			if (tab.UnsavedChanges) {
 
@@ -197,19 +208,47 @@ namespace UICatalog.Scenarios {
 				}
 
 				if (result == 0) {
-					tab.Save ();
+					if(tab.File == null) {
+						SaveAs ();
+					} else {
+						tab.Save ();
+					}
 				}
 			}
 
 			// close and dispose the tab
 			tv.RemoveTab (tab);
 			tab.View.Dispose ();
+			focusedTabView = tv;
 
 			if(tv.Tabs.Count == 0) {
 
 				var split = (TileView)tv.SuperView.SuperView;
+
+				// if it is the last TabView on screen don't drop it or we will
+				// be unable to open new docs!
+				if(split.IsRootTileView() && split.Tiles.Count == 1) {
+					return;
+				}
+
 				var tileIndex = split.IndexOf (tv);
 				split.RemoveTile (tileIndex);
+
+				if(split.Tiles.Count == 0) {
+					var parent = split.GetParentTileView ();
+
+					if (parent == null) {
+						return;
+					}
+
+					var idx = parent.IndexOf (split);
+
+					if (idx == -1) {
+						return;
+					}
+
+					parent.RemoveTile (idx);
+				}
 			}
 		}
 
@@ -239,15 +278,15 @@ namespace UICatalog.Scenarios {
 		/// <param name="fileInfo">File that was read or null if a new blank document</param>
 		private void Open (FileInfo fileInfo, string tabName)
 		{
-			var tab = new OpenedFile (tabView, tabName, fileInfo);
-			tabView.AddTab (tab, true);
+			var tab = new OpenedFile (focusedTabView, tabName, fileInfo);
+			focusedTabView.AddTab (tab, true);
 		}
 
 		public void Save ()
 		{
-			Save (tabView.SelectedTab);
+			Save (focusedTabView, focusedTabView.SelectedTab);
 		}
-		public void Save (TabView.Tab tabToSave)
+		public void Save (TabView tabViewToSave, TabView.Tab tabToSave)
 		{
 			var tab = tabToSave as OpenedFile;
 
@@ -260,12 +299,12 @@ namespace UICatalog.Scenarios {
 			}
 
 			tab.Save ();
-			tabView.SetNeedsDisplay ();
+			tabViewToSave.SetNeedsDisplay ();
 		}
 
 		public bool SaveAs ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
+			var tab = focusedTabView.SelectedTab as OpenedFile;
 
 			if (tab == null) {
 				return false;
@@ -275,6 +314,10 @@ namespace UICatalog.Scenarios {
 			Application.Run (fd);
 
 			if (string.IsNullOrWhiteSpace (fd.FilePath?.ToString ())) {
+				return false;
+			}
+			
+			if(fd.Canceled) {
 				return false;
 			}
 
