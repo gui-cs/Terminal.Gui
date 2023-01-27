@@ -153,6 +153,32 @@ namespace Terminal.Gui {
 
 			return toReturn;
 		}
+		public void RemoveTile (int idx)
+		{
+			var oldTiles = Tiles.ToArray ();
+			
+			if (idx < 0 || idx >= oldTiles.Length) {
+				return;
+			}
+
+			RebuildForTileCount (oldTiles.Length - 1);
+
+			for (int i = 0; i < tiles.Count; i++) {
+
+				int oldIdx = i >= idx ? i + 1: i;
+				var oldTile = oldTiles [oldIdx];
+
+				// remove the new empty View
+				Remove (tiles [i].View);
+
+				// restore old Tile and View
+				tiles [i] = oldTile;
+				Add (tiles [i].View);
+				
+			}
+			SetNeedsDisplay ();
+			LayoutSubviews ();
+		}
 
 		///<summary>
 		/// Returns the index of the first <see cref="Tile"/> in

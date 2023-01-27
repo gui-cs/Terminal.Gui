@@ -92,7 +92,7 @@ namespace UICatalog.Scenarios {
 
 				items = new MenuBarItem (new MenuItem [] {
 					new MenuItem ($"Save", "", () => Save(e.Tab)),
-					new MenuItem ($"Close", "", () => Close(e.Tab)),
+					new MenuItem ($"Close", "", () => Close(tv, e.Tab)),
 					null,
 					new MenuItem ($"Split Up", "", () => SplitUp(tv,t)),
 					new MenuItem ($"Split Down", "", () => SplitDown(tv,t)),
@@ -175,9 +175,10 @@ namespace UICatalog.Scenarios {
 
 		private void Close ()
 		{
-			Close (tabView.SelectedTab);
+			// TODO: Should be the tab view with focus not the root (first) one.
+			Close (tabView, tabView.SelectedTab);
 		}
-		private void Close (TabView.Tab tabToClose)
+		private void Close (TabView tv, TabView.Tab tabToClose)
 		{
 			var tab = tabToClose as OpenedFile;
 
@@ -201,8 +202,15 @@ namespace UICatalog.Scenarios {
 			}
 
 			// close and dispose the tab
-			tabView.RemoveTab (tab);
+			tv.RemoveTab (tab);
 			tab.View.Dispose ();
+
+			if(tv.Tabs.Count == 0) {
+
+				var split = (SplitView)tv.SuperView.SuperView;
+				var tileIndex = split.IndexOf (tv);
+				split.RemoveTile (tileIndex);
+			}
 		}
 
 		private void Open ()
@@ -219,6 +227,7 @@ namespace UICatalog.Scenarios {
 						return;
 					}
 
+					// TODO should open in focused TabView
 					Open (new FileInfo (path), Path.GetFileName (path));
 				}
 			}
