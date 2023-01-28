@@ -329,6 +329,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			// TODO: We are getting passed stale bounds, does this only happen in TileView
+			// or is it a larger problem? This line should not be required right?
+			bounds = Bounds;
+
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 			base.Redraw (bounds);
@@ -547,7 +551,7 @@ namespace Terminal.Gui {
 		}
 		private void Setup (Rect bounds)
 		{
-			if (bounds.IsEmpty) {
+			if (bounds.IsEmpty || bounds.Height <= 0 || bounds.Width <= 0) {
 				return;
 			}
 

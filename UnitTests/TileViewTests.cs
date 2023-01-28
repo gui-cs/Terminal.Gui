@@ -866,14 +866,26 @@ namespace UnitTests {
 		}
 
 		[Fact,AutoInitShutdown]
-		public void TestIsRoot_Yes()
+		public void TestNestedRoots_BothRoots_BothCanHaveBorders()
 		{
 			var tv  = new TileView{Width=10,Height=5,ColorScheme = new ColorScheme(),IntegratedBorder = BorderStyle.Single};
-			var tv2 = new TileView{Width=10,Height=5,ColorScheme = new ColorScheme(),IntegratedBorder = BorderStyle.Single,Orientation = Orientation.Horizontal};
+			var tv2 = new TileView{
+				Width=Dim.Fill(),Height=Dim.Fill(),
+				ColorScheme = new ColorScheme(),
+				IntegratedBorder = BorderStyle.Single,
+				Orientation = Orientation.Horizontal};
 			
 			Assert.True(tv.IsRootTileView());
+			tv.Tiles.ElementAt(1).View.Add(tv2);
 
-			tv.Tiles.ElementAt(0).View = tv2;
+			Application.Top.Add (tv);
+			tv.BeginInit();
+			tv.EndInit ();
+			tv.LayoutSubviews ();
+			
+			tv.LayoutSubviews ();
+			tv.Tiles.ElementAt(1).View.LayoutSubviews ();
+			tv2.LayoutSubviews ();
 
 			// tv2 is still considered a root because 
 			// it was manually created by API user.  That
@@ -881,11 +893,60 @@ namespace UnitTests {
 			// parents and it is permitted to have a border
 			Assert.True(tv2.IsRootTileView());
 
-			// TODO: Test that this draws correctly with nested borders
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+┌────┬───┐
+│    │┌─┐│
+│    │├─┤│
+│    │└─┘│
+└────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
 		}
 
-		// TODO: Add case showing no nested borders for child splits
-		// even when IntegratedBorder is set.
+		[Fact, AutoInitShutdown]
+		public void TestNestedNonRoots_OnlyOneRoot_OnlyRootCanHaveBorders ()
+		{
+			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+
+			tv.TrySplitTile (1, 2, out var tv2);
+			tv2.ColorScheme = new ColorScheme ();
+			tv2.IntegratedBorder = BorderStyle.Single; // will not be respected
+			tv2.Orientation = Orientation.Horizontal;
+			
+			Assert.True (tv.IsRootTileView ());
+
+			Application.Top.Add (tv);
+			tv.BeginInit ();
+			tv.EndInit ();
+			tv.LayoutSubviews ();
+
+			tv.LayoutSubviews ();
+			tv.Tiles.ElementAt (1).View.LayoutSubviews ();
+			tv2.LayoutSubviews ();
+
+			// tv2 is not considered a root because 
+			// it was created via TrySplitTile so it
+			// will have its lines joined to
+			// parent and cannot have its own border
+			Assert.False (tv2.IsRootTileView ());
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+┌────┬───┐
+│    │   │
+│    ├───┤
+│    │   │
+└────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
