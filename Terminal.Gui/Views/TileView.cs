@@ -13,9 +13,6 @@ namespace Terminal.Gui {
 
 		TileView parentTileView;
 
-		/// TODO: Might be able to make Border virtual and override here
-		/// To make this more API friendly
-
 		/// <summary>
 		/// Use this field instead of Border to create an integrated
 		/// Border in which lines connect with subviews and splitters
@@ -48,7 +45,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>
 			/// Title are not rendered for root level tiles if there is no
-			/// <see cref="TileView.IntegratedBorder"/> render into.
+			/// <see cref="TileView.IntegratedBorder"/> to render into.
 			///</remarks>
 			public string Title { get; set; }
 
@@ -120,7 +117,6 @@ namespace Terminal.Gui {
 		public void RebuildForTileCount (int count)
 		{
 			tiles = new List<Tile> ();
-			// TODO: keep these if growing
 			splitterDistances = new List<Pos> ();
 			splitterLines = new List<TileViewLineView> ();
 
@@ -226,12 +222,52 @@ namespace Terminal.Gui {
 
 		///<summary>
 		/// Returns the index of the first <see cref="Tile"/> in
-		/// <see cref="Tiles"/> which contains <paramref name="view"/>.
+		/// <see cref="Tiles"/> which contains <paramref name="toFind"/>.
 		///</summary>
-		public int IndexOf(View view)
+		public int IndexOf(View toFind, bool recursive = false)
 		{
-			// TODO: Could be recursive (i.e. search nested Subviews)
-			return tiles.IndexOf((t)=>t.View == view || t.View.Subviews.Contains(view));
+			for(int i = 0 ;i < tiles.Count; i++)
+			{
+				var v = tiles[i].View;
+
+				if(v == toFind)
+				{
+					return i;
+				}
+				
+				if(v.Subviews.Contains(toFind))
+				{
+					return i;
+				}
+
+				if(recursive)
+				{
+					if(RecursiveContains(v.Subviews,toFind))
+					{
+						return i;
+					}
+				}
+			}
+
+			return -1;
+		}
+
+		private bool RecursiveContains (IEnumerable<View> haystack, View needle)
+		{
+			foreach(var v in haystack)
+			{
+				if(v == needle)
+				{
+					return true;
+				}
+				
+				if(RecursiveContains(v.Subviews,needle))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>

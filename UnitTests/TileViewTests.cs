@@ -824,6 +824,46 @@ namespace UnitTests {
 			Assert.Null (tileView.RemoveTile (0));
 		}
 
+		[Theory,AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void TestTileView_IndexOf(bool recursive)
+		{
+			var tv = new TileView();
+			var lbl1 = new Label();
+			var lbl2 = new Label();
+			var frame = new FrameView();
+			var sub = new Label();
+			frame.Add(sub);
+
+			// IndexOf returns -1 when view not found
+			Assert.Equal(-1,tv.IndexOf(lbl1, recursive));
+			Assert.Equal(-1,tv.IndexOf(lbl2, recursive));
+
+			// IndexOf supports looking for Tile.View
+			Assert.Equal(0,tv.IndexOf(tv.Tiles.ElementAt(0).View, recursive));
+			Assert.Equal(1,tv.IndexOf(tv.Tiles.ElementAt(1).View, recursive));
+
+			// IndexOf supports looking for Tile.View.Subviews
+			tv.Tiles.ElementAt(0).View.Add(lbl1);
+			Assert.Equal(0,tv.IndexOf(lbl1, recursive));
+
+			tv.Tiles.ElementAt(1).View.Add(lbl2);
+			Assert.Equal(1,tv.IndexOf(lbl2, recursive));
+
+			// IndexOf supports looking deep into subviews only when
+			// the recursive true value is passed
+			tv.Tiles.ElementAt(1).View.Add(frame);
+			if(recursive)
+			{
+				Assert.Equal(1,tv.IndexOf(sub, recursive));
+			}
+			else
+			{
+				Assert.Equal(-1,tv.IndexOf(sub, recursive));
+			}
+		}
+
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
 		/// two (with horizontal splitter line).
