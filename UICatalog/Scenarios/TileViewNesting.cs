@@ -4,7 +4,7 @@ using Terminal.Gui.Graphs;
 using System.Linq;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Split View Nesting", Description: "Nest TileViews")]
+	[ScenarioMetadata (Name: "Tile View Nesting", Description: "Demonstrates recursive nesting of TileViews")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("LineView")]
 	public class TileViewNesting : Scenario {
@@ -105,7 +105,9 @@ namespace UICatalog.Scenarios {
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
 			root.Tiles.ElementAt(0).View.Add (CreateContentControl (1));
+			root.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View 1" : string.Empty;
 			root.Tiles.ElementAt (1).View.Add (CreateContentControl (2));
+			root.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View 2" : string.Empty;
 			
 
 			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
