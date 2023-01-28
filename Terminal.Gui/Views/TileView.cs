@@ -253,13 +253,6 @@ namespace Terminal.Gui {
 					contentArea.Y + 1,
 					Math.Max (0, contentArea.Width - 2),
 					Math.Max (0, contentArea.Height - 2));
-			} else if (HasAnyTitles () && IsRootTileView ()) {
-				// TODO: Bound with Max/Min
-				contentArea = new Rect (
-					contentArea.X,
-					contentArea.Y + 1,
-					contentArea.Width,
-					Math.Max (0, contentArea.Height - 1));
 			}
 
 			Setup (contentArea);
@@ -297,15 +290,14 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var childTitles = new List<ChildSplitterLine> ();
-
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 			base.Redraw (bounds);
 
 			var lc = new LineCanvas ();
 
-			var allLines = GetAllChildTileViewLineViewRecursively (this);
+			var allLines = GetAllLineViewsRecursively (this);
+			var allTitlesToRender = GetAllTitlesToRenderRecursively(this);
 
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
@@ -333,10 +325,6 @@ namespace Terminal.Gui {
 							origin.Y -= 1;
 						}
 						length += 2;
-
-						childTitles.Add (
-							new ChildSplitterLine (line));
-
 					}
 
 					lc.AddLine (origin, length, line.Orientation, IntegratedBorder);
@@ -351,26 +339,26 @@ namespace Terminal.Gui {
 				line.DrawSplitterSymbol ();
 			}
 
-			foreach (var child in childTitles) {
-				child.DrawTitles ();
-			}
-
 			// Draw Titles over Border
 
+			foreach(var titleToRender in allTitlesToRender)
+			{
+				var renderAt = titleToRender.GetLocalCoordinateForTitle(this);
 
-			for (int i = 0; i < tiles.Count; i++) {
+				if(renderAt.Y < 0)
+				{
+					// If we have no border then root level tiles
+					// have nowhere to render their titles.
+					continue;
+				}
 
-				var tile = tiles [i];
+				// TODO: Render with focus color if focused
 
-				if (tile.View.Visible && tile.Title.Length > 0) {
+				var title = titleToRender.Tile.Title;
 
-					var screen = i == 0 ?
-						ViewToScreen (new Rect (0, 0, bounds.Width, 1)) :
-						ViewToScreen (splitterLines [i - 1].Frame);
-
-
-					Driver.SetAttribute (tile.View.HasFocus ? ColorScheme.HotNormal : ColorScheme.Normal);
-					Driver.DrawWindowTitle (new Rect (screen.X, screen.Y, tile.View.Frame.Width, 0), tile.Title, 0, 0, 0, 0);
+				for(int i=0;i<title.Length;i++)
+				{
+					AddRune(renderAt.X+i,renderAt.Y,title[i]);
 				}
 			}
 		}
@@ -430,7 +418,7 @@ namespace Terminal.Gui {
 		}
 
 
-		private List<TileViewLineView> GetAllChildTileViewLineViewRecursively (View v)
+		private List<TileViewLineView> GetAllLineViewsRecursively (View v)
 		{
 			var lines = new List<TileViewLineView> ();
 
@@ -440,11 +428,42 @@ namespace Terminal.Gui {
 						lines.Add (s);
 					}
 				} else {
-					lines.AddRange (GetAllChildTileViewLineViewRecursively (sub));
+					lines.AddRange (GetAllLineViewsRecursively (sub));
 				}
 			}
 
 			return lines;
+		}
+
+		private List<TileTitleToRender> GetAllTitlesToRenderRecursively (TileView v, int depth = 0)
+		{
+			var titles = new List<TileTitleToRender> ();
+
+			foreach (var sub in v.Tiles) {
+
+				// Don't render titles for invisible stuff!
+				if(!sub.View.Visible)
+				{
+					continue;
+				}
+
+				if(sub.View is TileView subTileView)
+				{
+					// Panels with sub split tiles in them can never
+					// have their Titles rendered. Instead we dive in
+					// and pull up their children as titles
+					titles.AddRange (GetAllTitlesToRenderRecursively (subTileView,depth+1));
+				}
+				else
+				{
+					if(sub.Title.Length > 0)
+					{
+						titles.Add(new TileTitleToRender(sub,depth));
+					}
+				}
+			}
+
+			return titles;
 		}
 
 		/// <summary>
@@ -615,6 +634,30 @@ namespace Terminal.Gui {
 
 				availableSpace -= splitterLocation;
 				lastSplitterLocation = splitterLocation;
+			}
+		}
+
+		private class TileTitleToRender
+		{
+			public Tile Tile {get;}
+
+			public int Depth {get;}
+
+			public TileTitleToRender(Tile tile, int depth)
+			{
+				Tile = tile;
+				Depth = depth;				
+			}
+			
+			/// <summary>
+			/// Translates the <see cref="Tile"/> title location from its local
+			/// coordinate space <paramref name="intoCoordinateSpace"/>.
+			/// </summary>
+			public Point GetLocalCoordinateForTitle(TileView intoCoordinateSpace)
+			{
+				Tile.View.ViewToScreen(0,0, out var screenCol, out var screenRow);
+				screenRow--;
+				return intoCoordinateSpace.ScreenToView(screenCol,screenRow);
 			}
 		}
 

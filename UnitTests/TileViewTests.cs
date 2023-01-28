@@ -713,6 +713,28 @@ namespace UnitTests {
 			Assert.Equal(3,subSplit.Tiles.ElementAt(1).View.Frame.Height);
 			Assert.IsType<TextView>(subSplit.Tiles.ElementAt(1).View.Subviews.Single());
 		}
+		
+		[Fact,AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_WithTitledBorder_RendersNicely()
+		{
+			var tileView = GetNestedContainer3Right1Down (true,true);
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌T1───┬T2────┬T3───┐
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222│33333│
+│11111│222222├T4───┤
+│11111│222222│44444│
+│11111│222222│44444│
+│11111│222222│44444│
+└─────┴──────┴─────┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void TestNestedContainer3RightAnd1Down_WithBorder_RemovingTiles ()
@@ -827,7 +849,7 @@ namespace UnitTests {
 		/// </summary>
 		/// <param name="withBorder"></param>
 		/// <returns></returns>
-		private TileView GetNestedContainer3Right1Down(bool withBorder)
+		private TileView GetNestedContainer3Right1Down(bool withBorder, bool withTitles = false)
 		{
 			var container = 
 			new TileView (3)
@@ -845,6 +867,11 @@ namespace UnitTests {
 			foreach(var tile in container.Tiles.Take(2).Union(newContainer.Tiles))
 			{
 				i++;
+
+				if(withTitles)
+				{
+					tile.Title = "T"+i;
+				}
 
 				tile.View.Add(new TextView{
 					Width = Dim.Fill(),
