@@ -526,19 +526,19 @@ namespace Terminal.Gui {
 
 		static Colors ()
 		{
-			Init ();
+			ColorSchemes = Create ();
 		}
 
 		/// <summary>
-		/// Initializes the color schemes to their initial defaults.
+		/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
 		/// </summary>
-		public static void Init() 
+		public static Dictionary<string, ColorScheme> Create () 
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
-			ColorSchemes = typeof (Colors).GetProperties ()
+			return typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme()))
 				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase ());
 		}
 

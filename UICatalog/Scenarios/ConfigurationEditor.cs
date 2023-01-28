@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 					}
 
 					// Create empty config file
-					json = "{}";// ConfigurationManager.GetEmptyJson ();
+					json = ConfigurationManager.GetEmptyJson ();
 				} else {
 					json = File.ReadAllText (fileInfo.FullName);
 				}
