@@ -43,10 +43,13 @@ namespace Terminal.Gui {
 			public int MinSize { get; set; }
 
 			/// <summary>
-			/// The text that should be displayed above the <see cref="View"/>.  This will
-			/// either appear as content above <see cref="View"/> or superimposed over the
-			/// the parent <see cref="TileView.IntegratedBorder"/> (if it has one).
+			/// The text that should be displayed above the <see cref="View"/>.  This 
+			/// will appear over the splitter line or border (above the view client area).
 			/// </summary>
+			/// <remarks>
+			/// Title are not rendered for root level tiles if there is no
+			/// <see cref="TileView.IntegratedBorder"/> render into.
+			///</remarks>
 			public string Title { get; set; }
 
 			/// <summary>
