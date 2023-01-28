@@ -926,32 +926,6 @@ namespace Terminal.Gui {
 		{
 			return IntegratedBorder != BorderStyle.None;
 		}
-		private bool HasAnyTitles ()
-		{
-			return tiles.Any (t => t.Title.Length > 0);
-
-		}
-
-
-		private class ChildSplitterLine {
-
-			readonly TileViewLineView currentLine;
-			internal ChildSplitterLine (TileViewLineView currentLine)
-			{
-				this.currentLine = currentLine;
-			}
-
-			internal void DrawTitles ()
-			{
-				//TODO: Implement this
-				/*if(currentLine.Orientation == Orientation.Horizontal) 
-				{
-					var screenRect = currentLine.ViewToScreen (
-						new Rect(0,0,currentLine.Frame.Width,currentLine.Frame.Height));
-					Driver.DrawWindowTitle (screenRect, currentLine.Parent.View2Title, 0, 0, 0, 0);
-				}*/
-			}
-		}
 	}
 
 	/// <summary>

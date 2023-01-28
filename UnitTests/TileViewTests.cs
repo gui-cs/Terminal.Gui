@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -863,6 +864,28 @@ namespace UnitTests {
 				Assert.Equal(-1,tv.IndexOf(sub, recursive));
 			}
 		}
+
+		[Fact,AutoInitShutdown]
+		public void TestIsRoot_Yes()
+		{
+			var tv  = new TileView{Width=10,Height=5,ColorScheme = new ColorScheme(),IntegratedBorder = BorderStyle.Single};
+			var tv2 = new TileView{Width=10,Height=5,ColorScheme = new ColorScheme(),IntegratedBorder = BorderStyle.Single,Orientation = Orientation.Horizontal};
+			
+			Assert.True(tv.IsRootTileView());
+
+			tv.Tiles.ElementAt(0).View = tv2;
+
+			// tv2 is still considered a root because 
+			// it was manually created by API user.  That
+			// means it will not have its lines joined to
+			// parents and it is permitted to have a border
+			Assert.True(tv2.IsRootTileView());
+
+			// TODO: Test that this draws correctly with nested borders
+		}
+
+		// TODO: Add case showing no nested borders for child splits
+		// even when IntegratedBorder is set.
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
