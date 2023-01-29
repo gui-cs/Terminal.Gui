@@ -608,6 +608,10 @@ namespace Terminal.Gui {
 
 		private void HideSplittersBasedOnTileVisibility ()
 		{
+			if(splitterLines.Count == 0) {
+				return;
+			}
+
 			foreach(var line in splitterLines) {
 				line.Visible = true;
 			}
