@@ -1134,6 +1134,183 @@ namespace UnitTests {
 		}
 
 
+
+		[Fact, AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_TileVisibility_WithoutBorder ()
+		{
+			var tileView = GetNestedContainer3Right1Down (false);
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222├──────
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			tileView.Tiles.ElementAt (0).View.Visible = false;
+			tileView.Tiles.ElementAt (1).View.Visible = true;
+			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			 looksLike =
+@"
+2222222222222│333333
+2222222222222│333333
+2222222222222│333333
+2222222222222│333333
+2222222222222│333333
+2222222222222├──────
+2222222222222│444444
+2222222222222│444444
+2222222222222│444444
+2222222222222│444444";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			tileView.Tiles.ElementAt (0).View.Visible = true;
+			tileView.Tiles.ElementAt (1).View.Visible = false;
+			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111├──────
+1111111111111│444444
+1111111111111│444444
+1111111111111│444444
+1111111111111│444444";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			tileView.Tiles.ElementAt (0).View.Visible = true;
+			tileView.Tiles.ElementAt (1).View.Visible = true;
+			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			tileView.Tiles.ElementAt (0).View.Visible = true;
+			tileView.Tiles.ElementAt (1).View.Visible = false;
+			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			tileView.Tiles.ElementAt (0).View.Visible = false;
+			tileView.Tiles.ElementAt (1).View.Visible = true;
+			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			tileView.Tiles.ElementAt (0).View.Visible = false;
+			tileView.Tiles.ElementAt (1).View.Visible = false;
+			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+33333333333333333333
+33333333333333333333
+33333333333333333333
+33333333333333333333
+33333333333333333333
+────────────────────
+44444444444444444444
+44444444444444444444
+44444444444444444444
+44444444444444444444";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			tileView.Tiles.ElementAt (0).View.Visible = false;
+			tileView.Tiles.ElementAt (1).View.Visible = false;
+			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			looksLike =
+@"
+ ";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
+
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
 		/// two (with horizontal splitter line).
