@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
 				}
 
-				foreach (var line in allLines.Where (l => l.Visible)) {
+				foreach (var line in allLines) {
 					bool isRoot = splitterLines.Contains (line);
 
 					line.ViewToScreen (0, 0, out var x1, out var y1);
@@ -467,11 +467,13 @@ namespace Terminal.Gui {
 
 			foreach (var sub in v.Subviews) {
 				if (sub is TileViewLineView s) {
-					if (s.Parent.GetRootTileView () == this) {
+					if (s.Visible && s.Parent.GetRootTileView () == this) {
 						lines.Add (s);
 					}
 				} else {
-					lines.AddRange (GetAllLineViewsRecursively (sub));
+					if(sub.Visible) {
+						lines.AddRange (GetAllLineViewsRecursively (sub));
+					}
 				}
 			}
 
@@ -557,6 +559,7 @@ namespace Terminal.Gui {
 
 			RespectMinimumTileSizes ();
 
+
 			for (int i = 0; i < splitterLines.Count; i++) {
 				var line = splitterLines[i];
 
@@ -579,36 +582,77 @@ namespace Terminal.Gui {
 
 			}
 
-			for (int i = 0; i < tiles.Count; i++) {
-				var tile = tiles [i];
+			HideSplittersBasedOnTileVisibility ();
+
+			var visibleTiles = tiles.Where (t => t.View.Visible).ToArray ();
+			var visibleSplitterLines = splitterLines.Where (l => l.Visible).ToArray ();
+
+			for (int i = 0; i < visibleTiles.Length; i++) {
+				var tile = visibleTiles [i];
 
 				// TODO: Deal with lines being Visibility false
 
 				if (Orientation == Orientation.Vertical) {
-					tile.View.X = i == 0 ? bounds.X : Pos.Right (splitterLines [i - 1]);
+					tile.View.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
 					tile.View.Y = bounds.Y;
 					tile.View.Height = bounds.Height;					
-					tile.View.Width = GetTileWidthOrHeight(i, Bounds.Width);
+					tile.View.Width = GetTileWidthOrHeight(i, Bounds.Width, visibleTiles,visibleSplitterLines);
 				} else {
 					tile.View.X = bounds.X;
-					tile.View.Y = i == 0 ? 0 : Pos.Bottom (splitterLines [i - 1]);
+					tile.View.Y = i == 0 ? 0 : Pos.Bottom (visibleSplitterLines [i - 1]);
 					tile.View.Width = bounds.Width;
-					tile.View.Height = GetTileWidthOrHeight(i, Bounds.Height);
+					tile.View.Height = GetTileWidthOrHeight(i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
 			}
 		}
 
-		private Dim GetTileWidthOrHeight (int i, int space)
+		private void HideSplittersBasedOnTileVisibility ()
+		{
+			foreach(var line in splitterLines) {
+				line.Visible = true;
+			}
+
+			for(int i=0;i<tiles.Count;i++) {
+				if (!tiles [i].View.Visible) {
+
+					// when a tile is not visible, prefer hiding
+					// the splitter on it's left
+					var candidate = splitterLines [Math.Max (0, i - 1)];
+
+					// unless that splitter is already hidden
+					// e.g. when hiding panels 0 and 1 of a 3 panel 
+					// container
+					if (candidate.Visible) {
+						candidate.Visible = false;
+					}
+					else {
+						splitterLines [Math.Min(i,splitterLines.Count-1)].Visible = false;
+					}
+					
+					
+				}
+			}
+		}
+
+		private Dim GetTileWidthOrHeight (int i, int space, Tile[] visibleTiles, TileViewLineView [] visibleSplitterLines)
 		{
 			// last tile
-			if(i + 1 >= tiles.Count)
+			if(i + 1 >= visibleTiles.Length)
 			{
 				return Dim.Fill (HasBorder () ? 1 : 0);
 			}
-			var nextSplitter = splitterDistances [i].Anchor (space);
-			var lastSplitter = i >= 1 ? splitterDistances [i-1].Anchor (space) : 0;
 
-			var distance = nextSplitter - lastSplitter;
+			var nextSplitter = visibleSplitterLines [i];
+			var nextSplitterPos = Orientation == Orientation.Vertical ?
+				nextSplitter.X : nextSplitter.Y;
+			var nextSplitterDistance = nextSplitterPos.Anchor (space);
+
+			var lastSplitter = i >= 1 ? visibleSplitterLines [i-1]:null;
+			var lastSplitterPos = Orientation == Orientation.Vertical ?
+				lastSplitter?.X : lastSplitter?.Y;
+			var lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
+
+			var distance = nextSplitterDistance - lastSplitterDistance;
 
 			if(i>0) {
 				return distance - 1;
