@@ -66,7 +66,12 @@ namespace Terminal.Gui.Configuration {
 		/// attribute value.
 		/// </summary>
 		public static SettingsScope? Settings {
-			get => _settings ?? new SettingsScope ();
+			get {
+				if (_settings == null) {
+					throw new InvalidOperationException ("ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property.");
+				}
+				return _settings;
+			}
 			set {
 				_settings = value!;
 
@@ -339,11 +344,29 @@ namespace Terminal.Gui.Configuration {
 		/// The values are instances of <see cref="ConfigProperty"/> which hold the property's value and the
 		/// <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
 		/// </summary>
+		/// <remarks>
+		/// Is <see langword="null"/> until <see cref="Initialize"/> is called. 
+		/// </remarks>
 		private static Dictionary<string, ConfigProperty>? _allConfigProperties;
+
+		/// <summary>
+		/// The backing property for <see cref="Settings"/>. 
+		/// </summary>
+		/// <remarks>
+		/// Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by
+		/// deserializtion (see <see cref="Load"/>).
+		/// </remarks>
 		private static SettingsScope? _settings;
 
-		private static Dictionary<string, ConfigProperty> getConfigProperties ()
+		/// <summary>
+		/// Initializes the internal state of ConfiguraitonManager. Nominally called once as part of application
+		/// startup to initilaize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
+		/// </summary>
+		internal static void Initialize ()
 		{
+			_allConfigProperties = new Dictionary<string, ConfigProperty> ();
+			_settings = null;
+			
 			Dictionary<string, Type> classesWithConfigProps = new Dictionary<string, Type> (StringComparer.InvariantCultureIgnoreCase);
 			foreach (Type classWithConfig in typeof (ConfigurationManager).Assembly.ExportedTypes
 				.Where (myType => myType.IsClass &&
@@ -356,7 +379,6 @@ namespace Terminal.Gui.Configuration {
 			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} clases:");
 			classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
 
-			Dictionary<string, ConfigProperty> configProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
 			foreach (var p in from c in classesWithConfigProps
 					  let props = c.Value.GetProperties (BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where (prop =>
 						prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
@@ -366,7 +388,7 @@ namespace Terminal.Gui.Configuration {
 				if (p.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp) {
 					if (p.GetGetMethod (true)!.IsStatic) {
 						// If the class name is ommited, JsonPropertyName is allowed. 
-						configProperties.Add (scp.OmitClassName ? ConfigProperty.GetJsonPropertyName (p) : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
+						_allConfigProperties!.Add (scp.OmitClassName ? ConfigProperty.GetJsonPropertyName (p) : $"{p.DeclaringType?.Name}.{p.Name}", new ConfigProperty {
 							PropertyInfo = p,
 							PropertyValue = null
 						});
@@ -376,12 +398,10 @@ namespace Terminal.Gui.Configuration {
 				}
 			}
 
-			configProperties = configProperties.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
+			_allConfigProperties = _allConfigProperties!.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
 
-			Debug.WriteLine ($"ConfigManager.getConfigProperties found {configProperties.Count} properties:");
-			configProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
-
-			return configProperties;
+			Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
+			_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
 		}
 
 		/// <summary>
@@ -419,17 +439,22 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Resets the state of <see cref="ConfigurationManager"/>. 
+		/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
+		/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called intenrally by <see cref="Load"/>,
 		/// </summary>
+		/// <remarks>
+		/// 
+		/// </remarks>
 		internal static void Reset ()
 		{
+			if (_allConfigProperties == null) {
+				ConfigurationManager.Initialize ();
+			}
+
 			Debug.WriteLine ($"ConfigurationManager.Reset()");
 			Settings = new SettingsScope ();
 			ThemeManager.Reset ();
 
-			if (_allConfigProperties == null) {
-				_allConfigProperties = getConfigProperties ();
-			}
 
 			// To enable some unit tests, we only load from resources if the flag is set
 			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
@@ -637,10 +662,12 @@ namespace Terminal.Gui.Configuration {
 		public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
 
 		/// <summary>
-		/// Loads all settings found in the various locations to the <see cref="ConfigurationManager"/>. 
+		/// Resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults 
+		/// defined in <see cref="LoadAppResources"/>
+		/// then loads all settings found in the various locations to the <see cref="ConfigurationManager"/>. 
 		/// </summary>
 		/// <remarks>
-		/// Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application
+		/// Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
 		/// </remarks>
 		public static void Load ()
 		{

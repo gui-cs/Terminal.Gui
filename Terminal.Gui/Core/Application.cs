@@ -226,6 +226,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Disable or enable the mouse. The mouse is enabled by default.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool IsMouseDisabled { get; set; }
 
 		/// <summary>

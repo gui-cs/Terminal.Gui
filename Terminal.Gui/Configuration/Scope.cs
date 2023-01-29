@@ -20,7 +20,6 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			public Scope ()
 			{
-				ConfigurationManager._allConfigProperties ??= getConfigProperties ();
 				var props = ConfigurationManager._allConfigProperties.Where (cp =>
 					(cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty))
 					as SerializableConfigurationProperty)?.Scope == this.GetType ());

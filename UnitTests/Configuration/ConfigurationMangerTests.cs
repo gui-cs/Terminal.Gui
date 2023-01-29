@@ -198,13 +198,84 @@ namespace Terminal.Gui.ConfigurationTests {
 		}
 
 		[Fact]
-		public void TestReset()
+		public void UseWithoutResetAsserts ()
+		{
+			ConfigurationManager.Initialize ();
+			Assert.Throws<InvalidOperationException> (() => _ = ConfigurationManager.Settings);
+		}
+
+		[Fact]
+		public void Reset_Resets()
 		{
 			ConfigurationManager.Reset ();
 			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 		}
+
+		[Fact]
+		public void Reset_and_LoadWithLibraryResourcesOnly_are_same ()
+		{
+			// arrange
+			ConfigurationManager.Reset ();
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings.Apply ();
+
+			// assert apply worked
+			Assert.Equal (Key.Q, Application.QuitKey);
+			Assert.Equal (Key.F, Application.AlternateForwardKey);
+			Assert.Equal (Key.B, Application.AlternateBackwardKey);
+			Assert.True (Application.UseSystemConsole);
+			Assert.True (Application.IsMouseDisabled);
+			Assert.True (Application.HeightAsBuffer);
+
+			//act
+			ConfigurationManager.Reset ();
+
+			// assert
+			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
+			Assert.NotEmpty (ConfigurationManager.Themes);
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.False (Application.UseSystemConsole);
+			Assert.False (Application.IsMouseDisabled);
+			Assert.False (Application.HeightAsBuffer);
+
+			// arrange
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings.Apply ();
+
+
+			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+
+			// act
+			ConfigurationManager.Load ();
+
+			// assert
+			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
+			Assert.NotEmpty (ConfigurationManager.Themes);
+			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.False (Application.UseSystemConsole);
+			Assert.False (Application.IsMouseDisabled);
+			Assert.False (Application.HeightAsBuffer);
+
+		}
+
 
 		[Fact]
 		public void TestConfigProperties ()
