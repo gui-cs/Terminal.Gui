@@ -12,7 +12,7 @@ using static Terminal.Gui.Configuration.ConfigurationManager;
 namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationMangerTests {
 
-		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
+		public static readonly JsonSerializerOptions _jsonOptions = new() {
 			Converters = {
 				new AttributeJsonConverter (),
 				new ColorJsonConverter (),

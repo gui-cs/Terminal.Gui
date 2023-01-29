@@ -19,11 +19,11 @@ namespace Terminal.Gui.Configuration {
 		///  },
 		/// </code></example>
 		/// <remarks>
-		/// The nested class <see cref="ConfigScopeConverter{rootT}"/> Does all the heavy lifting for serialization 
+		/// The nested class <see cref="ScopeJsonConverter{rootT}"/> Does all the heavy lifting for serialization 
 		/// of the <see cref="SettingsScope"/> object. Uses reflection to determine
 		/// how to serialize properties based on their type (and [JsonConverter] attributes). 
 		/// </remarks>
-		[JsonConverter (typeof (ConfigScopeConverter<SettingsScope>))]
+		[JsonConverter (typeof (ScopeJsonConverter<SettingsScope>))]
 		public class SettingsScope : Scope {
 
 			/// <summary>

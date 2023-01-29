@@ -50,7 +50,7 @@ namespace Terminal.Gui.Configuration {
 		/// 		}
 		/// 	}
 		/// </code></example> 
-		[JsonConverter (typeof (ConfigScopeConverter<ThemeScope>))]
+		[JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 		public class ThemeScope : Scope {
 			/// <summary>
 			/// Event arguments for the <see cref="ThemeManager"/> events.
@@ -116,7 +116,7 @@ namespace Terminal.Gui.Configuration {
 		/// 	}
 		/// </code></example> 
 		public class ThemeManager : IDictionary<string, ThemeScope> {
-			private static ThemeManager _instance = new ThemeManager ();
+			private static readonly ThemeManager _instance = new ThemeManager ();
 			static ThemeManager () { } // Make sure it's truly lazy
 			private ThemeManager () { } // Prevent instantiation outside
 
@@ -129,7 +129,7 @@ namespace Terminal.Gui.Configuration {
 			private static Dictionary<string, ThemeScope>? themes;
 
 			/// <summary>
-			/// The currently selected theme. 
+			/// The currently selected theme. This is the internal version; see <see cref="Theme"/>.
 			/// </summary>
 			[JsonInclude, SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("Theme")]
 			internal static string SelectedTheme {
@@ -138,7 +138,7 @@ namespace Terminal.Gui.Configuration {
 					var oldTheme = theme;
 					theme = value;
 					if (oldTheme != theme && themes != null && themes.ContainsKey (theme)) {
-						ConfigurationManager.Settings ["Theme"].PropertyValue = theme;
+						ConfigurationManager.Settings! ["Theme"].PropertyValue = theme;
 						Instance.OnThemeChanged (oldTheme);
 						//Instance.Apply ();
 					}
@@ -146,13 +146,16 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <summary>
-			/// 
+			/// Gets or sets the currently selected theme. The value is persisted to the "Theme"
+			/// property.
 			/// </summary>
 			[JsonIgnore]
+#pragma warning disable CA1822 // Mark members as static
 			public string Theme {
-				get => SelectedTheme;
+#pragma warning restore CA1822 // Mark members as static
+				get => ThemeManager.SelectedTheme;
 				set {
-					SelectedTheme = value;
+					ThemeManager.SelectedTheme = value;
 				}
 			}
 
@@ -175,7 +178,7 @@ namespace Terminal.Gui.Configuration {
 			/// <summary>
 			/// Holds the <see cref="ThemeScope"/> definitions. 
 			/// </summary>
-			[JsonInclude, JsonConverter (typeof (DictionaryConverter<ThemeScope>))]
+			[JsonInclude, JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
 			[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
 			public static Dictionary<string, ThemeScope>? Themes {
 				get => themes ?? new Dictionary<string, ThemeScope> ();
@@ -183,7 +186,7 @@ namespace Terminal.Gui.Configuration {
 					if (themes == null || value == null) {
 						themes = value;
 					} else {
-						themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value, themes);
+						themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
 					}
 				}
 			}
@@ -243,69 +246,69 @@ namespace Terminal.Gui.Configuration {
 
 			#region IDictionary
 			/// <inheritdoc/>
-			public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes).Keys;
+			public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes!).Keys;
 			/// <inheritdoc/>
-			public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes).Values;
+			public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes!).Values;
 			/// <inheritdoc/>
-			public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Count;
+			public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Count;
 			/// <inheritdoc/>
-			public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).IsReadOnly;
+			public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).IsReadOnly;
 			/// <inheritdoc/>
-			public ThemeScope this [string key] { get => ((IDictionary<string, ThemeScope>)Themes) [key]; set => ((IDictionary<string, ThemeScope>)Themes) [key] = value; }
+			public ThemeScope this [string key] { get => ((IDictionary<string, ThemeScope>)Themes!) [key]; set => ((IDictionary<string, ThemeScope>)Themes!) [key] = value; }
 			/// <inheritdoc/>
 			public void Add (string key, ThemeScope value)
 			{
-				((IDictionary<string, ThemeScope>)Themes).Add (key, value);
+				((IDictionary<string, ThemeScope>)Themes!).Add (key, value);
 			}
 			/// <inheritdoc/>
 			public bool ContainsKey (string key)
 			{
-				return ((IDictionary<string, ThemeScope>)Themes).ContainsKey (key);
+				return ((IDictionary<string, ThemeScope>)Themes!).ContainsKey (key);
 			}
 			/// <inheritdoc/>
 			public bool Remove (string key)
 			{
-				return ((IDictionary<string, ThemeScope>)Themes).Remove (key);
+				return ((IDictionary<string, ThemeScope>)Themes!).Remove (key);
 			}
 			/// <inheritdoc/>
 			public bool TryGetValue (string key, out ThemeScope value)
 			{
-				return ((IDictionary<string, ThemeScope>)Themes).TryGetValue (key, out value!);
+				return ((IDictionary<string, ThemeScope>)Themes!).TryGetValue (key, out value!);
 			}
 			/// <inheritdoc/>
 			public void Add (KeyValuePair<string, ThemeScope> item)
 			{
-				((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Add (item);
+				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Add (item);
 			}
 			/// <inheritdoc/>
 			public void Clear ()
 			{
-				((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Clear ();
+				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Clear ();
 			}
 			/// <inheritdoc/>
 			public bool Contains (KeyValuePair<string, ThemeScope> item)
 			{
-				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Contains (item);
+				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Contains (item);
 			}
 			/// <inheritdoc/>
 			public void CopyTo (KeyValuePair<string, ThemeScope> [] array, int arrayIndex)
 			{
-				((ICollection<KeyValuePair<string, ThemeScope>>)Themes).CopyTo (array, arrayIndex);
+				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).CopyTo (array, arrayIndex);
 			}
 			/// <inheritdoc/>
 			public bool Remove (KeyValuePair<string, ThemeScope> item)
 			{
-				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Remove (item);
+				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Remove (item);
 			}
 			/// <inheritdoc/>
 			public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator ()
 			{
-				return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes).GetEnumerator ();
+				return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes!).GetEnumerator ();
 			}
 
 			IEnumerator IEnumerable.GetEnumerator ()
 			{
-				return ((IEnumerable)Themes).GetEnumerator ();
+				return ((IEnumerable)Themes!).GetEnumerator ();
 			}
 			#endregion
 		}

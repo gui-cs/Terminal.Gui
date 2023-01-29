@@ -32,7 +32,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal ("Default", ConfigurationManager.Settings ["Theme"].PropertyValue as string);
 
 			Assert.True (ConfigurationManager.Settings ["Themes"].PropertyValue is Dictionary<string, ConfigurationManager.ThemeScope>);
-			Assert.Equal (1, ((Dictionary<string, ConfigurationManager.ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue).Count);
+			Assert.Single (((Dictionary<string, ConfigurationManager.ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue));
 
 		}
 
@@ -65,6 +65,22 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.True (Application.IsMouseDisabled);
 			Assert.True (Application.HeightAsBuffer);
 		}
+
+		//[Fact]
+		//public void Apply_FiresApplied ()
+		//{
+		//	ConfigurationManager.Reset ();
+
+		//	ConfigurationManager.Applied += (object sender, EventArgs e) => {
+		//		// assert
+		//		Assert.Equal (Key.Q, Application.QuitKey);
+		//		Assert.Equal (Key.F, Application.AlternateForwardKey);
+		//		Assert.Equal (Key.B, Application.AlternateBackwardKey);
+		//		Assert.True (Application.UseSystemConsole);
+		//		Assert.True (Application.IsMouseDisabled);
+		//		Assert.True (Application.HeightAsBuffer);
+		//	};
+		//}
 
 		//[Fact, AutoInitShutdown]
 		//public void CopyUpdatedProperitesFrom_ShouldCopyChangedPropertiesOnly ()
