@@ -60,7 +60,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center () + 5,
 				Checked = labelH.AutoSize = labelV.AutoSize
 			};
-			ckbAutoSize.Toggled += (_) => labelH.AutoSize = labelV.AutoSize = ckbAutoSize.Checked;
+			ckbAutoSize.Toggled += (_) => labelH.AutoSize = labelV.AutoSize = (bool)ckbAutoSize.Checked;
 			Win.Add (ckbAutoSize);
 
 			var ckbPreserveTrailingSpaces = new CheckBox ("Preserve Trailing Spaces") {
@@ -69,7 +69,7 @@ namespace UICatalog.Scenarios {
 				Checked = labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces
 			};
 			ckbPreserveTrailingSpaces.Toggled += (_) =>
-					labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = ckbPreserveTrailingSpaces.Checked;
+					labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = (bool)ckbPreserveTrailingSpaces.Checked;
 			Win.Add (ckbPreserveTrailingSpaces);
 
 			var ckbWideText = new CheckBox ("Use wide runes") {
@@ -77,7 +77,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center () + 9
 			};
 			ckbWideText.Toggled += (_) => {
-				if (ckbWideText.Checked) {
+				if (ckbWideText.Checked == true) {
 					labelH.Text = labelV.Text = editText.Text = wideText;
 					labelH.Width = 14;
 					labelV.Height = 13;

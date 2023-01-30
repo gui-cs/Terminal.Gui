@@ -148,7 +148,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label) + 2
 			};
 			ckbEffect3D.Toggled += (e) => {
-				border.Effect3D = !e;
+				border.Effect3D = (bool)!e;
 			};
 			frame.Add (ckbEffect3D);
 

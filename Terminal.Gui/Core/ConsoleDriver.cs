@@ -1078,6 +1078,11 @@ namespace Terminal.Gui {
 		public Rune UnChecked = '\u2574';
 
 		/// <summary>
+		/// Null-checked checkmark.
+		/// </summary>
+		public Rune NullChecked = '\u2370';
+
+		/// <summary>
 		/// Selected mark.
 		/// </summary>
 		public Rune Selected = '\u25cf';

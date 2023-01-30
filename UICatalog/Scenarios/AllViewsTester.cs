@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 			Application.Init ();
 			// Don't create a sub-win; just use Applicatiion.Top
 		}
-		
+
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 			_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
 			_computedCheckBox.Toggled += (previousState) => {
 				if (_curView != null) {
-					_curView.LayoutStyle = previousState ? LayoutStyle.Absolute : LayoutStyle.Computed;
+					_curView.LayoutStyle = previousState == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
 				}
 			};

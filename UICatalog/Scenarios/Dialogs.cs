@@ -92,7 +92,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (numButtonsEdit);
 
-			var glyphsNotWords = new CheckBox ($"Add {Char.ConvertFromUtf32(CODE_POINT)} to button text to stress wide char support", false) {
+			var glyphsNotWords = new CheckBox ($"Add {Char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support", false) {
 				X = Pos.Left (numButtonsEdit),
 				Y = Pos.Bottom (label),
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
@@ -115,7 +115,7 @@ namespace UICatalog.Scenarios {
 			void Top_Loaded ()
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-					+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height(glyphsNotWords) + 2;
+					+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height (glyphsNotWords) + 2;
 				Application.Top.Loaded -= Top_Loaded;
 			}
 			Application.Top.Loaded += Top_Loaded;
@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 					for (int i = 0; i < numButtons; i++) {
 						int buttonId = i;
 						Button button = null;
-						if (glyphsNotWords.Checked) {
+						if (glyphsNotWords.Checked == true) {
 							buttonId = i;
 							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
 								is_default: buttonId == 0);
@@ -196,7 +196,7 @@ namespace UICatalog.Scenarios {
 					add.Clicked += () => {
 						var buttonId = buttons.Count;
 						Button button;
-						if (glyphsNotWords.Checked) {
+						if (glyphsNotWords.Checked == true) {
 							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
 								is_default: buttonId == 0);
 						} else {
@@ -216,7 +216,7 @@ namespace UICatalog.Scenarios {
 					};
 					dialog.Add (add);
 
-					var addChar = new Button ($"Add a {Char.ConvertFromUtf32(CODE_POINT)} to each button") {
+					var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
 						X = Pos.Center (),
 						Y = Pos.Center () + 1
 					};
