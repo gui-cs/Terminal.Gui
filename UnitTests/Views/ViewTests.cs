@@ -4215,7 +4215,7 @@ cccccccccccccccccccc", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_Using_Frame ()
+		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 		{
 			var label = new Label ("At 0,0");
 			var view = new DerivedView () {
@@ -4246,7 +4246,7 @@ At 0,0
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_Using_Pos_Dim ()
+		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 		{
 			var label = new Label ("At 0,0");
 			var view = new DerivedView () {
@@ -4281,7 +4281,7 @@ At 0,0
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_Using_Frame ()
+		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 		{
 			var label = new Label ("At 0,0");
 			var view = new DerivedView () {
@@ -4314,7 +4314,7 @@ At 0,0
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_Using_Pos_Dim ()
+		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 		{
 			var label = new Label ("At 0,0");
 			var view = new DerivedView () {
@@ -4348,6 +4348,146 @@ At 0,0
  A text wit                  
   A text with some long width
    and also with two lines.  ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+		{
+			var label = new Label ("At 0,0");
+			var view = new DerivedView () {
+				X = 2,
+				Y = 2,
+				Width = 30,
+				Height = 2,
+				Text = "A text with some long width\n and also with two lines."
+			};
+			var top = Application.Top;
+			top.Add (label, view);
+			Application.Begin (top);
+
+			view.CorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  ", output);
+
+			view.Frame = new Rect (3, 3, 10, 1);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
+			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
+			view.CorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0       
+             
+             
+   A text wit", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+		{
+			var label = new Label ("At 0,0");
+			var view = new DerivedView () {
+				X = 2,
+				Y = 2,
+				Width = 30,
+				Height = 2,
+				Text = "A text with some long width\n and also with two lines."
+			};
+			var top = Application.Top;
+			top.Add (label, view);
+			Application.Begin (top);
+
+			view.CorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  ", output);
+
+			view.X = 3;
+			view.Y = 3;
+			view.Width = 10;
+			view.Height = 1;
+			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
+			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
+			view.CorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0       
+             
+             
+   A text wit", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+		{
+			var label = new Label ("At 0,0");
+			var view = new DerivedView () {
+				X = 2,
+				Y = 2,
+				Width = 30,
+				Height = 2,
+				Text = "A text with some long width\n and also with two lines."
+			};
+			var top = Application.Top;
+			top.Add (label, view);
+			Application.Begin (top);
+
+			view.IncorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  ", output);
+
+			view.Frame = new Rect (3, 3, 10, 1);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
+			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
+			view.IncorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   A text witith two lines.  ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+		{
+			var label = new Label ("At 0,0");
+			var view = new DerivedView () {
+				X = 2,
+				Y = 2,
+				Width = 30,
+				Height = 2,
+				Text = "A text with some long width\n and also with two lines."
+			};
+			var top = Application.Top;
+			top.Add (label, view);
+			Application.Begin (top);
+
+			view.IncorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  ", output);
+
+			view.X = 3;
+			view.Y = 3;
+			view.Width = 10;
+			view.Height = 1;
+			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
+			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
+			view.IncorrectRedraw (view.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0                       
+                             
+  A text with some long width
+   A text witith two lines.  ", output);
 		}
 	}
 }
