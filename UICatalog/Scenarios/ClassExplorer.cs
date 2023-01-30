@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 					highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "", () => OnCheckHighlightModelTextOnly()) {
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				}) 
+				})
 			});
 			Application.Top.Add (menu);
 
@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 
 		private BindingFlags GetFlags ()
 		{
-			if (miShowPrivate.Checked) {
+			if (miShowPrivate.Checked == true) {
 				return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 			}
 

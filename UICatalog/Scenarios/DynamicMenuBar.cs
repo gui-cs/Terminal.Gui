@@ -42,6 +42,7 @@ namespace UICatalog.Scenarios {
 			public bool hasSubMenu;
 			public MenuItemCheckStyle checkStyle;
 			public ustring shortcut;
+			public bool allowNullChecked;
 
 			public DynamicMenuItem () { }
 
@@ -51,7 +52,7 @@ namespace UICatalog.Scenarios {
 				this.hasSubMenu = hasSubMenu;
 			}
 
-			public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortcut = null)
+			public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortcut = null, bool allowNullChecked = false)
 			{
 				this.title = title;
 				this.help = help;
@@ -60,6 +61,7 @@ namespace UICatalog.Scenarios {
 				this.hasSubMenu = hasSubMenu;
 				this.checkStyle = checkStyle;
 				this.shortcut = shortcut;
+				this.allowNullChecked = allowNullChecked;
 			}
 		}
 
@@ -564,6 +566,7 @@ namespace UICatalog.Scenarios {
 						newMenu.CheckType = item.checkStyle;
 						newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
 						newMenu.Shortcut = ShortcutHelper.GetShortcutFromTag (item.shortcut);
+						newMenu.AllowNullChecked = item.allowNullChecked;
 					} else if (item.isTopLevel) {
 						newMenu = new MenuBarItem (item.title, item.help, null);
 						newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
@@ -635,6 +638,7 @@ namespace UICatalog.Scenarios {
 			public TextView _txtAction;
 			public CheckBox _ckbIsTopLevel;
 			public CheckBox _ckbSubMenu;
+			public CheckBox _ckbNullCheck;
 			public RadioGroup _rbChkStyle;
 			public TextField _txtShortcut;
 
@@ -699,6 +703,12 @@ namespace UICatalog.Scenarios {
 					Checked = _menuItem == null ? !hasParent : HasSubMenus (_menuItem)
 				};
 				Add (_ckbSubMenu);
+
+				_ckbNullCheck = new CheckBox ("Allow null checked") {
+					X = Pos.Left (_lblTitle),
+					Y = Pos.Bottom (_ckbSubMenu)
+				};
+				Add (_ckbNullCheck);
 
 				var _rChkLabels = new ustring [] { "NoCheck", "Checked", "Radio" };
 				_rbChkStyle = new RadioGroup (_rChkLabels) {
@@ -825,6 +835,11 @@ namespace UICatalog.Scenarios {
 						_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
 					}
 				};
+				_ckbNullCheck.Toggled += (e) => {
+					if (_menuItem != null) {
+						_menuItem.AllowNullChecked = (bool)_ckbNullCheck.Checked;
+					}
+				};
 
 				//Add (_frmMenuDetails);
 
@@ -842,6 +857,7 @@ namespace UICatalog.Scenarios {
 					_txtAction.Text = m.action;
 					_ckbIsTopLevel.Checked = false;
 					_ckbSubMenu.Checked = !hasParent;
+					_ckbNullCheck.Checked = false;
 					_txtHelp.Enabled = hasParent;
 					_txtAction.Enabled = hasParent;
 					_txtShortcut.Enabled = hasParent;
@@ -880,7 +896,7 @@ namespace UICatalog.Scenarios {
 						_ckbSubMenu != null ? (bool)_ckbSubMenu.Checked : false,
 						_rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
 						_rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked : MenuItemCheckStyle.Radio,
-						_txtShortcut.Text);
+						_txtShortcut.Text, (bool)_ckbNullCheck.Checked);
 				} else {
 					return null;
 				}
@@ -903,6 +919,7 @@ namespace UICatalog.Scenarios {
 				_txtAction.Text = menuItem != null && menuItem.Action != null ? GetTargetAction (menuItem.Action) : ustring.Empty;
 				_ckbIsTopLevel.Checked = IsTopLevel (menuItem);
 				_ckbSubMenu.Checked = HasSubMenus (menuItem);
+				_ckbNullCheck.Checked = menuItem.AllowNullChecked;
 				_txtHelp.Enabled = (bool)!_ckbSubMenu.Checked;
 				_txtAction.Enabled = (bool)!_ckbSubMenu.Checked;
 				_rbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
@@ -963,7 +980,7 @@ namespace UICatalog.Scenarios {
 				case MenuItemCheckStyle.NoCheck:
 					return new Action (() => MessageBox.ErrorQuery (item.title, item.action, "Ok"));
 				case MenuItemCheckStyle.Checked:
-					return new Action (() => menuItem.Checked = !menuItem.Checked);
+					return new Action (menuItem.ToggleChecked);
 				case MenuItemCheckStyle.Radio:
 					break;
 				}

@@ -178,7 +178,7 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-				
+
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
@@ -330,7 +330,7 @@ namespace UICatalog {
 				miIsMouseDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMouseDisabled.Title.ToString ().Substring (1, 1) [0];
 				miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMouseDisabled.Action += () => {
-					miIsMouseDisabled.Checked = Application.IsMouseDisabled = !miIsMouseDisabled.Checked;
+					miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked;
 				};
 				menuItems.Add (miIsMouseDisabled);
 
@@ -363,7 +363,7 @@ namespace UICatalog {
 				miHeightAsBuffer.CheckType |= MenuItemCheckStyle.Checked;
 				miHeightAsBuffer.Action += () => {
 					miHeightAsBuffer.Checked = !miHeightAsBuffer.Checked;
-					Application.HeightAsBuffer = miHeightAsBuffer.Checked;
+					Application.HeightAsBuffer = (bool)miHeightAsBuffer.Checked;
 				};
 				menuItems.Add (miHeightAsBuffer);
 
@@ -392,10 +392,10 @@ namespace UICatalog {
 					}
 					item.Action += () => {
 						var t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
-						if (item.Title == t && !item.Checked) {
+						if (item.Title == t && item.Checked == false) {
 							_diagnosticFlags &= ~(ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
 							item.Checked = true;
-						} else if (item.Title == t && item.Checked) {
+						} else if (item.Title == t && item.Checked == true) {
 							_diagnosticFlags |= (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
 							item.Checked = false;
 						} else {

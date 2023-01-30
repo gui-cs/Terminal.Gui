@@ -90,7 +90,7 @@ namespace UICatalog.Scenarios {
 				Checked = false
 			};
 			allowMultiSelection.Action = () => allowMultiSelection.Checked = _listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
-			allowMultiSelection.CanExecute = () => allowMarking.Checked;
+			allowMultiSelection.CanExecute = () => (bool)allowMarking.Checked;
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Configure", new MenuItem [] {
@@ -156,7 +156,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_listView) + 2,
 				Y = 1, // for menu
-				Width = Dim.Percent	 (50),
+				Width = Dim.Percent (50),
 				Height = 1,
 			};
 			Application.Top.Add (label);
