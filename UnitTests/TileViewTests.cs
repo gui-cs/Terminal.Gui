@@ -908,33 +908,26 @@ namespace UnitTests {
 		[Fact,AutoInitShutdown]
 		public void Test5Panel_MinSizes_VerticalSplitters()
 		{
-			
-			var tv = new TileView (5){ Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = Get5x1TilesView();
 
-			tv.Tiles.ElementAt (0).View.Add (new Label(new string('1',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (1).View.Add (new Label(new string('2',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (2).View.Add (new Label(new string('3',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (3).View.Add (new Label(new string('4',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (4).View.Add (new Label(new string('5',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt(0).MinSize = int.MaxValue;
+			tv.SetNeedsDisplay();
+			tv.LayoutSubviews();
 
-			Application.Top.Add (tv);
-			tv.BeginInit ();
-			tv.EndInit ();
-			tv.LayoutSubviews ();
-
+			Assert.True(tv.IsInitialized);
 
 			tv.Redraw (tv.Bounds);
 
 			var looksLike =
 @"
-┌────┬────┬────┬────┬───┐
-│1111│2222│3333│4444│555│
-│    │    │    │    │   │
-└────┴────┴────┴────┴───┘
+┌───────────────────────┐
+│11111111111111111111111│
+│                       │
+└───────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			// TODO : Apply min sizes and create test assertions
+
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1416,6 +1409,37 @@ namespace UnitTests {
 			var line = GetLine (tileView);
 			line.SetFocus ();
 			Assert.True (line.HasFocus);
+		}
+
+
+		private TileView Get5x1TilesView ()
+		{
+			var tv = new TileView (5){ Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+
+			tv.Tiles.ElementAt (0).View.Add (new Label(new string('1',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt (1).View.Add (new Label(new string('2',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt (2).View.Add (new Label(new string('3',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt (3).View.Add (new Label(new string('4',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt (4).View.Add (new Label(new string('5',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+
+			Application.Top.Add (tv);
+			tv.BeginInit ();
+			tv.EndInit ();
+			tv.LayoutSubviews ();
+
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			return tv;
 		}
 
 		private TileView Get11By3TileView (out LineView line, bool withBorder = false)

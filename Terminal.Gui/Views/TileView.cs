@@ -704,7 +704,9 @@ namespace Terminal.Gui {
 				if (availableLeft < requiredLeft) {
 
 					// There is not enough space for panel on left
-					var insteadTake = requiredLeft + (HasBorder() ? 1 :0);
+					var insteadTake = requiredLeft == int.MaxValue ?
+						 int.MaxValue :
+						 requiredLeft + (HasBorder() ? 1 :0);
 
 					// Don't take more than the available space in view
 					insteadTake = Math.Max(0,Math.Min (fullSpace, insteadTake));
