@@ -307,17 +307,51 @@ namespace Terminal.Gui {
 		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
 		/// are supported for this property.</para>
 		/// </summary>
-		public void SetSplitterPos (int idx, Pos value)
+		public bool SetSplitterPos (int idx, Pos value)
 		{
 			if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
 				throw new ArgumentException ($"Only Percent and Absolute values are supported.  Passed value was {value.GetType ().Name}");
 			}
 
+			var fullSpace = orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
+
+			if(fullSpace != 0) {
+				int posUs = value.Anchor (fullSpace);
+				
+				// Cannot move off screen right
+				if (posUs >= fullSpace) {
+					return false;
+				}
+
+				// Cannot move off screen left
+				if (posUs <= 0) {
+					return false;
+				}
+
+				// Do not allow splitter to move left of the one before
+				if (idx > 0) {
+					int posLeft = splitterDistances [idx - 1].Anchor (fullSpace);
+
+					if (posUs <= posLeft) {
+						return false;
+					}
+				}
+
+				// Do not allow splitter to move right of the one after
+				if (idx+1 < splitterDistances.Count) {
+					int posLeft = splitterDistances [idx + 1].Anchor (fullSpace);
+
+					if (posUs >= posLeft) {
+						return false;
+					}
+				}
+			}
+
 			splitterDistances [idx] = value;
 			GetRootTileView ().LayoutSubviews ();
 			OnSplitterMoved (idx);
+			return true;
 		}
-
 
 		/// <inheritdoc/>
 		public override bool OnEnter (View view)
@@ -557,9 +591,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			RespectMinimumTileSizes ();
-
-
 			for (int i = 0; i < splitterLines.Count; i++) {
 				var line = splitterLines[i];
 
@@ -663,71 +694,6 @@ namespace Terminal.Gui {
 			}
 
 			return distance - (HasBorder() ? 1 : 0);
-		}
-
-		private void RespectMinimumTileSizes ()
-		{
-			// if we are not yet initialized then we don't know
-			// how big we are and therefore cannot sensibly calculate
-			// how big the views will be with a given SplitterDistance
-			if (!IsInitialized) {
-				return;
-			}
-
-			// how much space is there?
-			var availableSpace = Orientation == Orientation.Horizontal 
-				? this.Bounds.Height 
-				: this.Bounds.Width;
-			
-			var fullSpace = availableSpace;
-
-			var lastSplitterLocation = 0;
-
-			for(int i=0;i< splitterDistances.Count; i++) {
-				var splitterLocation = splitterDistances [i].Anchor(fullSpace);
-
-				var availableLeft = splitterLocation - lastSplitterLocation;
-				// Border steals space
-				availableLeft -= HasBorder () && i == 0 ? 1 : 0;
-
-				var availableRight = fullSpace - splitterLocation;
-				// Border steals space
-				availableRight -= HasBorder () && i == 0 ? 1 : 0;
-				// Splitter line steals space
-				availableRight--;
-
-				// TODO: Test 3+ panel max/mins because this calculation is probably wrong
-
-				var requiredLeft = tiles [i].MinSize;
-				var requiredRight = tiles [i+1].MinSize;
-
-				if (availableLeft < requiredLeft) {
-
-					// There is not enough space for panel on left
-					var insteadTake = requiredLeft == int.MaxValue ?
-						 int.MaxValue :
-						 requiredLeft + (HasBorder() ? 1 :0);
-
-					// Don't take more than the available space in view
-					insteadTake = Math.Max(0,Math.Min (fullSpace, insteadTake));
-					splitterDistances [i] = insteadTake;
-					splitterLocation = insteadTake;
-				}
-				else if (availableRight < requiredRight) {
-					// There is not enough space for panel on right
-					var insteadTake = fullSpace - (requiredRight + (HasBorder()?1:0));
-
-					// leave 1 space for the splitter
-					insteadTake --;
-
-					insteadTake = Math.Max (0, Math.Min (fullSpace, insteadTake));
-					splitterDistances [i] = insteadTake;
-					splitterLocation = insteadTake;
-				}
-
-				availableSpace -= splitterLocation;
-				lastSplitterLocation = splitterLocation;
-			}
 		}
 
 		private class TileTitleToRender
@@ -871,11 +837,11 @@ namespace Terminal.Gui {
 					// how far has user dragged from original location?						
 					if (Orientation == Orientation.Horizontal) {
 						int dy = mouseEvent.Y - dragPosition.Value.Y;
-						Parent.splitterDistances [Idx] = Offset (Y, dy);
+						Parent.SetSplitterPos (Idx, Offset (Y, dy));
 						moveRuneRenderLocation = new Point (mouseEvent.X, 0);
 					} else {
 						int dx = mouseEvent.X - dragPosition.Value.X;
-						Parent.splitterDistances [Idx] = Offset (X, dx);
+						Parent.SetSplitterPos (Idx, Offset (X, dx));
 						moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
 					}
 
@@ -909,8 +875,7 @@ namespace Terminal.Gui {
 					}
 
 					var oldX = X;
-					FinalisePosition (oldX, (Pos)Offset (X, distanceX));
-					return true;
+					return FinalisePosition (oldX, Offset (X, distanceX));
 				} else {
 
 					// Cannot move in this direction
@@ -919,8 +884,7 @@ namespace Terminal.Gui {
 					}
 
 					var oldY = Y;
-					FinalisePosition (oldY, (Pos)Offset (Y, distanceY));
-					return true;
+					return FinalisePosition (oldY, (Pos)Offset (Y, distanceY));
 				}
 			}
 
@@ -943,16 +907,16 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="oldValue"></param>
 			/// <param name="newValue"></param>
-			private void FinalisePosition (Pos oldValue, Pos newValue)
+			private bool FinalisePosition (Pos oldValue, Pos newValue)
 			{
 				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						Parent.SetSplitterPos(Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
+						return Parent.SetSplitterPos(Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
 					} else {
-						Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
+						return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
 					}
 				} else {
-					Parent.SetSplitterPos (Idx, newValue);
+					return Parent.SetSplitterPos (Idx, newValue);
 				}
 			}
 
