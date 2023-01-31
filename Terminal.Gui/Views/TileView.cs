@@ -315,36 +315,8 @@ namespace Terminal.Gui {
 
 			var fullSpace = orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
 
-			if(fullSpace != 0) {
-				int posUs = value.Anchor (fullSpace);
-				
-				// Cannot move off screen right
-				if (posUs >= fullSpace) {
-					return false;
-				}
-
-				// Cannot move off screen left
-				if (posUs <= 0) {
-					return false;
-				}
-
-				// Do not allow splitter to move left of the one before
-				if (idx > 0) {
-					int posLeft = splitterDistances [idx - 1].Anchor (fullSpace);
-
-					if (posUs <= posLeft) {
-						return false;
-					}
-				}
-
-				// Do not allow splitter to move right of the one after
-				if (idx+1 < splitterDistances.Count) {
-					int posLeft = splitterDistances [idx + 1].Anchor (fullSpace);
-
-					if (posUs >= posLeft) {
-						return false;
-					}
-				}
+			if(fullSpace != 0 && !IsValidNewSplitterPos(idx,value,fullSpace)) {
+				return false;
 			}
 
 			splitterDistances [idx] = value;
@@ -494,6 +466,41 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
+		{
+			int newSize = value.Anchor (fullSpace);
+			bool isGettingBigger = newSize > splitterDistances [idx].Anchor (fullSpace);
+
+			// Cannot move off screen right
+			if (newSize >= fullSpace - (HasBorder () ? 1 : 0)) {
+				return false;
+			}
+
+			// Cannot move off screen left
+			if (newSize < (HasBorder()?1:0)) {
+				return false;
+			}
+
+			// Do not allow splitter to move left of the one before
+			if (idx > 0) {
+				int posLeft = splitterDistances [idx - 1].Anchor (fullSpace);
+
+				if (newSize <= posLeft) {
+					return false;
+				}
+			}
+
+			// Do not allow splitter to move right of the one after
+			if (idx + 1 < splitterDistances.Count) {
+				int posLeft = splitterDistances [idx + 1].Anchor (fullSpace);
+
+				if (newSize >= posLeft) {
+					return false;
+				}
+			}
+
+			return true;
+		}
 
 		private List<TileViewLineView> GetAllLineViewsRecursively (View v)
 		{
