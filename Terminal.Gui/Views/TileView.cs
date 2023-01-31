@@ -160,21 +160,19 @@ namespace Terminal.Gui {
 
 			Tile toReturn = null;
 
-			for(int i=0;i<tiles.Count;i++) {
-				
-				if(i != idx) {
+			for (int i = 0; i < tiles.Count; i++) {
+
+				if (i != idx) {
 					var oldTile = oldTiles [i > idx ? i - 1 : i];
 
 					// remove the new empty View
 					Remove (tiles [i].View);
-					
+
 					// restore old Tile and View
 					tiles [i] = oldTile;
 					Add (tiles [i].View);
-				}
-				else
-				{
-					toReturn = tiles[i];
+				} else {
+					toReturn = tiles [i];
 				}
 			}
 			SetNeedsDisplay ();
@@ -192,18 +190,18 @@ namespace Terminal.Gui {
 		public Tile RemoveTile (int idx)
 		{
 			var oldTiles = Tiles.ToArray ();
-			
+
 			if (idx < 0 || idx >= oldTiles.Length) {
 				return null;
 			}
-			
+
 			var removed = Tiles.ElementAt (idx);
 
 			RebuildForTileCount (oldTiles.Length - 1);
 
 			for (int i = 0; i < tiles.Count; i++) {
 
-				int oldIdx = i >= idx ? i + 1: i;
+				int oldIdx = i >= idx ? i + 1 : i;
 				var oldTile = oldTiles [oldIdx];
 
 				// remove the new empty View
@@ -212,7 +210,7 @@ namespace Terminal.Gui {
 				// restore old Tile and View
 				tiles [i] = oldTile;
 				Add (tiles [i].View);
-				
+
 			}
 			SetNeedsDisplay ();
 			LayoutSubviews ();
@@ -224,26 +222,21 @@ namespace Terminal.Gui {
 		/// Returns the index of the first <see cref="Tile"/> in
 		/// <see cref="Tiles"/> which contains <paramref name="toFind"/>.
 		///</summary>
-		public int IndexOf(View toFind, bool recursive = false)
+		public int IndexOf (View toFind, bool recursive = false)
 		{
-			for(int i = 0 ;i < tiles.Count; i++)
-			{
-				var v = tiles[i].View;
+			for (int i = 0; i < tiles.Count; i++) {
+				var v = tiles [i].View;
 
-				if(v == toFind)
-				{
-					return i;
-				}
-				
-				if(v.Subviews.Contains(toFind))
-				{
+				if (v == toFind) {
 					return i;
 				}
 
-				if(recursive)
-				{
-					if(RecursiveContains(v.Subviews,toFind))
-					{
+				if (v.Subviews.Contains (toFind)) {
+					return i;
+				}
+
+				if (recursive) {
+					if (RecursiveContains (v.Subviews, toFind)) {
 						return i;
 					}
 				}
@@ -254,15 +247,12 @@ namespace Terminal.Gui {
 
 		private bool RecursiveContains (IEnumerable<View> haystack, View needle)
 		{
-			foreach(var v in haystack)
-			{
-				if(v == needle)
-				{
+			foreach (var v in haystack) {
+				if (v == needle) {
 					return true;
 				}
-				
-				if(RecursiveContains(v.Subviews,needle))
-				{
+
+				if (RecursiveContains (v.Subviews, needle)) {
 					return true;
 				}
 			}
@@ -315,7 +305,7 @@ namespace Terminal.Gui {
 
 			var fullSpace = orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
 
-			if(fullSpace != 0 && !IsValidNewSplitterPos(idx,value,fullSpace)) {
+			if (fullSpace != 0 && !IsValidNewSplitterPos (idx, value, fullSpace)) {
 				return false;
 			}
 
@@ -346,7 +336,7 @@ namespace Terminal.Gui {
 			var lc = new LineCanvas ();
 
 			var allLines = GetAllLineViewsRecursively (this);
-			var allTitlesToRender = GetAllTitlesToRenderRecursively(this);
+			var allTitlesToRender = GetAllTitlesToRenderRecursively (this);
 
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
@@ -390,12 +380,10 @@ namespace Terminal.Gui {
 
 			// Draw Titles over Border
 
-			foreach(var titleToRender in allTitlesToRender)
-			{
-				var renderAt = titleToRender.GetLocalCoordinateForTitle(this);
+			foreach (var titleToRender in allTitlesToRender) {
+				var renderAt = titleToRender.GetLocalCoordinateForTitle (this);
 
-				if(renderAt.Y < 0)
-				{
+				if (renderAt.Y < 0) {
 					// If we have no border then root level tiles
 					// have nowhere to render their titles.
 					continue;
@@ -405,9 +393,8 @@ namespace Terminal.Gui {
 
 				var title = titleToRender.Tile.Title;
 
-				for(int i=0;i<title.Length;i++)
-				{
-					AddRune(renderAt.X+i,renderAt.Y,title[i]);
+				for (int i = 0; i < title.Length; i++) {
+					AddRune (renderAt.X + i, renderAt.Y, title [i]);
 				}
 			}
 		}
@@ -425,7 +412,7 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="TileView"/></returns>
-		public bool TrySplitTile(int idx, int panels, out TileView result)
+		public bool TrySplitTile (int idx, int panels, out TileView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
@@ -440,14 +427,14 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var newContainer = new TileView(panels) {
+			var newContainer = new TileView (panels) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				parentTileView = this,
 			};
-			
+
 			// Take everything out of the View we are moving
-			var childViews = toMove.Subviews.ToArray();
+			var childViews = toMove.Subviews.ToArray ();
 			toMove.RemoveAll ();
 
 			// Remove the view itself and replace it with the new TileView
@@ -470,17 +457,23 @@ namespace Terminal.Gui {
 		{
 			int newSize = value.Anchor (fullSpace);
 			bool isGettingBigger = newSize > splitterDistances [idx].Anchor (fullSpace);
-			int lastSplitterOrBorder = HasBorder()?1:0;
-			int nextSplitterOrBorder = HasBorder() ? fullSpace-1:fullSpace;
+			int lastSplitterOrBorder = HasBorder () ? 1 : 0;
+			int nextSplitterOrBorder = HasBorder () ? fullSpace - 1 : fullSpace;
 
 			// Cannot move off screen right
 			if (newSize >= fullSpace - (HasBorder () ? 1 : 0)) {
-				return false;
+
+				if (isGettingBigger) {
+					return false;
+				}
 			}
 
 			// Cannot move off screen left
-			if (newSize < (HasBorder()?1:0)) {
-				return false;
+			if (newSize < (HasBorder () ? 1 : 0)) {
+
+				if (!isGettingBigger) {
+					return false;
+				}
 			}
 
 			// Do not allow splitter to move left of the one before
@@ -490,7 +483,7 @@ namespace Terminal.Gui {
 				if (newSize <= posLeft) {
 					return false;
 				}
-				
+
 				lastSplitterOrBorder = posLeft;
 			}
 
@@ -503,19 +496,18 @@ namespace Terminal.Gui {
 				}
 				nextSplitterOrBorder = posRight;
 			}
-			
-			if(isGettingBigger) {
+
+			if (isGettingBigger) {
 				var spaceForNext = nextSplitterOrBorder - newSize;
-				
+
 				// space required for the line itself
 				spaceForNext--;
 
 				// don't grow if it would take us below min size of right panel
-				if (spaceForNext < tiles [idx+1].MinSize) {
+				if (spaceForNext < tiles [idx + 1].MinSize) {
 					return false;
 				}
-			}
-			else {
+			} else {
 				var spaceForLast = newSize - lastSplitterOrBorder;
 
 				// don't shrink if it would take us below min size of left panel
@@ -537,7 +529,7 @@ namespace Terminal.Gui {
 						lines.Add (s);
 					}
 				} else {
-					if(sub.Visible) {
+					if (sub.Visible) {
 						lines.AddRange (GetAllLineViewsRecursively (sub));
 					}
 				}
@@ -553,23 +545,18 @@ namespace Terminal.Gui {
 			foreach (var sub in v.Tiles) {
 
 				// Don't render titles for invisible stuff!
-				if(!sub.View.Visible)
-				{
+				if (!sub.View.Visible) {
 					continue;
 				}
 
-				if(sub.View is TileView subTileView)
-				{
+				if (sub.View is TileView subTileView) {
 					// Panels with sub split tiles in them can never
 					// have their Titles rendered. Instead we dive in
 					// and pull up their children as titles
-					titles.AddRange (GetAllTitlesToRenderRecursively (subTileView,depth+1));
-				}
-				else
-				{
-					if(sub.Title.Length > 0)
-					{
-						titles.Add(new TileTitleToRender(sub,depth));
+					titles.AddRange (GetAllTitlesToRenderRecursively (subTileView, depth + 1));
+				} else {
+					if (sub.Title.Length > 0) {
+						titles.Add (new TileTitleToRender (sub, depth));
 					}
 				}
 			}
@@ -624,7 +611,7 @@ namespace Terminal.Gui {
 			}
 
 			for (int i = 0; i < splitterLines.Count; i++) {
-				var line = splitterLines[i];
+				var line = splitterLines [i];
 
 				line.Orientation = Orientation;
 				line.Width = orientation == Orientation.Vertical
@@ -637,8 +624,7 @@ namespace Terminal.Gui {
 				if (orientation == Orientation.Vertical) {
 					line.X = splitterDistances [i];
 					line.Y = 0;
-				}
-				else {
+				} else {
 					line.Y = splitterDistances [i];
 					line.X = 0;
 				}
@@ -658,28 +644,28 @@ namespace Terminal.Gui {
 				if (Orientation == Orientation.Vertical) {
 					tile.View.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
 					tile.View.Y = bounds.Y;
-					tile.View.Height = bounds.Height;					
-					tile.View.Width = GetTileWidthOrHeight(i, Bounds.Width, visibleTiles,visibleSplitterLines);
+					tile.View.Height = bounds.Height;
+					tile.View.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
 				} else {
 					tile.View.X = bounds.X;
 					tile.View.Y = i == 0 ? 0 : Pos.Bottom (visibleSplitterLines [i - 1]);
 					tile.View.Width = bounds.Width;
-					tile.View.Height = GetTileWidthOrHeight(i, Bounds.Height, visibleTiles, visibleSplitterLines);
+					tile.View.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
 			}
 		}
 
 		private void HideSplittersBasedOnTileVisibility ()
 		{
-			if(splitterLines.Count == 0) {
+			if (splitterLines.Count == 0) {
 				return;
 			}
 
-			foreach(var line in splitterLines) {
+			foreach (var line in splitterLines) {
 				line.Visible = true;
 			}
 
-			for(int i=0;i<tiles.Count;i++) {
+			for (int i = 0; i < tiles.Count; i++) {
 				if (!tiles [i].View.Visible) {
 
 					// when a tile is not visible, prefer hiding
@@ -691,21 +677,19 @@ namespace Terminal.Gui {
 					// container
 					if (candidate.Visible) {
 						candidate.Visible = false;
+					} else {
+						splitterLines [Math.Min (i, splitterLines.Count - 1)].Visible = false;
 					}
-					else {
-						splitterLines [Math.Min(i,splitterLines.Count-1)].Visible = false;
-					}
-					
-					
+
+
 				}
 			}
 		}
 
-		private Dim GetTileWidthOrHeight (int i, int space, Tile[] visibleTiles, TileViewLineView [] visibleSplitterLines)
+		private Dim GetTileWidthOrHeight (int i, int space, Tile [] visibleTiles, TileViewLineView [] visibleSplitterLines)
 		{
 			// last tile
-			if(i + 1 >= visibleTiles.Length)
-			{
+			if (i + 1 >= visibleTiles.Length) {
 				return Dim.Fill (HasBorder () ? 1 : 0);
 			}
 
@@ -714,41 +698,40 @@ namespace Terminal.Gui {
 				nextSplitter.X : nextSplitter.Y;
 			var nextSplitterDistance = nextSplitterPos.Anchor (space);
 
-			var lastSplitter = i >= 1 ? visibleSplitterLines [i-1]:null;
+			var lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
 			var lastSplitterPos = Orientation == Orientation.Vertical ?
 				lastSplitter?.X : lastSplitter?.Y;
 			var lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
 
 			var distance = nextSplitterDistance - lastSplitterDistance;
 
-			if(i>0) {
+			if (i > 0) {
 				return distance - 1;
 			}
 
-			return distance - (HasBorder() ? 1 : 0);
+			return distance - (HasBorder () ? 1 : 0);
 		}
 
-		private class TileTitleToRender
-		{
-			public Tile Tile {get;}
+		private class TileTitleToRender {
+			public Tile Tile { get; }
 
-			public int Depth {get;}
+			public int Depth { get; }
 
-			public TileTitleToRender(Tile tile, int depth)
+			public TileTitleToRender (Tile tile, int depth)
 			{
 				Tile = tile;
-				Depth = depth;				
+				Depth = depth;
 			}
-			
+
 			/// <summary>
 			/// Translates the <see cref="Tile"/> title location from its local
 			/// coordinate space <paramref name="intoCoordinateSpace"/>.
 			/// </summary>
-			public Point GetLocalCoordinateForTitle(TileView intoCoordinateSpace)
+			public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
 			{
-				Tile.View.ViewToScreen(0,0, out var screenCol, out var screenRow);
+				Tile.View.ViewToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
-				return intoCoordinateSpace.ScreenToView(screenCol,screenRow);
+				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
 			}
 		}
 
@@ -943,7 +926,7 @@ namespace Terminal.Gui {
 			{
 				if (oldValue is Pos.PosFactor) {
 					if (Orientation == Orientation.Horizontal) {
-						return Parent.SetSplitterPos(Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
+						return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
 					} else {
 						return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
 					}
