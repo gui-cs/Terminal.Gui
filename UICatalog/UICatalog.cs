@@ -233,6 +233,7 @@ namespace UICatalog {
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 
 				ContentPane.Tiles.ElementAt(0).Title = "Categories";
+				ContentPane.Tiles.ElementAt (0).MinSize = 2;
 				ContentPane.Tiles.ElementAt (0).View.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
@@ -248,6 +249,7 @@ namespace UICatalog {
 
 				ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
 				ContentPane.Tiles.ElementAt (1).View.Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).MinSize = 2;
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);

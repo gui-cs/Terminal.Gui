@@ -470,6 +470,8 @@ namespace Terminal.Gui {
 		{
 			int newSize = value.Anchor (fullSpace);
 			bool isGettingBigger = newSize > splitterDistances [idx].Anchor (fullSpace);
+			int lastSplitterOrBorder = HasBorder()?1:0;
+			int nextSplitterOrBorder = HasBorder() ? fullSpace-1:fullSpace;
 
 			// Cannot move off screen right
 			if (newSize >= fullSpace - (HasBorder () ? 1 : 0)) {
@@ -488,13 +490,36 @@ namespace Terminal.Gui {
 				if (newSize <= posLeft) {
 					return false;
 				}
+				
+				lastSplitterOrBorder = posLeft;
 			}
 
 			// Do not allow splitter to move right of the one after
 			if (idx + 1 < splitterDistances.Count) {
-				int posLeft = splitterDistances [idx + 1].Anchor (fullSpace);
+				int posRight = splitterDistances [idx + 1].Anchor (fullSpace);
 
-				if (newSize >= posLeft) {
+				if (newSize >= posRight) {
+					return false;
+				}
+				nextSplitterOrBorder = posRight;
+			}
+			
+			if(isGettingBigger) {
+				var spaceForNext = nextSplitterOrBorder - newSize;
+				
+				// space required for the line itself
+				spaceForNext--;
+
+				// don't grow if it would take us below min size of right panel
+				if (spaceForNext < tiles [idx+1].MinSize) {
+					return false;
+				}
+			}
+			else {
+				var spaceForLast = newSize - lastSplitterOrBorder;
+
+				// don't shrink if it would take us below min size of left panel
+				if (spaceForLast < tiles [idx].MinSize) {
 					return false;
 				}
 			}
