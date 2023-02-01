@@ -150,9 +150,7 @@ namespace Terminal.Gui.Configuration {
 			/// property.
 			/// </summary>
 			[JsonIgnore]
-#pragma warning disable CA1822 // Mark members as static
 			public string Theme {
-#pragma warning restore CA1822 // Mark members as static
 				get => ThemeManager.SelectedTheme;
 				set {
 					ThemeManager.SelectedTheme = value;

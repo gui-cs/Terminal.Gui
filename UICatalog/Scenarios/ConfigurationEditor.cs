@@ -2,15 +2,36 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Terminal.Gui;
 using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Configuration Editor", Description: "Edits Terminal.Gui Config Files.")]
-	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory("Files and IO"), ScenarioCategory("TextView") ]
+	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory ("Files and IO"), ScenarioCategory ("TextView")]
 	public class ConfigurationEditor : Scenario {
 		TabView tabView;
+
+		private static ColorScheme? editorColorScheme = new ColorScheme () {
+			Normal = new Attribute (Color.Red, Color.White),
+			Focus = new Attribute (Color.Red, Color.Black),
+			HotFocus = new Attribute (Color.BrightRed, Color.Black),
+			HotNormal = new Attribute (Color.Magenta, Color.White)
+		};
+
+		[SerializableConfigurationProperty (Scope = typeof (AppScope))]
+		public static ColorScheme? EditorColorScheme {
+			get => editorColorScheme;
+			set {
+				editorColorScheme = value;
+				EditorColorSchemeChanged?.Invoke ();
+			}
+		}
+
+		private static Action EditorColorSchemeChanged;
 
 		private string [] configFiles = {
 			"~/.tui/UICatalog.config.json",
@@ -55,6 +76,15 @@ namespace UICatalog.Scenarios {
 			Open ();
 
 			tabView.SelectedTab = tabView.Tabs.ToArray () [0];
+
+			ConfigurationEditor.EditorColorSchemeChanged += () => {
+				foreach (var t in tabView.Tabs) {
+					t.View.ColorScheme = ConfigurationEditor.EditorColorScheme;
+					t.View.SetNeedsDisplay ();
+				};
+			};
+
+			ConfigurationEditor.EditorColorSchemeChanged.Invoke ();
 		}
 
 		private void Open ()
@@ -180,7 +210,7 @@ namespace UICatalog.Scenarios {
 				var newText = View.Text.ToString ();
 
 				System.IO.File.WriteAllText (File.FullName, newText);
-				SavedText = newText;
+				savedText = newText;
 
 				Text = Text.ToString ().TrimEnd ('*');
 			}

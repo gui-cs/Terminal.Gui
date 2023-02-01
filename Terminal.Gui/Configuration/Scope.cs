@@ -52,7 +52,7 @@ namespace Terminal.Gui.Configuration {
 			/// Applies all congiguration properties of this scope that have a non-null <see cref="ConfigProperty.PropertyValue"/>.
 			/// </summary>
 			/// <returns><see langword="true"/> if any property was non-null and was set.</returns>
-			internal bool Apply()
+			public bool Apply()
 			{
 				bool set = false;
 				foreach (var p in this.Where (t => t.Value != null && t.Value.PropertyValue != null)) {

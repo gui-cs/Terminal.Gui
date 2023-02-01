@@ -11,6 +11,8 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -47,8 +49,14 @@ namespace UICatalog {
 	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
 	/// </summary>
 	class UICatalogApp {
-		static FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
-		static FileSystemWatcher _homeDirWatcher = new FileSystemWatcher ();
+		//[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
+		//public static bool ShowStatusBar { get; set; } = true;
+
+		[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName("UICatalog.StatusBar")]
+		public static bool ShowStatusBar { get; set; } = true;
+
+		static readonly FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
+		static readonly FileSystemWatcher _homeDirWatcher = new FileSystemWatcher ();
 
 		static void Main (string [] args)
 		{
@@ -149,11 +157,11 @@ namespace UICatalog {
 			_homeDirWatcher.Filter = "*config.json";
 
 			_currentDirWatcher.Changed += ConfigFileChanged;
-			_currentDirWatcher.Created += ConfigFileChanged;
+			//_currentDirWatcher.Created += ConfigFileChanged;
 			_currentDirWatcher.EnableRaisingEvents = true;
 
 			_homeDirWatcher.Changed += ConfigFileChanged;
-			_homeDirWatcher.Created += ConfigFileChanged;
+			//_homeDirWatcher.Created += ConfigFileChanged;
 			_homeDirWatcher.EnableRaisingEvents = true;
 		}
 
@@ -168,6 +176,7 @@ namespace UICatalog {
 			ConfigurationManager.Load ();
 			ConfigurationManager.Apply ();
 			ConfigurationManager.Themes.Apply ();
+			ConfigurationManager.AppSettings?.Apply ();
 		}
 
 		/// <summary>
@@ -214,7 +223,7 @@ namespace UICatalog {
 		/// This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on 
 		/// the command line) and each time a Scenario ends.
 		/// </summary>
-		class UICatalogTopLevel : Toplevel {
+		public class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
@@ -254,8 +263,9 @@ namespace UICatalog {
 				OS = new StatusItem (Key.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
-					Visible = true,
+					Visible = UICatalogApp.ShowStatusBar					
 				};
+
 				StatusBar.Items = new StatusItem [] {
 					new StatusItem(Application.QuitKey, $"~{Application.QuitKey} to quit", () => {
 						if (_selectedScenario is null){
@@ -268,10 +278,6 @@ namespace UICatalog {
 					}),
 					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
-						LeftPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-						RightPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-						LayoutSubviews();
-						SetChildNeedsDisplay();
 					}),
 					DriverName,
 					OS
@@ -355,6 +361,17 @@ namespace UICatalog {
 				if (!_isFirstRunning) {
 					RightPane.SetFocus ();
 				}
+
+				StatusBar.VisibleChanged += () => {
+					UICatalogApp.ShowStatusBar = StatusBar.Visible;
+
+					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
+					LeftPane.Height = Dim.Fill (height);
+					RightPane.Height = Dim.Fill (height);
+					LayoutSubviews ();
+					SetChildNeedsDisplay ();
+				};
+
 				Loaded -= LoadedHandler;
 			}
 
@@ -389,20 +406,22 @@ namespace UICatalog {
 
 			List<MenuItem []> CreateDiagnosticMenuItems ()
 			{
-				List<MenuItem []> menuItems = new List<MenuItem []> ();
-				menuItems.Add (CreateDiagnosticFlagsMenuItems ());
-				menuItems.Add (new MenuItem [] { null });
-				menuItems.Add (CreateHeightAsBufferMenuItems ());
-				menuItems.Add (CreateDisabledEnabledMouseItems ());
-				menuItems.Add (CreateKeybindingsMenuItems ());
+				List<MenuItem []> menuItems = new List<MenuItem []> {
+					CreateDiagnosticFlagsMenuItems (),
+					new MenuItem [] { null },
+					CreateHeightAsBufferMenuItems (),
+					CreateDisabledEnabledMouseItems (),
+					CreateKeybindingsMenuItems ()
+				};
 				return menuItems;
 			}
 
 			MenuItem [] CreateDisabledEnabledMouseItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miIsMouseDisabled = new MenuItem ();
-				miIsMouseDisabled.Title = "_Disable Mouse";
+				miIsMouseDisabled = new MenuItem {
+					Title = "_Disable Mouse"
+				};
 				miIsMouseDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMouseDisabled.Title.ToString ().Substring (1, 1) [0];
 				miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMouseDisabled.Action += () => {
@@ -416,9 +435,10 @@ namespace UICatalog {
 			MenuItem [] CreateKeybindingsMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				var item = new MenuItem ();
-				item.Title = "_Key Bindings";
-				item.Help = "Change which keys do what";
+				var item = new MenuItem {
+					Title = "_Key Bindings",
+					Help = "Change which keys do what"
+				};
 				item.Action += () => {
 					var dlg = new KeyBindingsDialog ();
 					Application.Run (dlg);
@@ -433,8 +453,9 @@ namespace UICatalog {
 			MenuItem [] CreateHeightAsBufferMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miHeightAsBuffer = new MenuItem ();
-				miHeightAsBuffer.Title = "_Height As Buffer";
+				miHeightAsBuffer = new MenuItem {
+					Title = "_Height As Buffer"
+				};
 				miHeightAsBuffer.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miHeightAsBuffer.Title.ToString ().Substring (1, 1) [0];
 				miHeightAsBuffer.CheckType |= MenuItemCheckStyle.Checked;
 				miHeightAsBuffer.Action += () => {
@@ -455,9 +476,10 @@ namespace UICatalog {
 
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
-					var item = new MenuItem ();
-					item.Title = GetDiagnosticsTitle (diag);
-					item.Shortcut = Key.AltMask + index.ToString () [0];
+					var item = new MenuItem {
+						Title = GetDiagnosticsTitle (diag),
+						Shortcut = Key.AltMask + index.ToString () [0]
+					};
 					index++;
 					item.CheckType |= MenuItemCheckStyle.Checked;
 					if (GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off) == item.Title) {
@@ -499,26 +521,21 @@ namespace UICatalog {
 
 				string GetDiagnosticsTitle (Enum diag)
 				{
-					switch (Enum.GetName (_diagnosticFlags.GetType (), diag)) {
-					case "Off":
-						return OFF;
-					case "FrameRuler":
-						return FRAME_RULER;
-					case "FramePadding":
-						return FRAME_PADDING;
-					}
-					return "";
+					return Enum.GetName (_diagnosticFlags.GetType (), diag) switch {
+						"Off" => OFF,
+						"FrameRuler" => FRAME_RULER,
+						"FramePadding" => FRAME_PADDING,
+						_ => "",
+					};
 				}
 
 				Enum GetDiagnosticsEnumValue (ustring title)
 				{
-					switch (title.ToString ()) {
-					case FRAME_RULER:
-						return ConsoleDriver.DiagnosticFlags.FrameRuler;
-					case FRAME_PADDING:
-						return ConsoleDriver.DiagnosticFlags.FramePadding;
-					}
-					return null;
+					return title.ToString () switch {
+						FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,
+						FRAME_PADDING => ConsoleDriver.DiagnosticFlags.FramePadding,
+						_ => null,
+					};
 				}
 
 				void SetDiagnosticsFlag (Enum diag, bool add)
@@ -563,10 +580,11 @@ namespace UICatalog {
 
 				var schemeMenuItems = new List<MenuItem> ();
 				foreach (var sc in Colors.ColorSchemes) {
-					var item = new MenuItem ();
-					item.Title = $"_{sc.Key}";
-					item.Data = sc.Key;
-					item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
+					var item = new MenuItem {
+						Title = $"_{sc.Key}",
+						Data = sc.Key,
+						Shortcut = Key.AltMask | (Key)sc.Key [..1] [0]
+					};
 					item.CheckType |= MenuItemCheckStyle.Radio;
 					item.Checked = sc.Key == _topLevelColorScheme;
 					item.Action += () => {
@@ -628,7 +646,11 @@ namespace UICatalog {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 
-				
+				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
+				LeftPane.Height = Dim.Fill (height);
+				RightPane.Height = Dim.Fill (height);
+
+				StatusBar.Visible = UICatalogApp.ShowStatusBar;
 
 				Application.Top.SetNeedsDisplay ();
 			}
@@ -703,7 +725,7 @@ namespace UICatalog {
 					url = url.Replace ("&", "^&");
 					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
-					using (var process = new Process {
+					using var process = new Process {
 						StartInfo = new ProcessStartInfo {
 							FileName = "xdg-open",
 							Arguments = url,
@@ -712,9 +734,8 @@ namespace UICatalog {
 							CreateNoWindow = true,
 							UseShellExecute = false
 						}
-					}) {
-						process.Start ();
-					}
+					};
+					process.Start ();
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					Process.Start ("open", url);
 				}

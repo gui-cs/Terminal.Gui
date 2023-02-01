@@ -55,31 +55,6 @@ namespace Terminal.Gui.Configuration {
 
 		private static readonly string _configFilename = "config.json";
 
-		/// <summary>
-		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the <see cref="SettingsScope"/>
-		/// attribute value.
-		/// </summary>
-		public static SettingsScope? Settings {
-			get {
-				if (_settings == null) {
-					throw new InvalidOperationException ("ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property.");
-				}
-				return _settings;
-			}
-			set {
-				_settings = value!;
-
-				// Update the other scopes
-				ThemeManager.Themes = (Dictionary<string, ThemeScope>)_settings.Properties ["Themes"]!.PropertyValue!;
-			}
-		}
-
-		/// <summary>
-		/// The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
-		/// attribute value.
-		/// </summary>
-		public static ThemeManager? Themes => ThemeManager.Instance;	
-
 		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
 			PropertyNameCaseInsensitive = true,
@@ -155,12 +130,6 @@ namespace Terminal.Gui.Configuration {
 				get => propertyValue;
 				set {
 					propertyValue = value;
-
-					//if (PropertyValue == null) {
-					//	propertyValue = value;
-					//} else {
-					//	propertyValue = DeepMemberwiseCopy (value, PropertyValue);
-					//}
 				}
 			}
 
@@ -226,6 +195,37 @@ namespace Terminal.Gui.Configuration {
 		private static SettingsScope? _settings;
 
 		/// <summary>
+		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the <see cref="SettingsScope"/>
+		/// attribute value.
+		/// </summary>
+		public static SettingsScope? Settings {
+			get {
+				if (_settings == null) {
+					throw new InvalidOperationException ("ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property.");
+				}
+				return _settings;
+			}
+			set {
+				_settings = value!;
+
+				// Update the other scopes
+				ThemeManager.Themes = (Dictionary<string, ThemeScope>)_settings.Properties ["Themes"]!.PropertyValue!;
+			}
+		}
+
+		/// <summary>
+		/// The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
+		/// attribute value.
+		/// </summary>
+		public static ThemeManager? Themes => ThemeManager.Instance;
+
+		/// <summary>
+		/// Aplication-specific configuration settings scope.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("AppSettings")]
+		public static AppScope? AppSettings { get; set; } 
+
+		/// <summary>
 		/// Initializes the internal state of ConfiguraitonManager. Nominally called once as part of application
 		/// startup to initilaize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
 		/// </summary>
@@ -235,10 +235,14 @@ namespace Terminal.Gui.Configuration {
 			_settings = null;
 
 			Dictionary<string, Type> classesWithConfigProps = new Dictionary<string, Type> (StringComparer.InvariantCultureIgnoreCase);
-			foreach (Type classWithConfig in typeof (ConfigurationManager).Assembly.ExportedTypes
-				.Where (myType => myType.IsClass &&
-					(myType.IsPublic || myType.IsNestedPublic) &&
-					(myType.GetProperties ().Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)))) {
+			// Get Terminal.Gui.dll classes
+
+			var types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
+				    from type in assembly.GetTypes ()
+				    where type.GetProperties ().Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
+				    select type;
+
+			foreach (var classWithConfig in types) {
 				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
 
@@ -268,6 +272,8 @@ namespace Terminal.Gui.Configuration {
 
 			Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
 			_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
+
+			AppSettings = new AppScope ();
 		}
 
 		/// <summary>
@@ -306,12 +312,13 @@ namespace Terminal.Gui.Configuration {
 
 		/// <summary>
 		/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
-		/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called intenrally by <see cref="Load"/>,
+		/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called intenrally by <see cref="Load"/>
+		/// if the <c>reset</c> parameter is <see langword="true"/>.
 		/// </summary>
 		/// <remarks>
 		/// 
 		/// </remarks>
-		internal static void Reset ()
+		public static void Reset ()
 		{
 			if (_allConfigProperties == null) {
 				ConfigurationManager.Initialize ();
@@ -320,13 +327,14 @@ namespace Terminal.Gui.Configuration {
 			Debug.WriteLine ($"ConfigurationManager.Reset()");
 			Settings = new SettingsScope ();
 			ThemeManager.Reset ();
-
+			//AppSettings.Reset ();
 
 			// To enable some unit tests, we only load from resources if the flag is set
 			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
 
 			Apply ();
 			Themes?.Apply ();
+			AppSettings?.Apply ();
 		}
 
 		/// <summary>
@@ -349,6 +357,7 @@ namespace Terminal.Gui.Configuration {
 		{
 			Settings = new SettingsScope ();
 			ThemeManager.GetHardCodedDefaults ();
+			AppSettings?.RetrieveValues ();
 			foreach (var p in Settings!.Where (cp => cp.Value.PropertyInfo != null)) {
 				Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
 			}
@@ -527,18 +536,21 @@ namespace Terminal.Gui.Configuration {
 		public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
 
 		/// <summary>
-		/// Resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults 
-		/// defined in <see cref="LoadAppResources"/>
-		/// then loads all settings found in the various locations to the <see cref="ConfigurationManager"/>. 
+		/// Loads all settings found in the various configuraiton storage locations to 
+		/// the <see cref="ConfigurationManager"/>. Optionally,
+		/// resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults 
+		/// defined in <see cref="LoadAppResources"/>.
 		/// </summary>
 		/// <remarks>
 		/// Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
 		/// </remarks>
-		public static void Load ()
+		/// <param name="reset">If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will
+		/// be reset to the defaults defined in <see cref="LoadAppResources"/>.</param>
+		public static void Load (bool reset = false)
 		{
 			Debug.WriteLine ($"ConfigurationManager.Load()");
 
-			Reset ();
+			if (reset) Reset ();
 
 			// LibraryResoruces is always loaded by Reset
 

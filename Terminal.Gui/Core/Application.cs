@@ -60,7 +60,7 @@ namespace Terminal.Gui {
 	///   </para>
 	/// </remarks>
 	public static class Application {
-		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver"/> in use.
@@ -279,7 +279,7 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			MainLoop mainLoop;
+			readonly MainLoop mainLoop;
 
 			public MainLoopSyncContext (MainLoop mainLoop)
 			{
@@ -405,9 +405,10 @@ namespace Terminal.Gui {
 			// mulitlple times. We need to do this because some settings are only
 			// valid after a Driver is loaded. In this cases we need just 
 			// `Settings` so we can determine which driver to use.
-			ConfigurationManager.Load ();
+			ConfigurationManager.Load (true);
 			ConfigurationManager.Apply ();
 			ConfigurationManager.Themes.Apply ();
+			ConfigurationManager.AppSettings?.Apply ();
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
@@ -796,9 +797,7 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseGrabView != null) {
-				if (view == null) {
-					view = mouseGrabView;
-				}
+				view ??= mouseGrabView;
 
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
@@ -1010,9 +1009,7 @@ namespace Terminal.Gui {
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
 			if (refreshDriver) {
-				if (MdiTop != null) {
-					MdiTop.OnChildLoaded (toplevel);
-				}
+				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
 				Redraw (toplevel);
 				toplevel.PositionCursor ();
@@ -1130,12 +1127,6 @@ namespace Terminal.Gui {
 
 
 		static void Redraw (View view)
-		{
-			view.Redraw (view.Bounds);
-			Driver.Refresh ();
-		}
-
-		static void Refresh (View view)
 		{
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();

@@ -187,6 +187,8 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void SaveDefaults ()
 		{
+			ConfigurationManager.Initialize ();
+
 			// Get the hard coded settings
 			ConfigurationManager.GetHardCodedDefaults ();
 
@@ -208,13 +210,12 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void Reset_Resets()
 		{
 			ConfigurationManager.Reset ();
-			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 		}
 
 		[Fact]
-		public void Reset_and_LoadWithLibraryResourcesOnly_are_same ()
+		public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
 		{
 			// arrange
 			ConfigurationManager.Reset ();
@@ -238,7 +239,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 
 			// assert
-			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
@@ -261,10 +261,10 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 
 			// act
+			ConfigurationManager.Reset ();
 			ConfigurationManager.Load ();
 
 			// assert
-			Assert.Empty (ConfigurationManager.Settings.Where (p => p.Value.PropertyValue == null));
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);

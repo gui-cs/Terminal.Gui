@@ -188,7 +188,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		//		}
 		//	}";
 		[Fact, AutoInitShutdown]
-		public void TestColorSchemeSerialization ()
+		public void TestColorSchemesSerialization ()
 		{
 			// Arrange
 			var expectedColorScheme = new ColorScheme {
