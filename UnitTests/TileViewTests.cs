@@ -953,7 +953,167 @@ namespace UnitTests {
 └────────┴┴────┴────┴───┘
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
 
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+
+			tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 0; x <= 5; x++) {
+				// All these values would result in tile 0 getting smaller
+				// so are not allowed (tile[0] has a min size of Int.Max)
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 6; x < 10; x++) {
+				// All these values would result in tile 0 getting bigger
+				// so are allowed
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
+				// the second splitter so are not allowed
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+111111111││3333│4444│5555
+         ││    │    │
+         ││    │    │
+         ││    │    │
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder ()
+		{
+			var tv = Get5x1TilesView ();
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 5; x > 0; x--) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			Assert.False (tv.SetSplitterPos (0, 0));
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+┌┬────────┬────┬────┬───┐
+││22222222│3333│4444│555│
+││        │    │    │   │
+└┴────────┴────┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 6; x < 10; x++) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
+				// the second splitter so are not allowed
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+┌────────┬┬────┬────┬───┐
+│11111111││3333│4444│555│
+│        ││    │    │   │
+└────────┴┴────┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 5; x >= 0; x--) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+│222222222│3333│4444│5555
+│         │    │    │
+│         │    │    │
+│         │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 6; x < 10; x++) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
+				// the second splitter so are not allowed
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+111111111││3333│4444│5555
+         ││    │    │
+         ││    │    │
+         ││    │    │
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1015,6 +1175,64 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 10; x > 5; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 5; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+11111││33333333│4444│5555
+     ││        │    │
+     ││        │    │
+     ││        │    │
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			for (int x = 10; x < 15; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 15; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+11111│22222222││4444│5555
+     │        ││    │
+     │        ││    │
+     │        ││    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+		[Fact, AutoInitShutdown]
 		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2 ()
 		{
 			var tv = Get5x1TilesView ();
@@ -1070,6 +1288,70 @@ namespace UnitTests {
 │1111│22222│333│4444│555│
 │    │     │   │    │   │
 └────┴─────┴───┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+			tv.Tiles.ElementAt (1).MinSize = 2;
+			tv.Tiles.ElementAt (2).MinSize = 3;
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 10; x > 7; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 7; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+
+11111│22│333333│4444│5555
+     │  │      │    │
+     │  │      │    │
+     │  │      │    │
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			for (int x = 10; x < 12; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 12; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"  
+11111│22222│333│4444│5555
+     │     │   │    │
+     │     │   │    │
+     │     │   │    │
+
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -1134,6 +1416,65 @@ namespace UnitTests {
 
 		}
 
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"   
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 20; x > 15; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 15; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"  
+11111│2222│3333││55555555
+     │    │    ││
+     │    │    ││
+     │    │    ││
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+
+			for (int x = 20; x < 25; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 25; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+11111│2222│3333│44444444│
+     │    │    │        │
+     │    │    │        │
+     │    │    │        │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
 
 		[Fact, AutoInitShutdown]
 		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4 ()
@@ -1192,6 +1533,66 @@ namespace UnitTests {
 │1111│2222│3333│444444│5│
 │    │    │    │      │ │
 └────┴────┴────┴──────┴─┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4_NoBorder ()
+		{
+			var tv = Get5x1TilesView (false);
+
+			tv.Tiles.ElementAt (3).MinSize = 2;
+			tv.Tiles.ElementAt (4).MinSize = 1;
+
+			tv.Redraw (tv.Bounds);
+
+			var looksLike =
+@"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 20; x > 17; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 17; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"   
+11111│2222│3333│44│555555
+     │    │    │  │
+     │    │    │  │
+     │    │    │  │
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+			for (int x = 20; x < 24; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+
+			for (int x = 24; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
+
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+11111│2222│3333│4444444│5
+     │    │    │       │
+     │    │    │       │
+     │    │    │       │
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -1678,9 +2079,13 @@ namespace UnitTests {
 		}
 
 
-		private TileView Get5x1TilesView ()
+		private TileView Get5x1TilesView (bool border = true)
 		{
 			var tv = new TileView (5){ Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+
+			if(!border) {
+				tv.IntegratedBorder = BorderStyle.None;
+			}
 
 			tv.Tiles.ElementAt (0).View.Add (new Label(new string('1',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
 			tv.Tiles.ElementAt (1).View.Add (new Label(new string('2',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
