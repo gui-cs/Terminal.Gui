@@ -419,7 +419,6 @@ namespace Terminal.Gui {
 			// the title too
 			var tile = tiles [idx];
 
-			// TODO: migrate the title too right?
 			var title = tile.Title;
 			View toMove = tile.View;
 
@@ -449,6 +448,10 @@ namespace Terminal.Gui {
 			foreach (var childView in childViews) {
 				newTileView1.Add (childView);
 			}
+
+			// Move the title across too
+			newContainer.tiles [0].Title = title;
+			tile.Title = string.Empty;
 
 			result = newContainer;
 			return true;

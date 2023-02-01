@@ -1637,7 +1637,19 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 		}
+		[Fact, AutoInitShutdown]
+		public void TestTrySplit_ShouldRetainTitle ()
+		{
+			var tv = new TileView ();
+			tv.Tiles.ElementAt (0).Title = "flibble";
+			tv.TrySplitTile (0, 2, out var subTileView);
 
+			// We moved the content so the title should also have been moved
+			Assert.Equal ("flibble", subTileView.Tiles.ElementAt (0).Title);
+
+			// Secondly we should have cleared the old title (it should have been moved not copied)
+			Assert.Empty (tv.Tiles.ElementAt (0).Title);
+		}
 
 
 		[Fact, AutoInitShutdown]
