@@ -588,7 +588,6 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public bool IsRootTileView ()
 		{
-			// TODO: don't want to layout subviews since the parent recursively lays them all out
 			return parentTileView == null;
 		}
 
@@ -650,8 +649,6 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < visibleTiles.Length; i++) {
 				var tile = visibleTiles [i];
-
-				// TODO: Deal with lines being Visibility false
 
 				if (Orientation == Orientation.Vertical) {
 					tile.View.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
