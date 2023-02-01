@@ -513,10 +513,10 @@ namespace Terminal.Gui {
 				var spaceForLast = newSize - lastSplitterOrBorder;
 
 				// space required for the line itself
-				if(idx > 0) {
+				if (idx > 0) {
 					spaceForLast--;
 				}
-					
+
 
 				// don't shrink if it would take us below min size of left panel
 				if (spaceForLast < tiles [idx].MinSize) {

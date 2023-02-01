@@ -213,10 +213,10 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
-			Assert.False(tileView.SetSplitterPos (0, 2));
+			Assert.False (tileView.SetSplitterPos (0, 2));
 
 			// Should stay where it was originally at (50%)
-			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
+			Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -258,10 +258,10 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
-			Assert.False(tileView.SetSplitterPos (0, 2));
+			Assert.False (tileView.SetSplitterPos (0, 2));
 
 			// Should stay where it was originally at (50%)
-			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
+			Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -302,10 +302,10 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
-			Assert.False(tileView.SetSplitterPos (0, 8));
+			Assert.False (tileView.SetSplitterPos (0, 8));
 
 			//  Should stay where it was originally at (50%)
-			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
+			Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -346,10 +346,10 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
-			Assert.False(tileView.SetSplitterPos (0, 8));
+			Assert.False (tileView.SetSplitterPos (0, 8));
 
 			//  Should stay where it was originally at (50%)
-			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
+			Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -490,9 +490,9 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
-			Assert.False(tileView.SetSplitterPos (0, 0));
+			Assert.False (tileView.SetSplitterPos (0, 0));
 			// position should remain where it was, at 50%
-			Assert.Equal (Pos.Percent(50f), tileView.SplitterDistances.ElementAt (0));
+			Assert.Equal (Pos.Percent (50f), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -906,12 +906,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		[Fact,AutoInitShutdown]
-		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1()
+		[Fact, AutoInitShutdown]
+		public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1 ()
 		{
-			var tv = Get5x1TilesView();
+			var tv = Get5x1TilesView ();
 
-			tv.Tiles.ElementAt(0).MinSize = int.MaxValue;
+			tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
 
 			tv.Redraw (tv.Bounds);
 
@@ -924,7 +924,7 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for(int x=0;x<=5;x++) {
+			for (int x = 0; x <= 5; x++) {
 				// All these values would result in tile 0 getting smaller
 				// so are not allowed (tile[0] has a min size of Int.Max)
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
@@ -933,7 +933,7 @@ namespace UnitTests {
 			for (int x = 6; x < 10; x++) {
 				// All these values would result in tile 0 getting bigger
 				// so are allowed
-				Assert.True (tv.SetSplitterPos (0, x),$"Assert failed for x={x}");
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
 
@@ -1668,7 +1668,7 @@ namespace UnitTests {
 
 			tileView.Redraw (tileView.Bounds);
 
-			 looksLike =
+			looksLike =
 @"
 ┌────────────┬─────┐
 │222222222222│33333│
@@ -1854,7 +1854,7 @@ namespace UnitTests {
 
 			tileView.Redraw (tileView.Bounds);
 
-			 looksLike =
+			looksLike =
 @"
 2222222222222│333333
 2222222222222│333333
@@ -2081,17 +2081,17 @@ namespace UnitTests {
 
 		private TileView Get5x1TilesView (bool border = true)
 		{
-			var tv = new TileView (5){ Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
 
-			if(!border) {
+			if (!border) {
 				tv.IntegratedBorder = BorderStyle.None;
 			}
 
-			tv.Tiles.ElementAt (0).View.Add (new Label(new string('1',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (1).View.Add (new Label(new string('2',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (2).View.Add (new Label(new string('3',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (3).View.Add (new Label(new string('4',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
-			tv.Tiles.ElementAt (4).View.Add (new Label(new string('5',100)){AutoSize=false,Width=Dim.Fill(),Height = 1});
+			tv.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (2).View.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (3).View.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (4).View.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
 
 			Application.Top.Add (tv);
 			tv.BeginInit ();
