@@ -213,19 +213,19 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
-			tileView.SetSplitterPos (0, 2);
+			Assert.False(tileView.SetSplitterPos (0, 2));
 
-			// Should bound the value to the minimum distance
-			Assert.Equal (6, tileView.SplitterDistances.ElementAt (0));
+			// Should stay where it was originally at (50%)
+			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
 @"
-111111│2222
-111111◊2222
-      │     ";
+11111│22222
+11111◊22222
+     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect because it
@@ -242,9 +242,9 @@ namespace UnitTests {
 
 			looksLike =
 @"
-1111111│222
-1111111◊222
-       │     ";
+111111│2222
+111111◊2222
+      │     ";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -258,19 +258,19 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
-			tileView.SetSplitterPos (0, 2);
+			Assert.False(tileView.SetSplitterPos (0, 2));
 
-			// Should bound the value to the minimum distance
-			Assert.Equal (6, tileView.SplitterDistances.ElementAt (0));
+			// Should stay where it was originally at (50%)
+			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 5
 			string looksLike =
 @"
-┌─────┬───┐
-│11111◊222│
-└─────┴───┘";
+┌────┬────┐
+│1111◊2222│
+└────┴────┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect because it
@@ -287,9 +287,9 @@ namespace UnitTests {
 
 			looksLike =
 @"
-┌──────┬──┐
-│111111◊22│
-└──────┴──┘";
+┌─────┬───┐
+│11111◊222│
+└─────┴───┘";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -302,19 +302,19 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
-			tileView.SetSplitterPos (0, 8);
+			Assert.False(tileView.SetSplitterPos (0, 8));
 
-			// Should bound the value to the minimum distance
-			Assert.Equal (4, tileView.SplitterDistances.ElementAt (0));
+			//  Should stay where it was originally at (50%)
+			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
 @"
-1111│222222
-1111◊222222
-    │     ";
+11111│22222
+11111◊22222
+     │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect because it
@@ -331,9 +331,9 @@ namespace UnitTests {
 
 			looksLike =
 @"
-111│2222222
-111◊2222222
-   │     ";
+1111│222222
+1111◊222222
+    │    ";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
@@ -346,19 +346,19 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
-			tileView.SetSplitterPos (0, 8);
+			Assert.False(tileView.SetSplitterPos (0, 8));
 
-			// Should bound the value to the minimum distance
-			Assert.Equal (4, tileView.SplitterDistances.ElementAt (0));
+			//  Should stay where it was originally at (50%)
+			Assert.Equal (Pos.Percent(50), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
 @"
-┌───┬─────┐
-│111◊22222│
-└───┴─────┘";
+┌────┬────┐
+│1111◊2222│
+└────┴────┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect because it
@@ -375,9 +375,9 @@ namespace UnitTests {
 
 			looksLike =
 @"
-┌──┬──────┐
-│11◊222222│
-└──┴──────┘";
+┌───┬─────┐
+│111◊22222│
+└───┴─────┘";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -490,8 +490,9 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
-			tileView.SetSplitterPos (0, 0);
-			Assert.Equal ((Pos)1, tileView.SplitterDistances.ElementAt (0));
+			Assert.False(tileView.SetSplitterPos (0, 0));
+			// position should remain where it was, at 50%
+			Assert.Equal (Pos.Percent(50f), tileView.SplitterDistances.ElementAt (0));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -906,7 +907,7 @@ namespace UnitTests {
 		}
 
 		[Fact,AutoInitShutdown]
-		public void Test5Panel_MinSizes_VerticalSplitters()
+		public void Test5Panel_MinSizes_VerticalSplitters_ResizeTile1()
 		{
 			var tv = Get5x1TilesView();
 
@@ -920,13 +921,42 @@ namespace UnitTests {
 
 			var looksLike =
 @"
-┌───────────────────────┐
-│11111111111111111111111│
-│                       │
-└───────────────────────┘
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
+			for(int x=0;x<=5;x++) {
+				// All these values would result in tile 0 getting smaller
+				// so are not allowed (tile[0] has a min size of Int.Max)
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			for (int x = 6; x < 10; x++) {
+				// All these values would result in tile 0 getting bigger
+				// so are allowed
+				Assert.True (tv.SetSplitterPos (0, x),$"Assert failed for x={x}");
+			}
+
+
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
+				// the second splitter so are not allowed
+				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
+
+			tv.Redraw (tv.Bounds);
+
+			looksLike =
+@"
+┌────────┬┬────┬────┬───┐
+│11111111││3333│4444│555│
+│        ││    │    │   │
+└────────┴┴────┴────┴───┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 		}
 
@@ -1426,18 +1456,6 @@ namespace UnitTests {
 			tv.BeginInit ();
 			tv.EndInit ();
 			tv.LayoutSubviews ();
-
-
-			tv.Redraw (tv.Bounds);
-
-			var looksLike =
-@"
-┌────┬────┬────┬────┬───┐
-│1111│2222│3333│4444│555│
-│    │    │    │    │   │
-└────┴────┴────┴────┴───┘
-";
-			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			return tv;
 		}
