@@ -500,6 +500,11 @@ namespace Terminal.Gui {
 			if (isGettingBigger) {
 				var spaceForNext = nextSplitterOrBorder - newSize;
 
+				// space required for the last line itself
+				if (idx > 0) {
+					spaceForNext--;
+				}
+
 				// don't grow if it would take us below min size of right panel
 				if (spaceForNext < tiles [idx + 1].MinSize) {
 					return false;
