@@ -276,7 +276,6 @@ namespace Terminal.Gui {
 			var contentArea = Bounds;
 
 			if (HasBorder ()) {
-				// TODO: Bound with Max/Min
 				contentArea = new Rect (
 					contentArea.X + 1,
 					contentArea.Y + 1,
@@ -291,8 +290,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>Distance Horizontally or Vertically to the splitter line when
-		/// neither view is collapsed.
+		/// <para>Attempts to update the <see cref="splitterDistances"/> of line at <paramref name="idx"/>
+		/// to the new <paramref name="value"/>.  Returns false if the new position is not allowed because of
+		/// <see cref="Tile.MinSize"/>, location of other splitters etc.
 		/// </para>
 		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
 		/// are supported for this property.</para>
@@ -400,19 +400,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts <see cref="Tile.View"/> of <see cref="Tiles"/> element <paramref name="idx"/>
-		/// from a regular <see cref="View"/> to a new nested <see cref="TileView"/> with <paramref name="panels"/>
-		/// number of panels.  Returns false if the element already contains a nested view.
+		/// Converts of <see cref="Tiles"/> element <paramref name="idx"/>
+		/// from a regular <see cref="View"/> to a new nested <see cref="TileView"/> 
+		/// the specified <paramref name="numberOfPanels"/>.
+		/// Returns false if the element already contains a nested view.
 		/// </summary>
-		/// <remarks>After successful splitting, the <paramref name="result"/> <see cref="TileView"/>
-		/// will contain the previous (replaced) <see cref="Tile.View"/> at element 0.</remarks>
+		/// <remarks>After successful splitting, the old contents will be moved to the 
+		/// <paramref name="result"/> <see cref="TileView"/>'s first tile.</remarks>
 		/// <param name="idx">The element of <see cref="Tiles"/> that is to be subdivided.</param>
-		/// <param name="panels">The number of panels that the <see cref="Tile"/> should be split into</param>
+		/// <param name="numberOfPanels">The number of panels that the <see cref="Tile"/> should be split into</param>
 		/// <param name="result">The new nested <see cref="TileView"/>.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
 		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
 		/// <see cref="TileView"/></returns>
-		public bool TrySplitTile (int idx, int panels, out TileView result)
+		public bool TrySplitTile (int idx, int numberOfPanels, out TileView result)
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
@@ -427,7 +428,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var newContainer = new TileView (panels) {
+			var newContainer = new TileView (numberOfPanels) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				parentTileView = this,
