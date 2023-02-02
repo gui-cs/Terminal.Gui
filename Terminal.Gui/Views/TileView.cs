@@ -13,6 +13,7 @@ namespace Terminal.Gui {
 
 		TileView parentTileView;
 
+
 		/// <summary>
 		/// Use this field instead of Border to create an integrated
 		/// Border in which lines connect with subviews and splitters
@@ -391,7 +392,7 @@ namespace Terminal.Gui {
 
 				// TODO: Render with focus color if focused
 
-				var title = titleToRender.Tile.Title;
+				var title = titleToRender.GetTrimmedTitle();			
 
 				for (int i = 0; i < title.Length; i++) {
 					AddRune (renderAt.X + i, renderAt.Y, title [i]);
@@ -568,7 +569,7 @@ namespace Terminal.Gui {
 					titles.AddRange (GetAllTitlesToRenderRecursively (subTileView, depth + 1));
 				} else {
 					if (sub.Title.Length > 0) {
-						titles.Add (new TileTitleToRender (sub, depth));
+						titles.Add (new TileTitleToRender (v,sub, depth));
 					}
 				}
 			}
@@ -722,12 +723,14 @@ namespace Terminal.Gui {
 		}
 
 		private class TileTitleToRender {
+			public TileView Parent { get; }
 			public Tile Tile { get; }
 
 			public int Depth { get; }
 
-			public TileTitleToRender (Tile tile, int depth)
+			public TileTitleToRender (TileView parent, Tile tile, int depth)
 			{
+				Parent = parent;
 				Tile = tile;
 				Depth = depth;
 			}
@@ -741,6 +744,21 @@ namespace Terminal.Gui {
 				Tile.View.ViewToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
 				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
+			}
+
+			internal string GetTrimmedTitle ()
+			{
+				Dim spaceDim = Tile.View.Width;
+
+				var spaceAbs = spaceDim.Anchor (Parent.Bounds.Width);
+
+				var title = Tile.Title;
+
+				if(title.Length > spaceAbs) {
+					return title.Substring (0, spaceAbs);
+				}
+
+				return title;
 			}
 		}
 

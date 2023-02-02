@@ -2013,6 +2013,56 @@ namespace UnitTests {
 
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill()
+		{
+			var tileView = GetNestedContainer3Right1Down (true,true,1);
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌T1───┬T3────┬T2───┐
+│11111│333333│22222│
+│11111│333333│22222│
+│11111│333333│22222│
+│11111│333333│22222│
+│11111├T4────┤22222│
+│11111│444444│22222│
+│11111│444444│22222│
+│11111│444444│22222│
+└─────┴──────┴─────┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestNestedContainer3RightAnd1Down_TitleTriesToOverspill ()
+		{
+			var tileView = GetNestedContainer3Right1Down (true, true, 1);
+
+			tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
+
+			((TileView)tileView.Tiles.ElementAt (1).View)
+				.Tiles.ElementAt(1).Title = new string ('y', 100);
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌xxxxx┬T3────┬T2───┐
+│11111│333333│22222│
+│11111│333333│22222│
+│11111│333333│22222│
+│11111│333333│22222│
+│11111├yyyyyy┤22222│
+│11111│444444│22222│
+│11111│444444│22222│
+│11111│444444│22222│
+└─────┴──────┴─────┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
@@ -2039,7 +2089,7 @@ namespace UnitTests {
 		/// </summary>
 		/// <param name="withBorder"></param>
 		/// <returns></returns>
-		private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false)
+		private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2)
 		{
 			var container =
 			new TileView (3) {
@@ -2048,12 +2098,16 @@ namespace UnitTests {
 				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
 			};
 
-			Assert.True (container.TrySplitTile (2, 2, out var newContainer));
+			Assert.True (container.TrySplitTile (split, 2, out var newContainer));
 
 			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 
 			int i = 0;
-			foreach (var tile in container.Tiles.Take (2).Union (newContainer.Tiles)) {
+			foreach (var tile in container.Tiles.Union (newContainer.Tiles)) {
+				
+				if(tile.View is TileView) {
+					continue;
+				}
 				i++;
 
 				if (withTitles) {
