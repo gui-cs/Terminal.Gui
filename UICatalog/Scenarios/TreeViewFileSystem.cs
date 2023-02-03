@@ -164,7 +164,7 @@ namespace UICatalog.Scenarios {
 			{
 				Title = "Details";
 				Visible = true;
-				CanFocus = true;				
+				CanFocus = true;
 			}
 
 			public FileSystemInfo FileInfo {
@@ -251,7 +251,7 @@ namespace UICatalog.Scenarios {
 		{
 			miShowLines.Checked = !miShowLines.Checked;
 
-			treeViewFiles.Style.ShowBranchLines = miShowLines.Checked;
+			treeViewFiles.Style.ShowBranchLines = (bool)miShowLines.Checked;
 			treeViewFiles.SetNeedsDisplay ();
 		}
 
@@ -270,14 +270,14 @@ namespace UICatalog.Scenarios {
 		{
 			miColoredSymbols.Checked = !miColoredSymbols.Checked;
 
-			treeViewFiles.Style.ColorExpandSymbol = miColoredSymbols.Checked;
+			treeViewFiles.Style.ColorExpandSymbol = (bool)miColoredSymbols.Checked;
 			treeViewFiles.SetNeedsDisplay ();
 		}
 		private void InvertExpandableSymbols ()
 		{
 			miInvertSymbols.Checked = !miInvertSymbols.Checked;
 
-			treeViewFiles.Style.InvertExpandSymbolColors = miInvertSymbols.Checked;
+			treeViewFiles.Style.InvertExpandSymbolColors = (bool)miInvertSymbols.Checked;
 			treeViewFiles.SetNeedsDisplay ();
 		}
 
@@ -285,7 +285,7 @@ namespace UICatalog.Scenarios {
 		{
 			miFullPaths.Checked = !miFullPaths.Checked;
 
-			if (miFullPaths.Checked) {
+			if (miFullPaths.Checked == true) {
 				treeViewFiles.AspectGetter = (f) => f.FullName;
 			} else {
 				treeViewFiles.AspectGetter = (f) => f.Name;
@@ -296,17 +296,17 @@ namespace UICatalog.Scenarios {
 		private void SetLeaveLastRow ()
 		{
 			miLeaveLastRow.Checked = !miLeaveLastRow.Checked;
-			treeViewFiles.Style.LeaveLastRow = miLeaveLastRow.Checked;
+			treeViewFiles.Style.LeaveLastRow = (bool)miLeaveLastRow.Checked;
 		}
 		private void SetCursor ()
 		{
 			miCursor.Checked = !miCursor.Checked;
-			treeViewFiles.DesiredCursorVisibility = miCursor.Checked ? CursorVisibility.Default : CursorVisibility.Invisible;
+			treeViewFiles.DesiredCursorVisibility = miCursor.Checked == true ? CursorVisibility.Default : CursorVisibility.Invisible;
 		}
 		private void SetMultiSelect ()
 		{
 			miMultiSelect.Checked = !miMultiSelect.Checked;
-			treeViewFiles.MultiSelect = miMultiSelect.Checked;
+			treeViewFiles.MultiSelect = (bool)miMultiSelect.Checked;
 		}
 
 
@@ -319,7 +319,7 @@ namespace UICatalog.Scenarios {
 
 			miCustomColors.Checked = !miCustomColors.Checked;
 
-			if (miCustomColors.Checked) {
+			if (miCustomColors.Checked == true) {
 				treeViewFiles.ColorGetter = (m) => {
 					if (m is DirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
 					if (m is FileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;

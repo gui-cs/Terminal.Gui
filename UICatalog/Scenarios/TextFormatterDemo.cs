@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 			block.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
 			block.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
 			block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
-			block.AppendLine ("                       ░  ░                 "); 
+			block.AppendLine ("                       ░  ░                 ");
 			blockText.Text = ustring.Make (block.ToString ()); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
 			Win.Add (blockText);
 
@@ -82,8 +82,8 @@ namespace UICatalog.Scenarios {
 
 			unicodeCheckBox.Toggled += (previous) => {
 				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].Text = previous ? text : unicode;
-					multipleLines [(int)alignment].Text = previous ? text : unicode;
+					singleLines [(int)alignment].Text = previous == true ? text : unicode;
+					multipleLines [(int)alignment].Text = previous == true ? text : unicode;
 				}
 			};
 		}

@@ -176,21 +176,21 @@ namespace UICatalog.Scenarios {
 		{
 			miShowTopLine.Checked = !miShowTopLine.Checked;
 
-			tabView.Style.ShowTopLine = miShowTopLine.Checked;
+			tabView.Style.ShowTopLine = (bool)miShowTopLine.Checked;
 			tabView.ApplyStyleChanges ();
 		}
 		private void ShowBorder ()
 		{
 			miShowBorder.Checked = !miShowBorder.Checked;
 
-			tabView.Style.ShowBorder = miShowBorder.Checked;
+			tabView.Style.ShowBorder = (bool)miShowBorder.Checked;
 			tabView.ApplyStyleChanges ();
 		}
 		private void SetTabsOnBottom ()
 		{
 			miTabsOnBottom.Checked = !miTabsOnBottom.Checked;
 
-			tabView.Style.TabsOnBottom = miTabsOnBottom.Checked;
+			tabView.Style.TabsOnBottom = (bool)miTabsOnBottom.Checked;
 			tabView.ApplyStyleChanges ();
 		}
 

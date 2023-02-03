@@ -13,9 +13,11 @@ namespace Terminal.Gui {
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
+		Rune charNullChecked;
 		Rune charChecked;
 		Rune charUnChecked;
-		bool @checked;
+		bool? @checked;
+		bool allowNullChecked;
 
 		/// <summary>
 		///   Toggled event, raised when the <see cref="CheckBox"/>  is toggled.
@@ -25,12 +27,12 @@ namespace Terminal.Gui {
 		///   raised when the <see cref="CheckBox"/> is activated either with
 		///   the mouse or the keyboard. The passed <c>bool</c> contains the previous state. 
 		/// </remarks>
-		public event Action<bool> Toggled;
+		public event Action<bool?> Toggled;
 
 		/// <summary>
 		/// Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.
 		/// </summary>
-		public virtual void OnToggled (bool previousChecked)
+		public virtual void OnToggled (bool? previousChecked)
 		{
 			Toggled?.Invoke (previousChecked);
 		}
@@ -75,6 +77,7 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring s, bool is_checked)
 		{
+			charNullChecked = new Rune (Driver != null ? Driver.NullChecked : '?');
 			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
 			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
 			Checked = is_checked;
@@ -100,11 +103,20 @@ namespace Terminal.Gui {
 			case TextAlignment.Left:
 			case TextAlignment.Centered:
 			case TextAlignment.Justified:
-				TextFormatter.Text = ustring.Make (Checked ? charChecked : charUnChecked) + " " + GetFormatterText ();
+				TextFormatter.Text = ustring.Make (GetCheckedState ()) + " " + GetFormatterText ();
 				break;
 			case TextAlignment.Right:
-				TextFormatter.Text = GetFormatterText () + " " + ustring.Make (Checked ? charChecked : charUnChecked);
+				TextFormatter.Text = GetFormatterText () + " " + ustring.Make (GetCheckedState ());
 				break;
+			}
+		}
+
+		Rune GetCheckedState ()
+		{
+			switch (Checked) {
+			case true: return charChecked;
+			case false: return charUnChecked;
+			default: return charNullChecked;
 			}
 		}
 
@@ -119,12 +131,29 @@ namespace Terminal.Gui {
 		/// <summary>
 		///    The state of the <see cref="CheckBox"/>
 		/// </summary>
-		public bool Checked {
+		public bool? Checked {
 			get => @checked;
 			set {
+				if (value == null && !AllowNullChecked) {
+					return;
+				}
 				@checked = value;
 				UpdateTextFormatterText ();
 				ProcessResizeView ();
+			}
+		}
+
+		/// <summary>
+		/// If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false.
+		/// If <see langword="false"/> only allows <see cref="Checked"/> to be true or false.
+		/// </summary>
+		public bool AllowNullChecked {
+			get => allowNullChecked;
+			set {
+				allowNullChecked = value;
+				if (Checked == null) {
+					Checked = false;
+				}
 			}
 		}
 
@@ -159,7 +188,21 @@ namespace Terminal.Gui {
 				SetFocus ();
 			}
 			var previousChecked = Checked;
-			Checked = !Checked;
+			if (AllowNullChecked) {
+				switch (previousChecked) {
+				case null:
+					Checked = true;
+					break;
+				case true:
+					Checked = false;
+					break;
+				case false:
+					Checked = null;
+					break;
+				}
+			} else {
+				Checked = !Checked;
+			}
 			OnToggled (previousChecked);
 			SetNeedsDisplay ();
 			return true;
@@ -171,11 +214,7 @@ namespace Terminal.Gui {
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
 				return false;
 
-			SetFocus ();
-			var previousChecked = Checked;
-			Checked = !Checked;
-			OnToggled (previousChecked);
-			SetNeedsDisplay ();
+			ToggleChecked ();
 
 			return true;
 		}

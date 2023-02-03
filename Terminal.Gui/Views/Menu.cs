@@ -33,6 +33,9 @@ namespace Terminal.Gui {
 	public class MenuItem {
 		ustring title;
 		ShortcutHelper shortcutHelper;
+		bool allowNullChecked;
+		MenuItemCheckStyle checkType;
+
 		internal int TitleLength => GetMenuBarItemLength (Title);
 
 		/// <summary>
@@ -158,19 +161,42 @@ namespace Terminal.Gui {
 		internal int Width => 1 + // space before Title
 			TitleLength +
 			2 + // space after Title - BUGBUG: This should be 1 
-			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) + // check glyph + space 
+			(Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) + // check glyph + space 
 			(Help.ConsoleWidth > 0 ? 2 + Help.ConsoleWidth : 0) + // Two spaces before Help
 			(ShortcutTag.ConsoleWidth > 0 ? 2 + ShortcutTag.ConsoleWidth : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
 		/// </summary>
-		public bool Checked { set; get; }
+		public bool? Checked { set; get; }
+
+		/// <summary>
+		/// Used only if <see cref="CheckType"/> is of <see cref="MenuItemCheckStyle.Checked"/> type.
+		/// If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false.
+		/// If <see langword="false"/> only allows <see cref="Checked"/> to be true or false.
+		/// </summary>
+		public bool AllowNullChecked {
+			get => allowNullChecked;
+			set {
+				allowNullChecked = value;
+				if (Checked == null) {
+					Checked = false;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Sets or gets the <see cref="MenuItemCheckStyle"/> of a menu item where <see cref="Checked"/> is set to <see langword="true"/>.
 		/// </summary>
-		public MenuItemCheckStyle CheckType { get; set; }
+		public MenuItemCheckStyle CheckType {
+			get => checkType;
+			set {
+				checkType = value;
+				if (checkType == MenuItemCheckStyle.Checked && !allowNullChecked && Checked == null) {
+					Checked = false;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets the parent for this <see cref="MenuItem"/>.
@@ -197,6 +223,33 @@ namespace Terminal.Gui {
 		public bool GetMenuBarItem ()
 		{
 			return IsFromSubMenu;
+		}
+
+		/// <summary>
+		/// Toggle the <see cref="Checked"/> between three states if <see cref="AllowNullChecked"/> is <see langword="true"/>
+		/// or between two states if <see cref="AllowNullChecked"/> is <see langword="false"/>.
+		/// </summary>
+		public void ToggleChecked ()
+		{
+			if (checkType != MenuItemCheckStyle.Checked) {
+				throw new InvalidOperationException ("This isn't a Checked MenuItemCheckStyle!");
+			}
+			var previousChecked = Checked;
+			if (AllowNullChecked) {
+				switch (previousChecked) {
+				case null:
+					Checked = true;
+					break;
+				case true:
+					Checked = false;
+					break;
+				case false:
+					Checked = null;
+					break;
+				}
+			} else {
+				Checked = !Checked;
+			}
 		}
 
 		void GetHotKey ()
@@ -500,6 +553,7 @@ namespace Terminal.Gui {
 				}
 
 				ustring textToDraw;
+				var nullCheckedChar = Driver.NullChecked;
 				var checkChar = Driver.Selected;
 				var uncheckedChar = Driver.UnSelected;
 
@@ -509,7 +563,9 @@ namespace Terminal.Gui {
 				}
 
 				// Support Checked even though CheckType wasn't set
-				if (item.Checked) {
+				if (item.CheckType == MenuItemCheckStyle.Checked && item.Checked == null) {
+					textToDraw = ustring.Make (new Rune [] { nullCheckedChar, ' ' }) + item.Title;
+				} else if (item.Checked == true) {
 					textToDraw = ustring.Make (new Rune [] { checkChar, ' ' }) + item.Title;
 				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) || item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
 					textToDraw = ustring.Make (new Rune [] { uncheckedChar, ' ' }) + item.Title;

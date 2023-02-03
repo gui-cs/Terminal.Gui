@@ -1734,5 +1734,96 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void AllowNullChecked_Get_Set ()
+		{
+			MenuItem mi = new MenuItem ("Check this out 你", "", null) {
+				CheckType = MenuItemCheckStyle.Checked
+			};
+			mi.Action = mi.ToggleChecked;
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("Nullable Checked",new MenuItem [] {
+					mi
+				})
+			});
+			new CheckBox ();
+			var top = Application.Top;
+			top.Add (menu);
+			Application.Begin (top);
+
+			Assert.False (mi.Checked);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Application.MainLoop.MainIteration ();
+			Assert.True (mi.Checked);
+			Assert.True (menu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed,
+				View = menu
+			}));
+			Assert.True (menu.openMenu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked,
+				View = menu.openMenu
+			}));
+			Application.MainLoop.MainIteration ();
+			Assert.False (mi.Checked);
+
+			mi.AllowNullChecked = true;
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Application.MainLoop.MainIteration ();
+			Assert.Null (mi.Checked);
+			Assert.True (menu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed,
+				View = menu
+			}));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ Nullable Checked       
+┌──────────────────────┐
+│ ⍰ Check this out 你  │
+└──────────────────────┘", output);
+			Assert.True (menu.openMenu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked,
+				View = menu.openMenu
+			}));
+			Application.MainLoop.MainIteration ();
+			Assert.True (mi.Checked);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Application.MainLoop.MainIteration ();
+			Assert.False (mi.Checked);
+			Assert.True (menu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed,
+				View = menu
+			}));
+			Assert.True (menu.openMenu.MouseEvent (new MouseEvent () {
+				X = 0,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked,
+				View = menu.openMenu
+			}));
+			Application.MainLoop.MainIteration ();
+			Assert.Null (mi.Checked);
+
+			mi.AllowNullChecked = false;
+			Assert.False (mi.Checked);
+
+			mi.CheckType = MenuItemCheckStyle.NoCheck;
+			Assert.Throws<InvalidOperationException> (mi.ToggleChecked);
+
+			mi.CheckType = MenuItemCheckStyle.Radio;
+			Assert.Throws<InvalidOperationException> (mi.ToggleChecked);
+		}
 	}
 }

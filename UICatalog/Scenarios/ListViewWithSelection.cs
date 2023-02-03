@@ -43,7 +43,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (_allowMarkingCB) + 1,
 				Y = 0,
 				Height = 1,
-				Visible = _allowMarkingCB.Checked
+				Visible = (bool)_allowMarkingCB.Checked
 			};
 			Win.Add (_allowMultipleCB);
 			_allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.AnchorEnd (k.Length + 3),
 				Y = 0,
 			};
-			keepCheckBox.Toggled += (_) => _scrollBar.KeepContentAlwaysInViewport = keepCheckBox.Checked;
+			keepCheckBox.Toggled += (_) => _scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
 			Win.Add (keepCheckBox);
 		}
 
@@ -113,9 +113,9 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void _customRenderCB_Toggled (bool prev)
+		private void _customRenderCB_Toggled (bool? prev)
 		{
-			if (prev) {
+			if (prev == true) {
 				_listView.SetSource (_scenarios);
 			} else {
 				_listView.Source = new ScenarioListDataSource (_scenarios);
@@ -124,16 +124,16 @@ namespace UICatalog.Scenarios {
 			Win.SetNeedsDisplay ();
 		}
 
-		private void AllowMarkingCB_Toggled (bool prev)
+		private void AllowMarkingCB_Toggled (bool? prev)
 		{
-			_listView.AllowsMarking = !prev;
+			_listView.AllowsMarking = (bool)!prev;
 			_allowMultipleCB.Visible = _listView.AllowsMarking;
 			Win.SetNeedsDisplay ();
 		}
 
-		private void AllowMultipleCB_Toggled (bool prev)
+		private void AllowMultipleCB_Toggled (bool? prev)
 		{
-			_listView.AllowsMultipleSelection = !prev;
+			_listView.AllowsMultipleSelection = (bool)!prev;
 			Win.SetNeedsDisplay ();
 		}
 

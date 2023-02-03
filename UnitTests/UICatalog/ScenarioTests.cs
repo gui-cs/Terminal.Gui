@@ -299,7 +299,7 @@ namespace UICatalog.Tests {
 
 			_computedCheckBox.Toggled += (previousState) => {
 				if (_curView != null) {
-					_curView.LayoutStyle = previousState ? LayoutStyle.Absolute : LayoutStyle.Computed;
+					_curView.LayoutStyle = previousState == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
 				}
 			};
