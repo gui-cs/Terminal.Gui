@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -181,7 +181,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
