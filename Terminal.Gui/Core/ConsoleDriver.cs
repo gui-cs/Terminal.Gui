@@ -8,8 +8,11 @@
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Unix.Terminal;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -209,153 +212,27 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The default color for text, when the view is not focused.
 		/// </summary>
-		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
+		public Attribute Normal { get { return _normal; } set { _normal = value; } }
 
 		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
-		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
+		public Attribute Focus { get { return _focus; } set { _focus = value; } }
 
 		/// <summary>
 		/// The color for the hotkey when a view is not focused
 		/// </summary>
-		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
+		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = value; } }
 
 		/// <summary>
 		/// The color for the hotkey when the view is focused.
 		/// </summary>
-		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = value; } }
 
 		/// <summary>
 		/// The default color for text, when the view is disabled.
 		/// </summary>
-		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
-
-		bool preparingScheme = false;
-
-		Attribute SetAttribute (Attribute attribute, [CallerMemberName] string callerMemberName = null)
-		{
-			if (!Application._initialized && !preparingScheme)
-				return attribute;
-
-			if (preparingScheme)
-				return attribute;
-
-			preparingScheme = true;
-			switch (caller) {
-			case "TopLevel":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Base":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Menu":
-				switch (callerMemberName) {
-				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				case "Disabled":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Dialog":
-				switch (callerMemberName) {
-				case "Normal":
-					if (Focus.Background != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					break;
-				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-					if (Focus.Background != attribute.Background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
-					if (Normal.Foreground != attribute.Background)
-						Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
-					if (Focus.Foreground != attribute.Background)
-						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
-					break;
-				}
-				break;
-
-			case "Error":
-				switch (callerMemberName) {
-				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
-					break;
-				case "HotNormal":
-				case "HotFocus":
-					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
-					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
-					break;
-				}
-				break;
-			}
-			preparingScheme = false;
-			return attribute;
-		}
+		public Attribute Disabled { get { return _disabled; } set { _disabled = value; } }
 
 		/// <summary>
 		/// Compares two <see cref="ColorScheme"/> objects for equality.
@@ -681,11 +558,13 @@ namespace Terminal.Gui {
 		/// <param name="col">Column to move the cursor to.</param>
 		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
+
 		/// <summary>
-		/// Adds the specified rune to the display at the current cursor position
+		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
+
 		/// <summary>
 		/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
 		/// to equivalent, printable, Unicode chars.
@@ -694,21 +573,13 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			var controlChars = gethexaformat (c, 4);
-			if (controlChars <= 0x1F || (controlChars >= 0X7F && controlChars <= 0x9F)) {
+			if (c <= 0x1F || (c >= 0X7F && c <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (controlChars + 0x2400);
-			} else {
-				return c;
+				return new Rune (c + 0x2400);
 			}
-		}
 
-		static uint gethexaformat (uint rune, int length)
-		{
-			var hex = rune.ToString ($"x{length}");
-			var hexstr = hex.Substring (hex.Length - length, length);
-			return (uint)int.Parse (hexstr, System.Globalization.NumberStyles.HexNumber);
+			return c;
 		}
 
 		/// <summary>
@@ -722,10 +593,11 @@ namespace Terminal.Gui {
 			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
 
 		/// <summary>
-		/// Adds the specified
+		/// Adds the <paramref name="str"/> to the display at the cursor position.
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
+
 		/// <summary>
 		/// Prepare the driver and set the key and mouse events handlers.
 		/// </summary>
@@ -1390,8 +1262,78 @@ namespace Terminal.Gui {
 			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
 			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
 			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
-			Colors.Error.HotFocus = MakeColor (Color.BrightRed, Color.Gray);
+			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
 			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
+		}
+	}
+
+	/// <summary>
+	/// Helper class for console drivers to invoke shell commands to interact with the clipboard.
+	/// Used primarily by CursesDriver, but also used in Unit tests which is why it is in
+	/// ConsoleDriver.cs.
+	/// </summary>
+	internal static class ClipboardProcessRunner {
+		public static (int exitCode, string result) Bash (string commandLine, string inputText = "", bool waitForOutput = false)
+		{
+			var arguments = $"-c \"{commandLine}\"";
+			var (exitCode, result) = Process ("bash", arguments, inputText, waitForOutput);
+
+			return (exitCode, result.TrimEnd ());
+		}
+
+		public static (int exitCode, string result) Process (string cmd, string arguments, string input = null, bool waitForOutput = true)
+		{
+			var output = string.Empty;
+
+			using (Process process = new Process {
+				StartInfo = new ProcessStartInfo {
+					FileName = cmd,
+					Arguments = arguments,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true,
+					UseShellExecute = false,
+					CreateNoWindow = true,
+				}
+			}) {
+				var eventHandled = new TaskCompletionSource<bool> ();
+				process.Start ();
+				if (!string.IsNullOrEmpty (input)) {
+					process.StandardInput.Write (input);
+					process.StandardInput.Close ();
+				}
+
+				if (!process.WaitForExit (5000)) {
+					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.";
+					throw new TimeoutException (timeoutError);
+				}
+
+				if (waitForOutput && process.StandardOutput.Peek () != -1) {
+					output = process.StandardOutput.ReadToEnd ();
+				}
+
+				if (process.ExitCode > 0) {
+					output = $@"Process failed to run. Command line: {cmd} {arguments}.
+										Output: {output}
+										Error: {process.StandardError.ReadToEnd ()}";
+				}
+
+				return (process.ExitCode, output);
+			}
+		}
+
+		public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+		{
+			var result = process.WaitForExit (500);
+			if (result) {
+				process.WaitForExit ();
+			}
+			return result;
+		}
+
+		public static bool FileExists (this string value)
+		{
+			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
 		}
 	}
 }

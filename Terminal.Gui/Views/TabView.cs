@@ -53,6 +53,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
+
+		/// <summary>
+		/// Event fired when a <see cref="TabView.Tab"/> is clicked.  Can be used to cancel navigation,
+		/// show context menu (e.g. on right click) etc.
+		/// </summary>
+		public event EventHandler<TabMouseEventArgs> TabClicked;
+
+
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
@@ -98,7 +106,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Initialzies a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		public TabView () : base ()
 		{
@@ -182,7 +190,7 @@ namespace Terminal.Gui {
 
 			if (Style.ShowBorder) {
 
-				// How muc space do we need to leave at the bottom to show the tabs
+				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
@@ -347,8 +355,10 @@ namespace Terminal.Gui {
 				var maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
 
 				// if tab view is width <= 3 don't render any tabs
-				if (maxWidth == 0)
-					yield break;
+				if (maxWidth == 0) {
+					yield return new TabToRender (i, tab, string.Empty, Equals (SelectedTab, tab), 0);
+					break;
+				}
 
 				if (tabTextWidth > maxWidth) {
 					text = tab.Text.ToString ().Substring (0, (int)maxWidth);
@@ -412,7 +422,7 @@ namespace Terminal.Gui {
 
 			// if the currently selected tab is no longer a member of Tabs
 			if (SelectedTab == null || !Tabs.Contains (SelectedTab)) {
-				// select the tab closest to the one that disapeared
+				// select the tab closest to the one that disappeared
 				var toSelect = Math.Max (idx - 1, 0);
 
 				if (toSelect < Tabs.Count) {
@@ -464,31 +474,10 @@ namespace Terminal.Gui {
 				Width = Dim.Fill ();
 			}
 
-			/// <summary>
-			/// Positions the cursor at the start of the currently selected tab
-			/// </summary>
-			public override void PositionCursor ()
+			public override bool OnEnter (View view)
 			{
-				base.PositionCursor ();
-
-				var selected = host.CalculateViewport (Bounds).FirstOrDefault (t => Equals (host.SelectedTab, t.Tab));
-
-				if (selected == null) {
-					return;
-				}
-
-				int y;
-
-				if (host.Style.TabsOnBottom) {
-					y = 1;
-				} else {
-					y = host.Style.ShowTopLine ? 1 : 0;
-				}
-
-				Move (selected.X, y);
-
-
-
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+				return base.OnEnter (view);
 			}
 
 			public override void Redraw (Rect bounds)
@@ -657,7 +646,7 @@ namespace Terminal.Gui {
 					Driver.AddRune (Driver.LeftArrow);
 				}
 
-				// if there are mmore tabs to the right not visible
+				// if there are more tabs to the right not visible
 				if (ShouldDrawRightScrollIndicator (tabLocations)) {
 					Move (width - 1, y);
 
@@ -684,6 +673,22 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
+				var hit = ScreenToTab (me.X, me.Y);
+
+				bool isClick = me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
+					me.Flags.HasFlag (MouseFlags.Button2Clicked) ||
+					me.Flags.HasFlag (MouseFlags.Button3Clicked);
+
+				if (isClick) {
+					host.OnTabClicked (new TabMouseEventArgs (hit, me));
+
+					// user canceled click
+					if (me.Handled) {
+						return true;
+					}
+				}
+
+
 				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
@@ -708,7 +713,7 @@ namespace Terminal.Gui {
 						return true;
 					}
 
-					var hit = ScreenToTab (me.X, me.Y);
+
 					if (hit != null) {
 						host.SelectedTab = hit;
 						SetNeedsDisplay ();
@@ -757,6 +762,45 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Raises the <see cref="TabClicked"/> event.
+		/// </summary>
+		/// <param name="tabMouseEventArgs"></param>
+		protected virtual private void OnTabClicked (TabMouseEventArgs tabMouseEventArgs)
+		{
+			TabClicked?.Invoke (this, tabMouseEventArgs);
+		}
+
+		/// <summary>
+		/// Describes a mouse event over a specific <see cref="TabView.Tab"/> in a <see cref="TabView"/>.
+		/// </summary>
+		public class TabMouseEventArgs : EventArgs {
+
+			/// <summary>
+			/// Gets the <see cref="TabView.Tab"/> (if any) that the mouse
+			/// was over when the <see cref="MouseEvent"/> occurred.
+			/// </summary>
+			/// <remarks>This will be null if the click is after last tab
+			/// or before first.</remarks>
+			public Tab Tab { get; }
+
+			/// <summary>
+			/// Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event
+			/// and perform custom behavior (e.g. show a context menu).
+			/// </summary>
+			public MouseEvent MouseEvent { get; }
+
+			/// <summary>
+			/// Creates a new instance of the <see cref="TabMouseEventArgs"/> class.
+			/// </summary>
+			/// <param name="tab"><see cref="TabView.Tab"/> that the mouse was over when the event occurred.</param>
+			/// <param name="mouseEvent">The mouse activity being reported</param>
+			public TabMouseEventArgs (Tab tab, MouseEvent mouseEvent)
+			{
+				Tab = tab;
+				MouseEvent = mouseEvent;
+			}
+		}
 
 		/// <summary>
 		/// A single tab in a <see cref="TabView"/>

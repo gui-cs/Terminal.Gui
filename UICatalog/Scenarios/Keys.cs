@@ -48,11 +48,10 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top;
-
+			
 			Win = new TestWindow ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
@@ -60,7 +59,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 		}
 
 		public override void Setup ()
@@ -107,7 +106,7 @@ namespace UICatalog.Scenarios {
 				Shift = true
 			});
 			var maxLogEntry = $"Key{"",-5}: {fakeKeyPress}".Length;
-			var yOffset = (Top == Application.Top ? 1 : 6);
+			var yOffset = (Application.Top == Application.Top ? 1 : 6);
 			var keyStrokelist = new List<string> ();
 			var keyStrokeListView = new ListView (keyStrokelist) {
 				X = 0,
@@ -126,7 +125,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (processKeyLogLabel);
 
 			maxLogEntry = $"{fakeKeyPress}".Length;
-			yOffset = (Top == Application.Top ? 1 : 6);
+			yOffset = (Application.Top == Application.Top ? 1 : 6);
 			var processKeyListView = new ListView (((TestWindow)Win)._processKeyList) {
 				X = Pos.Left (processKeyLogLabel),
 				Y = Pos.Top (processKeyLogLabel) + yOffset,
@@ -144,7 +143,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (processHotKeyLogLabel);
 
-			yOffset = (Top == Application.Top ? 1 : 6);
+			yOffset = (Application.Top == Application.Top ? 1 : 6);
 			var processHotKeyListView = new ListView (((TestWindow)Win)._processHotKeyList) {
 				X = Pos.Left (processHotKeyLogLabel),
 				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
@@ -162,7 +161,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (processColdKeyLogLabel);
 
-			yOffset = (Top == Application.Top ? 1 : 6);
+			yOffset = (Application.Top == Application.Top ? 1 : 6);
 			var processColdKeyListView = new ListView (((TestWindow)Win)._processColdKeyList) {
 				X = Pos.Left (processColdKeyLogLabel),
 				Y = Pos.Top (processColdKeyLogLabel) + yOffset,

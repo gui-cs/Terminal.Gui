@@ -3,9 +3,15 @@
     "UICatalog": {
       "commandName": "Project"
     },
-    "UICatalog : -usc": {
+    "UICatalog -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
+    },
+    "WSL: UICatalog -usc": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll -usc",
+      "distributionName": ""
     },
     "Wizards": {
       "commandName": "Project",
@@ -23,9 +29,31 @@
       "commandName": "Project",
       "commandLineArgs": "WizardAsView"
     },
-    "Issue1719Repro": {
+    "VkeyPacketSimulator": {
       "commandName": "Project",
-      "commandLineArgs": "\"ProgressBar Styles\""
+      "commandLineArgs": "VkeyPacketSimulator"
+    },
+    "CollectionNavigatorTester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Search Collection Nav\""
+    },
+    "Charmap": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Character Map\""
+    },
+    "All Views Tester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"All Views Tester\""
+    },
+    "Windows & FrameViews": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Windows & FrameViews\""
+    },
+    "WSL : UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll",
+      "distributionName": ""
     }
   }
 }

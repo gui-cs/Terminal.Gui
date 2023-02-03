@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begin loaded.
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
@@ -77,13 +77,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
-		/// <see cref="Application.End(View)"/>.
+		/// <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> ChildClosed;
 
 		/// <summary>
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
-		/// by <see cref="Application.End(View)"/>.
+		/// by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action AllChildClosed;
 
@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 		public event Action<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
-		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(View)"/>.
+		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> Closed;
 
@@ -613,11 +613,9 @@ namespace Terminal.Gui {
 			}
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			var canChange = SetWidth (top.Frame.Width, out int rWidth);
-			if (canChange && rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Max (top.Frame.Right - 2, 0);
-			} else if (rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Min (nx + 1, top.Frame.Right - 2);
+			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
+			if (nx + mfLength > top.Frame.X + top.Frame.Width) {
+				nx = Math.Max (top.Frame.Right - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
@@ -656,11 +654,8 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			canChange = SetHeight (top.Frame.Height, out int rHeight);
-			if (canChange && rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Max (top.Frame.Bottom - 2, 0);
-			} else if (rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Min (ny + 1, top.Frame.Bottom - 2);
+			if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
+				ny = Math.Max (top.Frame.Bottom - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
@@ -701,7 +696,7 @@ namespace Terminal.Gui {
 			}
 
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-					&& top.Height is Dim.DimFill) {
+				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 				top.Height = Dim.Fill (sb.Visible ? 1 : 0);
 				layoutSubviews = true;
@@ -775,6 +770,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
+
 			int nx, ny;
 			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
 				|| mouseEvent.Flags == MouseFlags.Button2Pressed
@@ -809,32 +806,27 @@ namespace Terminal.Gui {
 						SuperView.SetNeedsDisplay ();
 					}
 					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - start.Y : Frame.Y - start.Y),
 						out nx, out ny, out _, out _);
 
 					dragPosition = new Point (nx, ny);
-					LayoutSubviews ();
-					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
-					if (X == null || X is Pos.PosAbsolute) {
-						X = nx;
-					}
-					if (Y == null || Y is Pos.PosAbsolute) {
-						Y = ny;
-					}
-					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
+					X = nx;
+					Y = ny;
+					//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
 
 					SetNeedsDisplay ();
 					return true;
 				}
 			}
 
-			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
+			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				Application.UngrabMouse ();
 				Driver.UncookMouse ();
 				dragPosition = null;
 			}
 
-			//System.Diagnostics.Debug.WriteLine (mouseEvent.ToString ());
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
+			//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
 			return false;
 		}
 

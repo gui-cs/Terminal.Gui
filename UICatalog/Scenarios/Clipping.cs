@@ -7,23 +7,10 @@ namespace UICatalog.Scenarios {
 
 	public class Clipping : Scenario {
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-
-			Top = top;
-			if (Top == null) {
-				Top = Application.Top;
-			}
-
-			Top.ColorScheme = Colors.Base;
-			//Win = new TopLevel($"CTRL-Q to Close - Scenario: {GetName ()}") {
-			//	X = 0,
-			//	Y = 0,
-			//	Width = Dim.Fill (),
-			//	Height = Dim.Fill ()
-			//};
-			//Top.Add (Win);
+			Application.Top.ColorScheme = Colors.Base;
 		}
 
 		public override void Setup ()
@@ -36,7 +23,7 @@ namespace UICatalog.Scenarios {
 				X = 0, Y = 0,
 				//ColorScheme = Colors.Dialog
 			};
-			Top.Add (label);
+			Application.Top.Add (label);
 
 			var scrollView = new ScrollView (new Rect (3, 3, 50, 20));
 			scrollView.ColorScheme = Colors.Menu;
@@ -79,7 +66,7 @@ namespace UICatalog.Scenarios {
 
 			scrollView.Add (embedded1);
 
-			Top.Add (scrollView);
+			Application.Top.Add (scrollView);
 		}
 	}
 }

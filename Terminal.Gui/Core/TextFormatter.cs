@@ -294,12 +294,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the mask to apply to the hotkey to tag it as the hotkey. The default value of <c>0x100000</c> causes
-		/// the underlying Rune to be identified as a "private use" Unicode character.
-		/// </summary>HotKeyTagMask
-		public uint HotKeyTagMask { get; set; } = 0x100000;
-
-		/// <summary>
 		/// Gets the cursor position from <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
 		/// </summary>
 		public int CursorPosition { get; set; }
@@ -317,8 +311,9 @@ namespace Terminal.Gui {
 			get {
 				// With this check, we protect against subclasses with overrides of Text
 				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
-					lines = new List<ustring> ();
-					lines.Add (ustring.Empty);
+					lines = new List<ustring> {
+						ustring.Empty
+					};
 					NeedsFormat = false;
 					return lines;
 				}
@@ -716,7 +711,7 @@ namespace Terminal.Gui {
 		}
 
 		static char [] whitespace = new char [] { ' ', '\t' };
-		private int hotKeyPos;
+		private int hotKeyPos = -1;
 
 		/// <summary>
 		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
@@ -1113,14 +1108,13 @@ namespace Terminal.Gui {
 		/// <returns>The text with the hotkey tagged.</returns>
 		/// <remarks>
 		/// The returned string will not render correctly without first un-doing the tag. To undo the tag, search for 
-		/// Runes with a bitmask of <c>otKeyTagMask</c> and remove that bitmask.
 		/// </remarks>
 		public ustring ReplaceHotKeyWithTag (ustring text, int hotPos)
 		{
 			// Set the high bit
 			var runes = text.ToRuneList ();
 			if (Rune.IsLetterOrNumber (runes [hotPos])) {
-				runes [hotPos] = new Rune ((uint)runes [hotPos] | HotKeyTagMask);
+				runes [hotPos] = new Rune ((uint)runes [hotPos]);
 			}
 			return ustring.Make (runes);
 		}
@@ -1182,10 +1176,22 @@ namespace Terminal.Gui {
 			}
 
 			var isVertical = IsVerticalDirection (textDirection);
+			var savedClip = Application.Driver?.Clip;
+			var maxBounds = bounds;
+			if (Application.Driver != null) {
+				Application.Driver.Clip = maxBounds = containerBounds == default
+					? bounds
+					: new Rect (Math.Max (containerBounds.X, bounds.X),
+					Math.Max (containerBounds.Y, bounds.Y),
+					Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
+					Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
+			}
 
 			for (int line = 0; line < linesFormated.Count; line++) {
 				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
+				if ((isVertical && line > maxBounds.Left + maxBounds.Width - bounds.X) || (!isVertical && line > maxBounds.Top + maxBounds.Height - bounds.Y))
+					break;
 
 				var runes = lines [line].ToRunes ();
 
@@ -1206,11 +1212,11 @@ namespace Terminal.Gui {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
+						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
+						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
 					}
 				} else if (textAlignment == TextAlignment.Left || textAlignment == TextAlignment.Justified) {
 					if (isVertical) {
@@ -1219,16 +1225,16 @@ namespace Terminal.Gui {
 					} else {
 						x = bounds.Left;
 					}
-					CursorPosition = hotKeyPos;
+					CursorPosition = hotKeyPos > -1 ? hotKeyPos : 0;
 				} else if (textAlignment == TextAlignment.Centered) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
-						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Left + (bounds.Width - runesWidth) / 2;
-						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
 					}
 				} else {
 					throw new ArgumentOutOfRangeException ();
@@ -1262,15 +1268,6 @@ namespace Terminal.Gui {
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start;
-				var savedClip = Application.Driver?.Clip;
-				if (Application.Driver != null) {
-					Application.Driver.Clip = containerBounds == default
-						? bounds
-						: new Rect (Math.Max (containerBounds.X, bounds.X),
-						Math.Max (containerBounds.Y, bounds.Y),
-						Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
-						Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
-				}
 
 				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
 					if (!fillRemaining && idx < 0) {
@@ -1279,6 +1276,9 @@ namespace Terminal.Gui {
 					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
+					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+						break;
+
 					var rune = (Rune)' ';
 					if (isVertical) {
 						Application.Driver?.Move (x, current);
@@ -1291,13 +1291,13 @@ namespace Terminal.Gui {
 							rune = runes [idx];
 						}
 					}
-					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
+					if (HotKeyPos > -1 && idx == HotKeyPos) {
 						if ((isVertical && textVerticalAlignment == VerticalTextAlignment.Justified) ||
-						    (!isVertical && textAlignment == TextAlignment.Justified)) {
+						(!isVertical && textAlignment == TextAlignment.Justified)) {
 							CursorPosition = idx - start;
 						}
 						Application.Driver?.SetAttribute (hotColor);
-						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
+						Application.Driver?.AddRune (rune);
 						Application.Driver?.SetAttribute (normalColor);
 					} else {
 						Application.Driver?.AddRune (rune);
@@ -1313,9 +1313,9 @@ namespace Terminal.Gui {
 						break;
 					}
 				}
-				if (Application.Driver != null)
-					Application.Driver.Clip = (Rect)savedClip;
 			}
+			if (Application.Driver != null)
+				Application.Driver.Clip = (Rect)savedClip;
 		}
 	}
 }

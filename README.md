@@ -16,6 +16,19 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ![Sample app](docfx/images/sample.gif)
 
+## Quick Start
+
+Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
+
+(Press `CTRL-Q` to exit the app)
+
+```powershell
+dotnet new --install Terminal.Gui.templates
+dotnet new tui -n myproj
+cd myproj
+dotnet run
+```
+
 ## Documentation 
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
@@ -51,99 +64,85 @@ See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/mas
 
 ## Sample Usage in C#
 
+The following example shows a basic Terminal.Gui application written in C#:
+
 ```csharp
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
 
 using Terminal.Gui;
-using NStack;
 
-Application.Init ();
+Application.Run<ExampleWindow> ();
 
-// Creates the top-level window to show
-var win = new Window ("Example App") {
-	X = 0,
-	Y = 1, // Leave one row for the toplevel menu
+System.Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
 
-	// By using Dim.Fill(), this Window will automatically resize without manual intervention
-	Width = Dim.Fill (),
-	Height = Dim.Fill ()
-};
-
-Application.Top.Add (win);
-
-// Creates a menubar, the item "New" has a help menu.
-var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "Creates a new file", null),
-				new MenuItem ("_Close", "",null),
-				new MenuItem ("_Quit", "", () => { if (Quit ()) Application.Top.Running = false; })
-			}),
-			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
-			})
-		});
-Application.Top.Add (menu);
-
-static bool Quit ()
-{
-	var n = MessageBox.Query (50, 7, "Quit Example", "Are you sure you want to quit this example?", "Yes", "No");
-	return n == 0;
-}
-
-var login = new Label ("Login: ") { X = 3, Y = 2 };
-var password = new Label ("Password: ") {
-	X = Pos.Left (login),
-	Y = Pos.Top (login) + 1
-};
-var loginText = new TextField ("") {
-	X = Pos.Right (password),
-	Y = Pos.Top (login),
-	Width = 40
-};
-var passText = new TextField ("") {
-	Secret = true,
-	X = Pos.Left (loginText),
-	Y = Pos.Top (password),
-	Width = Dim.Width (loginText)
-};
-
-// Add the views to the main window, 
-win.Add (
-	// Using Computed Layout:
-	login, password, loginText, passText,
-
-	// Using Absolute Layout:
-	new CheckBox (3, 6, "Remember me"),
-	new RadioGroup (3, 8, new ustring [] { "_Personal", "_Company" }, 0),
-	new Button (3, 14, "Ok"),
-	new Button (10, 14, "Cancel"),
-	new Label (3, 18, "Press F9 or ESC plus 9 to activate the menubar")
-);
-
-// Run blocks until the user quits the application
-Application.Run ();
-
-// Always bracket Application.Init with .Shutdown.
+// Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
-```
 
-The example above shows adding views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://gui-cs.github.io/Terminal.Gui/articles/overview.html#layout)**.
-
-Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
-
-```csharp
-using Terminal.Gui;
-
-class Demo {
-	static void Main ()
+// Defines a top-level window with border and title
+public class ExampleWindow : Window {
+	public TextField usernameText;
+	
+	public ExampleWindow ()
 	{
-		Application.Run<App> ();
-		Application.Shutdown ();
+		Title = "Example App (Ctrl+Q to quit)";
+
+		// Create input components and labels
+		var usernameLabel = new Label () { 
+			Text = "Username:" 
+		};
+
+		usernameText = new TextField ("") {
+			// Position text field adjacent to the label
+			X = Pos.Right (usernameLabel) + 1,
+
+			// Fill remaining horizontal space
+			Width = Dim.Fill (),
+		};
+
+		var passwordLabel = new Label () {
+			Text = "Password:",
+			X = Pos.Left (usernameLabel),
+			Y = Pos.Bottom (usernameLabel) + 1
+		};
+
+		var passwordText = new TextField ("") {
+			Secret = true,
+			// align with the text box above
+			X = Pos.Left (usernameText),
+			Y = Pos.Top (passwordLabel),
+			Width = Dim.Fill (),
+		};
+
+		// Create login button
+		var btnLogin = new Button () {
+			Text = "Login",
+			Y = Pos.Bottom(passwordLabel) + 1,
+			// center the login button horizontally
+			X = Pos.Center (),
+			IsDefault = true,
+		};
+
+		// When login button is clicked display a message popup
+		btnLogin.Clicked += () => {
+			if (usernameText.Text == "admin" && passwordText.Text == "password") {
+				MessageBox.Query ("Logging In", "Login Successful", "Ok");
+				Application.RequestStop ();
+			} else {
+				MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+			}
+		};
+
+		// Add the views to the Window
+		Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
 	}
 }
 ```
+
+When run the application looks as follows:
+
+![Simple Usage app](./docfx/images/Example.png)
+
+_Sample application running_
 
 ## Installing
 
@@ -157,12 +156,14 @@ To install Terminal.Gui into a .NET Core project, use the `dotnet` CLI tool with
 dotnet add package Terminal.Gui
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
+Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
-## Running and Building
+## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
 * Windows - Open `Terminal.sln` with Visual Studio 2022.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions for downloading and forking the source.
 
 ## Contributing
 

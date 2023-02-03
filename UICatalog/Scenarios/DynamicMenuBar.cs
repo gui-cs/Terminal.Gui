@@ -13,11 +13,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Top Level Windows")]
 	[ScenarioCategory ("Menus")]
 	public class DynamicMenuBar : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = Application.Top;
-			Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
 		}
 
 		public class DynamicMenuItemList {
@@ -144,7 +143,7 @@ namespace UICatalog.Scenarios {
 					TextAlignment = TextAlignment.Centered,
 					X = Pos.Right (_btnPrevious) + 1,
 					Y = Pos.Top (_btnPrevious),
-					Width = Dim.Fill () - Dim.Width (_btnAdd) - 1,
+					Width = Dim.Fill () - Dim.Function (() => _btnAdd.Frame.Width + 1),
 					Height = 1
 				};
 				_frmMenu.Add (_lblMenuBar);
