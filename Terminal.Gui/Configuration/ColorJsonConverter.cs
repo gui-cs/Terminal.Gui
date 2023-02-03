@@ -72,9 +72,5 @@ namespace Terminal.Gui.Configuration {
 				throw new JsonException ($"Unkown color value");
 			}
 		}
-
 	}
-
-
-
 }

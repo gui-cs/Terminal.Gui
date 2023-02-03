@@ -90,11 +90,14 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
+		/// Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> 
+		/// to get and set the property's value.
 		/// </summary>
 		/// <remarks>
-		/// Configuration properties must be <see langword="public"/> and <see langword="static"/> and have the <see cref="SerializableConfigurationProperty"/>
-		/// attribute. If the type of the property requires specialized JSON serialization, a <see cref="JsonConverter"/> must be provided using 
+		/// Configuration properties must be <see langword="public"/> and <see langword="static"/> 
+		/// and have the <see cref="SerializableConfigurationProperty"/>
+		/// attribute. If the type of the property requires specialized JSON serialization, 
+		/// a <see cref="JsonConverter"/> must be provided using 
 		/// the <see cref="JsonConverterAttribute"/> attribute.
 		/// </remarks>
 		public class ConfigProperty {
@@ -139,8 +142,9 @@ namespace Terminal.Gui.Configuration {
 					return PropertyValue;
 				}
 
-				if (source.GetType () != PropertyInfo!.PropertyType) {
-					throw new ArgumentException ($"The source object is not of type {PropertyInfo!.PropertyType}.");
+				var ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
+				if (source.GetType () != PropertyInfo!.PropertyType && (ut != null && source.GetType () != ut)) {
+					throw new ArgumentException ($"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}.");
 				}
 				if (PropertyValue != null && source != null) {
 					PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
@@ -220,7 +224,7 @@ namespace Terminal.Gui.Configuration {
 		/// Aplication-specific configuration settings scope.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("AppSettings")]
-		public static AppScope? AppSettings { get; set; } 
+		public static AppScope? AppSettings { get; set; }
 
 		/// <summary>
 		/// Initializes the internal state of ConfiguraitonManager. Nominally called once as part of application
@@ -283,7 +287,6 @@ namespace Terminal.Gui.Configuration {
 			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
 		}
 
-		
 		/// <summary>
 		/// Event arguments for the <see cref="ConfigurationManager"/> events.
 		/// </summary>
@@ -297,7 +300,6 @@ namespace Terminal.Gui.Configuration {
 			}
 		}
 
-
 		/// <summary>
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 		/// </summary>
@@ -310,7 +312,6 @@ namespace Terminal.Gui.Configuration {
 			Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
 			OnUpdated ();
 		}
-
 
 		/// <summary>
 		/// Called when the configuration has been updated from a configuration file. Invokes the <see cref="Updated"/>
@@ -342,7 +343,7 @@ namespace Terminal.Gui.Configuration {
 
 		/// <summary>
 		/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
-		/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called intenrally by <see cref="Load"/>
+		/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called by <see cref="Load"/>
 		/// if the <c>reset</c> parameter is <see langword="true"/>.
 		/// </summary>
 		/// <remarks>
@@ -357,7 +358,7 @@ namespace Terminal.Gui.Configuration {
 			Debug.WriteLine ($"ConfigurationManager.Reset()");
 			Settings = new SettingsScope ();
 			ThemeManager.Reset ();
-			//AppSettings.Reset ();
+			AppSettings = new AppScope ();
 
 			// To enable some unit tests, we only load from resources if the flag is set
 			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
@@ -385,6 +386,9 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		internal static void GetHardCodedDefaults ()
 		{
+			if (_allConfigProperties == null) {
+				throw new InvalidOperationException ("Initialize must be called first.");
+			}
 			Settings = new SettingsScope ();
 			ThemeManager.GetHardCodedDefaults ();
 			AppSettings?.RetrieveValues ();
@@ -398,7 +402,7 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		/// <remarks>
 		/// This only applies <see cref="SettingsScope"/> properites. Use <see cref="ThemeManager.Apply"/> to apply the 
-		/// current theme.</remarks>
+		/// current theme and <see cref="ConfigurationManager.AppSettings.Apply()"/> to apply any app-specific settings.</remarks>
 		public static void Apply ()
 		{
 			if (Settings!.Apply ()) {
@@ -612,7 +616,7 @@ namespace Terminal.Gui.Configuration {
 		internal static object? DeepMemberwiseCopy (object? source, object? destination)
 		{
 			if (destination == null) {
-				throw new ArgumentNullException (nameof(destination));
+				throw new ArgumentNullException (nameof (destination));
 			}
 
 			if (source == null) {

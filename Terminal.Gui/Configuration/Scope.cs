@@ -66,7 +66,7 @@ namespace Terminal.Gui.Configuration {
 			/// Applies the values of the properties of this scope to their corresponding static properties.
 			/// </summary>
 			/// <returns></returns>
-			public bool Apply ()
+			internal bool Apply ()
 			{
 				bool set = false;
 				foreach (var p in this.Where (t => t.Value != null && t.Value.PropertyValue != null)) {

@@ -72,26 +72,23 @@ namespace UICatalog {
 		/// </remarks>
 		public virtual void Init (ColorScheme colorScheme)
 		{
-			ConfigurationManager.Applied += (a) => {
-			};
+			//ConfigurationManager.Applied += (a) => {
+			//	if (Application.Top == null) {
+			//		return;
+			//	}
 
-			ConfigurationManager.Themes.Applied += (a) => {
-				//if (Application.Top == null) {
-				//	return;
-				//}
+			//	//// Apply changes that apply to either UICatalogTopLevel or a Scenario
+			//	//if (Application.Top.MenuBar != null) {
+			//	//	Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+			//	//	Application.Top.MenuBar.SetNeedsDisplay ();
+			//	//}
 
-				////// Apply changes that apply to either UICatalogTopLevel or a Scenario
-				////if (Application.Top.MenuBar != null) {
-				////	Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				////	Application.Top.MenuBar.SetNeedsDisplay ();
-				////}
-
-				////if (Application.Top.StatusBar != null) {
-				////	Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-				////	Application.Top.StatusBar.SetNeedsDisplay ();
-				////}
-				////Application.Top.SetNeedsDisplay ();
-			};
+			//	//if (Application.Top.StatusBar != null) {
+			//	//	Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+			//	//	Application.Top.StatusBar.SetNeedsDisplay ();
+			//	//}
+			//	//Application.Top.SetNeedsDisplay ();
+			//};
 			
 			Application.Init ();
 

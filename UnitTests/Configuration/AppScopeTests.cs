@@ -19,7 +19,30 @@ namespace Terminal.Gui.ConfigurationTests {
 
 		public class AppSettingsTestClass {
 			[SerializableConfigurationProperty (Scope = typeof (AppScope))]
-			public static bool? TestProperty { get; set; } 
+			public static bool? TestProperty { get; set; } = null;
+		}
+
+		[Fact]
+		public void TestNullable ()
+		{
+			AppSettingsTestClass.TestProperty = null;
+			Assert.Null (AppSettingsTestClass.TestProperty);
+
+			ConfigurationManager.Initialize ();
+			ConfigurationManager.GetHardCodedDefaults ();
+			ConfigurationManager.Apply ();
+			Assert.Null (AppSettingsTestClass.TestProperty);
+			var json = ConfigurationManager.ToJson ();
+			ConfigurationManager.Update (json);
+
+			AppSettingsTestClass.TestProperty = true;
+			ConfigurationManager.Initialize ();
+			ConfigurationManager.GetHardCodedDefaults ();
+			Assert.NotNull (AppSettingsTestClass.TestProperty);
+			ConfigurationManager.Apply ();
+			Assert.NotNull (AppSettingsTestClass.TestProperty);
+			json = ConfigurationManager.ToJson ();
+			ConfigurationManager.Update (json);
 		}
 
 		[Fact, AutoInitShutdown]

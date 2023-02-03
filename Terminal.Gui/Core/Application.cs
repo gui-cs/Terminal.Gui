@@ -407,8 +407,6 @@ namespace Terminal.Gui {
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load (true);
 			ConfigurationManager.Apply ();
-			ConfigurationManager.Themes.Apply ();
-			ConfigurationManager.AppSettings?.Apply ();
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;

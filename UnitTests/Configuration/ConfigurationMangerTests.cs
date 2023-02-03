@@ -321,20 +321,6 @@ namespace Terminal.Gui.ConfigurationTests {
 
 		}
 
-		[Fact]
-		public void TestValueChanges ()
-		{
-			//ConfigurationManager.GetHardCodedDefaults ();
-			//ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
-			//Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-			//var json = ConfigurationManager.ToJson ();
-
-			//ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = false;
-			//Assert.False ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-			//ConfigurationManager.Update (json);
-			//Assert.True ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
-		}
-
 		[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
 		public void TestConfigurationManagerInitDriver_NoLocations ()
 		{

@@ -13,7 +13,6 @@ using System.Threading;
 using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.Configuration.ConfigurationManager.ThemeManager;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -176,8 +175,6 @@ namespace UICatalog {
 			Thread.Sleep (500);
 			ConfigurationManager.Load ();
 			ConfigurationManager.Apply ();
-			ConfigurationManager.Themes.Apply ();
-			ConfigurationManager.AppSettings?.Apply ();
 		}
 
 		/// <summary>
@@ -345,7 +342,7 @@ namespace UICatalog {
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
 
-				ConfigurationManager.Themes.Applied += ThemeAppliedHandler;
+				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
 
 			void LoadedHandler ()
@@ -378,11 +375,11 @@ namespace UICatalog {
 
 			private void UnloadedHandler ()
 			{
-				ConfigurationManager.Themes.Applied -= ThemeAppliedHandler;
+				ConfigurationManager.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
 			
-			void ThemeAppliedHandler (ThemeManagerEventArgs a)
+			void ConfigAppliedHandler (ConfigurationManagerEventArgs a)
 			{
 				ConfigChanged ();
 			}
@@ -567,14 +564,15 @@ namespace UICatalog {
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				foreach (var theme in ConfigurationManager.Themes) {
-					var item = new MenuItem ();
-					item.Title = theme.Key;
-					item.Shortcut = Key.AltMask + theme.Key [0];
+					var item = new MenuItem {
+						Title = theme.Key,
+						Shortcut = Key.AltMask + theme.Key [0]
+					};
 					item.CheckType |= MenuItemCheckStyle.Checked;
 					item.Checked = theme.Key == ConfigurationManager.Themes.Theme;
 					item.Action += () => {
 						ConfigurationManager.Themes.Theme = theme.Key;
-						ConfigurationManager.Themes.Apply ();
+						ConfigurationManager.Apply ();
 					};
 					menuItems.Add (item);
 				}
@@ -607,10 +605,6 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
-				//if (ConfigurationManager.Themes.Theme == "UI Catalog Theme" && string.IsNullOrEmpty (_topLevelColorScheme)) {
-				//	_topLevelColorScheme = "UI Catalog Scheme";
-				//}
-
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
 				}

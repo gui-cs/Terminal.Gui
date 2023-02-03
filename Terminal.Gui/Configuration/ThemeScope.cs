@@ -201,33 +201,16 @@ namespace Terminal.Gui.Configuration {
 			/// <remarks>
 			/// This only applies <see cref="ThemeScope"/> properites. Use <see cref="ConfigurationManager.Apply"/> to apply the 
 			/// global settings.</remarks>
-			public void Apply ()
+			internal void Apply ()
 			{
 				if (Themes != null && Themes.ContainsKey (SelectedTheme)) {
 					if (Themes [SelectedTheme].Apply ()) {
 						// If there's a driver, make sure the color schemes are properly
 						// initialized.
 						Application.Driver?.InitalizeColorSchemes ();
-						OnApplied ();
 					}
 				}
 			}
-
-			/// <summary>
-			/// Called when an updated theme has been applied to the  
-			/// application. Fires the <see cref="Applied"/> event.
-			/// </summary>
-			public void OnApplied ()
-			{
-				Debug.WriteLine ($"Themes.OnApplied() -> {Theme}");
-				Applied?.Invoke (new ThemeManagerEventArgs (Theme));
-			}
-
-			/// <summary>
-			/// Event fired when an updated theme has been applied to the  
-			/// application.
-			/// </summary>
-			public event Action<ThemeManagerEventArgs>? Applied;
 
 			internal static void Reset ()
 			{
