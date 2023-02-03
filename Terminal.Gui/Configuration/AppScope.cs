@@ -13,7 +13,7 @@ namespace Terminal.Gui.Configuration {
 
 	public static partial class ConfigurationManager {
 		/// <summary>
-		/// The <see cref="Scope"/> class for application-defined configuration settings.
+		/// The <see cref="Scope{T}"/> class for application-defined configuration settings.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -39,18 +39,7 @@ namespace Terminal.Gui.Configuration {
 		/// </code>
 		/// </example> 
 		[JsonConverter (typeof (ScopeJsonConverter<AppScope>))]
-		public class AppScope : Scope {
-
-			/// <summary>
-			/// Constructs a new instance.
-			/// </summary>
-			/// <exception cref="InvalidOperationException">Thrown if a property tries to omit the class name it its name.</exception>
-			public AppScope () : base ()
-			{
-				//if (Properties.Any (p => (p.Value.PropertyInfo!.GetCustomAttribute (typeof (SerializableConfigurationProperty)) as SerializableConfigurationProperty)!.OmitClassName)) {
-				//	throw new InvalidOperationException ("AppScope property names must not omit the classname.");
-				//}
-			}
+		public class AppScope : Scope<AppScope> {
 		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class SettingsScopeTests {
@@ -15,7 +16,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 
 			Assert.Equal (3, ((Dictionary<string, ConfigurationManager.ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue).Count);
-
 
 			ConfigurationManager.GetHardCodedDefaults ();
 			Assert.NotEmpty (ConfigurationManager.Themes);
@@ -56,7 +56,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
 
 			ConfigurationManager.Settings.Apply ();
-			
+
 			// assert
 			Assert.Equal (Key.Q, Application.QuitKey);
 			Assert.Equal (Key.F, Application.AlternateForwardKey);
@@ -66,44 +66,27 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.True (Application.HeightAsBuffer);
 		}
 
-		//[Fact]
-		//public void Apply_FiresApplied ()
-		//{
-		//	ConfigurationManager.Reset ();
+		[Fact, AutoInitShutdown]
+		public void CopyUpdatedProperitesFrom_ShouldCopyChangedPropertiesOnly ()
+		{
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.End;
 
-		//	ConfigurationManager.Applied += (object sender, EventArgs e) => {
-		//		// assert
-		//		Assert.Equal (Key.Q, Application.QuitKey);
-		//		Assert.Equal (Key.F, Application.AlternateForwardKey);
-		//		Assert.Equal (Key.B, Application.AlternateBackwardKey);
-		//		Assert.True (Application.UseSystemConsole);
-		//		Assert.True (Application.IsMouseDisabled);
-		//		Assert.True (Application.HeightAsBuffer);
-		//	};
-		//}
+			var updatedSettings = new SettingsScope ();
 
-		//[Fact, AutoInitShutdown]
-		//public void CopyUpdatedProperitesFrom_ShouldCopyChangedPropertiesOnly ()
-		//{
-		//	var settings = new Settings ();
-		//	settings.QuitKey = Key.End;
-		//	var updatedSettings = new Settings ();
+			///Don't set Quitkey
+			updatedSettings["Application.AlternateForwardKey"].PropertyValue = Key.F;
+			updatedSettings["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			updatedSettings["Application.UseSystemConsole"].PropertyValue = true;
+			updatedSettings["Application.IsMouseDisabled"].PropertyValue = true;
+			updatedSettings["Application.HeightAsBuffer"].PropertyValue = true;
 
-		//	///Don't set Quitkey
-		//	// updatedSettings.QuitKey = Key.Q;
-		//	updatedSettings.AlternateForwardKey = Key.F;
-		//	updatedSettings.AlternateBackwardKey = Key.B;
-		//	updatedSettings.UseSystemConsole = true;
-		//	updatedSettings.IsMouseDisabled = true;
-		//	updatedSettings.HeightAsBuffer = true;
-
-		//	settings.CopyUpdatedProperitesFrom (updatedSettings);
-		//	Assert.Equal (Key.End, settings.QuitKey);
-		//	Assert.Equal (Key.F, settings.AlternateForwardKey);
-		//	Assert.Equal (Key.B, settings.AlternateBackwardKey);
-		//	Assert.True (settings.UseSystemConsole);
-		//	Assert.True (settings.IsMouseDisabled);
-		//	Assert.True (settings.HeightAsBuffer);
-		//}
+			ConfigurationManager.Settings.UpdateFrom (updatedSettings);
+			Assert.Equal (Key.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (Key.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
+			Assert.Equal (Key.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);
+			Assert.True ((bool)updatedSettings ["Application.UseSystemConsole"].PropertyValue);
+			Assert.True ((bool)updatedSettings ["Application.IsMouseDisabled"].PropertyValue);
+			Assert.True ((bool)updatedSettings ["Application.HeightAsBuffer"].PropertyValue);
+		}
 	}
 }

@@ -295,7 +295,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
 			pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
 			Assert.False (ConfigurationManager.Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-			Assert.True (ConfigurationManager.Themes ["Default"].Properties.ContainsKey ("FrameView.DefaultBorderStyle"));
+			Assert.True (ConfigurationManager.Themes ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
 		}
 
 		[Fact]
@@ -358,7 +358,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			
 			ConfigurationManager.Update (json);
 
-			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme].Properties ["ColorSchemes"].PropertyValue);
+			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme] ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Colors.Base, colorSchemes ["Base"]);
 			Assert.Equal (Colors.TopLevel, colorSchemes ["TopLevel"]);
 			Assert.Equal (Colors.Error, colorSchemes ["Error"]);
@@ -539,7 +539,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 
-			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First().Value.Properties ["ColorSchemes"].PropertyValue;
+			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First().Value ["ColorSchemes"].PropertyValue;
 			Assert.Equal (Color.White, colorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, colorSchemes ["Base"].Normal.Background);
 
@@ -668,6 +668,75 @@ namespace Terminal.Gui.ConfigurationTests {
 			//// Assert
 			//// Check that the settings from the highest precedence source are loaded
 			//Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
+		}
+
+
+		[Fact]
+		public void Load_FiresUpdated ()
+		{
+			ConfigurationManager.Reset ();
+			
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+
+			ConfigurationManager.Updated += ConfigurationManager_Updated;
+			bool fired = false;
+			void ConfigurationManager_Updated (ConfigurationManager.ConfigurationManagerEventArgs obj)
+			{
+				fired = true;
+				// assert
+				Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+				Assert.Equal (Key.PageDown | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
+				Assert.Equal (Key.PageUp | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
+				Assert.False ((bool)ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue);
+				Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
+				Assert.False ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
+			}
+
+			ConfigurationManager.Load (true);
+
+			// assert
+			Assert.True (fired);
+
+			ConfigurationManager.Updated -= ConfigurationManager_Updated;
+		}
+
+		[Fact]
+		public void Apply_FiresApplied ()
+		{
+			ConfigurationManager.Reset ();
+			ConfigurationManager.Applied += ConfigurationManager_Applied;
+			bool fired = false;
+			void ConfigurationManager_Applied (ConfigurationManager.ConfigurationManagerEventArgs obj)
+			{
+				fired = true;
+				// assert
+				Assert.Equal (Key.Q, Application.QuitKey);
+				Assert.Equal (Key.F, Application.AlternateForwardKey);
+				Assert.Equal (Key.B, Application.AlternateBackwardKey);
+				Assert.True (Application.UseSystemConsole);
+				Assert.True (Application.IsMouseDisabled);
+				Assert.True (Application.HeightAsBuffer);
+			}
+
+			// act
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+
+			ConfigurationManager.Apply ();
+
+			// assert
+			Assert.True (fired);
+
+			ConfigurationManager.Applied -= ConfigurationManager_Applied;
 		}
 	}
 }

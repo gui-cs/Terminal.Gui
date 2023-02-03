@@ -79,7 +79,7 @@ namespace Terminal.Gui.Configuration {
 			/// <summary>
 			/// Specifies the scope of the property. 
 			/// </summary>
-			public Type Scope { get; set; } = typeof (Scope);
+			public Type? Scope { get; set; }
 
 			/// <summary>
 			/// If <see langword="true"/>, the property will be serialized to the configuration file using only the property name
@@ -207,9 +207,6 @@ namespace Terminal.Gui.Configuration {
 			}
 			set {
 				_settings = value!;
-
-				// Update the other scopes
-				ThemeManager.Themes = (Dictionary<string, ThemeScope>)_settings.Properties ["Themes"]!.PropertyValue!;
 			}
 		}
 
@@ -286,6 +283,21 @@ namespace Terminal.Gui.Configuration {
 			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
 		}
 
+		
+		/// <summary>
+		/// Event arguments for the <see cref="ConfigurationManager"/> events.
+		/// </summary>
+		public class ConfigurationManagerEventArgs : EventArgs {
+
+			/// <summary>
+			/// Initializes a new instance of <see cref="ConfigurationManagerEventArgs"/>
+			/// </summary>
+			public ConfigurationManagerEventArgs ()
+			{
+			}
+		}
+
+
 		/// <summary>
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 		/// </summary>
@@ -296,7 +308,25 @@ namespace Terminal.Gui.Configuration {
 			// Update the existing settings with the new settings.
 			var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
 			Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
+			OnUpdated ();
 		}
+
+
+		/// <summary>
+		/// Called when the configuration has been updated from a configuration file. Invokes the <see cref="Updated"/>
+		/// event.
+		/// </summary>
+		public static void OnUpdated ()
+		{
+			Debug.WriteLine ($"ConfigurationManager.OnApplied()");
+			Updated?.Invoke (new ConfigurationManagerEventArgs ());
+		}
+
+		/// <summary>
+		/// Event fired when the configuration has been upddated from a configuration source.  
+		/// application.
+		/// </summary>
+		public static event Action<ConfigurationManagerEventArgs>? Updated;
 
 		/// <summary>
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON file.
@@ -383,14 +413,14 @@ namespace Terminal.Gui.Configuration {
 		public static void OnApplied ()
 		{
 			Debug.WriteLine ($"ConfigurationManager.OnApplied()");
-			Applied?.Invoke (new SettingsScope.EventArgs ());
+			Applied?.Invoke (new ConfigurationManagerEventArgs ());
 		}
 
 		/// <summary>
 		/// Event fired when an updated configuration has been applied to the  
 		/// application.
 		/// </summary>
-		public static event Action<SettingsScope.EventArgs>? Applied;
+		public static event Action<ConfigurationManagerEventArgs>? Applied;
 
 		/// <summary>
 		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c> into <see cref="ConfigurationManager"/>. 
@@ -400,10 +430,7 @@ namespace Terminal.Gui.Configuration {
 			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
 			using Stream? stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName)!;
 			using StreamReader reader = new StreamReader (stream);
-			string json = reader.ReadToEnd ();
-			if (json != null) {
-				Settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
-			}
+			Update (reader.ReadToEnd ());
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
 		}
 
@@ -553,7 +580,6 @@ namespace Terminal.Gui.Configuration {
 			if (reset) Reset ();
 
 			// LibraryResoruces is always loaded by Reset
-
 			if (Locations.HasFlag (ConfigLocations.GlobalAppDirectory)) LoadGlobalAppDirectory ();
 			if (Locations.HasFlag (ConfigLocations.GlobalHomeDirectory)) LoadGlobalHomeDirectory ();
 			if (Locations.HasFlag (ConfigLocations.AppResources)) LoadAppResources ();
@@ -571,7 +597,6 @@ namespace Terminal.Gui.Configuration {
 			emptyScope.Clear ();
 			return JsonSerializer.Serialize<SettingsScope> (emptyScope, serializerOptions);
 		}
-
 
 		/// <summary>
 		/// System.Text.Json does not support copying a deserialized object to an existing instance.
@@ -594,6 +619,22 @@ namespace Terminal.Gui.Configuration {
 				return null!;
 			}
 
+			if (source.GetType () == typeof (SettingsScope)) {
+				return ((SettingsScope)destination).UpdateFrom ((SettingsScope)source);
+			}
+			if (source.GetType () == typeof (ThemeScope)) {
+				return ((ThemeScope)destination).UpdateFrom ((ThemeScope)source);
+			}
+			if (source.GetType () == typeof (AppScope)) {
+				return ((AppScope)destination).UpdateFrom ((AppScope)source);
+			}
+
+			// If value type, just use copy constructor.
+			if (source.GetType ().IsValueType || source.GetType () == typeof (string)) {
+				return source;
+			}
+
+			// Dictionary
 			if (source.GetType ().IsGenericType && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>))) {
 				foreach (var srcKey in ((IDictionary)source).Keys) {
 					if (((IDictionary)destination).Contains (srcKey))
@@ -605,16 +646,7 @@ namespace Terminal.Gui.Configuration {
 				return destination;
 			}
 
-			if (source.GetType ().BaseType == typeof (Scope)) {
-				return ((Scope)destination).UpdateFrom ((Scope)source);
-
-			}
-
-			// If value type, just use copy constructor.
-			if (source.GetType ().IsValueType || source.GetType () == typeof (string)) {
-				return source;
-			}
-
+			// ALl other object types
 			var sourceProps = source?.GetType ().GetProperties ().Where (x => x.CanRead).ToList ();
 			var destProps = destination?.GetType ().GetProperties ().Where (x => x.CanWrite).ToList ()!;
 			foreach (var (sourceProp, destProp) in

@@ -5,30 +5,42 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 
 #nullable enable
 
 namespace Terminal.Gui.Configuration {
 	public static partial class ConfigurationManager {
+
 		/// <summary>
 		/// Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
 		/// scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
 		/// </summary>
-		public abstract class Scope : IDictionary<string, ConfigProperty> {
+		public class Scope<T> : Dictionary<string, ConfigProperty> { //, IScope<Scope<T>> {
 			/// <summary>
 			/// Crates a new instance.
 			/// </summary>
-			public Scope ()
+			public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
 			{
-				var props = ConfigurationManager._allConfigProperties!.Where (cp =>
-					(cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty))
-					as SerializableConfigurationProperty)?.Scope == this.GetType ());
-				Properties = props.ToDictionary (dict => dict.Key,
-					dict => new ConfigProperty () { PropertyInfo = dict.Value.PropertyInfo, PropertyValue = null }, StringComparer.InvariantCultureIgnoreCase);
+				foreach (var p in GetScopeProperties ()) {
+					Add (p.Key, new ConfigProperty () { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
+				}
 			}
 
-			internal object? UpdateFrom (Scope source)
+			private IEnumerable<KeyValuePair<string, ConfigProperty>> GetScopeProperties ()
+			{
+				return ConfigurationManager._allConfigProperties!.Where (cp =>
+					(cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty))
+					as SerializableConfigurationProperty)?.Scope == GetType ());
+			}
+
+			/// <summary>
+			/// Updates this instance from the specified source scope.
+			/// </summary>
+			/// <param name="source"></param>
+			/// <returns>The updated scope (this).</returns>
+			public object? UpdateFrom (Scope<T> source)
 			{
 				foreach (var prop in source) {
 					if (ContainsKey (prop.Key))
@@ -40,128 +52,38 @@ namespace Terminal.Gui.Configuration {
 				return this;
 			}
 
-			internal void RetrieveValues ()
+			/// <summary>
+			/// Retrieves the values of the properties of this scope from their corresponding static properties.
+			/// </summary>
+			public void RetrieveValues ()
 			{
 				foreach (var p in this.Where (cp => cp.Value.PropertyInfo != null)) {
 					p.Value.RetrieveValue ();
 				}
-
 			}
 
 			/// <summary>
-			/// Applies all congiguration properties of this scope that have a non-null <see cref="ConfigProperty.PropertyValue"/>.
+			/// Applies the values of the properties of this scope to their corresponding static properties.
 			/// </summary>
-			/// <returns><see langword="true"/> if any property was non-null and was set.</returns>
-			public bool Apply()
+			/// <returns></returns>
+			public bool Apply ()
 			{
 				bool set = false;
 				foreach (var p in this.Where (t => t.Value != null && t.Value.PropertyValue != null)) {
-					set = p.Value.Apply ();
+					if (p.Value.Apply ()) {
+						set = true;
+					}
 				}
 				return set;
 			}
-
-			/// <summary>
-			/// Gets the dictionary of <see cref="ConfigProperty"/> objects for this scope.
-			/// </summary>
-			/// <remarks>
-			/// This dictionary is populated in the constructor of the <see cref="Scope"/> class with the properties
-			/// attributed with the <see cref="SerializableConfigurationProperty"/> attribute 
-			/// and whose <see cref="SerializableConfigurationProperty.Scope"/> 
-			/// is the same as the type of this scope.
-			/// </remarks>
-			[JsonIgnore]
-			public Dictionary<string, ConfigProperty> Properties { get; set; }
-
-			// We are derived from IDictionary so that the ColorSchemes JSON element 
-			// has a list of ColorScheme objects. 
-			#region IDictionary			
-			/// <inheritdoc/>
-			public ICollection<string> Keys => ((IDictionary<string, ConfigProperty>)Properties).Keys;
-			/// <inheritdoc/>
-			public ICollection<ConfigProperty> Values => ((IDictionary<string, ConfigProperty>)Properties).Values;
-			/// <inheritdoc/>
-			public int Count => ((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).Count;
-			/// <inheritdoc/>
-			public bool IsReadOnly => ((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).IsReadOnly;
-
-			/// <inheritdoc/>
-			[JsonIgnore]
-			public ConfigProperty this [string index] {
-				get {
-					return Properties [index];
-				}
-				set {
-					Properties [index] = value;
-				}
-			}
-			
-			/// <inheritdoc/>
-			public void Add (string key, ConfigProperty value)
-			{
-				((IDictionary<string, ConfigProperty>)Properties).Add (key, value);
-			}
-			/// <inheritdoc/>
-			public bool ContainsKey (string key)
-			{
-				return ((IDictionary<string, ConfigProperty>)Properties).ContainsKey (key);
-			}
-			/// <inheritdoc/>
-			public bool Remove (string key)
-			{
-				return ((IDictionary<string, ConfigProperty>)Properties).Remove (key);
-			}
-			/// <inheritdoc/>
-			public bool TryGetValue (string key, out ConfigProperty value)
-			{
-				return ((IDictionary<string, ConfigProperty>)Properties).TryGetValue (key, out value!);
-			}
-			/// <inheritdoc/>
-			public void Add (KeyValuePair<string, ConfigProperty> item)
-			{
-				((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).Add (item);
-			}
-			/// <inheritdoc/>
-			public void Clear ()
-			{
-				((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).Clear ();
-			}
-			/// <inheritdoc/>
-			public bool Contains (KeyValuePair<string, ConfigProperty> item)
-			{
-				return ((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).Contains (item);
-			}
-			/// <inheritdoc/>
-			public void CopyTo (KeyValuePair<string, ConfigProperty> [] array, int arrayIndex)
-			{
-				((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).CopyTo (array, arrayIndex);
-			}
-			/// <inheritdoc/>
-			public bool Remove (KeyValuePair<string, ConfigProperty> item)
-			{
-				return ((ICollection<KeyValuePair<string, ConfigProperty>>)Properties).Remove (item);
-			}
-			/// <inheritdoc/>
-			public IEnumerator<KeyValuePair<string, ConfigProperty>> GetEnumerator ()
-			{
-				return ((IEnumerable<KeyValuePair<string, ConfigProperty>>)Properties).GetEnumerator ();
-			}
-
-			IEnumerator IEnumerable.GetEnumerator ()
-			{
-				return ((IEnumerable)Properties).GetEnumerator ();
-			}
-
-			#endregion
 		}
 
-
 		/// <summary>
-		/// Converts <see cref="Scope"/> instances to/from JSON. Does all the heavy lifting of reading/writing
+		/// Converts <see cref="Scope{T}"/> instances to/from JSON. Does all the heavy lifting of reading/writing
 		/// config data to/from <see cref="ConfigurationManager"/> JSON documents.
 		/// </summary>
-		/// <typeparam name="Tscope"></typeparam>
-		public class ScopeJsonConverter<Tscope> : JsonConverter<Tscope> {
+		/// <typeparam name="scopeT"></typeparam>
+		public class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT> {
 			// See: https://stackoverflow.com/questions/60830084/how-to-pass-an-argument-by-reference-using-reflection
 			internal abstract class ReadHelper {
 				public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
@@ -177,19 +99,16 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <inheritdoc/>
-			public override Tscope Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+			public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
 				if (reader.TokenType != JsonTokenType.StartObject) {
 					throw new JsonException ();
 				}
 
-				var scope = Activator.CreateInstance (typeof (Tscope)) as Scope;
-				// Get ConfigProperty store for this Scope type
-
-				//var scopeProperties = typeToConvert!.GetProperty ("Properties")?.GetValue (scope) as Dictionary<string, ConfigProperty>;
+				var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
 				while (reader.Read ()) {
 					if (reader.TokenType == JsonTokenType.EndObject) {
-						return (Tscope)(object)scope!;
+						return scope!;
 					}
 					if (reader.TokenType != JsonTokenType.PropertyName) {
 						throw new JsonException ();
@@ -209,7 +128,7 @@ namespace Terminal.Gui.Configuration {
 									converter = factory.CreateConverter (propertyType, options);
 								}
 							}
-							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (Tscope), propertyType!)!, converter) as ReadHelper;
+							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (scopeT), propertyType!)!, converter) as ReadHelper;
 							scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
 						} else {
 							scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
@@ -230,21 +149,20 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <inheritdoc/>
-			public override void Write (Utf8JsonWriter writer, Tscope root, JsonSerializerOptions options)
+			public override void Write (Utf8JsonWriter writer, scopeT scope, JsonSerializerOptions options)
 			{
 				writer.WriteStartObject ();
 
-				var properties = root!.GetType ().GetProperties ().Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute)) != null);
+				var properties = scope!.GetType ().GetProperties ().Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute)) != null);
 				foreach (var p in properties) {
 					writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
-					JsonSerializer.Serialize (writer, root.GetType ().GetProperty (p.Name)?.GetValue (root), options);
+					JsonSerializer.Serialize (writer, scope.GetType ().GetProperty (p.Name)?.GetValue (scope), options);
 				}
 
-				var configStore = (Dictionary<string, ConfigProperty>)typeof (Tscope).GetProperty ("Properties")?.GetValue (root)!;
-				foreach (var p in from p in configStore
+				foreach (var p in from p in scope
 						  .Where (cp =>
 							cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is
-							SerializableConfigurationProperty scp && scp?.Scope == typeof (Tscope))
+							SerializableConfigurationProperty scp && scp?.Scope == typeof (scopeT))
 						  where p.Value.PropertyValue != null
 						  select p) {
 
@@ -266,10 +184,8 @@ namespace Terminal.Gui.Configuration {
 						JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
 					}
 				}
-
 				writer.WriteEndObject ();
 			}
 		}
-
 	}
 }

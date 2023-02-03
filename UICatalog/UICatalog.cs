@@ -13,6 +13,7 @@ using System.Threading;
 using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.Configuration.ConfigurationManager.ThemeManager;
 
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
@@ -381,7 +382,7 @@ namespace UICatalog {
 				Unloaded -= UnloadedHandler;
 			}
 			
-			void ThemeAppliedHandler (ConfigurationManager.ThemeScope.EventArgs a)
+			void ThemeAppliedHandler (ThemeManagerEventArgs a)
 			{
 				ConfigChanged ();
 			}

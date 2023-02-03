@@ -350,7 +350,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
+		/// Event arguments for <see cref="Title"/> chane events.
 		/// </summary>
 		public class TitleEventArgs : EventArgs {
 			/// <summary>

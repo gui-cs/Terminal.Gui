@@ -19,26 +19,9 @@ namespace Terminal.Gui.Configuration {
 		///  },
 		/// </code></example>
 		/// <remarks>
-		/// The nested class <see cref="ScopeJsonConverter{rootT}"/> Does all the heavy lifting for serialization 
-		/// of the <see cref="SettingsScope"/> object. Uses reflection to determine
-		/// how to serialize properties based on their type (and [JsonConverter] attributes). 
 		/// </remarks>
 		[JsonConverter (typeof (ScopeJsonConverter<SettingsScope>))]
-		public class SettingsScope : Scope {
-
-			/// <summary>
-			/// Event arguments for the <see cref="ConfigurationManager"/> events.
-			/// </summary>
-			public class EventArgs : System.EventArgs {
-
-				/// <summary>
-				/// Initializes a new instance of <see cref="EventArgs"/>
-				/// </summary>
-				public EventArgs ()
-				{
-				}
-			}
-			
+		public class SettingsScope : Scope<SettingsScope> {
 			/// <summary>
 			/// Points to our JSON schema.
 			/// </summary>

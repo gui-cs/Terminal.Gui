@@ -51,24 +51,7 @@ namespace Terminal.Gui.Configuration {
 		/// 	}
 		/// </code></example> 
 		[JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
-		public class ThemeScope : Scope {
-			/// <summary>
-			/// Event arguments for the <see cref="ThemeManager"/> events.
-			/// </summary>
-			public class EventArgs : System.EventArgs {
-				/// <summary>
-				/// The name of the new active theme..
-				/// </summary>
-				public string NewTheme { get; set; } = string.Empty;
-
-				/// <summary>
-				/// Initializes a new instance of <see cref="EventArgs"/>
-				/// </summary>
-				public EventArgs (string newTheme)
-				{
-					NewTheme = newTheme;
-				}
-			}
+		public class ThemeScope : Scope<ThemeScope> {
 		}
 
 		/// <summary>
@@ -82,6 +65,10 @@ namespace Terminal.Gui.Configuration {
 		/// The <see cref="ThemeManager.Theme"/> property is used to detemrine the currently active theme. 
 		/// </para>
 		/// </remarks>
+		/// <para>
+		/// <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property is accessed.
+		/// Accessing <see cref="ThemeManager.Instance"/> is the same as accessing <see cref="ConfigurationManager.Themes"/>.
+		/// </para>
 		/// <example><code>
 		/// 	"Themes": [
 		/// 	{
@@ -126,7 +113,6 @@ namespace Terminal.Gui.Configuration {
 			public static ThemeManager Instance { get { return _instance; } }
 
 			private static string theme = string.Empty;
-			private static Dictionary<string, ThemeScope>? themes;
 
 			/// <summary>
 			/// The currently selected theme. This is the internal version; see <see cref="Theme"/>.
@@ -137,10 +123,11 @@ namespace Terminal.Gui.Configuration {
 				set {
 					var oldTheme = theme;
 					theme = value;
-					if (oldTheme != theme && themes != null && themes.ContainsKey (theme)) {
+					if (oldTheme != theme && 
+						ConfigurationManager.Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes &&
+						themes.ContainsKey (theme)) {
 						ConfigurationManager.Settings! ["Theme"].PropertyValue = theme;
 						Instance.OnThemeChanged (oldTheme);
-						//Instance.Apply ();
 					}
 				}
 			}
@@ -158,20 +145,37 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			/// <summary>
+			/// Event arguments for the <see cref="ThemeManager"/> events.
+			/// </summary>
+			public class ThemeManagerEventArgs : EventArgs {
+				/// <summary>
+				/// The name of the new active theme..
+				/// </summary>
+				public string NewTheme { get; set; } = string.Empty;
+
+				/// <summary>
+				/// Initializes a new instance of <see cref="ThemeManagerEventArgs"/>
+				/// </summary>
+				public ThemeManagerEventArgs (string newTheme)
+				{
+					NewTheme = newTheme;
+				}
+			}
+
+			/// <summary>
 			/// Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.
 			/// </summary>
-			public void OnThemeChanged (string theme)
+			internal void OnThemeChanged (string theme)
 			{
 				Debug.WriteLine ($"Themes.OnThemeChanged({theme}) -> {Theme}");
-				ThemeChanged?.Invoke (new ThemeScope.EventArgs (theme));
+				ThemeChanged?.Invoke (new ThemeManagerEventArgs (theme));
 			}
 
 			/// <summary>
 			/// Event fired he selected theme has changed.
 			/// application.
 			/// </summary>
-			public event Action<ThemeScope.EventArgs>? ThemeChanged;
-
+			public event Action<ThemeManagerEventArgs>? ThemeChanged;
 
 			/// <summary>
 			/// Holds the <see cref="ThemeScope"/> definitions. 
@@ -179,13 +183,14 @@ namespace Terminal.Gui.Configuration {
 			[JsonInclude, JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
 			[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
 			public static Dictionary<string, ThemeScope>? Themes {
-				get => themes ?? new Dictionary<string, ThemeScope> ();
+				get => Settings? ["Themes"]?.PropertyValue as Dictionary<string, ThemeScope>; // themes ?? new Dictionary<string, ThemeScope> ();
 				set {
-					if (themes == null || value == null) {
-						themes = value;
-					} else {
-						themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
-					}
+					//if (themes == null || value == null) {
+					//	themes = value;
+					//} else {
+					//	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
+					//}
+					Settings! ["Themes"].PropertyValue = value;
 				}
 			}
 
@@ -198,7 +203,7 @@ namespace Terminal.Gui.Configuration {
 			/// global settings.</remarks>
 			public void Apply ()
 			{
-				if (Themes!.ContainsKey (SelectedTheme)) {
+				if (Themes != null && Themes.ContainsKey (SelectedTheme)) {
 					if (Themes [SelectedTheme].Apply ()) {
 						// If there's a driver, make sure the color schemes are properly
 						// initialized.
@@ -215,14 +220,14 @@ namespace Terminal.Gui.Configuration {
 			public void OnApplied ()
 			{
 				Debug.WriteLine ($"Themes.OnApplied() -> {Theme}");
-				Applied?.Invoke (new ThemeScope.EventArgs (Theme));
+				Applied?.Invoke (new ThemeManagerEventArgs (Theme));
 			}
 
 			/// <summary>
 			/// Event fired when an updated theme has been applied to the  
 			/// application.
 			/// </summary>
-			public event Action<ThemeScope.EventArgs>? Applied;
+			public event Action<ThemeManagerEventArgs>? Applied;
 
 			internal static void Reset ()
 			{
