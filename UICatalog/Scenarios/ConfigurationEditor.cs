@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios {
 	public class ConfigurationEditor : Scenario {
 		TabView tabView;
 
-		private static ColorScheme? editorColorScheme = new ColorScheme () {
+		private static ColorScheme editorColorScheme = new ColorScheme () {
 			Normal = new Attribute (Color.Red, Color.White),
 			Focus = new Attribute (Color.Red, Color.Black),
 			HotFocus = new Attribute (Color.BrightRed, Color.Black),
@@ -30,7 +30,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private static Action? EditorColorSchemeChanged;
+		private static Action EditorColorSchemeChanged;
 
 		private string [] configFiles = {
 			"~/.tui/UICatalog.config.json",

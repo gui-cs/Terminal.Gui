@@ -60,15 +60,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			ConfigurationManager.Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Dialog.ButtonAlignments.Right;
 
-			// ConfigurationManager.Settings should NOT apply theme settings
-			ConfigurationManager.Settings.Apply ();
-			Assert.Equal (Dialog.ButtonAlignments.Center, Dialog.DefaultButtonAlignment);
-
-			// ConfigurationManager.Settings should NOT apply theme settings
-			ConfigurationManager.Apply ();
-			Assert.Equal (Dialog.ButtonAlignments.Center, Dialog.DefaultButtonAlignment);
-
-			ConfigurationManager.Themes.Apply ();
+			ConfigurationManager.ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
 			Assert.Equal (Dialog.ButtonAlignments.Right, Dialog.DefaultButtonAlignment);
 		}
 		

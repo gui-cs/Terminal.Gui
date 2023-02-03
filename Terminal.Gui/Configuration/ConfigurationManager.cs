@@ -345,11 +345,11 @@ namespace Terminal.Gui.Configuration {
 				var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
 				Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
 				OnUpdated ();
-			} catch (JsonException je) {
+			} catch (Exception e) {
 				if (ThrowOnJsonErrors ?? false) {
 					throw;
 				} else {
-					AddJsonError ($"Error deserializing {source}: {je.Message}");
+					AddJsonError ($"Error deserializing {source}: {e.Message}");
 				}
 			}
 		}
@@ -407,7 +407,7 @@ namespace Terminal.Gui.Configuration {
 			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
 
 			Apply ();
-			Themes?.Apply ();
+			ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
 			AppSettings?.Apply ();
 		}
 
@@ -445,7 +445,10 @@ namespace Terminal.Gui.Configuration {
 		/// </summary>
 		public static void Apply ()
 		{
-			if (Settings!.Apply ()) {
+			bool settings = Settings?.Apply () ?? false;
+			bool themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+			bool appsettings = AppSettings?.Apply () ?? false;
+			if (settings || themes || appsettings) {
 				OnApplied ();
 			}
 		}

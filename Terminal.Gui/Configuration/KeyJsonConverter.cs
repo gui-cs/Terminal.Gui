@@ -13,7 +13,7 @@ namespace Terminal.Gui.Configuration {
 		{
 			if (reader.TokenType == JsonTokenType.StartObject) {
 				Key key = Key.Unknown;;
-				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> {
+				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> (comparer: StringComparer.InvariantCultureIgnoreCase) {
 					{ "Shift", Key.ShiftMask },
 					{ "Ctrl", Key.CtrlMask },
 					{ "Alt", Key.AltMask }
@@ -30,8 +30,8 @@ namespace Terminal.Gui.Configuration {
 						string propertyName = reader.GetString ();
 						reader.Read ();
 
-						switch (propertyName) {
-						case "Key":
+						switch (propertyName.ToLowerInvariant()) {
+						case "key":
 							if (reader.TokenType == JsonTokenType.String) {
 								Enum.TryParse(reader.GetString(), false, out key);
 								if (key == Key.Unknown) {
@@ -50,7 +50,7 @@ namespace Terminal.Gui.Configuration {
 
 							throw new JsonException ("Key is invalid.");
 
-						case "Modifiers":
+						case "modifiers":
 							if (reader.TokenType == JsonTokenType.StartArray) {
 								while (reader.Read ()) {
 									if (reader.TokenType == JsonTokenType.EndArray) {

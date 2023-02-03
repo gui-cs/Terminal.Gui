@@ -42,7 +42,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Act
 			Themes.Theme = "testTheme";
-			Themes.Apply ();
+			Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
 			// Assert
 			var updatedScheme = Colors.ColorSchemes ["test"];
@@ -65,7 +65,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			theme ["Dialog.DefaultBorder"].PropertyValue = new Border () { Effect3D = false }; // default is true
 
 			Themes.Theme = "testTheme";
-			Themes.Apply ();
+			Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
 			Assert.False (Dialog.DefaultBorder.Effect3D);
 		}

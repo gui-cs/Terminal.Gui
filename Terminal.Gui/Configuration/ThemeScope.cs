@@ -52,6 +52,14 @@ namespace Terminal.Gui.Configuration {
 		/// </code></example> 
 		[JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 		public class ThemeScope : Scope<ThemeScope> {
+
+			/// <inheritdoc/>
+			internal override bool Apply ()
+			{
+				var ret = base.Apply ();
+				Application.Driver?.InitalizeColorSchemes ();
+				return ret;
+			}
 		}
 
 		/// <summary>
@@ -123,7 +131,7 @@ namespace Terminal.Gui.Configuration {
 				set {
 					var oldTheme = theme;
 					theme = value;
-					if (oldTheme != theme && 
+					if (oldTheme != theme &&
 						ConfigurationManager.Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes &&
 						themes.ContainsKey (theme)) {
 						ConfigurationManager.Settings! ["Theme"].PropertyValue = theme;
@@ -191,24 +199,6 @@ namespace Terminal.Gui.Configuration {
 					//	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
 					//}
 					Settings! ["Themes"].PropertyValue = value;
-				}
-			}
-
-			/// <summary>
-			/// Applies the theme settings in the current <see cref="ThemeScope"/> (determiend by <see cref="Theme"/>
-			/// to the running <see cref="Application"/> instance.
-			/// </summary>
-			/// <remarks>
-			/// This only applies <see cref="ThemeScope"/> properites. Use <see cref="ConfigurationManager.Apply"/> to apply the 
-			/// global settings.</remarks>
-			internal void Apply ()
-			{
-				if (Themes != null && Themes.ContainsKey (SelectedTheme)) {
-					if (Themes [SelectedTheme].Apply ()) {
-						// If there's a driver, make sure the color schemes are properly
-						// initialized.
-						Application.Driver?.InitalizeColorSchemes ();
-					}
 				}
 			}
 

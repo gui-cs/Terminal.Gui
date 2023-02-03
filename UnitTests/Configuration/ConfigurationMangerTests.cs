@@ -10,7 +10,7 @@ using Xunit;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests {
-	public class ConfigurationMangerTests {
+	public class ConfigurationManagerTests {
 
 		public static readonly JsonSerializerOptions _jsonOptions = new() {
 			Converters = {
@@ -209,6 +209,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void Reset_Resets()
 		{
+			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 			ConfigurationManager.Reset ();
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
@@ -217,6 +218,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
 		{
+			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 			// arrange
 			ConfigurationManager.Reset ();
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -531,8 +533,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Now re-apply
 			ConfigurationManager.Apply ();
-			ConfigurationManager.Themes.Apply ();
-			
+
 			Assert.Equal (Key.Z | Key.AltMask, Application.QuitKey);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 

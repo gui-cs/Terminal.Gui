@@ -33,7 +33,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			string json = $"\"{colorName}\"";
 
 			// Act
-			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationMangerTests._jsonOptions);
+			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationManagerTests._jsonOptions);
 
 			// Assert
 			Assert.Equal (expectedColor, actualColor);
@@ -138,13 +138,13 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Test deserializing from human-readable color names
 			var json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\"}";
-			var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationMangerTests._jsonOptions);
+			var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
 			Assert.Equal (Color.Blue, attribute.Foreground);
 			Assert.Equal (Color.Green, attribute.Background);
 
 			// Test deserializing from RGB values
 			json = "{\"Foreground\":\"rgb(255,0,0)\",\"Background\":\"rgb(0,255,0)\"}";
-			attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationMangerTests._jsonOptions);
+			attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
 			Assert.Equal (Color.BrightRed, attribute.Foreground);
 			Assert.Equal (Color.BrightGreen, attribute.Background);
 		}
@@ -154,7 +154,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Test serializing to human-readable color names
 			var attribute = new Attribute (Color.Blue, Color.Green);
-			var json = JsonSerializer.Serialize<Attribute> (attribute, ConfigurationMangerTests._jsonOptions);
+			var json = JsonSerializer.Serialize<Attribute> (attribute, ConfigurationManagerTests._jsonOptions);
 			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\"}", json);
 		}
 	}
@@ -198,10 +198,10 @@ namespace Terminal.Gui.ConfigurationTests {
 				HotFocus = Attribute.Make (Color.BrightBlue, Color.Gray),
 				Disabled = Attribute.Make (Color.DarkGray, Color.Blue)
 			};
-			var serializedColorScheme = JsonSerializer.Serialize<ColorScheme> (expectedColorScheme, ConfigurationMangerTests._jsonOptions);
+			var serializedColorScheme = JsonSerializer.Serialize<ColorScheme> (expectedColorScheme, ConfigurationManagerTests._jsonOptions);
 
 			// Act
-			var actualColorScheme = JsonSerializer.Deserialize<ColorScheme> (serializedColorScheme, ConfigurationMangerTests._jsonOptions);
+			var actualColorScheme = JsonSerializer.Deserialize<ColorScheme> (serializedColorScheme, ConfigurationManagerTests._jsonOptions);
 
 			// Assert
 			Assert.Equal (expectedColorScheme, actualColorScheme);
