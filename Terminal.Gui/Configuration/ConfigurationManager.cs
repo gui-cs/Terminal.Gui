@@ -316,6 +316,9 @@ namespace Terminal.Gui.Configuration {
 			jsonErrors.AppendLine (error);
 		}
 
+		/// <summary>
+		/// Prints any Json deserialization errors that occurred during deserialization to the console.
+		/// </summary>
 		public static void PrintJsonErrors ()
 		{
 			if (jsonErrors.Length > 0) {

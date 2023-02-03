@@ -9,7 +9,6 @@ using static Terminal.Gui.Configuration.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
-#nullable enable
 	[ScenarioMetadata (Name: "Configuration Editor", Description: "Edits Terminal.Gui Config Files.")]
 	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory ("Files and IO"), ScenarioCategory ("TextView")]
 	public class ConfigurationEditor : Scenario {
@@ -23,7 +22,7 @@ namespace UICatalog.Scenarios {
 		};
 
 		[SerializableConfigurationProperty (Scope = typeof (AppScope))]
-		public static ColorScheme? EditorColorScheme {
+		public static ColorScheme EditorColorScheme {
 			get => editorColorScheme;
 			set {
 				editorColorScheme = value;
@@ -31,7 +30,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private static Action EditorColorSchemeChanged;
+		private static Action? EditorColorSchemeChanged;
 
 		private string [] configFiles = {
 			"~/.tui/UICatalog.config.json",
@@ -96,7 +95,7 @@ namespace UICatalog.Scenarios {
 				if (!fileInfo.Exists) {
 					if (!Directory.Exists (fileInfo.DirectoryName)) {
 						// Create dir
-						Directory.CreateDirectory (fileInfo.DirectoryName);
+						Directory.CreateDirectory (fileInfo.DirectoryName!);
 					}
 
 					// Create empty config file
@@ -111,8 +110,8 @@ namespace UICatalog.Scenarios {
 
 		private void Reload ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
-			tab.SavedText = File.ReadAllText (tab.File.FullName);
+			var tab = tabView!.SelectedTab as OpenedFile;
+			tab!.SavedText = File.ReadAllText (tab!.File.FullName);
 		}
 
 		/// <summary>
@@ -130,26 +129,27 @@ namespace UICatalog.Scenarios {
 				Text = initialText
 			};
 
-			var tab = new OpenedFile (tabName, fileInfo, textView);
-			tabView.AddTab (tab, true);
+			OpenedFile tab = new OpenedFile (tabName, fileInfo, textView);
+			tabView?.AddTab (tab, true);
 
 			// when user makes changes rename tab to indicate unsaved
 			textView.KeyUp += (k) => {
 
 				// if current text doesn't match saved text
+				string tabStr = tab.Text.ToString ()!;
 				var areDiff = tab.UnsavedChanges;
 				if (areDiff) {
-					if (!tab.Text.ToString ().EndsWith ('*')) {
+					if (!tabStr.EndsWith ('*')) {
 
-						tab.Text = tab.Text.ToString () + '*';
-						tabView.SetNeedsDisplay ();
+						tab.Text = tabStr + '*';
+						tabView?.SetNeedsDisplay ();
 					}
 				} else {
 
-					if (tab.Text.ToString ().EndsWith ('*')) {
+					if (tabStr.EndsWith ('*')) {
 
-						tab.Text = tab.Text.ToString ().TrimEnd ('*');
-						tabView.SetNeedsDisplay ();
+						tab.Text = tabStr.TrimEnd ('*');
+						tabView?.SetNeedsDisplay ();
 					}
 				}
 			};
@@ -157,17 +157,16 @@ namespace UICatalog.Scenarios {
 
 		public void Save ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
-			tab.Save ();
+			(tabView?.SelectedTab as OpenedFile)!.Save();
 			tabView.SetNeedsDisplay ();
 		}
 
 		private void Quit ()
 		{
-			foreach (var t in tabView.Tabs) {
+			foreach (var t in tabView!.Tabs) {
 				var tab = t as OpenedFile;
-				if (tab != null && tab.UnsavedChanges) {
-					int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.ToString ().TrimEnd ('*')}", "Yes", "No", "Cancel");
+				if (tab!.UnsavedChanges) {
+					int result = MessageBox.Query ("Save Changes", $"Save changes to {tab!.Text.ToString ()!.TrimEnd ('*')}", "Yes", "No", "Cancel");
 					if (result == -1 || result == 2) {
 						// user cancelled
 					}
@@ -212,7 +211,7 @@ namespace UICatalog.Scenarios {
 				System.IO.File.WriteAllText (File.FullName, newText);
 				savedText = newText;
 
-				Text = Text.ToString ().TrimEnd ('*');
+				Text = Text.ToString ()!.TrimEnd ('*');
 			}
 		}
 	}
