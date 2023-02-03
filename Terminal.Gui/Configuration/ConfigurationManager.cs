@@ -437,11 +437,8 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Applies the settings in <see cref="SettingsScope"/> to the running <see cref="Application"/> instance.
+		/// Applies the configuration settings to the running <see cref="Application"/> instance.
 		/// </summary>
-		/// <remarks>
-		/// This only applies <see cref="SettingsScope"/> properites. Use <see cref="ThemeManager.Apply"/> to apply the 
-		/// current theme and <see cref="ConfigurationManager.AppSettings.Apply()"/> to apply any app-specific settings.</remarks>
 		public static void Apply ()
 		{
 			if (Settings!.Apply ()) {

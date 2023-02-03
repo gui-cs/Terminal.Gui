@@ -9,7 +9,7 @@ using static Terminal.Gui.Configuration.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
-
+#nullable enable
 	[ScenarioMetadata (Name: "Configuration Editor", Description: "Edits Terminal.Gui Config Files.")]
 	[ScenarioCategory ("TabView"), ScenarioCategory ("Colors"), ScenarioCategory ("Files and IO"), ScenarioCategory ("TextView")]
 	public class ConfigurationEditor : Scenario {
