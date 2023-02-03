@@ -332,7 +332,8 @@ namespace Terminal.Gui.Configuration {
 		/// <summary>
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 		/// </summary>
-		/// <param name="json"></param>
+		/// <param name="json">Json document to update the settings with.</param>
+		/// <param name="source">The source (filename/resource name) the Json document was read from.</param>
 		internal static void Update (string json, string source)
 		{
 			Debug.WriteLine ($"ConfigurationManager.UpdateConfiguration()");
