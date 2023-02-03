@@ -212,7 +212,8 @@ namespace Terminal.Gui {
 
 		static void OnQuitKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			// Duplicate the list so if it changes during enumeration we're safe
+			foreach (var top in toplevels.ToArray()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -1081,6 +1082,8 @@ namespace Terminal.Gui {
 		public static void Shutdown ()
 		{
 			ResetState ();
+
+			ConfigurationManager.PrintJsonErrors ();
 		}
 
 		// Encapsulate all setting of initial state for Application; Having

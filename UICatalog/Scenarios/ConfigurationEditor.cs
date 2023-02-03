@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 
 			var lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} Quit", () => Quit()),
 				new StatusItem(Key.F5, "~F5~ Reload", () => Reload()),
 				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
 				lenStatusItem,

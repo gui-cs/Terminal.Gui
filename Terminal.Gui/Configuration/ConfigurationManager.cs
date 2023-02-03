@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Terminal.Gui.Configuration.ConfigurationManager;
@@ -301,16 +302,52 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
+		/// Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters 
+		/// an error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the 
+		/// console when <see cref="Application.Shutdown"/> is called. 
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool? ThrowOnJsonErrors { get; set; } = false;
+
+		internal static StringBuilder jsonErrors = new StringBuilder ();
+
+		private static void AddJsonError (string error)
+		{
+			jsonErrors.AppendLine (error);
+		}
+
+		public static void PrintJsonErrors ()
+		{
+			if (jsonErrors.Length > 0) {
+				Console.WriteLine ($"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:");
+				Console.WriteLine (jsonErrors.ToString ());
+			}
+		}
+
+		private static void ClearJsonErrors ()
+		{
+			jsonErrors.Clear ();
+		}
+
+		/// <summary>
 		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 		/// </summary>
 		/// <param name="json"></param>
-		internal static void Update (string json)
+		internal static void Update (string json, string source)
 		{
 			Debug.WriteLine ($"ConfigurationManager.UpdateConfiguration()");
 			// Update the existing settings with the new settings.
-			var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
-			Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
-			OnUpdated ();
+			try {
+				var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
+				Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
+				OnUpdated ();
+			} catch (JsonException je) {
+				if (ThrowOnJsonErrors ?? false) {
+					throw;
+				} else {
+					AddJsonError ($"Error deserializing {source}: {je.Message}");
+				}
+			}
 		}
 
 		/// <summary>
@@ -337,7 +374,7 @@ namespace Terminal.Gui.Configuration {
 		{
 			// Read the JSON file
 			string json = File.ReadAllText (filePath);
-			Update (json);
+			Update (json, filePath);
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {filePath}");
 		}
 
@@ -351,11 +388,13 @@ namespace Terminal.Gui.Configuration {
 		/// </remarks>
 		public static void Reset ()
 		{
+			Debug.WriteLine ($"ConfigurationManager.Reset()");
 			if (_allConfigProperties == null) {
 				ConfigurationManager.Initialize ();
 			}
 
-			Debug.WriteLine ($"ConfigurationManager.Reset()");
+			ClearJsonErrors ();
+
 			Settings = new SettingsScope ();
 			ThemeManager.Reset ();
 			AppSettings = new AppScope ();
@@ -434,7 +473,7 @@ namespace Terminal.Gui.Configuration {
 			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
 			using Stream? stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName)!;
 			using StreamReader reader = new StreamReader (stream);
-			Update (reader.ReadToEnd ());
+			Update (reader.ReadToEnd (), resourceName);
 			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
 		}
 
@@ -473,7 +512,7 @@ namespace Terminal.Gui.Configuration {
 				using Stream? stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (embeddedStylesResourceName);
 				using StreamReader reader = new StreamReader (stream!);
 				string json = reader.ReadToEnd ();
-				Update (json);
+				Update (json, embeddedStylesResourceName);
 				Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
 			}
 		}

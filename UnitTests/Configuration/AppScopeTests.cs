@@ -32,8 +32,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.GetHardCodedDefaults ();
 			ConfigurationManager.Apply ();
 			Assert.Null (AppSettingsTestClass.TestProperty);
-			var json = ConfigurationManager.ToJson ();
-			ConfigurationManager.Update (json);
 
 			AppSettingsTestClass.TestProperty = true;
 			ConfigurationManager.Initialize ();
@@ -41,8 +39,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.NotNull (AppSettingsTestClass.TestProperty);
 			ConfigurationManager.Apply ();
 			Assert.NotNull (AppSettingsTestClass.TestProperty);
-			json = ConfigurationManager.ToJson ();
-			ConfigurationManager.Update (json);
 		}
 
 		[Fact, AutoInitShutdown]

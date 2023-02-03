@@ -317,7 +317,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.GetHardCodedDefaults ();
 			var json = ConfigurationManager.ToJson ();
 
-			ConfigurationManager.Update (json);
+			ConfigurationManager.Update (json, "TestConfigurationManagerToJson");
 
 		}
 
@@ -342,7 +342,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Change Base
 			var json = ConfigurationManager.ToJson ();
 			
-			ConfigurationManager.Update (json);
+			ConfigurationManager.Update (json, "TestConfigurationManagerInitDriver");
 
 			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme] ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Colors.Base, colorSchemes ["Base"]);
@@ -515,7 +515,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			";
 
 			ConfigurationManager.Reset ();
-			ConfigurationManager.Update (json);
+			ConfigurationManager.Update (json, "TestConfigurationManagerUpdateFromJson");
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 			Assert.Equal (Key.Z | Key.AltMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
@@ -541,8 +541,9 @@ namespace Terminal.Gui.ConfigurationTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestConfigurationManagerInvalidJsonAsserts ()
+		public void TestConfigurationManagerInvalidJsonThrows ()
 		{
+			ConfigurationManager.ThrowOnJsonErrors = true;
 			// "yellow" is not a color
 			string json = @"
 			{
@@ -566,7 +567,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
+			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
 			Assert.Equal ("Invalid color string: 'yellow'", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
@@ -592,7 +593,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
 			Assert.Equal ("Unrecognized property name: AbNormal", jsonException.Message);
 
 			// Modify hotNormal background only 
@@ -617,8 +618,101 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
 			Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
+
+			Assert.Equal (0, ConfigurationManager.jsonErrors.Length);
+
+			ConfigurationManager.ThrowOnJsonErrors = false;
+		}
+
+		[Fact]
+		public void TestConfigurationManagerInvalidJsonLogs ()
+		{
+			Application.Init (new FakeDriver ());
+
+			ConfigurationManager.ThrowOnJsonErrors = false;
+			// "yellow" is not a color
+			string json = @"
+			{
+				""Themes"" : {
+					""ThemeDefinitions"" : [ 
+                                        {
+						""Default"" : {
+							""ColorSchemes"": [
+							{
+								""UserDefined"": {
+									""hotNormal"": {
+										""foreground"": ""yellow"",
+										""background"": ""1234""
+									}
+								}
+							}
+							]
+						}
+					}
+					]
+				}
+			}";
+
+			ConfigurationManager.Update (json, "test");
+
+			// AbNormal is not a ColorScheme attribute
+			json = @"
+			{
+				""Themes"" : {
+					""ThemeDefinitions"" : [ 
+                                        {
+						""Default"" : {
+							""ColorSchemes"": [
+							{
+								""UserDefined"": {
+									""AbNormal"": {
+										""foreground"": ""green"",
+										""background"": ""1234""
+									}
+								}
+							}
+							]
+						}
+					}
+					]
+				}
+			}";
+
+			ConfigurationManager.Update (json, "test");
+
+			// Modify hotNormal background only 
+			json = @"
+			{
+				""Themes"" : {
+					""ThemeDefinitions"" : [ 
+                                        {
+						""Default"" : {
+							""ColorSchemes"": [
+							{
+								""UserDefined"": {
+									""hotNormal"": {
+										""background"": ""cyan""
+									}
+								}
+							}
+							]
+						}
+					}
+					]
+				}
+			}";
+
+			ConfigurationManager.Update (json, "test");
+
+			ConfigurationManager.Update ("{}}", "test");
+
+			Assert.NotEqual (0, ConfigurationManager.jsonErrors.Length);
+
+			Application.Shutdown ();
+
+			ConfigurationManager.ThrowOnJsonErrors = false;
 		}
 
 		[Fact, AutoInitShutdown]
