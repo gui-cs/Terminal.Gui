@@ -2,7 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using Terminal.Gui;
+using Terminal.UI;
 using NStack;
 
 namespace UICatalog.Scenarios {

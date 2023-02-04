@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using Xunit.Abstractions;
 using static AutoInitShutdownAttribute;
 
-namespace Terminal.Gui.DriverTests {
+namespace Terminal.UI.DriverTests {
 	public class ClipboardTests {
 		readonly ITestOutputHelper output;
 

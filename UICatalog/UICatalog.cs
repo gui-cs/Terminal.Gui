@@ -6,12 +6,12 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 using Microsoft.DotNet.PlatformAbstractions;
 using Rune = System.Rune;
 
 /// <summary>
-/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+/// UI Catalog is a comprehensive sample library for Terminal.UI. It provides a simple UI for adding to the catalog of scenarios.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -21,7 +21,7 @@ using Rune = System.Rune;
 /// <list type="number">
 ///	<item>
 ///		<description>
-///		Be an easy to use showcase for Terminal.Gui concepts and features.
+///		Be an easy to use showcase for Terminal.UI concepts and features.
 ///		</description>
 ///	</item>
 ///	<item>
@@ -80,14 +80,14 @@ namespace UICatalog {
 			_aboutMessage = new StringBuilder ();
 			_aboutMessage.AppendLine (@"A comprehensive sample library for");
 			_aboutMessage.AppendLine (@"");
-			_aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
-			_aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
-			_aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
-			_aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
-			_aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
-			_aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
+			_aboutMessage.AppendLine (@"  _______                  _             _  _    _  _____  ");
+			_aboutMessage.AppendLine (@" |__   __|                (_)           | || |  | ||_   _| ");
+			_aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  | |  | |   ");
+			_aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || |  | |  | |   ");
+			_aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | _| |_  ");
+			_aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____||_____| ");
 			_aboutMessage.AppendLine (@"");
-			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
+			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.UI");
 
 			Scenario scenario;
 			while ((scenario = RunUICatalogTopLevel ()) != null) {

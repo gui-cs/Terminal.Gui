@@ -7,13 +7,13 @@
 using System;
 using System.ComponentModel;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Stores the location and size of a rectangular region.
 	/// </summary>
 	public struct RectangleF : IEquatable<RectangleF> {
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class.
+		/// Initializes a new instance of the <see cref='Terminal.UI.RectangleF'/> class.
 		/// </summary>
 		public static readonly RectangleF Empty;
 
@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 		private float height; // Do not rename (binary serialization)
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location
+		/// Initializes a new instance of the <see cref='Terminal.UI.RectangleF'/> class with the specified location
 		/// and size.
 		/// </summary>
 		public RectangleF (float x, float y, float width, float height)
@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location
+		/// Initializes a new instance of the <see cref='Terminal.UI.RectangleF'/> class with the specified location
 		/// and size.
 		/// </summary>
 		public RectangleF (PointF location, SizeF size)
@@ -47,14 +47,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Creates a new <see cref='Terminal.Gui.RectangleF'/> with the specified location and size.
+		/// Creates a new <see cref='Terminal.UI.RectangleF'/> with the specified location and size.
 		/// </summary>
 		public static RectangleF FromLTRB (float left, float top, float right, float bottom) =>
 		    new RectangleF (left, top, right - left, bottom - top);
 
 		/// <summary>
 		/// Gets or sets the coordinates of the upper-left corner of the rectangular region represented by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		[Browsable (false)]
 		public PointF Location {
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the size of this <see cref='Terminal.Gui.RectangleF'/>.
+		/// Gets or sets the size of this <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		[Browsable (false)]
 		public SizeF Size {
@@ -79,7 +79,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets the x-coordinate of the upper-left corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public float X {
 			get => x;
@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets the y-coordinate of the upper-left corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public float Y {
 			get => y;
@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the width of the rectangular region defined by this <see cref='Terminal.Gui.RectangleF'/>.
+		/// Gets or sets the width of the rectangular region defined by this <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public float Width {
 			get => width;
@@ -104,7 +104,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the height of the rectangular region defined by this <see cref='Terminal.Gui.RectangleF'/>.
+		/// Gets or sets the height of the rectangular region defined by this <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public float Height {
 			get => height;
@@ -113,83 +113,83 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the x-coordinate of the upper-left corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/> .
+		/// <see cref='Terminal.UI.RectangleF'/> .
 		/// </summary>
 		[Browsable (false)]
 		public float Left => X;
 
 		/// <summary>
 		/// Gets the y-coordinate of the upper-left corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		[Browsable (false)]
 		public float Top => Y;
 
 		/// <summary>
 		/// Gets the x-coordinate of the lower-right corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		[Browsable (false)]
 		public float Right => X + Width;
 
 		/// <summary>
 		/// Gets the y-coordinate of the lower-right corner of the rectangular region defined by this
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		[Browsable (false)]
 		public float Bottom => Y + Height;
 
 		/// <summary>
-		/// Tests whether this <see cref='Terminal.Gui.RectangleF'/> has a <see cref='Terminal.Gui.RectangleF.Width'/> or a <see cref='Terminal.Gui.RectangleF.Height'/> of 0.
+		/// Tests whether this <see cref='Terminal.UI.RectangleF'/> has a <see cref='Terminal.UI.RectangleF.Width'/> or a <see cref='Terminal.UI.RectangleF.Height'/> of 0.
 		/// </summary>
 		[Browsable (false)]
 		public bool IsEmpty => (Width <= 0) || (Height <= 0);
 
 		/// <summary>
-		/// Tests whether <paramref name="obj"/> is a <see cref='Terminal.Gui.RectangleF'/> with the same location and
-		/// size of this <see cref='Terminal.Gui.RectangleF'/>.
+		/// Tests whether <paramref name="obj"/> is a <see cref='Terminal.UI.RectangleF'/> with the same location and
+		/// size of this <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public override bool Equals (object obj) => obj is RectangleF && Equals ((RectangleF)obj);
 
 		/// <summary>
-		/// Returns true if two <see cref='Terminal.Gui.RectangleF'/> objects have equal location and size.
+		/// Returns true if two <see cref='Terminal.UI.RectangleF'/> objects have equal location and size.
 		/// </summary>
 		/// <param name="other"></param>
 		/// <returns></returns>
 		public bool Equals (RectangleF other) => this == other;
 
 		/// <summary>
-		/// Tests whether two <see cref='Terminal.Gui.RectangleF'/> objects have equal location and size.
+		/// Tests whether two <see cref='Terminal.UI.RectangleF'/> objects have equal location and size.
 		/// </summary>
 		public static bool operator == (RectangleF left, RectangleF right) =>
 		    left.X == right.X && left.Y == right.Y && left.Width == right.Width && left.Height == right.Height;
 
 		/// <summary>
-		/// Tests whether two <see cref='Terminal.Gui.RectangleF'/> objects differ in location or size.
+		/// Tests whether two <see cref='Terminal.UI.RectangleF'/> objects differ in location or size.
 		/// </summary>
 		public static bool operator != (RectangleF left, RectangleF right) => !(left == right);
 
 		/// <summary>
 		/// Determines if the specified point is contained within the rectangular region defined by this
-		/// <see cref='Terminal.Gui.Rect'/> .
+		/// <see cref='Terminal.UI.Rect'/> .
 		/// </summary>
 		public bool Contains (float x, float y) => X <= x && x < X + Width && Y <= y && y < Y + Height;
 
 		/// <summary>
 		/// Determines if the specified point is contained within the rectangular region defined by this
-		/// <see cref='Terminal.Gui.Rect'/> .
+		/// <see cref='Terminal.UI.Rect'/> .
 		/// </summary>
 		public bool Contains (PointF pt) => Contains (pt.X, pt.Y);
 
 		/// <summary>
 		/// Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within
-		/// the rectangular region represented by this <see cref='Terminal.Gui.Rect'/> .
+		/// the rectangular region represented by this <see cref='Terminal.UI.Rect'/> .
 		/// </summary>
 		public bool Contains (RectangleF rect) =>
 		    (X <= rect.X) && (rect.X + rect.Width <= X + Width) && (Y <= rect.Y) && (rect.Y + rect.Height <= Y + Height);
 
 		/// <summary>
-		/// Gets the hash code for this <see cref='Terminal.Gui.RectangleF'/>.
+		/// Gets the hash code for this <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public override int GetHashCode ()
 		{
@@ -197,7 +197,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Inflates this <see cref='Terminal.Gui.Rect'/> by the specified amount.
+		/// Inflates this <see cref='Terminal.UI.Rect'/> by the specified amount.
 		/// </summary>
 		public void Inflate (float x, float y)
 		{
@@ -208,12 +208,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Inflates this <see cref='Terminal.Gui.Rect'/> by the specified amount.
+		/// Inflates this <see cref='Terminal.UI.Rect'/> by the specified amount.
 		/// </summary>
 		public void Inflate (SizeF size) => Inflate (size.Width, size.Height);
 
 		/// <summary>
-		/// Creates a <see cref='Terminal.Gui.Rect'/> that is inflated by the specified amount.
+		/// Creates a <see cref='Terminal.UI.Rect'/> that is inflated by the specified amount.
 		/// </summary>
 		public static RectangleF Inflate (RectangleF rect, float x, float y)
 		{
@@ -287,14 +287,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts the specified <see cref='Terminal.Gui.Rect'/> to a
-		/// <see cref='Terminal.Gui.RectangleF'/>.
+		/// Converts the specified <see cref='Terminal.UI.Rect'/> to a
+		/// <see cref='Terminal.UI.RectangleF'/>.
 		/// </summary>
 		public static implicit operator RectangleF (Rect r) => new RectangleF (r.X, r.Y, r.Width, r.Height);
 
 		/// <summary>
-		/// Converts the <see cref='Terminal.Gui.RectangleF.Location'/> and <see cref='Terminal.Gui.RectangleF.Size'/>
-		/// of this <see cref='Terminal.Gui.RectangleF'/> to a human-readable string.
+		/// Converts the <see cref='Terminal.UI.RectangleF.Location'/> and <see cref='Terminal.UI.RectangleF.Size'/>
+		/// of this <see cref='Terminal.UI.RectangleF'/> to a human-readable string.
 		/// </summary>
 		public override string ToString () =>
 		    "{X=" + X.ToString () + ",Y=" + Y.ToString () +

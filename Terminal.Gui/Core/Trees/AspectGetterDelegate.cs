@@ -1,5 +1,5 @@
 ﻿
-namespace Terminal.Gui.Trees {
+namespace Terminal.UI.Trees {
 
 	/// <summary>
 	/// Delegates of this type are used to fetch string representations of user's model objects

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Definition to interact with the OS clipboard.
 	/// </summary>

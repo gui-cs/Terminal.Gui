@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Threading", Description: "Demonstration of how to use threading in different ways")]

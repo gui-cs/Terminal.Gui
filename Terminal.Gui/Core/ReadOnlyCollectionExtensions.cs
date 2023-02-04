@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	static class ReadOnlyCollectionExtensions {
 

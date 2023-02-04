@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Rune = System.Rune;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.UI.CoreTests {
 	public class BorderTests {
 		[Fact]
 		[AutoInitShutdown]

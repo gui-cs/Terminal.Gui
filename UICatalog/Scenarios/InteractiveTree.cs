@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.UI;
+using Terminal.UI.Trees;
 using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {

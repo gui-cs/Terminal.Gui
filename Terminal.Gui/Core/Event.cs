@@ -6,7 +6,7 @@
 //
 using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Identifies the state of the "shift"-keys within a event.

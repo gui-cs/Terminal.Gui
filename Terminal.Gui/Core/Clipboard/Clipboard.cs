@@ -1,7 +1,7 @@
 ﻿using NStack;
 using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Provides cut, copy, and paste support for the OS clipboard.
 	/// </summary>

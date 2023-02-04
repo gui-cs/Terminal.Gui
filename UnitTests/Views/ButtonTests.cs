@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class ButtonTests {
 		readonly ITestOutputHelper output;
 

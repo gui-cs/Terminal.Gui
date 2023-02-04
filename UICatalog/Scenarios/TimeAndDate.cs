@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Time And Date", Description: "Illustrates TimeField and time & date handling")]

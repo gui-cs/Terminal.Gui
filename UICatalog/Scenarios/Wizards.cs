@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Wizards", Description: "Demonstrates the Wizard class")]
@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 15,
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 				AutoSize = false
 			};
 			frame.Add (label);
@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 				AutoSize = false
 			};
 			frame.Add (label);
@@ -58,7 +58,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 				AutoSize = false
 			};
 			frame.Add (label);
@@ -80,7 +80,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("Action:") {
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd (1),
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			Win.Add (label);
 

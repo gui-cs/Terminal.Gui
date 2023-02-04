@@ -1,10 +1,10 @@
-# Terminal.Gui Project
+# Terminal.UI Project
 
 All files required to build the **Terminal.Gui** library (and NuGet package).
 
 ## Project Folder Structure
 
-- `Terminal.Gui.sln` - The Visual Studio solution
+- `Terminal.UI.sln` - The Visual Studio solution
 - `Core/` - Source files for all types that comprise the core building blocks of **Terminal-Gui** 
     - `Application` - A `static` class that provides the base 'application driver'. Given it defines a **Terminal.Gui** application it is both logically and literally (because `static`) a singleton. It has direct dependencies on `MainLoop`, `Events.cs` `NetDriver`, `CursesDriver`, `WindowsDriver`, `Responder`, `View`, and `TopLevel` (and nothing else).
     - `MainLoop` - Defines `IMainLoopDriver` and implements the `MainLoop` class.
@@ -22,7 +22,7 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 
 ## Version numbers
 
-Version info for Terminal.Gui is managed by [gitversion](https://gitversion.net).
+Version info for Terminal.UI is managed by [gitversion](https://gitversion.net).
 
 Install `gitversion`:
 
@@ -31,7 +31,7 @@ dotnet tool install --global GitVersion.Tool
 dotnet-gitversion
 ```
 
-The project version (the nuget package and in `Terminal.Gui.dll`) is determined from the latest `git tag`. 
+The project version (the nuget package and in `Terminal.UI.dll`) is determined from the latest `git tag`. 
 
 The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
 
@@ -47,7 +47,7 @@ dotnet build -c Release
 
 Doing so will update the `.csproj` files in your branch with version info, which we do not want.
 
-## Publishing a Release of Terminal.Gui
+## Publishing a Release of Terminal.UI
 
 To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
 

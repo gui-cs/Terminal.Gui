@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
+using Terminal.UI;
+using Attribute = Terminal.UI.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Syntax Highlighting", Description: "Text editor with keyword highlighting using the TextView control.")]

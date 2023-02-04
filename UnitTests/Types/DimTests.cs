@@ -5,14 +5,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.TypeTests {
+namespace Terminal.UI.TypeTests {
 	public class DimTests {
 		readonly ITestOutputHelper output;
 
@@ -30,7 +30,7 @@ namespace Terminal.Gui.TypeTests {
 		public void New_Works ()
 		{
 			var dim = new Dim ();
-			Assert.Equal ("Terminal.Gui.Dim", dim.ToString ());
+			Assert.Equal ("Terminal.UI.Dim", dim.ToString ());
 		}
 
 		[Fact]

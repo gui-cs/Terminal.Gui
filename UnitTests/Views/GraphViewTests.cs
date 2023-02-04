@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
-using Terminal.Gui.Graphs;
-using Point = Terminal.Gui.Point;
-using Attribute = Terminal.Gui.Attribute;
+using Terminal.UI.Graphs;
+using Point = Terminal.UI.Point;
+using Attribute = Terminal.UI.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 using Rune = System.Rune;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 
 	#region Helper Classes
 	class FakeHAxis : HorizontalAxis {

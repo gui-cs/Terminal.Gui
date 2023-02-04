@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.ApplicationTests {
+namespace Terminal.UI.ApplicationTests {
 	public class ApplicationTests {
 		public ApplicationTests ()
 		{

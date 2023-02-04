@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TextView Autocomplete Popup", Description: "Shows five TextView Autocomplete Popup effects")]

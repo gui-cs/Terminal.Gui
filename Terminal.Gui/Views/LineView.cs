@@ -1,7 +1,7 @@
 ﻿using System;
-using Terminal.Gui.Graphs;
+using Terminal.UI.Graphs;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	
 	/// <summary>
 	/// A straight line control either horizontal or vertical

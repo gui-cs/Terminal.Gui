@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Rune = System.Rune;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

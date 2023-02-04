@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Concurrency;
 using ReactiveUI;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace ReactiveExample {
 	public static class Program {

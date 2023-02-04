@@ -4,8 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
-using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
+using Terminal.UI;
+using Attribute = Terminal.UI.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]

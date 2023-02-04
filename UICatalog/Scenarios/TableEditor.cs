@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using Terminal.Gui;
+using Terminal.UI;
 using System.Linq;
 using System.Globalization;
-using static Terminal.Gui.TableView;
+using static Terminal.UI.TableView;
 
 namespace UICatalog.Scenarios {
 

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Threading;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "RuneWidthGreaterThanOne", Description: "Test rune width greater than one")]

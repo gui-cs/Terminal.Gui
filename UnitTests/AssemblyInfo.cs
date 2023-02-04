@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 
 // Since Application is a singleton we can't run tests in parallel

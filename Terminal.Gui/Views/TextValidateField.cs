@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Terminal.Gui.TextValidateProviders;
+using Terminal.UI.TextValidateProviders;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	namespace TextValidateProviders {
 		/// <summary>

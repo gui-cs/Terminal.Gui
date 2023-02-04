@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Shared abstract class to enforce rules from the implementation of the <see cref="IClipboard"/> interface.
 	/// </summary>

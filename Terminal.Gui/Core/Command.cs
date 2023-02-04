@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.

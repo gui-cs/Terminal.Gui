@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Responder base class implemented by objects that want to participate on keyboard and mouse input.
 	/// </summary>

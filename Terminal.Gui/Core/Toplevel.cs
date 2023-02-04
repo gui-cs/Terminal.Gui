@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
 	/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	///     been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>). 
 	///   </para>
 	///   <para>
-	///     A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
+	///     A Toplevel is created when an application initializes Terminal.UI by calling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
 	///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.

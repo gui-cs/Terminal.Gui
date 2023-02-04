@@ -1,10 +1,10 @@
-This is a sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
+This is a sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.UI`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
 
 <img src="https://user-images.githubusercontent.com/6759207/94748621-646a7280-038a-11eb-8ea0-34629dc799b3.gif" width="450">
 
 ### Scheduling
 
-In order to use reactive extensions scheduling, copy-paste the `TerminalScheduler.cs` file into your project, and add the following lines to the composition root of your `Terminal.Gui` application:
+In order to use reactive extensions scheduling, copy-paste the `TerminalScheduler.cs` file into your project, and add the following lines to the composition root of your `Terminal.UI` application:
 
 ```cs
 Application.Init ();

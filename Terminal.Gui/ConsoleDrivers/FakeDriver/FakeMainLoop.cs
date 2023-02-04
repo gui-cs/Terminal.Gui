@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Mainloop intended to be used with the .NET System.Console API, and can
 	/// be used on Windows and Unix, it is cross platform but lacks things like

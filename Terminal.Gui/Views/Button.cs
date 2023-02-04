@@ -8,7 +8,7 @@
 using System;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	///   Button is a <see cref="View"/> that provides an item that invokes an <see cref="Action"/> when activated by the user.
 	/// </summary>

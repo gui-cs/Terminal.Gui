@@ -1,15 +1,15 @@
 ﻿// This is a simple example application.  For the full range of functionality
 // see the UICatalog project
 
-// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
+// A simple Terminal.UI example in C# - using C# 9.0 Top-level statements
 
-using Terminal.Gui;
+using Terminal.UI;
 
 Application.Run<ExampleWindow> ();
 
 System.Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
 
-// Before the application exits, reset Terminal.Gui for clean shutdown
+// Before the application exits, reset Terminal.UI for clean shutdown
 Application.Shutdown ();
 
 // Defines a top-level window with border and title

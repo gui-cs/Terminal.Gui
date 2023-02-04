@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Terminal.Gui.Trees;
+using Terminal.UI.Trees;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Interface for all non generic members of <see cref="TreeView{T}"/>.

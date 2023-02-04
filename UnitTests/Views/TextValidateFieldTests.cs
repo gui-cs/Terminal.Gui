@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Terminal.Gui.TextValidateProviders;
+using Terminal.UI.TextValidateProviders;
 
 using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 
 	public class TextValidateField_NET_Provider_Tests {
 

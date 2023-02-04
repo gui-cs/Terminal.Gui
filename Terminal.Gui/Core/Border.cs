@@ -1,7 +1,7 @@
 ﻿using NStack;
 using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Specifies the border style for a <see cref="View"/> and to be used by the <see cref="Border"/> class.
 	/// </summary>

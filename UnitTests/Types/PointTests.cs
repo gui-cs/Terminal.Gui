@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui.TypeTests {
+namespace Terminal.UI.TypeTests {
 	public class PointTests {
 		[Fact]
 		public void Point_New ()

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Stress Tests Windows, sub-Windows, and FrameViews.")]
@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 		{
 			static int About ()
 			{
-				return MessageBox.Query ("About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok");
+				return MessageBox.Query ("About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.UI", "Ok");
 			}
 
 			int margin = 2;

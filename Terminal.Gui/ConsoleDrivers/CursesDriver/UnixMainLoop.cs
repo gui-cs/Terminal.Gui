@@ -29,7 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Unix main loop, suitable for using on Posix systems
 	/// </summary>

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.
 	/// </summary>

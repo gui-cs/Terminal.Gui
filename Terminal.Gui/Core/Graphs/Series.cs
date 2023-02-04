@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Terminal.Gui.Graphs {
+namespace Terminal.UI.Graphs {
 	/// <summary>
 	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>
 	/// </summary>

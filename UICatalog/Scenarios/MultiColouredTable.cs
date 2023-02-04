@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 
@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		class TableViewColors : TableView {
-			protected override void RenderCell (Terminal.Gui.Attribute cellColor, string render, bool isPrimaryCell)
+			protected override void RenderCell (Terminal.UI.Attribute cellColor, string render, bool isPrimaryCell)
 			{
 				int unicorns = render.IndexOf ("unicorns",StringComparison.CurrentCultureIgnoreCase);
 				int rainbows = render.IndexOf ("rainbows", StringComparison.CurrentCultureIgnoreCase);

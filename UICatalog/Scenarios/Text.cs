@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Terminal.Gui;
-using Terminal.Gui.TextValidateProviders;
+using Terminal.UI;
+using Terminal.UI.TextValidateProviders;
 
 
 
@@ -197,7 +197,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (netProviderField);
 
-			// TextRegexProvider - Regex provider implemented by Terminal.Gui
+			// TextRegexProvider - Regex provider implemented by Terminal.UI
 			var regexProvider = new Label ("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
 				X = Pos.Left (netProviderLabel),
 				Y = Pos.Bottom (netProviderLabel) + 1

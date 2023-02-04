@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one 
 	/// or more <see cref="Button"/>s. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.

@@ -1,4 +1,4 @@
-﻿using Terminal.Gui;
+﻿using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Direction and AutoSize", Description: "Demos TextFormatter Direction and View AutoSize.")]

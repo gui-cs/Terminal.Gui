@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	internal class NetWinVTConsole {
 		IntPtr InputHandle, OutputHandle, ErrorHandle;
 		uint originalInputConsoleMode, originalOutputConsoleMode, originalErrorConsoleMode;

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 15,
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var widthEdit = new TextField ("0") {
@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var heightEdit = new TextField ("0") {
@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var titleEdit = new TextField ("Title") {
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (titleEdit),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var numButtonsEdit = new TextField ("3") {
@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 			var glyphsNotWords = new CheckBox ($"Add {Char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support", false) {
 				X = Pos.Left (numButtonsEdit),
 				Y = Pos.Bottom (label),
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			frame.Add (glyphsNotWords);
 
@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("Button Style:") {
 				X = 0,
 				Y = Pos.Bottom (glyphsNotWords),
-				TextAlignment = Terminal.Gui.TextAlignment.Right
+				TextAlignment = Terminal.UI.TextAlignment.Right
 			};
 			frame.Add (label);
 			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
@@ -124,7 +124,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 4,
 				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				TextAlignment = Terminal.UI.TextAlignment.Right,
 			};
 			Win.Add (label);
 			var buttonPressedLabel = new Label (" ") {

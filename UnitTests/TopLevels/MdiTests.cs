@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.UI.TopLevelTests {
 	public class MdiTests {
 		public MdiTests ()
 		{

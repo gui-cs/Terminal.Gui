@@ -11,8 +11,8 @@ namespace ReactiveExample {
 	//
 	// This view model can be easily shared across different UI frameworks.
 	// For example, if you have a WPF or XF app with view models written
-	// this way, you can easily port your app to Terminal.Gui by implementing
-	// the views with Terminal.Gui classes and ReactiveUI bindings.
+	// this way, you can easily port your app to Terminal.UI by implementing
+	// the views with Terminal.UI classes and ReactiveUI bindings.
 	//
 	// We mark the view model with the [DataContract] attributes and this
 	// allows you to save the view model class to the disk, and then to read

@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	internal class WindowsConsole {
 		public const int STD_OUTPUT_HANDLE = -11;
@@ -121,7 +121,7 @@ namespace Terminal.Gui {
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
 				}
-				visibility = Gui.CursorVisibility.Default;
+				visibility = CursorVisibility.Default;
 
 				return false;
 			}

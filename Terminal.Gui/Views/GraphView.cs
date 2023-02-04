@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui.Graphs;
+using Terminal.UI.Graphs;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Control for rendering graphs (bar, scatter etc)

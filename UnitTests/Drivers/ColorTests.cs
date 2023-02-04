@@ -2,9 +2,9 @@
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.DriverTests {
+namespace Terminal.UI.DriverTests {
 	public class ColorTests {
 
 		[Theory]

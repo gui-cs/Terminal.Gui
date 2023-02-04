@@ -1,7 +1,7 @@
-﻿using Terminal.Gui.Graphs;
+﻿using Terminal.UI.Graphs;
 using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class LineViewTests {
 
 		[Fact]

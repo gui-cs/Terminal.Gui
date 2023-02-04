@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// A container for single <see cref="Child"/> that will allow to drawn <see cref="Border"/> in
 	///  two ways. If <see cref="UsePanelFrame"/> the borders and the child will be accommodated in the available

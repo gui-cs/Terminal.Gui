@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
-using Terminal.Gui.Graphs;
+using Terminal.UI;
+using Terminal.UI.Graphs;
 
-using Color = Terminal.Gui.Color;
+using Color = Terminal.UI.Color;
 
 namespace UICatalog.Scenarios {
 
@@ -513,19 +513,19 @@ namespace UICatalog.Scenarios {
 
 			graphView.Series.Add (femalesSeries);
 
-			graphView.Annotations.Add (new TextAnnotation () { Text = "M", ScreenPosition = new Terminal.Gui.Point (0, 10) });
-			graphView.Annotations.Add (new TextAnnotation () { Text = "F", ScreenPosition = new Terminal.Gui.Point (graphView.Bounds.Width - 1, 10) });
+			graphView.Annotations.Add (new TextAnnotation () { Text = "M", ScreenPosition = new Terminal.UI.Point (0, 10) });
+			graphView.Annotations.Add (new TextAnnotation () { Text = "F", ScreenPosition = new Terminal.UI.Point (graphView.Bounds.Width - 1, 10) });
 
 			graphView.SetNeedsDisplay ();
 
 		}
 
 		class DiscoBarSeries : BarSeries {
-			private Terminal.Gui.Attribute green;
-			private Terminal.Gui.Attribute brightgreen;
-			private Terminal.Gui.Attribute brightyellow;
-			private Terminal.Gui.Attribute red;
-			private Terminal.Gui.Attribute brightred;
+			private Terminal.UI.Attribute green;
+			private Terminal.UI.Attribute brightgreen;
+			private Terminal.UI.Attribute brightyellow;
+			private Terminal.UI.Attribute red;
+			private Terminal.UI.Attribute brightred;
 
 			public DiscoBarSeries ()
 			{
@@ -536,7 +536,7 @@ namespace UICatalog.Scenarios {
 				red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
 				brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
 			}
-			protected override void DrawBarLine (GraphView graph, Terminal.Gui.Point start, Terminal.Gui.Point end, Bar beingDrawn)
+			protected override void DrawBarLine (GraphView graph, Terminal.UI.Point start, Terminal.UI.Point end, Bar beingDrawn)
 			{
 				var driver = Application.Driver;
 

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.UI;
+using Terminal.UI.Trees;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 
 	public class TreeViewTests {
 

@@ -2,9 +2,9 @@
 using Xunit;
 using Xunit.Abstractions;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.UI.TopLevelTests {
 
 	public class MessageBoxTests {
 		readonly ITestOutputHelper output;

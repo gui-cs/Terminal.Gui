@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;

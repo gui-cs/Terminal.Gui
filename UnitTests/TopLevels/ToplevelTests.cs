@@ -1,9 +1,9 @@
 ﻿using System;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.UI.TopLevelTests {
 	public class ToplevelTests {
 		readonly ITestOutputHelper output;
 

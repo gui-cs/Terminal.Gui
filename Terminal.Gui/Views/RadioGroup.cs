@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.
 	/// </summary>

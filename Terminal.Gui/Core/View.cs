@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Determines the LayoutStyle for a <see cref="View"/>, if Absolute, during <see cref="View.LayoutSubviews"/>, the
 	/// value from the <see cref="View.Frame"/> will be used, if the value is Computed, then <see cref="View.Frame"/>
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal.Gui. Views
+	///    The View defines the base functionality for user interface elements in Terminal.UI. Views
 	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
 	/// </para>
 	/// <para>
@@ -436,7 +436,7 @@ namespace Terminal.Gui {
 		/// <value>The frame.</value>
 		/// <remarks>
 		/// <para>
-		///    Change the Frame when using the <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout style to move or resize views. 
+		///    Change the Frame when using the <see cref="Terminal.UI.LayoutStyle.Absolute"/> layout style to move or resize views. 
 		/// </para>
 		/// <para>
 		///    Altering the Frame of a view will trigger the redrawing of the
@@ -471,8 +471,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to
-		/// <see cref="Terminal.Gui.LayoutStyle.Absolute"/>, 
-		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		/// <see cref="Terminal.UI.LayoutStyle.Absolute"/>, 
+		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="Terminal.UI.LayoutStyle.Computed"/>
 		/// the <see cref="Frame"/> is updated using
 		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
@@ -509,11 +509,11 @@ namespace Terminal.Gui {
 		Pos x, y;
 
 		/// <summary>
-		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The X Position.</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos X {
 			get => x;
@@ -529,11 +529,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The y position (line).</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos Y {
 			get => y;
@@ -550,11 +550,11 @@ namespace Terminal.Gui {
 		Dim width, height;
 
 		/// <summary>
-		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The width.</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Dim Width {
 			get => width;
@@ -577,10 +577,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The height.</value>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.UI.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
 			get => height;
 			set {
@@ -602,7 +602,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Forces validation with <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout
+		/// Forces validation with <see cref="Terminal.UI.LayoutStyle.Computed"/> layout
 		///  to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
 		/// </summary>
 		public bool ForceValidatePosDim { get; set; }
@@ -665,7 +665,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
+		/// Gets or sets the <see cref="Terminal.UI.TextFormatter"/> which can be handled differently by any derived class.
 		/// </summary>
 		public TextFormatter TextFormatter { get; set; }
 
@@ -676,13 +676,13 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of a <see cref="Terminal.Gui.LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
+		/// Initializes a new instance of a <see cref="Terminal.UI.LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
 		/// dimensions specified in the <see langword="frame"/> parameter. 
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		/// <remarks>
-		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Absolute"/>.
-		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/> 
+		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.UI.LayoutStyle.Absolute"/>.
+		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.UI.LayoutStyle.Computed"/> 
 		/// </remarks>
 		public View (Rect frame)
 		{
@@ -690,12 +690,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.UI.LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
-		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		///   The <see cref="View"/> will be created using <see cref="Terminal.UI.LayoutStyle.Computed"/>
 		///   coordinates. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
@@ -703,14 +703,14 @@ namespace Terminal.Gui {
 		///   If <see cref="Height"/> is greater than one, word wrapping is provided.
 		/// </para>
 		/// <para>
-		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/>. 
+		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.UI.LayoutStyle.Computed"/>. 
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
 		/// </para>
 		/// </remarks>
 		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom) { }
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.UI.LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -728,7 +728,7 @@ namespace Terminal.Gui {
 		public View (int x, int y, ustring text) : this (TextFormatter.CalcRect (x, y, text), text) { }
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.UI.LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -749,11 +749,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.UI.LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		///   The <see cref="View"/> will be created using <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		///   The <see cref="View"/> will be created using <see cref="Terminal.UI.LayoutStyle.Computed"/>
 		///   coordinates with the given string. The initial size (<see cref="View.Frame"/>) will be 
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
@@ -795,7 +795,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
+		/// Can be overridden if the <see cref="Terminal.UI.TextFormatter.Text"/> has
 		///  different format than the default.
 		/// </summary>
 		protected virtual void UpdateTextFormatterText ()
@@ -2506,10 +2506,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a flag that determines whether <see cref="Terminal.Gui.TextFormatter.Text"/> will have trailing spaces preserved
-		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> 
+		/// Gets or sets a flag that determines whether <see cref="Terminal.UI.TextFormatter.Text"/> will have trailing spaces preserved
+		/// or not when <see cref="Terminal.UI.TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> 
 		/// any trailing spaces will be trimmed when either the <see cref="Text"/> property is changed or 
-		/// when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is set to <see langword="true"/>.
+		/// when <see cref="Terminal.UI.TextFormatter.WordWrap"/> is set to <see langword="true"/>.
 		/// The default is <see langword="false"/>.
 		/// </summary>
 		public virtual bool PreserveTrailingSpaces {
@@ -2750,10 +2750,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.
+		/// Get the width or height of the <see cref="Terminal.UI.TextFormatter.HotKeySpecifier"/> length.
 		/// </summary>
 		/// <param name="isWidth"><see langword="true"/> if is the width (default) <see langword="false"/> if is the height.</param>
-		/// <returns>The length of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.</returns>
+		/// <returns>The length of the <see cref="Terminal.UI.TextFormatter.HotKeySpecifier"/>.</returns>
 		public int GetHotKeySpecifierLength (bool isWidth = true)
 		{
 			if (isWidth) {
@@ -2768,9 +2768,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the bounds size from a <see cref="Terminal.Gui.TextFormatter.Size"/>.
+		/// Gets the bounds size from a <see cref="Terminal.UI.TextFormatter.Size"/>.
 		/// </summary>
-		/// <returns>The bounds size minus the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
+		/// <returns>The bounds size minus the <see cref="Terminal.UI.TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetTextFormatterBoundsSize ()
 		{
 			return new Size (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
@@ -2780,7 +2780,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the text formatter size from a <see cref="Bounds"/> size.
 		/// </summary>
-		/// <returns>The text formatter size more the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
+		/// <returns>The text formatter size more the <see cref="Terminal.UI.TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetBoundsTextFormatterSize ()
 		{
 			if (ustring.IsNullOrEmpty (TextFormatter.Text))
@@ -3070,8 +3070,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
 		/// </summary>
-		/// <returns><see cref="Terminal.Gui.ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
-		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// <returns><see cref="Terminal.UI.ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.UI.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 		/// If it's overridden can return other values.</returns>
 		public virtual Attribute GetNormalColor ()
 		{
@@ -3081,8 +3081,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
 		/// </summary>
-		/// <returns><see cref="Terminal.Gui.ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/>
-		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// <returns><see cref="Terminal.UI.ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.UI.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 		/// If it's overridden can return other values.</returns>
 		public virtual Attribute GetHotNormalColor ()
 		{

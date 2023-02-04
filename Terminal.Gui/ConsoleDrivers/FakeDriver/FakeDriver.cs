@@ -13,9 +13,9 @@ using System.Threading;
 using NStack;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Implements a mock ConsoleDriver for unit testing
 	/// </summary>

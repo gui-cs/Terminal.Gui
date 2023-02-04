@@ -1,4 +1,4 @@
-# Contributing to Terminal.Gui
+# Contributing to Terminal.UI
 
 We welcome contributions from the community. See [Issues](https://github.com/gui-cs/Terminal.Gui/issues) for a list of open [bugs](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abug) and [enhancements](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement). Contributors looking for something fun to work on should look at issues tagged as:
 
@@ -13,14 +13,14 @@ Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branchin
 * The `main` branch is always stable, and always matches the most recently released Nuget package.
 * The `develop` branch is where new development and bug-fixes happen. It is the default branch.
 
-### Forking Terminal.Gui
+### Forking Terminal.UI
 
-1. Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
+1. Use GitHub to fork the `Terminal.UI` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
 
 2. Clone your fork to your local machine
 
 ```
-git clone https://github.com/<yourID>/Terminal.Gui
+git clone https://github.com/<yourID>/Terminal.UI
 ```
 
 Now, your local repo will have an `origin` remote pointing to `https://github.com/<yourID>/Terminal.Gui`.
@@ -29,7 +29,7 @@ Now, your local repo will have an `origin` remote pointing to `https://github.co
 ```
 git remote add upstream https://github.com/gui-cs/Terminal.Gui
 ```
-You now have your own fork and a local repo that references it as `origin`. Your local repo also now references the orignal Terminal.Gui repo as `upstream`. 
+You now have your own fork and a local repo that references it as `origin`. Your local repo also now references the orignal Terminal.UI repo as `upstream`. 
 
 ### Starting to Make a Change
 
@@ -90,7 +90,7 @@ remote:
 
 Follow the template instructions found on Github.
 
-## Terminal.Gui Coding Style
+## Terminal.UI Coding Style
 
 **Terminal.Gui** follows the [Mono Coding Guidelines](https://www.mono-project.com/community/contributing/coding-guidelines/). [`/.editorconfig`](https://github.com/gui-cs/Terminal.Gui/blob/b0a43ba338adf5ec069066e5a7dff8fea39b41db/.editorconfig) enforces this style in Visual Studio. Use `Ctrl-K-D` in Visual Studio to have it reformat code.
 
@@ -118,7 +118,7 @@ Follow the template instructions found on Github.
 
 ### Include API Documentation
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.UI.html). Contributors have the responsibility of continuously improving the API Documentation.
 
 - All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
 - Keep the `<summary></summary>` terse.
@@ -167,7 +167,7 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 ## Breaking Changes to User Behavior or the Public API
 
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
-- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html).
+- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.UI.html).
 
 ## Unit Tests
 

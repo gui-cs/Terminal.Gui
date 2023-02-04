@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.UI.Trees {
 	/// <summary>
 	/// Event arguments describing a change in selected object in a tree view
 	/// </summary>

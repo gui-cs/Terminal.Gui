@@ -1,4 +1,4 @@
-﻿using Terminal.Gui;
+﻿using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Borders Comparisons", Description: "Compares Window, Toplevel and FrameView borders.")]

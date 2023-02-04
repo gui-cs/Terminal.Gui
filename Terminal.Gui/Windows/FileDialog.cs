@@ -14,9 +14,9 @@ using System.Collections.Generic;
 using NStack;
 using System.IO;
 using System.Linq;
-using Terminal.Gui.Resources;
+using Terminal.UI.Resources;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	internal class DirListView : View {
 		int top, selected;
 		DirectoryInfo dirInfo;
@@ -1004,7 +1004,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="Terminal.Gui.OpenDialog"/> can choose files.
+		/// Gets or sets a value indicating whether this <see cref="Terminal.UI.OpenDialog"/> can choose files.
 		/// </summary>
 		/// <value><c>true</c> if can choose files; otherwise, <c>false</c>.  Defaults to <c>true</c></value>
 		public bool CanChooseFiles {

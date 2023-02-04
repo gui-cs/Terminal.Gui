@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class AutocompleteTests {
 
 		[Fact]

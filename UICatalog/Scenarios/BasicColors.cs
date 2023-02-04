@@ -1,4 +1,4 @@
-﻿using Terminal.Gui;
+﻿using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Basic Colors", Description: "Show all basic colors.")]

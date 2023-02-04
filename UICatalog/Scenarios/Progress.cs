@@ -1,7 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Threading;
-using Terminal.Gui;
+using Terminal.UI;
 using System.Linq;
 
 namespace UICatalog.Scenarios {

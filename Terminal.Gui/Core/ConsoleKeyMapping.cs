@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Helper class to handle the scan code and virtual key from a <see cref="ConsoleKey"/>.
 	/// </summary>

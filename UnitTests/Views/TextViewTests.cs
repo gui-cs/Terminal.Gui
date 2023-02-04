@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class TextViewTests {
 		private static TextView _textView;
 		readonly ITestOutputHelper output;

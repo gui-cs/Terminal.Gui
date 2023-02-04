@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog {
 	/// <summary>
@@ -25,7 +25,7 @@ namespace UICatalog {
 	/// <example>
 	/// The example below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
 	/// <code>
-	/// using Terminal.Gui;
+	/// using Terminal.UI;
 	/// 
 	/// namespace UICatalog {
 	/// 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
@@ -48,15 +48,15 @@ namespace UICatalog {
 		private bool _disposedValue;
 
 		/// <summary>
-		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
+		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.UI.Application.Top"/> in most cases.
 		/// </summary>
 		public Window Win { get; set; }
 
 		/// <summary>
-		/// Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and 
+		/// Helper that provides the default <see cref="Terminal.UI.Window"/> implementation with a frame and 
 		/// label showing the name of the <see cref="Scenario"/> and logic to exit back to 
 		/// the Scenario picker UI.
-		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
+		/// Override <see cref="Init"/> to provide any <see cref="Terminal.UI.Toplevel"/> behavior needed.
 		/// </summary>
 		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
@@ -66,7 +66,7 @@ namespace UICatalog {
 		/// </para>
 		/// <para>
 		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> 
-		/// before creating any views or calling other Terminal.Gui APIs.
+		/// before creating any views or calling other Terminal.UI APIs.
 		/// </para>
 		/// </remarks>
 		public virtual void Init (ColorScheme colorScheme)

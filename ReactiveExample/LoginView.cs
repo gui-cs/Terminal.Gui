@@ -2,7 +2,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using NStack;
 using ReactiveUI;
-using Terminal.Gui;
+using Terminal.UI;
 using ReactiveMarbles.ObservableEvents;
 
 namespace ReactiveExample {

@@ -4,14 +4,14 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.TypeTests {
+namespace Terminal.UI.TypeTests {
 	public class PosTests {
 		readonly ITestOutputHelper output;
 
@@ -24,7 +24,7 @@ namespace Terminal.Gui.TypeTests {
 		public void New_Works ()
 		{
 			var pos = new Pos ();
-			Assert.Equal ("Terminal.Gui.Pos", pos.ToString ());
+			Assert.Equal ("Terminal.UI.Pos", pos.ToString ());
 		}
 
 		[Fact]
@@ -127,7 +127,7 @@ namespace Terminal.Gui.TypeTests {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = Terminal.UI.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -173,7 +173,7 @@ namespace Terminal.Gui.TypeTests {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = Terminal.UI.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -220,7 +220,7 @@ namespace Terminal.Gui.TypeTests {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = Terminal.UI.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
@@ -283,7 +283,7 @@ namespace Terminal.Gui.TypeTests {
 			var win = new Window ();
 
 			var label = new Label ("This should be the last line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = Terminal.UI.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),

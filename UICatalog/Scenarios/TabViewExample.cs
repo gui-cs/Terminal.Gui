@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {

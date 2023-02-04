@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ComboBoxIteration", Description: "ComboBox iteration.")]

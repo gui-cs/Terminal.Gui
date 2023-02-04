@@ -35,7 +35,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\Terminal.Gui\Terminal.UI.csproj" />
     <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">

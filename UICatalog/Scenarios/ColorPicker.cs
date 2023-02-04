@@ -1,4 +1,4 @@
-﻿using Terminal.Gui;
+﻿using Terminal.UI;
 using System;
 
 namespace UICatalog.Scenarios {
@@ -106,7 +106,7 @@ namespace UICatalog.Scenarios {
 		/// Update Demo Label.
 		/// </summary>
 		private void UpdateDemoLabel () => demoLabel.ColorScheme = new ColorScheme () {
-			Normal = new Terminal.Gui.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
+			Normal = new Terminal.UI.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
 		};
 	}
 }

@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Stores an ordered pair of integers, which specify a Height and Width.
 	/// </summary>

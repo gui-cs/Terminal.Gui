@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "SendKeys", Description: "SendKeys sample - Send key combinations.")]

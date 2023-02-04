@@ -8,7 +8,7 @@
 using System;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by newline characters.
 	/// Multi-line Labels support word wrap.

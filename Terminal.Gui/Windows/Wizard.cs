@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NStack;
-using Terminal.Gui.Resources;
+using Terminal.UI.Resources;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<see cref="WizardStep"/>) can host 
@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	/// <example>
 	/// <code>
-	/// using Terminal.Gui;
+	/// using Terminal.UI;
 	/// using NStack;
 	/// 
 	/// Application.Init();

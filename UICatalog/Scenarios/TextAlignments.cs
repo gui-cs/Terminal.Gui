@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Simple Text Alignment", Description: "Demonstrates horizontal text alignment")]
@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 			string txt = "Hello world, how are you today? Pretty neat!";
 			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
 
-			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
+			var alignments = Enum.GetValues (typeof (Terminal.UI.TextAlignment)).Cast<Terminal.UI.TextAlignment> ().ToList ();
 			var singleLines = new Label [alignments.Count];
 			var multipleLines = new Label [alignments.Count];
 

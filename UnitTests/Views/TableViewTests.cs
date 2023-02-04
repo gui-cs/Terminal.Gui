@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 
 	public class TableViewTests {
 		readonly ITestOutputHelper output;

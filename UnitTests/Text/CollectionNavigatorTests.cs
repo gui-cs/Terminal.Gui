@@ -2,7 +2,7 @@
 using System.Threading;
 using Xunit;
 
-namespace Terminal.Gui.TextTests {
+namespace Terminal.UI.TextTests {
 	public class CollectionNavigatorTests {
 		static string [] simpleStrings = new string []{
 		    "appricot", // 0

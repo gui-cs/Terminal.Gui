@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui.Graphs {
+namespace Terminal.UI.Graphs {
 	/// <summary>
 	/// <para>Describes an overlay element that is rendered either before or
 	/// after a series.</para>

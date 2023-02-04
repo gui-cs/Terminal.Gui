@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
-//using static Terminal.Gui.ViewTests.MenuTests;
+//using static Terminal.UI.ViewTests.MenuTests;
 
-namespace Terminal.Gui.MenuTests {
+namespace Terminal.UI.MenuTests {
 	public class MenuTests {
 		readonly ITestOutputHelper output;
 

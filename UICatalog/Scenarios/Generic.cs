@@ -1,4 +1,4 @@
-﻿using Terminal.Gui;
+﻿using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]

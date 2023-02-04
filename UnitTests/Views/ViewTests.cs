@@ -1,12 +1,12 @@
 ﻿using System;
 using Xunit;
 using Xunit.Abstractions;
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
+//using GraphViewTests = Terminal.UI.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class ViewTests {
 		readonly ITestOutputHelper output;
 

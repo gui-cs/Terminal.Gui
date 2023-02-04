@@ -6,7 +6,7 @@
 //
 
 using System;
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or 
 	/// relative to the ending dimension. Integer values are implicitly convertible to
@@ -272,10 +272,10 @@ namespace Terminal.Gui {
 		static PosCombine posCombine;
 
 		/// <summary>
-		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
+		/// Adds a <see cref="Terminal.UI.Pos"/> to a <see cref="Terminal.UI.Pos"/>, yielding a new <see cref="Pos"/>.
 		/// </summary>
-		/// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
-		/// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
+		/// <param name="left">The first <see cref="Terminal.UI.Pos"/> to add.</param>
+		/// <param name="right">The second <see cref="Terminal.UI.Pos"/> to add.</param>
 		/// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Pos operator + (Pos left, Pos right)
 		{
@@ -289,10 +289,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
+		/// Subtracts a <see cref="Terminal.UI.Pos"/> from a <see cref="Terminal.UI.Pos"/>, yielding a new <see cref="Pos"/>.
 		/// </summary>
-		/// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
-		/// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
+		/// <param name="left">The <see cref="Terminal.UI.Pos"/> to subtract from (the minuend).</param>
+		/// <param name="right">The <see cref="Terminal.UI.Pos"/> to subtract (the subtrahend).</param>
 		/// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Pos operator - (Pos left, Pos right)
 		{
@@ -621,10 +621,10 @@ namespace Terminal.Gui {
 		static DimCombine dimCombine;
 
 		/// <summary>
-		/// Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
+		/// Adds a <see cref="Terminal.UI.Dim"/> to a <see cref="Terminal.UI.Dim"/>, yielding a new <see cref="Dim"/>.
 		/// </summary>
-		/// <param name="left">The first <see cref="Terminal.Gui.Dim"/> to add.</param>
-		/// <param name="right">The second <see cref="Terminal.Gui.Dim"/> to add.</param>
+		/// <param name="left">The first <see cref="Terminal.UI.Dim"/> to add.</param>
+		/// <param name="right">The second <see cref="Terminal.UI.Dim"/> to add.</param>
 		/// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Dim operator + (Dim left, Dim right)
 		{
@@ -638,10 +638,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Subtracts a <see cref="Terminal.Gui.Dim"/> from a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
+		/// Subtracts a <see cref="Terminal.UI.Dim"/> from a <see cref="Terminal.UI.Dim"/>, yielding a new <see cref="Dim"/>.
 		/// </summary>
-		/// <param name="left">The <see cref="Terminal.Gui.Dim"/> to subtract from (the minuend).</param>
-		/// <param name="right">The <see cref="Terminal.Gui.Dim"/> to subtract (the subtrahend).</param>
+		/// <param name="left">The <see cref="Terminal.UI.Dim"/> to subtract from (the minuend).</param>
+		/// <param name="right">The <see cref="Terminal.UI.Dim"/> to subtract (the subtrahend).</param>
 		/// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Dim operator - (Dim left, Dim right)
 		{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace Terminal.Gui.ApplicationTests {
+namespace Terminal.UI.ApplicationTests {
 	public class StackExtensionsTests {
 		[Fact]
 		public void Stack_Toplevels_CreateToplevels ()

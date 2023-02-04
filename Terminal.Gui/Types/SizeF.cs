@@ -7,21 +7,21 @@
 using System;
 using System.ComponentModel;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Represents the size of a rectangular region with an ordered pair of width and height.
 	/// </summary>
 	public struct SizeF : IEquatable<SizeF> {
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.SizeF'/> class.
+		/// Initializes a new instance of the <see cref='Terminal.UI.SizeF'/> class.
 		/// </summary>
 		public static readonly SizeF Empty;
 		private float width; // Do not rename (binary serialization)
 		private float height; // Do not rename (binary serialization)
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.SizeF'/> class from the specified
-		/// existing <see cref='Terminal.Gui.SizeF'/>.
+		/// Initializes a new instance of the <see cref='Terminal.UI.SizeF'/> class from the specified
+		/// existing <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public SizeF (SizeF size)
 		{
@@ -30,8 +30,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.SizeF'/> class from the specified
-		/// <see cref='Terminal.Gui.PointF'/>.
+		/// Initializes a new instance of the <see cref='Terminal.UI.SizeF'/> class from the specified
+		/// <see cref='Terminal.UI.PointF'/>.
 		/// </summary>
 		public SizeF (PointF pt)
 		{
@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref='Terminal.Gui.SizeF'/> class from the specified dimensions.
+		/// Initializes a new instance of the <see cref='Terminal.UI.SizeF'/> class from the specified dimensions.
 		/// </summary>
 		public SizeF (float width, float height)
 		{
@@ -49,12 +49,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Performs vector addition of two <see cref='Terminal.Gui.SizeF'/> objects.
+		/// Performs vector addition of two <see cref='Terminal.UI.SizeF'/> objects.
 		/// </summary>
 		public static SizeF operator + (SizeF sz1, SizeF sz2) => Add (sz1, sz2);
 
 		/// <summary>
-		/// Contracts a <see cref='Terminal.Gui.SizeF'/> by another <see cref='Terminal.Gui.SizeF'/>
+		/// Contracts a <see cref='Terminal.UI.SizeF'/> by another <see cref='Terminal.UI.SizeF'/>
 		/// </summary>
 		public static SizeF operator - (SizeF sz1, SizeF sz2) => Subtract (sz1, sz2);
 
@@ -84,28 +84,28 @@ namespace Terminal.Gui {
 		    => new SizeF (left.width / right, left.height / right);
 
 		/// <summary>
-		/// Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are identical.
+		/// Tests whether two <see cref='Terminal.UI.SizeF'/> objects are identical.
 		/// </summary>
 		public static bool operator == (SizeF sz1, SizeF sz2) => sz1.Width == sz2.Width && sz1.Height == sz2.Height;
 
 		/// <summary>
-		/// Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are different.
+		/// Tests whether two <see cref='Terminal.UI.SizeF'/> objects are different.
 		/// </summary>
 		public static bool operator != (SizeF sz1, SizeF sz2) => !(sz1 == sz2);
 
 		/// <summary>
-		/// Converts the specified <see cref='Terminal.Gui.SizeF'/> to a <see cref='Terminal.Gui.PointF'/>.
+		/// Converts the specified <see cref='Terminal.UI.SizeF'/> to a <see cref='Terminal.UI.PointF'/>.
 		/// </summary>
 		public static explicit operator PointF (SizeF size) => new PointF (size.Width, size.Height);
 
 		/// <summary>
-		/// Tests whether this <see cref='Terminal.Gui.SizeF'/> has zero width and height.
+		/// Tests whether this <see cref='Terminal.UI.SizeF'/> has zero width and height.
 		/// </summary>
 		[Browsable (false)]
 		public bool IsEmpty => width == 0 && height == 0;
 
 		/// <summary>
-		/// Represents the horizontal component of this <see cref='Terminal.Gui.SizeF'/>.
+		/// Represents the horizontal component of this <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public float Width {
 			get => width;
@@ -113,7 +113,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Represents the vertical component of this <see cref='Terminal.Gui.SizeF'/>.
+		/// Represents the vertical component of this <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public float Height {
 			get => height;
@@ -121,24 +121,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Performs vector addition of two <see cref='Terminal.Gui.SizeF'/> objects.
+		/// Performs vector addition of two <see cref='Terminal.UI.SizeF'/> objects.
 		/// </summary>
 		public static SizeF Add (SizeF sz1, SizeF sz2) => new SizeF (sz1.Width + sz2.Width, sz1.Height + sz2.Height);
 
 		/// <summary>
-		/// Contracts a <see cref='Terminal.Gui.SizeF'/> by another <see cref='Terminal.Gui.SizeF'/>.
+		/// Contracts a <see cref='Terminal.UI.SizeF'/> by another <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public static SizeF Subtract (SizeF sz1, SizeF sz2) => new SizeF (sz1.Width - sz2.Width, sz1.Height - sz2.Height);
 
 		/// <summary>
-		/// Tests to see whether the specified object is a <see cref='Terminal.Gui.SizeF'/>  with the same dimensions
-		/// as this <see cref='Terminal.Gui.SizeF'/>.
+		/// Tests to see whether the specified object is a <see cref='Terminal.UI.SizeF'/>  with the same dimensions
+		/// as this <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public override bool Equals (object obj) => obj is SizeF && Equals ((SizeF)obj);
 
 
 		/// <summary>
-		/// Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are identical.
+		/// Tests whether two <see cref='Terminal.UI.SizeF'/> objects are identical.
 		/// </summary>
 		public bool Equals (SizeF other) => this == other;
 
@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Creates a human-readable string that represents this <see cref='Terminal.Gui.SizeF'/>.
+		/// Creates a human-readable string that represents this <see cref='Terminal.UI.SizeF'/>.
 		/// </summary>
 		public override string ToString () => "{Width=" + width.ToString () + ", Height=" + height.ToString () + "}";
 

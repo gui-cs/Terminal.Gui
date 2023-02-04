@@ -10,7 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Provides a drop-down list of items the user can select from.
 	/// </summary>

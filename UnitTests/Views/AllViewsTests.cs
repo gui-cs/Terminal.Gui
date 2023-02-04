@@ -5,7 +5,7 @@ using System.Reflection;
 using Xunit;
 using System.IO;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class AllViewsTests {
 		[Fact]
 		public void AllViews_Tests_All_Constructors ()

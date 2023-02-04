@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Linq;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	///   Time editing <see cref="View"/>
 	/// </summary>

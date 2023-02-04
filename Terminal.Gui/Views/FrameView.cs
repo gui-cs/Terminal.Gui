@@ -13,7 +13,7 @@ using System;
 using System.Linq;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// The FrameView is a container frame that draws a frame around the contents. It is similar to
 	/// a GroupBox in Windows.

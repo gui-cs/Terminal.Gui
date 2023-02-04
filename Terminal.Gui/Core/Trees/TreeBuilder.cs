@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.UI.Trees {
 
 	/// <summary>
 	/// Abstract implementation of <see cref="ITreeBuilder{T}"/>.

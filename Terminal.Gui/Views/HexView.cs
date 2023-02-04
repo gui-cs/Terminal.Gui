@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// An hex viewer and editor <see cref="View"/> over a <see cref="System.IO.Stream"/>
 	/// </summary>

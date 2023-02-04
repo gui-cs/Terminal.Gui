@@ -3,7 +3,7 @@ using NStack;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// Specifies how a <see cref="MenuItem"/> shows selection state. 

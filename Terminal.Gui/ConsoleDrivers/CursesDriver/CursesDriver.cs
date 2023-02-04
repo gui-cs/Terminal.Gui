@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using NStack;
 using Unix.Terminal;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// This is the Curses driver for the gui.cs/Terminal framework.

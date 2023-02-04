@@ -1,16 +1,16 @@
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.UI.CoreTests {
 	public class ResponderTests {
 		[Fact]
 		public void New_Initializes ()
 		{
 			var r = new Responder ();
 			Assert.NotNull (r);
-			Assert.Equal ("Terminal.Gui.Responder", r.ToString ());
+			Assert.Equal ("Terminal.UI.Responder", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.True (r.Enabled);

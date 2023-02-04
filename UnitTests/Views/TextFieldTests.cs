@@ -2,7 +2,7 @@
 using System.Reflection;
 using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.UI.ViewTests {
 	public class TextFieldTests {
 
 		// This class enables test functions annotated with the [InitShutdown] attribute

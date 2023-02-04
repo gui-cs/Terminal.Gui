@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unix.Terminal;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Basic colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>

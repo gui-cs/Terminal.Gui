@@ -11,10 +11,10 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NStack;
-using Terminal.Gui.Resources;
+using Terminal.UI.Resources;
 using Rune = System.Rune;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	///   Single-line text entry <see cref="View"/>
 	/// </summary>
@@ -557,7 +557,7 @@ namespace Terminal.Gui {
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
-			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
+			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.UI.Elmish/issues/2
 			oldCursorPos = point;
 
 			// Give autocomplete first opportunity to respond to key presses

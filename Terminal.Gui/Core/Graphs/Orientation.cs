@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Graphs {
+﻿namespace Terminal.UI.Graphs {
 	/// <summary>
 	/// Direction of an element (horizontal or vertical)
 	/// </summary>

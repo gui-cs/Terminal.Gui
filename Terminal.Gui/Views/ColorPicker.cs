@@ -1,7 +1,7 @@
 ﻿using System;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Trees {
+﻿namespace Terminal.UI.Trees {
 	/// <summary>
 	/// Event args for the <see cref="TreeView{T}.ObjectActivated"/> event
 	/// </summary>

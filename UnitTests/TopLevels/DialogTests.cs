@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
 using NStack;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.UI.TopLevelTests {
 
 	public class DialogTests {
 		readonly ITestOutputHelper output;

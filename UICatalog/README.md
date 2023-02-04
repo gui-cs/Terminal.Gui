@@ -1,8 +1,8 @@
-# Terminal.Gui UI Catalog
+# Terminal.UI UI Catalog
 
-UI Catalog is a comprehensive sample library for Terminal.Gui. It attempts to satisfy the following goals:
+UI Catalog is a comprehensive sample library for Terminal.UI. It attempts to satisfy the following goals:
 
-1. Be an easy-to-use showcase for Terminal.Gui concepts and features.
+1. Be an easy-to-use showcase for Terminal.UI concepts and features.
 2. Provide sample code that illustrates how to properly implement 
 said concepts & features.
 3. Make it easy for contributors to add additional samples in a structured way.
@@ -11,7 +11,7 @@ said concepts & features.
 
 ## Motivation
 
-The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. 
+The original `demo.cs` sample app for Terminal.UI is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.UI. 
 See [Issue #368](https://github.com/giu-cs/Terminal.Gui/issues/368) for more background.
 
 # API Reference
@@ -20,7 +20,7 @@ See [Issue #368](https://github.com/giu-cs/Terminal.Gui/issues/368) for more bac
 
 ## How To Use
 
-Build and run UI Catalog by typing `dotnet run` from the `UI Catalog` folder or by using the `Terminal.Gui` Visual Studio solution.
+Build and run UI Catalog by typing `dotnet run` from the `UI Catalog` folder or by using the `Terminal.UI` Visual Studio solution.
 
 `Program.cs` is the main **UI Catalog** app and provides a UI for selecting and running **Scenarios**. Each **Scenario* is implemented as a class derived from `Scenario` and `Program.cs` uses reflection to dynamically build the UI.
 
@@ -38,9 +38,9 @@ e.g.
 UICatalog.exe Buttons
 ```
 
-Hitting ENTER on a selected Scenario or double-clicking on a Scenario runs that scenario as though it were a stand-alone Terminal.Gui app.
+Hitting ENTER on a selected Scenario or double-clicking on a Scenario runs that scenario as though it were a stand-alone Terminal.UI app.
 
-When a **Scenario** is run, it runs as though it were a standalone `Terminal.Gui` app. However, scaffolding is provided (in the `Scenario` base class) that (optionally) takes care of `Terminal.Gui` initialization.
+When a **Scenario** is run, it runs as though it were a standalone `Terminal.UI` app. However, scaffolding is provided (in the `Scenario` base class) that (optionally) takes care of `Terminal.UI` initialization.
 
 ## Contributing by Adding Scenarios
 
@@ -55,7 +55,7 @@ To add a new **Scenario** simply:
 The sample below is provided in the `.\UICatalog\Scenarios` directory as a generic sample that can be copied and re-named:
 
 ```csharp
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
@@ -80,7 +80,7 @@ The default `Window` shows the Scenario name and supports exiting the Scenario t
 
 ![screenshot](generic_screenshot.png)
 
-To build a more advanced scenario, where control of the `Toplevel` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply use `Application.Top` per normal Terminal.Gui programming, as seen in the `Notepad` scenario.
+To build a more advanced scenario, where control of the `Toplevel` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply use `Application.Top` per normal Terminal.UI programming, as seen in the `Notepad` scenario.
 
 For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` creates `Win`. The `base.Run` simply calls `Application.Run(Application.Top)`.
 
@@ -93,4 +93,4 @@ For complete control, the `Init` and `Run` overrides can be implemented. The `ba
 - Use the `Bug Repo` Category for `Scenarios` that reproduce bugs. 
 	- Include the Github Issue # in the Description.
 	- Once the bug has been fixed in `develop` submit another PR to remove the `Scenario` (or modify it to provide a good regression test/sample).
-- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/gui-cs/Terminal.Gui/issues) with "UICatalog: ".
+- Tag bugs or suggestions for `UI Catalog` as [`Terminal.UI` Github Issues](https://github.com/gui-cs/Terminal.Gui/issues) with "UICatalog: ".

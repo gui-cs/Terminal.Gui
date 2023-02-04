@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
-using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.UI;
+using Terminal.UI.Trees;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "File System Explorer", Description: "Hierarchical file system explorer demonstrating TreeView.")]
@@ -313,8 +313,8 @@ namespace UICatalog.Scenarios {
 		private void SetCustomColors ()
 		{
 			var hidden = new ColorScheme {
-				Focus = new Terminal.Gui.Attribute (Color.BrightRed, treeViewFiles.ColorScheme.Focus.Background),
-				Normal = new Terminal.Gui.Attribute (Color.BrightYellow, treeViewFiles.ColorScheme.Normal.Background),
+				Focus = new Terminal.UI.Attribute (Color.BrightRed, treeViewFiles.ColorScheme.Focus.Background),
+				Normal = new Terminal.UI.Attribute (Color.BrightYellow, treeViewFiles.ColorScheme.Normal.Background),
 			};
 
 			miCustomColors.Checked = !miCustomColors.Checked;

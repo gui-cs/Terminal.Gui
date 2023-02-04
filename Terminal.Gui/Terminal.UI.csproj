@@ -55,10 +55,10 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
-    <RootNamespace>Terminal.Gui</RootNamespace>
-    <AssemblyName>Terminal.Gui</AssemblyName>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
+    <TargetFrameworks>net7.0</TargetFrameworks>
+    <RootNamespace>Terminal.UI</RootNamespace>
+    <AssemblyName>Terminal.UI</AssemblyName>
+    <DocumentationFile>bin\Release\Terminal.UI.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
     <!--<GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>-->
     <PackageId>Terminal.Gui</PackageId>
@@ -78,7 +78,7 @@
     <Description>Cross platform Terminal UI toolkit for .NET</Description>
     <Owners>Miguel de Icaza, Charlie Kindel</Owners>
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
-    <Title>Terminal.Gui - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
+    <Title>Terminal.UI - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
     <PackageReleaseNotes>
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>

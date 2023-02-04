@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Text alignment enumeration, controls how text is displayed.
 	/// </summary>

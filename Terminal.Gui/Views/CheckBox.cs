@@ -7,7 +7,7 @@
 using System;
 using NStack;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
 	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set

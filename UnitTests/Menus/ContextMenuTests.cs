@@ -2,9 +2,9 @@
 using System.Threading;
 using Xunit;
 using Xunit.Abstractions;
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
+//using GraphViewTests = Terminal.UI.Views.GraphViewTests;
 
-namespace Terminal.Gui.MenuTests {
+namespace Terminal.UI.MenuTests {
 	public class ContextMenuTests {
 		readonly ITestOutputHelper output;
 

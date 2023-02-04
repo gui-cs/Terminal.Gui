@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.UI;
+using Terminal.UI.Trees;
 
 namespace UICatalog.Scenarios {
 
@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 			_items.Sort (StringComparer.OrdinalIgnoreCase);
 
 			CreateListView ();
-			var vsep = new LineView (Terminal.Gui.Graphs.Orientation.Vertical) {
+			var vsep = new LineView (Terminal.UI.Graphs.Orientation.Vertical) {
 				X = Pos.Right (_listView),
 				Y = 1,
 				Height = Dim.Fill ()

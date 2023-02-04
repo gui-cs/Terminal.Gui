@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Terminal.Gui
+namespace Terminal.UI
 {
 	/// <summary>
 	/// Stores a set of four integers that represent the location and size of a rectangle

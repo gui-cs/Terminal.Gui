@@ -1,6 +1,6 @@
 ﻿using NStack;
 using System;
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.
 	/// </summary>
@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 		ProgressBarStyle progressBarStyle;
 
 		/// <summary>
-		/// Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/>
+		/// Gets/Sets the progress bar style based on the <see cref="Terminal.UI.ProgressBarStyle"/>
 		/// </summary>
 		public ProgressBarStyle ProgressBarStyle {
 			get => progressBarStyle;

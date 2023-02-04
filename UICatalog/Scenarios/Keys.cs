@@ -1,6 +1,6 @@
 ﻿using NStack;
 using System.Collections.Generic;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
@@ -86,7 +86,7 @@ namespace UICatalog.Scenarios {
 			var labelKeypress = new Label ("") {
 				X = Pos.Left (edit),
 				Y = Pos.Top (keyPressedLabel),
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = Terminal.UI.TextAlignment.Centered,
 				ColorScheme = Colors.Error,
 				AutoSize = true
 			};

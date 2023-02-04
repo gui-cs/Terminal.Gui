@@ -7,15 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
-using Terminal.Gui.Resources;
+using Terminal.UI;
+using Terminal.UI.Resources;
 using Rune = System.Rune;
 
 namespace UICatalog.Scenarios {
 	/// <summary>
 	/// This Scenario demonstrates building a custom control (a class deriving from View) that:
 	///   - Provides a "Character Map" application (like Windows' charmap.exe).
-	///   - Helps test unicode character rendering in Terminal.Gui
+	///   - Helps test unicode character rendering in Terminal.UI
 	///   - Illustrates how to use ScrollView to do infinite scrolling
 	/// </summary>
 	[ScenarioMetadata (Name: "Character Map",

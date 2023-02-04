@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dynamic MenuBar", Description: "Demonstrates how to change a MenuBar dynamically.")]

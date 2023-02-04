@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. 
 	/// The <see cref="SearchString"/> is used to find the next item in the collection that matches the search string

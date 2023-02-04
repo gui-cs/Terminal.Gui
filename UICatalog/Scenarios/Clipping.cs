@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Clipping", Description: "Used to test that things clip correctly")]

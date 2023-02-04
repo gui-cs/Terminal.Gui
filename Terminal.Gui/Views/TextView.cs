@@ -8,11 +8,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using NStack;
-using Terminal.Gui.Resources;
-using static Terminal.Gui.Graphs.PathAnnotation;
+using Terminal.UI.Resources;
+using static Terminal.UI.Graphs.PathAnnotation;
 using Rune = System.Rune;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	class TextModel {
 		List<List<Rune>> lines = new List<List<Rune>> ();
 

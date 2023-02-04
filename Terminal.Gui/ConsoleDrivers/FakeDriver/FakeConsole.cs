@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 #pragma warning disable RCS1138 // Add summary to documentation comment.
 	/// <summary>

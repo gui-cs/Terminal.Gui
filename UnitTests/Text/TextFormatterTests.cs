@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
+using Console = Terminal.UI.FakeConsole;
 
-namespace Terminal.Gui.TextTests {
+namespace Terminal.UI.TextTests {
 	public class TextFormatterTests {
 		readonly ITestOutputHelper output;
 

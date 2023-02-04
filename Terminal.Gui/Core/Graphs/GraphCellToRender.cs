@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui.Graphs {
+namespace Terminal.UI.Graphs {
 	/// <summary>
 	/// Describes how to render a single row/column of a <see cref="GraphView"/> based
 	/// on the value(s) in <see cref="ISeries"/> at that location

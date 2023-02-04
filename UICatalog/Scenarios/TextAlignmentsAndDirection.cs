@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
+using Terminal.UI;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Alignment and Direction", Description: "Demos horiztonal and vertical text alignment and text direction.")]
@@ -165,7 +165,7 @@ namespace UICatalog.Scenarios {
 
 			// Direction Options
 
-			var directionsEnum = Enum.GetValues (typeof (Terminal.Gui.TextDirection)).Cast<Terminal.Gui.TextDirection> ().ToList ();
+			var directionsEnum = Enum.GetValues (typeof (Terminal.UI.TextDirection)).Cast<Terminal.UI.TextDirection> ().ToList ();
 
 			var directionOptions = new RadioGroup (directionsEnum.Select (e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 				X = Pos.Right (container) + 1,

@@ -21,14 +21,14 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 
 	/// <summary>
-	/// A static, singleton class providing the main application driver for Terminal.Gui apps. 
+	/// A static, singleton class providing the main application driver for Terminal.UI apps. 
 	/// </summary>
 	/// <example>
 	/// <code>
-	/// // A simple Terminal.Gui app that creates a window with a frame and title with 
+	/// // A simple Terminal.UI app that creates a window with a frame and title with 
 	/// // 5 rows/columns of padding.
 	/// Application.Init();
 	/// var win = new Window ("Hello World - CTRL-Q to quit") {
@@ -44,12 +44,12 @@ namespace Terminal.Gui {
 	/// </example>
 	/// <remarks>
 	///   <para>
-	///     Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
+	///     Creates a instance of <see cref="Terminal.UI.MainLoop"/> to process input events, handle timers and
 	///     other sources of data. It is accessible via the <see cref="MainLoop"/> property.
 	///   </para>
 	///   <para>
 	///     You can hook up to the <see cref="Iteration"/> event to have your method
-	///     invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
+	///     invoked on each iteration of the <see cref="Terminal.UI.MainLoop"/>.
 	///   </para>
 	///   <para>
 	///     When invoked sets the SynchronizationContext to one that is tied
@@ -262,7 +262,7 @@ namespace Terminal.Gui {
 		}
 
 		//
-		// provides the sync context set while executing code in Terminal.Gui, to let
+		// provides the sync context set while executing code in Terminal.UI, to let
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
@@ -313,7 +313,7 @@ namespace Terminal.Gui {
 		internal static bool ForceFakeConsole;
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
+		/// Initializes a new instance of <see cref="Terminal.UI"/> Application. 
 		/// </summary>
 		/// <para>
 		/// Call this method once per instance (or after <see cref="Shutdown"/> has been called).

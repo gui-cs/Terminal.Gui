@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui {
+namespace Terminal.UI {
 	/// <summary>
 	/// ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. 
 	/// ContextMenu is analogous to <see cref="MenuBar"/> and, once activated, works like a sub-menu 
