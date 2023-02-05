@@ -446,14 +446,11 @@ namespace Terminal.Gui {
 		public virtual Rect Frame {
 			get => frame;
 			set {
-				if (SuperView != null) {
-					SuperView.SetNeedsDisplay (frame);
-					SuperView.SetNeedsDisplay (value);
-				}
+				var rect = GetMaxNeedDisplay (frame, value);
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
-				SetNeedsDisplay (frame);
+				SetNeedsDisplay (rect);
 			}
 		}
 
@@ -811,6 +808,7 @@ namespace Terminal.Gui {
 		{
 			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
+			Rect oldFrame = frame;
 
 			if (AutoSize) {
 				var s = GetAutoSize ();
@@ -825,7 +823,21 @@ namespace Terminal.Gui {
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			SetNeedsLayout ();
-			SetNeedsDisplay ();
+			SetNeedsDisplay (GetMaxNeedDisplay (oldFrame, frame));
+		}
+
+		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
+		{
+			var rect = new Rect () {
+				X = Math.Min (oldFrame.X, newFrame.X),
+				Y = Math.Min (oldFrame.Y, newFrame.Y),
+				Width = Math.Max (oldFrame.Width, newFrame.Width),
+				Height = Math.Max (oldFrame.Height, newFrame.Height)
+			};
+			rect.Width += Math.Max (oldFrame.X - newFrame.X, 0);
+			rect.Height += Math.Max (oldFrame.Y - newFrame.Y, 0);
+
+			return rect;
 		}
 
 		void TextFormatter_HotKeyChanged (Key obj)
@@ -1538,12 +1550,7 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								var rect = new Rect () {
-									X = Math.Min (view.Bounds.X, view.NeedDisplay.X),
-									Y = Math.Min (view.Bounds.Y, view.NeedDisplay.Y),
-									Width = Math.Max (view.Bounds.Width, view.NeedDisplay.Width),
-									Height = Math.Max (view.Bounds.Height, view.NeedDisplay.Height)
-								};
+								var rect = view.Bounds;
 								view.OnDrawContent (rect);
 								view.Redraw (rect);
 								view.OnDrawContentComplete (rect);
