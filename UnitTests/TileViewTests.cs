@@ -470,6 +470,7 @@ namespace UnitTests {
 			// And 2 up
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tileView.SetNeedsDisplay();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -516,6 +517,8 @@ namespace UnitTests {
 			// And up 2 (only 1 is allowed because of minimum size of 1 on view1)
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+
+			tileView.SetNeedsDisplay();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -943,6 +946,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -993,6 +997,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1028,6 +1033,7 @@ namespace UnitTests {
 
 			Assert.False (tv.SetSplitterPos (0, 0));
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1050,6 +1056,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1081,6 +1088,7 @@ namespace UnitTests {
 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1103,6 +1111,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1140,6 +1149,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1161,6 +1171,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1198,6 +1209,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1220,6 +1232,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1259,6 +1272,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1280,6 +1294,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1320,6 +1335,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1343,6 +1359,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1382,6 +1399,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1403,6 +1421,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1440,6 +1459,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1462,6 +1482,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1503,6 +1524,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1525,6 +1547,7 @@ namespace UnitTests {
 			}
 
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1564,6 +1587,7 @@ namespace UnitTests {
 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 			}
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1585,6 +1609,7 @@ namespace UnitTests {
 			}
 
 
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
