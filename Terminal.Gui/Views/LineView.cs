@@ -71,8 +71,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			base.Redraw (bounds);
-			bounds = Bounds;
-
+			
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
