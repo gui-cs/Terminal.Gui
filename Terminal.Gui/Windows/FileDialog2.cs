@@ -64,6 +64,8 @@ namespace Terminal.Gui {
 		private Label lblBack;
 		private Label lblUp;
 
+		private CollectionNavigator collectionNavigator = new CollectionNavigator();
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
@@ -127,7 +129,10 @@ namespace Terminal.Gui {
 				}
 				else
 				{
-					if(this.tableView.HasFocus && char.IsLetterOrDigit((char)k.KeyEvent.KeyValue))
+					if(this.tableView.HasFocus && 
+					!k.KeyEvent.Key.HasFlag(Key.CtrlMask) &&
+					!k.KeyEvent.Key.HasFlag(Key.AltMask) &&
+					 char.IsLetterOrDigit((char)k.KeyEvent.KeyValue))
 					{
 						CycleToNextTableEntryBeginningWith(k);
 					}
@@ -230,16 +235,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var collection = tableView
-				.Table
-				.Rows
-				.Cast<DataRow>()
-				.Select((o,idx)=>RowToStats(idx))
-				.Select(s=>s.FileSystemInfo.Name)
-				.ToArray();
-
-			var collectionNavigator = new CollectionNavigator(collection);
-
 			var row = tableView.SelectedRow;
 
 			// There is a multi select going on and not just for the current row
@@ -248,10 +243,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if(tableView.Table.Rows.Count == 0)
-			{
-				return;
-			}
 			int match = collectionNavigator.GetNextMatchingItem(row,(char)keyEvent.KeyEvent.KeyValue);
 
 			if(match != -1)
@@ -261,6 +252,20 @@ namespace Terminal.Gui {
 				tableView.EnsureSelectedCellIsVisible();
 				keyEvent.Handled = true;
 			}
+		}
+
+		private void UpdateCollectionNavigator ()
+		{
+			
+			var collection = tableView
+				.Table
+				.Rows
+				.Cast<DataRow>()
+				.Select((o,idx)=>RowToStats(idx))
+				.Select(s=>s.FileSystemInfo.Name)
+				.ToArray();
+
+			collectionNavigator = new CollectionNavigator(collection);
 		}
 
 		/// <summary>
@@ -829,7 +834,9 @@ namespace Terminal.Gui {
 
 			this.sorter.ApplySort ();
 			this.tableView.Update ();
+			UpdateCollectionNavigator();
 		}
+
 		private void BuildRow (int idx)
 		{
 			this.tableView.Table.Rows.Add (idx, idx, idx, idx);
@@ -1560,6 +1567,7 @@ namespace Terminal.Gui {
 				}
 
 				this.tableView.Update ();
+				dlg.UpdateCollectionNavigator();
 			}
 
 			private static string TrimArrows (string columnName)
