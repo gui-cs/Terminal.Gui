@@ -1769,17 +1769,9 @@ namespace Terminal.Gui {
 		}
 
 		#region Unused
-		public override void Suspend ()
-		{
-		}
-
-		public override void StartReportingMouseMoves ()
-		{
-		}
-
-		public override void StopReportingMouseMoves ()
-		{
-		}
+		public override void StartReportingMouseMoves () { }
+		public override void StopReportingMouseMoves () { }
+		public override void Suspend () { }
 		#endregion
 	}
 

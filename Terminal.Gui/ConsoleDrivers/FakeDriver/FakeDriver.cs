@@ -626,7 +626,6 @@ namespace Terminal.Gui {
 			return hasColor;
 		}
 
-		#region Unused
 		public override void UpdateCursor ()
 		{
 			if (!EnsureCursorVisibility ())
@@ -642,17 +641,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void StartReportingMouseMoves ()
-		{
-		}
-
-		public override void StopReportingMouseMoves ()
-		{
-		}
-
-		public override void Suspend ()
-		{
-		}
+		#region Unused
+		public override void StartReportingMouseMoves () {}
+		public override void StopReportingMouseMoves () {}
+		public override void Suspend () {}
 		#endregion
 
 		public class FakeClipboard : ClipboardBase {

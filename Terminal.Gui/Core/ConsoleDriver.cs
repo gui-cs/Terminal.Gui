@@ -170,9 +170,18 @@ namespace Terminal.Gui {
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
 	///   They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in an application.
+	/// </para>
+	/// <para>
+	///   <see cref="Attribute"/>s are driver-specific and, as a result, are only valid if initialized by a <see cref="ConsoleDriver"/>.
+	///   If an <see cref="Attribute"/> is created before a driver is initialized <see cref="Initialized"/ will be <see langword="false"/>
+	///   and attempts to use the <see cref="Attribute"/> will result in an exception. To use an <see cref="Attribute"/> that is not
+	///   initilzied, after a driver is initialized, recreate the <see cref="Attribute"/> by calling the <see cref="Attribute"/> constructor
+	///   or <see cref="Make(Color, Color)"/>.
+	///   </para>
 	/// </remarks>
 	public struct Attribute {
 		/// <summary>
@@ -424,11 +433,11 @@ namespace Terminal.Gui {
 		public bool Equals (ColorScheme other)
 		{
 			return other != null &&
-			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+				EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+				EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+				EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+				EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+				EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 		}
 
 		/// <summary>
@@ -654,71 +663,6 @@ namespace Terminal.Gui {
 		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 		BoxFix = 0x02020164,
 	}
-
-	///// <summary>
-	///// Special characters that can be drawn with 
-	///// </summary>
-	//public enum SpecialChar {
-	//	/// <summary>
-	//	/// Horizontal line character.
-	//	/// </summary>
-	//	HLine,
-
-	//	/// <summary>
-	//	/// Vertical line character.
-	//	/// </summary>
-	//	VLine,
-
-	//	/// <summary>
-	//	/// Stipple pattern
-	//	/// </summary>
-	//	Stipple,
-
-	//	/// <summary>
-	//	/// Diamond character
-	//	/// </summary>
-	//	Diamond,
-
-	//	/// <summary>
-	//	/// Upper left corner
-	//	/// </summary>
-	//	ULCorner,
-
-	//	/// <summary>
-	//	/// Lower left corner
-	//	/// </summary>
-	//	LLCorner,
-
-	//	/// <summary>
-	//	/// Upper right corner
-	//	/// </summary>
-	//	URCorner,
-
-	//	/// <summary>
-	//	/// Lower right corner
-	//	/// </summary>
-	//	LRCorner,
-
-	//	/// <summary>
-	//	/// Left tee
-	//	/// </summary>
-	//	LeftTee,
-
-	//	/// <summary>
-	//	/// Right tee
-	//	/// </summary>
-	//	RightTee,
-
-	//	/// <summary>
-	//	/// Top tee
-	//	/// </summary>
-	//	TopTee,
-
-	//	/// <summary>
-	//	/// The bottom tee.
-	//	/// </summary>
-	//	BottomTee,
-	//}
 
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
