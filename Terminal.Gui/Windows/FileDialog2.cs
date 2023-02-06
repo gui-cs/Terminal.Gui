@@ -125,6 +125,13 @@ namespace Terminal.Gui {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
 				}
+				else
+				{
+					if(this.tableView.HasFocus && char.IsLetterOrDigit((char)k.KeyEvent.KeyValue))
+					{
+						CycleToNextTableEntryBeginningWith(k);
+					}
+				}
 
 			};
 
@@ -214,6 +221,46 @@ namespace Terminal.Gui {
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 			this.Add (this.btnToggleSplitterCollapse);
+		}
+
+		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
+		{
+			if(tableView.Table.Rows.Count == 0)
+			{
+				return;
+			}
+
+			var collection = tableView
+				.Table
+				.Rows
+				.Cast<DataRow>()
+				.Select((o,idx)=>RowToStats(idx))
+				.Select(s=>s.FileSystemInfo.Name)
+				.ToArray();
+
+			var collectionNavigator = new CollectionNavigator(collection);
+
+			var row = tableView.SelectedRow;
+
+			// There is a multi select going on and not just for the current row
+			if(tableView.GetAllSelectedCells().Any(c=>c.Y != row))
+			{
+				return;
+			}
+
+			if(tableView.Table.Rows.Count == 0)
+			{
+				return;
+			}
+			int match = collectionNavigator.GetNextMatchingItem(row,(char)keyEvent.KeyEvent.KeyValue);
+
+			if(match != -1)
+			{
+				tableView.SelectedRow = match;
+				tableView.EnsureValidSelection();
+				tableView.EnsureSelectedCellIsVisible();
+				keyEvent.Handled = true;
+			}
 		}
 
 		/// <summary>
@@ -782,7 +829,6 @@ namespace Terminal.Gui {
 
 			this.sorter.ApplySort ();
 			this.tableView.Update ();
-
 		}
 		private void BuildRow (int idx)
 		{
