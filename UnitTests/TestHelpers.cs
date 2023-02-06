@@ -37,9 +37,9 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
 	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
-		Type consoleDriverType = null, 
-		bool useFakeClipboard = false, 
-		bool fakeClipboardAlwaysThrowsNotSupportedException = false, 
+		Type consoleDriverType = null,
+		bool useFakeClipboard = false,
+		bool fakeClipboardAlwaysThrowsNotSupportedException = false,
 		bool fakeClipboardIsSupportedAlwaysTrue = false)
 	{
 		//Assert.True (autoInit == false && consoleDriverType == null);
@@ -54,7 +54,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 	static bool _init = false;
 	bool AutoInit { get; }
-	bool AutoShutdown { get;  }
+	bool AutoShutdown { get; }
 	Type DriverType;
 
 	public override void Before (MethodInfo methodUnderTest)
@@ -120,8 +120,11 @@ class TestHelpers {
 			expectedLook = expectedLook.Replace ("\r\n", "\n");
 			actualLook = actualLook.Replace ("\r\n", "\n");
 
-			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			// If test is about to fail show user what things looked like
+			if(!string.Equals(expectedLook,actualLook)) {
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			}
 
 			Assert.Equal (expectedLook, actualLook);
 		}
@@ -251,7 +254,7 @@ class TestHelpers {
 
 				var match = expectedColors.Where (e => e.Value == val).ToList ();
 				if (match.Count == 0) {
-					throw new Exception ($"Unexpected color {DescribeColor (val)} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value))})");
+					throw new Exception ($"Unexpected color {DescribeColor (val)} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => DescribeColor (c.Value)))})");
 				} else if (match.Count > 1) {
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -260,7 +263,7 @@ class TestHelpers {
 				var userExpected = line [c];
 
 				if (colorUsed != userExpected) {
-					throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {DescribeColor (colorUsed)} but test expected {DescribeColor (userExpected)} (these are indexes into the expectedColors array)");
+					throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({DescribeColor (val)}) but test expected {userExpected} ({DescribeColor (expectedColors [int.Parse (userExpected.ToString ())].Value)}) (these are indexes into the expectedColors array)");
 				}
 			}
 

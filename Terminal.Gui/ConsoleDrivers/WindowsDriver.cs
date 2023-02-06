@@ -251,7 +251,7 @@ namespace Terminal.Gui {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
-			if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
+			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				return new Size (cols, rows);
 			}
@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
 		{
-			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
@@ -773,7 +773,7 @@ namespace Terminal.Gui {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 1));
+					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 				left = 0;
 				top = 0;
 				cols = newSize.Width;
@@ -1517,35 +1517,56 @@ namespace Terminal.Gui {
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
-
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
 					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var prevPosition = GetOutputBufferPosition () + 1;
-					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					OutputBuffer [position].Char.UnicodeChar = (char)' ';
-					contents [crow, ccol, 0] = (int)(uint)' ';
+					OutputBuffer [prevPosition].Char.UnicodeChar = c;
+					contents [crow, ccol - 1, 0] = c;
+					OutputBuffer [prevPosition].Attributes = (ushort)currentAttribute;
+					contents [crow, ccol - 1, 1] = currentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
 				} else {
-					OutputBuffer [position].Char.UnicodeChar = (char)rune;
-					contents [crow, ccol, 0] = (int)(uint)rune;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+						var prevPosition = crow * Cols + (ccol - 1);
+						OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var prevPosition = GetOutputBufferPosition () + 1;
+						OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						OutputBuffer [position].Char.UnicodeChar = (char)' ';
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						OutputBuffer [position].Char.UnicodeChar = (char)rune;
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 				}
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();

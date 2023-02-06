@@ -53,6 +53,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
+
+		/// <summary>
+		/// Event fired when a <see cref="TabView.Tab"/> is clicked.  Can be used to cancel navigation,
+		/// show context menu (e.g. on right click) etc.
+		/// </summary>
+		public event EventHandler<TabMouseEventArgs> TabClicked;
+
+
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
@@ -187,7 +195,7 @@ namespace Terminal.Gui {
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, bounds.Width,
-			       Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
+				Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
 			}
 
 			if (Tabs.Any ()) {
@@ -665,6 +673,22 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
+				var hit = ScreenToTab (me.X, me.Y);
+
+				bool isClick = me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
+					me.Flags.HasFlag (MouseFlags.Button2Clicked) ||
+					me.Flags.HasFlag (MouseFlags.Button3Clicked);
+
+				if (isClick) {
+					host.OnTabClicked (new TabMouseEventArgs (hit, me));
+
+					// user canceled click
+					if (me.Handled) {
+						return true;
+					}
+				}
+
+
 				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
@@ -689,7 +713,7 @@ namespace Terminal.Gui {
 						return true;
 					}
 
-					var hit = ScreenToTab (me.X, me.Y);
+
 					if (hit != null) {
 						host.SelectedTab = hit;
 						SetNeedsDisplay ();
@@ -738,6 +762,45 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Raises the <see cref="TabClicked"/> event.
+		/// </summary>
+		/// <param name="tabMouseEventArgs"></param>
+		protected virtual private void OnTabClicked (TabMouseEventArgs tabMouseEventArgs)
+		{
+			TabClicked?.Invoke (this, tabMouseEventArgs);
+		}
+
+		/// <summary>
+		/// Describes a mouse event over a specific <see cref="TabView.Tab"/> in a <see cref="TabView"/>.
+		/// </summary>
+		public class TabMouseEventArgs : EventArgs {
+
+			/// <summary>
+			/// Gets the <see cref="TabView.Tab"/> (if any) that the mouse
+			/// was over when the <see cref="MouseEvent"/> occurred.
+			/// </summary>
+			/// <remarks>This will be null if the click is after last tab
+			/// or before first.</remarks>
+			public Tab Tab { get; }
+
+			/// <summary>
+			/// Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event
+			/// and perform custom behavior (e.g. show a context menu).
+			/// </summary>
+			public MouseEvent MouseEvent { get; }
+
+			/// <summary>
+			/// Creates a new instance of the <see cref="TabMouseEventArgs"/> class.
+			/// </summary>
+			/// <param name="tab"><see cref="TabView.Tab"/> that the mouse was over when the event occurred.</param>
+			/// <param name="mouseEvent">The mouse activity being reported</param>
+			public TabMouseEventArgs (Tab tab, MouseEvent mouseEvent)
+			{
+				Tab = tab;
+				MouseEvent = mouseEvent;
+			}
+		}
 
 		/// <summary>
 		/// A single tab in a <see cref="TabView"/>

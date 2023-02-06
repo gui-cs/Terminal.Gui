@@ -151,7 +151,7 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public SplitContainer ContentPane;
+			public TileView ContentPane;
 			public ListView CategoryListView;
 			public ListView ScenarioListView;
 
@@ -207,15 +207,16 @@ namespace UICatalog {
 					OS
 				};
 
-				ContentPane = new SplitContainer () {
+				ContentPane = new TileView () {
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
-					SplitterDistance = 25
+					IntegratedBorder = BorderStyle.Rounded,
 				};
+				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 					
 				CategoryListView = new ListView (_categories) {
@@ -231,8 +232,9 @@ namespace UICatalog {
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 
-				ContentPane.Panels [0].Title = "Categories";
-				ContentPane.Panels [0].Add (CategoryListView);
+				ContentPane.Tiles.ElementAt(0).Title = "Categories";
+				ContentPane.Tiles.ElementAt (0).MinSize = 2;
+				ContentPane.Tiles.ElementAt (0).View.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -245,8 +247,9 @@ namespace UICatalog {
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
 
-				ContentPane.Panels [1].Title = "Scenarios";
-				ContentPane.Panels [1].Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
+				ContentPane.Tiles.ElementAt (1).View.Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).MinSize = 2;
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);

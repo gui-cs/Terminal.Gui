@@ -446,14 +446,11 @@ namespace Terminal.Gui {
 		public virtual Rect Frame {
 			get => frame;
 			set {
-				if (SuperView != null) {
-					SuperView.SetNeedsDisplay (frame);
-					SuperView.SetNeedsDisplay (value);
-				}
+				var rect = GetMaxNeedDisplay (frame, value);
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
-				SetNeedsDisplay (frame);
+				SetNeedsDisplay (rect);
 			}
 		}
 
@@ -811,6 +808,7 @@ namespace Terminal.Gui {
 		{
 			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
+			Rect oldFrame = frame;
 
 			if (AutoSize) {
 				var s = GetAutoSize ();
@@ -825,7 +823,21 @@ namespace Terminal.Gui {
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			SetNeedsLayout ();
-			SetNeedsDisplay ();
+			SetNeedsDisplay (GetMaxNeedDisplay (oldFrame, frame));
+		}
+
+		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
+		{
+			var rect = new Rect () {
+				X = Math.Min (oldFrame.X, newFrame.X),
+				Y = Math.Min (oldFrame.Y, newFrame.Y),
+				Width = Math.Max (oldFrame.Width, newFrame.Width),
+				Height = Math.Max (oldFrame.Height, newFrame.Height)
+			};
+			rect.Width += Math.Max (oldFrame.X - newFrame.X, 0);
+			rect.Height += Math.Max (oldFrame.Y - newFrame.Y, 0);
+
+			return rect;
 		}
 
 		void TextFormatter_HotKeyChanged (Key obj)
@@ -1093,8 +1105,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			var h = Frame.Height;
-			var w = Frame.Width;
+			Rect containerBounds = GetContainerBounds ();
+			Rect viewBounds = Bounds;
+			if (!containerBounds.IsEmpty) {
+				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
+				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
+			}
+
+			var h = viewBounds.Height;
+			var w = viewBounds.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1127,7 +1146,7 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		public void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
@@ -1511,11 +1530,7 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
-				containerBounds.X = Math.Max (containerBounds.X, Driver.Clip.X);
-				containerBounds.Y = Math.Max (containerBounds.Y, Driver.Clip.Y);
-				containerBounds.Width = Math.Min (containerBounds.Width, Driver.Clip.Width);
-				containerBounds.Height = Math.Min (containerBounds.Height, Driver.Clip.Height);
+				Rect containerBounds = GetContainerBounds ();
 				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
 				    containerBounds);
@@ -1534,12 +1549,7 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								var rect = new Rect () {
-									X = Math.Min (view.Bounds.X, view.NeedDisplay.X),
-									Y = Math.Min (view.Bounds.Y, view.NeedDisplay.Y),
-									Width = Math.Max (view.Bounds.Width, view.NeedDisplay.Width),
-									Height = Math.Max (view.Bounds.Height, view.NeedDisplay.Height)
-								};
+								var rect = view.Bounds;
 								view.OnDrawContent (rect);
 								view.Redraw (rect);
 								view.OnDrawContentComplete (rect);
@@ -1556,6 +1566,17 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		Rect GetContainerBounds ()
+		{
+			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
+			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
+			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
+			containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
+			containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
+			return containerBounds;
 		}
 
 		/// <summary>
