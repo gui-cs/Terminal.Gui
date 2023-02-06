@@ -195,18 +195,6 @@ namespace Terminal.Gui {
 			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
 		}
 
-		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
-		public override void SetColors (short foreColorId, short backgroundColorId)
-		{
-			// BUGBUG: This code is never called ?? See Issue #2300
-			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
-			if (!rawPairs.TryGetValue (key, out var v)) {
-				v = MakeColor (foreColorId, backgroundColorId);
-				rawPairs [key] = v;
-			}
-			SetAttribute (v);
-		}
-
 		static Key MapCursesKey (int cursesKey)
 		{
 			switch (cursesKey) {

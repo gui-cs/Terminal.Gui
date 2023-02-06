@@ -654,11 +654,6 @@ namespace Terminal.Gui {
 		{
 		}
 
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-			throw new NotImplementedException ();
-		}
-
 		public override void CookMouse ()
 		{
 		}

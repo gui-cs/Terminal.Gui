@@ -905,16 +905,6 @@ namespace Terminal.Gui {
 			CurrentAttribute = c;
 		}
 
-		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		// that independently with the R, G, B values.
-		/// <summary>
-		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		/// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		/// <param name="foregroundColorId">Foreground color identifier.</param>
-		/// <param name="backgroundColorId">Background color identifier.</param>
-		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
-
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.
 		/// </summary>

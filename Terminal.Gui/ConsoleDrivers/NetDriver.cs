@@ -2001,11 +2001,6 @@ namespace Terminal.Gui {
 		}
 
 		#region Unused
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-		}
-
 		public override void CookMouse ()
 		{
 		}
