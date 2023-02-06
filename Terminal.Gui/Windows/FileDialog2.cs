@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 		private DataTable dtFiles;
 		private TableView tableView;
 		private TreeView<object> treeView;
-		private SplitContainer splitContainer;
+		private TileView splitContainer;
 		private Button btnOk;
 		private Button btnToggleSplitterCollapse;
 		private Label lblForward;
@@ -106,16 +106,15 @@ namespace Terminal.Gui {
 				this.SuppressIfBadChar (k);
 			};
 
-			this.splitContainer = new SplitContainer () {
+			this.splitContainer = new TileView () {
 				X = 0,
 				Y = 2,
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
-				SplitterDistance = 30,
 			};
-			this.splitContainer.Border.BorderStyle = BorderStyle.None;
-			this.splitContainer.Border.DrawMarginFrame = false;
-			this.splitContainer.Panels [0].Visible = false;
+			this.splitContainer.SetSplitterPos(0,30);
+			this.splitContainer.IntegratedBorder = BorderStyle.None;
+			this.splitContainer.Tiles.ElementAt(0).View.Visible = false;
 
 			this.tableView = new TableView () {
 				Width = Dim.Fill (),
@@ -157,15 +156,17 @@ namespace Terminal.Gui {
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
 
-			this.splitContainer.Panels [0].Add (this.treeView);
-			this.splitContainer.Panels [1].Add (this.tableView);
+			this.splitContainer.Tiles.ElementAt(0).View.Add (this.treeView);
+			this.splitContainer.Tiles.ElementAt(1).View.Add (this.tableView);
 
 			this.btnToggleSplitterCollapse = new Button (">>") {
 				Y = Pos.AnchorEnd (1),
 			};
 			this.btnToggleSplitterCollapse.Clicked += () => {
-				var newState = !this.splitContainer.Panels [0].Visible;
-				this.splitContainer.Panels [0].Visible = newState;
+				var tile = this.splitContainer.Tiles.ElementAt(0);
+
+				var newState = !tile.View.Visible;
+				tile.View.Visible = newState;
 				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
 
