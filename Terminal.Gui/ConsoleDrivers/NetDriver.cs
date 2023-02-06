@@ -2000,16 +2000,6 @@ namespace Terminal.Gui {
 			return hasColor;
 		}
 
-		#region Unused
-		public override void CookMouse ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
-		}
-		#endregion
-
 		//
 		// These are for the .NET driver, but running natively on Windows, wont run
 		// on the Mono emulation

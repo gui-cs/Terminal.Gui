@@ -1222,17 +1222,6 @@ namespace Terminal.Gui {
 		public abstract void StopReportingMouseMoves ();
 
 		/// <summary>
-		/// Disables the cooked event processing from the mouse driver. 
-		/// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		public abstract void UncookMouse ();
-
-		/// <summary>
-		/// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		public abstract void CookMouse ();
-
-		/// <summary>
 		/// Horizontal line character.
 		/// </summary>
 		public Rune HLine = '\u2500';

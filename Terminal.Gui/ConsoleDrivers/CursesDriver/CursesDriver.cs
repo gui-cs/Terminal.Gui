@@ -1035,23 +1035,6 @@ namespace Terminal.Gui {
 			Console.Out.Flush ();
 		}
 
-		//int lastMouseInterval;
-		//bool mouseGrabbed;
-
-		public override void UncookMouse ()
-		{
-			//if (mouseGrabbed)
-			//	return;
-			//lastMouseInterval = Curses.mouseinterval (0);
-			//mouseGrabbed = true;
-		}
-
-		public override void CookMouse ()
-		{
-			//mouseGrabbed = false;
-			//Curses.mouseinterval (lastMouseInterval);
-		}
-
 		public override Attribute GetAttribute ()
 		{
 			return CurrentAttribute;

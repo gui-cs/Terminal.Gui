@@ -821,7 +821,6 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				Application.UngrabMouse ();
-				Driver.UncookMouse ();
 				dragPosition = null;
 			}
 

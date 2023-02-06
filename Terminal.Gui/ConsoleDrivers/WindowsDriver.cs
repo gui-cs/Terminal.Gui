@@ -1780,14 +1780,6 @@ namespace Terminal.Gui {
 		public override void StopReportingMouseMoves ()
 		{
 		}
-
-		public override void UncookMouse ()
-		{
-		}
-
-		public override void CookMouse ()
-		{
-		}
 		#endregion
 	}
 

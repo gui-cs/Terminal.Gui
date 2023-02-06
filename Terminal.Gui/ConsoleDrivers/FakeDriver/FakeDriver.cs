@@ -653,15 +653,6 @@ namespace Terminal.Gui {
 		public override void Suspend ()
 		{
 		}
-
-		public override void CookMouse ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
-		}
-
 		#endregion
 
 		public class FakeClipboard : ClipboardBase {
