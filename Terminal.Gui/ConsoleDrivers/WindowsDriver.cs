@@ -116,6 +116,10 @@ namespace Terminal.Gui {
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
+			if (ScreenBuffer == IntPtr.Zero) {
+				visibility = CursorVisibility.Invisible;
+				return false;
+			}
 			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {

@@ -960,6 +960,18 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			return MostFocused?.OnEnter (view) ?? base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
+		}
 	}
 
 	/// <summary>
