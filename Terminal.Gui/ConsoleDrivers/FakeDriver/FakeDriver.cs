@@ -473,11 +473,6 @@ namespace Terminal.Gui {
 			keyUpHandler (new KeyEvent (map, keyModifiers));
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return CurrentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{

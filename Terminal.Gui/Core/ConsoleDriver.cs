@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   <see cref="Attribute"/>s are driver-specific and, as a result, are only valid if initialized by a <see cref="ConsoleDriver"/>.
-	///   If an <see cref="Attribute"/> is created before a driver is initialized <see cref="Initialized"/ will be <see langword="false"/>
+	///   If an <see cref="Attribute"/> is created before a driver is initialized <see cref="Initialized"/> will be <see langword="false"/>
 	///   and attempts to use the <see cref="Attribute"/> will result in an exception. To use an <see cref="Attribute"/> that is not
 	///   initilzied, after a driver is initialized, recreate the <see cref="Attribute"/> by calling the <see cref="Attribute"/> constructor
 	///   or <see cref="Make(Color, Color)"/>.
@@ -824,7 +824,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current attribute the driver is using. 
 		/// </summary>
-		public virtual Attribute CurrentAttribute {
+		internal virtual Attribute CurrentAttribute {
 			get => _currentAttribute; 
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
@@ -1369,7 +1369,7 @@ namespace Terminal.Gui {
 		/// Gets the current <see cref="Attribute"/>.
 		/// </summary>
 		/// <returns>The current attribute.</returns>
-		public abstract Attribute GetAttribute ();
+		public Attribute GetAttribute () => CurrentAttribute;
 
 		/// <summary>
 		/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.

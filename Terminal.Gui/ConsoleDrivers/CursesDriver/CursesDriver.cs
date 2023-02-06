@@ -143,19 +143,6 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
-
-			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
-			// Clear and reset entire screen.
-			//Console.Out.Write ("\x1b[2J");
-			//Console.Out.Flush ();
-
-			// Set top and bottom lines of a window.
-			//Console.Out.Write ("\x1b[1;25r");
-			//Console.Out.Flush ();
-
-			//Set cursor key to cursor.
-			//Console.Out.Write ("\x1b[?1l");
-			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -167,8 +154,6 @@ namespace Terminal.Gui {
 		}
 
 		public Curses.Window window;
-
-		//static short last_color_pair = 16;
 
 		/// <summary>
 		/// Creates a curses color from the provided foreground and background colors
@@ -782,7 +767,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		Curses.Event oldMouseEvents, reportableMouseEvents;
+		Curses.Event reportableMouseEvents;
 		public override void Init (Action terminalResized)
 		{
 			if (window != null)
@@ -839,7 +824,7 @@ namespace Terminal.Gui {
 			Curses.noecho ();
 
 			Curses.Window.Standard.keypad (true);
-			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
+			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out _);
 			TerminalResized = terminalResized;
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
@@ -961,7 +946,7 @@ namespace Terminal.Gui {
 			case Color.White:
 				return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.Invalid:
-				return Curses.COLOR_BLACK; 
+				return Curses.COLOR_BLACK;
 			}
 			throw new ArgumentException ("Invalid color code");
 		}
@@ -1033,11 +1018,6 @@ namespace Terminal.Gui {
 		{
 			Console.Out.Write ("\x1b[?1003l");
 			Console.Out.Flush ();
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return CurrentAttribute;
 		}
 
 		/// <inheritdoc/>
