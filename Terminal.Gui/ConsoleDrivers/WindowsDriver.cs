@@ -1455,13 +1455,13 @@ namespace Terminal.Gui {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
-
 				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
+				
 				ResizeScreen ();
 				UpdateOffScreen ();
-
-				CreateColors ();
 			} catch (Win32Exception e) {
 				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
 			}
@@ -1517,63 +1517,42 @@ namespace Terminal.Gui {
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
-				if (runeWidth == 0 && ccol > 0) {
-					var r = contents [crow, ccol - 1, 0];
-					var s = new string (new char [] { (char)r, (char)rune });
-					string sn;
-					if (!s.IsNormalized ()) {
-						sn = s.Normalize ();
-					} else {
-						sn = s;
-					}
-					var c = sn [0];
+				if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
 					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = c;
-					contents [crow, ccol - 1, 0] = c;
-					OutputBuffer [prevPosition].Attributes = (ushort)currentAttribute;
-					contents [crow, ccol - 1, 1] = currentAttribute;
-					contents [crow, ccol - 1, 2] = 1;
-					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
-				} else {
-					if (runeWidth < 2 && ccol > 0
-						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+					contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-						var prevPosition = crow * Cols + (ccol - 1);
-						OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
-						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
 
-					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					var prevPosition = GetOutputBufferPosition () + 1;
+					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+					contents [crow, ccol + 1, 0] = (int)(uint)' ';
 
-						var prevPosition = GetOutputBufferPosition () + 1;
-						OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
-						contents [crow, ccol + 1, 0] = (int)(uint)' ';
-
-					}
-					if (runeWidth > 1 && ccol == Clip.Right - 1) {
-						OutputBuffer [position].Char.UnicodeChar = (char)' ';
-						contents [crow, ccol, 0] = (int)(uint)' ';
-					} else {
-						OutputBuffer [position].Char.UnicodeChar = (char)rune;
-						contents [crow, ccol, 0] = (int)(uint)rune;
-					}
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
-					contents [crow, ccol, 1] = currentAttribute;
-					contents [crow, ccol, 2] = 1;
-					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 				}
+				if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					OutputBuffer [position].Char.UnicodeChar = (char)' ';
+					contents [crow, ccol, 0] = (int)(uint)' ';
+				} else {
+					OutputBuffer [position].Char.UnicodeChar = (char)rune;
+					contents [crow, ccol, 0] = (int)(uint)rune;
+				}
+				OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
+				contents [crow, ccol, 1] = CurrentAttribute;
+				contents [crow, ccol, 2] = 1;
+				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
-			if (runeWidth < 0 || runeWidth > 0) {
-				ccol++;
-			}
+			ccol++;
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -1589,11 +1568,9 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
 		}
 
 		public override Attribute MakeColor (Color foreground, Color background)
@@ -1697,7 +1674,7 @@ namespace Terminal.Gui {
 
 		public override Attribute GetAttribute ()
 		{
-			return currentAttribute;
+			return CurrentAttribute;
 		}
 
 		/// <inheritdoc/>
@@ -1792,9 +1769,6 @@ namespace Terminal.Gui {
 		}
 
 		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
 
 		public override void SetColors (short foregroundColorId, short backgroundColorId)
 		{
