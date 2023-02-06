@@ -705,7 +705,6 @@ namespace Terminal.Gui {
 				return;
 			OnGrabbedMouse (view);
 			mouseGrabView = view;
-			Driver.UncookMouse ();
 		}
 
 		/// <summary>
@@ -717,7 +716,6 @@ namespace Terminal.Gui {
 				return;
 			OnUnGrabbedMouse (mouseGrabView);
 			mouseGrabView = null;
-			Driver.CookMouse ();
 		}
 
 		static void OnGrabbedMouse (View view)
