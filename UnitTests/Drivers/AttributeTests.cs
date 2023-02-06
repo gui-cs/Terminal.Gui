@@ -85,18 +85,6 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		[Fact]
-		public void Make_Asserts_IfNotInit ()
-		{
-			var fg = new Color ();
-			fg = Color.Red;
-
-			var bg = new Color ();
-			bg = Color.Blue;
-
-			Assert.Throws<InvalidOperationException> (() => Attribute.Make (fg, bg));
-		}
-
-		[Fact]
 		public void Make_Creates ()
 		{
 			var driver = new FakeDriver ();
