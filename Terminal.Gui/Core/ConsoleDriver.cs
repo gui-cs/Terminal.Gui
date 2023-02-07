@@ -167,7 +167,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
+	/// Attributes are used as elements that contain both a foreground and a background or platform specific features.
 	/// </summary>
 	/// <remarks>
 	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
@@ -1478,6 +1478,9 @@ namespace Terminal.Gui {
 				return;
 			}
 
+
+			// Define the default color theme only if the user has not defined one.
+			
 			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
