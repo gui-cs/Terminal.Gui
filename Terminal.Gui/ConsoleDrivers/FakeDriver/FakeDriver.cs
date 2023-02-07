@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 					}
 					var c = sn [0];
 					contents [crow, ccol - 1, 0] = c;
-					contents [crow, ccol - 1, 1] = currentAttribute;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
 					contents [crow, ccol - 1, 2] = 1;
 
 				} else {
@@ -163,20 +163,22 @@ namespace Terminal.Gui {
 					} else {
 						contents [crow, ccol, 0] = (int)(uint)rune;
 					}
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 1;
 
 					dirtyLine [crow] = true;
 				}
-			} else
+			} else {
 				needMove = true;
+			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
 				ccol++;
 			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -187,8 +189,9 @@ namespace Terminal.Gui {
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -226,8 +229,9 @@ namespace Terminal.Gui {
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
-			// Call CreateColors before UpdateOffScreen as it references Colors
-			CreateColors ();
+			// Call InitalizeColorSchemes before UpdateOffScreen as it references Colors
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
+			InitalizeColorSchemes ();
 			UpdateOffScreen ();
 		}
 
@@ -299,11 +303,9 @@ namespace Terminal.Gui {
 			UpdateCursor ();
 		}
 
-		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
-			currentAttribute = c;
 		}
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -490,11 +492,6 @@ namespace Terminal.Gui {
 			keyDownHandler (new KeyEvent (map, keyModifiers));
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
 		}
 
 		/// <inheritdoc/>

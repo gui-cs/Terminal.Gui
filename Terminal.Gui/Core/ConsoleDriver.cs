@@ -17,7 +17,6 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// The <see cref="Color.Invalid"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
-	[DefaultValue(Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -82,11 +81,89 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White, 
+		White,
 		/// <summary>
 		/// Indicates an invalid or un-set color value. 
 		/// </summary>
 		Invalid = -1
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class TrueColor {
+		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int Red { get; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int Green { get; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int Blue { get; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public TrueColor (int red, int green, int blue)
+		{
+			Red = red;
+			Green = green;
+			Blue = blue;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public Color ToConsoleColor ()
+		{
+			var trueColorMap = new Dictionary<TrueColor, Color> () {
+				{ new TrueColor (0,0,0),Color.Black},
+				{ new TrueColor (0, 0, 0x80),Color.Blue},
+				{ new TrueColor (0, 0x80, 0),Color.Green},
+				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
+				{ new TrueColor (0x80, 0, 0),Color.Red},
+				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
+				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
+				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
+				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
+				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
+				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
+				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
+				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
+				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
+				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
+				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
+				};
+			// Iterate over all colors in the map
+			var distances = trueColorMap.Select (
+							k => Tuple.Create (
+								// the candidate we are considering matching against (RGB)
+								k.Key,
+
+								CalculateDistance (k.Key, this)
+							));
+
+			// get the closest
+			var match = distances.OrderBy (t => t.Item2).First ();
+			return trueColorMap [match.Item1];
+		}
+
+		private float CalculateDistance (TrueColor color1, TrueColor color2)
+		{
+			// use RGB distance
+			return
+				Math.Abs (color1.Red - color2.Red) +
+				Math.Abs (color1.Green - color2.Green) +
+				Math.Abs (color1.Blue - color2.Blue);
+		}
 	}
 
 	/// <summary>
@@ -123,7 +200,7 @@ namespace Terminal.Gui {
 		public Attribute (int value)
 		{
 			Color foreground = Color.Invalid;
-			Color background = Color.Invalid; 
+			Color background = Color.Invalid;
 
 			Initialized = false;
 			if (Application.Driver != null) {
@@ -156,8 +233,9 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			Initialized = false;
-			Value = Make (foreground, background).Value;
+			var make = Make (foreground, background);
+			Initialized = make.Initialized;
+			Value = make.Value;
 			Foreground = foreground;
 			Background = background;
 		}
@@ -175,10 +253,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The driver-specific color value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) {
-			Debug.WriteLineIf (!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized by a driver before use.");
-			//if (!c.IsInitialized) throw new InvalidOperationException ("Attributes must be initialized by driver before use.");
-			return c.Value; 
+		public static implicit operator int (Attribute c)
+		{
+			if (!c.Initialized) throw new InvalidOperationException ("Attribute: Attributes must be initialized by a driver before use.");
+			return c.Value;
 		}
 
 		/// <summary>
@@ -251,11 +329,11 @@ namespace Terminal.Gui {
 	/// See also: <see cref="Colors.ColorSchemes"/>.
 	/// </remarks>
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal;
-		Attribute _focus;
-		Attribute _hotNormal;
-		Attribute _hotFocus;
-		Attribute _disabled;
+		Attribute _normal = new Attribute(Color.White, Color.Black);
+		Attribute _focus = new Attribute (Color.White, Color.Black);
+		Attribute _hotNormal = new Attribute (Color.White, Color.Black);
+		Attribute _hotFocus = new Attribute (Color.White, Color.Black);
+		Attribute _disabled = new Attribute (Color.White, Color.Black);
 
 		/// <summary>
 		/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to track which ColorScheme 
@@ -269,7 +347,6 @@ namespace Terminal.Gui {
 		public Attribute Normal {
 			get { return _normal; }
 			set {
-
 				if (!value.HasValidColors) {
 					return;
 				}
@@ -390,20 +467,67 @@ namespace Terminal.Gui {
 		{
 			return !(left == right);
 		}
+
+		internal void Initialize ()
+		{
+			// If the new scheme was created before a driver was loaded, we need to re-make
+			// the attributes
+			if (!_normal.Initialized) {
+				_normal = new Attribute (_normal.Foreground, _normal.Background);
+			}
+			if (!_focus.Initialized) {
+				_focus = new Attribute (_focus.Foreground, _focus.Background);
+			}
+			if (!_hotNormal.Initialized) {
+				_hotNormal = new Attribute (_hotNormal.Foreground, _hotNormal.Background);
+			}
+			if (!_hotFocus.Initialized) {
+				_hotFocus = new Attribute (_hotFocus.Foreground, _hotFocus.Background);
+			}
+			if (!_disabled.Initialized) {
+				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
+			}
+		}
 	}
 
 	/// <summary>
 	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
+	/// <remarks>
+	/// This property can be set in a Theme to change the default <see cref="Colors"/> for the application.
+	/// </remarks>
 	public static class Colors {
+		private class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
+			public bool Equals (string x, string y)
+			{
+				if (x != null && y != null) {
+					return x.ToLowerInvariant () == y.ToLowerInvariant ();
+				}
+				return false;
+			}
+
+			public int GetHashCode (string obj)
+			{
+				return obj.ToLowerInvariant ().GetHashCode ();
+			}
+		}
+
 		static Colors ()
+		{
+			ColorSchemes = Create ();
+		}
+
+		/// <summary>
+		/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
+		/// </summary>
+		public static Dictionary<string, ColorScheme> Create () 
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
-			ColorSchemes = typeof (Colors).GetProperties ()
+			return typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
-				.ToDictionary (t => t.Key, t => t.Value);
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme()))
+				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase ());
 		}
 
 		/// <summary>
@@ -470,7 +594,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
-		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
+		public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; }
 	}
 
 	/// <summary>
@@ -754,6 +878,22 @@ namespace Terminal.Gui {
 		public abstract void UpdateScreen ();
 
 		/// <summary>
+		/// The current attribute the driver is using. 
+		/// </summary>
+		public virtual Attribute CurrentAttribute {
+			get => currentAttribute; 
+			set {
+				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
+					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+					return;
+				}
+				if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
+
+				currentAttribute = value;
+			}
+		}
+
+		/// <summary>
 		/// Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.
 		/// </summary>
 		/// <remarks>
@@ -762,7 +902,7 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public virtual void SetAttribute (Attribute c)
 		{
-			Debug.WriteLineIf(!c.Initialized, "ConsoleDriver.SetAttribute: Attributes must be initialized before use.");
+			CurrentAttribute = c;
 		}
 
 		/// <summary>
@@ -1298,6 +1438,7 @@ namespace Terminal.Gui {
 		/// Lower right rounded corner
 		/// </summary>
 		public Rune LRRCorner = '\u256f';
+		private Attribute currentAttribute;
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
@@ -1311,7 +1452,7 @@ namespace Terminal.Gui {
 		/// Gets the current <see cref="Attribute"/>.
 		/// </summary>
 		/// <returns>The current attribute.</returns>
-		public abstract Attribute GetAttribute ();
+		public Attribute GetAttribute () => CurrentAttribute;
 
 		/// <summary>
 		/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.
@@ -1322,17 +1463,16 @@ namespace Terminal.Gui {
 		public abstract Attribute MakeColor (Color foreground, Color background);
 
 		/// <summary>
-		/// Create all <see cref="Colors"/> with the <see cref="ColorScheme"/> for the console driver.
+		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correclty 
+		/// initalized by the driver.
 		/// </summary>
-		/// <param name="supportsColors">Flag indicating if colors are supported.</param>
-		public void CreateColors (bool supportsColors = true)
+		/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
+		public void InitalizeColorSchemes (bool supportsColors = true)
 		{
-			// BUGBUG: No need to create these instances here as they are created in constructor
-			//Colors.TopLevel = new ColorScheme ();
-			//Colors.Base = new ColorScheme ();
-			//Colors.Dialog = new ColorScheme ();
-			//Colors.Menu = new ColorScheme ();
-			//Colors.Error = new ColorScheme ();
+			// Ensure all Attributes are initlaized by the driver
+			foreach (var s in Colors.ColorSchemes) {
+				s.Value.Initialize ();
+			}
 
 			if (!supportsColors) {
 				return;
