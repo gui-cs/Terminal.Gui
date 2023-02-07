@@ -85,7 +85,34 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		[Fact]
-		public void Make_Asserts_IfNotInit ()
+		public void Implicit_Assign_NoDriver ()
+		{
+
+			var attr = new Attribute ();
+
+			var fg = new Color ();
+			fg = Color.Red;
+
+			var bg = new Color ();
+			bg = Color.Blue;
+
+			// Test conversion to int
+			attr = new Attribute (fg, bg);
+			int value_implicit = (int)attr.Value;
+			Assert.False (attr.Initialized);
+
+			Assert.Equal (-1, value_implicit);
+			Assert.False (attr.Initialized);
+
+			// Test conversion from int
+			attr = -1;
+			Assert.Equal (-1, attr.Value);
+			Assert.False (attr.Initialized);
+
+		}
+
+		[Fact]
+		public void Make_SetsNotInitialized_NoDriver ()
 		{
 			var fg = new Color ();
 			fg = Color.Red;
@@ -93,7 +120,9 @@ namespace Terminal.Gui.DriverTests {
 			var bg = new Color ();
 			bg = Color.Blue;
 
-			Assert.Throws<InvalidOperationException> (() => Attribute.Make (fg, bg));
+			var a = Attribute.Make (fg, bg);
+
+			Assert.False (a.Initialized);
 		}
 
 		[Fact]
@@ -109,8 +138,8 @@ namespace Terminal.Gui.DriverTests {
 			var bg = new Color ();
 			bg = Color.Blue;
 
-			var attr =  Attribute.Make (fg, bg);
-
+			var attr = Attribute.Make (fg, bg);
+			Assert.True (attr.Initialized);
 			Assert.Equal (fg, attr.Foreground);
 			Assert.Equal (bg, attr.Background);
 
@@ -119,7 +148,23 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		[Fact]
-		public void Get_Asserts_IfNotInit ()
+		public void Make_Creates_NoDriver ()
+		{
+
+			var fg = new Color ();
+			fg = Color.Red;
+
+			var bg = new Color ();
+			bg = Color.Blue;
+
+			var attr = Attribute.Make (fg, bg);
+			Assert.False (attr.Initialized);
+			Assert.Equal (fg, attr.Foreground);
+			Assert.Equal (bg, attr.Background);
+		}
+
+		[Fact]
+		public void Get_Asserts_NoDriver ()
 		{
 			Assert.Throws<InvalidOperationException> (() => Attribute.Get ());
 		}
@@ -162,6 +207,25 @@ namespace Terminal.Gui.DriverTests {
 
 			Assert.Equal (Color.Red, fg);
 			Assert.Equal (Color.Green, bg);
+		}
+
+		[Fact]
+		public void IsValid_Tests ()
+		{
+			var attr = new Attribute ();
+			Assert.True (attr.HasValidColors);
+
+			attr = new Attribute (Color.Red, Color.Green);
+			Assert.True (attr.HasValidColors);
+
+			attr = new Attribute (Color.Red, Color.Invalid);
+			Assert.False (attr.HasValidColors);
+
+			attr = new Attribute (Color.Invalid, Color.Green);
+			Assert.False (attr.HasValidColors);
+
+			attr = new Attribute (Color.Invalid, Color.Invalid);
+			Assert.False (attr.HasValidColors);
 		}
 	}
 }

@@ -1602,8 +1602,8 @@ Y
 					// Calling the Text constructor.
 					lbl = new Label (text);
 				}
-				lbl.ColorScheme = new ColorScheme ();
-				lbl.Redraw (lbl.Bounds);
+				Application.Top.Add (lbl);
+				Application.Top.Redraw (Application.Top.Bounds);
 
 				// should have the initial text
 				Assert.Equal ('t', driver.Contents [0, 0, 0]);
