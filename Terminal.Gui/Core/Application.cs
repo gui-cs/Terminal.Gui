@@ -955,6 +955,8 @@ namespace Terminal.Gui {
 				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
+				} else if (Top != null && toplevel != Top && toplevels.Contains (Top)) {
+					Top.OnLeave (toplevel);
 				}
 				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
@@ -1063,6 +1065,7 @@ namespace Terminal.Gui {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
+					Current.OnEnter (Current);
 				}
 				Refresh ();
 			}
