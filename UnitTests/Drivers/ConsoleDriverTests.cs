@@ -492,8 +492,6 @@ namespace Terminal.Gui.DriverTests {
 				Application.Run ();
 				Application.Shutdown ();
 			}
-			Application.Run ();
-			Application.Shutdown ();
 		}
 
 		public class PacketTest : IEnumerable, IEnumerable<object []> {
