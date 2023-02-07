@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 				UseFakeClipboard = useFakeClipboard;
 				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
 				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-				
+
 				// double check usage is correct
 				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
 				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
@@ -131,31 +131,51 @@ namespace Terminal.Gui {
 					//MockConsole.CursorTop = crow;
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
+
+				} else {
+					if (runeWidth < 2 && ccol > 0
 					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
 
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
 
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					contents [crow, ccol + 1, 2] = 1;
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						contents [crow, ccol + 1, 2] = 1;
 
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+
+					dirtyLine [crow] = true;
 				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					contents [crow, ccol, 0] = (int)(uint)' ';
-				} else {
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = CurrentAttribute;
-				contents [crow, ccol, 2] = 1;
-
-				dirtyLine [crow] = true;
-			} else
+			} else {
 				needMove = true;
+			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					contents [crow, ccol, 1] = CurrentAttribute;
@@ -169,8 +189,9 @@ namespace Terminal.Gui {
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
