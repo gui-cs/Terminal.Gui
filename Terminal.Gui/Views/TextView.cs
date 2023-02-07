@@ -2035,6 +2035,16 @@ namespace Terminal.Gui {
 			return base.OnEnter (view);
 		}
 
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
+				Application.UngrabMouse ();
+			}
+
+			return base.OnLeave (view);
+		}
+
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 		void GetEncodedRegionBounds (out long start, out long end,
 			int? startRow = null, int? startCol = null, int? cRow = null, int? cCol = null)
@@ -4445,16 +4455,6 @@ namespace Terminal.Gui {
 			}
 
 			line = r;
-		}
-
-		///<inheritdoc/>
-		public override bool OnLeave (View view)
-		{
-			if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
-				Application.UngrabMouse ();
-			}
-
-			return base.OnLeave (view);
 		}
 
 		/// <summary>
