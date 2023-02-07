@@ -769,7 +769,7 @@ namespace Terminal.Gui {
 		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
 		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-						TextFormatter = new TextFormatter ();
+			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
