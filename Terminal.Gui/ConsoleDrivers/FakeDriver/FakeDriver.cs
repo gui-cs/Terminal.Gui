@@ -226,11 +226,9 @@ namespace Terminal.Gui {
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
-			UpdateOffScreen ();
-
+			// Call CreateColors before UpdateOffScreen as it references Colors
 			CreateColors ();
-
-			//MockConsole.Clear ();
+			UpdateOffScreen ();
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -301,9 +299,10 @@ namespace Terminal.Gui {
 			UpdateCursor ();
 		}
 
-		Attribute currentAttribute;
+		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
 		public override void SetAttribute (Attribute c)
 		{
+			base.SetAttribute (c);
 			currentAttribute = c;
 		}
 

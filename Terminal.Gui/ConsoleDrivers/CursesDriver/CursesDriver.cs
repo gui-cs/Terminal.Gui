@@ -179,10 +179,11 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute;
+		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
 
 		public override void SetAttribute (Attribute c)
 		{
+			base.SetAttribute (c);
 			currentAttribute = c;
 			Curses.attrset (currentAttribute);
 		}
@@ -220,6 +221,7 @@ namespace Terminal.Gui {
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int f = (short)foreground;
 			int b = (short)background;
 			var v = colorPairs [f, b];
@@ -237,6 +239,7 @@ namespace Terminal.Gui {
 		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
 		public override void SetColors (short foreColorId, short backgroundColorId)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
 			if (!rawPairs.TryGetValue (key, out var v)) {
 				v = MakeColor (foreColorId, backgroundColorId);
