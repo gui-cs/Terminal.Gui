@@ -1,12 +1,10 @@
 # Configuration Management
 
-Terminal.Gui provides configuration and theme management for Terminal.Gui applications.
+Terminal.Gui provides configuration and theme management for Terminal.Gui applications via the [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.
 
-The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class loads and saves Json-formatted configuration files. 
-
-Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files. There are two types, or scopes, of settings: Setting scope and Theme scope. Setting scope settings are generally applied to the [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml) class. Theme scope settings are applied to various classes such as [`FrameView`](~/api/Terminal.Gui/Terminal.Gui.FrameView.yml) and [`Window`](~/api/Terminal.Gui/Terminal.Gui.Window.yml).
-
-See below for more information on [`ThemeManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ThemeManager.yml).
+1) **Settings**. Settings are applied to the [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml) class. Settings are accessed via the `Settings` property of the [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) class.
+2) **Themes**. Themes are a named collection of settings impacting how applications look. The default theme is named "Default". The built-in configuration stored within the Terminal.Gui library defines two additional themes: "Dark", and "Light". Additional themes can be defined in the configuration files.
+3) **AppSettings**. AppSettings allow applicaitons to use the  [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) to store and retrieve application-specific settings.
 
 The The [`ConfigurationManager`](~/api/Terminal.Gui/Terminal.Gui.Configuration.ConfigurationManager.yml) will look for configuration files in the `.tui` folder in the user's home directory (e.g. `C:/Users/username/.tui` or `/usr/username/.tui`), the folder where the Terminal.Gui application was launched from (e.g. `./.tui`), or as a resource within the Terminal.Gui application's main assembly.
 
@@ -42,7 +40,7 @@ Settings for the [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml
 
 ## Themes
 
-A Theme is a collection of settings that are named. The default theme is named "Default". The built-in configuration stored within the Terminal.Gui library defines two additional themes: "Dark", and "Light". Additional themes can be defined in the configuration files. 
+A Theme is a named collection of settings that impact the visual style of Terminal.Gui applications. The default theme is named "Default". The built-in configuration stored within the Terminal.Gui library defines two more themes: "Dark", and "Light". Additional themes can be defined in the configuration files. 
 
 The Json property `Theme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
 
@@ -56,6 +54,7 @@ Themes support defining ColorSchemes as well as various default settings for Vie
   "Application.QuitKey": {
     "Key": "Esc"
   },
+  "Theme": "UI Catalog Theme",
   "Themes": [
     {
       "UI Catalog Theme": {
@@ -94,11 +93,7 @@ Themes support defining ColorSchemes as well as various default settings for Vie
             }
           }
         ],
-        "Dialog.DefaultBorderStyle": "Double",
-        "Dialog.DefaultButtonAlignment": "Right",
-        "Dialog.DefaultEffect3D": false,
-        "FrameView.DefaultBorderStyle": "Single",
-        "Window.DefaultBorderStyle": "Double",      
+        "Dialog.DefaultEffect3D": false
       }
     }
   ]
