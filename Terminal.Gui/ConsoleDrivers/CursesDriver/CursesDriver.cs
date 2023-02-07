@@ -62,40 +62,61 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					Curses.mvaddch (crow, ccol - 1, (int)(uint)c);
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					var curAtttib = CurrentAttribute;
-					Curses.attrset (contents [crow, ccol - 1, 1]);
-					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var curAtttib = CurrentAttribute;
-					Curses.attrset (contents [crow, ccol + 1, 1]);
-					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					Curses.addch ((int)(uint)' ');
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					Curses.addch ((int)(uint)rune);
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = CurrentAttribute;
-				contents [crow, ccol, 2] = 1;
-			} else
-				needMove = true;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-			ccol++;
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol - 1, 1]);
+						Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol + 1, 1]);
+						Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						Curses.addch ((int)(uint)' ');
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						Curses.addch ((int)(uint)rune);
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+				}
+			} else {
+				needMove = true;
+			}
+
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+			
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					contents [crow, ccol, 1] = CurrentAttribute;
@@ -104,8 +125,9 @@ namespace Terminal.Gui {
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -143,6 +165,19 @@ namespace Terminal.Gui {
 			SetCursorVisibility (CursorVisibility.Default);
 
 			Curses.endwin ();
+
+			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
+			// Clear and reset entire screen.
+			//Console.Out.Write ("\x1b[2J");
+			//Console.Out.Flush ();
+
+			// Set top and bottom lines of a window.
+			//Console.Out.Write ("\x1b[1;25r");
+			//Console.Out.Flush ();
+
+			//Set cursor key to cursor.
+			//Console.Out.Write ("\x1b[?1l");
+			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
@@ -154,6 +189,8 @@ namespace Terminal.Gui {
 		}
 
 		public Curses.Window window;
+
+		//static short last_color_pair = 16;
 
 		/// <summary>
 		/// Creates a curses color from the provided foreground and background colors
@@ -178,6 +215,37 @@ namespace Terminal.Gui {
 		public override Attribute MakeColor (Color fore, Color back)
 		{
 			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
+		}
+
+		int [,] colorPairs = new int [16, 16];
+
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		{
+			// BUGBUG: This code is never called ?? See Issue #2300
+			int f = (short)foreground;
+			int b = (short)background;
+			var v = colorPairs [f, b];
+			if ((v & 0x10000) == 0) {
+				b &= 0x7;
+				bool bold = (f & 0x8) != 0;
+				f &= 0x7;
+
+				v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
+				colorPairs [(int)foreground, (int)background] = v | 0x1000;
+			}
+			SetAttribute (v & 0xffff);
+		}
+
+		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
+		public override void SetColors (short foreColorId, short backgroundColorId)
+		{
+			// BUGBUG: This code is never called ?? See Issue #2300
+			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
+			if (!rawPairs.TryGetValue (key, out var v)) {
+				v = MakeColor (foreColorId, backgroundColorId);
+				rawPairs [key] = v;
+			}
+			SetAttribute (v);
 		}
 
 		static Key MapCursesKey (int cursesKey)
@@ -767,7 +835,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		Curses.Event reportableMouseEvents;
+		Curses.Event oldMouseEvents, reportableMouseEvents;
 		public override void Init (Action terminalResized)
 		{
 			if (window != null)
@@ -824,7 +892,7 @@ namespace Terminal.Gui {
 			Curses.noecho ();
 
 			Curses.Window.Standard.keypad (true);
-			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out _);
+			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			TerminalResized = terminalResized;
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
@@ -946,7 +1014,7 @@ namespace Terminal.Gui {
 			case Color.White:
 				return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.Invalid:
-				return Curses.COLOR_BLACK;
+				return Curses.COLOR_BLACK; 
 			}
 			throw new ArgumentException ("Invalid color code");
 		}
@@ -1018,6 +1086,23 @@ namespace Terminal.Gui {
 		{
 			Console.Out.Write ("\x1b[?1003l");
 			Console.Out.Flush ();
+		}
+
+		//int lastMouseInterval;
+		//bool mouseGrabbed;
+
+		public override void UncookMouse ()
+		{
+			//if (mouseGrabbed)
+			//	return;
+			//lastMouseInterval = Curses.mouseinterval (0);
+			//mouseGrabbed = true;
+		}
+
+		public override void CookMouse ()
+		{
+			//mouseGrabbed = false;
+			//Curses.mouseinterval (lastMouseInterval);
 		}
 
 		/// <inheritdoc/>

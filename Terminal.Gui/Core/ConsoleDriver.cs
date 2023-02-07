@@ -170,18 +170,9 @@ namespace Terminal.Gui {
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
-	/// <para>
 	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
 	///   They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in an application.
-	/// </para>
-	/// <para>
-	///   <see cref="Attribute"/>s are driver-specific and, as a result, are only valid if initialized by a <see cref="ConsoleDriver"/>.
-	///   If an <see cref="Attribute"/> is created before a driver is initialized <see cref="Initialized"/> will be <see langword="false"/>
-	///   and attempts to use the <see cref="Attribute"/> will result in an exception. To use an <see cref="Attribute"/> that is not
-	///   initilzied, after a driver is initialized, recreate the <see cref="Attribute"/> by calling the <see cref="Attribute"/> constructor
-	///   or <see cref="Make(Color, Color)"/>.
-	///   </para>
 	/// </remarks>
 	public struct Attribute {
 		/// <summary>
@@ -433,11 +424,11 @@ namespace Terminal.Gui {
 		public bool Equals (ColorScheme other)
 		{
 			return other != null &&
-				EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-				EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-				EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-				EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-				EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 		}
 
 		/// <summary>
@@ -664,6 +655,71 @@ namespace Terminal.Gui {
 		BoxFix = 0x02020164,
 	}
 
+	///// <summary>
+	///// Special characters that can be drawn with 
+	///// </summary>
+	//public enum SpecialChar {
+	//	/// <summary>
+	//	/// Horizontal line character.
+	//	/// </summary>
+	//	HLine,
+
+	//	/// <summary>
+	//	/// Vertical line character.
+	//	/// </summary>
+	//	VLine,
+
+	//	/// <summary>
+	//	/// Stipple pattern
+	//	/// </summary>
+	//	Stipple,
+
+	//	/// <summary>
+	//	/// Diamond character
+	//	/// </summary>
+	//	Diamond,
+
+	//	/// <summary>
+	//	/// Upper left corner
+	//	/// </summary>
+	//	ULCorner,
+
+	//	/// <summary>
+	//	/// Lower left corner
+	//	/// </summary>
+	//	LLCorner,
+
+	//	/// <summary>
+	//	/// Upper right corner
+	//	/// </summary>
+	//	URCorner,
+
+	//	/// <summary>
+	//	/// Lower right corner
+	//	/// </summary>
+	//	LRCorner,
+
+	//	/// <summary>
+	//	/// Left tee
+	//	/// </summary>
+	//	LeftTee,
+
+	//	/// <summary>
+	//	/// Right tee
+	//	/// </summary>
+	//	RightTee,
+
+	//	/// <summary>
+	//	/// Top tee
+	//	/// </summary>
+	//	TopTee,
+
+	//	/// <summary>
+	//	/// The bottom tee.
+	//	/// </summary>
+	//	BottomTee,
+	//}
+
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
@@ -824,8 +880,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current attribute the driver is using. 
 		/// </summary>
-		internal virtual Attribute CurrentAttribute {
-			get => _currentAttribute; 
+		public virtual Attribute CurrentAttribute {
+			get => currentAttribute; 
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
 					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
@@ -833,7 +889,7 @@ namespace Terminal.Gui {
 				}
 				if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
 
-				_currentAttribute = value;
+				currentAttribute = value;
 			}
 		}
 
@@ -848,6 +904,23 @@ namespace Terminal.Gui {
 		{
 			CurrentAttribute = c;
 		}
+
+		/// <summary>
+		/// Set Colors from limit sets of colors. Not implemented by any driver: See Issue #2300.
+		/// </summary>
+		/// <param name="foreground">Foreground.</param>
+		/// <param name="background">Background.</param>
+		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+
+		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		// that independently with the R, G, B values.
+		/// <summary>
+		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		/// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
+		/// </summary>
+		/// <param name="foregroundColorId">Foreground color identifier.</param>
+		/// <param name="backgroundColorId">Background color identifier.</param>
+		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.
@@ -1166,6 +1239,17 @@ namespace Terminal.Gui {
 		public abstract void StopReportingMouseMoves ();
 
 		/// <summary>
+		/// Disables the cooked event processing from the mouse driver. 
+		/// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
+		/// </summary>
+		public abstract void UncookMouse ();
+
+		/// <summary>
+		/// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
+		/// </summary>
+		public abstract void CookMouse ();
+
+		/// <summary>
 		/// Horizontal line character.
 		/// </summary>
 		public Rune HLine = '\u2500';
@@ -1354,8 +1438,7 @@ namespace Terminal.Gui {
 		/// Lower right rounded corner
 		/// </summary>
 		public Rune LRRCorner = '\u256f';
-		
-		private Attribute _currentAttribute;
+		private Attribute currentAttribute;
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
@@ -1383,8 +1466,6 @@ namespace Terminal.Gui {
 		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correclty 
 		/// initalized by the driver.
 		/// </summary>
-		/// <remarks>
-		/// </remarks>
 		/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
 		public void InitalizeColorSchemes (bool supportsColors = true)
 		{
@@ -1397,6 +1478,35 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
+			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
+			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
+			Colors.TopLevel.HotFocus = MakeColor (Color.Blue, Color.Cyan);
+			Colors.TopLevel.Disabled = MakeColor (Color.DarkGray, Color.Black);
+
+			Colors.Base.Normal = MakeColor (Color.White, Color.Blue);
+			Colors.Base.Focus = MakeColor (Color.Black, Color.Gray);
+			Colors.Base.HotNormal = MakeColor (Color.BrightCyan, Color.Blue);
+			Colors.Base.HotFocus = MakeColor (Color.BrightBlue, Color.Gray);
+			Colors.Base.Disabled = MakeColor (Color.DarkGray, Color.Blue);
+
+			Colors.Dialog.Normal = MakeColor (Color.Black, Color.Gray);
+			Colors.Dialog.Focus = MakeColor (Color.White, Color.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (Color.Blue, Color.Gray);
+			Colors.Dialog.HotFocus = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Dialog.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Menu.Normal = MakeColor (Color.White, Color.DarkGray);
+			Colors.Menu.Focus = MakeColor (Color.White, Color.Black);
+			Colors.Menu.HotNormal = MakeColor (Color.BrightYellow, Color.DarkGray);
+			Colors.Menu.HotFocus = MakeColor (Color.BrightYellow, Color.Black);
+			Colors.Menu.Disabled = MakeColor (Color.Gray, Color.DarkGray);
+
+			Colors.Error.Normal = MakeColor (Color.Red, Color.White);
+			Colors.Error.Focus = MakeColor (Color.Black, Color.BrightRed);
+			Colors.Error.HotNormal = MakeColor (Color.Black, Color.White);
+			Colors.Error.HotFocus = MakeColor (Color.White, Color.BrightRed);
+			Colors.Error.Disabled = MakeColor (Color.DarkGray, Color.White);
 		}
 	}
 
