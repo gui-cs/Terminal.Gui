@@ -319,7 +319,7 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-
+		
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
@@ -441,7 +441,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		private static object packetLock = new object ();
-
+		
 		/// <summary>
 		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
 		/// These are indicated with the wVirtualKeyCode of 231. When we see this code
@@ -486,6 +486,7 @@ namespace Terminal.Gui.DriverTests {
 				iterations++;
 				if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
 			};
+
 
 			lock (packetLock) {
 				Application.Run ();

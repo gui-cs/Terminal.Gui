@@ -172,7 +172,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
+	/// Attributes are used as elements that contain both a foreground and a background or platform specific features.
 	/// </summary>
 	/// <remarks>
 	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
@@ -1466,7 +1466,7 @@ namespace Terminal.Gui {
 		/// Gets the current <see cref="Attribute"/>.
 		/// </summary>
 		/// <returns>The current attribute.</returns>
-		public abstract Attribute GetAttribute ();
+		public Attribute GetAttribute () => CurrentAttribute;
 
 		/// <summary>
 		/// Make the <see cref="Colors"/> for the <see cref="ColorScheme"/>.

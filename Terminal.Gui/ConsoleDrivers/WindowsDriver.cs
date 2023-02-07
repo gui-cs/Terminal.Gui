@@ -1695,11 +1695,6 @@ namespace Terminal.Gui {
 			WinConsole = null;
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return CurrentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{

@@ -1105,11 +1105,6 @@ namespace Terminal.Gui {
 			//Curses.mouseinterval (lastMouseInterval);
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return CurrentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
