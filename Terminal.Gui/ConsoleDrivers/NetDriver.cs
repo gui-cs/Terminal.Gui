@@ -1631,9 +1631,11 @@ namespace Terminal.Gui {
 		{
 		}
 
-		Attribute currentAttribute;
+		Attribute currentAttribute = new Attribute (Color.White, Color.Black);
+
 		public override void SetAttribute (Attribute c)
 		{
+			base.SetAttribute (c);
 			currentAttribute = c;
 		}
 
