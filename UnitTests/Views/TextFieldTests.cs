@@ -1,9 +1,18 @@
-﻿using System;
+﻿using NStack;
+using System;
+using System.Globalization;
 using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests {
 	public class TextFieldTests {
+		readonly ITestOutputHelper output;
+
+		public TextFieldTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		// This class enables test functions annotated with the [InitShutdown] attribute
 		// to have a function called before the test function is called and after.
@@ -1322,6 +1331,99 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (newText.Length, tf.CursorPosition);
 			Assert.Equal (0, tf.SelectedLength);
 			Assert.Null (tf.SelectedText);
+		}
+
+
+		[Fact]
+		public void WordBackward_WordForward_SelectedText_With_Accent ()
+		{
+			string text = "Les Misérables movie.";
+			var tf = new TextField (text) { Width = 30 };
+
+			Assert.Equal (21, text.Length);
+			Assert.Equal (21, tf.Text.RuneCount);
+			Assert.Equal (21, tf.Text.ConsoleWidth);
+
+			var runes = tf.Text.ToRuneList ();
+			Assert.Equal (21, runes.Count);
+			Assert.Equal (22, tf.Text.Length);
+
+			for (int i = 0; i < runes.Count; i++) {
+				var cs = text [i];
+				var cus = (char)runes [i];
+				Assert.Equal (cs, cus);
+			}
+
+			var idx = 15;
+			Assert.Equal ('m', text [idx]);
+			Assert.Equal ('m', (char)runes [idx]);
+			Assert.Equal ("m", ustring.Make (runes [idx]));
+
+			Assert.True (tf.MouseEvent (new MouseEvent {
+				X = idx,
+				Y = 1,
+				Flags = MouseFlags.Button1DoubleClicked,
+				View = tf
+			}));
+			Assert.Equal ("movie.", tf.SelectedText);
+
+			Assert.True (tf.MouseEvent (new MouseEvent {
+				X = idx + 1,
+				Y = 1,
+				Flags = MouseFlags.Button1DoubleClicked,
+				View = tf
+			}));
+			Assert.Equal ("movie.", tf.SelectedText);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
+		{
+			var tf = new TextField ("Les Misérables") { Width = 30 };
+			var top = Application.Top;
+			top.Add (tf);
+			Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Les Misérables", output);
+
+			tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Les Misérables", output);
+
+			// incorrect order will result with a wrong accent place
+			tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Les Miśerables", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
+		{
+			var tf = new TextField ("ắ") { Width = 3 };
+			var top = Application.Top;
+			top.Add (tf);
+			Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ắ", output);
+
+			tf.Text = "\u1eaf";
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ắ", output);
+
+			tf.Text = "\u0103\u0301";
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ắ", output);
+
+			tf.Text = "\u0061\u0306\u0301";
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ắ", output);
 		}
 	}
 }
