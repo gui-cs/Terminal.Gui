@@ -6,9 +6,16 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests {
 	public class AutocompleteTests {
+		readonly ITestOutputHelper output;
+
+		public AutocompleteTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact]
 		public void Test_GenerateSuggestions_Simple ()
@@ -150,6 +157,85 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, tv.Autocomplete.AllSuggestions.Count);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void CursorLeft_CursorRight_Mouse_Button_Pressed_Does_Not_Show_Popup ()
+		{
+			var tv = new TextView () {
+				Width = 50,
+				Height = 5,
+				Text = "This a long line and against TextView."
+			};
+			tv.Autocomplete.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+					.Select (s => s.Value)
+					.Distinct ().ToList ();
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+
+			for (int i = 0; i < 7; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.", output);
+			}
+
+			Assert.True (tv.MouseEvent (new MouseEvent () {
+				X = 6,
+				Y = 0,
+				Flags = MouseFlags.Button1Pressed
+			}));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.g, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.
+       against                         ", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.
+      against                          ", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.
+     against                           ", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.", output);
+
+			for (int i = 0; i < 3; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.", output);
+			}
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This an long line and against TextView.
+       and                             ", output);
+
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This an long line and against TextView.", output);
 		}
 	}
 }
