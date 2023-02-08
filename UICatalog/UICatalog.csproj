@@ -19,10 +19,10 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\config.json" />
+    <None Remove="Resources\config.jsonx" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\config.json" />
+    <EmbeddedResource Include="Resources\config.jsonx" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />

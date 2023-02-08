@@ -209,7 +209,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void Reset_Resets()
 		{
-			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
 			ConfigurationManager.Reset ();
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
@@ -218,7 +218,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
 		{
-			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
 			// arrange
 			ConfigurationManager.Reset ();
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -260,7 +260,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings.Apply ();
 
 
-			ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
 
 			// act
 			ConfigurationManager.Reset ();
@@ -282,8 +282,8 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact]
 		public void TestConfigProperties ()
 		{
+			ConfigurationManager.Locations = ConfigLocations.All;
 			ConfigurationManager.Reset ();
-			ConfigurationManager.ResetFromLibraryResource ();
 
 			Assert.NotEmpty (ConfigurationManager.Settings);
 			// test that all ConfigProperites have our attribute
@@ -317,9 +317,10 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void TestConfigurationManagerToJson ()
 		{
 			ConfigurationManager.GetHardCodedDefaults ();
-			var json = ConfigurationManager.ToJson ();
+			var stream = ConfigurationManager.ToStream ();
 
-			ConfigurationManager.Update (json, "TestConfigurationManagerToJson");
+			
+			ConfigurationManager.Settings.Update (stream, "TestConfigurationManagerToJson");
 
 		}
 
@@ -330,7 +331,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			
 		}
 
-		[Fact, AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+		[Fact, AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
 		public void TestConfigurationManagerInitDriver ()
 		{
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
@@ -342,9 +343,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 
 			// Change Base
-			var json = ConfigurationManager.ToJson ();
+			var json = ConfigurationManager.ToStream ();
 			
-			ConfigurationManager.Update (json, "TestConfigurationManagerInitDriver");
+			ConfigurationManager.Settings.Update (json, "TestConfigurationManagerInitDriver");
 
 			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme] ["ColorSchemes"].PropertyValue);
 			Assert.Equal (Colors.Base, colorSchemes ["Base"]);
@@ -515,7 +516,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 			ConfigurationManager.ThrowOnJsonErrors = true;
 			
-			ConfigurationManager.Update (json, "TestConfigurationManagerUpdateFromJson");
+			ConfigurationManager.Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 			Assert.Equal (Key.Z | Key.AltMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
@@ -566,7 +567,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
+			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
 			Assert.Equal ("Invalid Color: 'yellow'", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
@@ -592,7 +593,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
 			Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
 
 			// Modify hotNormal background only 
@@ -617,7 +618,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
 			Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
 
@@ -627,7 +628,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				""Unknown"" : ""Not known""
 			}";
 
-			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
 			Assert.StartsWith ("Unknown property", jsonException.Message);
 			
 			Assert.Equal (0, ConfigurationManager.jsonErrors.Length);
@@ -664,7 +665,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			ConfigurationManager.Update (json, "test");
+			ConfigurationManager.Settings.Update (json, "test");
 
 			// AbNormal is not a ColorScheme attribute
 			json = @"
@@ -689,7 +690,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			ConfigurationManager.Update (json, "test");
+			ConfigurationManager.Settings.Update (json, "test");
 
 			// Modify hotNormal background only 
 			json = @"
@@ -713,10 +714,10 @@ namespace Terminal.Gui.ConfigurationTests {
 				}
 			}";
 
-			ConfigurationManager.Update (json, "test");
+			ConfigurationManager.Settings.Update (json, "test");
 
-			ConfigurationManager.Update ("{}}", "test");
-
+			ConfigurationManager.Settings.Update ("{}}", "test");
+			
 			Assert.NotEqual (0, ConfigurationManager.jsonErrors.Length);
 
 			Application.Shutdown ();

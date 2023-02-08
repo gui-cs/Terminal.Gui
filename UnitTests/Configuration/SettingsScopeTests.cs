@@ -80,7 +80,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			updatedSettings["Application.IsMouseDisabled"].PropertyValue = true;
 			updatedSettings["Application.HeightAsBuffer"].PropertyValue = true;
 
-			ConfigurationManager.Settings.UpdateFrom (updatedSettings);
+			ConfigurationManager.Settings.Update (updatedSettings);
 			Assert.Equal (Key.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 			Assert.Equal (Key.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
 			Assert.Equal (Key.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);

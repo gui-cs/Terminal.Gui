@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 #nullable enable
@@ -288,6 +289,18 @@ namespace Terminal.Gui.Configuration {
 			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
 		}
 
+		internal static Stream ToStream ()
+		{
+			var json = JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
+			// turn it into a stream
+			var stream = new MemoryStream ();
+			var writer = new StreamWriter (stream);
+			writer.Write (json);
+			writer.Flush ();
+			stream.Position = 0;
+			return stream;
+		}
+
 		/// <summary>
 		/// Event arguments for the <see cref="ConfigurationManager"/> events.
 		/// </summary>
@@ -313,6 +326,7 @@ namespace Terminal.Gui.Configuration {
 
 		private static void AddJsonError (string error)
 		{
+			Debug.WriteLine ($"ConfigurationManager: {error}");
 			jsonErrors.AppendLine (error);
 		}
 
@@ -333,28 +347,6 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
-		/// </summary>
-		/// <param name="json">Json document to update the settings with.</param>
-		/// <param name="source">The source (filename/resource name) the Json document was read from.</param>
-		internal static void Update (string json, string source)
-		{
-			Debug.WriteLine ($"ConfigurationManager.UpdateConfiguration()");
-			// Update the existing settings with the new settings.
-			try {
-				var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
-				Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
-				OnUpdated ();
-			} catch (JsonException e) {
-				if (ThrowOnJsonErrors ?? false) {
-					throw;
-				} else {
-					AddJsonError ($"Error deserializing {source}: {e.Message}");
-				}
-			}
-		}
-
-		/// <summary>
 		/// Called when the configuration has been updated from a configuration file. Invokes the <see cref="Updated"/>
 		/// event.
 		/// </summary>
@@ -369,18 +361,6 @@ namespace Terminal.Gui.Configuration {
 		/// application.
 		/// </summary>
 		public static event Action<ConfigurationManagerEventArgs>? Updated;
-
-		/// <summary>
-		/// Updates the <see cref="SettingsScope"/> with the settings in a JSON file.
-		/// </summary>
-		/// <param name="filePath"></param>
-		internal static void UpdateFromFile (string filePath)
-		{
-			// Read the JSON file
-			string json = File.ReadAllText (filePath);
-			Update (json, filePath);
-			Debug.WriteLine ($"ConfigurationManager: Read configuration from {filePath}");
-		}
 
 		/// <summary>
 		/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
@@ -398,13 +378,13 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			ClearJsonErrors ();
-
+			
 			Settings = new SettingsScope ();
 			ThemeManager.Reset ();
 			AppSettings = new AppScope ();
 
 			// To enable some unit tests, we only load from resources if the flag is set
-			if (Locations.HasFlag (ConfigLocations.LibraryResources)) ResetFromLibraryResource ();
+			if (Locations.HasFlag (ConfigLocations.DefaultOnly)) Settings.UpdateFromResource (typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}");
 
 			Apply ();
 			ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
@@ -470,86 +450,9 @@ namespace Terminal.Gui.Configuration {
 		public static event Action<ConfigurationManagerEventArgs>? Applied;
 
 		/// <summary>
-		/// Loads all settings found in <c>Terminal.Gui.Resources.config.json</c> into <see cref="ConfigurationManager"/>. 
-		/// </summary>
-		internal static void ResetFromLibraryResource ()
-		{
-			var resourceName = $"Terminal.Gui.Resources.{_configFilename}";
-			using Stream? stream = typeof (ConfigurationManager).Assembly.GetManifestResourceStream (resourceName)!;
-			using StreamReader reader = new StreamReader (stream);
-			Update (reader.ReadToEnd (), resourceName);
-			Debug.WriteLine ($"ConfigurationManager: Read configuration from {resourceName}");
-		}
-
-		/// <summary>
-		/// Loads global configuration from the directory the app was launched from (<c>./.tui/config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadGlobalAppDirectory ()
-		{
-			string globalLocal = $"./.tui/{_configFilename}";
-			if (File.Exists (globalLocal)) {
-				UpdateFromFile (globalLocal);
-			}
-		}
-
-		/// <summary>
-		/// Loads global configuration in the user's home directory (<c>~/.tui/config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadGlobalHomeDirectory ()
-		{
-			string globalHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}";
-			if (File.Exists (globalHome)) {
-				UpdateFromFile (globalHome);
-			}
-		}
-
-		/// <summary>
-		/// Loads application configuration in the app's resources (<c>appname.Resources.config.json</c>) into
-		/// <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppResources ()
-		{
-			var embeddedStylesResourceName = Assembly.GetEntryAssembly ()?.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
-			if (embeddedStylesResourceName != null) {
-				using Stream? stream = Assembly.GetEntryAssembly ()?.GetManifestResourceStream (embeddedStylesResourceName);
-				using StreamReader reader = new StreamReader (stream!);
-				string json = reader.ReadToEnd ();
-				Update (json, embeddedStylesResourceName);
-				Debug.WriteLine ($"ConfigurationManager: Read configuration from {embeddedStylesResourceName}");
-			}
-		}
-
-		/// <summary>
 		/// Name of the running application. By default this property is set to the application's assembly name.
 		/// </summary>
 		public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
-
-		/// <summary>
-		/// Loads application configuration found in the directory the app was launched from (<c>./.tui/appname.config.json</c>)
-		/// into <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppDirectory ()
-		{
-			string appLocal = $"./.tui/{AppName}.{_configFilename}";
-			if (File.Exists (appLocal)) {
-				UpdateFromFile (appLocal);
-			}
-		}
-
-		/// <summary>
-		/// Loads application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>)
-		/// into <see cref="ConfigurationManager"/>.
-		/// </summary>
-		internal static void LoadAppHomeDirectory ()
-		{
-			string appHome = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}";
-			if (File.Exists (appHome)) {
-				UpdateFromFile (appHome);
-			}
-		}
-
 
 		/// <summary>
 		/// Describes the location of the configuration files. The constancts can be
@@ -562,44 +465,19 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			/// <remarks>
 			///  Used for development and testing only. For Terminal,Gui to function properly, at least
-			///  <see cref="LibraryResources"/> should be set.
+			///  <see cref="DefaultOnly"/> should be set.
 			/// </remarks>
 			None = 0,
 
 			/// <summary>
-			/// Application configuration found in the user's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precidence 
-			/// </summary>
-			AppHomeDirectory,
-
-			/// <summary>
-			/// Global configuration in the directory the app was launched from (<c>./.tui/config.json</c>).
-			/// </summary>
-			GlobalAppDirectory,
-
-			/// <summary>
-			/// Global configuration in the user's home directory (<c>~/.tui/config.json</c>).
-			/// </summary>
-			GlobalHomeDirectory,
-
-			/// <summary>
-			/// Application configuration in the app's resources (<c>appname.Resources.config.json</c>).
-			/// </summary>
-			AppResources,
-
-			/// <summary>
-			/// Application configuration in the directory the app was launched from.
-			/// </summary>
-			AppDirectory,
-
-			/// <summary>
 			/// Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precidence.
 			/// </summary>
-			LibraryResources,
+			DefaultOnly,
 
 			/// <summary>
 			/// This constant is a combination of all locations
 			/// </summary>
-			All = AppHomeDirectory | GlobalAppDirectory | GlobalHomeDirectory | AppResources | AppDirectory | LibraryResources
+			All = -1
 
 		}
 
@@ -627,11 +505,25 @@ namespace Terminal.Gui.Configuration {
 			if (reset) Reset ();
 
 			// LibraryResoruces is always loaded by Reset
-			if (Locations.HasFlag (ConfigLocations.GlobalAppDirectory)) LoadGlobalAppDirectory ();
-			if (Locations.HasFlag (ConfigLocations.GlobalHomeDirectory)) LoadGlobalHomeDirectory ();
-			if (Locations.HasFlag (ConfigLocations.AppResources)) LoadAppResources ();
-			if (Locations.HasFlag (ConfigLocations.AppDirectory)) LoadAppDirectory ();
-			if (Locations.HasFlag (ConfigLocations.AppHomeDirectory)) LoadAppHomeDirectory ();
+			if (Locations == ConfigLocations.All) {
+				var embeddedStylesResourceName = Assembly.GetEntryAssembly ()?
+					.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
+				if (string.IsNullOrEmpty(embeddedStylesResourceName)) {
+					embeddedStylesResourceName = _configFilename;
+				}
+
+				Settings = Settings?
+					// Global current directory
+					.Update ($"./.tui/{_configFilename}")?
+					// Global home directory
+					.Update ($"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}")?
+					// App resources
+					.UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!)?
+					// App current directory
+					.Update ($"./.tui/{AppName}.{_configFilename}")?
+					// App home directory
+					.Update ($"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}");
+			}
 		}
 
 		/// <summary>
@@ -667,13 +559,13 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			if (source.GetType () == typeof (SettingsScope)) {
-				return ((SettingsScope)destination).UpdateFrom ((SettingsScope)source);
+				return ((SettingsScope)destination).Update ((SettingsScope)source);
 			}
 			if (source.GetType () == typeof (ThemeScope)) {
-				return ((ThemeScope)destination).UpdateFrom ((ThemeScope)source);
+				return ((ThemeScope)destination).Update ((ThemeScope)source);
 			}
 			if (source.GetType () == typeof (AppScope)) {
-				return ((AppScope)destination).UpdateFrom ((AppScope)source);
+				return ((AppScope)destination).Update ((AppScope)source);
 			}
 
 			// If value type, just use copy constructor.
@@ -716,5 +608,56 @@ namespace Terminal.Gui.Configuration {
 			}
 			return destination!;
 		}
+
+		//public class ConfiguraitonLocation
+		//{
+		//	public string Name { get; set; } = string.Empty;
+
+		//	public string? Path { get; set; }
+
+		//	public async Task<SettingsScope> UpdateAsync (Stream stream)
+		//	{
+		//		var scope = await JsonSerializer.DeserializeAsync<SettingsScope> (stream, serializerOptions);
+		//		if (scope != null) {
+		//			ConfigurationManager.Settings?.UpdateFrom (scope);
+		//			return scope;
+		//		}
+		//		return new SettingsScope ();
+		//	}
+
+		//}
+
+		//public class StreamConfiguration {
+		//	private bool _reset;
+
+		//	public StreamConfiguration (bool reset)
+		//	{
+		//		_reset = reset;
+		//	}
+
+		//	public StreamConfiguration UpdateAppResources ()
+		//	{
+		//		if (Locations.HasFlag (ConfigLocations.AppResources)) LoadAppResources ();
+		//		return this;
+		//	}
+
+		//	public StreamConfiguration UpdateAppDirectory ()
+		//	{
+		//		if (Locations.HasFlag (ConfigLocations.AppDirectory)) LoadAppDirectory ();
+		//		return this;
+		//	}
+
+		//	// Additional update methods for each location here
+
+		//	private void LoadAppResources ()
+		//	{
+		//		// Load AppResources logic here
+		//	}
+
+		//	private void LoadAppDirectory ()
+		//	{
+		//		// Load AppDirectory logic here
+		//	}
+		//}
 	}
 }

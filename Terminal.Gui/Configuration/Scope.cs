@@ -40,7 +40,7 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			/// <param name="source"></param>
 			/// <returns>The updated scope (this).</returns>
-			public object? UpdateFrom (Scope<T> source)
+			public Scope<T>? Update (Scope<T> source)
 			{
 				foreach (var prop in source) {
 					if (ContainsKey (prop.Key))
