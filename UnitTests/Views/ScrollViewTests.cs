@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NStack;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -279,6 +275,59 @@ namespace Terminal.Gui.ViewTests {
          ▼
 ◄░░░├─┤░► 
 ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
+		{
+			var sv = new ScrollView {
+				X = 3,
+				Y = 3,
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+			for (int i = 0; i < 8; i++) {
+				sv.Add (new CustomButton (Colors.Base, $"Button {i}") { Y = i * 3, Width = 20, Height = 3 });
+			}
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   ┌────────▲
+   │     But┬
+   └────────┴
+   ┌────────░
+   │     But░
+   └────────░
+   ┌────────░
+   │     But░
+   └────────▼
+   ◄├┤░░░░░► ", output);
+
+			sv.ContentOffset = new Point (5, 5);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   ─────────▲
+   ─────────┬
+    Button 2│
+   ─────────┴
+   ─────────░
+    Button 3░
+   ─────────░
+   ─────────░
+    Button 4▼
+   ◄├─┤░░░░► ", output);
+		}
+
+		private class CustomButton : FrameView {
+			public CustomButton (ColorScheme fill, ustring text)
+			{
+				var labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), ColorScheme = fill };
+				var labelText = new Label (text) { X = Pos.Center () };
+				Add (labelFill, labelText);
+				CanFocus = true;
+			}
 		}
 	}
 }
