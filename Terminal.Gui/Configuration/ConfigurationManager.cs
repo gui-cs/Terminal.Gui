@@ -345,7 +345,7 @@ namespace Terminal.Gui.Configuration {
 				var settings = JsonSerializer.Deserialize<SettingsScope> (json, serializerOptions);
 				Settings = DeepMemberwiseCopy (settings, Settings) as SettingsScope;
 				OnUpdated ();
-			} catch (Exception e) {
+			} catch (JsonException e) {
 				if (ThrowOnJsonErrors ?? false) {
 					throw;
 				} else {

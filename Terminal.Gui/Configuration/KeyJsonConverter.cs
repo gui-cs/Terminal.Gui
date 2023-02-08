@@ -12,7 +12,7 @@ namespace Terminal.Gui.Configuration {
 		public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType == JsonTokenType.StartObject) {
-				Key key = Key.Unknown;;
+				Key key = Key.Unknown;
 				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> (comparer: StringComparer.InvariantCultureIgnoreCase) {
 					{ "Shift", Key.ShiftMask },
 					{ "Ctrl", Key.CtrlMask },
@@ -30,25 +30,33 @@ namespace Terminal.Gui.Configuration {
 						string propertyName = reader.GetString ();
 						reader.Read ();
 
-						switch (propertyName.ToLowerInvariant()) {
+						switch (propertyName.ToLowerInvariant ()) {
 						case "key":
 							if (reader.TokenType == JsonTokenType.String) {
-								Enum.TryParse(reader.GetString(), false, out key);
-								if (key == Key.Unknown) {
-									// The enum uses "D0..D9" for the number keys
-									Enum.TryParse (reader.GetString ().TrimStart('D', 'd'), false, out key);
-									if (key == Key.Unknown) {
-										throw new JsonException ("If Key is a string, it must match a constant in the Key enum.");
-									}
+								if (Enum.TryParse (reader.GetString (), false, out key)) {
+									break;
+								}
+								
+								// The enum uses "D0..D9" for the number keys
+								if (Enum.TryParse (reader.GetString ().TrimStart ('D', 'd'), false, out key)) {
+									break;
+								}
+
+								if (key == Key.Unknown || key == Key.Null) {
+									throw new JsonException ($"The value \"{reader.GetString ()}\" is not a valid Key.");
+								}
+
+							} else if (reader.TokenType == JsonTokenType.Number) {
+								try {
+									key = (Key)reader.GetInt32 ();
+								} catch (InvalidOperationException ioe) {
+									throw new JsonException ($"Error parsing Key value: {ioe.Message}", ioe);
+								} catch (FormatException ioe) {
+									throw new JsonException ($"Error parsing Key value: {ioe.Message}", ioe);
 								}
 								break;
 							}
-							if (reader.TokenType == JsonTokenType.Number) {
-								key = (Key)reader.GetInt32 ();
-								break;
-							}
-
-							throw new JsonException ("Key is invalid.");
+							break;
 
 						case "modifiers":
 							if (reader.TokenType == JsonTokenType.StartArray) {
@@ -57,10 +65,19 @@ namespace Terminal.Gui.Configuration {
 										break;
 									}
 									var mod = reader.GetString ();
-									modifiers.Add (modifierDict [mod]);
+									try {
+										modifiers.Add (modifierDict [mod]);
+									} catch (KeyNotFoundException e) {
+										throw new JsonException ($"The value \"{mod}\" is not a valid modifier.", e);
+									}
 								}
+							} else {
+								throw new JsonException ($"Expected an array of modifiers, but got \"{reader.TokenType}\".");
 							}
 							break;
+
+						default:
+							throw new JsonException ($"Unexpected Key property \"{propertyName}\".");
 						}
 					}
 				}
@@ -71,8 +88,7 @@ namespace Terminal.Gui.Configuration {
 
 				return key;
 			}
-
-			throw new JsonException ();
+			throw new JsonException ($"Unexpected StartObject token when parsing Key: {reader.TokenType}.");
 		}
 
 		/// <inheritdoc/>
@@ -80,7 +96,7 @@ namespace Terminal.Gui.Configuration {
 		{
 			writer.WriteStartObject ();
 
-			var keyName = (value & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask).ToString();
+			var keyName = (value & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask).ToString ();
 			if (keyName != null) {
 				writer.WriteString ("Key", keyName);
 			} else {

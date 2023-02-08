@@ -54,6 +54,9 @@ Themes support defining ColorSchemes as well as various default settings for Vie
   "Application.QuitKey": {
     "Key": "Esc"
   },
+  "AppSettings": {
+    "UICatalog.StatusBar": false
+  },
   "Theme": "UI Catalog Theme",
   "Themes": [
     {

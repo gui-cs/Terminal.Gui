@@ -102,7 +102,7 @@ namespace Terminal.Gui.Configuration {
 			public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
 				if (reader.TokenType != JsonTokenType.StartObject) {
-					throw new JsonException ();
+					throw new JsonException ($"Expected a JSON object, but got \"{reader.TokenType}\".");
 				}
 
 				var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
@@ -111,7 +111,7 @@ namespace Terminal.Gui.Configuration {
 						return scope!;
 					}
 					if (reader.TokenType != JsonTokenType.PropertyName) {
-						throw new JsonException ();
+						throw new JsonException ($"Expected a JSON property name, but got \"{reader.TokenType}\".");
 					}
 					var propertyName = reader.GetString ();
 					reader.Read ();
@@ -134,14 +134,29 @@ namespace Terminal.Gui.Configuration {
 							scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
 						}
 					} else {
-						if (scope!.GetType ().GetCustomAttribute (typeof (JsonIncludeAttribute)) != null) {
-							if (scope.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute)) != null) {
-								propertyName = scope.GetType ().GetCustomAttribute (typeof (JsonPropertyNameAttribute))?.ToString ();
+						// It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
+						// like ScopeSettings.$schema...
+						var property = scope!.GetType ().GetProperties ().Where (p => {
+							var jia = p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as JsonIncludeAttribute;
+							if (jia != null) {
+								var jpna = p.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
+								if (jpna?.Name == propertyName) {
+									// Bit of a hack, modifying propertyName in an enumerator...
+									propertyName = p.Name;
+									return true;
+								}
+
+								return p.Name == propertyName;
 							}
+							return false;
+						}).FirstOrDefault ();
+
+						if (property != null) {
 							var prop = scope.GetType ().GetProperty (propertyName!)!;
 							prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
 						} else {
-							reader.Skip ();
+							// Unknown property
+							throw new JsonException ($"Unknown property name \"{propertyName}\".");
 						}
 					}
 				}

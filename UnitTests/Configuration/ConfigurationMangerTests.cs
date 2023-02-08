@@ -505,11 +505,7 @@ namespace Terminal.Gui.ConfigurationTests {
             }
           }
         ],
-        ""Dialog.DefaultBorderStyle"": ""Single"",
-        ""Dialog.DefaultButtonAlignment"": ""Center"",
-        ""Dialog.DefaultEffect3D"": true,
-        ""FrameView.DefaultBorderStyle"": ""Single"",
-        ""Window.DefaultBorderStyle"": ""Single""
+        ""Dialog.DefaultButtonAlignment"": ""Center""
       }
     }
   ]
@@ -517,6 +513,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			";
 
 			ConfigurationManager.Reset ();
+			ConfigurationManager.ThrowOnJsonErrors = true;
+			
 			ConfigurationManager.Update (json, "TestConfigurationManagerUpdateFromJson");
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
@@ -569,7 +567,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			}";
 
 			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
-			Assert.Equal ("Invalid color string: 'yellow'", jsonException.Message);
+			Assert.Equal ("Invalid Color: 'yellow'", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
 			json = @"
@@ -595,7 +593,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			}";
 
 			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
-			Assert.Equal ("Unrecognized property name: AbNormal", jsonException.Message);
+			Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
 
 			// Modify hotNormal background only 
 			json = @"
@@ -622,6 +620,16 @@ namespace Terminal.Gui.ConfigurationTests {
 			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
 			Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
+
+			// Unknown proeprty
+			json = @"
+			{
+				""Unknown"" : ""Not known""
+			}";
+
+			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Update (json, "test"));
+			Assert.StartsWith ("Unknown property", jsonException.Message);
+			
 			Assert.Equal (0, ConfigurationManager.jsonErrors.Length);
 
 			ConfigurationManager.ThrowOnJsonErrors = false;

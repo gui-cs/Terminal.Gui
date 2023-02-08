@@ -3,6 +3,31 @@
   "Application.QuitKey": {
     "Key": "Esc"
   },
+  "AppSettings": {
+    "UICatalog.StatusBar": true,
+    "ConfigurationEditor.EditorColorScheme": {
+      "Normal": {
+        "Foreground": "Red",
+        "Background": "White"
+      },
+      "Focus": {
+        "Foreground": "Green",
+        "Background": "White"
+      },
+      "HotNormal": {
+        "Foreground": "Black",
+        "Background": "White"
+      },
+      "HotFocus": {
+        "Foreground": "White",
+        "Background": "BrightRed"
+      },
+      "Disabled": {
+        "Foreground": "DarkGray",
+        "Background": "White"
+      }
+    }
+  },
   "Themes": [
     {
       "UI Catalog Theme": {
@@ -152,12 +177,6 @@
             }
           }
         ]
-        //,
-        //"Dialog.DefaultBorderStyle": "Double",
-        //"Dialog.DefaultButtonAlignment": "Right",
-        //"Dialog.DefaultEffect3D": false,
-        //"FrameView.DefaultBorderStyle": "Single",
-        //"Window.DefaultBorderStyle": "Double"
       }
     }
   ]

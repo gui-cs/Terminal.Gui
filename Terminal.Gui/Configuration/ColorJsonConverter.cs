@@ -44,11 +44,11 @@ namespace Terminal.Gui.Configuration {
 						var b = int.Parse (match.Groups [3].Value);
 						return new TrueColor (r, g, b).ToConsoleColor ();
 					} else {
-						throw new JsonException ($"Invalid color string: '{colorString}'");
+						throw new JsonException ($"Invalid Color: '{colorString}'");
 					}
 				}
 			} else {
-				throw new JsonException ($"Unexpected token when parsing color: {reader.TokenType}");
+				throw new JsonException ($"Unexpected token when parsing Color: {reader.TokenType}");
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace Terminal.Gui.Configuration {
 
 				//// Write the RGB values as a string to the JSON
 				//writer.WriteStringValue ($"rgb({r},{g},{b})");
-				throw new JsonException ($"Unkown color value");
+				throw new JsonException ($"Unknown Color value. Cannot serialize to JSON: {value}");
 			}
 		}
 	}

@@ -27,7 +27,7 @@ namespace Terminal.Gui.Configuration {
 		public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartObject) {
-				throw new JsonException ();
+				throw new JsonException ($"Unexpected StartObject token when parsing Attribute: {reader.TokenType}.");
 			}
 
 			Attribute attribute = new Attribute ();
@@ -36,13 +36,13 @@ namespace Terminal.Gui.Configuration {
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
 					if (foreground == Color.Invalid || background == Color.Invalid) {
-						throw new JsonException ("Both Foreground and Background colors must be provided.");
+						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					}
 					return attribute;
 				}
 
 				if (reader.TokenType != JsonTokenType.PropertyName) {
-					throw new JsonException ();
+					throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
 				}
 
 				string propertyName = reader.GetString ();
@@ -56,15 +56,17 @@ namespace Terminal.Gui.Configuration {
 				case "background":
 					background = JsonSerializer.Deserialize<Color> (color, options);
 					break;
-					//case "Bright":
-					//	attribute.Bright = reader.GetBoolean ();
-					//	break;
-					//case "Underline":
-					//	attribute.Underline = reader.GetBoolean ();
-					//	break;
-					//case "Reverse":
-					//	attribute.Reverse = reader.GetBoolean ();
-					//	break;
+				//case "Bright":
+				//	attribute.Bright = reader.GetBoolean ();
+				//	break;
+				//case "Underline":
+				//	attribute.Underline = reader.GetBoolean ();
+				//	break;
+				//case "Reverse":
+				//	attribute.Reverse = reader.GetBoolean ();
+				//	break;
+				default:
+					throw new JsonException ($"Unknown Attribute property {propertyName}.");
 				}
 
 				attribute = new Attribute (foreground, background);

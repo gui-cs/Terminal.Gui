@@ -25,7 +25,7 @@ namespace Terminal.Gui.Configuration {
 		public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType != JsonTokenType.StartObject) {
-				throw new JsonException ();
+				throw new JsonException ($"Unexpected StartObject token when parsing ColorScheme: {reader.TokenType}.");
 			}
 
 			var colorScheme = new ColorScheme ();
@@ -36,7 +36,7 @@ namespace Terminal.Gui.Configuration {
 				}
 
 				if (reader.TokenType != JsonTokenType.PropertyName) {
-					throw new JsonException ();
+					throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
 				}
 
 				var propertyName = reader.GetString ();
@@ -60,7 +60,7 @@ namespace Terminal.Gui.Configuration {
 					colorScheme.Disabled = attribute;
 					break;
 				default:
-					throw new JsonException ($"Unrecognized property name: {propertyName}");
+					throw new JsonException ($"Unrecognized ColorScheme Attribute name: {propertyName}.");
 				}
 			}
 
