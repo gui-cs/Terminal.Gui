@@ -5,7 +5,7 @@ using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests {
+namespace Terminal.Gui.ViewTests {
 	public class TileViewTests {
 
 		readonly ITestOutputHelper output;
@@ -187,7 +187,7 @@ namespace UnitTests {
 		public void TestTileView_Horizontal ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -444,7 +444,7 @@ namespace UnitTests {
 		{
 			var tileView = Get11By3TileView (out var line);
 
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			SetInputFocusLine (tileView);
 
 			tileView.Redraw (tileView.Bounds);
@@ -470,7 +470,7 @@ namespace UnitTests {
 			// And 2 up
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			tileView.SetNeedsDisplay();
+			tileView.SetNeedsDisplay ();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -486,7 +486,7 @@ namespace UnitTests {
 		{
 			var tileView = Get11By3TileView (out var line);
 
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			SetInputFocusLine (tileView);
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
@@ -518,7 +518,7 @@ namespace UnitTests {
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 
-			tileView.SetNeedsDisplay();
+			tileView.SetNeedsDisplay ();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -859,11 +859,8 @@ namespace UnitTests {
 			// IndexOf supports looking deep into subviews only when
 			// the recursive true value is passed
 			tv.Tiles.ElementAt (1).View.Add (frame);
-			if (recursive) {
-				Assert.Equal (1, tv.IndexOf (sub, recursive));
-			} else {
-				Assert.Equal (-1, tv.IndexOf (sub, recursive));
-			}
+			if (recursive) 				Assert.Equal (1, tv.IndexOf (sub, recursive));
+else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 		}
 
 		[Fact, AutoInitShutdown]
@@ -927,26 +924,20 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 0; x <= 5; x++) {
-				// All these values would result in tile 0 getting smaller
+			for (int x = 0; x <= 5; x++) 				// All these values would result in tile 0 getting smaller
 				// so are not allowed (tile[0] has a min size of Int.Max)
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			for (int x = 6; x < 10; x++) {
-				// All these values would result in tile 0 getting bigger
+			for (int x = 6; x < 10; x++) 				// All these values would result in tile 0 getting bigger
 				// so are allowed
 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
 
-			for (int x = 10; x < 100; x++) {
-				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -978,26 +969,20 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 0; x <= 5; x++) {
-				// All these values would result in tile 0 getting smaller
+			for (int x = 0; x <= 5; x++) 				// All these values would result in tile 0 getting smaller
 				// so are not allowed (tile[0] has a min size of Int.Max)
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			for (int x = 6; x < 10; x++) {
-				// All these values would result in tile 0 getting bigger
+			for (int x = 6; x < 10; x++) 				// All these values would result in tile 0 getting bigger
 				// so are allowed
 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
 
-			for (int x = 10; x < 100; x++) {
-				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1027,13 +1012,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 5; x > 0; x--) {
-				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
+			for (int x = 5; x > 0; x--) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 
 			Assert.False (tv.SetSplitterPos (0, 0));
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1045,18 +1028,14 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 6; x < 10; x++) {
-				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
+			for (int x = 6; x < 10; x++) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 
 
-			for (int x = 10; x < 100; x++) {
-				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1084,11 +1063,9 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 5; x >= 0; x--) {
-				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
+			for (int x = 5; x >= 0; x--) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1100,18 +1077,14 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 6; x < 10; x++) {
-				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
+			for (int x = 6; x < 10; x++) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
 
 
-			for (int x = 10; x < 100; x++) {
-				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
-			}
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1141,15 +1114,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 5; x--) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x > 5; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			for (int x = 5; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 5; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1162,16 +1131,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 15; x++) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x < 15; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
 
-			for (int x = 15; x < 25; x++) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 15; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1201,15 +1166,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 5; x--) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x > 5; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			for (int x = 5; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 5; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1223,16 +1184,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 15; x++) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x < 15; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
 
-			for (int x = 15; x < 25; x++) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 15; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1264,15 +1221,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 7; x--) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x > 7; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			for (int x = 7; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 7; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1285,16 +1238,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 12; x++) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x < 12; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
 
-			for (int x = 12; x < 25; x++) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 12; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1327,15 +1276,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 7; x--) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x > 7; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			for (int x = 7; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 7; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1350,16 +1295,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 12; x++) {
-				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 10; x < 12; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
 
-			for (int x = 12; x < 25; x++) {
-				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
-			}
+			for (int x = 12; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1391,15 +1332,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 15; x--) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x > 15; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			for (int x = 15; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 15; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1412,16 +1349,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 20; x < 24; x++) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x < 24; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			for (int x = 24; x < 100; x++) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 24; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1451,15 +1384,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 15; x--) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x > 15; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			for (int x = 15; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 15; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1473,16 +1402,12 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 20; x < 25; x++) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x < 25; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			for (int x = 25; x < 100; x++) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 25; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1516,15 +1441,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 17; x--) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x > 17; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			for (int x = 17; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 17; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1537,17 +1458,13 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x < 23; x++) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x < 23; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			for (int x = 23; x < 100; x++) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 23; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1579,15 +1496,11 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 17; x--) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x > 17; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			for (int x = 17; x > 0; x--) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 17; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1599,17 +1512,13 @@ namespace UnitTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x < 24; x++) {
-				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 20; x < 24; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			for (int x = 24; x < 100; x++) {
-				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
-			}
+			for (int x = 24; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
 
 
-			tv.SetNeedsDisplay();
+			tv.SetNeedsDisplay ();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -2039,9 +1948,9 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill()
+		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill ()
 		{
-			var tileView = GetNestedContainer3Right1Down (true,true,1);
+			var tileView = GetNestedContainer3Right1Down (true, true, 1);
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -2068,7 +1977,7 @@ namespace UnitTests {
 			tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
 
 			((TileView)tileView.Tiles.ElementAt (1).View)
-				.Tiles.ElementAt(1).Title = new string ('y', 100);
+				.Tiles.ElementAt (1).Title = new string ('y', 100);
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -2100,7 +2009,7 @@ namespace UnitTests {
 			var container = GetTileView (20, 10, withBorder);
 			Assert.True (container.TrySplitTile (0, 2, out var newContainer));
 
-			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			newContainer.Orientation = Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();
 			container.ColorScheme = new ColorScheme ();
 
@@ -2125,19 +2034,15 @@ namespace UnitTests {
 
 			Assert.True (container.TrySplitTile (split, 2, out var newContainer));
 
-			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			newContainer.Orientation = Orientation.Horizontal;
 
 			int i = 0;
 			foreach (var tile in container.Tiles.Union (newContainer.Tiles)) {
-				
-				if(tile.View is TileView) {
-					continue;
-				}
+
+				if (tile.View is TileView) 					continue;
 				i++;
 
-				if (withTitles) {
-					tile.Title = "T" + i;
-				}
+				if (withTitles) 					tile.Title = "T" + i;
 
 				tile.View.Add (new TextView {
 					Width = Dim.Fill (),
@@ -2174,9 +2079,7 @@ namespace UnitTests {
 		{
 			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
 
-			if (!border) {
-				tv.IntegratedBorder = BorderStyle.None;
-			}
+			if (!border) 				tv.IntegratedBorder = BorderStyle.None;
 
 			tv.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
 			tv.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });

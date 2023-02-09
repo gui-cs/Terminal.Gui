@@ -48,8 +48,8 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
-			split.Tiles.ElementAt(0).View.Add (tabView);
-			split.IntegratedBorder = BorderStyle.None;
+			split.Tiles.ElementAt(0).ContentView.Add (tabView);
+			split.Border.BorderStyle = BorderStyle.None;
 
 			Application.Top.Add (split);
 
@@ -156,7 +156,7 @@ namespace UICatalog.Scenarios {
 			var newTile = split.InsertTile(tileIndex + offset);
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			newTile.View.Add(newTabView);
+			newTile.ContentView.Add(newTabView);
 
 			newTabView.EnsureFocus();
 			newTabView.FocusFirst();
