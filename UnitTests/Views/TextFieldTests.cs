@@ -1186,6 +1186,21 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("-", newText);
 			Assert.Equal ("-1", oldText);
 			Assert.Equal ("-", tf.Text.ToString ());
+
+			// Delete word with accented char
+			tf.Text = "Les Misérables movie.";
+			Assert.True (tf.MouseEvent (new MouseEvent {
+				X = 7,
+				Y = 1,
+				Flags = MouseFlags.Button1DoubleClicked,
+				View = tf
+			}));
+			Assert.Equal ("Misérables ", tf.SelectedText);
+			Assert.Equal (11, tf.SelectedLength);
+			Assert.True (tf.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers ())));
+			Assert.Equal ("Les movie.", newText);
+			Assert.Equal ("Les Misérables movie.", oldText);
+			Assert.Equal ("Les movie.", tf.Text.ToString ());
 		}
 
 		[Fact]
