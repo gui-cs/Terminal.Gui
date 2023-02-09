@@ -289,7 +289,7 @@ namespace UICatalog {
 					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.C,
+					Shortcut = Key.CtrlMask | Key.C
 				};
 				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
