@@ -104,19 +104,19 @@ namespace UICatalog.Scenarios {
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
-			root.Tiles.ElementAt(0).View.Add (CreateContentControl (1));
+			root.Tiles.ElementAt(0).ContentView.Add (CreateContentControl (1));
 			root.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View 1" : string.Empty;
-			root.Tiles.ElementAt (1).View.Add (CreateContentControl (2));
+			root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
 			root.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View 2" : string.Empty;
 			
 
-			root.IntegratedBorder = border ? BorderStyle.Rounded : BorderStyle.None;
+			root.Border.BorderStyle = border ? BorderStyle.Rounded : BorderStyle.None;
 
 
 			workArea.Add (root);
 
 			if (numberOfViews == 1) {
-				root.Tiles.ElementAt (1).View.Visible = false;
+				root.Tiles.ElementAt (1).ContentView.Visible = false;
 			}
 
 			if (numberOfViews > 2) {
@@ -164,18 +164,18 @@ namespace UICatalog.Scenarios {
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
-			if (!(to.Tiles.ElementAt(0).View is TileView)) {
+			if (!(to.Tiles.ElementAt(0).ContentView is TileView)) {
 				Split(to,true);
 			}
 
-			if (!(to.Tiles.ElementAt (1).View is TileView)) {
+			if (!(to.Tiles.ElementAt (1).ContentView is TileView)) {
 				Split(to,false);				
 			}
 
-			if (to.Tiles.ElementAt (0).View is TileView && to.Tiles.ElementAt (1).View is TileView) {
+			if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView) {
 
-				AddMoreViews ((TileView)to.Tiles.ElementAt (0).View);
-				AddMoreViews ((TileView)to.Tiles.ElementAt (1).View);
+				AddMoreViews ((TileView)to.Tiles.ElementAt (0).ContentView);
+				AddMoreViews ((TileView)to.Tiles.ElementAt (1).ContentView);
 			}
 
 		}
@@ -207,7 +207,7 @@ namespace UICatalog.Scenarios {
 				Orientation.Horizontal :
 				Orientation.Vertical;
 
-			newView.Tiles.ElementAt (1).View.Add (CreateContentControl(viewsCreated));
+			newView.Tiles.ElementAt (1).ContentView.Add (CreateContentControl(viewsCreated));
 		}
 
 		private TileView CreateTileView (int titleNumber, Orientation orientation)
