@@ -329,11 +329,10 @@ namespace Terminal.Gui {
 			//Clear ();
 
 			var savedClip = ClipToBounds ();
-			var rect = new Rect (new Point (-contentView.Frame.X, -contentView.Frame.Y),
+			OnDrawContent (new Rect (ContentOffset,
 				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
-			OnDrawContent (rect);
-			contentView.Redraw (rect);
+					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0))));
+			contentView.Redraw (contentView.Frame);
 			Driver.Clip = savedClip;
 
 			if (autoHideScrollBars) {
@@ -509,7 +508,7 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
 				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
-				//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
 			}
