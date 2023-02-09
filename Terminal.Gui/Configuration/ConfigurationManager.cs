@@ -516,13 +516,13 @@ namespace Terminal.Gui.Configuration {
 					// Global current directory
 					.Update ($"./.tui/{_configFilename}")?
 					// Global home directory
-					.Update ($"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{_configFilename}")?
+					.Update ($"~/.tui/{_configFilename}")?
 					// App resources
 					.UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!)?
 					// App current directory
 					.Update ($"./.tui/{AppName}.{_configFilename}")?
 					// App home directory
-					.Update ($"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}/.tui/{AppName}.{_configFilename}");
+					.Update ($"~/.tui/{AppName}.{_configFilename}");
 			}
 		}
 

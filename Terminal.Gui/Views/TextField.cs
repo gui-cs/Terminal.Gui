@@ -1346,12 +1346,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		protected override string GetCurrentWord ()
+		protected override string GetCurrentWord (int columnOffset = 0)
 		{
 			var host = (TextField)HostControl;
 			var currentLine = host.Text.ToRuneList ();
-			var cursorPosition = Math.Min (host.CursorPosition, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition);
+			var cursorPosition = Math.Min (host.CursorPosition + columnOffset, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition, columnOffset);
 		}
 
 		/// <inheritdoc/>

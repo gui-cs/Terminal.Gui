@@ -1,4 +1,4 @@
-﻿using NStack;
+using NStack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -225,9 +225,8 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public FrameView LeftPane;
+			public TileView ContentPane;
 			public ListView CategoryListView;
-			public FrameView RightPane;
 			public ListView ScenarioListView;
 
 			public StatusItem Capslock;
@@ -276,22 +275,25 @@ namespace UICatalog {
 					}),
 					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
+						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
+						LayoutSubviews();
+						SetChildNeedsDisplay();
 					}),
 					DriverName,
 					OS
 				};
 
-				LeftPane = new FrameView ("Categories") {
+				ContentPane = new TileView () {
 					X = 0,
 					Y = 1, // for menu
-					Width = 25,
+					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.C
+					Shortcut = Key.CtrlMask | Key.C,
 				};
-				LeftPane.Title = $"{LeftPane.Title} ({LeftPane.ShortcutTag})";
-				LeftPane.ShortcutAction = () => LeftPane.SetFocus ();
-
+				ContentPane.SetSplitterPos (0, 25);
+				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
+					
 				CategoryListView = new ListView (_categories) {
 					X = 0,
 					Y = 0,
@@ -301,21 +303,13 @@ namespace UICatalog {
 					CanFocus = true,
 				};
 				CategoryListView.OpenSelectedItem += (a) => {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
-				LeftPane.Add (CategoryListView);
 
-				RightPane = new FrameView ("Scenarios") {
-					X = 25,
-					Y = 1, // for menu
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.S
-				};
-				RightPane.Title = $"{RightPane.Title} ({RightPane.ShortcutTag})";
-				RightPane.ShortcutAction = () => RightPane.SetFocus ();
+				ContentPane.Tiles.ElementAt (0).Title = "Categories";
+				ContentPane.Tiles.ElementAt (0).MinSize = 2;
+				ContentPane.Tiles.ElementAt (0).ContentView.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -327,12 +321,15 @@ namespace UICatalog {
 				};
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
-				RightPane.Add (ScenarioListView);
+
+				ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
+				ContentPane.Tiles.ElementAt (1).ContentView.Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).MinSize = 2;
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);
-				Add (LeftPane);
-				Add (RightPane);
+				Add (ContentPane);
+
 				Add (StatusBar);
 
 				Loaded += LoadedHandler;
@@ -344,7 +341,7 @@ namespace UICatalog {
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
-
+ 
 			void LoadedHandler ()
 			{
 				ConfigChanged ();
@@ -357,15 +354,14 @@ namespace UICatalog {
 					_isFirstRunning = false;
 				}
 				if (!_isFirstRunning) {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				}
 
 				StatusBar.VisibleChanged += () => {
 					UICatalogApp.ShowStatusBar = StatusBar.Visible;
 
 					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
-					LeftPane.Height = Dim.Fill (height);
-					RightPane.Height = Dim.Fill (height);
+					ContentPane.Height = Dim.Fill (height);
 					LayoutSubviews ();
 					SetChildNeedsDisplay ();
 				};
@@ -628,11 +624,7 @@ namespace UICatalog {
 
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-				LeftPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
-				LeftPane.SetNeedsDisplay ();
-
-				RightPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
-				RightPane.SetNeedsDisplay ();
+				ContentPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
 
 				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
 				StatusBar.Items [0].Shortcut = Application.QuitKey;
@@ -642,8 +634,7 @@ namespace UICatalog {
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 
 				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
-				LeftPane.Height = Dim.Fill (height);
-				RightPane.Height = Dim.Fill (height);
+				ContentPane.Height = Dim.Fill (height);
 
 				StatusBar.Visible = UICatalogApp.ShowStatusBar;
 
@@ -699,6 +690,7 @@ namespace UICatalog {
 			// after a scenario was selected to run. This proves the main UI Catalog
 			// 'app' closed cleanly.
 			foreach (var inst in Responder.Instances) {
+				
 				Debug.Assert (inst.WasDisposed);
 			}
 			Responder.Instances.Clear ();

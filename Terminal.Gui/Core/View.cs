@@ -769,7 +769,7 @@ namespace Terminal.Gui {
 		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
 		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-						TextFormatter = new TextFormatter ();
+			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
@@ -1146,7 +1146,7 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		public void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
@@ -1514,7 +1514,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
-			if (Border != null) {
+			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
@@ -2662,6 +2662,15 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <summary>
+		/// Get or sets whether the view will use <see cref="Terminal.Gui.Border"/> (if <see cref="Border"/> is set) to draw 
+		/// a border. If <see langword="false"/> (the default),
+		/// <see cref="View.Redraw(Rect)"/> will call <see cref="Border.DrawContent(View, bool)"/>
+		/// to draw the view's border. If <see langword="true"/> no border is drawn (and the view is expected to draw the border
+		/// itself).
+		/// </summary>
+		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; } = false;
 
 		/// <summary>
 		/// Pretty prints the View

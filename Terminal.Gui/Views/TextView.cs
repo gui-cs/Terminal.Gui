@@ -2447,6 +2447,10 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 
+			if (clickWithSelecting) {
+				clickWithSelecting = false;
+				return;
+			}
 			if (SelectedLength > 0)
 				return;
 
@@ -2677,8 +2681,10 @@ namespace Terminal.Gui {
 				need = true;
 			} else if ((wordWrap && leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width
 				&& tSize.size + RightOffset < Frame.Width + offB.width)) {
-				leftColumn = 0;
-				need = true;
+				if (leftColumn > 0) {
+					leftColumn = 0;
+					need = true;
+				}
 			}
 
 			if (currentRow < topRow) {
@@ -4279,6 +4285,7 @@ namespace Terminal.Gui {
 		}
 
 		bool isButtonShift;
+		bool clickWithSelecting;
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
@@ -4372,6 +4379,7 @@ namespace Terminal.Gui {
 				columnTrack = currentColumn;
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 				if (shiftSelecting) {
+					clickWithSelecting = true;
 					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
@@ -4475,12 +4483,12 @@ namespace Terminal.Gui {
 	public class TextViewAutocomplete : Autocomplete {
 
 		///<inheritdoc/>
-		protected override string GetCurrentWord ()
+		protected override string GetCurrentWord (int columnOffset = 0)
 		{
 			var host = (TextView)HostControl;
 			var currentLine = host.GetCurrentLine ();
-			var cursorPosition = Math.Min (host.CurrentColumn, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition);
+			var cursorPosition = Math.Min (host.CurrentColumn + columnOffset, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition, columnOffset);
 		}
 
 		/// <inheritdoc/>

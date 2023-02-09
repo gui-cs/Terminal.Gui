@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -32,43 +34,8 @@ namespace Terminal.Gui.Configuration {
 			[JsonInclude, JsonPropertyName ("$schema")]
 			public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
 
+			public List<string> Sources = new List<string> ();
 
-			/// <summary>
-			/// Updates the <see cref="SettingsScope"/> with the settings in a JSON file.
-			/// </summary>
-			/// <param name="filePath"></param>
-			public SettingsScope? Update (string filePath)
-			{
-				if (!File.Exists (filePath)) {
-					Debug.WriteLine ($"ConfigurationManager: Configuration file \"{filePath}\" does not exist.");
-					return this;
-				}
-
-				var stream = File.OpenRead (filePath);
-				return Update (stream, filePath);
-			}
-
-			/// <summary>
-			/// Updates the <see cref="SettingsScope"/> with the settings from a Json resource.
-			/// </summary>
-			/// <param name="assembly"></param>
-			/// <param name="resourceName"></param>
-			public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
-			{
-				if (resourceName == null || string.IsNullOrEmpty (resourceName)) {
-					Debug.WriteLine ($"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.FullName}\".");
-					return this;
-				}
-				
-				using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
-				if (stream == null) {
-					Debug.WriteLine ($"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.FullName}\".");
-					return this;
-				}
-
-				return Update (stream, resourceName);
-			}
-			
 			/// <summary>
 			/// Updates the <see cref="SettingsScope"/> with the settings in a JSON string.
 			/// </summary>
@@ -81,6 +48,7 @@ namespace Terminal.Gui.Configuration {
 					Update (JsonSerializer.Deserialize<SettingsScope> (stream, serializerOptions)!);
 					OnUpdated ();
 					Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
+					Sources.Add (source);
 					return this;
 				} catch (JsonException e) {
 					if (ThrowOnJsonErrors ?? false) {
@@ -90,6 +58,44 @@ namespace Terminal.Gui.Configuration {
 					}
 				}
 				return this;
+			}
+			
+			/// <summary>
+			/// Updates the <see cref="SettingsScope"/> with the settings in a JSON file.
+			/// </summary>
+			/// <param name="filePath"></param>
+			public SettingsScope? Update (string filePath)
+			{
+				var realPath = filePath.Replace("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+				if (!File.Exists (realPath)) {
+					Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
+					Sources.Add (filePath);
+					return this;
+				}
+
+				var stream = File.OpenRead (realPath);
+				return Update (stream, filePath);
+			}
+
+			/// <summary>
+			/// Updates the <see cref="SettingsScope"/> with the settings from a Json resource.
+			/// </summary>
+			/// <param name="assembly"></param>
+			/// <param name="resourceName"></param>
+			public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
+			{
+				if (resourceName == null || string.IsNullOrEmpty (resourceName)) {
+					Debug.WriteLine ($"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\".");
+					return this;
+				}
+				
+				using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
+				if (stream == null) {
+					Debug.WriteLine ($"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\".");
+					return this;
+				}
+
+				return Update (stream, $"resource://[{assembly.GetName().Name}]/{resourceName}");
 			}
 
 			/// <summary>

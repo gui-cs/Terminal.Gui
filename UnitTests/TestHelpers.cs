@@ -125,8 +125,11 @@ class TestHelpers {
 			expectedLook = expectedLook.Replace ("\r\n", "\n");
 			actualLook = actualLook.Replace ("\r\n", "\n");
 
-			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			// If test is about to fail show user what things looked like
+			if(!string.Equals(expectedLook,actualLook)) {
+				output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+				output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			}
 
 			Assert.Equal (expectedLook, actualLook);
 		}
