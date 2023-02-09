@@ -821,7 +821,6 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				Application.UngrabMouse ();
-				Driver.UncookMouse ();
 				dragPosition = null;
 			}
 
@@ -959,6 +958,18 @@ namespace Terminal.Gui {
 				return Application.ShowChild (top == null ? this : top);
 			}
 			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			return MostFocused?.OnEnter (view) ?? base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
 		}
 	}
 

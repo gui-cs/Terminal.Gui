@@ -1447,8 +1447,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual ColorScheme ColorScheme {
 			get {
-				if (colorScheme == null)
+				if (colorScheme == null) {
 					return SuperView?.ColorScheme;
+				}
 				return colorScheme;
 			}
 			set {

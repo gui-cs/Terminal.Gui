@@ -163,7 +163,7 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				ColorScheme = _colorScheme = Colors.Base;
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
