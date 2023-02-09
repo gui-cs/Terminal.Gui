@@ -187,7 +187,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Horizontal ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.Orientation = Orientation.Horizontal;
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -444,7 +444,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var tileView = Get11By3TileView (out var line);
 
-			tileView.Orientation = Orientation.Horizontal;
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			SetInputFocusLine (tileView);
 
 			tileView.Redraw (tileView.Bounds);
@@ -470,7 +470,7 @@ namespace Terminal.Gui.ViewTests {
 			// And 2 up
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			tileView.SetNeedsDisplay ();
+			tileView.SetNeedsDisplay();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -486,7 +486,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var tileView = Get11By3TileView (out var line);
 
-			tileView.Orientation = Orientation.Horizontal;
+			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			SetInputFocusLine (tileView);
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
@@ -518,7 +518,7 @@ namespace Terminal.Gui.ViewTests {
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
 
-			tileView.SetNeedsDisplay ();
+			tileView.SetNeedsDisplay();
 			tileView.Redraw (tileView.Bounds);
 			looksLike =
 @"    
@@ -534,15 +534,15 @@ namespace Terminal.Gui.ViewTests {
 			var tileView = Get11By3TileView ();
 
 			var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
 
 
 			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosFunc", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
 			// Also not allowed because this results in a PosCombine
 			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Percent (50) - 1));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -551,22 +551,22 @@ namespace Terminal.Gui.ViewTests {
 			var tileView = GetNestedContainer2Left1Right (false);
 
 			Assert.Equal (20, tileView.Frame.Width);
-			Assert.Equal (10, tileView.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (9, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (9, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).View);
-			var left = (TileView)tileView.Tiles.ElementAt (0).View;
+			Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).ContentView);
+			var left = (TileView)tileView.Tiles.ElementAt (0).ContentView;
 			Assert.Same (left.SuperView, tileView);
 
 
-			Assert.Equal (2, left.Tiles.ElementAt (0).View.Subviews.Count);
-			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [0]);
-			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [1]);
-			var onesTop = (Label)left.Tiles.ElementAt (0).View.Subviews [0];
-			var onesBottom = (Label)left.Tiles.ElementAt (0).View.Subviews [1];
+			Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.Subviews.Count);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [0]);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [1]);
+			var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [0];
+			var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [1];
 
-			Assert.Same (left.Tiles.ElementAt (0).View, onesTop.SuperView);
-			Assert.Same (left.Tiles.ElementAt (0).View, onesBottom.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);
 
 			Assert.Equal (10, onesTop.Frame.Width);
 			Assert.Equal (10, onesBottom.Frame.Width);
@@ -621,39 +621,39 @@ namespace Terminal.Gui.ViewTests {
 
 
 			// Check X and Widths of Tiles
-			Assert.Equal (0, tileView.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (0).View.Frame.Width);
+			Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
 
-			Assert.Equal (7, tileView.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (7, tileView.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.Equal (14, tileView.Tiles.ElementAt (2).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (2).View.Frame.Width);
+			Assert.Equal (14, tileView.Tiles.ElementAt (2).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (2).ContentView.Frame.Width);
 
 
 			// Check Y and Heights of Tiles
-			Assert.Equal (0, tileView.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (0).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Height);
 
-			Assert.Equal (0, tileView.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (1).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (1).ContentView.Frame.Height);
 
-			Assert.Equal (0, tileView.Tiles.ElementAt (2).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (2).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (2).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (2).ContentView.Frame.Height);
 
 			// Check Sub containers in last panel
-			var subSplit = (TileView)tileView.Tiles.ElementAt (2).View;
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (0).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).View.Subviews.Single ());
+			var subSplit = (TileView)tileView.Tiles.ElementAt (2).ContentView;
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
-			Assert.Equal (0, subSplit.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (1).View.Frame.Width);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (4, subSplit.Tiles.ElementAt (1).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).View.Subviews.Single ());
+			Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -684,39 +684,39 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (5, tileView.Subviews.Count);
 
 			// Check X and Widths of Tiles
-			Assert.Equal (1, tileView.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (5, tileView.Tiles.ElementAt (0).View.Frame.Width);
+			Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (5, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
 
-			Assert.Equal (7, tileView.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (7, tileView.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.Equal (14, tileView.Tiles.ElementAt (2).View.Frame.X);
-			Assert.Equal (5, tileView.Tiles.ElementAt (2).View.Frame.Width);
+			Assert.Equal (14, tileView.Tiles.ElementAt (2).ContentView.Frame.X);
+			Assert.Equal (5, tileView.Tiles.ElementAt (2).ContentView.Frame.Width);
 
 
 			// Check Y and Heights of Tiles
-			Assert.Equal (1, tileView.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (0).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (0).ContentView.Frame.Height);
 
-			Assert.Equal (1, tileView.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (1).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (1).ContentView.Frame.Height);
 
-			Assert.Equal (1, tileView.Tiles.ElementAt (2).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (2).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (2).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (2).ContentView.Frame.Height);
 
 			// Check Sub containers in last panel
-			var subSplit = (TileView)tileView.Tiles.ElementAt (2).View;
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (4, subSplit.Tiles.ElementAt (0).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).View.Subviews.Single ());
+			var subSplit = (TileView)tileView.Tiles.ElementAt (2).ContentView;
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (4, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
-			Assert.Equal (0, subSplit.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (1).View.Frame.Width);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (3, subSplit.Tiles.ElementAt (1).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).View.Subviews.Single ());
+			Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (3, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -846,37 +846,45 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (-1, tv.IndexOf (lbl2, recursive));
 
 			// IndexOf supports looking for Tile.View
-			Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).View, recursive));
-			Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).View, recursive));
+			Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).ContentView, recursive));
+			Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).ContentView, recursive));
 
 			// IndexOf supports looking for Tile.View.Subviews
-			tv.Tiles.ElementAt (0).View.Add (lbl1);
+			tv.Tiles.ElementAt (0).ContentView.Add (lbl1);
 			Assert.Equal (0, tv.IndexOf (lbl1, recursive));
 
-			tv.Tiles.ElementAt (1).View.Add (lbl2);
+			tv.Tiles.ElementAt (1).ContentView.Add (lbl2);
 			Assert.Equal (1, tv.IndexOf (lbl2, recursive));
 
 			// IndexOf supports looking deep into subviews only when
 			// the recursive true value is passed
-			tv.Tiles.ElementAt (1).View.Add (frame);
-			if (recursive) 				Assert.Equal (1, tv.IndexOf (sub, recursive));
-else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
+			tv.Tiles.ElementAt (1).ContentView.Add (frame);
+			if (recursive) {
+				Assert.Equal (1, tv.IndexOf (sub, recursive));
+			} else {
+				Assert.Equal (-1, tv.IndexOf (sub, recursive));
+			}
 		}
 
 		[Fact, AutoInitShutdown]
 		public void TestNestedRoots_BothRoots_BothCanHaveBorders ()
 		{
-			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView { 
+				Width = 10, 
+				Height = 5, 
+				ColorScheme = new ColorScheme (), 
+				Border = new Border () { BorderStyle = BorderStyle.Single } 
+			};
 			var tv2 = new TileView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				ColorScheme = new ColorScheme (),
-				IntegratedBorder = BorderStyle.Single,
+				Border = new Border () { BorderStyle = BorderStyle.Single },
 				Orientation = Orientation.Horizontal
 			};
 
 			Assert.True (tv.IsRootTileView ());
-			tv.Tiles.ElementAt (1).View.Add (tv2);
+			tv.Tiles.ElementAt (1).ContentView.Add (tv2);
 
 			Application.Top.Add (tv);
 			tv.BeginInit ();
@@ -884,11 +892,11 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			tv.LayoutSubviews ();
 
 			tv.LayoutSubviews ();
-			tv.Tiles.ElementAt (1).View.LayoutSubviews ();
+			tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
 			tv2.LayoutSubviews ();
 
 			// tv2 is still considered a root because 
-			// it was manually created by API user.  That
+			// it was manually created by API user. That
 			// means it will not have its lines joined to
 			// parents and it is permitted to have a border
 			Assert.True (tv2.IsRootTileView ());
@@ -924,20 +932,26 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 0; x <= 5; x++) 				// All these values would result in tile 0 getting smaller
+			for (int x = 0; x <= 5; x++) {
+				// All these values would result in tile 0 getting smaller
 				// so are not allowed (tile[0] has a min size of Int.Max)
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 6; x < 10; x++) 				// All these values would result in tile 0 getting bigger
+			for (int x = 6; x < 10; x++) {
+				// All these values would result in tile 0 getting bigger
 				// so are allowed
 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -969,20 +983,26 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 0; x <= 5; x++) 				// All these values would result in tile 0 getting smaller
+			for (int x = 0; x <= 5; x++) {
+				// All these values would result in tile 0 getting smaller
 				// so are not allowed (tile[0] has a min size of Int.Max)
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 6; x < 10; x++) 				// All these values would result in tile 0 getting bigger
+			for (int x = 6; x < 10; x++) {
+				// All these values would result in tile 0 getting bigger
 				// so are allowed
 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1012,11 +1032,13 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 5; x > 0; x--) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			for (int x = 5; x > 0; x--) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
 			Assert.False (tv.SetSplitterPos (0, 0));
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1028,14 +1050,18 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 6; x < 10; x++) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			for (int x = 6; x < 10; x++) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1063,9 +1089,11 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 5; x >= 0; x--) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			for (int x = 5; x >= 0; x--) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1077,14 +1105,18 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 6; x < 10; x++) 				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			for (int x = 6; x < 10; x++) {
+				Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 10; x < 100; x++) 				// These values would result in the first splitter moving past
+			for (int x = 10; x < 100; x++) {
+				// These values would result in the first splitter moving past
 				// the second splitter so are not allowed
 				Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1114,11 +1146,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 5; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x > 5; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 5; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 5; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1131,12 +1167,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 15; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x < 15; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 15; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 15; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1166,11 +1206,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 5; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x > 5; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 5; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 5; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1184,12 +1228,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 15; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x < 15; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 15; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 15; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1221,11 +1269,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 7; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x > 7; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 7; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 7; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1238,12 +1290,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 12; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x < 12; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 12; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 12; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1276,11 +1332,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 10; x > 7; x--) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x > 7; x--) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 7; x > 0; x--) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 7; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1295,12 +1355,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 10; x < 12; x++) 				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 10; x < 12; x++) {
+				Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 12; x < 25; x++) 				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			for (int x = 12; x < 25; x++) {
+				Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1332,11 +1396,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 15; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x > 15; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 15; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 15; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1349,12 +1417,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 20; x < 24; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x < 24; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 24; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 24; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1384,11 +1456,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 15; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x > 15; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 15; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 15; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1402,12 +1478,16 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			for (int x = 20; x < 25; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x < 25; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 25; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 25; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1441,11 +1521,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 17; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x > 17; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 17; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 17; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1458,13 +1542,17 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x < 23; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x < 23; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 23; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 23; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1496,11 +1584,15 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x > 17; x--) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x > 17; x--) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			for (int x = 17; x > 0; x--) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 17; x > 0; x--) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1512,13 +1604,17 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			for (int x = 20; x < 24; x++) 				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 20; x < 24; x++) {
+				Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			for (int x = 24; x < 100; x++) 				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			for (int x = 24; x < 100; x++) {
+				Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+			}
 
 
-			tv.SetNeedsDisplay ();
+			tv.SetNeedsDisplay();
 			tv.Redraw (tv.Bounds);
 
 			looksLike =
@@ -1534,11 +1630,13 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 		[Fact, AutoInitShutdown]
 		public void TestNestedNonRoots_OnlyOneRoot_OnlyRootCanHaveBorders ()
 		{
-			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (),
+				Border = new Border () { BorderStyle = BorderStyle.Single }
+			};
 
 			tv.TrySplitTile (1, 2, out var tv2);
 			tv2.ColorScheme = new ColorScheme ();
-			tv2.IntegratedBorder = BorderStyle.Single; // will not be respected
+			tv2.Border.BorderStyle = BorderStyle.Single; 
 			tv2.Orientation = Orientation.Horizontal;
 
 			Assert.True (tv.IsRootTileView ());
@@ -1549,7 +1647,7 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			tv.LayoutSubviews ();
 
 			tv.LayoutSubviews ();
-			tv.Tiles.ElementAt (1).View.LayoutSubviews ();
+			tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
 			tv2.LayoutSubviews ();
 
 			// tv2 is not considered a root because 
@@ -1607,9 +1705,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1629,9 +1727,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1652,9 +1750,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1675,9 +1773,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1698,9 +1796,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1720,9 +1818,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1746,9 +1844,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1793,9 +1891,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1815,9 +1913,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1838,9 +1936,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1861,9 +1959,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1884,9 +1982,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1906,9 +2004,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1932,9 +2030,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1948,9 +2046,9 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill ()
+		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill()
 		{
-			var tileView = GetNestedContainer3Right1Down (true, true, 1);
+			var tileView = GetNestedContainer3Right1Down (true,true,1);
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -1976,8 +2074,8 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 			tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
 
-			((TileView)tileView.Tiles.ElementAt (1).View)
-				.Tiles.ElementAt (1).Title = new string ('y', 100);
+			((TileView)tileView.Tiles.ElementAt (1).ContentView)
+				.Tiles.ElementAt(1).Title = new string ('y', 100);
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -2009,7 +2107,7 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 			var container = GetTileView (20, 10, withBorder);
 			Assert.True (container.TrySplitTile (0, 2, out var newContainer));
 
-			newContainer.Orientation = Orientation.Horizontal;
+			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();
 			container.ColorScheme = new ColorScheme ();
 
@@ -2025,26 +2123,29 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 		/// <returns></returns>
 		private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2)
 		{
-			var container =
-			new TileView (3) {
+			var container =	new TileView (3) {
 				Width = 20,
-				Height = 10,
-				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
+				Height = 10
 			};
+			container.Border.BorderStyle = withBorder ? BorderStyle.Single : BorderStyle.None;
 
 			Assert.True (container.TrySplitTile (split, 2, out var newContainer));
 
-			newContainer.Orientation = Orientation.Horizontal;
+			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
 
 			int i = 0;
 			foreach (var tile in container.Tiles.Union (newContainer.Tiles)) {
-
-				if (tile.View is TileView) 					continue;
+				
+				if(tile.ContentView is TileView) {
+					continue;
+				}
 				i++;
 
-				if (withTitles) 					tile.Title = "T" + i;
+				if (withTitles) {
+					tile.Title = "T" + i;
+				}
 
-				tile.View.Add (new TextView {
+				tile.ContentView.Add (new TextView {
 					Width = Dim.Fill (),
 					Height = Dim.Fill (),
 					Text =
@@ -2077,15 +2178,19 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 
 		private TileView Get5x1TilesView (bool border = true)
 		{
-			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (),
+				Border = new Border () { BorderStyle = BorderStyle.Single }
+			};
 
-			if (!border) 				tv.IntegratedBorder = BorderStyle.None;
+			if (!border) {
+				tv.Border.BorderStyle = BorderStyle.None;
+			}
 
-			tv.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (2).View.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (3).View.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (4).View.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (2).ContentView.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (3).ContentView.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (4).ContentView.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
 
 			Application.Top.Add (tv);
 			tv.BeginInit ();
@@ -2113,12 +2218,12 @@ else 				Assert.Equal (-1, tv.IndexOf (sub, recursive));
 				Height = height,
 			};
 
-			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
+			container.Border.BorderStyle = withBorder ? BorderStyle.Single : BorderStyle.None;
 
-			container.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-			container.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
-			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+			container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+			container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
 
 			container.Tiles.ElementAt (0).MinSize = 0;
 			container.Tiles.ElementAt (1).MinSize = 0;
