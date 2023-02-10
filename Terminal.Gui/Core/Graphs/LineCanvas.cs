@@ -113,40 +113,85 @@ namespace Terminal.Gui.Graphs {
 			protected abstract Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded);
 		}
 
-		private class ULIntersectionRuneResolver : IntersectionRuneResolver 
-		{
+		private abstract class CornerIntersectionRuneResolver : IntersectionRuneResolver {
 			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
 			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
+				
+				bool doubleHorizontal = intersects.Any(l=>l.Line.Orientation == Orientation.Horizontal && l.Line.Style == BorderStyle.Double);
+				bool doubleVertical = intersects.Any(l=>l.Line.Orientation == Orientation.Vertical && l.Line.Style == BorderStyle.Double);
+
+				return GetRuneForIntersects(driver,useRounded,doubleHorizontal,doubleVertical);
+			}
+
+			protected abstract Rune? GetRuneForIntersects(ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical);
+		}
+
+		private class ULIntersectionRuneResolver : CornerIntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
+			{
+				if(doubleHorizontal)
+				{
+						return doubleVertical ? driver.ULDCorner : '╒';
+				}
+				
+				if(doubleVertical)
+				{
+					return '╓';
+				}
+
+				return useRounded ? driver.ULRCorner : driver.ULCorner;
 			}
 		}
-		private class URIntersectionRuneResolver : IntersectionRuneResolver 
+		private class URIntersectionRuneResolver : CornerIntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
 			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
+				if(doubleHorizontal)
+				{
+						return doubleVertical ? driver.URDCorner : '╕';
+				}
+				
+				if(doubleVertical)
+				{
+					return '╖';
+				}
+				
+				return useRounded ? driver.URRCorner : driver.URCorner;
 			}
 		}
-		private class LLIntersectionRuneResolver : IntersectionRuneResolver 
+		private class LLIntersectionRuneResolver : CornerIntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
 			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? driver.LLDCorner : useRounded ? driver.LLRCorner : driver.LLCorner;
+				if(doubleHorizontal)
+				{
+						return doubleVertical ? driver.LLDCorner : '╘';
+				}
+				
+				if(doubleVertical)
+				{
+					return '╙';
+				}
+
+				return useRounded ? driver.LLRCorner : driver.LLCorner;
 			}
 		}
-		private class LRIntersectionRuneResolver : IntersectionRuneResolver 
+		private class LRIntersectionRuneResolver : CornerIntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
 			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? driver.LRDCorner : useRounded ? driver.LRRCorner : driver.LRCorner;
+				if(doubleHorizontal)
+				{
+						return doubleVertical ? driver.LRDCorner : '╛';
+				}
+				
+				if(doubleVertical)
+				{
+					return '╜';
+				}
+
+				return useRounded ? driver.LRRCorner : driver.LRCorner;
 			}
 		}
 		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver 
