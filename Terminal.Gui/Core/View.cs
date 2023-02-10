@@ -1575,8 +1575,18 @@ namespace Terminal.Gui {
 			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
 			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
 			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
-			containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
-			containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
+			var lenOffset = (driverClip.X + driverClip.Width) - (containerBounds.X + containerBounds.Width);
+			if (containerBounds.X + containerBounds.Width > driverClip.X + driverClip.Width) {
+				containerBounds.Width = Math.Max (containerBounds.Width + lenOffset, 0);
+			} else {
+				containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
+			}
+			lenOffset = (driverClip.Y + driverClip.Height) - (containerBounds.Y + containerBounds.Height);
+			if (containerBounds.Y + containerBounds.Height > driverClip.Y + driverClip.Height) {
+				containerBounds.Height = Math.Max (containerBounds.Height + lenOffset, 0);
+			} else {
+				containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
+			}
 			return containerBounds;
 		}
 
