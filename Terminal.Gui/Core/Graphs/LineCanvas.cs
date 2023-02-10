@@ -14,6 +14,11 @@ namespace Terminal.Gui.Graphs {
 		
 		private List<StraightLine> lines = new List<StraightLine> ();
 
+		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> { 
+			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
+			// TODO: Add other resolvers
+		};
+
 		/// <summary>
 		/// Add a new line to the canvas starting at <paramref name="from"/>.
 		/// Use positive <paramref name="length"/> for Right and negative for Left
@@ -84,22 +89,51 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
+		private abstract class IntersectionRuneResolver
+		{
+			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+			{
+				var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
+				var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+
+				return GetRuneForIntersects (driver, intersects, useDouble, useRounded);
+			}
+
+			protected abstract Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded);
+		}
+
+		private class ULIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
+			}
+		}
+
 		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ())
 				return null;
 
 			var runeType = GetRuneTypeForIntersects (intersects);
+
+			if(runeResolvers.ContainsKey (runeType)) {
+				return runeResolvers [runeType].GetRuneForIntersects (driver, intersects);
+			}
+
+			// TODO: Remove these two once we have all of the below ported to IntersectionRuneResolvers
 			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
 			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
 
+			// TODO: Turn all these into classes
 			switch (runeType) {
 			case IntersectionRuneType.None: 
 				return null;
 			case IntersectionRuneType.Dot: 
 				return (Rune)'.';
 			case IntersectionRuneType.ULCorner:
-				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
 			case IntersectionRuneType.URCorner: 
 				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
 			case IntersectionRuneType.LLCorner: 
