@@ -16,6 +16,17 @@ namespace Terminal.Gui.Graphs {
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> { 
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
+			{IntersectionRuneType.URCorner,new URIntersectionRuneResolver()},
+			{IntersectionRuneType.LLCorner,new LLIntersectionRuneResolver()},
+			{IntersectionRuneType.LRCorner,new LRIntersectionRuneResolver()},
+
+			{IntersectionRuneType.TopTee,new TopTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.LeftTee,new LeftTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.RightTee,new RightTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.BottomTee,new BottomTeeIntersectionRuneResolver()},
+
+
+			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
 
@@ -111,6 +122,78 @@ namespace Terminal.Gui.Graphs {
 				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
 			}
 		}
+		private class URIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
+			}
+		}
+		private class LLIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? driver.LLDCorner : useRounded ? driver.LLRCorner : driver.LLCorner;
+			}
+		}
+		private class LRIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? driver.LRDCorner : useRounded ? driver.LRRCorner : driver.LRCorner;
+			}
+		}
+		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? '╦' : driver.TopTee;
+			}
+		}
+		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? '╠' : driver.LeftTee;
+			}
+		}
+		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? '╣' : driver.RightTee;
+			}
+		}
+		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? '╩' : driver.BottomTee;
+			}
+		}
+		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			{
+				// TODO: Handle all relevant permutations of double lines into single lines
+				// to make F type borders instead.
+				return useDouble ? '╬' : '┼';
+			}
+		}
 
 		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
@@ -127,36 +210,19 @@ namespace Terminal.Gui.Graphs {
 			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
 			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
 
-			// TODO: Turn all these into classes
+			// TODO: maybe make these resolvers to for simplicity?
+			// or for dotted lines later on or that kind of thing?
 			switch (runeType) {
 			case IntersectionRuneType.None: 
 				return null;
 			case IntersectionRuneType.Dot: 
 				return (Rune)'.';
-			case IntersectionRuneType.ULCorner:
-			case IntersectionRuneType.URCorner: 
-				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
-			case IntersectionRuneType.LLCorner: 
-				return useDouble ? driver.LLDCorner : useRounded ? driver.LLRCorner : driver.LLCorner;
-			case IntersectionRuneType.LRCorner: 
-				return useDouble ? driver.LRDCorner : useRounded ? driver.LRRCorner : driver.LRCorner;
-			case IntersectionRuneType.TopTee: 
-				return useDouble ? '╦' : driver.TopTee;
-			case IntersectionRuneType.BottomTee: 
-				return useDouble ? '╩' : driver.BottomTee;
-			case IntersectionRuneType.RightTee: 
-				return useDouble ? '╣' : driver.RightTee;
-			case IntersectionRuneType.LeftTee: 
-				return useDouble ? '╠' : driver.LeftTee;
-			case IntersectionRuneType.Crosshair: 
-				return useDouble ? '╬' : '┼';
 			case IntersectionRuneType.HLine: 
 				return useDouble ? driver.HDLine : driver.HLine;
 			case IntersectionRuneType.VLine: 
 				return useDouble ? driver.VDLine : driver.VLine;
-			default: throw new ArgumentOutOfRangeException (nameof (runeType));
+			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}
-
 		}
 
 
