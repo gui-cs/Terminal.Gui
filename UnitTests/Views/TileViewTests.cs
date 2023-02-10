@@ -2104,14 +2104,14 @@ namespace Terminal.Gui.ViewTests {
 			var myReusableView = new DisposeCounter ();
 
 			// I want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Equal (0, myReusableView.DisposalCount);
 
 			// I've changed my mind, I want 3 tiles now
 			tv.RebuildForTileCount (3);
 
 			// but I still want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
 				()=>Assert.Equal (0, myReusableView.DisposalCount)
 				,()=> {
@@ -2127,7 +2127,7 @@ namespace Terminal.Gui.ViewTests {
 			var myReusableView = new DisposeCounter ();
 
 			// I want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Equal (0, myReusableView.DisposalCount);
 
 			// I've changed my mind, I want 3 tiles now
@@ -2135,7 +2135,7 @@ namespace Terminal.Gui.ViewTests {
 			tv.InsertTile (2);
 
 			// but I still want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
 				() => Assert.Equal (0, myReusableView.DisposalCount)
 				, () => {
@@ -2155,13 +2155,13 @@ namespace Terminal.Gui.ViewTests {
 			var myReusableView = new DisposeCounter ();
 
 			// I want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Equal (0, myReusableView.DisposalCount);
 
 			tv.RemoveTile (idx);
 
 			// but I still want my view in the first tile
-			tv.Tiles.ElementAt (0).View.Add (myReusableView);
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
 				() => Assert.Equal (0, myReusableView.DisposalCount)
 				, () => {
