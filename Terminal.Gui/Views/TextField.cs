@@ -1064,8 +1064,8 @@ namespace Terminal.Gui {
 				EnsureHasFocus ();
 				int x = PositionCursor (ev);
 				int sbw = x;
-				if (x == text.Count || (x > 0 && (char)Text [x - 1] != ' '
-					|| (x > 0 && (char)Text [x] == ' '))) {
+				if (x == text.Count || (x > 0 && (char)text [x - 1] != ' ')
+					|| (x > 0 && (char)text [x] == ' ')) {
 
 					sbw = WordBackward (x);
 				}
