@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.CoreTests {
 	public class LineCanvasTests {
 
 		readonly ITestOutputHelper output;
