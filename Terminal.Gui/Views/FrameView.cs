@@ -85,9 +85,10 @@ namespace Terminal.Gui {
 		/// <param name="title">Title.</param>
 		/// <param name="views">Views.</param>
 		/// <param name="border">The <see cref="Border"/>.</param>
-		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) : base (frame)
+		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) //: base (frame)
 		{
 			//var cFrame = new Rect (1, 1, Math.Max (frame.Width - 2, 0), Math.Max (frame.Height - 2, 0));
+			
 			Initialize (frame, title, views, border);
 		}
 

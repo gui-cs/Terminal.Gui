@@ -18,7 +18,12 @@ namespace UICatalog.Scenarios {
 		{
 			
 		}
-		
+
+		public override void Init (ColorScheme colorScheme)
+		{
+			Application.Init ();
+		}
+
 		/// <summary>
 		/// Setup the scenario.
 		/// </summary>
@@ -35,8 +40,9 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
+				Height = Dim.Fill (),
 			};
+			frame.Border.BorderStyle = BorderStyle.Double;
 			Application.Top.Add (frame);
 
 		}
