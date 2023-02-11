@@ -102,142 +102,112 @@ namespace Terminal.Gui.Graphs {
 
 		private abstract class IntersectionRuneResolver
 		{
-			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
-			{
-				var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
-				var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+			readonly Rune round;
+			readonly Rune doubleH;
+			readonly Rune doubleV;
+			readonly Rune doubleBoth;
+			readonly Rune normal;
 
-				return GetRuneForIntersects (driver, intersects, useDouble, useRounded);
+			public IntersectionRuneResolver(Rune round, Rune doubleH, Rune doubleV, Rune doubleBoth, Rune normal)
+			{
+				this.round = round;
+				this.doubleH = doubleH;
+				this.doubleV = doubleV;
+				this.doubleBoth = doubleBoth;
+				this.normal = normal;
 			}
 
-			protected abstract Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded);
-		}
-
-		private abstract class CornerIntersectionRuneResolver : IntersectionRuneResolver {
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
+			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 			{
-				
+				var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+
 				bool doubleHorizontal = intersects.Any(l=>l.Line.Orientation == Orientation.Horizontal && l.Line.Style == BorderStyle.Double);
 				bool doubleVertical = intersects.Any(l=>l.Line.Orientation == Orientation.Vertical && l.Line.Style == BorderStyle.Double);
 
-				return GetRuneForIntersects(driver,useRounded,doubleHorizontal,doubleVertical);
-			}
 
-			protected abstract Rune? GetRuneForIntersects(ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical);
-		}
-
-		private class ULIntersectionRuneResolver : CornerIntersectionRuneResolver 
-		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
-			{
 				if(doubleHorizontal)
 				{
-						return doubleVertical ? driver.ULDCorner : '╒';
+						return doubleVertical ? doubleBoth : doubleH;
 				}
 				
 				if(doubleVertical)
 				{
-					return '╓';
+					return doubleV;
 				}
 
-				return useRounded ? driver.ULRCorner : driver.ULCorner;
+				return useRounded ? round : normal;
 			}
 		}
-		private class URIntersectionRuneResolver : CornerIntersectionRuneResolver 
-		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
-			{
-				if(doubleHorizontal)
-				{
-						return doubleVertical ? driver.URDCorner : '╕';
-				}
-				
-				if(doubleVertical)
-				{
-					return '╖';
-				}
-				
-				return useRounded ? driver.URRCorner : driver.URCorner;
-			}
-		}
-		private class LLIntersectionRuneResolver : CornerIntersectionRuneResolver 
-		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
-			{
-				if(doubleHorizontal)
-				{
-						return doubleVertical ? driver.LLDCorner : '╘';
-				}
-				
-				if(doubleVertical)
-				{
-					return '╙';
-				}
 
-				return useRounded ? driver.LLRCorner : driver.LLCorner;
-			}
-		}
-		private class LRIntersectionRuneResolver : CornerIntersectionRuneResolver 
+		private class ULIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, bool useRounded, bool doubleHorizontal, bool doubleVertical)
+			public ULIntersectionRuneResolver() :
+				base('╭','╒','╓','╔','┌')
 			{
-				if(doubleHorizontal)
-				{
-						return doubleVertical ? driver.LRDCorner : '╛';
-				}
 				
-				if(doubleVertical)
-				{
-					return '╜';
-				}
-
-				return useRounded ? driver.LRRCorner : driver.LRCorner;
 			}
 		}
+		private class URIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+
+			public URIntersectionRuneResolver() :
+				base('╮','╕','╖','╗','┐')
+			{
+				
+			}
+		}
+		private class LLIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+
+			public LLIntersectionRuneResolver() :
+				base('╰','╘','╙','╚','└')
+			{
+				
+			}
+		}
+		private class LRIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public LRIntersectionRuneResolver() :
+				base('╯','╛','╜','╝','┘')
+			{
+				
+			}
+		}
+
 		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
-			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? '╦' : driver.TopTee;
-			}
+			public TopTeeIntersectionRuneResolver():
+				base('┬','╤','╥','╦','┬'){
+					
+				}
 		}
 		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
-			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? '╠' : driver.LeftTee;
-			}
+			public LeftTeeIntersectionRuneResolver():
+				base('├','╞','╟','╠','├'){
+					
+				}
 		}
 		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
-			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? '╣' : driver.RightTee;
-			}
+			public RightTeeIntersectionRuneResolver():
+				base('┤','╡','╢','╣','┤'){
+					
+				}
 		}
 		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
-			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? '╩' : driver.BottomTee;
-			}
+			public BottomTeeIntersectionRuneResolver():
+				base('┴','╧','╨','╩','┴'){
+					
+				}
 		}
 		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver 
 		{
-			protected override Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects, bool useDouble, bool useRounded)
-			{
-				// TODO: Handle all relevant permutations of double lines into single lines
-				// to make F type borders instead.
-				return useDouble ? '╬' : '┼';
-			}
+			public CrosshairIntersectionRuneResolver():
+				base('┼','╪','╫','╬','┼'){
+					
+				}
 		}
 
 		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)

@@ -233,19 +233,18 @@ namespace Terminal.Gui.Core {
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical,thinStyle);
 			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
 
 			v.Redraw (v.Bounds);
 
-// TODO: Fix those Ts!
 			string looksLike =
 @"    
-╒════╦═══╕
-│    ║   │
-╠════╬═══╣
-│    ║   │
-╘════╩═══╛
+╒════╤═══╕
+│    │   │
+╞════╪═══╡
+│    │   │
+╘════╧═══╛
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
@@ -265,18 +264,18 @@ namespace Terminal.Gui.Core {
 
 
 			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, thinStyle);
 
 			v.Redraw (v.Bounds);
 
-// TODO: Fix those Ts!
 			string looksLike =
 @"    
-╓────╦───╖
+╓────╥───╖
 ║    ║   ║
-╠════╬═══╣
+╟────╫───╢
 ║    ║   ║
-╙────╩───╜
+╙────╨───╜
+
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
