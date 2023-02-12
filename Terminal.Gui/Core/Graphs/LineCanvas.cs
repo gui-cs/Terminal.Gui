@@ -14,6 +14,22 @@ namespace Terminal.Gui.Graphs {
 		
 		private List<StraightLine> lines = new List<StraightLine> ();
 
+		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> { 
+			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
+			{IntersectionRuneType.URCorner,new URIntersectionRuneResolver()},
+			{IntersectionRuneType.LLCorner,new LLIntersectionRuneResolver()},
+			{IntersectionRuneType.LRCorner,new LRIntersectionRuneResolver()},
+
+			{IntersectionRuneType.TopTee,new TopTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.LeftTee,new LeftTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.RightTee,new RightTeeIntersectionRuneResolver()},
+			{IntersectionRuneType.BottomTee,new BottomTeeIntersectionRuneResolver()},
+
+
+			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
+			// TODO: Add other resolvers
+		};
+
 		/// <summary>
 		/// Add a new line to the canvas starting at <paramref name="from"/>.
 		/// Use positive <paramref name="length"/> for Right and negative for Left
@@ -84,45 +100,144 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
+		private abstract class IntersectionRuneResolver
+		{
+			readonly Rune round;
+			readonly Rune doubleH;
+			readonly Rune doubleV;
+			readonly Rune doubleBoth;
+			readonly Rune normal;
+
+			public IntersectionRuneResolver(Rune round, Rune doubleH, Rune doubleV, Rune doubleBoth, Rune normal)
+			{
+				this.round = round;
+				this.doubleH = doubleH;
+				this.doubleV = doubleV;
+				this.doubleBoth = doubleBoth;
+				this.normal = normal;
+			}
+
+			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+			{
+				var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+
+				bool doubleHorizontal = intersects.Any(l=>l.Line.Orientation == Orientation.Horizontal && l.Line.Style == BorderStyle.Double);
+				bool doubleVertical = intersects.Any(l=>l.Line.Orientation == Orientation.Vertical && l.Line.Style == BorderStyle.Double);
+
+
+				if(doubleHorizontal)
+				{
+						return doubleVertical ? doubleBoth : doubleH;
+				}
+				
+				if(doubleVertical)
+				{
+					return doubleV;
+				}
+
+				return useRounded ? round : normal;
+			}
+		}
+
+		private class ULIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public ULIntersectionRuneResolver() :
+				base('╭','╒','╓','╔','┌')
+			{
+				
+			}
+		}
+		private class URIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+
+			public URIntersectionRuneResolver() :
+				base('╮','╕','╖','╗','┐')
+			{
+				
+			}
+		}
+		private class LLIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+
+			public LLIntersectionRuneResolver() :
+				base('╰','╘','╙','╚','└')
+			{
+				
+			}
+		}
+		private class LRIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public LRIntersectionRuneResolver() :
+				base('╯','╛','╜','╝','┘')
+			{
+				
+			}
+		}
+
+		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public TopTeeIntersectionRuneResolver():
+				base('┬','╤','╥','╦','┬'){
+					
+				}
+		}
+		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public LeftTeeIntersectionRuneResolver():
+				base('├','╞','╟','╠','├'){
+					
+				}
+		}
+		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public RightTeeIntersectionRuneResolver():
+				base('┤','╡','╢','╣','┤'){
+					
+				}
+		}
+		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public BottomTeeIntersectionRuneResolver():
+				base('┴','╧','╨','╩','┴'){
+					
+				}
+		}
+		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver 
+		{
+			public CrosshairIntersectionRuneResolver():
+				base('┼','╪','╫','╬','┼'){
+					
+				}
+		}
+
 		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ())
 				return null;
 
 			var runeType = GetRuneTypeForIntersects (intersects);
+
+			if(runeResolvers.ContainsKey (runeType)) {
+				return runeResolvers [runeType].GetRuneForIntersects (driver, intersects);
+			}
+
+			// TODO: Remove these two once we have all of the below ported to IntersectionRuneResolvers
 			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
 			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
 
+			// TODO: maybe make these resolvers to for simplicity?
+			// or for dotted lines later on or that kind of thing?
 			switch (runeType) {
 			case IntersectionRuneType.None: 
 				return null;
 			case IntersectionRuneType.Dot: 
 				return (Rune)'.';
-			case IntersectionRuneType.ULCorner:
-				return useDouble ? driver.ULDCorner : useRounded ? driver.ULRCorner : driver.ULCorner;
-			case IntersectionRuneType.URCorner: 
-				return useDouble ? driver.URDCorner : useRounded ? driver.URRCorner : driver.URCorner;
-			case IntersectionRuneType.LLCorner: 
-				return useDouble ? driver.LLDCorner : useRounded ? driver.LLRCorner : driver.LLCorner;
-			case IntersectionRuneType.LRCorner: 
-				return useDouble ? driver.LRDCorner : useRounded ? driver.LRRCorner : driver.LRCorner;
-			case IntersectionRuneType.TopTee: 
-				return useDouble ? '╦' : driver.TopTee;
-			case IntersectionRuneType.BottomTee: 
-				return useDouble ? '╩' : driver.BottomTee;
-			case IntersectionRuneType.RightTee: 
-				return useDouble ? '╣' : driver.RightTee;
-			case IntersectionRuneType.LeftTee: 
-				return useDouble ? '╠' : driver.LeftTee;
-			case IntersectionRuneType.Crosshair: 
-				return useDouble ? '╬' : '┼';
 			case IntersectionRuneType.HLine: 
 				return useDouble ? driver.HDLine : driver.HLine;
 			case IntersectionRuneType.VLine: 
 				return useDouble ? driver.VDLine : driver.VLine;
-			default: throw new ArgumentOutOfRangeException (nameof (runeType));
+			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}
-
 		}
 
 
