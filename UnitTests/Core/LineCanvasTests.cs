@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui.CoreTests {
 	public class LineCanvasTests {
 
 		readonly ITestOutputHelper output;
@@ -215,6 +215,68 @@ namespace Terminal.Gui.Core {
 ╠════╬═══╣
 ║    ║   ║
 ╚════╩═══╝";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+
+		[Theory, AutoInitShutdown]
+		[InlineData(BorderStyle.Single)]
+		[InlineData(BorderStyle.Rounded)]
+		public void TestLineCanvas_Window_DoubleTop_SingleSides (BorderStyle thinStyle)
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
+
+
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical,thinStyle);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+╒════╤═══╕
+│    │   │
+╞════╪═══╡
+│    │   │
+╘════╧═══╛
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData(BorderStyle.Single)]
+		[InlineData(BorderStyle.Rounded)]
+		public void TestLineCanvas_Window_SingleTop_DoubleSides (BorderStyle thinStyle)
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal,thinStyle);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical,  BorderStyle.Double);
+
+
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, thinStyle);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+╓────╥───╖
+║    ║   ║
+╟────╫───╢
+║    ║   ║
+╙────╨───╜
+
+";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
