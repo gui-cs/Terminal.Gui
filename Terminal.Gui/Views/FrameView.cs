@@ -12,6 +12,7 @@
 using System;
 using System.Linq;
 using NStack;
+using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -88,7 +89,7 @@ namespace Terminal.Gui {
 		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) //: base (frame)
 		{
 			//var cFrame = new Rect (1, 1, Math.Max (frame.Width - 2, 0), Math.Max (frame.Height - 2, 0));
-			
+
 			Initialize (frame, title, views, border);
 		}
 
@@ -230,14 +231,87 @@ namespace Terminal.Gui {
 
 			ClearNeedsDisplay ();
 
-			Driver.SetAttribute (GetNormalColor ());
-			//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
-			Border.DrawContent (this, false);
-			if (HasFocus)
-				Driver.SetAttribute (ColorScheme.HotNormal);
-			if (Border.DrawMarginFrame)
-				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			Driver.SetAttribute (GetNormalColor ());
+			if (!IgnoreBorderPropertyOnRedraw) {
+				Driver.SetAttribute (GetNormalColor ());
+				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
+				Border.DrawContent (this, false);
+				if (HasFocus)
+					Driver.SetAttribute (ColorScheme.HotNormal);
+				if (Border.DrawMarginFrame)
+					Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+				Driver.SetAttribute (GetNormalColor ());
+			} else {
+				Driver.SetAttribute (ColorScheme.Normal);
+
+				var lc = new LineCanvas ();
+
+				if (Border?.BorderStyle != BorderStyle.None) {
+
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, Border.BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, Border.BorderStyle);
+
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, Border.BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, Border.BorderStyle);
+				}
+
+				foreach (var subview in contentView.Subviews) {
+					lc.AddLine (new Point (subview.Frame.X+1, subview.Frame.Y+1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X+1, subview.Frame.Y+1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
+
+					lc.AddLine (new Point (subview.Frame.Width - 1, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Height - 1), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
+				}
+
+				//foreach (var line in allLines) {
+				//	bool isRoot = splitterLines.Contains (line);
+
+				//	line.ViewToScreen (0, 0, out var x1, out var y1);
+				//	var origin = ScreenToView (x1, y1);
+				//	var length = line.Orientation == Orientation.Horizontal ?
+				//			line.Frame.Width - 1 :
+				//			line.Frame.Height - 1;
+
+				//	if (!isRoot) {
+				//		if (line.Orientation == Orientation.Horizontal) {
+				//			origin.X -= 1;
+				//		} else {
+				//			origin.Y -= 1;
+				//		}
+				//		length += 2;
+				//	}
+
+				//	lc.AddLine (origin, length, line.Orientation, Border.BorderStyle);
+				//}
+
+
+				Driver.SetAttribute (ColorScheme.Normal);
+				lc.Draw (this, bounds);
+
+				//// Redraw the lines so that focus/drag symbol renders
+				//foreach (var line in allLines) {
+				//	line.DrawSplitterSymbol ();
+				//}
+
+				// Draw Titles over Border
+
+				//foreach (var titleToRender in allTitlesToRender) {
+				//	var renderAt = titleToRender.GetLocalCoordinateForTitle (this);
+
+				//	if (renderAt.Y < 0) {
+				//		// If we have no border then root level tiles
+				//		// have nowhere to render their titles.
+				//		continue;
+				//	}
+
+				//	// TODO: Render with focus color if focused
+
+				//	var title = titleToRender.GetTrimmedTitle ();
+
+				//	for (int i = 0; i < title.Length; i++) {
+				//		AddRune (renderAt.X + i, renderAt.Y, title [i]);
+				//	}
+				//}
+			}
 		}
 
 		/// <summary>
