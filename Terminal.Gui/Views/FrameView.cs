@@ -241,8 +241,6 @@ namespace Terminal.Gui {
 					Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
 				Driver.SetAttribute (GetNormalColor ());
 			} else {
-				Driver.SetAttribute (ColorScheme.Normal);
-
 				var lc = new LineCanvas ();
 
 				if (Border?.BorderStyle != BorderStyle.None) {
@@ -255,66 +253,34 @@ namespace Terminal.Gui {
 				}
 
 				foreach (var subview in contentView.Subviews) {
-					lc.AddLine (new Point (subview.Frame.X+1, subview.Frame.Y+1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X+1, subview.Frame.Y+1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
 
-					lc.AddLine (new Point (subview.Frame.Width - 1, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Height - 1), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
+					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
+
 				}
-
-				//TODO: Figure out how to draw Titles
-				
-				// TODO: Figure out how to add splitters
-
-				//foreach (var line in allLines) {
-				//	bool isRoot = splitterLines.Contains (line);
-
-				//	line.ViewToScreen (0, 0, out var x1, out var y1);
-				//	var origin = ScreenToView (x1, y1);
-				//	var length = line.Orientation == Orientation.Horizontal ?
-				//			line.Frame.Width - 1 :
-				//			line.Frame.Height - 1;
-
-				//	if (!isRoot) {
-				//		if (line.Orientation == Orientation.Horizontal) {
-				//			origin.X -= 1;
-				//		} else {
-				//			origin.Y -= 1;
-				//		}
-				//		length += 2;
-				//	}
-
-				//	lc.AddLine (origin, length, line.Orientation, Border.BorderStyle);
-				//}
-
 
 				Driver.SetAttribute (ColorScheme.Normal);
 				lc.Draw (this, bounds);
 
-				//// Redraw the lines so that focus/drag symbol renders
-				//foreach (var line in allLines) {
-				//	line.DrawSplitterSymbol ();
-				//}
+
+				// Redraw the lines so that focus/drag symbol renders
+				foreach (var subview in contentView.Subviews) {
+					//	line.DrawSplitterSymbol ();
+				}
 
 				// Draw Titles over Border
-
-				//foreach (var titleToRender in allTitlesToRender) {
-				//	var renderAt = titleToRender.GetLocalCoordinateForTitle (this);
-
-				//	if (renderAt.Y < 0) {
-				//		// If we have no border then root level tiles
-				//		// have nowhere to render their titles.
-				//		continue;
-				//	}
-
-				//	// TODO: Render with focus color if focused
-
-				//	var title = titleToRender.GetTrimmedTitle ();
-
-				//	for (int i = 0; i < title.Length; i++) {
-				//		AddRune (renderAt.X + i, renderAt.Y, title [i]);
-				//	}
-				//}
+				foreach (var subview in contentView.Subviews) {
+					// TODO: Use reflection to see if subview has a Title property
+					if (subview is FrameView viewWithTite) {
+						var rect = viewWithTite.Frame;
+						rect.X = rect.X + 1;
+						rect.Y = rect.Y + 2;
+						// TODO: Do focus color correctly
+						Driver.DrawWindowTitle (rect, viewWithTite.Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+					}
+				}
 			}
 		}
 

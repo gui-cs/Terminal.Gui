@@ -51,13 +51,15 @@ namespace UICatalog.Scenarios {
 
 			frame.Add (view1);
 
+			//var view12splitter = new SplitterEventArgs
+
 			var view2 = new FrameView () {
 				Title = "View 2",
-				Text = "View2 right of view1, 30%/Fill Single.",
+				Text = "View2 right of view1, 30%/70% Single.",
 				X = Pos.Right (view1) - 1,
 				Y = -1,
 				Width = Dim.Percent (30),
-				Height = Dim.Fill (-1),
+				Height = Dim.Percent (70),
 				ColorScheme = Colors.ColorSchemes ["Error"],
 				Border = new Border () { BorderStyle = BorderStyle.Single }
 			};
@@ -79,10 +81,10 @@ namespace UICatalog.Scenarios {
 
 			var view4 = new FrameView () {
 				Title = "View 4",
-				Text = "View4 below View1 30%/5 Single",
-				X = -1,
-				Y = Pos.Bottom (view1)-1,
-				Width = Dim.Percent (30),
+				Text = "View4 below View2 view2.Width/5 Single",
+				X = Pos.Left (view2),
+				Y = Pos.Bottom (view2) - 1,
+				Width = view2.Width,
 				Height = 5,
 				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Border = new Border () { BorderStyle = BorderStyle.Single }
@@ -93,7 +95,7 @@ namespace UICatalog.Scenarios {
 			var view5 = new FrameView () {
 				Title = "View 5",
 				Text = "View5 below View4 view4.Width/5 Double",
-				X = -1,
+				X = Pos.Left (view2),
 				Y = Pos.Bottom (view4) - 1,
 				Width = view4.Width,
 				Height = 5,
