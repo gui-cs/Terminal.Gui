@@ -262,6 +262,10 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Height - 1), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
 				}
 
+				//TODO: Figure out how to draw Titles
+				
+				// TODO: Figure out how to add splitters
+
 				//foreach (var line in allLines) {
 				//	bool isRoot = splitterLines.Contains (line);
 
