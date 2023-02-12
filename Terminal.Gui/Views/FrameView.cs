@@ -270,6 +270,7 @@ namespace Terminal.Gui {
 					//	line.DrawSplitterSymbol ();
 				}
 
+
 				// Draw Titles over Border
 				foreach (var subview in contentView.Subviews) {
 					// TODO: Use reflection to see if subview has a Title property
