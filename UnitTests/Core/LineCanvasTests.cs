@@ -1,4 +1,7 @@
-﻿using Terminal.Gui.Graphs;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -129,6 +132,7 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		
 		}
+
 		[Fact,AutoInitShutdown]
 		public void TestLineCanvas_Window ()
 		{
@@ -279,6 +283,52 @@ namespace Terminal.Gui.CoreTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+
+
+		[Theory, AutoInitShutdown]
+		[InlineData(0,0,@"
+═══
+══
+═══")]
+		[InlineData (1, 0,@"
+══
+═
+══")]
+		[InlineData (2, 0,@"
+═
+
+═")]
+		[InlineData (0, 1,@"
+══
+═══")]
+		[InlineData (0, 2,@"
+═══")]
+		public void TestLineCanvasRenderOffset_NoOffset (int xOffset,int yOffset, string expect)
+		{
+			var canvas = new LineCanvas ();
+			canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 1), 1, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 2), 2, Orientation.Horizontal, BorderStyle.Double);
+
+			var bmp = canvas.GenerateImage (new Rect (xOffset, yOffset, 3, 3));
+			var actual = BmpToString (bmp);
+			Assert.Equal (expect.TrimStart (), actual);
+
+		}
+
+		private string BmpToString (System.Rune? [,] bmp)
+		{
+			var sb = new StringBuilder ();
+			for (int y = 0; y < bmp.GetLength (1); y++) {
+				for (int x = 0; x < bmp.GetLength (0); x++) {
+					sb.Append (bmp [y, x]);
+				}
+				sb.AppendLine ();
+			}
+
+			return sb.ToString ().TrimEnd ();
+		}
+
 
 		private View GetCanvas (out LineCanvas canvas)
 		{
