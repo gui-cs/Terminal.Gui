@@ -60,7 +60,7 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[InlineData (BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Rounded)]
 		[Theory, AutoInitShutdown]
 		public void TestLineCanvas_Vertical (BorderStyle style)
 		{
@@ -96,7 +96,7 @@ namespace Terminal.Gui.CoreTests {
 		/// Not when they terminate adjacent to one another.
 		/// </summary>
 		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_Corner_NoOverlap()
+		public void TestLineCanvas_Corner_NoOverlap ()
 		{
 			var v = GetCanvas (out var canvas);
 			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Single);
@@ -130,14 +130,14 @@ namespace Terminal.Gui.CoreTests {
 │
 │";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-		
+
 		}
 
-		[Fact,AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void TestLineCanvas_Window ()
 		{
 			var v = GetCanvas (out var canvas);
-			
+
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Single);
 			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
@@ -172,10 +172,10 @@ namespace Terminal.Gui.CoreTests {
 
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Rounded);
-			
+
 			// BorderStyle.Single is ignored because corner overlaps with the above line which is Rounded
 			// this results in a rounded corner being used.
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single); 
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
 			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Rounded);
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Single);
 
@@ -224,8 +224,8 @@ namespace Terminal.Gui.CoreTests {
 
 
 		[Theory, AutoInitShutdown]
-		[InlineData(BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Single)]
+		[InlineData (BorderStyle.Rounded)]
 		public void TestLineCanvas_Window_DoubleTop_SingleSides (BorderStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
@@ -237,7 +237,7 @@ namespace Terminal.Gui.CoreTests {
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical,thinStyle);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, thinStyle);
 			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
 
 			v.Redraw (v.Bounds);
@@ -254,8 +254,8 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData(BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Single)]
+		[InlineData (BorderStyle.Rounded)]
 		public void TestLineCanvas_Window_SingleTop_DoubleSides (BorderStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
@@ -263,8 +263,8 @@ namespace Terminal.Gui.CoreTests {
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, thinStyle);
 			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Double);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal,thinStyle);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical,  BorderStyle.Double);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Double);
 
 
 			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
@@ -286,24 +286,24 @@ namespace Terminal.Gui.CoreTests {
 
 
 		[Theory, AutoInitShutdown]
-		[InlineData(0,0,@"
+		[InlineData (0, 0, @"
 ═══
 ══
 ═══")]
-		[InlineData (1, 0,@"
+		[InlineData (1, 0, @"
 ══
 ═
 ══")]
-		[InlineData (2, 0,@"
+		[InlineData (2, 0, @"
 ═
 
 ═")]
-		[InlineData (0, 1,@"
+		[InlineData (0, 1, @"
 ══
 ═══")]
-		[InlineData (0, 2,@"
+		[InlineData (0, 2, @"
 ═══")]
-		public void TestLineCanvasRenderOffset_NoOffset (int xOffset,int yOffset, string expect)
+		public void TestLineCanvasRenderOffset_NoOffset (int xOffset, int yOffset, string expect)
 		{
 			var canvas = new LineCanvas ();
 			canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, BorderStyle.Double);
@@ -338,8 +338,8 @@ namespace Terminal.Gui.CoreTests {
 				Bounds = new Rect (0, 0, 10, 5)
 			};
 
-			var canvasCopy = canvas =  new LineCanvas ();
-			v.DrawContentComplete += (r)=> canvasCopy.Draw (v, v.Bounds);
+			var canvasCopy = canvas = new LineCanvas ();
+			v.DrawContentComplete += (r) => canvasCopy.Draw (v, v.Bounds);
 
 			return v;
 		}
