@@ -89,12 +89,15 @@ namespace Terminal.Gui.Graphs {
 		{
 			var runes = GenerateImage (bounds);
 
-			for (int y = bounds.Y; y < bounds.Height; y++) {
-				for (int x = bounds.X; x < bounds.Width; x++) {
+			var runeRows = runes.GetLength (0);
+			var runeCols = runes.GetLength (1);
+
+			for (int y = 0; y < runeRows; y++) {
+				for (int x = 0; x < runeCols; x++) {
 					var rune = runes [y, x];
 
 					if (rune.HasValue) {
-						view.AddRune (x, y, rune.Value);
+						view.AddRune (bounds.X + x, bounds.Y + y, rune.Value);
 					}
 				}
 			}

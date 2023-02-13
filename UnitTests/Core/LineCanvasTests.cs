@@ -284,6 +284,35 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_PositiveLocation ()
+		{
+			var x = 1;
+			var y = 1;
+			var v = GetCanvas (out var canvas, x, y);
+
+			// outer box
+			canvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
+
+
+			canvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+
+ ┌────┬───┐
+ │    │   │
+ ├────┼───┤
+ │    │   │
+ └────┴───┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
 
 		[Theory, AutoInitShutdown]
 		[InlineData (0, 0, @"
@@ -330,12 +359,20 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 
-		private View GetCanvas (out LineCanvas canvas)
+		/// <summary>
+		/// Creates a new <see cref="View"/> into which a <see cref="LineCanvas"/> is rendered
+		/// at <see cref="View.DrawContentComplete"/> time.
+		/// </summary>
+		/// <param name="canvas">The <see cref="LineCanvas"/> you can draw into.</param>
+		/// <param name="offsetX">How far to offset the <see cref="View.Bounds"/> in X</param>
+		/// <param name="offsetX">How far to offset the <see cref="View.Bounds"/> in Y</param>
+		/// <returns></returns>
+		private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
 		{
 			var v = new View {
 				Width = 10,
 				Height = 5,
-				Bounds = new Rect (0, 0, 10, 5)
+				Bounds = new Rect (offsetX, offsetY, 10, 5)
 			};
 
 			var canvasCopy = canvas = new LineCanvas ();
