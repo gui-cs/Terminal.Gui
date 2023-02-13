@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// 
+	/// Indicates the RGB for true colors.
 	/// </summary>
 	public class TrueColor {
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// 
+		/// Converts true color to console color.
 		/// </summary>
 		/// <returns></returns>
 		public Color ToConsoleColor ()
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 	/// See also: <see cref="Colors.ColorSchemes"/>.
 	/// </remarks>
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal = new Attribute(Color.White, Color.Black);
+		Attribute _normal = new Attribute (Color.White, Color.Black);
 		Attribute _focus = new Attribute (Color.White, Color.Black);
 		Attribute _hotNormal = new Attribute (Color.White, Color.Black);
 		Attribute _hotFocus = new Attribute (Color.White, Color.Black);
@@ -501,7 +501,7 @@ namespace Terminal.Gui {
 			public bool Equals (string x, string y)
 			{
 				if (x != null && y != null) {
-					return x.ToLowerInvariant () == y.ToLowerInvariant ();
+					return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
 				}
 				return false;
 			}
@@ -520,13 +520,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
 		/// </summary>
-		public static Dictionary<string, ColorScheme> Create () 
+		public static Dictionary<string, ColorScheme> Create ()
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
 			return typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme()))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ()))
 				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase ());
 		}
 
@@ -881,7 +881,7 @@ namespace Terminal.Gui {
 		/// The current attribute the driver is using. 
 		/// </summary>
 		public virtual Attribute CurrentAttribute {
-			get => currentAttribute; 
+			get => currentAttribute;
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
 					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
@@ -1480,7 +1480,7 @@ namespace Terminal.Gui {
 
 
 			// Define the default color theme only if the user has not defined one.
-			
+
 			Colors.TopLevel.Normal = MakeColor (Color.BrightGreen, Color.Black);
 			Colors.TopLevel.Focus = MakeColor (Color.White, Color.Cyan);
 			Colors.TopLevel.HotNormal = MakeColor (Color.Brown, Color.Black);
