@@ -48,24 +48,24 @@ namespace Terminal.Gui.Graphs {
 		}
 		/// <summary>
 		/// Evaluate all currently defined lines that lie within 
-		/// <paramref name="inArea"/> and generate a 'bitmap' that
+		/// <paramref name="bounds"/> and generate a 'bitmap' that
 		/// shows what characters (if any) should be rendered at each
 		/// point so that all lines connect up correctly with appropriate
 		/// intersection symbols.
 		/// <returns></returns>
 		/// </summary>
-		/// <param name="inArea"></param>
+		/// <param name="bounds"></param>
 		/// <returns>Map as 2D array where first index is rows and second is column</returns>
-		public Rune? [,] GenerateImage (Rect inArea)
+		public Rune? [,] GenerateImage (Rect bounds)
 		{
-			Rune? [,] canvas = new Rune? [inArea.Height, inArea.Width];
+			Rune? [,] canvas = new Rune? [bounds.Height, bounds.Width];
 
 			// walk through each pixel of the bitmap
-			for (int y = 0; y < inArea.Height; y++) {
-				for (int x = 0; x < inArea.Width; x++) {
+			for (int y = 0; y < bounds.Height; y++) {
+				for (int x = 0; x < bounds.Width; x++) {
 
 					var intersects = lines
-						.Select (l => l.Intersects (x, y))
+						.Select (l => l.Intersects (bounds.X + x, bounds.Y + y))
 						.Where (i => i != null)
 						.ToArray ();
 
@@ -88,13 +88,18 @@ namespace Terminal.Gui.Graphs {
 		public void Draw (View view, Rect bounds)
 		{
 			var runes = GenerateImage (bounds);
-
-			for (int y = bounds.Y; y < bounds.Height; y++) {
-				for (int x = bounds.X; x < bounds.Width; x++) {
-					var rune = runes [y, x];
+			
+			for (int y = bounds.Y; y < bounds.Y + bounds.Height; y++) {
+				for (int x = bounds.X; x < bounds.X + bounds.Width; x++) {
+					var rune = runes [y - bounds.Y, x - bounds.X];
 
 					if (rune.HasValue) {
-						view.AddRune (x, y, rune.Value);
+						if (view != null) {
+							view.AddRune (x - bounds.X, y - bounds.Y, rune.Value);
+						} else {
+							Application.Driver.Move (x, y);
+							Application.Driver.AddRune (rune.Value);
+						}
 					}
 				}
 			}

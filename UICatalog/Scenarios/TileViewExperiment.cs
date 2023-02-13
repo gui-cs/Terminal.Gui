@@ -32,78 +32,85 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				IgnoreBorderPropertyOnRedraw = true
+				//IgnoreBorderPropertyOnRedraw = true
 			};
 			frame.Border.BorderStyle = BorderStyle.Double;
 
 			Application.Top.Add (frame);
 
-			var view1 = new FrameView () {
-				Title = "View 1",
+			var view1 = new View () {
+				//Title = "View 1",
 				Text = "View1 30%/50% Single",
-				X = -1,
-				Y = -1,
-				Width = Dim.Percent (30),
-				Height = Dim.Percent (50),
+				X = 5,
+				Y = 5,
+				Width = Dim.Percent (30) - 5,
+				Height = Dim.Percent (50) - 5,
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
-				Border = new Border () { BorderStyle = BorderStyle.Single }
+				Border = new Border () { 
+					BorderStyle = BorderStyle.Single, 
+					//BorderThickness = new Thickness (1), 
+					DrawMarginFrame = true,
+					//Padding = new Thickness(1),
+					BorderBrush = Color.BrightMagenta,
+					Title = "Border Title"
+				}
 			};
 
 			frame.Add (view1);
 
 			//var view12splitter = new SplitterEventArgs
 
-			var view2 = new FrameView () {
-				Title = "View 2",
-				Text = "View2 right of view1, 30%/70% Single.",
-				X = Pos.Right (view1) - 1,
-				Y = -1,
-				Width = Dim.Percent (30),
-				Height = Dim.Percent (70),
-				ColorScheme = Colors.ColorSchemes ["Error"],
-				Border = new Border () { BorderStyle = BorderStyle.Single }
-			};
+			//var view2 = new FrameView () {
+			//	Title = "View 2",
+			//	Text = "View2 right of view1, 30%/70% Single.",
+			//	X = Pos.Right (view1) - 1,
+			//	Y = -1,
+			//	Width = Dim.Percent (30),
+			//	Height = Dim.Percent (70),
+			//	ColorScheme = Colors.ColorSchemes ["Error"],
+			//	Border = new Border () { BorderStyle = BorderStyle.Single }
+			//};
 
-			frame.Add (view2);
+			//frame.Add (view2);
 
-			var view3 = new FrameView () {
-				Title = "View 3",
-				Text = "View3 right of View2 Fill/Fill Single",
-				X = Pos.Right (view2) - 1,
-				Y = -1,
-				Width = Dim.Fill (-1),
-				Height = Dim.Fill (-1),
-				ColorScheme = Colors.ColorSchemes ["Menu"],
-				Border = new Border () { BorderStyle = BorderStyle.Single }
-			};
+			//var view3 = new FrameView () {
+			//	Title = "View 3",
+			//	Text = "View3 right of View2 Fill/Fill Single",
+			//	X = Pos.Right (view2) - 1,
+			//	Y = -1,
+			//	Width = Dim.Fill (-1),
+			//	Height = Dim.Fill (-1),
+			//	ColorScheme = Colors.ColorSchemes ["Menu"],
+			//	Border = new Border () { BorderStyle = BorderStyle.Single }
+			//};
 
-			frame.Add (view3);
+			//frame.Add (view3);
 
-			var view4 = new FrameView () {
-				Title = "View 4",
-				Text = "View4 below View2 view2.Width/5 Single",
-				X = Pos.Left (view2),
-				Y = Pos.Bottom (view2) - 1,
-				Width = view2.Width,
-				Height = 5,
-				ColorScheme = Colors.ColorSchemes ["TopLevel"],
-				Border = new Border () { BorderStyle = BorderStyle.Single }
-			};
+			//var view4 = new FrameView () {
+			//	Title = "View 4",
+			//	Text = "View4 below View2 view2.Width/5 Single",
+			//	X = Pos.Left (view2),
+			//	Y = Pos.Bottom (view2) - 1,
+			//	Width = view2.Width,
+			//	Height = 5,
+			//	ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			//	Border = new Border () { BorderStyle = BorderStyle.Single }
+			//};
 
-			frame.Add (view4);
+			//frame.Add (view4);
 
-			var view5 = new FrameView () {
-				Title = "View 5",
-				Text = "View5 below View4 view4.Width/5 Double",
-				X = Pos.Left (view2),
-				Y = Pos.Bottom (view4) - 1,
-				Width = view4.Width,
-				Height = 5,
-				ColorScheme = Colors.ColorSchemes ["TopLevel"],
-				Border = new Border () { BorderStyle = BorderStyle.Double }
-			};
+			//var view5 = new FrameView () {
+			//	Title = "View 5",
+			//	Text = "View5 below View4 view4.Width/5 Double",
+			//	X = Pos.Left (view2),
+			//	Y = Pos.Bottom (view4) - 1,
+			//	Width = view4.Width,
+			//	Height = 5,
+			//	ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			//	Border = new Border () { BorderStyle = BorderStyle.Double }
+			//};
 
-			frame.Add (view5);
+			//frame.Add (view5);
 		}
 	}
 }

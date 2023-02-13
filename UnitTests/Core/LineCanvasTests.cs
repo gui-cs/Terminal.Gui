@@ -57,7 +57,7 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[InlineData (BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Rounded)]
 		[Theory, AutoInitShutdown]
 		public void TestLineCanvas_Vertical (BorderStyle style)
 		{
@@ -93,7 +93,7 @@ namespace Terminal.Gui.CoreTests {
 		/// Not when they terminate adjacent to one another.
 		/// </summary>
 		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_Corner_NoOverlap()
+		public void TestLineCanvas_Corner_NoOverlap ()
 		{
 			var v = GetCanvas (out var canvas);
 			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Single);
@@ -127,13 +127,14 @@ namespace Terminal.Gui.CoreTests {
 │
 │";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-		
+
 		}
-		[Fact,AutoInitShutdown]
+
+		[Fact, AutoInitShutdown]
 		public void TestLineCanvas_Window ()
 		{
 			var v = GetCanvas (out var canvas);
-			
+
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Single);
 			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
@@ -156,6 +157,36 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_PositiveLocation ()
+		{
+			var x = 1;
+			var y = 1;
+			var v = GetCanvas (out var canvas, x, y);
+
+			// outer box
+			canvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
+
+
+			canvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+
+ ┌────┬───┐
+ │    │   │
+ ├────┼───┤
+ │    │   │
+ └────┴───┘";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
 		/// <summary>
 		/// Demonstrates when <see cref="BorderStyle.Rounded"/> corners are used. Notice how
 		/// not all lines declare rounded.  If there are 1+ lines intersecting and a corner is
@@ -168,10 +199,10 @@ namespace Terminal.Gui.CoreTests {
 
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Rounded);
-			
+
 			// BorderStyle.Single is ignored because corner overlaps with the above line which is Rounded
 			// this results in a rounded corner being used.
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single); 
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
 			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Rounded);
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Single);
 
@@ -220,8 +251,8 @@ namespace Terminal.Gui.CoreTests {
 
 
 		[Theory, AutoInitShutdown]
-		[InlineData(BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Single)]
+		[InlineData (BorderStyle.Rounded)]
 		public void TestLineCanvas_Window_DoubleTop_SingleSides (BorderStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
@@ -233,7 +264,7 @@ namespace Terminal.Gui.CoreTests {
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical,thinStyle);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, thinStyle);
 			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
 
 			v.Redraw (v.Bounds);
@@ -250,8 +281,8 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData(BorderStyle.Single)]
-		[InlineData(BorderStyle.Rounded)]
+		[InlineData (BorderStyle.Single)]
+		[InlineData (BorderStyle.Rounded)]
 		public void TestLineCanvas_Window_SingleTop_DoubleSides (BorderStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
@@ -259,8 +290,8 @@ namespace Terminal.Gui.CoreTests {
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, thinStyle);
 			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Double);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal,thinStyle);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical,  BorderStyle.Double);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Double);
 
 
 			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
@@ -280,16 +311,16 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		private View GetCanvas (out LineCanvas canvas)
+		private View GetCanvas (out LineCanvas canvas, int x = 0, int y = 0)
 		{
 			var v = new View {
 				Width = 10,
 				Height = 5,
-				Bounds = new Rect (0, 0, 10, 5)
+				Bounds = new Rect (x, y, 10, 5)
 			};
 
-			var canvasCopy = canvas =  new LineCanvas ();
-			v.DrawContentComplete += (r)=> canvasCopy.Draw (v, v.Bounds);
+			var canvasCopy = canvas = new LineCanvas ();
+			v.DrawContentComplete += (r) => canvasCopy.Draw (v, v.Bounds);
 
 			return v;
 		}
