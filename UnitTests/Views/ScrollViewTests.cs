@@ -288,15 +288,15 @@ namespace Terminal.Gui.ViewTests {
 				ContentSize = new Size (50, 50)
 			};
 			for (int i = 0; i < 8; i++) {
-				sv.Add (new CustomButton (Colors.Base, $"Button {i}") { Y = i * 3, Width = 20, Height = 3 });
+				sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
 			}
 			Application.Top.Add (sv);
 			Application.Begin (Application.Top);
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-   ┌────────▲
-   │     But┬
-   └────────┴
+   █████████▲
+   ██████But┬
+   █████████┴
    ┌────────░
    │     But░
    └────────░
@@ -321,12 +321,46 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		private class CustomButton : FrameView {
-			public CustomButton (ColorScheme fill, ustring text)
+			private Label labelFill;
+			private Label labelText;
+
+			public CustomButton (string fill, ustring text, int width, int height)
 			{
-				var labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), ColorScheme = fill };
-				var labelText = new Label (text) { X = Pos.Center () };
+				Width = width;
+				Height = height;
+				labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+				var fillText = new System.Text.StringBuilder ();
+				for (int i = 0; i < Bounds.Height; i++) {
+					if (i > 0) {
+						fillText.AppendLine ("");
+					}
+					for (int j = 0; j < Bounds.Width; j++) {
+						fillText.Append (fill);
+					}
+				}
+				labelFill.Text = fillText.ToString ();
+				labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
 				Add (labelFill, labelText);
 				CanFocus = true;
+			}
+
+			public override bool OnEnter (View view)
+			{
+				Border.BorderStyle = BorderStyle.None;
+				Border.DrawMarginFrame = false;
+				labelFill.Visible = true;
+				view = this;
+				return base.OnEnter (view);
+			}
+
+			public override bool OnLeave (View view)
+			{
+				Border.BorderStyle = BorderStyle.Single;
+				Border.DrawMarginFrame = true;
+				labelFill.Visible = false;
+				if (view == null)
+					view = this;
+				return base.OnLeave (view);
 			}
 		}
 	}
