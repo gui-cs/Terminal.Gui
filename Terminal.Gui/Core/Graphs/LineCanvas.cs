@@ -79,15 +79,20 @@ namespace Terminal.Gui.Graphs {
 		}
 
 		/// <summary>
-		/// Draws all the lines that lie within the <paramref name="bounds"/> onto
-		/// the <paramref name="view"/> client area.  This method should be called from
+		/// Draws all the lines that lie within the <paramref name="sourceRect"/> onto
+		/// the <paramref name="view"/> client area at given <paramref name="drawOffset"/>.
+		///  This method should be called from
 		/// <see cref="View.Redraw(Rect)"/>.
 		/// </summary>
 		/// <param name="view"></param>
-		/// <param name="bounds"></param>
-		public void Draw (View view, Rect bounds)
+		/// <param name="sourceRect">The area of the canvas to draw.</param>
+		/// <param name="drawOffset">The point within the client area of 
+		/// <paramref name="view"/> to draw at.</param>
+		public void Draw (View view, Rect sourceRect, Point? drawOffset = null)
 		{
-			var runes = GenerateImage (bounds);
+			var offset = drawOffset ?? Point.Empty;
+
+			var runes = GenerateImage (sourceRect);
 
 			var runeRows = runes.GetLength (0);
 			var runeCols = runes.GetLength (1);
@@ -97,7 +102,7 @@ namespace Terminal.Gui.Graphs {
 					var rune = runes [y, x];
 
 					if (rune.HasValue) {
-						view.AddRune (bounds.X + x, bounds.Y + y, rune.Value);
+						view.AddRune (offset.X + x, offset.Y + y, rune.Value);
 					}
 				}
 			}

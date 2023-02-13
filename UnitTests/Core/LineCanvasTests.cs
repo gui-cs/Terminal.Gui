@@ -285,32 +285,30 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_PositiveLocation ()
+		public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
 		{
-			var x = 1;
-			var y = 1;
-			var v = GetCanvas (out var canvas, x, y);
+			// Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
+			var v = GetCanvas (out var canvas, 1, 1);
 
 			// outer box
-			canvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 0), 8, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (8, 3), -8, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, BorderStyle.Single);
 
 
-			canvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (5, 0), 3, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 2), 8, Orientation.Horizontal, BorderStyle.Single);
 
 			v.Redraw (v.Bounds);
 
 			string looksLike =
-@"    
-
- ┌────┬───┐
- │    │   │
- ├────┼───┤
- │    │   │
- └────┴───┘";
+@"
+ ┌────┬──┐
+ │    │  │
+ ├────┼──┤
+ └────┴──┘
+";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
@@ -364,19 +362,19 @@ namespace Terminal.Gui.CoreTests {
 		/// at <see cref="View.DrawContentComplete"/> time.
 		/// </summary>
 		/// <param name="canvas">The <see cref="LineCanvas"/> you can draw into.</param>
-		/// <param name="offsetX">How far to offset the <see cref="View.Bounds"/> in X</param>
-		/// <param name="offsetX">How far to offset the <see cref="View.Bounds"/> in Y</param>
+		/// <param name="offsetX">How far to offset drawing in X</param>
+		/// <param name="offsetY">How far to offset drawing in Y</param>
 		/// <returns></returns>
 		private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
 		{
 			var v = new View {
 				Width = 10,
 				Height = 5,
-				Bounds = new Rect (offsetX, offsetY, 10, 5)
+				Bounds = new Rect (0, 0, 10, 5)
 			};
 
 			var canvasCopy = canvas = new LineCanvas ();
-			v.DrawContentComplete += (r) => canvasCopy.Draw (v, v.Bounds);
+			v.DrawContentComplete += (r) => canvasCopy.Draw (v, v.Bounds, new Point(offsetX,offsetY));
 
 			return v;
 		}
