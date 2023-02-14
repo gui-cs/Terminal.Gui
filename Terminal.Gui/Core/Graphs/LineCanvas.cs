@@ -48,64 +48,39 @@ namespace Terminal.Gui.Graphs {
 		}
 		/// <summary>
 		/// Evaluate all currently defined lines that lie within 
-		/// <paramref name="inArea"/> and generate a 'bitmap' that
+		/// <paramref name="inArea"/> and map that
 		/// shows what characters (if any) should be rendered at each
 		/// point so that all lines connect up correctly with appropriate
 		/// intersection symbols.
 		/// <returns></returns>
 		/// </summary>
 		/// <param name="inArea"></param>
-		/// <returns>Map as 2D array where first index is rows and second is column</returns>
-		public Rune? [,] GenerateImage (Rect inArea)
+		/// <returns>Mapping of all the points within <paramref name="inArea"/> to
+		/// line or intersection runes which should be drawn there.</returns>
+		public Dictionary<Point,Rune> GenerateImage (Rect inArea)
 		{
-			Rune? [,] canvas = new Rune? [inArea.Height, inArea.Width];
+			var map = new Dictionary<Point,Rune>();
 
 			// walk through each pixel of the bitmap
-			for (int y = 0; y < inArea.Height; y++) {
-				for (int x = 0; x < inArea.Width; x++) {
+			for (int y = inArea.Y; y < inArea.Height; y++) {
+				for (int x = inArea.X; x < inArea.Width; x++) {
 
 					var intersects = lines
-						.Select (l => l.Intersects (inArea.X + x, inArea.Y + y))
+						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
 
 					// TODO: use Driver and LineStyle to map
-					canvas [y, x] = GetRuneForIntersects (Application.Driver, intersects);
+					var rune = GetRuneForIntersects (Application.Driver, intersects);
 
-				}
-			}
-
-			return canvas;
-		}
-
-		/// <summary>
-		/// Draws all the lines that lie within the <paramref name="sourceRect"/> onto
-		/// the <paramref name="view"/> client area at given <paramref name="drawOffset"/>.
-		///  This method should be called from
-		/// <see cref="View.Redraw(Rect)"/>.
-		/// </summary>
-		/// <param name="view"></param>
-		/// <param name="sourceRect">The area of the canvas to draw.</param>
-		/// <param name="drawOffset">The point within the client area of 
-		/// <paramref name="view"/> to draw at.</param>
-		public void Draw (View view, Rect sourceRect, Point? drawOffset = null)
-		{
-			var offset = drawOffset ?? Point.Empty;
-
-			var runes = GenerateImage (sourceRect);
-
-			var runeRows = runes.GetLength (0);
-			var runeCols = runes.GetLength (1);
-
-			for (int y = 0; y < runeRows; y++) {
-				for (int x = 0; x < runeCols; x++) {
-					var rune = runes [y, x];
-
-					if (rune.HasValue) {
-						view.AddRune (offset.X + x, offset.Y + y, rune.Value);
+					if(rune != null)
+					{
+						map.Add(new Point(x,y),rune.Value);
 					}
 				}
 			}
+
+			return map;
 		}
 
 		private abstract class IntersectionRuneResolver {

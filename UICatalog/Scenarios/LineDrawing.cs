@@ -71,7 +71,12 @@ namespace UICatalog.Scenarios {
 				base.Redraw (bounds);
 
 				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
-				grid.Draw (this, bounds);
+				
+				
+				foreach(var p in grid.GenerateImage(bounds))
+				{
+					this.AddRune(p.Key.X,p.Key.Y,p.Value);
+				}
 
 				foreach (var swatch in swatches) {
 					Driver.SetAttribute (new Terminal.Gui.Attribute (swatch.Value, ColorScheme.Normal.Background));
@@ -151,7 +156,13 @@ namespace UICatalog.Scenarios {
 				foreach (var kvp in colorLayers) {
 
 					Driver.SetAttribute (new Terminal.Gui.Attribute (kvp.Key, ColorScheme.Normal.Background));
-					canvases [kvp.Value].Draw (this, bounds);
+
+					var canvas = canvases [kvp.Value];
+
+					foreach(var p in canvas.GenerateImage(bounds))
+					{
+						this.AddRune(p.Key.X,p.Key.Y,p.Value);
+					}
 				}
 			}
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
