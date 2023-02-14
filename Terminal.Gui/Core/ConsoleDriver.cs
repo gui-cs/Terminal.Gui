@@ -309,7 +309,7 @@ namespace Terminal.Gui {
 		/// Returns <see langword="true"/> if the Attribute is valid (both foreground and background have valid color values).
 		/// </summary>
 		/// <returns></returns>
-		public bool HasValidColors { get => (int)Foreground > -1 && (int)Background != -1; }
+		public bool HasValidColors { get => (int)Foreground > -1 && (int)Background > -1; }
 	}
 
 	/// <summary>
