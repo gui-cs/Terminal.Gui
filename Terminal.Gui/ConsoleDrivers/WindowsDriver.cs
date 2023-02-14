@@ -287,6 +287,9 @@ namespace Terminal.Gui {
 			position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 			SetConsoleOutputWindow (csbi);
 			var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
+			if (!SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+			}
 			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
@@ -1463,7 +1466,7 @@ namespace Terminal.Gui {
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
 				InitalizeColorSchemes ();
-				
+
 				ResizeScreen ();
 				UpdateOffScreen ();
 			} catch (Win32Exception e) {
@@ -1571,7 +1574,7 @@ namespace Terminal.Gui {
 			if (runeWidth < 0 || runeWidth > 0) {
 				ccol++;
 			}
-			
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
