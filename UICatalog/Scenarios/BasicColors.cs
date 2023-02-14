@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Basic Colors", Description: "Show all basic colors.")]
@@ -11,11 +10,10 @@ namespace UICatalog.Scenarios {
 			var vx = 30;
 			var x = 30;
 			var y = 14;
-			var colors = System.Enum.GetValues (typeof (Color)).Cast<Color> ().ToArray ();
+			var colors = System.Enum.GetValues (typeof (Color));
 
-			for (int i = 0; i < colors.Length; i++) {
-				Color bg = colors [i];
-				Attribute attr = new Attribute (bg, colors [colors.Length - 1 - i]);
+			foreach (Color bg in colors) {
+				Attribute attr = new Attribute (bg, colors.Length - 1 - bg);
 				var vl = new Label (bg.ToString (), TextDirection.TopBottom_LeftRight) {
 					X = vx,
 					Y = 0,
