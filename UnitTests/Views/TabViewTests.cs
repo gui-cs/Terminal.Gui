@@ -719,7 +719,7 @@ namespace Terminal.Gui.ViewTests {
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────┐    
-│Les Misérables│    
+│Les Misérables│    
 ◄              └───┐
 │hi2               │
 └──────────────────┘", output);
@@ -756,7 +756,7 @@ namespace Terminal.Gui.ViewTests {
 ┌──────────────────┐
 │hi2               │
 ◄              ┌───┘
-│Les Misérables│    
+│Les Misérables│    
 └──────────────┘    ", output);
 		}
 

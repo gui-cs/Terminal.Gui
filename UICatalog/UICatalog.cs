@@ -1,4 +1,4 @@
-﻿using NStack;
+using NStack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -151,9 +151,8 @@ namespace UICatalog {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
 
-			public FrameView LeftPane;
+			public TileView ContentPane;
 			public ListView CategoryListView;
-			public FrameView RightPane;
 			public ListView ScenarioListView;
 
 			public StatusItem Capslock;
@@ -164,7 +163,7 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				ColorScheme = _colorScheme = Colors.Base;
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
@@ -200,8 +199,7 @@ namespace UICatalog {
 					}),
 					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
-						LeftPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-						RightPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
+						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
 						SetChildNeedsDisplay();
 					}),
@@ -209,17 +207,18 @@ namespace UICatalog {
 					OS
 				};
 
-				LeftPane = new FrameView ("Categories") {
+				ContentPane = new TileView () {
 					X = 0,
 					Y = 1, // for menu
-					Width = 25,
+					Width = Dim.Fill (),
 					Height = Dim.Fill (1),
 					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.C
+					Shortcut = Key.CtrlMask | Key.C,
 				};
-				LeftPane.Title = $"{LeftPane.Title} ({LeftPane.ShortcutTag})";
-				LeftPane.ShortcutAction = () => LeftPane.SetFocus ();
-
+				ContentPane.Border.BorderStyle = BorderStyle.Single;
+				ContentPane.SetSplitterPos (0, 25);
+				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
+					
 				CategoryListView = new ListView (_categories) {
 					X = 0,
 					Y = 0,
@@ -229,21 +228,13 @@ namespace UICatalog {
 					CanFocus = true,
 				};
 				CategoryListView.OpenSelectedItem += (a) => {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
-				LeftPane.Add (CategoryListView);
 
-				RightPane = new FrameView ("Scenarios") {
-					X = 25,
-					Y = 1, // for menu
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					CanFocus = true,
-					Shortcut = Key.CtrlMask | Key.S
-				};
-				RightPane.Title = $"{RightPane.Title} ({RightPane.ShortcutTag})";
-				RightPane.ShortcutAction = () => RightPane.SetFocus ();
+				ContentPane.Tiles.ElementAt(0).Title = "Categories";
+				ContentPane.Tiles.ElementAt (0).MinSize = 2;
+				ContentPane.Tiles.ElementAt (0).ContentView.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
 					X = 0,
@@ -255,12 +246,15 @@ namespace UICatalog {
 				};
 
 				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
-				RightPane.Add (ScenarioListView);
+
+				ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
+				ContentPane.Tiles.ElementAt (1).ContentView.Add (ScenarioListView);
+				ContentPane.Tiles.ElementAt (1).MinSize = 2;
 
 				KeyDown += KeyDownHandler;
 				Add (MenuBar);
-				Add (LeftPane);
-				Add (RightPane);
+				Add (ContentPane);
+
 				Add (StatusBar);
 
 				Loaded += LoadedHandler;
@@ -269,7 +263,7 @@ namespace UICatalog {
 				CategoryListView.SelectedItem = _cachedCategoryIndex;
 				ScenarioListView.SelectedItem = _cachedScenarioIndex;
 			}
-
+ 
 			void LoadedHandler ()
 			{
 				Application.HeightAsBuffer = _heightAsBuffer;
@@ -288,7 +282,7 @@ namespace UICatalog {
 					_isFirstRunning = false;
 				}
 				if (!_isFirstRunning) {
-					RightPane.SetFocus ();
+					ScenarioListView.SetFocus ();
 				}
 				Loaded -= LoadedHandler;
 			}
