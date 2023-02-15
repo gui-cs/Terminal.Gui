@@ -158,32 +158,30 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_PositiveLocation ()
+		public void TestLineCanvas_ScreenCoords ()
 		{
-			var x = 1;
-			var y = 1;
-			var v = GetCanvas (out var canvas, x, y);
+			var x = 3;
+			var y = 5;
+			var screenCanvas = new LineCanvas ();
 
 			// outer box
-			canvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
+			screenCanvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
+			screenCanvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			screenCanvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
+			screenCanvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
 
+			screenCanvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
+			screenCanvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
 
-			canvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
-
-			v.Redraw (v.Bounds);
+			screenCanvas.Draw (null, new Rect (x, y, 10, 5));
 
 			string looksLike =
-@"    
-
- ┌────┬───┐
- │    │   │
- ├────┼───┤
- │    │   │
- └────┴───┘";
+@$"    
+{new string ('\n', y)}{new string (' ', x)}┌────┬───┐
+{new string (' ', x)}│    │   │
+{new string (' ', x)}├────┼───┤
+{new string (' ', x)}│    │   │
+{new string (' ', x)}└────┴───┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 

@@ -27,36 +27,50 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
-			var frame = new FrameView () {
+			var frame1 = new FrameView () {
 				X = 0,
 				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
+				Width = 15, //Dim.Fill (),
+				Height = 15, //Dim.Fill (),
 				//IgnoreBorderPropertyOnRedraw = true
+
 			};
-			frame.Border.BorderStyle = BorderStyle.Double;
+			frame1.Border.BorderStyle = BorderStyle.Double;
 
-			Application.Top.Add (frame);
+			var frame2 = new FrameView () {
+				X = 0,
+				Y = Pos.Bottom (frame1) + 1,
+				Width = 15, //Dim.Fill (),
+				Height = 15, //Dim.Fill (),
+					     //IgnoreBorderPropertyOnRedraw = true
 
-			var view1 = new View () {
+			};
+			frame2.Border.BorderStyle = BorderStyle.Single;
+
+			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+
+			Application.Top.Add (frame1);
+
+			var view1 = new TextField () {
 				//Title = "View 1",
 				Text = "View1 30%/50% Single",
-				X = 5,
-				Y = 5,
-				Width = Dim.Percent (30) - 5,
-				Height = Dim.Percent (50) - 5,
+				X = 0,
+				Y = 0,
+				Width = 14, //Dim.Percent (30) - 5,
+				Height = 14, //Dim.Percent (50) - 5,
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				Border = new Border () { 
 					BorderStyle = BorderStyle.Single, 
 					//BorderThickness = new Thickness (1), 
 					DrawMarginFrame = true,
-					//Padding = new Thickness(1),
+					Padding = new Thickness(1),
 					BorderBrush = Color.BrightMagenta,
 					Title = "Border Title"
 				}
 			};
 
-			frame.Add (view1);
+			frame1.Add (view1);
+			frame2.Add (view1);
 
 			//var view12splitter = new SplitterEventArgs
 
