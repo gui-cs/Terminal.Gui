@@ -134,11 +134,15 @@ namespace UICatalog.Scenarios {
 			private Image<Rgba32>[] fullResImages;
 			private Image<Rgba32>[] matchSizes;
 
+			Rect oldSize = Rect.Empty;
+
+
 			internal void SetImage (Image<Rgba32> image)
 			{
 				frameCount = image.Frames.Count;
 
 				fullResImages = new Image<Rgba32>[frameCount];
+				matchSizes = new Image<Rgba32>[frameCount];
 
 				for(int i=0;i<frameCount-1;i++)
 				{
@@ -150,14 +154,38 @@ namespace UICatalog.Scenarios {
 			}
 			public void NextFrame()
 			{
-				currentFrame = currentFrame+1%frameCount;
+				currentFrame = (currentFrame+1)%frameCount;
 			}
 
 			public override void Redraw (Rect bounds)
 			{
 				base.Redraw (bounds);
+
+				if(oldSize != bounds)
+				{
+					// Invalidate cached images now size has changed
+					matchSizes = new Image<Rgba32>[frameCount];
+					oldSize = bounds;
+				}
+
+				var imgScaled = matchSizes[currentFrame];
+
+				if(imgScaled == null)
+				{
+					var imgFull = fullResImages[currentFrame];
 				
-				var lines = GetBraille();
+					// keep aspect ratio
+					var newSize = Math.Min(bounds.Width,bounds.Height);
+
+					// generate one
+					matchSizes[currentFrame] = imgFull.Clone (
+						x => x.Resize (
+							 newSize * BitmapToBraille.CHAR_HEIGHT,
+							 newSize * BitmapToBraille.CHAR_HEIGHT));
+
+				}
+
+				var lines = GetBraille(matchSizes[currentFrame]);
 
 				for(int y = 0; y < lines.Length;y++)
 				{
@@ -169,10 +197,8 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private string[] GetBraille ()
+			private string[] GetBraille (Image<Rgba32> img)
 			{
-				var img = fullResImages[currentFrame];
-
 				var braille = new BitmapToBraille(
 					img.Width,
 					img.Height,
