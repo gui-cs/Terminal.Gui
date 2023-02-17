@@ -23,16 +23,23 @@ namespace UICatalog.Scenarios {
 		{
 			base.Setup ();
 
-			var x = 0;
-			var y = 0;
 
 			var imageView = new ImageView () {
-				X = x,
-				Y = y++,
 				Width = Dim.Fill(),
-				Height = Dim.Fill(),
+				Height = Dim.Fill()-2,
 			};
+
 			Win.Add (imageView);
+
+			var lbl = new Label("Image by Wikiscient"){
+				Y = Pos.AnchorEnd(2)
+			};
+			Win.Add(lbl);
+
+			var lbl2 = new Label("https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"){
+				Y = Pos.AnchorEnd(1)
+			};
+			Win.Add(lbl2);
 
 			var dir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 			
