@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NStack;
@@ -402,7 +403,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
+		internal Rect NeedDisplay { get; set; } = Rect.Empty;
 
 		// The frame for the object. Superview relative.
 		Rect frame;
@@ -499,8 +500,13 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public Rect Bounds {
+			// BUGBUG: This is crazy. Super restrictive that Bounds.Location is always Empty.
 			get => new Rect (Point.Empty, Frame.Size);
-			set => Frame = new Rect (frame.Location, value.Size);
+			// BUGBUG: This is even more crazy. This does not actually set Bounds, but Frame.
+			set {
+				Debug.Assert (value.Location.IsEmpty);
+				Frame = new Rect (frame.Location, value.Size);
+			}
 		}
 
 		Pos x, y;
@@ -654,6 +660,9 @@ namespace Terminal.Gui {
 		public bool SetMinWidthHeight ()
 		{
 			if (GetMinWidthHeight (out Size size)) {
+				// BUGBUG: Bounds ignores `value` on `set` so what this line of code actually does is
+				// `Frame = new Rect (frame.Location, value.Size);`
+				// ...But... `Bounds.get` simply returns `Frame` with a 0,0 for Location!
 				Bounds = new Rect (Bounds.Location, size);
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				return true;
@@ -906,7 +915,7 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool ChildNeedsDisplay { get; private set; }
+		internal bool ChildNeedsDisplay { get; set; }
 
 		/// <summary>
 		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
@@ -1571,7 +1580,7 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-		Rect GetContainerBounds ()
+		internal Rect GetContainerBounds ()
 		{
 			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
 			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
@@ -2212,8 +2221,9 @@ namespace Terminal.Gui {
 			var r = new Rect (actX, actY, actW, actH);
 			if (Frame != r) {
 				Frame = r;
-				if (!SetMinWidthHeight ())
+				if (!SetMinWidthHeight ()) {
 					TextFormatter.Size = GetBoundsTextFormatterSize ();
+				}
 			}
 		}
 
@@ -2713,6 +2723,7 @@ namespace Terminal.Gui {
 				if (ForceValidatePosDim) {
 					aSize = SetWidthHeight (nBoundsSize);
 				} else {
+					// BUGBUG: `Bounds.set` ignores Location. This line also changes `Frame`
 					Bounds = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
 				}
 			}
@@ -2734,6 +2745,7 @@ namespace Terminal.Gui {
 				height = rH;
 			}
 			if (aSize) {
+				// BUGBUG: `Bounds.set` ignores Location. This line also changes `Frame`
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
@@ -2980,7 +2992,7 @@ namespace Terminal.Gui {
 			Initialized?.Invoke (this, EventArgs.Empty);
 		}
 
-		bool CanBeVisible (View view)
+		internal bool CanBeVisible (View view)
 		{
 			if (!view.Visible) {
 				return false;

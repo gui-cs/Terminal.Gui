@@ -30,41 +30,51 @@ namespace Terminal.Gui {
 	///  the <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and <see cref="Bottom"/> sides
 	///  of the rectangle, respectively.
 	/// </summary>
-	public struct Thickness {
-		/// <summary>
-		/// Gets or sets the width, in integers, of the left side of the bounding rectangle.
-		/// </summary>
-		public int Left;
-		/// <summary>
-		/// Gets or sets the width, in integers, of the upper side of the bounding rectangle.
-		/// </summary>
-		public int Top;
-		/// <summary>
-		/// Gets or sets the width, in integers, of the right side of the bounding rectangle.
-		/// </summary>
-		public int Right;
-		/// <summary>
-		/// Gets or sets the width, in integers, of the lower side of the bounding rectangle.
-		/// </summary>
-		public int Bottom;
+	public class Thickness {
+		private int _left;
+		private int _right;
+		private int _top;
+		private int _bottom;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Thickness"/> structure that has the
-		///  specified uniform length on each side.
-		/// </summary>
-		/// <param name="length"></param>
-		public Thickness (int length)
+		private int validate (int width)
 		{
-			if (length < 0) {
-				throw new ArgumentException ("Invalid value for this property.");
+			if (width < 0) {
+				throw new ArgumentException ("Thickness widths cannot be negative.");
 			}
-
-			Left = Top = Right = Bottom = length;
+			return width;
 		}
+		/// <summary>
+		/// Gets or sets the width of the left side of the rectangle.
+		/// </summary>
+		public int Left { get => _left; set => _left = validate (value); }
+		/// <summary>
+		/// Gets or sets the width of the upper side of the rectangle.
+		/// </summary>
+		public int Top { get => _top; set => _top = validate (value); }
+		/// <summary>
+		/// Gets or sets the width of the right side of the rectangle.
+		/// </summary>
+		public int Right { get => _right; set => _right = validate (value); }
+		/// <summary>
+		/// Gets or sets the width of the lower side of the rectangle.
+		/// </summary>
+		public int Bottom { get => _bottom; set => _bottom = validate (value); }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Thickness"/> structure that has specific
-		///  lengths (supplied as a <see cref="int"/>) applied to each side of the rectangle.
+		/// Initializes a new instance of the <see cref="Thickness"/> class with all widths
+		/// set to 0.
+		/// </summary>
+		public Thickness () { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Thickness"/> class with a uniform width to each side.
+		/// </summary>
+		/// <param name="width"></param>
+		public Thickness (int width) : this (width, width, width, width) { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Thickness"/> class that has specific
+		///  widths applied to each side of the rectangle.
 		/// </summary>
 		/// <param name="left"></param>
 		/// <param name="top"></param>
@@ -72,18 +82,80 @@ namespace Terminal.Gui {
 		/// <param name="bottom"></param>
 		public Thickness (int left, int top, int right, int bottom)
 		{
-			if (left < 0 || top < 0 || right < 0 || bottom < 0) {
-				throw new ArgumentException ("Invalid value for this property.");
-			}
-
 			Left = left;
 			Top = top;
 			Right = right;
 			Bottom = bottom;
 		}
 
-		/// <summary>Returns the fully qualified type name of this instance.</summary>
-		/// <returns>The fully qualified type name.</returns>
+		/// <summary>
+		/// Returns a rectangle describing the location and size of the inner area of <paramref name="rect"/>
+		/// with the thickness widths subracted. The height and width of the retunred rect may be zero.
+		/// </summary>
+		/// <param name="rect">The source rectangle</param>
+		/// <returns></returns>
+		public Rect GetInnerRect (Rect rect)
+		{
+			var width = rect.Size.Width - (Left + Right);
+			var height = rect.Size.Height - (Top + Bottom);
+			var size = new Size (Math.Max (0, width), Math.Max (0, height));
+			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
+		}
+
+		/// <summary>
+		/// Draws the thickness rectangle with an optional diagnostics label.
+		/// </summary>
+		/// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in 
+		/// screen coordinates.</param>
+		/// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
+		/// <returns>The inner rectangle remaining to be drawn.</returns>
+		public Rect Draw (Rect rect, string label = null)
+		{
+			// Draw the Top side
+			for (var r = rect.Y; r < Math.Min (rect.Y + rect.Height, rect.Y + Top); r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Left side
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < Math.Min (rect.X + rect.Width, rect.X + Left); c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Right side			
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X + Math.Max (0, rect.Width - Right); c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Bottom side
+			for (var r = rect.Y + Math.Max (0, rect.Height - Bottom); r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the diagnostics label on the bottom
+			var tf = new TextFormatter () {
+				Text = label == null ? string.Empty : $"{label} {this}",
+				Alignment = TextAlignment.Centered,
+				VerticalAlignment = VerticalTextAlignment.Bottom
+			};
+			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute);
+
+			return GetInnerRect (rect);
+
+		}
+		/// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
+		/// <returns>The thickness widths as a string.</returns>
 		public override string ToString ()
 		{
 			return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})";
@@ -318,10 +390,10 @@ namespace Terminal.Gui {
 
 		private BorderStyle borderStyle;
 		private bool drawMarginFrame;
-		private Thickness borderThickness;
+		private Thickness borderThickness = new Thickness (0);
 		private Color borderBrush;
 		private Color background;
-		private Thickness padding;
+		private Thickness padding = new Thickness (0);
 		private bool effect3D;
 		private Point effect3DOffset = new Point (1, 1);
 		private Attribute? effect3DBrush;
@@ -719,8 +791,8 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (rect.X, rect.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, BorderStyle);
 					lc.AddLine (new Point (rect.X + rect.Width, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
 
-					driver.SetAttribute (new Attribute(Color.Red, Color.BrightYellow));
-					
+					driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
+
 					lc.Draw (null, rect);
 					DrawTitle (Child);
 				}

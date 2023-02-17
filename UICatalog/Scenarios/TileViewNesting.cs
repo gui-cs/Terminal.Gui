@@ -90,9 +90,9 @@ namespace UICatalog.Scenarios {
 		{
 			int numberOfViews = GetNumberOfViews ();
 
-			bool titles = cbTitles.Checked;
-			bool border = cbBorder.Checked;
-			bool startHorizontal = cbHorizontal.Checked;
+			bool titles = cbTitles.Checked.Value;
+			bool border = cbBorder.Checked.Value;
+			bool startHorizontal = cbHorizontal.Checked.Value;
 
 			workArea.RemoveAll ();
 			
@@ -105,9 +105,9 @@ namespace UICatalog.Scenarios {
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
 			root.Tiles.ElementAt(0).ContentView.Add (CreateContentControl (1));
-			root.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View 1" : string.Empty;
+			root.Tiles.ElementAt(0).Title = cbTitles.Checked.Value ? $"View 1" : string.Empty;
 			root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
-			root.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View 2" : string.Empty;
+			root.Tiles.ElementAt(1).Title = cbTitles.Checked.Value ? $"View 2" : string.Empty;
 			
 
 			root.Border.BorderStyle = border ? BorderStyle.Rounded : BorderStyle.None;
@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 
 		private View CreateContentControl (int number)
 		{
-			return cbUseLabels.Checked ?
+			return cbUseLabels.Checked.Value ?
 				CreateLabelView (number) :
 				CreateTextView (number);
 		}
@@ -200,7 +200,7 @@ namespace UICatalog.Scenarios {
 
 			// During splitting the old Title will have been migrated to View1 so we only need
 			// to set the Title on View2 (the one that gets our new TextView)
-			newView.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
+			newView.Tiles.ElementAt(1).Title = cbTitles.Checked.Value ? $"View {viewsCreated}" : string.Empty;
 
 			// Flip orientation
 			newView.Orientation = to.Orientation == Orientation.Vertical ?
@@ -219,8 +219,8 @@ namespace UICatalog.Scenarios {
 				Orientation = orientation
 			};
 
-			toReturn.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
-			toReturn.Tiles.ElementAt (1).Title = cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
+			toReturn.Tiles.ElementAt(0).Title = cbTitles.Checked.Value ? $"View {titleNumber}" : string.Empty;
+			toReturn.Tiles.ElementAt (1).Title = cbTitles.Checked.Value ? $"View {titleNumber + 1}" : string.Empty;
 
 			return toReturn;
 		}
