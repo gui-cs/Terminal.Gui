@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui.Graphs;
 using Xunit;
@@ -2036,6 +2037,45 @@ namespace Terminal.Gui.ViewTests {
 			looksLike =
 @"
  ";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_SplitTop_WholeBottom()
+		{
+			var tileView = new TileView (2) {
+				Width = 20,
+				Height = 10,
+				Orientation = Orientation.Horizontal,
+			};
+			tileView.Border.BorderStyle = BorderStyle.Single;
+
+			Assert.True (tileView.TrySplitTile (0,2,out TileView top));
+
+			top.Tiles.ElementAt (0).ContentView.Add (new Label ("bleh"));
+			top.Tiles.ElementAt (1).ContentView.Add (new Label ("blah"));
+
+			tileView.Tiles.ElementAt (1).ContentView.Add (new Label ("Hello"));
+			tileView.ColorScheme = new ColorScheme ();
+			top.ColorScheme = new ColorScheme ();
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌─────────┬────────┐
+│bleh     │blah    │
+│         │        │
+│         │        │
+│         │        │
+├─────────┴────────┤
+│Hello             │
+│                  │
+│                  │
+└──────────────────┘";
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 

@@ -775,7 +775,7 @@ namespace Terminal.Gui {
 					tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
 				} else {
 					tile.ContentView.X = bounds.X;
-					tile.ContentView.Y = i == 0 ? 0 : Pos.Bottom (visibleSplitterLines [i - 1]);
+					tile.ContentView.Y = i == 0 ? bounds.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
 					tile.ContentView.Width = bounds.Width;
 					tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
