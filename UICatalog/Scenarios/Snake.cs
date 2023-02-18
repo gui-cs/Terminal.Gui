@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,7 +69,12 @@ namespace UICatalog.Scenarios {
 
 				canvas.Draw (this, Bounds);
 
-				AddRune (State.Head.X, State.Head.Y, 'S');
+				for(int i=0;i<State.Snake.Count;i++) {
+
+					var pt = State.Snake [i];
+					AddRune (pt.X, pt.Y, 'S');
+				}
+				
 				AddRune (State.Apple.X, State.Apple.Y, 'A');
 			}
 			public override bool OnKeyDown (KeyEvent keyEvent)
@@ -101,7 +107,7 @@ namespace UICatalog.Scenarios {
 			/// <summary>
 			/// Position of the snakes head
 			/// </summary>
-			public Point Head { get; private set; }
+			public Point Head => Snake.Last ();
 
 			/// <summary>
 			/// Current position of the Apple that the snake has to eat.
@@ -111,13 +117,16 @@ namespace UICatalog.Scenarios {
 			public Direction CurrentDirection { get; private set; }
 			public Direction PlannedDirection { get; set; }
 
+			public List<Point> Snake { get; private set; }
+
 			internal void AdvanceState ()
 			{
 				UpdateDirection ();
 
 				var newHead = GetNewHeadPoint ();
 
-				Head = newHead;
+				Snake.RemoveAt(0);
+				Snake.Add (newHead);
 
 				if(IsDeath(newHead)) {
 					GameOver ();
@@ -182,8 +191,10 @@ namespace UICatalog.Scenarios {
 				Width = width;
 				Height = height;
 
+				var middle = new Point (width / 2, height / 2);
 
-				Head = new Point(width/2,height/2);
+				// Start snake with a length of 2
+				Snake = new List<Point> { middle, middle };
 				Apple = GetNewRandomApplePoint ();
 			}
 
