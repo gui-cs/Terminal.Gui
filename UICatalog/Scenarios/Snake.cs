@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Snake", Description: "The game of apple eating.")]
@@ -22,28 +18,44 @@ namespace UICatalog.Scenarios {
 
 			var state = new SnakeState ();
 
-			state.Reset (100, 20);
+			state.Reset (60, 20);
 
 			var snakeView = new SnakeView (state) {
 				Width = state.Width,
 				Height = state.Height
 			};
 
-			Win.Add (snakeView);
 			
+			Win.Add (snakeView);
+
+			Stopwatch sw = new Stopwatch ();
+
 			Task.Run (() => {
 				while (!isDisposed) {
 
-					state.AdvanceState ();
+					sw.Restart ();
 
-					// When updating from a Thread/Task always use Invoke
-					Application.MainLoop.Invoke (() => {
-						snakeView.SetNeedsDisplay ();
-					});
+					if(state.AdvanceState ()) {
 
-					Task.Delay (100).Wait ();
+						// When updating from a Thread/Task always use Invoke
+						Application.MainLoop.Invoke (() => {
+							snakeView.SetNeedsDisplay ();
+						});
+					}
+
+					var wait = 50 - sw.ElapsedMilliseconds;
+
+					if(wait > 0) {
+						Task.Delay ((int)wait).Wait ();
+					}
 				}
 			});
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			isDisposed = true;
 		}
 
 		private class SnakeView : View {
@@ -67,13 +79,26 @@ namespace UICatalog.Scenarios {
 				canvas.AddLine (new Point (0, State.Height-1), State.Width-1, Orientation.Horizontal, BorderStyle.Double);
 				canvas.AddLine (new Point (State.Width-1, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
 
-				canvas.Draw (this, Bounds);
+				for (int i = 1; i < State.Snake.Count; i++) {
 
-				for(int i=0;i<State.Snake.Count;i++) {
+					var pt1 = State.Snake [i-1];
+					var pt2 = State.Snake [i];
 
-					var pt = State.Snake [i];
-					AddRune (pt.X, pt.Y, 'S');
+					var orientation = pt1.X == pt2.X ? Orientation.Vertical : Orientation.Horizontal;
+					var length = orientation == Orientation.Horizontal
+						? pt1.X > pt2.X ? 1 : -1
+						: pt1.Y > pt2.Y ? 1 : -1;
+
+					canvas.AddLine (
+						pt2,
+						length,
+						orientation,
+						BorderStyle.Single);
+
 				}
+
+				canvas.Draw (this, Bounds);
+				
 				
 				AddRune (State.Apple.X, State.Apple.Y, 'A');
 			}
@@ -101,6 +126,9 @@ namespace UICatalog.Scenarios {
 		}
 		private class SnakeState {
 
+			public const int StartingLength = 10;
+			public const int AppleGrowRate = 5;
+
 			public int Width { get; private set; }
 			public int Height { get; private set; }
 
@@ -119,8 +147,18 @@ namespace UICatalog.Scenarios {
 
 			public List<Point> Snake { get; private set; }
 
-			internal void AdvanceState ()
+			int step;
+
+			internal bool AdvanceState ()
 			{
+				step++;
+
+				if(step < GetStepVelocity()) {
+					return false;
+				}
+
+				step = 0;
+
 				UpdateDirection ();
 
 				var newHead = GetNewHeadPoint ();
@@ -132,6 +170,33 @@ namespace UICatalog.Scenarios {
 					GameOver ();
 				}
 
+				if(newHead == Apple) {
+					GrowSnake (AppleGrowRate);
+					Apple = GetNewRandomApplePoint ();
+				}
+
+				return true;
+			}
+
+			private int GetStepVelocity ()
+			{
+				if(CurrentDirection == Direction.Left || CurrentDirection == Direction.Right) {
+					return 1;
+				}
+
+				return 2;
+			}
+
+			public void GrowSnake ()
+			{
+				var tail = Snake.First ();
+				Snake.Insert (0, tail);
+			}
+			public void GrowSnake(int amount)
+			{
+				for (int i = 0; i < amount; i++) {
+					GrowSnake ();
+				}
 			}
 
 			private void UpdateDirection ()
@@ -196,6 +261,8 @@ namespace UICatalog.Scenarios {
 				// Start snake with a length of 2
 				Snake = new List<Point> { middle, middle };
 				Apple = GetNewRandomApplePoint ();
+
+				GrowSnake (StartingLength);
 			}
 
 			private Point GetNewRandomApplePoint ()
@@ -236,7 +303,8 @@ namespace UICatalog.Scenarios {
 					return true;
 				}
 
-				//TODO: if over snakes body
+				if (Snake.Take (Snake.Count - 1).Contains (p))
+					return true;
 
 				return false;
 			}
