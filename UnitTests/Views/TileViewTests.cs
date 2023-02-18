@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Terminal.Gui;
 using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
@@ -60,7 +59,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -100,7 +99,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -141,9 +140,10 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused_50PercentSplit ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -209,7 +209,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -254,7 +254,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -298,7 +298,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -342,7 +342,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -386,8 +386,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelAtStart ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (0);
 
 			tileView.Redraw (tileView.Bounds);
@@ -405,8 +403,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelMiddle ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (1);
 
 			tileView.Redraw (tileView.Bounds);
@@ -424,8 +420,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelAtEnd ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (2);
 
 			tileView.Redraw (tileView.Bounds);
@@ -445,7 +439,9 @@ namespace Terminal.Gui.ViewTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
+			Assert.True (line.HasFocus);
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -485,9 +481,9 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
@@ -2245,13 +2241,6 @@ namespace Terminal.Gui.ViewTests {
 		private LineView GetLine (TileView tileView)
 		{
 			return tileView.Subviews.OfType<LineView> ().Single ();
-		}
-
-		private void SetInputFocusLine (TileView tileView)
-		{
-			var line = GetLine (tileView);
-			line.SetFocus ();
-			Assert.True (line.HasFocus);
 		}
 
 
