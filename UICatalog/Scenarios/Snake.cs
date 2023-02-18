@@ -25,7 +25,7 @@ namespace UICatalog.Scenarios {
 				Height = state.Height
 			};
 
-			
+
 			Win.Add (snakeView);
 
 			Stopwatch sw = new Stopwatch ();
@@ -35,17 +35,17 @@ namespace UICatalog.Scenarios {
 
 					sw.Restart ();
 
-					if(state.AdvanceState ()) {
+					if (state.AdvanceState ()) {
 
 						// When updating from a Thread/Task always use Invoke
-						Application.MainLoop.Invoke (() => {
+						Application.MainLoop?.Invoke (() => {
 							snakeView.SetNeedsDisplay ();
 						});
 					}
 
 					var wait = 50 - sw.ElapsedMilliseconds;
 
-					if(wait > 0) {
+					if (wait > 0) {
 						Task.Delay ((int)wait).Wait ();
 					}
 				}
@@ -74,14 +74,14 @@ namespace UICatalog.Scenarios {
 
 				var canvas = new LineCanvas ();
 
-				canvas.AddLine (new Point (0, 0), State.Width-1, Orientation.Horizontal, BorderStyle.Double);
-				canvas.AddLine (new Point (0, 0), State.Height-1, Orientation.Vertical, BorderStyle.Double);
-				canvas.AddLine (new Point (0, State.Height-1), State.Width-1, Orientation.Horizontal, BorderStyle.Double);
-				canvas.AddLine (new Point (State.Width-1, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
+				canvas.AddLine (new Point (0, 0), State.Width - 1, Orientation.Horizontal, BorderStyle.Double);
+				canvas.AddLine (new Point (0, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
+				canvas.AddLine (new Point (0, State.Height - 1), State.Width - 1, Orientation.Horizontal, BorderStyle.Double);
+				canvas.AddLine (new Point (State.Width - 1, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
 
 				for (int i = 1; i < State.Snake.Count; i++) {
 
-					var pt1 = State.Snake [i-1];
+					var pt1 = State.Snake [i - 1];
 					var pt2 = State.Snake [i];
 
 					var orientation = pt1.X == pt2.X ? Orientation.Vertical : Orientation.Horizontal;
@@ -98,13 +98,13 @@ namespace UICatalog.Scenarios {
 				}
 
 				canvas.Draw (this, Bounds);
-				
-				
+
+
 				AddRune (State.Apple.X, State.Apple.Y, 'A');
 			}
 			public override bool OnKeyDown (KeyEvent keyEvent)
 			{
-				if(keyEvent.Key == Key.CursorUp) {
+				if (keyEvent.Key == Key.CursorUp) {
 					State.PlannedDirection = Direction.Up;
 					return true;
 				}
@@ -153,7 +153,7 @@ namespace UICatalog.Scenarios {
 			{
 				step++;
 
-				if(step < GetStepVelocity()) {
+				if (step < GetStepVelocity ()) {
 					return false;
 				}
 
@@ -163,14 +163,14 @@ namespace UICatalog.Scenarios {
 
 				var newHead = GetNewHeadPoint ();
 
-				Snake.RemoveAt(0);
+				Snake.RemoveAt (0);
 				Snake.Add (newHead);
 
-				if(IsDeath(newHead)) {
+				if (IsDeath (newHead)) {
 					GameOver ();
 				}
 
-				if(newHead == Apple) {
+				if (newHead == Apple) {
 					GrowSnake (AppleGrowRate);
 					Apple = GetNewRandomApplePoint ();
 				}
@@ -180,7 +180,7 @@ namespace UICatalog.Scenarios {
 
 			private int GetStepVelocity ()
 			{
-				if(CurrentDirection == Direction.Left || CurrentDirection == Direction.Right) {
+				if (CurrentDirection == Direction.Left || CurrentDirection == Direction.Right) {
 					return 1;
 				}
 
@@ -192,7 +192,7 @@ namespace UICatalog.Scenarios {
 				var tail = Snake.First ();
 				Snake.Insert (0, tail);
 			}
-			public void GrowSnake(int amount)
+			public void GrowSnake (int amount)
 			{
 				for (int i = 0; i < amount; i++) {
 					GrowSnake ();
@@ -201,18 +201,18 @@ namespace UICatalog.Scenarios {
 
 			private void UpdateDirection ()
 			{
-				if(!AreOpposites(CurrentDirection,PlannedDirection)) {
+				if (!AreOpposites (CurrentDirection, PlannedDirection)) {
 					CurrentDirection = PlannedDirection;
 				}
 			}
 
 			private bool AreOpposites (Direction a, Direction b)
 			{
-				switch(a) {
-					case Direction.Left: return b == Direction.Right;
-					case Direction.Right: return b == Direction.Left;
-					case Direction.Up: return b == Direction.Down;
-					case Direction.Down: return b == Direction.Up;
+				switch (a) {
+				case Direction.Left: return b == Direction.Right;
+				case Direction.Right: return b == Direction.Left;
+				case Direction.Up: return b == Direction.Down;
+				case Direction.Down: return b == Direction.Up;
 				}
 
 				return false;
@@ -233,7 +233,7 @@ namespace UICatalog.Scenarios {
 					return new Point (Head.X + 1, Head.Y);
 
 				case Direction.Up:
-					return new Point (Head.X, Head.Y -1);
+					return new Point (Head.X, Head.Y - 1);
 
 				case Direction.Down:
 					return new Point (Head.X, Head.Y + 1);
@@ -267,9 +267,9 @@ namespace UICatalog.Scenarios {
 
 			private Point GetNewRandomApplePoint ()
 			{
-				Random r = new Random();
+				Random r = new Random ();
 
-				for(int i = 0;i<1000;i++) {
+				for (int i = 0; i < 1000; i++) {
 					var x = r.Next (0, Width);
 					var y = r.Next (0, Height);
 
@@ -289,17 +289,17 @@ namespace UICatalog.Scenarios {
 				// Game is won or we are unable to generate a valid apple
 				// point after 1000 attempts.  Maybe screen size is very small
 				// or something.  Either way restart the game.
-				Reset(Width, Height);
+				Reset (Width, Height);
 				return Apple;
 			}
 
 			private bool IsDeath (Point p)
 			{
-				if(p.X <= 0 || p.X >= Width-1) {
+				if (p.X <= 0 || p.X >= Width - 1) {
 					return true;
 				}
 
-				if (p.Y <= 0 || p.Y >= Height-1) {
+				if (p.Y <= 0 || p.Y >= Height - 1) {
 					return true;
 				}
 
