@@ -43,7 +43,7 @@ namespace UICatalog.Scenarios {
 						});
 					}
 
-					var wait = 50 - sw.ElapsedMilliseconds;
+					var wait = state.SleepAfterAdvancingState - sw.ElapsedMilliseconds;
 
 					if (wait > 0) {
 						Task.Delay ((int)wait).Wait ();
@@ -128,6 +128,8 @@ namespace UICatalog.Scenarios {
 
 			public const int StartingLength = 10;
 			public const int AppleGrowRate = 5;
+			public const int StartingSpeed = 50;
+			public const int MaxSpeed = 15;
 
 			public int Width { get; private set; }
 			public int Height { get; private set; }
@@ -146,6 +148,8 @@ namespace UICatalog.Scenarios {
 			public Direction PlannedDirection { get; set; }
 
 			public List<Point> Snake { get; private set; }
+
+			public int SleepAfterAdvancingState { get; private set; } = StartingSpeed;
 
 			int step;
 
@@ -173,6 +177,15 @@ namespace UICatalog.Scenarios {
 				if (newHead == Apple) {
 					GrowSnake (AppleGrowRate);
 					Apple = GetNewRandomApplePoint ();
+
+					var delta = 5;
+					if(SleepAfterAdvancingState < 30) {
+						delta = 3;
+					}
+					if (SleepAfterAdvancingState < 20) {
+						delta = 2;
+					}
+					SleepAfterAdvancingState = Math.Max (MaxSpeed, SleepAfterAdvancingState - delta);
 				}
 
 				return true;
@@ -261,6 +274,8 @@ namespace UICatalog.Scenarios {
 				// Start snake with a length of 2
 				Snake = new List<Point> { middle, middle };
 				Apple = GetNewRandomApplePoint ();
+
+				SleepAfterAdvancingState = StartingSpeed;
 
 				GrowSnake (StartingLength);
 			}
