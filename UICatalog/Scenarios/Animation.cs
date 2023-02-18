@@ -56,6 +56,7 @@ namespace UICatalog.Scenarios {
 			Task.Run(()=>{
 				while(!isDisposed)
 				{
+					// When updating from a Thread/Task always use Invoke
 					Application.MainLoop.Invoke(()=>
 					{
 						imageView.NextFrame();
@@ -140,6 +141,7 @@ namespace UICatalog.Scenarios {
 
 			private Image<Rgba32>[] fullResImages;
 			private Image<Rgba32>[] matchSizes;
+			private string[] brailleCache;
 
 			Rect oldSize = Rect.Empty;
 
@@ -150,6 +152,7 @@ namespace UICatalog.Scenarios {
 
 				fullResImages = new Image<Rgba32>[frameCount];
 				matchSizes = new Image<Rgba32>[frameCount];
+				brailleCache = new string[frameCount];
 
 				for(int i=0;i<frameCount-1;i++)
 				{
@@ -172,10 +175,12 @@ namespace UICatalog.Scenarios {
 				{
 					// Invalidate cached images now size has changed
 					matchSizes = new Image<Rgba32>[frameCount];
+					brailleCache = new string[frameCount];
 					oldSize = bounds;
 				}
 
 				var imgScaled = matchSizes[currentFrame];
+				var braille = brailleCache[currentFrame];
 
 				if(imgScaled == null)
 				{
@@ -185,14 +190,19 @@ namespace UICatalog.Scenarios {
 					var newSize = Math.Min(bounds.Width,bounds.Height);
 
 					// generate one
-					matchSizes[currentFrame] = imgFull.Clone (
+					matchSizes[currentFrame] = imgScaled = imgFull.Clone (
 						x => x.Resize (
 							 newSize * BitmapToBraille.CHAR_HEIGHT,
 							 newSize * BitmapToBraille.CHAR_HEIGHT));
-
 				}
 
-				var lines = GetBraille(matchSizes[currentFrame]);
+				if(braille == null)
+				{
+					brailleCache[currentFrame] = braille = GetBraille(matchSizes[currentFrame]);
+				}
+
+
+				var lines = braille.Split('\n');
 
 				for(int y = 0; y < lines.Length;y++)
 				{
@@ -204,15 +214,14 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private string[] GetBraille (Image<Rgba32> img)
+			private string GetBraille (Image<Rgba32> img)
 			{
 				var braille = new BitmapToBraille(
 					img.Width,
 					img.Height,
 					(x,y)=>IsLit(img,x,y));
 
-				var pix = braille.GenerateImage();
-				return pix.Split('\n');
+				return braille.GenerateImage();
 			}
 
 			private bool IsLit (Image<Rgba32> img, int x, int y)
