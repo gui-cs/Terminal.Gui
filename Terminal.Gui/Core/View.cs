@@ -1564,10 +1564,10 @@ namespace Terminal.Gui {
 
 		Rect GetNeedDisplay (Rect containerBounds)
 		{
-			Rect rect = Rect.Empty;
+			Rect rect = NeedDisplay;
 			if (!containerBounds.IsEmpty) {
-				rect.Width = Math.Min (Bounds.Width, containerBounds.Width);
-				rect.Height = Math.Min (Bounds.Height, containerBounds.Height);
+				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
+				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
 			}
 
 			return rect;
