@@ -1013,8 +1013,6 @@ namespace Terminal.Gui {
 				return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
 			case Color.White:
 				return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.Invalid:
-				return Curses.COLOR_BLACK; 
 			}
 			throw new ArgumentException ("Invalid color code");
 		}
