@@ -129,7 +129,7 @@ namespace UICatalog.Scenarios {
 			public const int StartingLength = 10;
 			public const int AppleGrowRate = 5;
 			public const int StartingSpeed = 50;
-			public const int MaxSpeed = 15;
+			public const int MaxSpeed = 20;
 
 			public int Width { get; private set; }
 			public int Height { get; private set; }
@@ -179,10 +179,10 @@ namespace UICatalog.Scenarios {
 					Apple = GetNewRandomApplePoint ();
 
 					var delta = 5;
-					if(SleepAfterAdvancingState < 30) {
+					if(SleepAfterAdvancingState < 40) {
 						delta = 3;
 					}
-					if (SleepAfterAdvancingState < 20) {
+					if (SleepAfterAdvancingState < 30) {
 						delta = 2;
 					}
 					SleepAfterAdvancingState = Math.Max (MaxSpeed, SleepAfterAdvancingState - delta);
