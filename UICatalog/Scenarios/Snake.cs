@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Snake", Description: "The game of apple eating.")]
@@ -60,17 +61,31 @@ namespace UICatalog.Scenarios {
 
 		private class SnakeView : View {
 
+			private Attribute red = new Terminal.Gui.Attribute (Color.Red,Color.Black);
+			private Attribute white = new Terminal.Gui.Attribute (Color.White, Color.Black);
+
 			public SnakeState State { get; }
 
 			public SnakeView (SnakeState state)
 			{
 				State = state;
 				CanFocus = true;
+
+				ColorScheme = new ColorScheme {
+					Normal = white,
+					Focus = white,
+					HotNormal = white,
+					HotFocus = white,
+					Disabled = white
+				};
 			}
 
 			public override void Redraw (Rect bounds)
 			{
 				base.Redraw (bounds);
+
+				Driver.SetAttribute (white);
+				Clear ();
 
 				var canvas = new LineCanvas ();
 
@@ -100,7 +115,9 @@ namespace UICatalog.Scenarios {
 				canvas.Draw (this, Bounds);
 
 
+				Driver.SetAttribute (red);
 				AddRune (State.Apple.X, State.Apple.Y, 'A');
+				Driver.SetAttribute (white);
 			}
 			public override bool OnKeyDown (KeyEvent keyEvent)
 			{
