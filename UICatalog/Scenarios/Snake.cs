@@ -55,8 +55,8 @@ namespace UICatalog.Scenarios {
 
 		protected override void Dispose (bool disposing)
 		{
-			base.Dispose (disposing);
 			isDisposed = true;
+			base.Dispose (disposing);
 		}
 
 		private class SnakeView : View {
