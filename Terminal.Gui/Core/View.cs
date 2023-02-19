@@ -951,6 +951,10 @@ namespace Terminal.Gui {
 				view.tabIndex = tabIndexes.IndexOf (view);
 				addingView = false;
 			}
+			if (view.Enabled && !Enabled) {
+				view.oldEnabled = true;
+				view.Enabled = false;
+			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			OnAdded (view);
@@ -1303,14 +1307,16 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (focused?.Visible == true && focused?.Enabled == true && focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
+			if (focused == null && SuperView != null) {
+				SuperView.EnsureFocus ();
+			} else if (focused?.Visible == true && focused?.Enabled == true && focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
 				focused.PositionCursor ();
+			} else if (focused?.Visible == true && focused?.Enabled == false) {
+				focused = null;
+			} else if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
+				Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
 			} else {
-				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
-					Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
-				} else {
-					Move (frame.X, frame.Y);
-				}
+				Move (frame.X, frame.Y);
 			}
 		}
 
@@ -1504,13 +1510,17 @@ namespace Terminal.Gui {
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+				if (!IgnoreHasFocusPropertyOnRedraw) {
+					Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+				} else {
+					Driver.SetAttribute (GetNormalColor ());
+				}
 			}
 
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
-				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
+				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
 				Clear ();
@@ -1525,8 +1535,8 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				    containerBounds);
 			}
 
@@ -2617,7 +2627,13 @@ namespace Terminal.Gui {
 			get => base.Enabled;
 			set {
 				if (base.Enabled != value) {
-					base.Enabled = value;
+					if (value) {
+						if (SuperView == null || SuperView?.Enabled == true) {
+							base.Enabled = value;
+						}
+					} else {
+						base.Enabled = value;
+					}
 					if (!value && HasFocus) {
 						SetHasFocus (false, this);
 					}
@@ -2684,7 +2700,16 @@ namespace Terminal.Gui {
 		/// to draw the view's border. If <see langword="true"/> no border is drawn (and the view is expected to draw the border
 		/// itself).
 		/// </summary>
-		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; } = false;
+		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; }
+
+		/// <summary>
+		/// Get or sets whether the view will use <see cref="Terminal.Gui.View.HasFocus"/> 
+		/// to set the <see cref="Terminal.Gui.ColorScheme.Focus"/> color if it's focused.
+		/// If <see langword="false"/> (the default), <see cref="View.Redraw(Rect)"/> will call <see cref="GetFocusColor"/>
+		/// or the <see cref="GetNormalColor"/> method.
+		/// If <see langword="true"/> only the <see cref="GetNormalColor"/> will be called.
+		/// </summary>
+		public virtual bool IgnoreHasFocusPropertyOnRedraw { get; set; }
 
 		/// <summary>
 		/// Pretty prints the View
@@ -3107,6 +3132,17 @@ namespace Terminal.Gui {
 		public virtual Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+		}
+
+		/// <summary>
+		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
+		/// </summary>
+		/// <returns><see cref="Terminal.Gui.ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/>
+		/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
+		/// If it's overridden can return other values.</returns>
+		public virtual Attribute GetFocusColor ()
+		{
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		/// <summary>

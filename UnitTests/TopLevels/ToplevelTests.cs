@@ -1011,5 +1011,25 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.True (isEnter);
 			Assert.False (isLeave);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
+		{
+			var tf = new TextField ("test") { Width = 5 };
+			var view = new View () { Width = 10, Height = 10 };
+			view.Add (tf);
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			Assert.True (tf.HasFocus);
+			Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
+			Assert.Equal (CursorVisibility.Default, cursor);
+
+			view.Enabled = false;
+			Assert.False (tf.HasFocus);
+			Application.Refresh ();
+			Application.Driver.GetCursorVisibility (out cursor);
+			Assert.Equal (CursorVisibility.Invisible, cursor);
+		}
 	}
 }

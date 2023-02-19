@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -4208,6 +4209,7 @@ cccccccccccccccccccc", output);
 				v.CanFocus = true;
 				Assert.False (v.HasFocus);
 				v.SetFocus ();
+				Assert.True (v.HasFocus);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
 111111111111111111110", attributes);
@@ -4488,6 +4490,118 @@ At 0,0
                              
   A text with some long width
    A text witith two lines.  ", output);
+		}
+
+		[Fact]
+		public void Add_Enable_False_Also_Set_Subview_Enable_To_False ()
+		{
+			var view = new View () { Enabled = false };
+			var label = new Label ();
+
+			Assert.False (view.Enabled);
+			Assert.True (label.Enabled);
+
+			view.Add (label);
+			Assert.False (view.Enabled);
+			Assert.False (label.Enabled);
+
+			view.Enabled = true;
+			Assert.True (view.Enabled);
+			Assert.True (label.Enabled);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IgnoreHasFocusPropertyOnRedraw_Gets_Sets ()
+		{
+			var view = new View () { X = 1, Y = 1, Width = 5, Height = 5, ColorScheme = Colors.Base };
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			Assert.False (view.IgnoreHasFocusPropertyOnRedraw);
+			Assert.False (view.CanFocus);
+			Assert.False (view.HasFocus);
+
+			var attributes = new Attribute [] {
+				Colors.TopLevel.Normal,
+				Colors.Base.Normal,
+				Colors.Base.Focus
+			};
+
+			TestHelpers.AssertDriverColorsAre (@"
+0000000
+0111110
+0111110
+0111110
+0111110
+0111110
+0000000", attributes);
+
+			view.CanFocus = true;
+			Assert.False (view.IgnoreHasFocusPropertyOnRedraw);
+			Assert.True (view.CanFocus);
+			view.SetFocus ();
+			Assert.True (view.HasFocus);
+			Application.Refresh ();
+			TestHelpers.AssertDriverColorsAre (@"
+0000000
+0222220
+0222220
+0222220
+0222220
+0222220
+0000000", attributes);
+
+			view.IgnoreHasFocusPropertyOnRedraw = true;
+			Application.Refresh ();
+			Assert.True (view.IgnoreHasFocusPropertyOnRedraw);
+			Assert.True (view.CanFocus);
+			Assert.True (view.HasFocus);
+			TestHelpers.AssertDriverColorsAre (@"
+0000000
+0111110
+0111110
+0111110
+0111110
+0111110
+0000000", attributes);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void CanFocus_False_Set_To_True_Also_FocusFirst_If_Focused_Is_Null ()
+		{
+			var top = Application.Top;
+			var view = new View () { X = 1, Y = 1, Width = 5, Height = 5 };
+			top.Add (view);
+			Application.Begin (top);
+
+			Assert.False (view.CanFocus);
+			Assert.False (view.HasFocus);
+
+			view.CanFocus = true;
+			Application.Refresh ();
+			Assert.True (view.CanFocus);
+			Assert.True (view.HasFocus);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Focused_MostFocused ()
+		{
+			var lv = new ListView (new List<string> () { "one", "two", "three" }) {
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+			var fv = new FrameView ("List") { Width = 10, Height = 10 };
+			fv.Add (lv);
+			Application.Top.Add (fv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (fv, Application.Top.Focused);
+			Assert.Equal (fv.Subviews [0], fv.Focused);
+			Assert.Equal (lv, fv.Subviews [0].Focused);
+
+			Assert.Equal (lv, Application.Top.MostFocused);
+			Assert.Equal (lv, fv.MostFocused);
+			Assert.Equal (lv, fv.Subviews [0].MostFocused);
 		}
 	}
 }
