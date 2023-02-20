@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
@@ -30,7 +31,7 @@ namespace Terminal.Gui {
 	///  the <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and <see cref="Bottom"/> sides
 	///  of the rectangle, respectively.
 	/// </summary>
-	public class Thickness {
+	public class Thickness : IEquatable<Thickness> {
 		private int _left;
 		private int _right;
 		private int _top;
@@ -167,8 +168,7 @@ namespace Terminal.Gui {
 			if ((obj == null) || !this.GetType ().Equals (obj.GetType ())) {
 				return false;
 			} else {
-				Thickness t = (Thickness)obj;
-				return (_top == t._top) && (_left == t._left) && (_right == t._right) && (_bottom == t._bottom);
+				return Equals ((Thickness)obj);
 			}
 		}
 
@@ -177,6 +177,36 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})";
+		}
+
+		// IEquitable
+		public bool Equals (Thickness other)
+		{
+			return other is not null &&
+			       _left == other._left &&
+			       _right == other._right &&
+			       _top == other._top &&
+			       _bottom == other._bottom;
+		}
+
+		public override int GetHashCode ()
+		{
+			int hashCode = 1380952125;
+			hashCode = hashCode * -1521134295 + _left.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _right.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _top.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _bottom.GetHashCode ();
+			return hashCode;
+		}
+
+		public static bool operator == (Thickness left, Thickness right)
+		{
+			return EqualityComparer<Thickness>.Default.Equals (left, right);
+		}
+
+		public static bool operator != (Thickness left, Thickness right)
+		{
+			return !(left == right);
 		}
 	}
 
@@ -798,22 +828,35 @@ namespace Terminal.Gui {
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
-				var rect = Child.ViewToScreen (new Rect (-1, -1, Child.Frame.Width + 2, Child.Frame.Height + 2));
+
+				var rect = new Rect () {
+					X = frame.X - drawMarginFrame,
+					Y = frame.Y - drawMarginFrame,
+					Width = frame.Width + (2 * drawMarginFrame),
+					Height = frame.Height + (2 * drawMarginFrame)
+				};
 				if (rect.Width > 0 && rect.Height > 0) {
-
-					var lc = new LineCanvas ();
-
-					lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, BorderStyle);
-
-					lc.AddLine (new Point (rect.X, rect.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (new Point (rect.X + rect.Width, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
-
-					//driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
-
-					lc.Draw (null, rect);
+					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
 					DrawTitle (Child);
 				}
+
+				//var rect = Child.ViewToScreen (new Rect (-1, -1, Child.Frame.Width + 2, Child.Frame.Height + 2));
+				//if (rect.Width > 0 && rect.Height > 0) {
+
+				//	var lc = new LineCanvas ();
+
+				//	lc.AddLine (rect.Location, rect.Width-1, Orientation.Horizontal, BorderStyle);
+				//	lc.AddLine (rect.Location, rect.Height-1, Orientation.Vertical, BorderStyle);
+
+				//	lc.AddLine (new Point (rect.X, rect.Y + rect.Height-1), rect.Width, Orientation.Horizontal, BorderStyle);
+				//	lc.AddLine (new Point (rect.X + rect.Width-1, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
+
+				//	//driver.SetAttribute (new Attribute(Color.Red, Color.BrightYellow));
+				//	foreach (var p in lc.GenerateImage (rect)) {
+				//		AddRuneAt (driver, p.Key.X, p.Key.Y, p.Value);
+				//	}
+				//	DrawTitle (Child);
+				//}
 			}
 
 			if (Effect3D) {

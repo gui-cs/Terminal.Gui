@@ -12,6 +12,7 @@ namespace Terminal.Gui.Graphs {
 	public class LineCanvas {
 
 
+
 		private List<StraightLine> lines = new List<StraightLine> ();
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
@@ -48,60 +49,39 @@ namespace Terminal.Gui.Graphs {
 		}
 		/// <summary>
 		/// Evaluate all currently defined lines that lie within 
-		/// <paramref name="bounds"/> and generate a 'bitmap' that
+		/// <paramref name="inArea"/> and map that
 		/// shows what characters (if any) should be rendered at each
 		/// point so that all lines connect up correctly with appropriate
 		/// intersection symbols.
 		/// <returns></returns>
 		/// </summary>
-		/// <param name="bounds"></param>
-		/// <returns>Map as 2D array where first index is rows and second is column</returns>
-		public Rune? [,] GenerateImage (Rect inArea)
+		/// <param name="inArea"></param>
+		/// <returns>Mapping of all the points within <paramref name="inArea"/> to
+		/// line or intersection runes which should be drawn there.</returns>
+		public Dictionary<Point,Rune> GenerateImage (Rect inArea)
 		{
-			Rune? [,] canvas = new Rune? [inArea.Height, inArea.Width];
+			var map = new Dictionary<Point,Rune>();
 
 			// walk through each pixel of the bitmap
-			for (int y = 0; y < inArea.Height; y++) {
-				for (int x = 0; x < inArea.Width; x++) {
+			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
+				for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
 
 					var intersects = lines
-						.Select (l => l.Intersects (inArea.X + x, inArea.Y + y))
+						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
 
 					// TODO: use Driver and LineStyle to map
-					canvas [y, x] = GetRuneForIntersects (Application.Driver, intersects);
+					var rune = GetRuneForIntersects (Application.Driver, intersects);
 
-				}
-			}
-
-			return canvas;
-		}
-
-		/// <summary>
-		/// Draws all the lines that lie within the <paramref name="bounds"/> onto
-		/// the <paramref name="view"/> client area.  This method should be called from
-		/// <see cref="View.Redraw(Rect)"/>.
-		/// </summary>
-		/// <param name="view"></param>
-		/// <param name="bounds"></param>
-		public void Draw (View view, Rect bounds)
-		{
-			var runes = GenerateImage (bounds);
-
-			for (int y = bounds.Y; y < bounds.Y + bounds.Height; y++) {
-				for (int x = bounds.X; x < bounds.X + bounds.Width; x++) {
-					var rune = runes [y - bounds.Y, x - bounds.X];
-					if (rune.HasValue) {
-						if (view != null) {
-							view.AddRune (x - bounds.X, y - bounds.Y, rune.Value);
-						} else {
-							Application.Driver.Move (x, y);
-							Application.Driver.AddRune (rune.Value);
-						}
+					if(rune != null)
+					{
+						map.Add(new Point(x,y),rune.Value);
 					}
 				}
 			}
+
+			return map;
 		}
 
 		private abstract class IntersectionRuneResolver {

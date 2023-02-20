@@ -125,7 +125,10 @@ namespace Terminal.Gui {
 
 				lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
 				lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
-				lc.Draw (this, Frame);
+				foreach (var p in lc.GenerateImage(Frame)) {
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value);
+				}
 				Driver.DrawWindowTitle (Frame, $"{Text} {Thickness}", 0, 0, 0, 0);
 			}
 
