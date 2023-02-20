@@ -63,11 +63,11 @@ namespace Terminal.Gui.Graphs {
 			var map = new Dictionary<Point,Rune>();
 
 			// walk through each pixel of the bitmap
-			for (int y = inArea.Y; y < inArea.Height; y++) {
-				for (int x = inArea.X; x < inArea.Width; x++) {
+			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
+				for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
 
 					var intersects = lines
-						.Select (l => l.Intersects (inArea.X + x, inArea.Y + y))
+						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
 

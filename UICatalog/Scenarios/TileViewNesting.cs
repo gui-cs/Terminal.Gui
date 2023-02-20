@@ -90,27 +90,27 @@ namespace UICatalog.Scenarios {
 		{
 			int numberOfViews = GetNumberOfViews ();
 
-			bool titles = cbTitles.Checked;
-			bool border = cbBorder.Checked;
-			bool startHorizontal = cbHorizontal.Checked;
+			bool? titles = cbTitles.Checked;
+			bool? border = cbBorder.Checked;
+			bool? startHorizontal = cbHorizontal.Checked;
 
 			workArea.RemoveAll ();
-			
+
 			if (numberOfViews <= 0) {
 				return;
 			}
 
-			var root = CreateTileView (1,startHorizontal ?
+			var root = CreateTileView (1, (bool)startHorizontal ?
 					Terminal.Gui.Graphs.Orientation.Horizontal :
 					Terminal.Gui.Graphs.Orientation.Vertical);
 
-			root.Tiles.ElementAt(0).ContentView.Add (CreateContentControl (1));
-			root.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View 1" : string.Empty;
+			root.Tiles.ElementAt (0).ContentView.Add (CreateContentControl (1));
+			root.Tiles.ElementAt (0).Title = (bool)cbTitles.Checked ? $"View 1" : string.Empty;
 			root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
-			root.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View 2" : string.Empty;
-			
+			root.Tiles.ElementAt (1).Title = (bool)cbTitles.Checked ? $"View 2" : string.Empty;
 
-			root.Border.BorderStyle = border ? BorderStyle.Rounded : BorderStyle.None;
+
+			root.Border.BorderStyle = (bool)border ? BorderStyle.Rounded : BorderStyle.None;
 
 
 			workArea.Add (root);
@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 
 		private View CreateContentControl (int number)
 		{
-			return cbUseLabels.Checked ?
+			return (bool)cbUseLabels.Checked ?
 				CreateLabelView (number) :
 				CreateTextView (number);
 		}
@@ -152,7 +152,7 @@ namespace UICatalog.Scenarios {
 		{
 			return new TextView {
 				Width = Dim.Fill (),
-				Height = Dim.Fill(),
+				Height = Dim.Fill (),
 				Text = number.ToString ().Repeat (1000),
 				AllowsTab = false,
 				//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
@@ -164,12 +164,12 @@ namespace UICatalog.Scenarios {
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
-			if (!(to.Tiles.ElementAt(0).ContentView is TileView)) {
-				Split(to,true);
+			if (!(to.Tiles.ElementAt (0).ContentView is TileView)) {
+				Split (to, true);
 			}
 
 			if (!(to.Tiles.ElementAt (1).ContentView is TileView)) {
-				Split(to,false);				
+				Split (to, false);
 			}
 
 			if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView) {
@@ -179,35 +179,34 @@ namespace UICatalog.Scenarios {
 			}
 
 		}
-		
-		private void Split(TileView to, bool left)
+
+		private void Split (TileView to, bool left)
 		{
 			if (viewsCreated == viewsToCreate) {
 				return;
 			}
 
 			TileView newView;
-			
-			if (left) {
-				to.TrySplitTile(0,2,out newView);
 
-			}
-			else {
-				to.TrySplitTile (1,2,out newView);
+			if (left) {
+				to.TrySplitTile (0, 2, out newView);
+
+			} else {
+				to.TrySplitTile (1, 2, out newView);
 			}
 
 			viewsCreated++;
 
 			// During splitting the old Title will have been migrated to View1 so we only need
 			// to set the Title on View2 (the one that gets our new TextView)
-			newView.Tiles.ElementAt(1).Title = cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
+			newView.Tiles.ElementAt (1).Title = (bool)cbTitles.Checked ? $"View {viewsCreated}" : string.Empty;
 
 			// Flip orientation
 			newView.Orientation = to.Orientation == Orientation.Vertical ?
 				Orientation.Horizontal :
 				Orientation.Vertical;
 
-			newView.Tiles.ElementAt (1).ContentView.Add (CreateContentControl(viewsCreated));
+			newView.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (viewsCreated));
 		}
 
 		private TileView CreateTileView (int titleNumber, Orientation orientation)
@@ -219,8 +218,8 @@ namespace UICatalog.Scenarios {
 				Orientation = orientation
 			};
 
-			toReturn.Tiles.ElementAt(0).Title = cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
-			toReturn.Tiles.ElementAt (1).Title = cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
+			toReturn.Tiles.ElementAt (0).Title = (bool)cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
+			toReturn.Tiles.ElementAt (1).Title = (bool)cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
 
 			return toReturn;
 		}
