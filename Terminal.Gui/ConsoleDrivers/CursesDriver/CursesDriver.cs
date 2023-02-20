@@ -62,50 +62,72 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					Curses.mvaddch (crow, ccol - 1, (int)(uint)c);
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol - 1, 1]);
-					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol + 1, 1]);
-					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					Curses.addch ((int)(uint)' ');
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					Curses.addch ((int)(uint)rune);
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-			} else
-				needMove = true;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-			ccol++;
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol - 1, 1]);
+						Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol + 1, 1]);
+						Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						Curses.addch ((int)(uint)' ');
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						Curses.addch ((int)(uint)rune);
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+				}
+			} else {
+				needMove = true;
+			}
+
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+			
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -160,12 +182,10 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
-			Curses.attrset (currentAttribute);
+			base.SetAttribute (c);
+			Curses.attrset (CurrentAttribute);
 		}
 
 		public Curses.Window window;
@@ -201,6 +221,7 @@ namespace Terminal.Gui {
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int f = (short)foreground;
 			int b = (short)background;
 			var v = colorPairs [f, b];
@@ -218,6 +239,7 @@ namespace Terminal.Gui {
 		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
 		public override void SetColors (short foreColorId, short backgroundColorId)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
 			if (!rawPairs.TryGetValue (key, out var v)) {
 				v = MakeColor (foreColorId, backgroundColorId);
@@ -875,34 +897,18 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			ResizeScreen ();
-			UpdateOffScreen ();
-
-			//HLine = Curses.ACS_HLINE;
-			//VLine = Curses.ACS_VLINE;
-			//Stipple = Curses.ACS_CKBOARD;
-			//Diamond = Curses.ACS_DIAMOND;
-			//ULCorner = Curses.ACS_ULCORNER;
-			//LLCorner = Curses.ACS_LLCORNER;
-			//URCorner = Curses.ACS_URCORNER;
-			//LRCorner = Curses.ACS_LRCORNER;
-			//LeftTee = Curses.ACS_LTEE;
-			//RightTee = Curses.ACS_RTEE;
-			//TopTee = Curses.ACS_TTEE;
-			//BottomTee = Curses.ACS_BTEE;
-			//RightArrow = Curses.ACS_RARROW;
-			//LeftArrow = Curses.ACS_LARROW;
-			//UpArrow = Curses.ACS_UARROW;
-			//DownArrow = Curses.ACS_DARROW;
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
 
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				CreateColors ();
+				InitalizeColorSchemes ();
 			} else {
-				CreateColors (false);
+				InitalizeColorSchemes (false);
 
+				// BUGBUG: This is a hack to make the colors work on the Mac?
+				// The new Theme support overwrites these colors, so this is not needed?
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
@@ -929,6 +935,10 @@ namespace Terminal.Gui {
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
+
+			ResizeScreen ();
+			UpdateOffScreen ();
+
 		}
 
 		public override void ResizeScreen ()
@@ -1091,11 +1101,6 @@ namespace Terminal.Gui {
 		{
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
 		}
 
 		/// <inheritdoc/>

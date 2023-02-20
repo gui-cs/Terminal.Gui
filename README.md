@@ -6,10 +6,6 @@
 [![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
 ![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)
 
-# This is the v2.0 Branch - Under Development
-
-See the v2 Discussion here: https://github.com/gui-cs/Terminal.Gui/discussions/1940
-
 # Terminal.Gui - Cross Platform Terminal UI toolkit for .NET
 
 A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
