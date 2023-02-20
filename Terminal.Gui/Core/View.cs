@@ -1109,8 +1109,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			var h = Frame.Height;
-			var w = Frame.Width;
+			Rect containerBounds = GetContainerBounds ();
+			Rect viewBounds = Bounds;
+			if (!containerBounds.IsEmpty) {
+				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
+				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
+			}
+
+			var h = viewBounds.Height;
+			var w = viewBounds.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1524,8 +1531,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Rect containerBounds = GetContainerBounds ();
-				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+				Clear ();
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -1566,17 +1572,6 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-		}
-
-		Rect GetNeedDisplay (Rect containerBounds)
-		{
-			Rect rect = NeedDisplay;
-			if (!containerBounds.IsEmpty) {
-				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
-				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
-			}
-
-			return rect;
 		}
 
 		Rect GetContainerBounds ()
