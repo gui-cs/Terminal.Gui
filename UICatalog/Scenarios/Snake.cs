@@ -112,7 +112,9 @@ namespace UICatalog.Scenarios {
 
 				}
 
-				canvas.Draw (this, Bounds);
+				foreach(var p in canvas.GenerateImage (bounds)) {
+					AddRune (p.Key.X, p.Key.Y, p.Value);
+				}
 
 
 				Driver.SetAttribute (red);
