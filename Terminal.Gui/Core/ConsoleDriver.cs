@@ -18,10 +18,9 @@ namespace Terminal.Gui {
 	/// Colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
 	/// <remarks>
-	/// The <see cref="Color.Invalid"/> value indicates either no-color has been set or the color is invalid.
+	/// The <see cref="Attribute.HasValidColors"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
 	[JsonConverter (typeof (ColorJsonConverter))]
-	[DefaultValue (Invalid)]
 	public enum Color {
 		/// <summary>
 		/// The black color.
@@ -86,11 +85,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		White,
-		/// <summary>
-		/// Indicates an invalid or un-set color value. 
-		/// </summary>
-		Invalid = -1
+		White
 	}
 
 	/// <summary>
@@ -183,7 +178,7 @@ namespace Terminal.Gui {
 	public struct Attribute {
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="Initialized"/> is <see langword="false"/> 
-		/// the value of this property is invalid (typcially because the Attribute was created before a driver was loaded)
+		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
 		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
 		/// </summary>
 		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
@@ -208,8 +203,8 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		public Attribute (int value)
 		{
-			Color foreground = Color.Invalid;
-			Color background = Color.Invalid;
+			Color foreground = default;
+			Color background = default;
 
 			Initialized = false;
 			if (Application.Driver != null) {
@@ -289,9 +284,9 @@ namespace Terminal.Gui {
 		{
 			if (Application.Driver == null) {
 				// Create the attribute, but show it's not been initialized
-				var a = new Attribute (-1, foreground, background);
-				a.Initialized = false;
-				return a;
+				return new Attribute (-1, foreground, background) {
+					Initialized = false
+				};
 			}
 			return Application.Driver.MakeAttribute (foreground, background);
 		}
@@ -308,10 +303,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If <see langword="true"/> the attribute has been initialzed by a <see cref="ConsoleDriver"/> and 
+		/// If <see langword="true"/> the attribute has been initialized by a <see cref="ConsoleDriver"/> and 
 		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
-		/// and <see cref="Background"/> colors may have been set (see <see cref="Color.Invalid"/>) but
-		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value. 
+		/// and <see cref="Background"/> colors may have been set '-1' but
+		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value.
 		/// </summary>
 		/// <remarks>
 		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
@@ -320,15 +315,11 @@ namespace Terminal.Gui {
 		public bool Initialized { get; internal set; }
 
 		/// <summary>
-		/// Returns <see langword="true"/> if the Atrribute is valid (both foreground and background have valid color values).
+		/// Returns <see langword="true"/> if the Attribute is valid (both foreground and background have valid color values).
 		/// </summary>
 		/// <returns></returns>
 		[JsonIgnore]
-		public bool HasValidColors {
-			get {
-				return Foreground != Color.Invalid && Background != Color.Invalid;
-			}
-		}
+		public bool HasValidColors { get => (int)Foreground > -1 && (int)Background > -1; }
 	}
 
 	/// <summary>
@@ -341,7 +332,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal = new Attribute(Color.White, Color.Black);
+		Attribute _normal = new Attribute (Color.White, Color.Black);
 		Attribute _focus = new Attribute (Color.White, Color.Black);
 		Attribute _hotNormal = new Attribute (Color.White, Color.Black);
 		Attribute _hotFocus = new Attribute (Color.White, Color.Black);
@@ -532,13 +523,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
 		/// </summary>
-		public static Dictionary<string, ColorScheme> Create () 
+		public static Dictionary<string, ColorScheme> Create ()
 		{
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
 			return typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme()))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ()))
 				.ToDictionary (t => t.Key, t => t.Value, comparer: new SchemeNameComparerIgnoreCase ());
 		}
 
@@ -895,7 +886,7 @@ namespace Terminal.Gui {
 		/// The current attribute the driver is using. 
 		/// </summary>
 		public virtual Attribute CurrentAttribute {
-			get => currentAttribute; 
+			get => currentAttribute;
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
 					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
@@ -1477,8 +1468,8 @@ namespace Terminal.Gui {
 		public abstract Attribute MakeColor (Color foreground, Color background);
 
 		/// <summary>
-		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correclty 
-		/// initalized by the driver.
+		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
+		/// initialized by the driver.
 		/// </summary>
 		/// <remarks>
 		/// This method was previsouly named CreateColors. It was reanmed to InitalizeColorSchemes when
@@ -1487,7 +1478,7 @@ namespace Terminal.Gui {
 		/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
 		public void InitalizeColorSchemes (bool supportsColors = true)
 		{
-			// Ensure all Attributes are initlaized by the driver
+			// Ensure all Attributes are initialized by the driver
 			foreach (var s in Colors.ColorSchemes) {
 				s.Value.Initialize ();
 			}

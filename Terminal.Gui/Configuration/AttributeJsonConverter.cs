@@ -31,11 +31,11 @@ namespace Terminal.Gui.Configuration {
 			}
 
 			Attribute attribute = new Attribute ();
-			Color foreground = Color.Invalid;
-			Color background = Color.Invalid;
+			Color foreground =  (Color)(-1);
+			Color background =  (Color)(-1);
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
-					if (foreground == Color.Invalid || background == Color.Invalid) {
+					if (foreground ==  (Color)(-1) || background ==  (Color)(-1)) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					}
 					return attribute;

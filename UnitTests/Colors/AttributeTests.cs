@@ -218,13 +218,13 @@ namespace Terminal.Gui.ColorTests {
 			attr = new Attribute (Color.Red, Color.Green);
 			Assert.True (attr.HasValidColors);
 
-			attr = new Attribute (Color.Red, Color.Invalid);
+			attr = new Attribute (Color.Red, (Color)(-1));
 			Assert.False (attr.HasValidColors);
 
-			attr = new Attribute (Color.Invalid, Color.Green);
+			attr = new Attribute ((Color)(-1), Color.Green);
 			Assert.False (attr.HasValidColors);
 
-			attr = new Attribute (Color.Invalid, Color.Invalid);
+			attr = new Attribute ((Color)(-1), (Color)(-1));
 			Assert.False (attr.HasValidColors);
 		}
 	}
