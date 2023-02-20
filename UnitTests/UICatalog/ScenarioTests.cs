@@ -98,6 +98,7 @@ namespace UICatalog.Tests {
 			int stackSize = CreateInput ("");
 
 			Application.Init (new FakeDriver ());
+			Application.QuitKey = Key.CtrlMask | Key.Q; // Config manager may have set this to a different key
 
 			int iterations = 0;
 			Application.Iteration = () => {
