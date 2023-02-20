@@ -1510,11 +1510,7 @@ namespace Terminal.Gui {
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (ColorScheme != null) {
-				if (!IgnoreHasFocusPropertyOnRedraw) {
-					Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-				} else {
-					Driver.SetAttribute (GetNormalColor ());
-				}
+				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
@@ -2701,15 +2697,6 @@ namespace Terminal.Gui {
 		/// itself).
 		/// </summary>
 		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; }
-
-		/// <summary>
-		/// Get or sets whether the view will use <see cref="Terminal.Gui.View.HasFocus"/> 
-		/// to set the <see cref="Terminal.Gui.ColorScheme.Focus"/> color if it's focused.
-		/// If <see langword="false"/> (the default), <see cref="View.Redraw(Rect)"/> will call <see cref="GetFocusColor"/>
-		/// or the <see cref="GetNormalColor"/> method.
-		/// If <see langword="true"/> only the <see cref="GetNormalColor"/> will be called.
-		/// </summary>
-		public virtual bool IgnoreHasFocusPropertyOnRedraw { get; set; }
 
 		/// <summary>
 		/// Pretty prints the View

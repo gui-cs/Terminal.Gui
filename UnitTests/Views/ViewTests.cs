@@ -4517,7 +4517,6 @@ At 0,0
 			Application.Top.Add (view);
 			Application.Begin (Application.Top);
 
-			Assert.False (view.IgnoreHasFocusPropertyOnRedraw);
 			Assert.False (view.CanFocus);
 			Assert.False (view.HasFocus);
 
@@ -4537,7 +4536,6 @@ At 0,0
 0000000", attributes);
 
 			view.CanFocus = true;
-			Assert.False (view.IgnoreHasFocusPropertyOnRedraw);
 			Assert.True (view.CanFocus);
 			view.SetFocus ();
 			Assert.True (view.HasFocus);
@@ -4549,20 +4547,6 @@ At 0,0
 0222220
 0222220
 0222220
-0000000", attributes);
-
-			view.IgnoreHasFocusPropertyOnRedraw = true;
-			Application.Refresh ();
-			Assert.True (view.IgnoreHasFocusPropertyOnRedraw);
-			Assert.True (view.CanFocus);
-			Assert.True (view.HasFocus);
-			TestHelpers.AssertDriverColorsAre (@"
-0000000
-0111110
-0111110
-0111110
-0111110
-0111110
 0000000", attributes);
 		}
 
