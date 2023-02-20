@@ -11,7 +11,10 @@
 
 using System;
 using System.Collections;
+using System.Text.Json.Serialization;
 using NStack;
+using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -170,6 +173,15 @@ namespace Terminal.Gui {
 			Initialize (title, Rect.Empty, padding, border);
 		}
 
+		/// <summary>
+		/// The default <see cref="BorderStyle"/> for <see cref="FrameView"/>. The default is <see cref="BorderStyle.Single"/>.
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Window"/>s. 
+		/// </remarks>
+		///[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
+
 		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
 			CanFocus = true;
@@ -178,7 +190,7 @@ namespace Terminal.Gui {
 			Title = title;
 			if (border == null) {
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
+					BorderStyle = DefaultBorderStyle,
 					Padding = new Thickness (padding),
 					BorderBrush = ColorScheme.Normal.Background
 				};
@@ -338,7 +350,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
+		/// Event arguments for <see cref="Title"/> chane events.
 		/// </summary>
 		public class TitleEventArgs : EventArgs {
 			/// <summary>
