@@ -715,13 +715,14 @@ namespace Terminal.Gui {
 
 					lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, BorderStyle);
 					lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, BorderStyle);
-
+					
 					lc.AddLine (new Point (rect.X, rect.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, BorderStyle);
 					lc.AddLine (new Point (rect.X + rect.Width, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
 
 					driver.SetAttribute (new Attribute(Color.Red, Color.BrightYellow));
-					
-					lc.Draw (null, rect);
+					foreach (var p in lc.GenerateImage (rect)) {
+						Child.AddRune (p.Key.X, p.Key.Y, p.Value);
+					}
 					DrawTitle (Child);
 				}
 			}
