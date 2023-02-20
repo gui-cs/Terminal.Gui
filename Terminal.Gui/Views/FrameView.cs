@@ -262,7 +262,10 @@ namespace Terminal.Gui {
 				}
 
 				Driver.SetAttribute (ColorScheme.Normal);
-				lc.Draw (this, bounds);
+				foreach(var p in lc.GenerateImage (bounds)) {
+					AddRune (p.Key.X, p.Key.Y, p.Value);
+				}
+
 
 
 				// Redraw the lines so that focus/drag symbol renders
