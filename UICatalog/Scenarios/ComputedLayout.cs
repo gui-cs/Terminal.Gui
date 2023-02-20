@@ -32,21 +32,18 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (statusBar);
 
-			//Top.LayoutStyle = LayoutStyle.Computed;
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
-			// BUGBUG: Dim.Fill returns too big a value sometimes.
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Width = Dim.Fill (),  
 				ColorScheme = Colors.Error
 			};
 
 			Win.Add (horizontalRuler);
 
 			// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
-			// TODO: Either build a custom control for this or implement linewrap in Label #352
 			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
 			var verticalRuler = new Label ("") {
@@ -121,7 +118,7 @@ namespace UICatalog.Scenarios {
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
 			var anchorButton = new Button ("Anchor End") {
-				Y = Pos.AnchorEnd () - 1,
+				Y = Pos.AnchorEnd (1),
 			};
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
@@ -143,12 +140,11 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd () - 2 // FIXED: -2 should be two lines above border; but it has to be -4
+				Y = Pos.AnchorEnd () - 2 
 			};
 			Win.Add (bottomLabel);
 
 			// Show positioning vertically using Pos.Bottom 
-			// BUGBUG: -1 should be just above border; but it has to be -3
 			var leftButton = new Button ("Left") {
 				Y = Pos.AnchorEnd () - 1
 			};
@@ -189,7 +185,7 @@ namespace UICatalog.Scenarios {
 				Win.LayoutSubviews ();
 			};
 
-			// Center three buttons with 5 spaces between them
+			// Center three buttons with 5 spaces between them - shows PosCombine
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;
 			rightButton.X = Pos.Right (centerButton) + 5;
@@ -197,6 +193,13 @@ namespace UICatalog.Scenarios {
 			Win.Add (leftButton);
 			Win.Add (centerButton);
 			Win.Add (rightButton);
+
+			centerButton = new Button ("25% + 25%") {
+				X = Pos.Percent (25) + Pos.Percent (25),
+				Y = Pos.AnchorEnd (2)
+			};
+			Win.Add (centerButton);
+
 		}
 
 		public override void Run ()

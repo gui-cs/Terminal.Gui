@@ -154,6 +154,24 @@ namespace Terminal.Gui {
 			return GetInnerRect (rect);
 
 		}
+
+		// TODO: Add GetHashCode, and operator overloads
+		/// <summary>
+		/// Gets an empty thickness.
+		/// </summary>
+		public static Thickness Empty => new Thickness (0);
+
+		public override bool Equals (object obj)
+		{
+			//Check for null and compare run-time types.
+			if ((obj == null) || !this.GetType ().Equals (obj.GetType ())) {
+				return false;
+			} else {
+				Thickness t = (Thickness)obj;
+				return (_top == t._top) && (_left == t._left) && (_right == t._right) && (_bottom == t._bottom);
+			}
+		}
+
 		/// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
 		/// <returns>The thickness widths as a string.</returns>
 		public override string ToString ()
@@ -791,7 +809,7 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (rect.X, rect.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, BorderStyle);
 					lc.AddLine (new Point (rect.X + rect.Width, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
 
-					driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
+					//driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
 
 					lc.Draw (null, rect);
 					DrawTitle (Child);

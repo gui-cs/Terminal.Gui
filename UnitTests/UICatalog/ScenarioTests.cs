@@ -531,9 +531,13 @@ namespace UICatalog.Tests {
 
 				// If the view supports a Title property, set it so we have something to look at
 				if (view != null && view.GetType ().GetProperty ("Title") != null) {
-					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { ustring.Make ("Test Title") });
-				}
-
+					if (view.GetType ().GetProperty ("Title").PropertyType == typeof (ustring)) {
+						view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { ustring.Make ("Test Title") });
+					} else {
+						view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
+					}
+				}                               
+				
 				// If the view supports a Source property, set it so we have something to look at
 				if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (Terminal.Gui.IListDataSource)) {
 					var source = new ListWrapper (new List<ustring> () { ustring.Make ("Test Text #1"), ustring.Make ("Test Text #2"), ustring.Make ("Test Text #3") });

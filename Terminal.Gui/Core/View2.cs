@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Linq;
 using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
@@ -21,7 +22,7 @@ namespace Terminal.Gui {
 
 			foreach (var view in Subviews) {
 				if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-					if (view.Frame.IntersectsWith (clipRect)) {// && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+					if (true) {//)  && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
 						if (view.LayoutNeeded) {
 							view.LayoutSubviews ();
 						}
@@ -114,7 +115,9 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
-			Thickness.Draw (Frame, $"{Text} {DiagnosticsLabel.Text}");
+			if (Text != null) {
+				Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
+			}
 			if (BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
 				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
@@ -140,7 +143,7 @@ namespace Terminal.Gui {
 			IgnoreBorderPropertyOnRedraw = true;
 			Margin = new Frame () {
 				Text = "Margin",
-				Thickness = new Thickness (15, 2, 15, 4),
+				Thickness = new Thickness (0),
 				ColorScheme = Colors.ColorSchemes ["Error"]
 			};
 			//Margin.DiagnosticsLabel.Text = "Margin";
@@ -148,16 +151,48 @@ namespace Terminal.Gui {
 			Border = new Frame () {
 				Text = "Border",
 				BorderStyle = BorderStyle.Single,
-				Thickness = new Thickness (2),
+				Thickness = new Thickness (1),
 				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			};
 
 			Padding = new Frame () {
 				Text = "Padding",
-				Thickness = new Thickness (3),
+				Thickness = new Thickness (0),
 				ColorScheme = Colors.ColorSchemes ["Toplevel"]
 			};
 			SetNeedsLayout ();
+		}
+
+		string title;
+
+		/// <summary>
+		/// The title to be displayed for this <see cref="View2"/>.
+		/// </summary>
+		/// <value>The title.</value>
+		public string Title {
+			get => title;
+			set {
+				title = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+
+		public override Rect Bounds {
+			get {
+				if (Padding == null || Border == null || Margin == null) {
+					return Frame;
+				}
+				var frameRelativeBounds  = Padding.Thickness.GetInnerRect(Border.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (new Rect(Point.Empty, Frame.Size))));
+				return frameRelativeBounds;
+			}
+			set {
+				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
+				Frame = new Rect (Frame.Location, value.Size 
+					+ new Size(Margin.Thickness.Right, Margin.Thickness.Bottom)
+					+ new Size (Border.Thickness.Right, Border.Thickness.Bottom)
+					+ new Size (Border.Thickness.Right, Border.Thickness.Bottom));
+			}
 		}
 
 		public override void LayoutSubviews ()
@@ -188,7 +223,7 @@ namespace Terminal.Gui {
 			Padding.LayoutSubviews ();
 			Padding.SetNeedsDisplay ();
 
-			Bounds = Padding.Thickness.GetInnerRect (padding);
+			//Bounds = Padding.Thickness.GetInnerRect (padding);
 
 			base.LayoutSubviews ();
 		}
@@ -205,7 +240,7 @@ namespace Terminal.Gui {
 
 			// Draw the diagnostics label on the bottom of the content
 			var tf = new TextFormatter () {
-				Text = "Content",
+				Text = $"Content {Bounds}",
 				Alignment = TextAlignment.Centered,
 				VerticalAlignment = VerticalTextAlignment.Bottom
 			};

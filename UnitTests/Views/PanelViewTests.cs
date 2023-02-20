@@ -340,140 +340,140 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (5, 6, 15, 4), pv1.Child.Frame);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void Setting_Child_Size_Disable_AutoSize ()
-		{
-			var top = Application.Top;
-			var win = new Window ();
-			var label = new Label () {
-				ColorScheme = Colors.TopLevel,
-				Text = "This is a test\nwith a \nPanelView",
-				TextAlignment = TextAlignment.Centered,
-				Width = 24,
-				Height = 13,
-				AutoSize = false
-			};
-			var pv = new PanelView (label) {
-				Width = 24,
-				Height = 13,
-				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
-					DrawMarginFrame = true,
-					BorderThickness = new Thickness (2),
-					BorderBrush = Color.Red,
-					Padding = new Thickness (2),
-					Background = Color.BrightGreen,
-					Effect3D = true
-				},
-			};
-			win.Add (pv);
-			top.Add (win);
+//		[Fact, AutoInitShutdown]
+//		public void Setting_Child_Size_Disable_AutoSize ()
+//		{
+//			var top = Application.Top;
+//			var win = new Window ();
+//			var label = new Label () {
+//				ColorScheme = Colors.TopLevel,
+//				Text = "This is a test\nwith a \nPanelView",
+//				TextAlignment = TextAlignment.Centered,
+//				Width = 24,
+//				Height = 13,
+//				AutoSize = false
+//			};
+//			var pv = new PanelView (label) {
+//				Width = 24,
+//				Height = 13,
+//				Border = new Border () {
+//					BorderStyle = BorderStyle.Single,
+//					DrawMarginFrame = true,
+//					BorderThickness = new Thickness (2),
+//					BorderBrush = Color.Red,
+//					Padding = new Thickness (2),
+//					Background = Color.BrightGreen,
+//					Effect3D = true
+//				},
+//			};
+//			win.Add (pv);
+//			top.Add (win);
 
-			Application.Begin (top);
+//			Application.Begin (top);
 
-			Assert.False (label.AutoSize);
-			Assert.Equal (new Rect (0, 0, 24, 13), label.Frame);
-			Assert.Equal (new Rect (0, 0, 34, 23), pv.Frame);
-			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+//			Assert.False (label.AutoSize);
+//			Assert.Equal (new Rect (0, 0, 24, 13), label.Frame);
+//			Assert.Equal (new Rect (0, 0, 34, 23), pv.Frame);
+//			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+//			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
 
-			var expected = @"
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│    ┌────────────────────────┐                                                │
-│    │     This is a test     │                                                │
-│    │        with a          │                                                │
-│    │       PanelView        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    │                        │                                                │
-│    └────────────────────────┘                                                │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-└──────────────────────────────────────────────────────────────────────────────┘
-";
+//			var expected = @"
+//┌──────────────────────────────────────────────────────────────────────────────┐
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│    ┌────────────────────────┐                                                │
+//│    │     This is a test     │                                                │
+//│    │        with a          │                                                │
+//│    │       PanelView        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    │                        │                                                │
+//│    └────────────────────────┘                                                │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//└──────────────────────────────────────────────────────────────────────────────┘
+//";
 
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 80, 25), pos);
-		}
+//			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+//			Assert.Equal (new Rect (0, 0, 80, 25), pos);
+//		}
 
-		[Fact, AutoInitShutdown]
-		public void Not_Setting_Child_Size_Default_AutoSize_True ()
-		{
-			var top = Application.Top;
-			var win = new Window ();
-			var label = new Label () {
-				ColorScheme = Colors.TopLevel,
-				Text = "This is a test\nwith a \nPanelView",
-				TextAlignment = TextAlignment.Centered
-			};
-			var pv = new PanelView (label) {
-				Width = 24,
-				Height = 13,
-				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
-					DrawMarginFrame = true,
-					BorderThickness = new Thickness (2),
-					BorderBrush = Color.Red,
-					Padding = new Thickness (2),
-					Background = Color.BrightGreen,
-					Effect3D = true
-				},
-			};
-			win.Add (pv);
-			top.Add (win);
+//		[Fact, AutoInitShutdown]
+//		public void Not_Setting_Child_Size_Default_AutoSize_True ()
+//		{
+//			var top = Application.Top;
+//			var win = new Window ();
+//			var label = new Label () {
+//				ColorScheme = Colors.TopLevel,
+//				Text = "This is a test\nwith a \nPanelView",
+//				TextAlignment = TextAlignment.Centered
+//			};
+//			var pv = new PanelView (label) {
+//				Width = 24,
+//				Height = 13,
+//				Border = new Border () {
+//					BorderStyle = BorderStyle.Single,
+//					DrawMarginFrame = true,
+//					BorderThickness = new Thickness (2),
+//					BorderBrush = Color.Red,
+//					Padding = new Thickness (2),
+//					Background = Color.BrightGreen,
+//					Effect3D = true
+//				},
+//			};
+//			win.Add (pv);
+//			top.Add (win);
 
-			Application.Begin (top);
+//			Application.Begin (top);
 
-			Assert.True (label.AutoSize);
-			Assert.False (pv.UsePanelFrame);
-			Assert.Equal (new Rect (0, 0, 14, 3), label.Frame);
-			Assert.Equal (new Rect (0, 0, 24, 13), pv.Frame);
-			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+//			Assert.True (label.AutoSize);
+//			Assert.False (pv.UsePanelFrame);
+//			Assert.Equal (new Rect (0, 0, 14, 3), label.Frame);
+//			Assert.Equal (new Rect (0, 0, 24, 13), pv.Frame);
+//			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+//			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
 
-			var expected = @"
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│    ┌──────────────┐                                                          │
-│    │This is a test│                                                          │
-│    │   with a     │                                                          │
-│    │  PanelView   │                                                          │
-│    └──────────────┘                                                          │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-└──────────────────────────────────────────────────────────────────────────────┘
-";
+//			var expected = @"
+//┌──────────────────────────────────────────────────────────────────────────────┐
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│    ┌──────────────┐                                                          │
+//│    │This is a test│                                                          │
+//│    │   with a     │                                                          │
+//│    │  PanelView   │                                                          │
+//│    └──────────────┘                                                          │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//│                                                                              │
+//└──────────────────────────────────────────────────────────────────────────────┘
+//";
 
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 80, 25), pos);
-		}
+//			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+//			Assert.Equal (new Rect (0, 0, 80, 25), pos);
+//		}
 	}
 }

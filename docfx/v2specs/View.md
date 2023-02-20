@@ -9,6 +9,10 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * TrueColor support which will be covered separately.
   * ConsoleDriver refactor.
 
+## What's wrong with the View and the View-class Heirarchy in v1?
+
+
+
 ## Terminal.Gui v2 View-related Lexicon & Taxonomy
 
   * *View* - The most basic visual element in Terminal.Gui. Implemented in the `View` base-class. 
@@ -41,50 +45,41 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 
   ### Questions
 
-  * @bdisp - Why does `TopLevel.Activate/Deactivate` exist? Why is this just not `Focus`?
-  * @bdisp - is the "Mdi" concept, really about "non-modal views that have z-order and can overlap"? "Not Mdi" means "non-modal views that have the same-zorder and are tiled"
 
+### Problems with Current Architecture & Implementation
 
-        * `View.MouseEvent` etc... should always use `ContentBounds`-relative coordinates and should constrained by `GetClipRect`.
-  *  
-* After many fits and starts we have clipping working well. But the logic is convoluted and full of spaghetti code. We should simplfiy this by being super clear on how clipping works. 
-  * `View.Redraw(clipRect)` specifies a `clipRect` that is outside of `View.GetClipRect` it has no impact (only a `clipRect` where `View.ClipRect.Union(clipRect)` makes the rect smaller does anything). 
-  * Changing `Driver.ClipRect` from within a `Draw` implementation to draw outside of the `ContentBounds` should be disallowed (see non-ContentBounds drawing below).
-* Border (margin, padding, frame, title, etc...) is confusing and incorrect.
-  * The only reason FrameView exists is because the original architecture didn't support offsetting `View.Bounds` 
-  such that a border could be drawn and the interior content would clip correctly. Thus Miguel (or someone) built
+* `Frame`, `Bounds`, and `ClipRect` are confusing and not consistently applied...
+  * `Bounds` is `Rect` but is used to describe a `Size` (e.g. `Bounds.Size` is the size of the `View`'s content area). It literaly is implemented as a property that returns `new Rect(0, 0, Width, Height)`. Throughtout the codebase `bounds` is used for things that have non-zero `Size` (and actually descibe either the cliprect or the Frame).
+  * The restrictive nature of how `Bounds` is defined led to the hacky `FrameView` and `Window` classes with an embedded `ContentView` in order to draw a border around the content. 
+    * The only reason FrameView exists is because the original architecture didn't support offsetting `View.Bounds`  such that a border could be drawn and the interior content would clip correctly. Thus Miguel (or someone) built
   FrameView with nested `ContentView` that was at `new Rect(+1, +1, -2, -2)`. 
-    * `Border` was added later, but couldn't be retrofitted into `View` such that if `View.Border ~= null` just worked like `FrameView`
+    * `Border` was added later, but couldn't be retrofitted into `View` such that if `View.Border ~= null` just worked like `FrameView`.
     * Thus devs are forced to use the clunky `FrameView` instead of just setting `View.Border`.
-  * It's not possilbe for a `View` to utilize `Border.BorderBrush`.
   * `Border` has a bunch of confusing concepts that don't match other systems (esp the Web/HTML)
     * `Margin` on the web means the space between elements - `Border` doesn't have a margin property, but does has the confusing `DrawMarginFrame` property.
-    * `Border` on the web means the space where a border is drawn. The current implementaiton confuses the term `Frame` and `Border`. `BorderThickness` is provided. In the new world, 
-    but because of the confusion between `Padding` and `Margin` it doesn't work as expectedc.
+    * `Border` on the web means the space where a border is drawn. The current implementaiton confuses the term `Frame` and `Border`. `BorderThickness` is provided. 
     * `Padding` on the web means the padding inside of an element between the `Border` and `Content`. In the current implementation `Padding` is actually OUTSIDE of the `Border`. This means it's not possible for a view to offset internally by simply changing `Bounds`. 
-    * `Content` on the web means the area inside of the Margin + Border + Padding. `View` does not currently have a concept of this (but `FrameView` and `Window` do via thier private `ContentView`s.
-    * `Border` has a `Title` property. If `View` had a standard `Title` property could this be simplified (or should views that implement their own Title property just leverage `Border.Title`?).
-    * It is not possilble for a class drived from View to orverride the drawing of the "Border" (frame, title, padding, etc...). Multiple devs have asked to be able to have the border frame to be drawn with a different color than `View.ColorScheme`.
-* API should explicitly enable devs to override the drawing of `Border` independently of the `View.Draw` method. See how `WM_NCDRAW` works in wWindows (Draw non-client). It should be easy to do this from within a `View` sub-class (e.g. override `OnDrawBorder`) and externally (e.g. `DrawBorder += () => ...`. 
+    * `Content` on the web means the area inside of the Margin + Border + Padding. `View` does not currently have a concept of this (but `FrameView` and `Window` do via the embeded `ContentView`s.
+    * `Border` has a `Title` property. So does `Window` and `FrameView`. This is unneeded duplicate code.
+    * It is not possilble for a class drived from View to orverride the drawing of the "Border" (frame, title, padding, etc...). Multiple devs have asked to be able to have the border frame to be drawn with a different color than `View.ColorScheme`. The API should explicitly enable devs to override the drawing of `Border` independently of the `View.Draw` method. See how `WM_NCDRAW` works in wWindows (Draw non-client). It should be easy to do this from within a `View` sub-class (e.g. override `OnDrawBorder`) and externally (e.g. `DrawBorder += () => ...`. 
 
 * `AutoSize` mostly works, but only because of heroic special-casing logic all over the place by @bdisp. This should be massively simplified.
-* `FrameView` is superlufous and should be removed from the heirarchy (instead devs should just be able to manipulate `View.Border` to achieve what `FrameView` provides). The internal `FrameView.ContentView` is a bug-farm and un-needed if `View.Border` worked correctly. 
+* `FrameView` is superlufous and should be removed from the heirarchy (instead devs should just be able to manipulate `View.Border` (or similar) to achieve what `FrameView` provides). The internal `FrameView.ContentView` is a bug-farm and un-needed if `View.Border` worked correctly. 
 * `TopLevel` is currently built around several concepts that are muddled:
   * Views that host a Menu and StatusBar. It is not clear why this is and if it's needed as a concept. 
-  * Views that can be run via `Application.Run<TopLevel>`. It is not clear why ANY VIEW can't be run this way
+  * Views that can be run via `Application.Run<TopLevel>` (need a separate `RunState`). It is not clear why ANY VIEW can't be run this way, but it seems to be a limitation of the current implementation.
   * Views that can be used as a pop-up (modal) (e.g. `Dialog`). As proven by `Wizard`, it is possible to build a View that works well both ways. But it's way too hard to do this today.
-  * Views that can be moved by the user.
-  * If `View` class is REALLY required for enabling one more of the above concepts (e.g. `Window`) it should be as thin and simple as possilbe (e.g.  should inherit from `FrameView` (or just use `View.Border` effecively assuming `FrameView` is nuked) instead of containing duplicate code).
-* The `MdiContainer` stuff is complex, perhaps overly so. It's also mis-named because Terminal.Gui doesn't actually support "documents" nor does it have a full "MDI" system like Windows (did). It seems to represent features useful in overlapping Views, but it is super confusing on how this works, and the naming doesn't help. This all can be refactored to support specific scenarios and thus be simplified.
+  * Views that can be moved by the user must inherit from `Window` today. It should be possilbe to enable moving of any View (e.g. `View.CanMove = true`).
+* The `MdiContainer` stuff is complex, perhaps overly so, and is not actually used by anyone outside of the project. It's also mis-named because Terminal.Gui doesn't actually support "documents" nor does it have a full "MDI" system like Windows (did). It seems to represent features useful in overlapping Views, but it is super confusing on how this works, and the naming doesn't help. This all can be refactored to support specific scenarios and thus be simplified.
 * There is no facility for users' resizing of Views. @tznind's awesome work on `LineCanvas` and `TileView` combined with @tig's experiments show it could be done in a great way for both modal (overlapping) and tiled Views. 
 * `DrawFrame` and `DrawTitle` are implemented in `ConsoleDriver` and can be replaced by a combination of `LineCanvas` and `Border`.
 * Colors - 
   * As noted above each of Margin, Border, Padding, and Content should support independent colors.
   * Many View sub-classes bastardize the exiting ColorSchemes to get look/feel that works (e.g. `TextView` and `Wizard`). Separately we should revamp ColorSchemes to enable more scenarios. 
+  * TrueColor support is needed and should be the default.
 * `Responder` is supposed to be where all common, non-visual-related, code goes. We should ensure this is the case.
 * `View` should have default support for scroll bars. e.g. assume in the new world `View.ContentBounds` is the clip area (defined by `VIew.Frame` minus `Margin` + `Border` + `Padding`) then if any view is added with `View.Add` that has Frame coordinates outside of `ContentBounds` the appropriate scroll bars show up automatgically (optioally of course). Without any code, scrolling just works. 
 * We have many requests to support non-full-screen apps. We need to ensure the `View` class heirachy suppports this in a simple, understandable way. In a world with non-full-screen (where screen is defined as the visible terminal view) apps, the idea that `Frame` is "screen relative" is broken. Although we COULD just define "screen" as "the area that bounds the Terminal.GUI app.".  
-  * Question related to this: If `View.Border` works correctly (margin, border, padding, content) and if non-full-screen apps are supported, what happens if the margin of `Application.Top` is not zero (e.g. `Border.Margin = new Thickness(1,1)`). It feels more pure that such a margin would make the top-left corner of `Application.Top`'s border be att `ConsoleDriver.Row = 1, Column = 1`). If this is thw path, then "screen" means `Application.Top.Frame`). This is my preference. 
 
 ## Thoughts on Built-in Views
 * `LineView` can be replaced by `LineCanvas`?

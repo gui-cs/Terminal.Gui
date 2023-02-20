@@ -50,6 +50,7 @@ namespace UICatalog.Scenarios {
 			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 			Application.Top.Add (frame1);
+			Application.Top.Add (frame2);
 
 			var view1 = new TextField () {
 				//Title = "View 1",
@@ -70,7 +71,6 @@ namespace UICatalog.Scenarios {
 			};
 
 			frame1.Add (view1);
-			frame2.Add (view1);
 
 			//var view12splitter = new SplitterEventArgs
 

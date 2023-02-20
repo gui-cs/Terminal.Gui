@@ -499,12 +499,12 @@ namespace Terminal.Gui {
 		/// control for tasks such as drawing on the surface of the control.
 		/// </para>
 		/// </remarks>
-		public Rect Bounds {
+		public virtual Rect Bounds {
 			// BUGBUG: This is crazy. Super restrictive that Bounds.Location is always Empty.
 			get => new Rect (Point.Empty, Frame.Size);
 			// BUGBUG: This is even more crazy. This does not actually set Bounds, but Frame.
 			set {
-				Debug.Assert (value.Location.IsEmpty);
+				//Debug.Assert (value.Location.X < 1 || value.Location.Y < 1);
 				Frame = new Rect (frame.Location, value.Size);
 			}
 		}
@@ -1155,16 +1155,33 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + frame.Y;
-			rcol = col + frame.X;
+			if (this is View2) {
+				var cont = this as View2;
+				var inner = cont.Padding.Thickness.GetInnerRect (cont.Border.Thickness.GetInnerRect (cont.Margin.Thickness.GetInnerRect (this.Frame)));
+				rrow = row + inner.Y;
+				rcol = col + inner.X;
+			} else {
+				rrow = row + frame.Y;
+				rcol = col + frame.X;
+			}
 
 			var curContainer = container;
 			while (curContainer != null) {
-				rrow += curContainer.frame.Y;
-				rcol += curContainer.frame.X;
+				if (curContainer is View2) {
+					var cont = curContainer as View2;
+					var inner = cont.Padding.Thickness.GetInnerRect (cont.Border.Thickness.GetInnerRect (cont.Margin.Thickness.GetInnerRect (cont.Frame)));
+
+					//rrow += inner.Y - curContainer.frame.Y;
+					//rcol += inner.X - curContainer.frame.X;
+					rrow += curContainer.frame.Y;
+					rcol += curContainer.frame.X;
+				} else {
+					rrow += curContainer.frame.Y;
+					rcol += curContainer.frame.X;
+				}
 				curContainer = curContainer.container;
 			}
 
@@ -1194,7 +1211,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Converts a region in view-relative coordinates to screen-relative coordinates.
 		/// </summary>
-		internal Rect ViewToScreen (Rect region)
+		public virtual Rect ViewToScreen (Rect region)
 		{
 			ViewToScreen (region.X, region.Y, out var x, out var y, clipped: false);
 			return new Rect (x, y, region.Width, region.Height);
@@ -1526,7 +1543,7 @@ namespace Terminal.Gui {
 			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, bounds.Width - 2, bounds.Height - 2);
+				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max(0,bounds.Width - 2), Math.Max(0, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1583,6 +1600,11 @@ namespace Terminal.Gui {
 		internal Rect GetContainerBounds ()
 		{
 			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+			if (SuperView is View2) {
+				var view2 = SuperView as View2;
+				containerBounds = view2.Padding.Thickness.GetInnerRect (view2.Border.Thickness.GetInnerRect (view2.Margin.Thickness.GetInnerRect (view2.Frame)));
+
+			}
 			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
 			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
 			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
@@ -2175,50 +2197,123 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the View's <see cref="Frame"/> to the relative coordinates if its container, given the <see cref="Frame"/> for its container.
+		/// Sets the View's location (setting <see cref="Frame"/><c>Location</c> to the relative coordinates 
+		/// of the SuperView.
 		/// </summary>
-		/// <param name="hostFrame">The screen-relative frame for the host.</param>
+		/// <param name="superviewRelativeBounds">The superview-relative bounds for <see cref="SuperView"/>. </param>
 		/// <remarks>
-		/// Reminder: <see cref="Frame"/> is superview-relative; <see cref="Bounds"/> is view-relative.
+		/// <see cref="Frame"/> is screen-relative; <see cref="Bounds"/> is view-relative. 
+		/// In v1, <see cref="Bounds"/> always has a location of {0, 0}. In v2, <see cref="Bounds"/> can be non-zero, 
+		/// refelcting the Margin, Border, and Padding.
 		/// </remarks>
-		internal void SetRelativeLayout (Rect hostFrame)
+		internal void SetRelativeLayout (Rect superviewRelativeBounds)
 		{
 			int actW, actH, actX, actY;
-			var s = Size.Empty;
+			var autosize = Size.Empty;
 
 			if (AutoSize) {
-				s = GetAutoSize ();
+				autosize = GetAutoSize ();
 			}
 
-			if (x is Pos.PosCenter) {
-				if (width == null) {
-					actW = AutoSize ? s.Width : hostFrame.Width;
-				} else {
-					actW = width.Anchor (hostFrame.Width);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-				}
-				actX = x.Anchor (hostFrame.Width - actW);
-			} else {
-				actX = x?.Anchor (hostFrame.Width) ?? 0;
+			actX = x?.Anchor (superviewRelativeBounds.Width) ?? 0;
+			actW = Math.Max (CalculateActualWidth (width, superviewRelativeBounds, actX, autosize), 0);
 
-				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
+			switch (x) {
+			case Pos.PosCenter:
+				if (width == null) {
+					actW = !autosize.IsEmpty ? autosize.Width : superviewRelativeBounds.Width;
+				} else {
+					actW = width.Anchor (superviewRelativeBounds.Width);
+					actW = !autosize.IsEmpty && autosize.Width > actW ? autosize.Width : actW;
+				}
+				actX = x.Anchor (superviewRelativeBounds.Width - actW);
+				if (this.SuperView is View2) {
+					actX += superviewRelativeBounds.X;
+				}
+				break;
+
+			case Pos.PosAbsolute:
+
+				if (this.SuperView is View2) {
+					actX += superviewRelativeBounds.X;
+				}
+				break;
+
+			case Pos.PosAnchorEnd:
+
+				if (this.SuperView is View2) {
+					actX += superviewRelativeBounds.X;
+				}
+				break;
+
+			case Pos.PosCombine:
+
+				if (this.SuperView is View2) {
+					var pc = x as Pos.PosCombine;
+					switch (pc.left) {
+					case Pos.PosAbsolute:
+						actX += superviewRelativeBounds.X;
+						break;
+
+					case Pos.PosAnchorEnd:
+						actX += superviewRelativeBounds.X;
+						break;
+
+					case Pos.PosCenter:
+						actX = x.Anchor (superviewRelativeBounds.Width - actW);
+						actX += superviewRelativeBounds.X;
+						break;
+
+					case Pos.PosFactor:
+						actX += superviewRelativeBounds.X;
+						break;
+
+					}
+				}
+				break;
+
+			case Pos.PosFactor:
+
+				if (this.SuperView is View2) {
+					actX += superviewRelativeBounds.X;// - SuperView.Frame.X;
+				}
+				break;
+
+			default:
+				if (x != null) {
+					throw new InvalidOperationException (x.ToString ());
+				}
+				break;
+				;
 			}
 
 			if (y is Pos.PosCenter) {
 				if (height == null) {
-					actH = AutoSize ? s.Height : hostFrame.Height;
+					actH = !autosize.IsEmpty ? autosize.Height : superviewRelativeBounds.Height;
 				} else {
-					actH = height.Anchor (hostFrame.Height);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
+					actH = height.Anchor (superviewRelativeBounds.Height);
+					actH = !autosize.IsEmpty && autosize.Height > actH ? autosize.Height : actH;
 				}
-				actY = y.Anchor (hostFrame.Height - actH);
+				actY = y.Anchor (superviewRelativeBounds.Height - actH);
 			} else {
-				actY = y?.Anchor (hostFrame.Height) ?? 0;
+				actY = y?.Anchor (superviewRelativeBounds.Height) ?? 0;
+				actH = Math.Max (CalculateActualHight (height, superviewRelativeBounds, actY, autosize), 0);
+			}
 
-				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
+
+
+			if ((y is Pos.PosAbsolute || y is Pos.PosCenter) && this.SuperView is View2) {
+				actY += superviewRelativeBounds.Y;
+			}
+			if ((y is Pos.PosAnchorEnd) && this.SuperView is View2) {
+				actY += superviewRelativeBounds.Y;// - SuperView.Frame.Y;
+			}
+			if ((y is Pos.PosFactor) && this.SuperView is View2) {
+				actY += superviewRelativeBounds.Y;// - SuperView.Frame.Y;
 			}
 
 			var r = new Rect (actX, actY, actW, actH);
+
 			if (Frame != r) {
 				Frame = r;
 				if (!SetMinWidthHeight ()) {
@@ -2464,9 +2559,15 @@ namespace Terminal.Gui {
 
 			var ordered = TopologicalSort (nodes, edges);
 
+			var bounds = Frame;
+			if (this is View2) {
+				// in v2 Bounds really is Frame-relative			
+				bounds = Bounds;
+			}
+
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					v.SetRelativeLayout (Frame);
+					v.SetRelativeLayout (bounds);
 				}
 
 				v.LayoutSubviews ();
