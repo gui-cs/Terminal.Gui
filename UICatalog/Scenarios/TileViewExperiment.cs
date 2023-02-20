@@ -47,7 +47,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame2.Border.BorderStyle = BorderStyle.Single;
 
-			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			//ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 			Application.Top.Add (frame1);
 

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
-using Terminal.Gui;
 using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
@@ -60,7 +60,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -100,7 +100,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -141,9 +141,10 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_Focused_50PercentSplit ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -209,7 +210,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -254,7 +255,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -298,7 +299,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -342,7 +343,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -386,8 +387,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelAtStart ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (0);
 
 			tileView.Redraw (tileView.Bounds);
@@ -405,8 +404,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelMiddle ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (1);
 
 			tileView.Redraw (tileView.Bounds);
@@ -424,8 +421,6 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_InsertPanelAtEnd ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (2);
 
 			tileView.Redraw (tileView.Bounds);
@@ -445,7 +440,9 @@ namespace Terminal.Gui.ViewTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
+			Assert.True (line.HasFocus);
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -485,9 +482,9 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
@@ -2046,6 +2043,45 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void Test_SplitTop_WholeBottom()
+		{
+			var tileView = new TileView (2) {
+				Width = 20,
+				Height = 10,
+				Orientation = Orientation.Horizontal,
+			};
+			tileView.Border.BorderStyle = BorderStyle.Single;
+
+			Assert.True (tileView.TrySplitTile (0,2,out TileView top));
+
+			top.Tiles.ElementAt (0).ContentView.Add (new Label ("bleh"));
+			top.Tiles.ElementAt (1).ContentView.Add (new Label ("blah"));
+
+			tileView.Tiles.ElementAt (1).ContentView.Add (new Label ("Hello"));
+			tileView.ColorScheme = new ColorScheme ();
+			top.ColorScheme = new ColorScheme ();
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌─────────┬────────┐
+│bleh     │blah    │
+│         │        │
+│         │        │
+│         │        │
+├─────────┴────────┤
+│Hello             │
+│                  │
+│                  │
+└──────────────────┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill()
 		{
 			var tileView = GetNestedContainer3Right1Down (true,true,1);
@@ -2094,7 +2130,86 @@ namespace Terminal.Gui.ViewTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
+		{
+			var tv = GetTileView (20, 10);
 
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			// I've changed my mind, I want 3 tiles now
+			tv.RebuildForTileCount (3);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.Equal (1, myReusableView.DisposalCount);
+				});
+		}
+		[Fact, AutoInitShutdown]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
+		{
+			var tv = GetTileView (20, 10);
+
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			// I've changed my mind, I want 3 tiles now
+			tv.InsertTile (0);
+			tv.InsertTile (2);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.True (myReusableView.DisposalCount>=1);
+				});
+		}
+		[Theory, AutoInitShutdown]
+		[InlineData (0)]
+		[InlineData (1)]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)
+		{
+			var tv = GetTileView (20, 10);
+
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			tv.RemoveTile (idx);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.True (myReusableView.DisposalCount >= 1);
+				});
+		}
+		private class DisposeCounter : View {
+			public int DisposalCount;
+			protected override void Dispose (bool disposing)
+			{
+				DisposalCount++;
+				base.Dispose (disposing);
+			}
+
+		}
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
@@ -2166,13 +2281,6 @@ namespace Terminal.Gui.ViewTests {
 		private LineView GetLine (TileView tileView)
 		{
 			return tileView.Subviews.OfType<LineView> ().Single ();
-		}
-
-		private void SetInputFocusLine (TileView tileView)
-		{
-			var line = GetLine (tileView);
-			line.SetFocus ();
-			Assert.True (line.HasFocus);
 		}
 
 

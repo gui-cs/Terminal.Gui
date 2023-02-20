@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NStack;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -279,6 +275,228 @@ namespace Terminal.Gui.ViewTests {
          ▼
 ◄░░░├─┤░► 
 ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
+		{
+			var sv = new ScrollView {
+				X = 3,
+				Y = 3,
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+			for (int i = 0; i < 8; i++) {
+				sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
+			}
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   █████████▲
+   ██████But┬
+   █████████┴
+   ┌────────░
+   │     But░
+   └────────░
+   ┌────────░
+   │     But░
+   └────────▼
+   ◄├┤░░░░░► ", output);
+
+			sv.ContentOffset = new Point (5, 5);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   ─────────▲
+   ─────────┬
+    Button 2│
+   ─────────┴
+   ─────────░
+    Button 3░
+   ─────────░
+   ─────────░
+    Button 4▼
+   ◄├─┤░░░░► ", output);
+		}
+
+		private class CustomButton : FrameView {
+			private Label labelFill;
+			private Label labelText;
+
+			public CustomButton (string fill, ustring text, int width, int height)
+			{
+				Width = width;
+				Height = height;
+				labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+				var fillText = new System.Text.StringBuilder ();
+				for (int i = 0; i < Bounds.Height; i++) {
+					if (i > 0) {
+						fillText.AppendLine ("");
+					}
+					for (int j = 0; j < Bounds.Width; j++) {
+						fillText.Append (fill);
+					}
+				}
+				labelFill.Text = fillText.ToString ();
+				labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
+				Add (labelFill, labelText);
+				CanFocus = true;
+			}
+
+			public override bool OnEnter (View view)
+			{
+				Border.BorderStyle = BorderStyle.None;
+				Border.DrawMarginFrame = false;
+				labelFill.Visible = true;
+				view = this;
+				return base.OnEnter (view);
+			}
+
+			public override bool OnLeave (View view)
+			{
+				Border.BorderStyle = BorderStyle.Single;
+				Border.DrawMarginFrame = true;
+				labelFill.Visible = false;
+				if (view == null)
+					view = this;
+				return base.OnLeave (view);
+			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Clear_Window_Inside_ScrollView ()
+		{
+			var topLabel = new Label ("At 15,0") { X = 15 };
+			var sv = new ScrollView {
+				X = 3,
+				Y = 3,
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (23, 23),
+				KeepContentAlwaysInViewport = false
+			};
+			var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
+			Application.Top.Add (topLabel, sv, bottomLabel);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
+                       
+                       
+            ▲          
+            ┬          
+            ┴          
+            ░          
+            ░          
+            ░          
+            ░          
+            ░          
+            ▼          
+   ◄├┤░░░░░►           
+                       
+                       
+               At 15,15", output);
+
+			var attributes = new Attribute [] {
+				Colors.TopLevel.Normal,
+				Colors.TopLevel.Focus,
+				Colors.Base.Normal
+			};
+
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00011111111110000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", attributes);
+
+			sv.Add (new Window ("1") { X = 3, Y = 3, Width = 20, Height = 20 });
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
+                       
+                       
+            ▲          
+            ┬          
+            ┴          
+      ┌ 1 ──░          
+      │     ░          
+      │     ░          
+      │     ░          
+      │     ░          
+      │     ▼          
+   ◄├┤░░░░░►           
+                       
+                       
+               At 15,15", output);
+
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00011111111110000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", attributes);
+
+			sv.ContentOffset = new Point (20, 20);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
+                       
+                       
+     │      ▲          
+     │      ░          
+   ──┘      ░          
+            ░          
+            ░          
+            ┬          
+            │          
+            ┴          
+            ▼          
+   ◄░░░░├─┤►           
+                       
+                       
+               At 15,15", output);
+
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00022200000010000000000
+00022200000010000000000
+00022200000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00011111111110000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", attributes);
 		}
 	}
 }

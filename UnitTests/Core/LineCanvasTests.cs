@@ -1,4 +1,7 @@
-﻿using Terminal.Gui.Graphs;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -157,34 +160,6 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_ScreenCoords ()
-		{
-			var x = 3;
-			var y = 5;
-			var screenCanvas = new LineCanvas ();
-
-			// outer box
-			screenCanvas.AddLine (new Point (x, y), 9, Orientation.Horizontal, BorderStyle.Single);
-			screenCanvas.AddLine (new Point (x + 9, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			screenCanvas.AddLine (new Point (x + 9, y + 4), -9, Orientation.Horizontal, BorderStyle.Single);
-			screenCanvas.AddLine (new Point (x + 0, y + 4), -4, Orientation.Vertical, BorderStyle.Single);
-
-			screenCanvas.AddLine (new Point (x + 5, y + 0), 4, Orientation.Vertical, BorderStyle.Single);
-			screenCanvas.AddLine (new Point (x + 0, y + 2), 9, Orientation.Horizontal, BorderStyle.Single);
-
-			screenCanvas.Draw (null, new Rect (x, y, 10, 5));
-
-			string looksLike =
-@$"    
-{new string ('\n', y)}{new string (' ', x)}┌────┬───┐
-{new string (' ', x)}│    │   │
-{new string (' ', x)}├────┼───┤
-{new string (' ', x)}│    │   │
-{new string (' ', x)}└────┴───┘";
-			TestHelpers.AssertDriverContentsAre (looksLike, output);
-		}
-
 		/// <summary>
 		/// Demonstrates when <see cref="BorderStyle.Rounded"/> corners are used. Notice how
 		/// not all lines declare rounded.  If there are 1+ lines intersecting and a corner is
@@ -309,16 +284,60 @@ namespace Terminal.Gui.CoreTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		private View GetCanvas (out LineCanvas canvas, int x = 0, int y = 0)
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
+		{
+			// Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
+			var v = GetCanvas (out var canvas, 1, 1);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 8, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (8, 3), -8, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, BorderStyle.Single);
+
+
+			canvas.AddLine (new Point (5, 0), 3, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 2), 8, Orientation.Horizontal, BorderStyle.Single);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"
+ ┌────┬──┐
+ │    │  │
+ ├────┼──┤
+ └────┴──┘
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+
+		/// <summary>
+		/// Creates a new <see cref="View"/> into which a <see cref="LineCanvas"/> is rendered
+		/// at <see cref="View.DrawContentComplete"/> time.
+		/// </summary>
+		/// <param name="canvas">The <see cref="LineCanvas"/> you can draw into.</param>
+		/// <param name="offsetX">How far to offset drawing in X</param>
+		/// <param name="offsetY">How far to offset drawing in Y</param>
+		/// <returns></returns>
+		private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
 		{
 			var v = new View {
 				Width = 10,
 				Height = 5,
-				Bounds = new Rect (x, y, 10, 5)
+				Bounds = new Rect (0, 0, 10, 5)
 			};
 
 			var canvasCopy = canvas = new LineCanvas ();
-			v.DrawContentComplete += (r) => canvasCopy.Draw (v, v.Bounds);
+			v.DrawContentComplete += (r) => {
+				foreach (var p in canvasCopy.GenerateImage (v.Bounds)) {
+					v.AddRune (
+						offsetX + p.Key.X,
+						offsetY + p.Key.Y,
+						p.Value);
+				}
+			};
 
 			return v;
 		}
