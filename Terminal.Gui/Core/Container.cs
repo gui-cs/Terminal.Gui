@@ -7,8 +7,7 @@ using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 
-	public class Container : View
-	{
+	public class Container : View {
 		public Container ()
 		{
 			IgnoreBorderPropertyOnRedraw = true;
@@ -86,21 +85,7 @@ namespace Terminal.Gui {
 		public Label DiagnosticsLabel { get; set; }
 		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
 
-		public Frame ()
-		{
-			IgnoreBorderPropertyOnRedraw = true;
-
-			DiagnosticsLabel = new Label () {
-				AutoSize = false,
-				X = 0,
-				Y = Pos.AnchorEnd (1),
-				Width = Dim.Fill (),
-				TextAlignment = TextAlignment.Centered
-
-			};
-			Add (DiagnosticsLabel);
-			SetNeedsLayout ();
-		}
+		public Frame () => IgnoreBorderPropertyOnRedraw = true;
 		
 		public Thickness Thickness { get; set; }
 
@@ -132,9 +117,9 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			}
 
-			if (Text != null) {
-				Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
-			}
+			//if (Text != null) {
+			//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
+			//}
 			if (BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
 				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
@@ -142,11 +127,14 @@ namespace Terminal.Gui {
 
 				lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
 				lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
-				foreach (var p in lc.GenerateImage(Frame)) {
+				foreach (var p in lc.GenerateImage (Frame)) {
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);
 				}
-				Driver.DrawWindowTitle (Frame, $"{Text} {Thickness}", 0, 0, 0, 0);
+
+				if (!ustring.IsNullOrEmpty (Title)) {
+					Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
+				}
 			}
 
 			base.Redraw (bounds);

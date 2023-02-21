@@ -19,25 +19,14 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_Settings", new MenuItem [] {
-					null,
-					new MenuItem ("_Quit", "", () => Quit()),
-				}),
-			});
-			Application.Top.Add (menu);
-
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-			});
-			Application.Top.Add (statusBar);
-
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
 			const string rule = "|123456789";
-			var horizontalRuler = new Label ("") {
+			var horizontalRuler = new Label (rule, false) {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (),  
+				Width = Dim.Fill (),
+				Height = 1,
 				ColorScheme = Colors.Error
 			};
 
@@ -46,7 +35,8 @@ namespace UICatalog.Scenarios {
 			// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
 			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-			var verticalRuler = new Label ("") {
+			var verticalRuler = new Label (vrule, false) {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
 				Width = 1,
@@ -140,7 +130,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd () - 2 
+				Y = Pos.AnchorEnd (2)
 			};
 			Win.Add (bottomLabel);
 

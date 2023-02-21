@@ -31,8 +31,8 @@ namespace UICatalog.Scenarios {
 					Padding = padding,
 					Background = background,
 					Effect3D = effect3D,
-					Title = "Window"
 				},
+				Title = "Window",
 				ColorScheme = Colors.TopLevel
 			};
 

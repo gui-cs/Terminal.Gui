@@ -66,7 +66,6 @@ namespace UICatalog.Scenarios {
 					DrawMarginFrame = true,
 					Padding = new Thickness(1),
 					BorderBrush = Color.BrightMagenta,
-					Title = "Border Title"
 				}
 			};
 

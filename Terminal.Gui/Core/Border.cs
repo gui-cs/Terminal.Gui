@@ -103,60 +103,7 @@ namespace Terminal.Gui {
 			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
 		}
 
-		/// <summary>
-		/// Draws the thickness rectangle with an optional diagnostics label.
-		/// </summary>
-		/// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in 
-		/// screen coordinates.</param>
-		/// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
-		/// <returns>The inner rectangle remaining to be drawn.</returns>
-		public Rect Draw (Rect rect, string label = null)
-		{
-			// Draw the Top side
-			for (var r = rect.Y; r < Math.Min (rect.Y + rect.Height, rect.Y + Top); r++) {
-				for (var c = rect.X; c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
-
-			// Draw the Left side
-			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X; c < Math.Min (rect.X + rect.Width, rect.X + Left); c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
-
-			// Draw the Right side			
-			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X + Math.Max (0, rect.Width - Right); c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
-
-			// Draw the Bottom side
-			for (var r = rect.Y + Math.Max (0, rect.Height - Bottom); r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X; c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
-
-			// Draw the diagnostics label on the bottom
-			var tf = new TextFormatter () {
-				Text = label == null ? string.Empty : $"{label} {this}",
-				Alignment = TextAlignment.Centered,
-				VerticalAlignment = VerticalTextAlignment.Bottom
-			};
-			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute);
-
-			return GetInnerRect (rect);
-
-		}
-
-		// TODO: Add GetHashCode, and operator overloads
+		// TODO: add operator overloads
 		/// <summary>
 		/// Gets an empty thickness.
 		/// </summary>
@@ -216,220 +163,220 @@ namespace Terminal.Gui {
 	public class Border {
 		private int marginFrame => DrawMarginFrame ? 1 : 0;
 
-		/// <summary>
-		/// A sealed <see cref="Toplevel"/> derived class to implement <see cref="Border"/> feature.
-		/// This is only a wrapper to get borders on a toplevel and is recommended using another
-		/// derived, like <see cref="Window"/> where is possible to have borders with or without
-		/// border line or spacing around.
-		/// </summary>
-		public sealed class ToplevelContainer : Toplevel {
-			/// <inheritdoc/>
-			public override Border Border {
-				get => base.Border;
-				set {
-					if (base.Border != null && base.Border.Child != null && value.Child == null) {
-						value.Child = base.Border.Child;
-					}
-					base.Border = value;
-					if (value == null) {
-						return;
-					}
-					Rect frame;
-					if (Border.Child != null && (Border.Child.Width is Dim || Border.Child.Height is Dim)) {
-						frame = Rect.Empty;
-					} else {
-						frame = Frame;
-					}
-					AdjustContentView (frame);
+		///// <summary>
+		///// A sealed <see cref="Toplevel"/> derived class to implement <see cref="Border"/> feature.
+		///// This is only a wrapper to get borders on a toplevel and is recommended using another
+		///// derived, like <see cref="Window"/> where is possible to have borders with or without
+		///// border line or spacing around.
+		///// </summary>
+		//public sealed class ToplevelContainer : Toplevel {
+		//	/// <inheritdoc/>
+		//	public override Border Border {
+		//		get => base.Border;
+		//		set {
+		//			if (base.Border != null && base.Border.Child != null && value.Child == null) {
+		//				value.Child = base.Border.Child;
+		//			}
+		//			base.Border = value;
+		//			if (value == null) {
+		//				return;
+		//			}
+		//			Rect frame;
+		//			if (Border.Child != null && (Border.Child.Width is Dim || Border.Child.Height is Dim)) {
+		//				frame = Rect.Empty;
+		//			} else {
+		//				frame = Frame;
+		//			}
+		//			AdjustContentView (frame);
 
-					Border.BorderChanged += Border_BorderChanged;
-				}
-			}
+		//			Border.BorderChanged += Border_BorderChanged;
+		//		}
+		//	}
 
-			void Border_BorderChanged (Border border)
-			{
-				Rect frame;
-				if (Border.Child != null && (Border.Child.Width is Dim || Border.Child.Height is Dim)) {
-					frame = Rect.Empty;
-				} else {
-					frame = Frame;
-				}
-				AdjustContentView (frame);
-			}
+		//	void Border_BorderChanged (Border border)
+		//	{
+		//		Rect frame;
+		//		if (Border.Child != null && (Border.Child.Width is Dim || Border.Child.Height is Dim)) {
+		//			frame = Rect.Empty;
+		//		} else {
+		//			frame = Frame;
+		//		}
+		//		AdjustContentView (frame);
+		//	}
 
-			/// <summary>
-			/// Initializes with default null values.
-			/// </summary>
-			public ToplevelContainer () : this (null, string.Empty) { }
+		//	/// <summary>
+		//	/// Initializes with default null values.
+		//	/// </summary>
+		//	public ToplevelContainer () : this (null, string.Empty) { }
 
-			/// <summary>
-			/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Computed"/>
-			/// </summary>
-			/// <param name="border">The border.</param>
-			/// <param name="title">The title.</param>
-			public ToplevelContainer (Border border, string title = null)
-			{
-				Initialize (Rect.Empty, border, title ?? string.Empty);
-			}
+		//	/// <summary>
+		//	/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Computed"/>
+		//	/// </summary>
+		//	/// <param name="border">The border.</param>
+		//	/// <param name="title">The title.</param>
+		//	public ToplevelContainer (Border border, string title = null)
+		//	{
+		//		Initialize (Rect.Empty, border, title ?? string.Empty);
+		//	}
 
-			/// <summary>
-			/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Absolute"/>
-			/// </summary>
-			/// <param name="frame">The frame.</param>
-			/// <param name="border">The border.</param>
-			/// <param name="title">The title.</param>
-			public ToplevelContainer (Rect frame, Border border, string title = null) : base (frame)
-			{
-				Initialize (frame, border, title ?? string.Empty);
-			}
+		//	/// <summary>
+		//	/// Initializes a <see cref="ToplevelContainer"/> with a <see cref="LayoutStyle.Absolute"/>
+		//	/// </summary>
+		//	/// <param name="frame">The frame.</param>
+		//	/// <param name="border">The border.</param>
+		//	/// <param name="title">The title.</param>
+		//	public ToplevelContainer (Rect frame, Border border, string title = null) : base (frame)
+		//	{
+		//		Initialize (frame, border, title ?? string.Empty);
+		//	}
 
-			private void Initialize (Rect frame, Border border, string title)
-			{
-				ColorScheme = Colors.TopLevel;
-				if (border == null) {
-					Border = new Border () {
-						BorderStyle = BorderStyle.Single,
-						BorderBrush = ColorScheme.Normal.Background,
-						Title = (ustring)title
-					};
-				} else {
-					Border = border;
-				}
-				AdjustContentView (frame);
-			}
+		//	private void Initialize (Rect frame, Border border, string title)
+		//	{
+		//		ColorScheme = Colors.TopLevel;
+		//		if (border == null) {
+		//			Border = new Border () {
+		//				BorderStyle = BorderStyle.Single,
+		//				BorderBrush = ColorScheme.Normal.Background,
+		//				Title = (ustring)title
+		//			};
+		//		} else {
+		//			Border = border;
+		//		}
+		//		AdjustContentView (frame);
+		//	}
 
-			void AdjustContentView (Rect frame)
-			{
-				var borderLength = Border.DrawMarginFrame ? 1 : 0;
-				var sumPadding = Border.GetSumThickness ();
-				var wp = new Point ();
-				var wb = new Size ();
-				if (frame == Rect.Empty) {
-					wp.X = borderLength + sumPadding.Left;
-					wp.Y = borderLength + sumPadding.Top;
-					wb.Width = borderLength + sumPadding.Right;
-					wb.Height = borderLength + sumPadding.Bottom;
-					if (Border.Child == null) {
-						Border.Child = new ChildContentView (this) {
-							X = wp.X,
-							Y = wp.Y,
-							Width = Dim.Fill (wb.Width),
-							Height = Dim.Fill (wb.Height)
-						};
-					} else {
-						Border.Child.X = wp.X;
-						Border.Child.Y = wp.Y;
-						Border.Child.Width = Dim.Fill (wb.Width);
-						Border.Child.Height = Dim.Fill (wb.Height);
-					}
-				} else {
-					wb.Width = (2 * borderLength) + sumPadding.Right + sumPadding.Left;
-					wb.Height = (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
-					var cFrame = new Rect (borderLength + sumPadding.Left, borderLength + sumPadding.Top, frame.Width - wb.Width, frame.Height - wb.Height);
-					if (Border.Child == null) {
-						Border.Child = new ChildContentView (cFrame, this);
-					} else {
-						Border.Child.Frame = cFrame;
-					}
-				}
-				if (Subviews?.Count == 0)
-					base.Add (Border.Child);
-				Border.ChildContainer = this;
-			}
+		//	void AdjustContentView (Rect frame)
+		//	{
+		//		var borderLength = Border.DrawMarginFrame ? 1 : 0;
+		//		var sumPadding = Border.GetSumThickness ();
+		//		var wp = new Point ();
+		//		var wb = new Size ();
+		//		if (frame == Rect.Empty) {
+		//			wp.X = borderLength + sumPadding.Left;
+		//			wp.Y = borderLength + sumPadding.Top;
+		//			wb.Width = borderLength + sumPadding.Right;
+		//			wb.Height = borderLength + sumPadding.Bottom;
+		//			if (Border.Child == null) {
+		//				Border.Child = new ChildContentView (this) {
+		//					X = wp.X,
+		//					Y = wp.Y,
+		//					Width = Dim.Fill (wb.Width),
+		//					Height = Dim.Fill (wb.Height)
+		//				};
+		//			} else {
+		//				Border.Child.X = wp.X;
+		//				Border.Child.Y = wp.Y;
+		//				Border.Child.Width = Dim.Fill (wb.Width);
+		//				Border.Child.Height = Dim.Fill (wb.Height);
+		//			}
+		//		} else {
+		//			wb.Width = (2 * borderLength) + sumPadding.Right + sumPadding.Left;
+		//			wb.Height = (2 * borderLength) + sumPadding.Bottom + sumPadding.Top;
+		//			var cFrame = new Rect (borderLength + sumPadding.Left, borderLength + sumPadding.Top, frame.Width - wb.Width, frame.Height - wb.Height);
+		//			if (Border.Child == null) {
+		//				Border.Child = new ChildContentView (cFrame, this);
+		//			} else {
+		//				Border.Child.Frame = cFrame;
+		//			}
+		//		}
+		//		if (Subviews?.Count == 0)
+		//			base.Add (Border.Child);
+		//		Border.ChildContainer = this;
+		//	}
 
-			/// <inheritdoc/>
-			public override void Add (View view)
-			{
-				Border.Child.Add (view);
-				if (view.CanFocus) {
-					CanFocus = true;
-				}
-				AddMenuStatusBar (view);
-			}
+		//	/// <inheritdoc/>
+		//	public override void Add (View view)
+		//	{
+		//		Border.Child.Add (view);
+		//		if (view.CanFocus) {
+		//			CanFocus = true;
+		//		}
+		//		AddMenuStatusBar (view);
+		//	}
 
-			/// <inheritdoc/>
-			public override void Remove (View view)
-			{
-				if (view == null) {
-					return;
-				}
+		//	/// <inheritdoc/>
+		//	public override void Remove (View view)
+		//	{
+		//		if (view == null) {
+		//			return;
+		//		}
 
-				SetNeedsDisplay ();
-				var touched = view.Frame;
-				Border.Child.Remove (view);
+		//		SetNeedsDisplay ();
+		//		var touched = view.Frame;
+		//		Border.Child.Remove (view);
 
-				if (Border.Child.InternalSubviews.Count < 1) {
-					CanFocus = false;
-				}
-				RemoveMenuStatusBar (view);
-			}
+		//		if (Border.Child.InternalSubviews.Count < 1) {
+		//			CanFocus = false;
+		//		}
+		//		RemoveMenuStatusBar (view);
+		//	}
 
-			/// <inheritdoc/>
-			public override void RemoveAll ()
-			{
-				Border.Child.RemoveAll ();
-			}
+		//	/// <inheritdoc/>
+		//	public override void RemoveAll ()
+		//	{
+		//		Border.Child.RemoveAll ();
+		//	}
 
-			/// <inheritdoc/>
-			public override void Redraw (Rect bounds)
-			{
-				if (!NeedDisplay.IsEmpty) {
-					Driver.SetAttribute (GetNormalColor ());
-					Clear ();
-				}
-				var savedClip = Border.Child.ClipToBounds ();
-				Border.Child.Redraw (Border.Child.Bounds);
-				Driver.Clip = savedClip;
+		//	/// <inheritdoc/>
+		//	public override void Redraw (Rect bounds)
+		//	{
+		//		if (!NeedDisplay.IsEmpty) {
+		//			Driver.SetAttribute (GetNormalColor ());
+		//			Clear ();
+		//		}
+		//		var savedClip = Border.Child.ClipToBounds ();
+		//		Border.Child.Redraw (Border.Child.Bounds);
+		//		Driver.Clip = savedClip;
 
-				ClearLayoutNeeded ();
-				ClearNeedsDisplay ();
+		//		ClearLayoutNeeded ();
+		//		ClearNeedsDisplay ();
 
-				Driver.SetAttribute (GetNormalColor ());
-				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				if (Border.DrawMarginFrame) {
-					if (!ustring.IsNullOrEmpty (Border.Title))
-						Border.DrawTitle (this);
-					else
-						Border.DrawTitle (this, Frame);
-				}
-				Driver.SetAttribute (GetNormalColor ());
+		//		Driver.SetAttribute (GetNormalColor ());
+		//		Border.DrawContent (this, false);
+		//		if (HasFocus)
+		//			Driver.SetAttribute (ColorScheme.HotNormal);
+		//		if (Border.DrawMarginFrame) {
+		//			if (!ustring.IsNullOrEmpty (Border.Title))
+		//				Border.DrawTitle (this);
+		//			else
+		//				Border.DrawTitle (this, Frame);
+		//		}
+		//		Driver.SetAttribute (GetNormalColor ());
 
-				// Checks if there are any SuperView view which intersect with this window.
-				if (SuperView != null) {
-					SuperView.SetNeedsLayout ();
-					SuperView.SetNeedsDisplay ();
-				}
-			}
+		//		// Checks if there are any SuperView view which intersect with this window.
+		//		if (SuperView != null) {
+		//			SuperView.SetNeedsLayout ();
+		//			SuperView.SetNeedsDisplay ();
+		//		}
+		//	}
 
-			/// <inheritdoc/>
-			public override void OnCanFocusChanged ()
-			{
-				if (Border.Child != null) {
-					Border.Child.CanFocus = CanFocus;
-				}
-				base.OnCanFocusChanged ();
-			}
-		}
+		//	/// <inheritdoc/>
+		//	public override void OnCanFocusChanged ()
+		//	{
+		//		if (Border.Child != null) {
+		//			Border.Child.CanFocus = CanFocus;
+		//		}
+		//		base.OnCanFocusChanged ();
+		//	}
+		//}
 
-		private class ChildContentView : View {
-			View instance;
+		//private class ChildContentView : View {
+		//	View instance;
 
-			public ChildContentView (Rect frame, View instance) : base (frame)
-			{
-				this.instance = instance;
-			}
-			public ChildContentView (View instance)
-			{
-				this.instance = instance;
-			}
+		//	public ChildContentView (Rect frame, View instance) : base (frame)
+		//	{
+		//		this.instance = instance;
+		//	}
+		//	public ChildContentView (View instance)
+		//	{
+		//		this.instance = instance;
+		//	}
 
-			public override bool MouseEvent (MouseEvent mouseEvent)
-			{
-				return instance.MouseEvent (mouseEvent);
-			}
-		}
+		//	public override bool MouseEvent (MouseEvent mouseEvent)
+		//	{
+		//		return instance.MouseEvent (mouseEvent);
+		//	}
+		//}
 
 		/// <summary>
 		/// Invoked when any property of Border changes (except <see cref="Child"/>).
@@ -530,52 +477,52 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Gets the rendered width of this element.
-		/// </summary>
-		[JsonIgnore]
-		public int ActualWidth {
-			get {
-				var driver = Application.Driver;
-				if (Parent?.Border == null) {
-					return Math.Min (Child?.Frame.Width + (2 * marginFrame) + Padding.Right
-						+ BorderThickness.Right + Padding.Left + BorderThickness.Left ?? 0, driver.Cols);
-				}
-				return Math.Min (Parent.Frame.Width, driver.Cols);
-			}
-		}
-		/// <summary>
-		/// Gets the rendered height of this element.
-		/// </summary>
-		[JsonIgnore]
-		public int ActualHeight {
-			get {
-				var driver = Application.Driver;
-				if (Parent?.Border == null) {
-					return Math.Min (Child?.Frame.Height + (2 * marginFrame) + Padding.Bottom
-						+ BorderThickness.Bottom + Padding.Top + BorderThickness.Top ?? 0, driver.Rows);
-				}
-				return Math.Min (Parent.Frame.Height, driver.Rows);
-			}
-		}
+		///// <summary>
+		///// Gets the rendered width of this element.
+		///// </summary>
+		//[JsonIgnore]
+		//public int ActualWidth {
+		//	get {
+		//		var driver = Application.Driver;
+		//		if (Parent?.Border == null) {
+		//			return Math.Min (Child?.Frame.Width + (2 * marginFrame) + Padding.Right
+		//				+ BorderThickness.Right + Padding.Left + BorderThickness.Left ?? 0, driver.Cols);
+		//		}
+		//		return Math.Min (Parent.Frame.Width, driver.Cols);
+		//	}
+		//}
+		///// <summary>
+		///// Gets the rendered height of this element.
+		///// </summary>
+		//[JsonIgnore]
+		//public int ActualHeight {
+		//	get {
+		//		var driver = Application.Driver;
+		//		if (Parent?.Border == null) {
+		//			return Math.Min (Child?.Frame.Height + (2 * marginFrame) + Padding.Bottom
+		//				+ BorderThickness.Bottom + Padding.Top + BorderThickness.Top ?? 0, driver.Rows);
+		//		}
+		//		return Math.Min (Parent.Frame.Height, driver.Rows);
+		//	}
+		//}
 
-		/// <summary>
-		/// Gets or sets the single child element of a <see cref="View"/>.
-		/// </summary>
-		[JsonIgnore]
-		public View Child { get; set; }
+		///// <summary>
+		///// Gets or sets the single child element of a <see cref="View"/>.
+		///// </summary>
+		//[JsonIgnore]
+		//public View Child { get; set; }
 
-		/// <summary>
-		/// Gets the parent <see cref="Child"/> parent if any.
-		/// </summary>
-		[JsonIgnore]
-		public View Parent { get => Child?.SuperView; }
+		///// <summary>
+		///// Gets the parent <see cref="Child"/> parent if any.
+		///// </summary>
+		//[JsonIgnore]
+		//public View Parent { get => Child?.SuperView; }
 
-		/// <summary>
-		/// Gets or private sets by the <see cref="ToplevelContainer"/>
-		/// </summary>
-		[JsonIgnore]
-		public ToplevelContainer ChildContainer { get; private set; }
+		///// <summary>
+		///// Gets or private sets by the <see cref="ToplevelContainer"/>
+		///// </summary>
+		//[JsonIgnore]
+		//public ToplevelContainer ChildContainer { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the 3D effect around the <see cref="Border"/>.
@@ -619,527 +566,527 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// The title to be displayed for this view.
-		/// </summary>
-		[JsonIgnore]
-		public ustring Title {
-			get => title;
-			set {
-				title = value;
-				OnBorderChanged ();
-			}
-		}
-
-		/// <summary>
-		/// Calculate the sum of the <see cref="Padding"/> and the <see cref="BorderThickness"/>
-		/// </summary>
-		/// <returns>The total of the <see cref="Border"/> <see cref="Thickness"/></returns>
-		public Thickness GetSumThickness ()
-		{
-			return new Thickness () {
-				Left = Padding.Left + BorderThickness.Left,
-				Top = Padding.Top + BorderThickness.Top,
-				Right = Padding.Right + BorderThickness.Right,
-				Bottom = Padding.Bottom + BorderThickness.Bottom
-			};
-		}
-
-		/// <summary>
-		/// Drawn the <see cref="BorderThickness"/> more the <see cref="Padding"/>
-		///  more the <see cref="Border.BorderStyle"/> and the <see cref="Effect3D"/>.
-		/// </summary>
-		/// <param name="view">The view to draw.</param>
-		/// <param name="fill">If it will clear or not the content area.</param>
-		public void DrawContent (View view = null, bool fill = true)
-		{
-			if (Child == null) {
-				Child = view;
-			}
-			if (Parent?.Border != null) {
-				DrawParentBorder (Parent.ViewToScreen (Parent.Bounds), fill);
-			} else {
-				DrawChildBorder (Child.ViewToScreen (Child.Bounds), fill);
-			}
-		}
-
-		/// <summary>
-		/// Same as <see cref="DrawContent"/> but drawing full frames for all borders.
-		/// </summary>
-		public void DrawFullContent ()
-		{
-			var borderThickness = BorderThickness;
-			var padding = Padding;
-			var marginFrame = DrawMarginFrame ? 1 : 0;
-			var driver = Application.Driver;
-			Rect scrRect;
-			if (Parent?.Border != null) {
-				scrRect = Parent.ViewToScreen (Parent.Bounds);
-			} else {
-				scrRect = Child.ViewToScreen (Child.Bounds);
-			}
-			Rect borderRect;
-			if (Parent?.Border != null) {
-				borderRect = scrRect;
-			} else {
-				borderRect = new Rect () {
-					X = scrRect.X - marginFrame - padding.Left - borderThickness.Left,
-					Y = scrRect.Y - marginFrame - padding.Top - borderThickness.Top,
-					Width = ActualWidth,
-					Height = ActualHeight
-				};
-			}
-			var savedAttribute = driver.GetAttribute ();
-
-			// Draw 3D effects
-			if (Effect3D) {
-				driver.SetAttribute ((Attribute)Effect3DBrush);
-
-				var effectBorder = new Rect () {
-					X = borderRect.X + Effect3DOffset.X,
-					Y = borderRect.Y + Effect3DOffset.Y,
-					Width = ActualWidth,
-					Height = ActualHeight
-				};
-				//Child.Clear (effectBorder);
-				for (int r = effectBorder.Y; r < Math.Min (effectBorder.Bottom, driver.Rows); r++) {
-					for (int c = effectBorder.X; c < Math.Min (effectBorder.Right, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-			}
-
-			// Draw border thickness
-			driver.SetAttribute (new Attribute (BorderBrush));
-			Child.Clear (borderRect);
-
-			borderRect = new Rect () {
-				X = borderRect.X + borderThickness.Left,
-				Y = borderRect.Y + borderThickness.Top,
-				Width = Math.Max (borderRect.Width - borderThickness.Right - borderThickness.Left, 0),
-				Height = Math.Max (borderRect.Height - borderThickness.Bottom - borderThickness.Top, 0)
-			};
-			if (borderRect != scrRect) {
-				// Draw padding
-				driver.SetAttribute (new Attribute (Background));
-				Child.Clear (borderRect);
-			}
-
-			driver.SetAttribute (savedAttribute);
-
-			// Draw margin frame
-			if (DrawMarginFrame) {
-				if (Parent?.Border != null) {
-					var sumPadding = GetSumThickness ();
-					borderRect = new Rect () {
-						X = scrRect.X + sumPadding.Left,
-						Y = scrRect.Y + sumPadding.Top,
-						Width = Math.Max (scrRect.Width - sumPadding.Right - sumPadding.Left, 0),
-						Height = Math.Max (scrRect.Height - sumPadding.Bottom - sumPadding.Top, 0)
-					};
-				} else {
-					borderRect = new Rect () {
-						X = borderRect.X + padding.Left,
-						Y = borderRect.Y + padding.Top,
-						Width = Math.Max (borderRect.Width - padding.Right - padding.Left, 0),
-						Height = Math.Max (borderRect.Height - padding.Bottom - padding.Top, 0)
-					};
-				}
-				if (borderRect.Width > 0 && borderRect.Height > 0) {
-					driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
-				}
-			}
-		}
-
-		private void DrawChildBorder (Rect frame, bool fill = true)
-		{
-			var drawMarginFrame = DrawMarginFrame ? 1 : 0;
-			var sumThickness = GetSumThickness ();
-			var padding = Padding;
-			var effect3DOffset = Effect3DOffset;
-			var driver = Application.Driver;
-
-			var savedAttribute = driver.GetAttribute ();
-
-			driver.SetAttribute (new Attribute (BorderBrush));
-
-			// Draw the upper BorderThickness
-			for (int r = frame.Y - drawMarginFrame - sumThickness.Top;
-				r < frame.Y - drawMarginFrame - padding.Top; r++) {
-				for (int c = frame.X - drawMarginFrame - sumThickness.Left;
-					c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the left BorderThickness
-			for (int r = frame.Y - drawMarginFrame - padding.Top;
-				r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
-				for (int c = frame.X - drawMarginFrame - sumThickness.Left;
-					c < frame.X - drawMarginFrame - padding.Left; c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the right BorderThickness
-			for (int r = frame.Y - drawMarginFrame - padding.Top;
-				r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
-				for (int c = frame.Right + drawMarginFrame + padding.Right;
-					c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the lower BorderThickness
-			for (int r = frame.Bottom + drawMarginFrame + padding.Bottom;
-				r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom, driver.Rows); r++) {
-				for (int c = frame.X - drawMarginFrame - sumThickness.Left;
-					c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			driver.SetAttribute (new Attribute (Background));
-
-			// Draw the upper Padding
-			for (int r = frame.Y - drawMarginFrame - padding.Top;
-				r < frame.Y - drawMarginFrame; r++) {
-				for (int c = frame.X - drawMarginFrame - padding.Left;
-					c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the left Padding
-			for (int r = frame.Y - drawMarginFrame;
-				r < Math.Min (frame.Bottom + drawMarginFrame, driver.Rows); r++) {
-				for (int c = frame.X - drawMarginFrame - padding.Left;
-					c < frame.X - drawMarginFrame; c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the right Padding
-			for (int r = frame.Y - drawMarginFrame;
-				r < Math.Min (frame.Bottom + drawMarginFrame, driver.Rows); r++) {
-				for (int c = frame.Right + drawMarginFrame;
-					c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the lower Padding
-			for (int r = frame.Bottom + drawMarginFrame;
-				r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
-				for (int c = frame.X - drawMarginFrame - padding.Left;
-					c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			driver.SetAttribute (savedAttribute);
-
-			// Draw the MarginFrame
-			if (DrawMarginFrame) {
-
-				var rect = new Rect () {
-					X = frame.X - drawMarginFrame,
-					Y = frame.Y - drawMarginFrame,
-					Width = frame.Width + (2 * drawMarginFrame),
-					Height = frame.Height + (2 * drawMarginFrame)
-				};
-				if (rect.Width > 0 && rect.Height > 0) {
-					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
-					DrawTitle (Child);
-				}
-
-				//var rect = Child.ViewToScreen (new Rect (-1, -1, Child.Frame.Width + 2, Child.Frame.Height + 2));
-				//if (rect.Width > 0 && rect.Height > 0) {
-
-				//	var lc = new LineCanvas ();
-
-				//	lc.AddLine (rect.Location, rect.Width-1, Orientation.Horizontal, BorderStyle);
-				//	lc.AddLine (rect.Location, rect.Height-1, Orientation.Vertical, BorderStyle);
-
-				//	lc.AddLine (new Point (rect.X, rect.Y + rect.Height-1), rect.Width, Orientation.Horizontal, BorderStyle);
-				//	lc.AddLine (new Point (rect.X + rect.Width-1, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
-
-				//	//driver.SetAttribute (new Attribute(Color.Red, Color.BrightYellow));
-				//	foreach (var p in lc.GenerateImage (rect)) {
-				//		AddRuneAt (driver, p.Key.X, p.Key.Y, p.Value);
-				//	}
-				//	DrawTitle (Child);
-				//}
-			}
-
-			if (Effect3D) {
-				driver.SetAttribute ((Attribute)Effect3DBrush);
-
-				// Draw the upper Effect3D
-				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r >= 0 && r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
-					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the left Effect3D
-				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c >= 0 && c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the right Effect3D
-				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.Right + drawMarginFrame + sumThickness.Right;
-						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the lower Effect3D
-				for (int r = frame.Bottom + drawMarginFrame + sumThickness.Bottom;
-					r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-						c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-			}
-			driver.SetAttribute (savedAttribute);
-		}
-
-		private void DrawParentBorder (Rect frame, bool fill = true)
-		{
-			var sumThickness = GetSumThickness ();
-			var borderThickness = BorderThickness;
-			var effect3DOffset = Effect3DOffset;
-			var driver = Application.Driver;
-
-			var savedAttribute = driver.GetAttribute ();
-
-			driver.SetAttribute (new Attribute (BorderBrush));
-
-			// Draw the upper BorderThickness
-			for (int r = frame.Y;
-				r < Math.Min (frame.Y + borderThickness.Top, frame.Bottom); r++) {
-				for (int c = frame.X;
-					c < Math.Min (frame.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the left BorderThickness
-			for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
-				r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-				for (int c = frame.X;
-					c < Math.Min (frame.X + borderThickness.Left, frame.Right); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the right BorderThickness
-			for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
-				r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-				for (int c = Math.Max (frame.Right - borderThickness.Right, frame.X);
-					c < Math.Min (frame.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the lower BorderThickness
-			for (int r = Math.Max (frame.Bottom - borderThickness.Bottom, frame.Y);
-				r < Math.Min (frame.Bottom, driver.Rows); r++) {
-				for (int c = frame.X;
-					c < Math.Min (frame.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			driver.SetAttribute (new Attribute (Background));
-
-			// Draw the upper Padding
-			for (int r = frame.Y + borderThickness.Top;
-				r < Math.Min (frame.Y + sumThickness.Top, frame.Bottom - borderThickness.Bottom); r++) {
-				for (int c = frame.X + borderThickness.Left;
-					c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the left Padding
-			for (int r = frame.Y + sumThickness.Top;
-				r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
-				for (int c = frame.X + borderThickness.Left;
-					c < Math.Min (frame.X + sumThickness.Left, frame.Right - borderThickness.Right); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the right Padding
-			for (int r = frame.Y + sumThickness.Top;
-				r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
-				for (int c = Math.Max (frame.Right - sumThickness.Right, frame.X + sumThickness.Left);
-					c < Math.Max (frame.Right - borderThickness.Right, frame.X + sumThickness.Left); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			// Draw the lower Padding
-			for (int r = Math.Max (frame.Bottom - sumThickness.Bottom, frame.Y + borderThickness.Top);
-				r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-				for (int c = frame.X + borderThickness.Left;
-					c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
-
-					AddRuneAt (driver, c, r, ' ');
-				}
-			}
-
-			driver.SetAttribute (savedAttribute);
-
-			// Draw the MarginFrame
-			if (DrawMarginFrame) {
-				var rect = new Rect () {
-					X = frame.X + sumThickness.Left,
-					Y = frame.Y + sumThickness.Top,
-					Width = Math.Max (frame.Width - sumThickness.Right - sumThickness.Left, 0),
-					Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
-				};
-				if (rect.Width > 0 && rect.Height > 0) {
-					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
-					DrawTitle (Parent);
-				}
-			}
-
-			if (Effect3D) {
-				driver.SetAttribute ((Attribute)Effect3DBrush);
-
-				// Draw the upper Effect3D
-				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-					r < frame.Y; r++) {
-					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the left Effect3D
-				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-						c < frame.X; c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the right Effect3D
-				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = frame.Right;
-						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-
-				// Draw the lower Effect3D
-				for (int r = frame.Bottom;
-					r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-					for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-						c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-						AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-					}
-				}
-			}
-			driver.SetAttribute (savedAttribute);
-		}
-
-		private void AddRuneAt (ConsoleDriver driver, int col, int row, Rune ch)
-		{
-			if (col < driver.Cols && row < driver.Rows && col > 0 && driver.Contents [row, col, 2] == 0
-				&& Rune.ColumnWidth ((char)driver.Contents [row, col - 1, 0]) > 1) {
-
-				driver.Contents [row, col, 1] = driver.GetAttribute ();
-				return;
-			}
-			driver.Move (col, row);
-			driver.AddRune (ch);
-		}
-
-		/// <summary>
-		/// Draws the view <see cref="Title"/> to the screen.
-		/// </summary>
-		/// <param name="view">The view.</param>
-		public void DrawTitle (View view)
-		{
-			var driver = Application.Driver;
-			if (DrawMarginFrame) {
-				driver.SetAttribute (Child.GetNormalColor ());
-				if (Child.HasFocus)
-					driver.SetAttribute (Child.ColorScheme.HotNormal);
-				var padding = view.Border.GetSumThickness ();
-				Rect scrRect;
-				if (view == Child) {
-					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width + 2, view.Frame.Height + 2));
-					scrRect = new Rect (scrRect.X - 1, scrRect.Y - 1, scrRect.Width, scrRect.Height);
-					driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
-				} else {
-					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
-					driver.DrawWindowTitle (scrRect, Title,
-						padding.Left, padding.Top, padding.Right, padding.Bottom);
-				}
-			}
-			driver.SetAttribute (Child.GetNormalColor ());
-		}
-
-		/// <summary>
-		/// Draws the <see cref="View.Text"/> to the screen.
-		/// </summary>
-		/// <param name="view">The view.</param>
-		/// <param name="rect">The frame.</param>
-		public void DrawTitle (View view, Rect rect)
-		{
-			var driver = Application.Driver;
-			if (DrawMarginFrame) {
-				driver.SetAttribute (view.GetNormalColor ());
-				if (view.HasFocus) {
-					driver.SetAttribute (view.ColorScheme.HotNormal);
-				}
-				var padding = Parent.Border.GetSumThickness ();
-				var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));
-				driver.DrawWindowTitle (scrRect, view.Text,
-					padding.Left, padding.Top, padding.Right, padding.Bottom);
-			}
-			driver.SetAttribute (view.GetNormalColor ());
-		}
+		///// <summary>
+		///// The title to be displayed for this view.
+		///// </summary>
+		//[JsonIgnore]
+		//public ustring Title {
+		//	get => title;
+		//	set {
+		//		title = value;
+		//		OnBorderChanged ();
+		//	}
+		//}
+
+		///// <summary>
+		///// Calculate the sum of the <see cref="Padding"/> and the <see cref="BorderThickness"/>
+		///// </summary>
+		///// <returns>The total of the <see cref="Border"/> <see cref="Thickness"/></returns>
+		//public Thickness GetSumThickness ()
+		//{
+		//	return new Thickness () {
+		//		Left = Padding.Left + BorderThickness.Left,
+		//		Top = Padding.Top + BorderThickness.Top,
+		//		Right = Padding.Right + BorderThickness.Right,
+		//		Bottom = Padding.Bottom + BorderThickness.Bottom
+		//	};
+		//}
+
+		///// <summary>
+		///// Drawn the <see cref="BorderThickness"/> more the <see cref="Padding"/>
+		/////  more the <see cref="Border.BorderStyle"/> and the <see cref="Effect3D"/>.
+		///// </summary>
+		///// <param name="view">The view to draw.</param>
+		///// <param name="fill">If it will clear or not the content area.</param>
+		//public void DrawContent (View view = null, bool fill = true)
+		//{
+		//	if (Child == null) {
+		//		Child = view;
+		//	}
+		//	if (Parent?.Border != null) {
+		//		DrawParentBorder (Parent.ViewToScreen (Parent.Bounds), fill);
+		//	} else {
+		//		DrawChildBorder (Child.ViewToScreen (Child.Bounds), fill);
+		//	}
+		//}
+
+		///// <summary>
+		///// Same as <see cref="DrawContent"/> but drawing full frames for all borders.
+		///// </summary>
+		//public void DrawFullContent ()
+		//{
+		//	var borderThickness = BorderThickness;
+		//	var padding = Padding;
+		//	var marginFrame = DrawMarginFrame ? 1 : 0;
+		//	var driver = Application.Driver;
+		//	Rect scrRect;
+		//	if (Parent?.Border != null) {
+		//		scrRect = Parent.ViewToScreen (Parent.Bounds);
+		//	} else {
+		//		scrRect = Child.ViewToScreen (Child.Bounds);
+		//	}
+		//	Rect borderRect;
+		//	if (Parent?.Border != null) {
+		//		borderRect = scrRect;
+		//	} else {
+		//		borderRect = new Rect () {
+		//			X = scrRect.X - marginFrame - padding.Left - borderThickness.Left,
+		//			Y = scrRect.Y - marginFrame - padding.Top - borderThickness.Top,
+		//			Width = ActualWidth,
+		//			Height = ActualHeight
+		//		};
+		//	}
+		//	var savedAttribute = driver.GetAttribute ();
+
+		//	// Draw 3D effects
+		//	if (Effect3D) {
+		//		driver.SetAttribute ((Attribute)Effect3DBrush);
+
+		//		var effectBorder = new Rect () {
+		//			X = borderRect.X + Effect3DOffset.X,
+		//			Y = borderRect.Y + Effect3DOffset.Y,
+		//			Width = ActualWidth,
+		//			Height = ActualHeight
+		//		};
+		//		//Child.Clear (effectBorder);
+		//		for (int r = effectBorder.Y; r < Math.Min (effectBorder.Bottom, driver.Rows); r++) {
+		//			for (int c = effectBorder.X; c < Math.Min (effectBorder.Right, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+		//	}
+
+		//	// Draw border thickness
+		//	driver.SetAttribute (new Attribute (BorderBrush));
+		//	Child.Clear (borderRect);
+
+		//	borderRect = new Rect () {
+		//		X = borderRect.X + borderThickness.Left,
+		//		Y = borderRect.Y + borderThickness.Top,
+		//		Width = Math.Max (borderRect.Width - borderThickness.Right - borderThickness.Left, 0),
+		//		Height = Math.Max (borderRect.Height - borderThickness.Bottom - borderThickness.Top, 0)
+		//	};
+		//	if (borderRect != scrRect) {
+		//		// Draw padding
+		//		driver.SetAttribute (new Attribute (Background));
+		//		Child.Clear (borderRect);
+		//	}
+
+		//	driver.SetAttribute (savedAttribute);
+
+		//	// Draw margin frame
+		//	if (DrawMarginFrame) {
+		//		if (Parent?.Border != null) {
+		//			var sumPadding = GetSumThickness ();
+		//			borderRect = new Rect () {
+		//				X = scrRect.X + sumPadding.Left,
+		//				Y = scrRect.Y + sumPadding.Top,
+		//				Width = Math.Max (scrRect.Width - sumPadding.Right - sumPadding.Left, 0),
+		//				Height = Math.Max (scrRect.Height - sumPadding.Bottom - sumPadding.Top, 0)
+		//			};
+		//		} else {
+		//			borderRect = new Rect () {
+		//				X = borderRect.X + padding.Left,
+		//				Y = borderRect.Y + padding.Top,
+		//				Width = Math.Max (borderRect.Width - padding.Right - padding.Left, 0),
+		//				Height = Math.Max (borderRect.Height - padding.Bottom - padding.Top, 0)
+		//			};
+		//		}
+		//		if (borderRect.Width > 0 && borderRect.Height > 0) {
+		//			driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
+		//		}
+		//	}
+		//}
+
+		//private void DrawChildBorder (Rect frame, bool fill = true)
+		//{
+		//	var drawMarginFrame = DrawMarginFrame ? 1 : 0;
+		//	var sumThickness = GetSumThickness ();
+		//	var padding = Padding;
+		//	var effect3DOffset = Effect3DOffset;
+		//	var driver = Application.Driver;
+
+		//	var savedAttribute = driver.GetAttribute ();
+
+		//	driver.SetAttribute (new Attribute (BorderBrush));
+
+		//	// Draw the upper BorderThickness
+		//	for (int r = frame.Y - drawMarginFrame - sumThickness.Top;
+		//		r < frame.Y - drawMarginFrame - padding.Top; r++) {
+		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
+		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the left BorderThickness
+		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
+		//			c < frame.X - drawMarginFrame - padding.Left; c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the right BorderThickness
+		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.Right + drawMarginFrame + padding.Right;
+		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the lower BorderThickness
+		//	for (int r = frame.Bottom + drawMarginFrame + padding.Bottom;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
+		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	driver.SetAttribute (new Attribute (Background));
+
+		//	// Draw the upper Padding
+		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
+		//		r < frame.Y - drawMarginFrame; r++) {
+		//		for (int c = frame.X - drawMarginFrame - padding.Left;
+		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the left Padding
+		//	for (int r = frame.Y - drawMarginFrame;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame, driver.Rows); r++) {
+		//		for (int c = frame.X - drawMarginFrame - padding.Left;
+		//			c < frame.X - drawMarginFrame; c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the right Padding
+		//	for (int r = frame.Y - drawMarginFrame;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame, driver.Rows); r++) {
+		//		for (int c = frame.Right + drawMarginFrame;
+		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the lower Padding
+		//	for (int r = frame.Bottom + drawMarginFrame;
+		//		r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X - drawMarginFrame - padding.Left;
+		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	driver.SetAttribute (savedAttribute);
+
+		//	// Draw the MarginFrame
+		//	if (DrawMarginFrame) {
+
+		//		var rect = new Rect () {
+		//			X = frame.X - drawMarginFrame,
+		//			Y = frame.Y - drawMarginFrame,
+		//			Width = frame.Width + (2 * drawMarginFrame),
+		//			Height = frame.Height + (2 * drawMarginFrame)
+		//		};
+		//		if (rect.Width > 0 && rect.Height > 0) {
+		//			driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+		//			DrawTitle (Child);
+		//		}
+
+		//		//var rect = Child.ViewToScreen (new Rect (-1, -1, Child.Frame.Width + 2, Child.Frame.Height + 2));
+		//		//if (rect.Width > 0 && rect.Height > 0) {
+
+		//		//	var lc = new LineCanvas ();
+
+		//		//	lc.AddLine (rect.Location, rect.Width-1, Orientation.Horizontal, BorderStyle);
+		//		//	lc.AddLine (rect.Location, rect.Height-1, Orientation.Vertical, BorderStyle);
+
+		//		//	lc.AddLine (new Point (rect.X, rect.Y + rect.Height-1), rect.Width, Orientation.Horizontal, BorderStyle);
+		//		//	lc.AddLine (new Point (rect.X + rect.Width-1, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
+
+		//		//	//driver.SetAttribute (new Attribute(Color.Red, Color.BrightYellow));
+		//		//	foreach (var p in lc.GenerateImage (rect)) {
+		//		//		AddRuneAt (driver, p.Key.X, p.Key.Y, p.Value);
+		//		//	}
+		//		//	DrawTitle (Child);
+		//		//}
+		//	}
+
+		//	if (Effect3D) {
+		//		driver.SetAttribute ((Attribute)Effect3DBrush);
+
+		//		// Draw the upper Effect3D
+		//		for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
+		//			r >= 0 && r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
+		//			for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
+		//				c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the left Effect3D
+		//		for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
+		//			r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
+		//				c >= 0 && c < frame.X - drawMarginFrame - sumThickness.Left; c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the right Effect3D
+		//		for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
+		//			r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = frame.Right + drawMarginFrame + sumThickness.Right;
+		//				c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the lower Effect3D
+		//		for (int r = frame.Bottom + drawMarginFrame + sumThickness.Bottom;
+		//			r >= 0 && r < Math.Min (frame.Bottom + drawMarginFrame + sumThickness.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
+		//				c >= 0 && c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+		//	}
+		//	driver.SetAttribute (savedAttribute);
+		//}
+
+		//private void DrawParentBorder (Rect frame, bool fill = true)
+		//{
+		//	var sumThickness = GetSumThickness ();
+		//	var borderThickness = BorderThickness;
+		//	var effect3DOffset = Effect3DOffset;
+		//	var driver = Application.Driver;
+
+		//	var savedAttribute = driver.GetAttribute ();
+
+		//	driver.SetAttribute (new Attribute (BorderBrush));
+
+		//	// Draw the upper BorderThickness
+		//	for (int r = frame.Y;
+		//		r < Math.Min (frame.Y + borderThickness.Top, frame.Bottom); r++) {
+		//		for (int c = frame.X;
+		//			c < Math.Min (frame.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the left BorderThickness
+		//	for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
+		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X;
+		//			c < Math.Min (frame.X + borderThickness.Left, frame.Right); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the right BorderThickness
+		//	for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
+		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = Math.Max (frame.Right - borderThickness.Right, frame.X);
+		//			c < Math.Min (frame.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the lower BorderThickness
+		//	for (int r = Math.Max (frame.Bottom - borderThickness.Bottom, frame.Y);
+		//		r < Math.Min (frame.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X;
+		//			c < Math.Min (frame.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	driver.SetAttribute (new Attribute (Background));
+
+		//	// Draw the upper Padding
+		//	for (int r = frame.Y + borderThickness.Top;
+		//		r < Math.Min (frame.Y + sumThickness.Top, frame.Bottom - borderThickness.Bottom); r++) {
+		//		for (int c = frame.X + borderThickness.Left;
+		//			c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the left Padding
+		//	for (int r = frame.Y + sumThickness.Top;
+		//		r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X + borderThickness.Left;
+		//			c < Math.Min (frame.X + sumThickness.Left, frame.Right - borderThickness.Right); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the right Padding
+		//	for (int r = frame.Y + sumThickness.Top;
+		//		r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = Math.Max (frame.Right - sumThickness.Right, frame.X + sumThickness.Left);
+		//			c < Math.Max (frame.Right - borderThickness.Right, frame.X + sumThickness.Left); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	// Draw the lower Padding
+		//	for (int r = Math.Max (frame.Bottom - sumThickness.Bottom, frame.Y + borderThickness.Top);
+		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
+		//		for (int c = frame.X + borderThickness.Left;
+		//			c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
+
+		//			AddRuneAt (driver, c, r, ' ');
+		//		}
+		//	}
+
+		//	driver.SetAttribute (savedAttribute);
+
+		//	// Draw the MarginFrame
+		//	if (DrawMarginFrame) {
+		//		var rect = new Rect () {
+		//			X = frame.X + sumThickness.Left,
+		//			Y = frame.Y + sumThickness.Top,
+		//			Width = Math.Max (frame.Width - sumThickness.Right - sumThickness.Left, 0),
+		//			Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
+		//		};
+		//		if (rect.Width > 0 && rect.Height > 0) {
+		//			driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+		//			DrawTitle (Parent);
+		//		}
+		//	}
+
+		//	if (Effect3D) {
+		//		driver.SetAttribute ((Attribute)Effect3DBrush);
+
+		//		// Draw the upper Effect3D
+		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
+		//			r < frame.Y; r++) {
+		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
+		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the left Effect3D
+		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
+		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
+		//				c < frame.X; c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the right Effect3D
+		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
+		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = frame.Right;
+		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+
+		//		// Draw the lower Effect3D
+		//		for (int r = frame.Bottom;
+		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
+		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
+		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
+
+		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
+		//			}
+		//		}
+		//	}
+		//	driver.SetAttribute (savedAttribute);
+		//}
+
+		//private void AddRuneAt (ConsoleDriver driver, int col, int row, Rune ch)
+		//{
+		//	if (col < driver.Cols && row < driver.Rows && col > 0 && driver.Contents [row, col, 2] == 0
+		//		&& Rune.ColumnWidth ((char)driver.Contents [row, col - 1, 0]) > 1) {
+
+		//		driver.Contents [row, col, 1] = driver.GetAttribute ();
+		//		return;
+		//	}
+		//	driver.Move (col, row);
+		//	driver.AddRune (ch);
+		//}
+
+		///// <summary>
+		///// Draws the view <see cref="Title"/> to the screen.
+		///// </summary>
+		///// <param name="view">The view.</param>
+		//public void DrawTitle (View view)
+		//{
+		//	var driver = Application.Driver;
+		//	if (DrawMarginFrame) {
+		//		driver.SetAttribute (Child.GetNormalColor ());
+		//		if (Child.HasFocus)
+		//			driver.SetAttribute (Child.ColorScheme.HotNormal);
+		//		var padding = view.Border.GetSumThickness ();
+		//		Rect scrRect;
+		//		if (view == Child) {
+		//			scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width + 2, view.Frame.Height + 2));
+		//			scrRect = new Rect (scrRect.X - 1, scrRect.Y - 1, scrRect.Width, scrRect.Height);
+		//			driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
+		//		} else {
+		//			scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
+		//			driver.DrawWindowTitle (scrRect, Title,
+		//				padding.Left, padding.Top, padding.Right, padding.Bottom);
+		//		}
+		//	}
+		//	driver.SetAttribute (Child.GetNormalColor ());
+		//}
+
+		///// <summary>
+		///// Draws the <see cref="View.Text"/> to the screen.
+		///// </summary>
+		///// <param name="view">The view.</param>
+		///// <param name="rect">The frame.</param>
+		//public void DrawTitle (View view, Rect rect)
+		//{
+		//	var driver = Application.Driver;
+		//	if (DrawMarginFrame) {
+		//		driver.SetAttribute (view.GetNormalColor ());
+		//		if (view.HasFocus) {
+		//			driver.SetAttribute (view.ColorScheme.HotNormal);
+		//		}
+		//		var padding = Parent.Border.GetSumThickness ();
+		//		var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));
+		//		driver.DrawWindowTitle (scrRect, view.Text,
+		//			padding.Left, padding.Top, padding.Right, padding.Bottom);
+		//	}
+		//	driver.SetAttribute (view.GetNormalColor ());
+		//}
 
 		/// <summary>
 		/// Invoke the <see cref="BorderChanged"/> event.

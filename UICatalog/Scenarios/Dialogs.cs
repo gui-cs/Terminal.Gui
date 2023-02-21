@@ -27,6 +27,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
+			
 			var widthEdit = new TextField ("0") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -43,6 +44,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
+			
 			var heightEdit = new TextField ("0") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -68,6 +70,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
+			
 			var titleEdit = new TextField ("Title") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -84,6 +87,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
+			
 			var numButtonsEdit = new TextField ("3") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -99,13 +103,13 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (glyphsNotWords);
 
-
 			label = new Label ("Button Style:") {
 				X = 0,
 				Y = Pos.Bottom (glyphsNotWords),
 				TextAlignment = Terminal.Gui.TextAlignment.Right
 			};
 			frame.Add (label);
+			
 			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -127,6 +131,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
+
 			var buttonPressedLabel = new Label (" ") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 5,

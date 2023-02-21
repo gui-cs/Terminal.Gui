@@ -53,7 +53,7 @@ namespace UICatalog.Scenarios {
 			win.Add (tf1, button, label, tv, tf2);
 			Application.Top.Add (win);
 
-			var top2 = new Border.ToplevelContainer (new Rect (50, 5, 40, 20),
+			var top2 = new Window (new Rect (50, 5, 40, 20), "Test2", 0,
 				new Border () {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 					Padding = padding,
 					Background = background,
 					Effect3D = effect3D,
-					Title = "Test2"
+					//Title = "Test2"
 				}) {
 				ColorScheme = Colors.Base,
 			};

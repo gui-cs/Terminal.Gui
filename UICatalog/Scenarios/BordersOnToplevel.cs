@@ -18,7 +18,7 @@ namespace UICatalog.Scenarios {
 			var background = Colors.Base.HotNormal.Foreground;
 			var effect3D = true;
 
-			var smartView = new Border.ToplevelContainer () {
+			var smartView = new Window () {
 				X = Pos.Center (),
 				Y = Pos.Center () - 7,
 				Width = 40,
@@ -31,8 +31,8 @@ namespace UICatalog.Scenarios {
 					Padding = padding,
 					Background = background,
 					Effect3D = effect3D,
-					Title = "Toplevel"
 				},
+				Title = "Toplevel",
 				ColorScheme = Colors.TopLevel
 			};
 

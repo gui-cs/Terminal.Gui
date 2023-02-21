@@ -458,28 +458,32 @@ namespace Terminal.Gui {
 		public Frame Margin { get; set; }
 		public Frame BorderFrame { get; set; }
 		public Frame Padding { get; set; }
+
 		/// <summary>
 		/// Temporary API to support the new v2 API
 		/// </summary>
 		public void EnableFrames ()
 		{
 			IgnoreBorderPropertyOnRedraw = true;
+			Margin?.Dispose ();
 			Margin = new Frame () {
-				Text = "Margin",
+				Data = "Margin",
 				Thickness = new Thickness (0),
 				ColorScheme = Colors.ColorSchemes ["Error"]
 			};
 			//Margin.DiagnosticsLabel.Text = "Margin";
 
+			BorderFrame?.Dispose ();
 			BorderFrame = new Frame () {
-				Text = "BorderFrame",
+				Data = "BorderFrame",
 				BorderStyle = BorderStyle.Single,
-				Thickness = new Thickness (1),
-				ColorScheme = Colors.ColorSchemes ["Dialog"]
+				Thickness = new Thickness (0),
+				ColorScheme = ColorScheme
 			};
 
+			Padding?.Dispose ();
 			Padding = new Frame () {
-				Text = "Padding",
+				Data = "Padding",
 				Thickness = new Thickness (0),
 				ColorScheme = Colors.ColorSchemes ["Toplevel"]
 			};
@@ -544,9 +548,6 @@ namespace Terminal.Gui {
 			set {
 				Debug.WriteLine ($"It makes no sense to set Bounds. Use Frame instead. Bounds: {value}");
 				Frame = new Rect (Frame.Location, value.Size);
-				//	+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
-				//	+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
-				//	+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom));
 			}
 		}
 
@@ -832,9 +833,6 @@ namespace Terminal.Gui {
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
-			if (Border != null) {
-				Border.Child = this;
-			}
 			shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
@@ -1286,6 +1284,7 @@ namespace Terminal.Gui {
 		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
+			// TODO: Refactor to use Frames
 			var scrRect = ViewToScreen (region);
 			var savedClip = ClipToBounds ();
 			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: fill);
@@ -1548,6 +1547,7 @@ namespace Terminal.Gui {
 			}
 			
 			Margin.Redraw (Margin.Bounds);
+			BorderFrame.Title = Title;
 			BorderFrame.Redraw (BorderFrame.Bounds);
 			Padding.Redraw (BorderFrame.Bounds);
 
@@ -1555,13 +1555,13 @@ namespace Terminal.Gui {
 			var padding = BorderFrame.Thickness.GetInnerRect (border);
 			var content = Padding.Thickness.GetInnerRect (padding);
 
-			// Draw the diagnostics label on the bottom of the content
-			var tf = new TextFormatter () {
-				Text = $"Content {Bounds}",
-				Alignment = TextAlignment.Centered,
-				VerticalAlignment = VerticalTextAlignment.Bottom
-			};
-			tf.Draw (content, ColorScheme.Normal, ColorScheme.Normal);
+			//// Draw the diagnostics label on the bottom of the content
+			//var tf = new TextFormatter () {
+			//	Text = $"Content {Bounds}",
+			//	Alignment = TextAlignment.Centered,
+			//	VerticalAlignment = VerticalTextAlignment.Bottom
+			//};
+			//tf.Draw (content, ColorScheme.Normal, ColorScheme.Normal);
 
 			return true;
 		}
@@ -1583,7 +1583,6 @@ namespace Terminal.Gui {
 		///    larger than the <ref name="bounds"/> parameter, as this will cause the driver to clip the entire region.
 		/// </para>
 		/// </remarks>
-
 		public virtual void Redraw (Rect bounds)
 		{
 			if (!CanBeVisible (this)) {
@@ -1601,8 +1600,9 @@ namespace Terminal.Gui {
 
 			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
-				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max (0, bounds.Height - 2));
+				throw new InvalidOperationException ("Don't use Border!");
+				//Border.DrawContent (this);
+				//boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max (0, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic) && !IsOverridden (this, "Redraw") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -2883,6 +2883,11 @@ namespace Terminal.Gui {
 			set {
 				if (border != value) {
 					border = value;
+					EnableFrames ();
+					Margin.Thickness = border.BorderThickness;
+					BorderFrame.Thickness = new Thickness (border.BorderStyle != BorderStyle.None ? 1 : 0);
+					BorderFrame.BorderStyle = border.BorderStyle;
+					Padding.Thickness = border.Padding;
 					SetNeedsDisplay ();
 				}
 			}
