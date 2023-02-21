@@ -7,7 +7,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using NStack;
+using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -20,6 +23,26 @@ namespace Terminal.Gui {
 	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
 	public class Dialog : Window {
+		/// <summary>
+		/// The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>. 
+		/// </summary>
+		/// <remarks>
+		/// This property can be set in a Theme.
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
+
+		/// <summary>
+		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+		public static Border DefaultBorder { get; set; } = new Border () {
+			BorderStyle = BorderStyle.Single,
+			DrawMarginFrame = false,
+			Effect3D = true,
+			Effect3DOffset = new Point (1, 1),
+		};
+
 		internal List<Button> buttons = new List<Button> ();
 		const int padding = 0;
 
@@ -54,7 +77,8 @@ namespace Terminal.Gui {
 
 			ColorScheme = Colors.Dialog;
 			Modal = true;
-			Border.Effect3D = true;
+			ButtonAlignment = DefaultButtonAlignment;
+			Border = DefaultBorder;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {
@@ -117,6 +141,7 @@ namespace Terminal.Gui {
 			}
 			return buttons.Select (b => b.Bounds.Width).Sum ();
 		}
+
 		/// <summary>
 		/// Determines the horizontal alignment of the Dialog buttons.
 		/// </summary>
@@ -142,13 +167,12 @@ namespace Terminal.Gui {
 			Right
 		}
 
-		private ButtonAlignments buttonAlignment = Dialog.ButtonAlignments.Center;
 
 		/// <summary>
 		/// Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the 
 		/// bottom of the dialog. 
 		/// </summary>
-		public ButtonAlignments ButtonAlignment { get => buttonAlignment; set => buttonAlignment = value; }
+		public ButtonAlignments ButtonAlignment { get; set; }
 
 		void LayoutStartedHandler ()
 		{

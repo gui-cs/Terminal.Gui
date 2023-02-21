@@ -645,7 +645,7 @@ namespace Terminal.Gui.TypeTests {
 			};
 
 			Application.Iteration += () => {
-				while (count < 20) 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
@@ -1088,7 +1088,7 @@ namespace Terminal.Gui.TypeTests {
 			};
 
 			Application.Iteration += () => {
-				while (count > 0) 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};

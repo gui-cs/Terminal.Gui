@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Terminal.Gui.Graphs;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -47,19 +48,23 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the width of the left side of the rectangle.
 		/// </summary>
-		public int Left { get => _left; set => _left = validate (value); }
+		[JsonInclude]
+		public int Left;
 		/// <summary>
 		/// Gets or sets the width of the upper side of the rectangle.
 		/// </summary>
-		public int Top { get => _top; set => _top = validate (value); }
+		[JsonInclude]
+		public int Top;
 		/// <summary>
 		/// Gets or sets the width of the right side of the rectangle.
 		/// </summary>
-		public int Right { get => _right; set => _right = validate (value); }
+		[JsonInclude]
+		public int Right;
 		/// <summary>
 		/// Gets or sets the width of the lower side of the rectangle.
 		/// </summary>
-		public int Bottom { get => _bottom; set => _bottom = validate (value); }
+		[JsonInclude]
+		public int Bottom;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Thickness"/> class with all widths
@@ -450,6 +455,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof(JsonStringEnumConverter))]
 		public BorderStyle BorderStyle {
 			get => borderStyle;
 			set {
@@ -465,6 +471,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets if a margin frame is drawn around the <see cref="Child"/> regardless the <see cref="BorderStyle"/>
 		/// </summary>
+		[JsonInclude]
 		public bool DrawMarginFrame {
 			get => drawMarginFrame;
 			set {
@@ -482,6 +489,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the relative <see cref="Thickness"/> of a <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude]
 		public Thickness BorderThickness {
 			get => borderThickness;
 			set {
@@ -493,6 +501,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that draws the outer border color.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color BorderBrush {
 			get => borderBrush;
 			set {
@@ -504,6 +513,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that fills the area between the bounds of a <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
 		public Color Background {
 			get => background;
 			set {
@@ -516,6 +526,7 @@ namespace Terminal.Gui {
 		/// Gets or sets a <see cref="Thickness"/> value that describes the amount of space between a
 		///  <see cref="Border"/> and its child element.
 		/// </summary>
+		[JsonInclude]
 		public Thickness Padding {
 			get => padding;
 			set {
@@ -527,6 +538,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rendered width of this element.
 		/// </summary>
+		[JsonIgnore]
 		public int ActualWidth {
 			get {
 				var driver = Application.Driver;
@@ -540,6 +552,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rendered height of this element.
 		/// </summary>
+		[JsonIgnore]
 		public int ActualHeight {
 			get {
 				var driver = Application.Driver;
@@ -554,21 +567,25 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the single child element of a <see cref="View"/>.
 		/// </summary>
+		[JsonIgnore]
 		public View Child { get; set; }
 
 		/// <summary>
 		/// Gets the parent <see cref="Child"/> parent if any.
 		/// </summary>
+		[JsonIgnore]
 		public View Parent { get => Child?.SuperView; }
 
 		/// <summary>
 		/// Gets or private sets by the <see cref="ToplevelContainer"/>
 		/// </summary>
+		[JsonIgnore]
 		public ToplevelContainer ChildContainer { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the 3D effect around the <see cref="Border"/>.
 		/// </summary>
+		[JsonInclude]
 		public bool Effect3D {
 			get => effect3D;
 			set {
@@ -580,6 +597,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get or sets the offset start position for the <see cref="Effect3D"/>
 		/// </summary>
+		[JsonInclude]
 		public Point Effect3DOffset {
 			get => effect3DOffset;
 			set {
@@ -590,8 +608,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the color for the <see cref="Border"/>
 		/// </summary>
+		[JsonInclude, JsonConverter (typeof (Configuration.AttributeJsonConverter))]
 		public Attribute? Effect3DBrush {
-			get => effect3DBrush;
+			get {
+				if (effect3DBrush == null && effect3D) {
+					return effect3DBrush = new Attribute (Color.Gray, Color.DarkGray);
+				} else {
+					return effect3DBrush;
+				}
+			}
+
 			set {
 				effect3DBrush = value;
 				OnBorderChanged ();
@@ -601,6 +627,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The title to be displayed for this view.
 		/// </summary>
+		[JsonIgnore]
 		public ustring Title {
 			get => title;
 			set {
@@ -671,7 +698,7 @@ namespace Terminal.Gui {
 
 			// Draw 3D effects
 			if (Effect3D) {
-				driver.SetAttribute (GetEffect3DBrush ());
+				driver.SetAttribute ((Attribute)Effect3DBrush);
 
 				var effectBorder = new Rect () {
 					X = borderRect.X + Effect3DOffset.X,
@@ -860,7 +887,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Effect3D) {
-				driver.SetAttribute (GetEffect3DBrush ());
+				driver.SetAttribute ((Attribute)Effect3DBrush);
 
 				// Draw the upper Effect3D
 				for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
@@ -1015,7 +1042,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Effect3D) {
-				driver.SetAttribute (GetEffect3DBrush ());
+				driver.SetAttribute ((Attribute)Effect3DBrush);
 
 				// Draw the upper Effect3D
 				for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
@@ -1058,13 +1085,6 @@ namespace Terminal.Gui {
 				}
 			}
 			driver.SetAttribute (savedAttribute);
-		}
-
-		private Attribute GetEffect3DBrush ()
-		{
-			return Effect3DBrush == null
-				? new Attribute (Color.Gray, Color.DarkGray)
-				: (Attribute)Effect3DBrush;
 		}
 
 		private void AddRuneAt (ConsoleDriver driver, int col, int row, Rune ch)

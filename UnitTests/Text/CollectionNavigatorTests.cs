@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Terminal.Gui;
 using Xunit;
 
 namespace Terminal.Gui.TextTests {
@@ -339,7 +340,7 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void  MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
+		public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
 		{
 			var strings = new string [] {
 				"$$",

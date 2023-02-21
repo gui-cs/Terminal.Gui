@@ -69,6 +69,9 @@ namespace UICatalog.Tests {
 				scenario.Init (Colors.Base);
 				scenario.Setup ();
 				scenario.Run ();
+
+				scenario.Dispose();
+
 				Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 				foreach (var inst in Responder.Instances) {
@@ -98,6 +101,7 @@ namespace UICatalog.Tests {
 			int stackSize = CreateInput ("");
 
 			Application.Init (new FakeDriver ());
+			Application.QuitKey = Key.CtrlMask | Key.Q; // Config manager may have set this to a different key
 
 			int iterations = 0;
 			Application.Iteration = () => {
@@ -135,6 +139,8 @@ namespace UICatalog.Tests {
 			Assert.Equal (1, iterations);
 			// Using variable in the left side of Assert.Equal/NotEqual give error. Must be used literals values.
 			//Assert.Equal (stackSize, iterations);
+
+			generic.Dispose();
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();

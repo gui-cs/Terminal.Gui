@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Terminal.Gui;
 using Xunit;
 
 namespace Terminal.Gui.ApplicationTests {
@@ -11,11 +12,8 @@ namespace Terminal.Gui.ApplicationTests {
 
 			int index = toplevels.Count - 1;
 			foreach (var top in toplevels) {
-				if (top.GetType () == typeof (Toplevel)) {
-					Assert.Equal ("Top", top.Id);
-				} else {
-					Assert.Equal ($"w{index}", top.Id);
-				}
+				if (top.GetType () == typeof (Toplevel)) 					Assert.Equal ("Top", top.Id);
+else 					Assert.Equal ($"w{index}", top.Id);
 				index--;
 			}
 
@@ -35,7 +33,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var valueToReplace = new Window () { Id = "w1" };
 			var valueToReplaceWith = new Window () { Id = "new" };
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 
 			toplevels.Replace (valueToReplace, valueToReplaceWith, comparer);
 
@@ -55,7 +53,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var valueToSwapFrom = new Window () { Id = "w3" };
 			var valueToSwapTo = new Window () { Id = "w1" };
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 			toplevels.Swap (valueToSwapFrom, valueToSwapTo, comparer);
 
 			var tops = toplevels.ToArray ();
@@ -105,18 +103,16 @@ namespace Terminal.Gui.ApplicationTests {
 			Stack<Toplevel> toplevels = CreateToplevels ();
 
 			// Only allows unique keys
-			HashSet<int> hCodes = new HashSet<int> ();
+			var hCodes = new HashSet<int> ();
 
-			foreach (var top in toplevels) {
-				Assert.True (hCodes.Add (top.GetHashCode ()));
-			}
+			foreach (var top in toplevels) 				Assert.True (hCodes.Add (top.GetHashCode ()));
 		}
 
 		[Fact]
 		public void Stack_Toplevels_FindDuplicates ()
 		{
 			Stack<Toplevel> toplevels = CreateToplevels ();
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 
 			toplevels.Push (new Toplevel () { Id = "w4" });
 			toplevels.Push (new Toplevel () { Id = "w1" });
@@ -131,7 +127,7 @@ namespace Terminal.Gui.ApplicationTests {
 		public void Stack_Toplevels_Contains ()
 		{
 			Stack<Toplevel> toplevels = CreateToplevels ();
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 
 			Assert.True (toplevels.Contains (new Window () { Id = "w2" }, comparer));
 			Assert.False (toplevels.Contains (new Toplevel () { Id = "top2" }, comparer));
@@ -143,7 +139,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Stack<Toplevel> toplevels = CreateToplevels ();
 
 			var valueToMove = new Window () { Id = "w1" };
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 
 			toplevels.MoveTo (valueToMove, 1, comparer);
 
@@ -162,7 +158,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Stack<Toplevel> toplevels = CreateToplevels ();
 
 			var valueToMove = new Window () { Id = "Top" };
-			ToplevelEqualityComparer comparer = new ToplevelEqualityComparer ();
+			var comparer = new ToplevelEqualityComparer ();
 
 			toplevels.MoveTo (valueToMove, 0, comparer);
 
@@ -178,7 +174,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 		private Stack<Toplevel> CreateToplevels ()
 		{
-			Stack<Toplevel> toplevels = new Stack<Toplevel> ();
+			var toplevels = new Stack<Toplevel> ();
 
 			toplevels.Push (new Toplevel () { Id = "Top" });
 			toplevels.Push (new Window () { Id = "w1" });

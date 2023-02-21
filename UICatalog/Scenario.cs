@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog {
 	/// <summary>
@@ -14,7 +15,7 @@ namespace UICatalog {
 	///  <item><description>Annotate the <see cref="Scenario"/> derived class with a <see cref="Scenario.ScenarioMetadata"/> attribute specifying the scenario's name and description.</description></item>
 	///  <item><description>Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "_All".</description></item>
 	///  <item><description>Implement the <see cref="Setup"/> override which will be called when a user selects the scenario to run.</description></item>
-	///  <item><description>Optionally, implement the <see cref="Init(Toplevel, ColorScheme)"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description></item>
+	///  <item><description>Optionally, implement the <see cref="Init(ColorScheme)"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description></item>
 	///  </list>
 	/// </para>
 	/// <para>
@@ -71,9 +72,27 @@ namespace UICatalog {
 		/// </remarks>
 		public virtual void Init (ColorScheme colorScheme)
 		{
+			//ConfigurationManager.Applied += (a) => {
+			//	if (Application.Top == null) {
+			//		return;
+			//	}
+
+			//	//// Apply changes that apply to either UICatalogTopLevel or a Scenario
+			//	//if (Application.Top.MenuBar != null) {
+			//	//	Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+			//	//	Application.Top.MenuBar.SetNeedsDisplay ();
+			//	//}
+
+			//	//if (Application.Top.StatusBar != null) {
+			//	//	Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
+			//	//	Application.Top.StatusBar.SetNeedsDisplay ();
+			//	//}
+			//	//Application.Top.SetNeedsDisplay ();
+			//};
+			
 			Application.Init ();
 
-			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
+			Win = new Window ($"{Application.QuitKey} to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
