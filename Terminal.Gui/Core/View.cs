@@ -550,6 +550,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public Rect ScreenRelativeBounds {
+			get {
+				if (Padding == null || BorderFrame == null || Margin == null) {
+					return Frame;
+				}
+				return Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+			}
+		}
+
 		Pos x, y;
 
 		/// <summary>
@@ -2271,6 +2280,8 @@ namespace Terminal.Gui {
 				autosize = GetAutoSize ();
 			}
 
+			bool hasFrame = SuperView?.Margin != null || SuperView?.BorderFrame != null || SuperView?.Padding != null;
+
 			actX = x?.Anchor (superviewRelativeBounds.Width) ?? 0;
 			actW = Math.Max (CalculateActualWidth (width, superviewRelativeBounds, actX, autosize), 0);
 
@@ -2283,28 +2294,28 @@ namespace Terminal.Gui {
 					actW = !autosize.IsEmpty && autosize.Width > actW ? autosize.Width : actW;
 				}
 				actX = x.Anchor (superviewRelativeBounds.Width - actW);
-				if (Margin != null || BorderFrame != null || Padding != null) {
+				if (hasFrame) {
 					actX += superviewRelativeBounds.X;
 				}
 				break;
 
 			case Pos.PosAbsolute:
 
-				if (Margin != null || BorderFrame != null || Padding != null) {
+				if (hasFrame) {
 					actX += superviewRelativeBounds.X;
 				}
 				break;
 
 			case Pos.PosAnchorEnd:
 
-				if (Margin != null || BorderFrame != null || Padding != null) {
+				if (hasFrame) {
 					actX += superviewRelativeBounds.X;
 				}
 				break;
 
 			case Pos.PosCombine:
 
-				if (Margin != null || BorderFrame != null || Padding != null) {
+				if (hasFrame) {
 					var pc = x as Pos.PosCombine;
 					switch (pc.left) {
 					case Pos.PosAbsolute:
@@ -2330,7 +2341,7 @@ namespace Terminal.Gui {
 
 			case Pos.PosFactor:
 
-				if (Margin != null || BorderFrame != null || Padding != null) {
+				if (hasFrame) {
 					actX += superviewRelativeBounds.X;// - SuperView.Frame.X;
 				}
 				break;
@@ -2358,13 +2369,13 @@ namespace Terminal.Gui {
 
 
 
-			if ((y is Pos.PosAbsolute || y is Pos.PosCenter) && (Margin != null || BorderFrame != null || Padding != null)) {
+			if ((y is Pos.PosAbsolute || y is Pos.PosCenter) && (hasFrame)) {
 				actY += superviewRelativeBounds.Y;
 			}
-			if ((y is Pos.PosAnchorEnd) && (Margin != null || BorderFrame != null || Padding != null)) {
+			if ((y is Pos.PosAnchorEnd) && (hasFrame)) {
 				actY += superviewRelativeBounds.Y;// - SuperView.Frame.Y;
 			}
-			if ((y is Pos.PosFactor) && (Margin != null || BorderFrame != null || Padding != null)) {
+			if ((y is Pos.PosFactor) && (hasFrame)) {
 				actY += superviewRelativeBounds.Y;// - SuperView.Frame.Y;
 			}
 
@@ -2558,7 +2569,7 @@ namespace Terminal.Gui {
 			}
 
 			if (BorderFrame != null) {
-				var border = Margin?.Bounds ?? Bounds;
+				var border = Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
 				BorderFrame.X = border.Location.X;
 				BorderFrame.Y = border.Location.Y;
 				BorderFrame.Width = border.Size.Width;
@@ -2569,7 +2580,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Padding != null) {
-				var padding = BorderFrame?.Bounds ?? Margin?.Bounds ?? Bounds;
+				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame.Frame) ?? Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
 				Padding.Width = padding.Size.Width;
@@ -2649,7 +2660,9 @@ namespace Terminal.Gui {
 			var ordered = TopologicalSort (nodes, edges);
 
 			var bounds = Frame;
-			if ((Margin != null || BorderFrame != null || Padding != null)) {
+			bool hasFrame = Margin != null || BorderFrame != null || Padding != null;
+
+			if (hasFrame) {
 				// in v2 Bounds really is Frame-relative			
 				bounds = Bounds;
 			}
