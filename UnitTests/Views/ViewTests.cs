@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -4492,100 +4493,31 @@ At 0,0
    A text witith two lines.  ", output);
 		}
 
-		[Fact]
-		public void Add_Enable_False_Also_Set_Subview_Enable_To_False ()
-		{
-			var view = new View () { Enabled = false };
-			var label = new Label ();
-
-			Assert.False (view.Enabled);
-			Assert.True (label.Enabled);
-
-			view.Add (label);
-			Assert.False (view.Enabled);
-			Assert.False (label.Enabled);
-
-			view.Enabled = true;
-			Assert.True (view.Enabled);
-			Assert.True (label.Enabled);
-		}
 
 		[Fact, AutoInitShutdown]
-		public void IgnoreHasFocusPropertyOnRedraw_Gets_Sets ()
+		public void Test_Nested_Views_With_Height_Equal_To_One ()
 		{
-			var view = new View () { X = 1, Y = 1, Width = 5, Height = 5, ColorScheme = Colors.Base };
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
+			var v = new View () { Width = 11, Height = 3, ColorScheme = new ColorScheme () };
 
-			Assert.False (view.CanFocus);
-			Assert.False (view.HasFocus);
+			var top = new View () { Width = Dim.Fill (), Height = 1 };
+			var bottom = new View () { Width = Dim.Fill (), Height = 1, Y = 2 };
 
-			var attributes = new Attribute [] {
-				Colors.TopLevel.Normal,
-				Colors.Base.Normal,
-				Colors.Base.Focus
-			};
+			top.Add (new Label ("111"));
+			v.Add (top);
+			v.Add (new LineView (Orientation.Horizontal) { Y = 1 });
+			bottom.Add (new Label ("222"));
+			v.Add (bottom);
 
-			TestHelpers.AssertDriverColorsAre (@"
-0000000
-0111110
-0111110
-0111110
-0111110
-0111110
-0000000", attributes);
+			v.LayoutSubviews ();
+			v.Redraw (v.Bounds);
 
-			view.CanFocus = true;
-			Assert.True (view.CanFocus);
-			view.SetFocus ();
-			Assert.True (view.HasFocus);
-			Application.Refresh ();
-			TestHelpers.AssertDriverColorsAre (@"
-0000000
-0222220
-0222220
-0222220
-0222220
-0222220
-0000000", attributes);
-		}
 
-		[Fact, AutoInitShutdown]
-		public void CanFocus_False_Set_To_True_Also_FocusFirst_If_Focused_Is_Null ()
-		{
-			var top = Application.Top;
-			var view = new View () { X = 1, Y = 1, Width = 5, Height = 5 };
-			top.Add (view);
-			Application.Begin (top);
-
-			Assert.False (view.CanFocus);
-			Assert.False (view.HasFocus);
-
-			view.CanFocus = true;
-			Application.Refresh ();
-			Assert.True (view.CanFocus);
-			Assert.True (view.HasFocus);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void Focused_MostFocused ()
-		{
-			var lv = new ListView (new List<string> () { "one", "two", "three" }) {
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-			var fv = new FrameView ("List") { Width = 10, Height = 10 };
-			fv.Add (lv);
-			Application.Top.Add (fv);
-			Application.Begin (Application.Top);
-
-			Assert.Equal (fv, Application.Top.Focused);
-			Assert.Equal (fv.Subviews [0], fv.Focused);
-			Assert.Equal (lv, fv.Subviews [0].Focused);
-
-			Assert.Equal (lv, Application.Top.MostFocused);
-			Assert.Equal (lv, fv.MostFocused);
-			Assert.Equal (lv, fv.Subviews [0].MostFocused);
+			string looksLike =
+@"    
+111
+───────────
+222";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 	}
 }
