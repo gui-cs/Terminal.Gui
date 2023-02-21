@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -4488,6 +4489,32 @@ At 0,0
                              
   A text with some long width
    A text witith two lines.  ", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Test_Nested_Views_With_Height_Equal_To_One ()
+		{
+			var v = new View () { Width = 11, Height = 3, ColorScheme = new ColorScheme () };
+
+			var top = new View () { Width = Dim.Fill (), Height = 1 };
+			var bottom = new View () { Width = Dim.Fill (), Height = 1, Y = 2 };
+
+			top.Add (new Label ("111"));
+			v.Add (top);
+			v.Add (new LineView (Orientation.Horizontal) { Y = 1 });
+			bottom.Add (new Label ("222"));
+			v.Add (bottom);
+
+			v.LayoutSubviews ();
+			v.Redraw (v.Bounds);
+
+
+			string looksLike =
+@"    
+111
+───────────
+222";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 	}
 }
