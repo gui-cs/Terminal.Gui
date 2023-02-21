@@ -20,22 +20,16 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var view in Subviews) {
-				if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-					if (true) {//)  && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
-						if (view.LayoutNeeded) {
-							view.LayoutSubviews ();
-						}
+				// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
+				if (view.LayoutNeeded) {
+					view.LayoutSubviews ();
+				}
+				if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
+					view.Redraw (view.Bounds);
 
-						// Draw the subview
-						// Use the view's bounds (view-relative; Location will always be (0,0)
-						if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-							var rect = view.Bounds;
-							//view.OnDrawContent (rect);
-							view.Redraw (rect);
-							//view.OnDrawContentComplete (rect);
-						}
-					}
 					view.NeedDisplay = Rect.Empty;
+					// BUGBUG - v2 why does this need to be set to false?
+					// Shouldn't it be set when the subviews draw?
 					view.ChildNeedsDisplay = false;
 				}
 			}
@@ -50,18 +44,12 @@ namespace Terminal.Gui {
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
+					Rect containerBounds = GetContainerBounds ();
+					TextFormatter?.Draw (ViewToScreen (viewport), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+					    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+					    containerBounds);
 				}
-				Rect containerBounds = GetContainerBounds ();
-				TextFormatter?.Draw (ViewToScreen (viewport), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
-				    containerBounds);
 			}
-			//base.OnDrawContent (viewport);
-		}
-
-		public override void OnDrawContentComplete (Rect viewport)
-		{
-			//base.OnDrawContentComplete (viewport);
 		}
 
 		public override void Redraw (Rect bounds)
@@ -81,28 +69,34 @@ namespace Terminal.Gui {
 
 	}
 
+	/// <summary>
+	/// A <see cref="Container"/> used for the rectangles that compose the outer frames of a <see cref="View"/>.
+	/// </summary>
 	public class Frame : Container {
-		public Label DiagnosticsLabel { get; set; }
+		//public Label DiagnosticsLabel { get; set; }
+		// TODO: v2 = This is teporary; need to also enable (or not) simple way of setting 
+		// other border properties
+		// TOOD: v2 - Missing 3D effect
 		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
 
-		public Frame () => IgnoreBorderPropertyOnRedraw = true;
-		
 		public Thickness Thickness { get; set; }
 
+		// TODO: v2 - This is confusing. It is a read-only property and actually only returns a size, so 
+		// should not be a Rect. However, it may make sense to keep it a Rect and support negative Location
+		// for scrolling. Still noodling this.
+		/// <summary>
+		/// Gets the rectangle that describes the inner area of the frame. The Location is always 0, 0.
+		/// </summary>
 		public new Rect Bounds {
 			get {
 				if (Thickness != null) {
 					new Rect (Point.Empty, Frame.Size);
 				}
-				var frameRelativeBounds = Thickness.GetInnerRect (new Rect (Point.Empty, Frame.Size));
-				return frameRelativeBounds;
+				// Return the frame-relative bounds 
+				return Thickness.GetInnerRect (new Rect (Point.Empty, Frame.Size));
 			}
 			set {
 				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
-				//Frame = new Rect (Frame.Location, value.Size
-				//	+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
-				//	+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
-				//	+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom));
 			}
 		}
 

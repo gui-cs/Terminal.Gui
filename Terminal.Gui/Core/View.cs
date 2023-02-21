@@ -963,6 +963,8 @@ namespace Terminal.Gui {
 				}
 		}
 
+		// BUGBUG: v2 - this is poorly named. First, is this reallly  just about Children or 
+		// both subviews and children? And why "Display"? It should be "Redraw".
 		internal bool ChildNeedsDisplay { get; set; }
 
 		/// <summary>
@@ -975,6 +977,7 @@ namespace Terminal.Gui {
 				container.SetChildNeedsDisplay ();
 		}
 
+		// BUGBUG: v2 - this feels like a hack
 		internal bool addingView;
 
 		/// <summary>
@@ -1152,6 +1155,7 @@ namespace Terminal.Gui {
 			});
 		}
 
+		// TODO: v2 - remove duplicate code here
 		/// <summary>
 		///   Clears the view region with the current color.
 		/// </summary>
