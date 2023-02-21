@@ -1527,7 +1527,7 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				TextFormatter?.Draw (ViewToScreen (boundsAdjustedForBorder), HasFocus ? ColorScheme.Focus : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
 				    containerBounds);
 			}

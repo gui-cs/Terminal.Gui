@@ -30,8 +30,7 @@ namespace UICatalog.Scenarios {
 
 		private void ChangeWindowSize ()
 		{
-			miSmallerWindow.Checked = !miSmallerWindow.Checked;
-			smallerWindow = (bool)miSmallerWindow.Checked;
+			smallerWindow = (bool)(miSmallerWindow.Checked = !miSmallerWindow.Checked);
 			scrollViewTestWindow.Dispose ();
 			Application.Top.Remove (scrollViewTestWindow);
 			scrollViewTestWindow = new ScrollViewTestWindow ();
