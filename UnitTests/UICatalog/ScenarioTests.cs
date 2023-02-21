@@ -184,7 +184,6 @@ namespace UICatalog.Tests {
 			List<string> posNames = new List<String> { "Factor", "AnchorEnd", "Center", "Absolute" };
 			List<string> dimNames = new List<String> { "Factor", "Fill", "Absolute" };
 
-
 			Application.Init (new FakeDriver ());
 
 			var Top = Application.Top;

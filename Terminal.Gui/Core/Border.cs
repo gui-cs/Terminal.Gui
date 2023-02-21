@@ -33,11 +33,6 @@ namespace Terminal.Gui {
 	///  of the rectangle, respectively.
 	/// </summary>
 	public class Thickness : IEquatable<Thickness> {
-		private int _left;
-		private int _right;
-		private int _top;
-		private int _bottom;
-
 		private int validate (int width)
 		{
 			if (width < 0) {
@@ -188,19 +183,19 @@ namespace Terminal.Gui {
 		public bool Equals (Thickness other)
 		{
 			return other is not null &&
-			       _left == other._left &&
-			       _right == other._right &&
-			       _top == other._top &&
-			       _bottom == other._bottom;
+			       Left == other.Left &&
+			       Right == other.Right &&
+			       Top == other.Top &&
+			       Bottom == other.Bottom;
 		}
 
 		public override int GetHashCode ()
 		{
 			int hashCode = 1380952125;
-			hashCode = hashCode * -1521134295 + _left.GetHashCode ();
-			hashCode = hashCode * -1521134295 + _right.GetHashCode ();
-			hashCode = hashCode * -1521134295 + _top.GetHashCode ();
-			hashCode = hashCode * -1521134295 + _bottom.GetHashCode ();
+			hashCode = hashCode * -1521134295 + Left.GetHashCode ();
+			hashCode = hashCode * -1521134295 + Right.GetHashCode ();
+			hashCode = hashCode * -1521134295 + Top.GetHashCode ();
+			hashCode = hashCode * -1521134295 + Bottom.GetHashCode ();
 			return hashCode;
 		}
 

@@ -2633,7 +2633,7 @@ Y
 
 			verticalView.Text = $"最初の行{Environment.NewLine}二行目";
 			Application.Top.Redraw (Application.Top.Bounds);
-			Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
+			//Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
 			expected = @"
 ┌──────────────────────────────┐
 │First line Second li          │

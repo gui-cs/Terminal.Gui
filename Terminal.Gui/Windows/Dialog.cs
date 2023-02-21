@@ -104,7 +104,7 @@ namespace Terminal.Gui {
 		/// Use <see cref="AddButton(Button)"/> to add buttons to the dialog.
 		/// </para>
 		/// </remarks>
-		public Dialog () : this (title: string.Empty, width: 0, height: 0, buttons: null) { }
+		public Dialog () : this (title: ustring.Empty, width: 0, height: 0, buttons: null) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 

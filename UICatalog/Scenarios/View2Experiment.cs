@@ -20,16 +20,17 @@ namespace UICatalog.Scenarios {
 			};
 			Application.Top.Add (containerLabel);
 
-			var view2 = new View2 () {
+			var view2 = new View () {
 				X = 2,
 				Y = 2,
 				Height = Dim.Fill (2),
 				Width = Dim.Fill (2),
 				Title = "View2"
 			};
+			view2.EnableFrames ();
 			view2.Margin.Thickness = new Thickness (2);
-			view2.Border.Thickness = new Thickness (2);
-			view2.Border.BorderStyle = BorderStyle.Single;
+			view2.BorderFrame.Thickness = new Thickness (2);
+			view2.BorderFrame.BorderStyle = BorderStyle.Single;
 			view2.Padding.Thickness = new Thickness (2);
 
 			containerLabel.LayoutComplete += (a) => {

@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 				} 
 			}
 
-			internal ProgressDemo (ustring title) : base (title)
+			internal ProgressDemo (string title) : base (title)
 			{
 				ColorScheme = Colors.Dialog;
 
