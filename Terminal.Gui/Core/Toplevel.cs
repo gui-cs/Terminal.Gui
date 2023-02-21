@@ -908,6 +908,12 @@ namespace Terminal.Gui {
 		{
 			if (!IsMdiContainer) {
 				base.PositionCursor ();
+				if (Focused == null) {
+					EnsureFocus ();
+					if (Focused == null) {
+						Driver.SetCursorVisibility (CursorVisibility.Invisible);
+					}
+				}
 				return;
 			}
 
@@ -920,6 +926,9 @@ namespace Terminal.Gui {
 				}
 			}
 			base.PositionCursor ();
+			if (Focused == null) {
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
 		}
 
 		/// <summary>
