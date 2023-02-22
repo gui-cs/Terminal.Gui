@@ -72,6 +72,7 @@ namespace UICatalog {
 				_selectedScenario.Init (_colorScheme);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
+				_selectedScenario.Dispose ();
 				_selectedScenario = null;
 				Application.Shutdown ();
 				return;
@@ -95,6 +96,7 @@ namespace UICatalog {
 				scenario.Init (_colorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+				scenario.Dispose ();
 
 				// This call to Application.Shutdown brackets the Application.Init call
 				// made by Scenario.Init() above
