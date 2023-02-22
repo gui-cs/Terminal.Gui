@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using Terminal.Gui.Graphs;
 using System.Text.Json.Serialization;
+using System.Data;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -14,17 +16,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		None,
 		/// <summary>
-		/// The border is drawn with a single line limits.
+		/// The border is drawn using single-width line glyphs.
 		/// </summary>
 		Single,
 		/// <summary>
-		/// The border is drawn with a double line limits.
+		/// The border is drawn using double-width line glyphs.
 		/// </summary>
 		Double,
 		/// <summary>
-		/// The border is drawn with a single line and rounded corners limits.
+		/// The border is drawn using single-width line glyphs with rounded corners.
 		/// </summary>
-		Rounded
+		Rounded,
+		// TODO: Support Ruler
+		///// <summary>
+		///// The border is drawn as a diagnostic ruler ("|123456789...").
+		///// </summary>
+		//Ruler
 	}
 
 	/// <summary>
@@ -103,45 +110,83 @@ namespace Terminal.Gui {
 			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
 		}
 
+		private void FillRect (Rect rect, System.Rune rune = default)
+		{
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (rune == default ? ' ' : rune);
+				}
+			}
+		}
 
 		/// <summary>
-		/// Draws the thickness rectangle with an optional diagnostics label.
+		/// Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.
 		/// </summary>
+		/// <remarks>
+		/// If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to <see cref="ConsoleDriver.DiagnosticFlags.FramePadding"/> then
+		/// 'T', 'L', 'R', and 'B' glyphs will be used instead of space. If <see cref="ConsoleDriver.DiagnosticFlags"/>
+		/// is set to <see cref="ConsoleDriver.DiagnosticFlags.FrameRuler"/> then a ruler will be drawn on the outer edge of the
+		/// Thickness.
+		/// </remarks>
 		/// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in 
 		/// screen coordinates.</param>
 		/// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
 		/// <returns>The inner rectangle remaining to be drawn.</returns>
 		public Rect Draw (Rect rect, string label = null)
 		{
-			// Draw the Top side
-			for (var r = rect.Y; r < Math.Min (rect.Y + rect.Height, rect.Y + Top); r++) {
-				for (var c = rect.X; c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
+			System.Rune clearChar = ' ';
+			System.Rune leftChar = clearChar;
+			System.Rune rightChar = clearChar;
+			System.Rune topChar = clearChar;
+			System.Rune bottomChar = clearChar;
+
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding) {
+				leftChar = 'L';
+				rightChar = 'R';
+				topChar = 'T';
+				bottomChar = 'B';
 			}
+
+			ustring hrule = ustring.Empty;
+			ustring vrule = ustring.Empty;
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
+
+				string h = "0123456789";
+				hrule = h.Repeat ((int)Math.Ceiling ((double)(rect.Width) / (double)h.Length)) [0..(rect.Width)];
+				string v = "0123456789";
+				vrule = v.Repeat ((int)Math.Ceiling ((double)(rect.Height * 2) / (double)v.Length)) [0..(rect.Height * 2)];
+			};
+
+			// Draw the Top side
+			FillRect (new Rect (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
 
 			// Draw the Left side
-			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X; c < Math.Min (rect.X + rect.Width, rect.X + Left); c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
+			FillRect (new Rect (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
 
 			// Draw the Right side			
-			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X + Math.Max (0, rect.Width - Right); c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
-				}
-			}
+			FillRect (new Rect (Math.Max (0, rect.X + rect.Width - Right), rect.Y, Math.Min (rect.Width, Right), rect.Height), rightChar);
 
 			// Draw the Bottom side
-			for (var r = rect.Y + Math.Max (0, rect.Height - Bottom); r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X; c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (' ');
+			FillRect (new Rect (rect.X, rect.Y + Math.Max (0, rect.Height - Bottom), rect.Width, Bottom), bottomChar);
+
+			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
+				// Top
+				Application.Driver.Move (rect.X, rect.Y);
+				Application.Driver.AddStr (hrule);
+				//Left
+				for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+					Application.Driver.Move (rect.X, r);
+					Application.Driver.AddRune (vrule [r - rect.Y]);
+				}
+				// Bottom
+				Application.Driver.Move (rect.X, rect.Y + rect.Height - Bottom + 1);
+				Application.Driver.AddStr (hrule);
+				// Right
+				for (var r = rect.Y + 1; r < rect.Y + rect.Height; r++) {
+					Application.Driver.Move (rect.X + rect.Width - Right + 1, r);
+					Application.Driver.AddRune (vrule [r - rect.Y]);
 				}
 			}
 
@@ -151,7 +196,7 @@ namespace Terminal.Gui {
 				Alignment = TextAlignment.Centered,
 				VerticalAlignment = VerticalTextAlignment.Bottom
 			};
-			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute);
+			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
 
 			return GetInnerRect (rect);
 
@@ -207,6 +252,24 @@ namespace Terminal.Gui {
 		public static bool operator != (Thickness left, Thickness right)
 		{
 			return !(left == right);
+		}
+
+	}
+
+	internal static class StringExtensions {
+		public static string Repeat (this string instr, int n)
+		{
+			if (n <= 0) {
+				return null;
+			}
+
+			if (string.IsNullOrEmpty (instr) || n == 1) {
+				return instr;
+			}
+
+			return new StringBuilder (instr.Length * n)
+				.Insert (0, instr, n)
+				.ToString ();
 		}
 	}
 
@@ -450,7 +513,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
 		/// </summary>
-		[JsonInclude, JsonConverter (typeof(JsonStringEnumConverter))]
+		[JsonInclude, JsonConverter (typeof (JsonStringEnumConverter))]
 		public BorderStyle BorderStyle {
 			get => borderStyle;
 			set {

@@ -1199,25 +1199,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws a frame on the specified region with the specified padding around the frame.
-		/// </summary>
-		/// <param name="region">Screen relative region where the frame will be drawn.</param>
-		/// <param name="padding">Padding to add on the sides.</param>
-		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/>.</remarks>
-		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
-		/// A padding value of 0 means there is actually a one cell border.
-		/// </remarks>
-		public virtual void DrawFrame (Rect region, int padding, bool fill)
-		{
-			// DrawFrame assumes the border is always at least one row/col thick
-			// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
-			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height),
-				padding + 1, padding + 1, padding + 1, padding + 1, border: false, fill: fill);
-		}
-
-
-		/// <summary>
 		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
 		/// </summary>
 		public abstract void Suspend ();

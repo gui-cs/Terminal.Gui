@@ -68,9 +68,6 @@ namespace Terminal.Gui {
 
 			//OnDrawContent (bounds); 
 
-			//if (Text != null) {
-			//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
-			//}
 			if (BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
 				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
