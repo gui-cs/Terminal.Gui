@@ -467,15 +467,13 @@ namespace Terminal.Gui {
 			IgnoreBorderPropertyOnRedraw = true;
 			Margin?.Dispose ();
 			Margin = new Frame () {
-				Data = "Margin",
 				Thickness = new Thickness (0),
-				ColorScheme = Colors.ColorSchemes ["Error"]
+				ColorScheme = SuperView?.ColorScheme ?? ColorScheme
 			};
 			//Margin.DiagnosticsLabel.Text = "Margin";
 
 			BorderFrame?.Dispose ();
 			BorderFrame = new Frame () {
-				Data = "BorderFrame",
 				BorderStyle = BorderStyle.Single,
 				Thickness = new Thickness (0),
 				ColorScheme = ColorScheme
@@ -483,9 +481,8 @@ namespace Terminal.Gui {
 
 			Padding?.Dispose ();
 			Padding = new Frame () {
-				Data = "Padding",
 				Thickness = new Thickness (0),
-				ColorScheme = Colors.ColorSchemes ["Toplevel"]
+				ColorScheme = ColorScheme
 			};
 		}
 

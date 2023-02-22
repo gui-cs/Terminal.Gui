@@ -103,6 +103,59 @@ namespace Terminal.Gui {
 			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
 		}
 
+
+		/// <summary>
+		/// Draws the thickness rectangle with an optional diagnostics label.
+		/// </summary>
+		/// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in 
+		/// screen coordinates.</param>
+		/// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
+		/// <returns>The inner rectangle remaining to be drawn.</returns>
+		public Rect Draw (Rect rect, string label = null)
+		{
+			// Draw the Top side
+			for (var r = rect.Y; r < Math.Min (rect.Y + rect.Height, rect.Y + Top); r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Left side
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < Math.Min (rect.X + rect.Width, rect.X + Left); c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Right side			
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X + Math.Max (0, rect.Width - Right); c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the Bottom side
+			for (var r = rect.Y + Math.Max (0, rect.Height - Bottom); r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (' ');
+				}
+			}
+
+			// Draw the diagnostics label on the bottom
+			var tf = new TextFormatter () {
+				Text = label == null ? string.Empty : $"{label} {this}",
+				Alignment = TextAlignment.Centered,
+				VerticalAlignment = VerticalTextAlignment.Bottom
+			};
+			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute);
+
+			return GetInnerRect (rect);
+
+		}
 		// TODO: add operator overloads
 		/// <summary>
 		/// Gets an empty thickness.

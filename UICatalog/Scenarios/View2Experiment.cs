@@ -7,8 +7,7 @@ namespace UICatalog.Scenarios {
 		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = colorScheme;
 		}
 
 		public override void Setup ()
@@ -27,11 +26,20 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (2),
 				Title = "View2"
 			};
+			Application.Top.Add (view2);
+
 			view2.EnableFrames ();
 			view2.Margin.Thickness = new Thickness (2);
+			view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+			view2.Margin.Data = "Margin";
 			view2.BorderFrame.Thickness = new Thickness (2);
 			view2.BorderFrame.BorderStyle = BorderStyle.Single;
+			//view2.BorderFrame.ColorScheme = view2.ColorScheme;
+			view2.BorderFrame.Data = "BorderFrame";
 			view2.Padding.Thickness = new Thickness (2);
+			view2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+			view2.Padding.Data = "Padding";
+
 
 			containerLabel.LayoutComplete += (a) => {
 				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView2.Frame: {view2.Frame} .Bounds: {view2.Bounds}";
@@ -110,9 +118,6 @@ namespace UICatalog.Scenarios {
 			};
 			edit.X = 0;
 			view2.Add (edit);
-
-			Application.Top.Add (view2);
-
 		}
 	}
 }

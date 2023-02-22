@@ -7,32 +7,33 @@ using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 
-	public class Container : View {
-		public Container ()
+	public class Frame : View {
+
+		public Frame ()
 		{
 			IgnoreBorderPropertyOnRedraw = true;
 		}
 
 		public virtual void OnDrawSubViews (Rect clipRect)
 		{
-			if (Subviews == null) {
-				return;
-			}
+		//	if (Subviews == null) {
+		//		return;
+		//	}
 
-			foreach (var view in Subviews) {
-				// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
-				if (view.LayoutNeeded) {
-					view.LayoutSubviews ();
-				}
-				if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
-					view.Redraw (view.Bounds);
+		//	foreach (var view in Subviews) {
+		//		// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
+		//		if (view.LayoutNeeded) {
+		//			view.LayoutSubviews ();
+		//		}
+		//		if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
+		//			view.Redraw (view.Bounds);
 
-					view.NeedDisplay = Rect.Empty;
-					// BUGBUG - v2 why does this need to be set to false?
-					// Shouldn't it be set when the subviews draw?
-					view.ChildNeedsDisplay = false;
-				}
-			}
+		//			view.NeedDisplay = Rect.Empty;
+		//			// BUGBUG - v2 why does this need to be set to false?
+		//			// Shouldn't it be set when the subviews draw?
+		//			view.ChildNeedsDisplay = false;
+		//		}
+		//	}
 
 		}
 
@@ -54,25 +55,40 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
-			if (!CanBeVisible (this)) {
-				return;
-			}
+			
+			//OnDrawContent (bounds);
+			//OnDrawSubViews (bounds);
+			//OnDrawContentComplete (bounds);
 
 			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+				Driver.SetAttribute (ColorScheme.Normal);
 			}
 
-			OnDrawContent (bounds);
-			OnDrawSubViews (bounds);
-			OnDrawContentComplete (bounds);
+			Thickness.Draw (Frame, (string)Data);
+
+			//OnDrawContent (bounds); 
+
+			//if (Text != null) {
+			//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
+			//}
+			if (BorderStyle != BorderStyle.None) {
+				var lc = new LineCanvas ();
+				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (Frame.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+
+				lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
+				foreach (var p in lc.GenerateImage (Frame)) {
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value);
+				}
+
+				if (!ustring.IsNullOrEmpty (Title)) {
+					Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
+				}
+			}
 		}
 
-	}
-
-	/// <summary>
-	/// A <see cref="Container"/> used for the rectangles that compose the outer frames of a <see cref="View"/>.
-	/// </summary>
-	public class Frame : Container {
 		//public Label DiagnosticsLabel { get; set; }
 		// TODO: v2 = This is teporary; need to also enable (or not) simple way of setting 
 		// other border properties
@@ -100,39 +116,40 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void OnDrawContent (Rect viewport)
-		{
-			// do nothing
-		}
+		//public override void OnDrawContent (Rect viewport)
+		//{
+		//	// do nothing
+		//}
 
-		public override void Redraw (Rect bounds)
-		{
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			}
+		//public override void Redraw (Rect bounds)
+		//{
 
-			//if (Text != null) {
-			//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
-			//}
-			if (BorderStyle != BorderStyle.None) {
-				var lc = new LineCanvas ();
-				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (Frame.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+		//	if (ColorScheme != null) {
+		//		Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+		//	}
 
-				lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
-				foreach (var p in lc.GenerateImage (Frame)) {
-					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value);
-				}
+		//	//if (Text != null) {
+		//	//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
+		//	//}
+		//	if (BorderStyle != BorderStyle.None) {
+		//		var lc = new LineCanvas ();
+		//		lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+		//		lc.AddLine (Frame.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
 
-				if (!ustring.IsNullOrEmpty (Title)) {
-					Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
-				}
-			}
+		//		lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+		//		lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
+		//		foreach (var p in lc.GenerateImage (Frame)) {
+		//			Driver.Move (p.Key.X, p.Key.Y);
+		//			Driver.AddRune (p.Value);
+		//		}
 
-			base.Redraw (bounds);
-		}
+		//		if (!ustring.IsNullOrEmpty (Title)) {
+		//			Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
+		//		}
+		//	}
+
+		//	base.Redraw (bounds);
+		//}
 	}
 
 }

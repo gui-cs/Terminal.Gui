@@ -10,14 +10,21 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	public class Dialogs : Scenario {
 		static int CODE_POINT = '你'; // We know this is a wide char
+		public override void Init (ColorScheme colorScheme)
+		{
+			Application.Init ();
+			Application.Top.ColorScheme = colorScheme;
+		}
+
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {
 				X = Pos.Center (),
 				Y = 0,
-				Width = Dim.Percent (75)
+				Width = Dim.Percent (75),
+				Height = 12
 			};
-			Win.Add (frame);
+			Application.Top.Add (frame);
 
 			var label = new Label ("width:") {
 				X = 0,
@@ -27,7 +34,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			
+
 			var widthEdit = new TextField ("0") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -44,7 +51,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			
+
 			var heightEdit = new TextField ("0") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -70,7 +77,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			
+
 			var titleEdit = new TextField ("Title") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -87,7 +94,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			
+
 			var numButtonsEdit = new TextField ("3") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -109,7 +116,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right
 			};
 			frame.Add (label);
-			
+
 			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -118,8 +125,9 @@ namespace UICatalog.Scenarios {
 
 			void Top_Loaded ()
 			{
-				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-					+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height (glyphsNotWords) + 2;
+				// BUGBUG: This breaks with v2 ; causes TopologicalSort issue. Not sure why
+				//frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
+				//	+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height (glyphsNotWords) + 2;
 				Application.Top.Loaded -= Top_Loaded;
 			}
 			Application.Top.Loaded += Top_Loaded;
@@ -130,7 +138,7 @@ namespace UICatalog.Scenarios {
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
-			Win.Add (label);
+			Application.Top.Add (label);
 
 			var buttonPressedLabel = new Label (" ") {
 				X = Pos.Center (),
@@ -242,9 +250,9 @@ namespace UICatalog.Scenarios {
 					buttonPressedLabel.Text = "Invalid Options";
 				}
 			};
-			Win.Add (showDialogButton);
+			Application.Top.Add (showDialogButton);
 
-			Win.Add (buttonPressedLabel);
+			Application.Top.Add (buttonPressedLabel);
 		}
 	}
 }
