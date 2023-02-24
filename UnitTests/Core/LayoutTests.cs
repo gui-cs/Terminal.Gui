@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,127 +20,31 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact]
-		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
+		public void TopologicalSort_Missing_Add ()
 		{
-			// Object Initializer
-			var view = new View () {
-				X = 1,
-				Y = 2,
-				Width = 3,
-				Height = 4
-			};
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
-			Assert.False (view.Bounds.IsEmpty);
-			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
+			var root = new View ();
+			var sub1 = new View ();
+			root.Add (sub1);
+			var sub2 = new View ();
+			sub1.Width = Dim.Width (sub2);
 
-			view.LayoutSubviews ();
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.False (view.Bounds.IsEmpty);
+			sub2.Width = Dim.Width (sub1);
 
-			// Default Constructor
-			view = new View ();
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
-			Assert.True (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
-
-			// Constructor
-			view = new View (1, 2, "");
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
-
-			// Default Constructor and post assignment equivalent to Object Initializer
-			view = new View ();
-			view.X = 1;
-			view.Y = 2;
-			view.Width = 3;
-			view.Height = 4;
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
-			Assert.False (view.Bounds.IsEmpty);
-			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
 
 		[Fact]
-		public void FocusNearestView_Ensure_Focus_Ordered ()
+		public void TopologicalSort_Recursive_Ref ()
 		{
-			var top = new Toplevel ();
-
-			var win = new Window ();
-			var winSubview = new View ("WindowSubview") {
-				CanFocus = true
-			};
-			win.Add (winSubview);
-			top.Add (win);
-
-			var frm = new FrameView ();
-			var frmSubview = new View ("FrameSubview") {
-				CanFocus = true
-			};
-			frm.Add (frmSubview);
-			top.Add (frm);
-
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
-			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-		}
-
-		[Fact]
-		public void KeyPress_Handled_To_True_Prevents_Changes ()
-		{
-			Application.Init (new FakeDriver ());
-
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
-
-			var top = Application.Top;
-
-			var text = new TextField ("");
-			text.KeyPress += (e) => {
-				e.Handled = true;
-				Assert.True (e.Handled);
-				Assert.Equal (Key.N, e.KeyEvent.Key);
-			};
-			top.Add (text);
-
-			Application.Iteration += () => {
-				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
-				Assert.Equal ("", text.Text);
-
-				Application.RequestStop ();
-			};
-
-			Application.Run ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
+			var root = new View ();
+			var sub1 = new View ();
+			root.Add (sub1);
+			var sub2 = new View ();
+			root.Add (sub2);
+			sub2.Width = Dim.Width (sub2);
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1408,6 +1313,112 @@ Y
 			Assert.Equal ("Center", view2.Y.ToString ());
 			Assert.Equal ("Fill(0)", view2.Width.ToString ());
 			Assert.Equal ("Fill(0)", view2.Height.ToString ());
+		}
+
+		[Fact]
+		public void SetRelativeLayout_PosCombine_Center_Plus_Absolute ()
+		{
+			var superView = new View () {
+				AutoSize = false,
+				Width = 10,
+				Height = 10
+			};
+
+			var testView = new View () {
+				AutoSize = false,
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (4, testView.Frame.X);
+			Assert.Equal (4, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = Pos.Center () + 1,
+				Y = Pos.Center () + 1,
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (5, testView.Frame.X);
+			Assert.Equal (5, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = 1 + Pos.Center (),
+				Y = 1 + Pos.Center (),
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (5, testView.Frame.X);
+			Assert.Equal (5, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = 1 + Pos.Percent (50),
+				Y = Pos.Percent (50) + 1,
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (6, testView.Frame.X);
+			Assert.Equal (6, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = Pos.Percent (10) + Pos.Percent (40),
+				Y = Pos.Percent (10) + Pos.Percent (40),
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (5, testView.Frame.X);
+			Assert.Equal (5, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = 1 + Pos.Percent (10) + Pos.Percent (40) - 1,
+				Y = 5 + Pos.Percent (10) + Pos.Percent (40) - 5,
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (5, testView.Frame.X);
+			Assert.Equal (5, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = Pos.Left(testView),
+				Y = Pos.Left (testView),
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (5, testView.Frame.X);
+			Assert.Equal (5, testView.Frame.Y);
+
+			testView = new View () {
+				AutoSize = false,
+				X = 1 + Pos.Left (testView),
+				Y = Pos.Top (testView) + 1,
+				Width = 1,
+				Height = 1
+			};
+			superView.Add (testView);
+			testView.SetRelativeLayout (superView.Frame);
+			Assert.Equal (6, testView.Frame.X);
+			Assert.Equal (6, testView.Frame.Y);
 		}
 	}
 }

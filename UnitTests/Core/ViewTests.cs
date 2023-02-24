@@ -137,32 +137,99 @@ namespace Terminal.Gui.CoreTests {
 			// TODO: Add more
 		}
 
+
 		[Fact]
-		public void TopologicalSort_Missing_Add ()
+		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
 		{
-			var root = new View ();
-			var sub1 = new View ();
-			root.Add (sub1);
-			var sub2 = new View ();
-			sub1.Width = Dim.Width (sub2);
+			// Object Initializer
+			var view = new View () {
+				X = 1,
+				Y = 2,
+				Width = 3,
+				Height = 4
+			};
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+			Assert.False (view.Bounds.IsEmpty);
+			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
 
-			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+			view.LayoutSubviews ();
 
-			sub2.Width = Dim.Width (sub1);
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.False (view.Bounds.IsEmpty);
 
-			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+			// Default Constructor
+			view = new View ();
+			Assert.Null (view.X);
+			Assert.Null (view.Y);
+			Assert.Null (view.Width);
+			Assert.Null (view.Height);
+			Assert.True (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+
+			// Constructor
+			view = new View (1, 2, "");
+			Assert.Null (view.X);
+			Assert.Null (view.Y);
+			Assert.Null (view.Width);
+			Assert.Null (view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+
+			// Default Constructor and post assignment equivalent to Object Initializer
+			view = new View ();
+			view.X = 1;
+			view.Y = 2;
+			view.Width = 3;
+			view.Height = 4;
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+			Assert.False (view.Bounds.IsEmpty);
+			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
 		}
 
 		[Fact]
-		public void TopologicalSort_Recursive_Ref ()
+		public void FocusNearestView_Ensure_Focus_Ordered ()
 		{
-			var root = new View ();
-			var sub1 = new View ();
-			root.Add (sub1);
-			var sub2 = new View ();
-			root.Add (sub2);
-			sub2.Width = Dim.Width (sub2);
-			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+			var top = new Toplevel ();
+
+			var win = new Window ();
+			var winSubview = new View ("WindowSubview") {
+				CanFocus = true
+			};
+			win.Add (winSubview);
+			top.Add (win);
+
+			var frm = new FrameView ();
+			var frmSubview = new View ("FrameSubview") {
+				CanFocus = true
+			};
+			frm.Add (frmSubview);
+			top.Add (frm);
+
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 		}
 
 		[Fact]
@@ -1051,100 +1118,6 @@ namespace Terminal.Gui.CoreTests {
 
 			Application.Run ();
 			Application.Shutdown ();
-		}
-
-		[Fact]
-		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
-		{
-			// Object Initializer
-			var view = new View () {
-				X = 1,
-				Y = 2,
-				Width = 3,
-				Height = 4
-			};
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
-			Assert.False (view.Bounds.IsEmpty);
-			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
-
-			view.LayoutSubviews ();
-
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.False (view.Bounds.IsEmpty);
-
-			// Default Constructor
-			view = new View ();
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
-			Assert.True (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
-
-			// Constructor
-			view = new View (1, 2, "");
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.True (view.Bounds.IsEmpty);
-
-			// Default Constructor and post assignment equivalent to Object Initializer
-			view = new View ();
-			view.X = 1;
-			view.Y = 2;
-			view.Width = 3;
-			view.Height = 4;
-			Assert.Equal (1, view.X);
-			Assert.Equal (2, view.Y);
-			Assert.Equal (3, view.Width);
-			Assert.Equal (4, view.Height);
-			Assert.False (view.Frame.IsEmpty);
-			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
-			Assert.False (view.Bounds.IsEmpty);
-			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
-		}
-
-		[Fact]
-		public void FocusNearestView_Ensure_Focus_Ordered ()
-		{
-			var top = new Toplevel ();
-
-			var win = new Window ();
-			var winSubview = new View ("WindowSubview") {
-				CanFocus = true
-			};
-			win.Add (winSubview);
-			top.Add (win);
-
-			var frm = new FrameView ();
-			var frmSubview = new View ("FrameSubview") {
-				CanFocus = true
-			};
-			frm.Add (frmSubview);
-			top.Add (frm);
-
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
-			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
-			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 		}
 
 		[Fact]
