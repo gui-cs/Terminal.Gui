@@ -1265,8 +1265,8 @@ namespace Terminal.Gui.CoreTests {
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
 			view.ViewToScreen (0, 0, out rcol, out rrow);
-			Assert.Equal (-1, rcol);
-			Assert.Equal (-1, rrow);
+			Assert.Equal (-41, rcol);
+			Assert.Equal (-13, rrow);
 		}
 
 		[Fact]
