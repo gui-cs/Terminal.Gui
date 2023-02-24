@@ -159,8 +159,8 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
-					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {result}");
+					(exitCode, result) = ClipboardProcessRunner.Process ("powershell.exe", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+					output.WriteLine ($"  Windows: powershell.exe Set-Clipboard: exitCode = {exitCode}, result = {result}");
 					getClipText = Clipboard.Contents.ToString ();
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
@@ -231,8 +231,8 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 				output.WriteLine ($"Getting OS clipboard...");
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("pwsh", "-noprofile -command \"Get-Clipboard\"");
-					output.WriteLine ($"  Windows: pwsh Get-Clipboard: exitCode = {exitCode}, result = {clipReadText}");
+					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("powershell.exe", "-noprofile -command \"Get-Clipboard\"");
+					output.WriteLine ($"  Windows: powershell.exe Get-Clipboard: exitCode = {exitCode}, result = {clipReadText}");
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					(exitCode, clipReadText) = ClipboardProcessRunner.Process ("pbpaste", "");
