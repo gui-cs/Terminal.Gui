@@ -1465,6 +1465,9 @@ namespace Terminal.Gui {
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
 				InitalizeColorSchemes ();
 
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
+
 				ResizeScreen ();
 				UpdateOffScreen ();
 			} catch (Win32Exception e) {
