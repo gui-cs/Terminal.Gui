@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		private static bool? _heightAsBuffer;
+		private static bool? _enableConsoleScrolling;
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
@@ -133,12 +133,12 @@ namespace Terminal.Gui {
 		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
-					return _heightAsBuffer.HasValue && _heightAsBuffer.Value;
+					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
 				}
 				return Driver.EnableConsoleScrolling;
 			}
 			set {
-				_heightAsBuffer = value;
+				_enableConsoleScrolling = value;
 				if (Driver == null) {
 					return;
 				}
@@ -173,7 +173,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -227,7 +227,7 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (Key oldKey)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -1125,6 +1125,7 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
+			_enableConsoleScrolling = false;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
