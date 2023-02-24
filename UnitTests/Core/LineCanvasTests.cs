@@ -331,13 +331,14 @@ namespace Terminal.Gui.CoreTests {
 
 			var canvasCopy = canvas = new LineCanvas ();
 			v.DrawContentComplete += (r) => {
-				foreach (var p in canvasCopy.GenerateImage (v.Bounds)) {
-					v.AddRune (
-						offsetX + p.Key.X,
-						offsetY + p.Key.Y,
-						p.Value);
-				}
-			};
+					foreach(var p in canvasCopy.GenerateImage(v.Bounds))
+					{
+						v.AddRune(
+							offsetX + p.Key.X,
+							offsetY + p.Key.Y,
+							p.Value);
+					}
+				};
 
 			return v;
 		}

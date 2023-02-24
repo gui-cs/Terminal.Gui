@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -1513,10 +1513,8 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
-			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, bounds.Width - 2, bounds.Height - 2);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1533,20 +1531,18 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-        
 				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-            
 				    containerBounds);
 			}
 
 			// Invoke DrawContentEvent
-			OnDrawContent (boundsAdjustedForBorder);
+			OnDrawContent (bounds);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
 
@@ -1566,7 +1562,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (boundsAdjustedForBorder);
+			OnDrawContentComplete (bounds);
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
