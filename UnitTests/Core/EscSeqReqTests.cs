@@ -22,27 +22,27 @@ namespace Terminal.Gui.CoreTests {
 			escSeqReq.Add ("t");
 			Assert.Single (escSeqReq.EscSeqReqStats);
 			Assert.Equal ("t", escSeqReq.EscSeqReqStats [^1].Terminating);
-			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumOfReq);
-			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].Unfinished);
+			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumRequests);
+			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumOutstanding);
 
 			escSeqReq.Add ("t", 2);
 			Assert.Single (escSeqReq.EscSeqReqStats);
 			Assert.Equal ("t", escSeqReq.EscSeqReqStats [^1].Terminating);
-			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumOfReq);
-			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].Unfinished);
+			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumRequests);
+			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumOutstanding);
 
 			escSeqReq = new EscSeqReqProc ();
 			escSeqReq.Add ("t", 2);
 			Assert.Single (escSeqReq.EscSeqReqStats);
 			Assert.Equal ("t", escSeqReq.EscSeqReqStats [^1].Terminating);
-			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumOfReq);
-			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].Unfinished);
+			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumRequests);
+			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumOutstanding);
 
 			escSeqReq.Add ("t", 3);
 			Assert.Single (escSeqReq.EscSeqReqStats);
 			Assert.Equal ("t", escSeqReq.EscSeqReqStats [^1].Terminating);
-			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumOfReq);
-			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].Unfinished);
+			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumRequests);
+			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumOutstanding);
 		}
 
 		[Fact]
@@ -57,8 +57,8 @@ namespace Terminal.Gui.CoreTests {
 			escSeqReq.Remove ("t");
 			Assert.Single (escSeqReq.EscSeqReqStats);
 			Assert.Equal ("t", escSeqReq.EscSeqReqStats [^1].Terminating);
-			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumOfReq);
-			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].Unfinished);
+			Assert.Equal (2, escSeqReq.EscSeqReqStats [^1].NumRequests);
+			Assert.Equal (1, escSeqReq.EscSeqReqStats [^1].NumOutstanding);
 
 			escSeqReq.Remove ("t");
 			Assert.Empty (escSeqReq.EscSeqReqStats);
