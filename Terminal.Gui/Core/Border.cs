@@ -439,7 +439,7 @@ namespace Terminal.Gui {
 			set {
 				child = value;
 				if (child != null && Parent != null) {
-					Parent.Added += Parent_Added;
+					Parent.Initialized += Parent_Initialized;
 					Parent.Removed += Parent_Removed;
 				}
 			}
@@ -452,26 +452,28 @@ namespace Terminal.Gui {
 			child.Removed -= Parent_Removed;
 		}
 
-		private void Parent_Added (View obj)
+		private void Parent_Initialized (object s, EventArgs e)
 		{
 			SetMarginFrameTitleBrush ();
-			child.Added -= Parent_Added;
+			child.Initialized -= Parent_Initialized;
 		}
 
 		private void SetMarginFrameTitleBrush ()
 		{
 			if (child != null) {
 				var view = Parent?.Border != null ? Parent : child;
-				if (borderBrush == default) {
-					BorderBrush = view.GetNormalColor ().Foreground;
+				if (view.ColorScheme != null) {
+					if (borderBrush == default) {
+						BorderBrush = view.GetNormalColor ().Foreground;
+					}
+					if (background == default) {
+						Background = view.GetNormalColor ().Background;
+					}
+					return;
 				}
-				if (background == default) {
-					Background = view.GetNormalColor ().Background;
-				}
-			} else {
-				BorderBrush = default;
-				Background = default;
 			}
+			BorderBrush = default;
+			Background = default;
 		}
 
 		/// <summary>

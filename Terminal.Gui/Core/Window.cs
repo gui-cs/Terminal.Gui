@@ -183,8 +183,6 @@ namespace Terminal.Gui {
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single,
 					Padding = new Thickness (padding),
-					BorderBrush = ColorScheme.Normal.Foreground,
-					Background = ColorScheme.Normal.Background,
 					Title = title
 				};
 			} else {
