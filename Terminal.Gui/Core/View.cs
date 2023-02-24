@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NStack;
@@ -2169,162 +2170,104 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the View's <see cref="Frame"/> to the relative coordinates if its container, given the <see cref="Frame"/> for its container.
+		/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
+		/// container size and location are specified by <paramref name="superviewFrame"/> and are relative to the
+		/// View's superview.
 		/// </summary>
-		/// <param name="hostFrame">The screen-relative frame for the host.</param>
-		/// <remarks>
-		/// Reminder: <see cref="Frame"/> is superview-relative; <see cref="Bounds"/> is view-relative.
-		/// </remarks>
-		internal void SetRelativeLayout (Rect hostFrame)
+		/// <param name="superviewFrame">The supserview-relative rectangle describing View's container (nominally the 
+		/// same as <c>this.SuperView.Frame</c>).</param>
+		internal void SetRelativeLayout (Rect superviewFrame)
 		{
-			int actW, actH, actX, actY;
-			var s = Size.Empty;
+			int newX, newW, newY, newH;
+			var autosize = Size.Empty;
 
 			if (AutoSize) {
-				s = GetAutoSize ();
+				// Note this is global to this function and used as such within the local functions defined
+				// below. In v2 AutoSize will be re-factored to not need to be dealt with in this function.
+				autosize = GetAutoSize ();
 			}
 
-			if (x is Pos.PosCenter) {
-				if (width == null) {
-					actW = AutoSize ? s.Width : hostFrame.Width;
-				} else {
-					actW = width.Anchor (hostFrame.Width);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
+			// Returns the new dimension (width or height) and location (x or y) for the View given
+			//   the superview's Frame.X or Frame.Y
+			//   the superview's width or height
+			//   the current Pos (View.X or View.Y)
+			//   the current Dim (View.Width or View.Height)
+			(int newLocation, int newDimension) GetNewLocationAndDimension (int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
+			{				
+				int newDimension, newLocation;
+
+				switch (pos) {
+				case Pos.PosCenter:
+					if (dim == null) {
+						newDimension = AutoSize ? autosizeDimension : superviewDimension;
+					} else {
+						newDimension = width.Anchor (superviewDimension);
+						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
+					}
+					newLocation = pos.Anchor (superviewDimension - newDimension);
+					break;
+
+				case Pos.PosAbsolute:
+				case Pos.PosAnchorEnd:
+				case Pos.PosCombine:
+				case Pos.PosFactor:
+				case Pos.PosFunc:
+				case Pos.PosView:
+				default:
+					newLocation = pos?.Anchor (superviewDimension) ?? 0;
+					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					break;
 				}
-				actX = x.Anchor (hostFrame.Width - actW);
-			} else {
-				actX = x?.Anchor (hostFrame.Width) ?? 0;
-
-				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
+				return (newLocation, newDimension);
 			}
 
-			if (y is Pos.PosCenter) {
-				if (height == null) {
-					actH = AutoSize ? s.Height : hostFrame.Height;
-				} else {
-					actH = height.Anchor (hostFrame.Height);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
+			// Recursively calculates the new dimension (width or height) of the given Dim given:
+			//   the current location (x or y)
+			//   the current dimennsion (width or height)
+			int CalculateNewDimension (Dim d, int location, int dimension, int autosize)
+			{
+				int newDimension;
+				switch (d) {
+				case null:
+					newDimension = AutoSize ? autosize : dimension;
+					break;
+				case Dim.DimCombine combine:
+					int leftActW = CalculateNewDimension (combine.left, location, dimension, autosize);
+					int rightActW = CalculateNewDimension (combine.right, dimension, location, autosize);
+					if (combine.add) {
+						newDimension = leftActW + rightActW;
+					} else {
+						newDimension = leftActW - rightActW;
+					}
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+				case Dim.DimFactor factor when !factor.IsFromRemaining ():
+					newDimension = d.Anchor (dimension);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+				default:
+					newDimension = Math.Max (d.Anchor (dimension - location), 0);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
 				}
-				actY = y.Anchor (hostFrame.Height - actH);
-			} else {
-				actY = y?.Anchor (hostFrame.Height) ?? 0;
 
-				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
+				return newDimension;
 			}
 
-			var r = new Rect (actX, actY, actW, actH);
+
+			// horiztonal
+			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, Width, autosize.Width);
+
+			// vertical
+			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, Height, autosize.Height);
+
+			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
 				Frame = r;
-				if (!SetMinWidthHeight ())
+				if (!SetMinWidthHeight ()) {
 					TextFormatter.Size = GetBoundsTextFormatterSize ();
-			}
-		}
-
-		private int CalculateActualWidth (Dim width, Rect hostFrame, int actX, Size s)
-		{
-			int actW;
-			switch (width) {
-			case null:
-				actW = AutoSize ? s.Width : hostFrame.Width;
-				break;
-			case Dim.DimCombine combine:
-				int leftActW = CalculateActualWidth (combine.left, hostFrame, actX, s);
-				int rightActW = CalculateActualWidth (combine.right, hostFrame, actX, s);
-				if (combine.add) {
-					actW = leftActW + rightActW;
-				} else {
-					actW = leftActW - rightActW;
-				}
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
-			case Dim.DimFactor factor when !factor.IsFromRemaining ():
-				actW = width.Anchor (hostFrame.Width);
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
-			default:
-				actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
-			}
-
-			return actW;
-		}
-
-		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
-		{
-			int actH;
-			switch (height) {
-			case null:
-				actH = AutoSize ? s.Height : hostFrame.Height;
-				break;
-			case Dim.DimCombine combine:
-				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
-				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
-				if (combine.add) {
-					actH = leftActH + rightActH;
-				} else {
-					actH = leftActH - rightActH;
-				}
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			case Dim.DimFactor factor when !factor.IsFromRemaining ():
-				actH = height.Anchor (hostFrame.Height);
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			default:
-				actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			}
-
-			return actH;
-		}
-
-		// https://en.wikipedia.org/wiki/Topological_sorting
-		List<View> TopologicalSort (IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
-		{
-			var result = new List<View> ();
-
-			// Set of all nodes with no incoming edges
-			var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
-
-			while (noEdgeNodes.Any ()) {
-				//  remove a node n from S
-				var n = noEdgeNodes.First ();
-				noEdgeNodes.Remove (n);
-
-				// add n to tail of L
-				if (n != this?.SuperView)
-					result.Add (n);
-
-				// for each node m with an edge e from n to m do
-				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
-					var m = e.To;
-
-					// remove edge e from the graph
-					edges.Remove (e);
-
-					// if m has no other incoming edges then
-					if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
-						// insert m into S
-						noEdgeNodes.Add (m);
-					}
 				}
 			}
-
-			if (edges.Any ()) {
-				(var from, var to) = edges.First ();
-				if (from != Application.Top) {
-					if (!ReferenceEquals (from, to)) {
-						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
-					} else {
-						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
-					}
-				}
-			}
-
-			// return L (a topologically sorted order)
-			return result;
 		}
 
 		/// <summary>
@@ -2394,7 +2337,6 @@ namespace Terminal.Gui {
 
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 
-
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
@@ -2455,6 +2397,52 @@ namespace Terminal.Gui {
 
 			CollectAll (this, ref nodes, ref edges);
 
+			// https://en.wikipedia.org/wiki/Topological_sorting
+			List<View> TopologicalSort (IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
+			{
+				var result = new List<View> ();
+
+				// Set of all nodes with no incoming edges
+				var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
+
+				while (noEdgeNodes.Any ()) {
+					//  remove a node n from S
+					var n = noEdgeNodes.First ();
+					noEdgeNodes.Remove (n);
+
+					// add n to tail of L
+					if (n != this?.SuperView)
+						result.Add (n);
+
+					// for each node m with an edge e from n to m do
+					foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
+						var m = e.To;
+
+						// remove edge e from the graph
+						edges.Remove (e);
+
+						// if m has no other incoming edges then
+						if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
+							// insert m into S
+							noEdgeNodes.Add (m);
+						}
+					}
+				}
+
+				if (edges.Any ()) {
+					(var from, var to) = edges.First ();
+					if (from != Application.Top) {
+						if (!ReferenceEquals (from, to)) {
+							throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
+						} else {
+							throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
+						}
+					}
+				}
+				// return L (a topologically sorted order)
+				return result;
+			} // TopologicalSort
+			
 			var ordered = TopologicalSort (nodes, edges);
 
 			foreach (var v in ordered) {
@@ -2466,9 +2454,12 @@ namespace Terminal.Gui {
 				v.LayoutNeeded = false;
 			}
 
+			// If our SuperView is Application.Top and the layoutstyle is Computed it's a special-cass.
+			// Use SetRelativeaLayout with the Frame of the Application.Top
 			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
 			    && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				SetRelativeLayout (SuperView.Frame);
+				Debug.Assert (Application.Top.Frame.Location == Point.Empty);
+				SetRelativeLayout (Application.Top.Frame);
 			}
 
 			LayoutNeeded = false;
@@ -2751,9 +2742,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the size to fit all text if <see cref="AutoSize"/> is true.
+		/// Gets the dimensions required to fit <see cref="Text"/> using the text <see cref="Direction"/> specified by the
+		/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
+		/// .
 		/// </summary>
-		/// <returns>The <see cref="Size"/></returns>
+		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
 			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
@@ -2788,10 +2781,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.
+		/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters in the <see cref="Text"/> property.
 		/// </summary>
-		/// <param name="isWidth"><see langword="true"/> if is the width (default) <see langword="false"/> if is the height.</param>
-		/// <returns>The length of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.</returns>
+		/// <param name="isWidth">If <see langword="true"/> (the default) the width required for the hotkey specifier is returned. Otherwise the height is returned.</param>
+		/// <returns>The number of characters required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>. If the text direction specified
+		/// by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.</returns>
 		public int GetHotKeySpecifierLength (bool isWidth = true)
 		{
 			if (isWidth) {
@@ -2806,7 +2800,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the bounds size from a <see cref="Terminal.Gui.TextFormatter.Size"/>.
+		/// Gets the <see cref="TextFormatter.Size"/> minus the size required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
 		/// </summary>
 		/// <returns>The bounds size minus the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetTextFormatterBoundsSize ()
