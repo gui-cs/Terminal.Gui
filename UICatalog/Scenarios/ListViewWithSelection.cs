@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -16,11 +17,13 @@ namespace UICatalog.Scenarios {
 		public CheckBox _allowMultipleCB;
 		public ListView _listView;
 
-		public List<Type> _scenarios = Scenario.GetDerivedClasses<Scenario>().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
+		public List<Scenario> _scenarios;
 
 		public override void Setup ()
 		{
-			_customRenderCB = new CheckBox ("Render with columns") {
+			_scenarios = Scenario.GetScenarios ();
+
+			_customRenderCB = new CheckBox ("Use custom rendering") {
 				X = 0,
 				Y = 0,
 				Height = 1,
@@ -137,11 +140,11 @@ namespace UICatalog.Scenarios {
 		// This is basically the same implementation used by the UICatalog main window
 		internal class ScenarioListDataSource : IListDataSource {
 			int _nameColumnWidth = 30;
-			private List<Type> scenarios;
+			private List<Scenario> scenarios;
 			BitArray marks;
 			int count, len;
 
-			public List<Type> Scenarios {
+			public List<Scenario> Scenarios {
 				get => scenarios;
 				set {
 					if (value != null) {
@@ -163,14 +166,14 @@ namespace UICatalog.Scenarios {
 
 			public int Length => len;
 
-			public ScenarioListDataSource (List<Type> itemList) => Scenarios = itemList;
+			public ScenarioListDataSource (List<Scenario> itemList) => Scenarios = itemList;
 
 			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
 			{
 				container.Move (col, line);
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
-				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width, start);
+				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [item].GetName ());
+				RenderUstr (driver, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
 			}
 
 			public void SetMark (int item, bool value)
@@ -187,8 +190,8 @@ namespace UICatalog.Scenarios {
 
 				int maxLength = 0;
 				for (int i = 0; i < scenarios.Count; i++) {
-					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [i]));
-					var sc = $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [i])}";
+					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [i].GetName ());
+					var sc = $"{s}  {Scenarios [i].GetDescription ()}";
 					var l = sc.Length;
 					if (l > maxLength) {
 						maxLength = l;

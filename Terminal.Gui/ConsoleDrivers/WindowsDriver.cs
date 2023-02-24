@@ -116,6 +116,10 @@ namespace Terminal.Gui {
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
+			if (ScreenBuffer == IntPtr.Zero) {
+				visibility = CursorVisibility.Invisible;
+				return false;
+			}
 			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
@@ -251,7 +255,7 @@ namespace Terminal.Gui {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
-			if (!SetConsoleWindowInfo (ScreenBuffer, true, ref winRect)) {
+			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				return new Size (cols, rows);
 			}
@@ -261,7 +265,7 @@ namespace Terminal.Gui {
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
 		{
-			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
@@ -283,6 +287,9 @@ namespace Terminal.Gui {
 			position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 			SetConsoleOutputWindow (csbi);
 			var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
+			if (!SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+			}
 			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
@@ -534,12 +541,14 @@ namespace Terminal.Gui {
 			public ConsoleKeyInfo consoleKeyInfo;
 			public bool CapsLock;
 			public bool NumLock;
+			public bool Scrolllock;
 
-			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
+			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
 			{
 				this.consoleKeyInfo = consoleKeyInfo;
 				CapsLock = capslock;
 				NumLock = numlock;
+				Scrolllock = scrolllock;
 			}
 		}
 
@@ -771,7 +780,7 @@ namespace Terminal.Gui {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 1));
+					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 				left = 0;
 				top = 0;
 				cols = newSize.Width;
@@ -786,7 +795,26 @@ namespace Terminal.Gui {
 		{
 			switch (inputEvent.EventType) {
 			case WindowsConsole.EventType.Key:
+				var fromPacketKey = inputEvent.KeyEvent.wVirtualKeyCode == (uint)ConsoleKey.Packet;
+				if (fromPacketKey) {
+					inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
+				}
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
+				//var ke = inputEvent.KeyEvent;
+				//System.Diagnostics.Debug.WriteLine ($"fromPacketKey: {fromPacketKey}");
+				//if (ke.UnicodeChar == '\0') {
+				//	System.Diagnostics.Debug.WriteLine ("UnicodeChar: 0'\\0'");
+				//} else if (ke.UnicodeChar == 13) {
+				//	System.Diagnostics.Debug.WriteLine ("UnicodeChar: 13'\\n'");
+				//} else {
+				//	System.Diagnostics.Debug.WriteLine ($"UnicodeChar: {(uint)ke.UnicodeChar}'{ke.UnicodeChar}'");
+				//}
+				//System.Diagnostics.Debug.WriteLine ($"bKeyDown: {ke.bKeyDown}");
+				//System.Diagnostics.Debug.WriteLine ($"dwControlKeyState: {ke.dwControlKeyState}");
+				//System.Diagnostics.Debug.WriteLine ($"wRepeatCount: {ke.wRepeatCount}");
+				//System.Diagnostics.Debug.WriteLine ($"wVirtualKeyCode: {ke.wVirtualKeyCode}");
+				//System.Diagnostics.Debug.WriteLine ($"wVirtualScanCode: {ke.wVirtualScanCode}");
+
 				if (map == (Key)0xffffffff) {
 					KeyEvent key = new KeyEvent ();
 
@@ -854,6 +882,9 @@ namespace Terminal.Gui {
 						keyUpHandler (key);
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
+						// May occurs using SendKeys
+						if (keyModifiers == null)
+							keyModifiers = new KeyModifiers ();
 						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
 						keyDownHandler (new KeyEvent (map, keyModifiers));
 						keyHandler (new KeyEvent (map, keyModifiers));
@@ -861,7 +892,7 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				if (!inputEvent.KeyEvent.bKeyDown) {
+				if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
 					keyModifiers = null;
 				}
 				break;
@@ -1123,11 +1154,9 @@ namespace Terminal.Gui {
 				}
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
+				mouseFlag = MouseFlags.ReportMousePosition;
 				if (mouseEvent.MousePosition.X != pointMove.X || mouseEvent.MousePosition.Y != pointMove.Y) {
-					mouseFlag = MouseFlags.ReportMousePosition;
 					pointMove = new Point (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y);
-				} else {
-					mouseFlag = 0;
 				}
 			} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
 				mouseFlag = 0;
@@ -1244,7 +1273,38 @@ namespace Terminal.Gui {
 				keyModifiers.Scrolllock = scrolllock;
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
-			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
+
+			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock, scrolllock);
+		}
+
+		public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
+		{
+			if (keyEvent.wVirtualKeyCode != (uint)ConsoleKey.Packet) {
+				return keyEvent;
+			}
+
+			var mod = new ConsoleModifiers ();
+			if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ShiftPressed)) {
+				mod |= ConsoleModifiers.Shift;
+			}
+			if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightAltPressed) ||
+				keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed)) {
+				mod |= ConsoleModifiers.Alt;
+			}
+			if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed) ||
+				keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed)) {
+				mod |= ConsoleModifiers.Control;
+			}
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyEvent.UnicodeChar, mod, out uint virtualKey, out uint scanCode);
+
+			return new WindowsConsole.KeyEventRecord {
+				UnicodeChar = (char)keyChar,
+				bKeyDown = keyEvent.bKeyDown,
+				dwControlKeyState = keyEvent.dwControlKeyState,
+				wRepeatCount = keyEvent.wRepeatCount,
+				wVirtualKeyCode = (ushort)virtualKey,
+				wVirtualScanCode = (ushort)scanCode
+			};
 		}
 
 		public Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
@@ -1255,6 +1315,8 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			case ConsoleKey.Clear:
+				return MapKeyModifiers (keyInfo, Key.Clear);
 			case ConsoleKey.Home:
 				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
@@ -1281,6 +1343,8 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.DeleteChar);
 			case ConsoleKey.Insert:
 				return MapKeyModifiers (keyInfo, Key.InsertChar);
+			case ConsoleKey.PrintScreen:
+				return MapKeyModifiers (keyInfo, Key.PrintScreen);
 
 			case ConsoleKey.NumPad0:
 				return keyInfoEx.NumLock ? Key.D0 : Key.InsertChar;
@@ -1333,6 +1397,9 @@ namespace Terminal.Gui {
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
 				}
+				if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
 						return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
@@ -1349,8 +1416,11 @@ namespace Terminal.Gui {
 				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
 					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
 				}
+				if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
 						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 					}
 				}
@@ -1371,7 +1441,7 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
 			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
@@ -1388,16 +1458,20 @@ namespace Terminal.Gui {
 		{
 			TerminalResized = terminalResized;
 
-			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-			cols = winSize.Width;
-			rows = winSize.Height;
+			try {
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				cols = winSize.Width;
+				rows = winSize.Height;
+				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
-			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
 
-			ResizeScreen ();
-			UpdateOffScreen ();
-
-			CreateColors ();
+				ResizeScreen ();
+				UpdateOffScreen ();
+			} catch (Win32Exception e) {
+				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
+			}
 		}
 
 		public override void ResizeScreen ()
@@ -1437,57 +1511,85 @@ namespace Terminal.Gui {
 			crow = row;
 		}
 
+		int GetOutputBufferPosition ()
+		{
+			return crow * Cols + ccol;
+		}
+
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var position = crow * Cols + ccol;
+			var position = GetOutputBufferPosition ();
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
-
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
 					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var prevPosition = crow * Cols + ccol + 1;
-					OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					OutputBuffer [position].Char.UnicodeChar = (char)' ';
-					contents [crow, ccol, 0] = (int)(uint)' ';
+					OutputBuffer [prevPosition].Char.UnicodeChar = c;
+					contents [crow, ccol - 1, 0] = c;
+					OutputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
 				} else {
-					OutputBuffer [position].Char.UnicodeChar = (char)rune;
-					contents [crow, ccol, 0] = (int)(uint)rune;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+
+						var prevPosition = crow * Cols + (ccol - 1);
+						OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var prevPosition = GetOutputBufferPosition () + 1;
+						OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						OutputBuffer [position].Char.UnicodeChar = (char)' ';
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						OutputBuffer [position].Char.UnicodeChar = (char)rune;
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 				}
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					position = crow * Cols + ccol;
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					position = GetOutputBufferPosition ();
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -1496,11 +1598,9 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
 		}
 
 		public override Attribute MakeColor (Color foreground, Color background)
@@ -1602,11 +1702,6 @@ namespace Terminal.Gui {
 			WinConsole = null;
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
@@ -1662,9 +1757,7 @@ namespace Terminal.Gui {
 			}
 
 			keyEvent.UnicodeChar = keyChar;
-			if ((shift || alt || control)
-				&& (key >= ConsoleKey.A && key <= ConsoleKey.Z
-				|| key >= ConsoleKey.D0 && key <= ConsoleKey.D9)) {
+			if ((uint)key < 255) {
 				keyEvent.wVirtualKeyCode = (ushort)key;
 			} else {
 				keyEvent.wVirtualKeyCode = '\0';

@@ -772,7 +772,7 @@ namespace Terminal.Gui {
 			}
 
 			SetValue (searchset [listview.SelectedItem]);
-			search.CursorPosition = search.Text.RuneCount;
+			search.CursorPosition = search.Text.ConsoleWidth;
 			Search_Changed (search.Text);
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);

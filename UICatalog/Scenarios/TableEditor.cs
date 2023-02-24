@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			this.tableView = new TableView () {
 				X = 0,
@@ -70,6 +70,7 @@ namespace UICatalog.Scenarios {
 					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
 					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
+					new MenuItem ("Sho_w All Columns", "", ()=>ShowAllColumns())
 				}),
 				new MenuBarItem ("_Column", new MenuItem [] {
 					new MenuItem ("_Set Max Width", "", SetMaxWidth),
@@ -78,9 +79,9 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Set All MinAcceptableWidth=1", "",SetMinAcceptableWidthToOne),
 				}),
 			});
-		
 
-		Top.Add (menu);
+
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
@@ -88,7 +89,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			Win.Add (tableView);
 
@@ -130,8 +131,111 @@ namespace UICatalog.Scenarios {
 				Focus = Win.ColorScheme.Focus,
 				Normal = Application.Driver.MakeAttribute(Color.Red,Color.BrightBlue)
 			};
+
+			// if user clicks the mouse in TableView
+			tableView.MouseClick += e => {
+
+				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+
+				if (clickedCol != null) {
+					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+						
+						// left click in a header
+						SortColumn (clickedCol);
+					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+						// right click in a header
+						ShowHeaderContextMenu (clickedCol, e);
+					}
+				}
+			};
 		}
 
+		private void ShowAllColumns ()
+		{
+			foreach(var colStyle in tableView.Style.ColumnStyles) {
+				colStyle.Value.Visible = true;
+			}
+			tableView.Update ();
+		}
+
+		private void SortColumn (DataColumn clickedCol)
+		{
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+			SortColumn (clickedCol, sort, isAsc);
+		}
+
+		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
+		{
+			// set a sort order
+			tableView.Table.DefaultView.Sort = sort;
+
+			// copy the rows from the view
+			var sortedCopy = tableView.Table.DefaultView.ToTable ();
+			tableView.Table.Rows.Clear ();
+			foreach (DataRow r in sortedCopy.Rows) {
+				tableView.Table.ImportRow (r);
+			}
+
+			foreach (DataColumn col in tableView.Table.Columns) {
+
+				// remove any lingering sort indicator
+				col.ColumnName = TrimArrows(col.ColumnName);
+
+				// add a new one if this the one that is being sorted
+				if (col == clickedCol) {
+					col.ColumnName += isAsc ? '▲' : '▼';
+				}
+			}
+
+			tableView.Update ();
+		}
+
+		private string TrimArrows (string columnName)
+		{
+			return columnName.TrimEnd ('▼', '▲');
+		}
+		private string StripArrows (string columnName)
+		{
+			return columnName.Replace ("▼", "").Replace ("▲", "");
+		}
+		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+		{
+			// work out new sort order
+			var sort = tableView.Table.DefaultView.Sort;
+
+			if (sort?.EndsWith ("ASC") ?? false) {
+				sort = $"{clickedCol.ColumnName} DESC";
+				isAsc = false;
+			} else {
+				sort = $"{clickedCol.ColumnName} ASC";
+				isAsc = true;
+			}
+
+			return sort;
+		}
+
+		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+		{
+			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
+				new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,sort,isAsc)),
+				})
+			);
+
+			contextMenu.Show ();
+		}
+
+		private void HideColumn (DataColumn clickedCol)
+		{
+			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
+			style.Visible = false;
+			tableView.Update ();
+		}
 
 		private DataColumn GetColumn ()
 		{

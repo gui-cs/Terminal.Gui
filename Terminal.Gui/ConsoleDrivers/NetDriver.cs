@@ -533,6 +533,7 @@ namespace Terminal.Gui {
 			int foundPoint = 0;
 			string value = "";
 			var kChar = GetKeyCharArray (cki);
+			//System.Diagnostics.Debug.WriteLine ($"kChar: {new string (kChar)}");
 			for (int i = 0; i < kChar.Length; i++) {
 				var c = kChar [i];
 				if (c == '<') {
@@ -559,6 +560,8 @@ namespace Terminal.Gui {
 					//} else if (c == 'm') {
 					//	isButtonPressed = false;
 					//}
+
+					//System.Diagnostics.Debug.WriteLine ($"buttonCode: {buttonCode}");
 
 					switch (buttonCode) {
 					case 0:
@@ -1238,33 +1241,52 @@ namespace Terminal.Gui {
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					contents [crow, ccol + 1, 2] = 1;
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						contents [crow, ccol + 1, 2] = 1;
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+
+				}
 				dirtyLine [crow] = true;
 			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+			
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -1337,12 +1359,14 @@ namespace Terminal.Gui {
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
+			InitalizeColorSchemes ();
+
 			ResizeScreen ();
 			UpdateOffScreen ();
 
 			StartReportingMouseMoves ();
 
-			CreateColors ();
 
 			Clear ();
 		}
@@ -1480,7 +1504,13 @@ namespace Terminal.Gui {
 							output.Append (WriteAttributes (attr));
 						}
 						outputWidth++;
-						output.Append ((char)contents [row, col, 0]);
+						var rune = contents [row, col, 0];
+						char [] spair;
+						if (Rune.DecodeSurrogatePair ((uint)rune, out spair)) {
+							output.Append (spair);
+						} else {
+							output.Append ((char)rune);
+						}
 						contents [row, col, 2] = 0;
 					}
 				}
@@ -1604,10 +1634,26 @@ namespace Terminal.Gui {
 		{
 		}
 
-		Attribute currentAttribute;
+
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
+		}
+
+		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+		{
+			if (consoleKeyInfo.Key != ConsoleKey.Packet) {
+				return consoleKeyInfo;
+			}
+
+			var mod = consoleKeyInfo.Modifiers;
+			var shift = (mod & ConsoleModifiers.Shift) != 0;
+			var alt = (mod & ConsoleModifiers.Alt) != 0;
+			var control = (mod & ConsoleModifiers.Control) != 0;
+
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+
+			return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -1687,7 +1733,7 @@ namespace Terminal.Gui {
 					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
 						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 					}
 				}
@@ -1754,14 +1800,23 @@ namespace Terminal.Gui {
 		{
 			switch (inputEvent.EventType) {
 			case NetEvents.EventType.Key:
+				ConsoleKeyInfo consoleKeyInfo = inputEvent.ConsoleKeyInfo;
+				if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+					consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+				}
 				keyModifiers = new KeyModifiers ();
-				var map = MapKey (inputEvent.ConsoleKeyInfo);
+				var map = MapKey (consoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
 				}
-				keyDownHandler (new KeyEvent (map, keyModifiers));
-				keyHandler (new KeyEvent (map, keyModifiers));
-				keyUpHandler (new KeyEvent (map, keyModifiers));
+				if (map == Key.Null) {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				} else {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				}
 				break;
 			case NetEvents.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
@@ -1804,6 +1859,8 @@ namespace Terminal.Gui {
 
 		MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
 		{
+			//System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
+
 			MouseFlags mouseFlag = 0;
 
 			if ((me.ButtonState & NetEvents.MouseButtonState.Button1Pressed) != 0) {
@@ -1898,11 +1955,6 @@ namespace Terminal.Gui {
 			};
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
@@ -1935,14 +1987,8 @@ namespace Terminal.Gui {
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{
 			NetEvents.InputResult input = new NetEvents.InputResult ();
-			ConsoleKey ck;
-			if (char.IsLetter (keyChar)) {
-				ck = key;
-			} else {
-				ck = (ConsoleKey)'\0';
-			}
 			input.EventType = NetEvents.EventType.Key;
-			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, ck, shift, alt, control);
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control);
 
 			try {
 				ProcessInput (input);

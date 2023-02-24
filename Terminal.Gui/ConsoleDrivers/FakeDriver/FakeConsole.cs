@@ -164,11 +164,13 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+
+		static ConsoleColor _defaultBackgroundColor = ConsoleColor.Black;
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public static ConsoleColor BackgroundColor { get; set; } = _defaultBackgroundColor;
-		static ConsoleColor _defaultBackgroundColor = ConsoleColor.Black;
 
 		//
 		// Summary:
@@ -187,11 +189,13 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+
+		static ConsoleColor _defaultForegroundColor = ConsoleColor.Gray;
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public static ConsoleColor ForegroundColor { get; set; } = _defaultForegroundColor;
-		static ConsoleColor _defaultForegroundColor = ConsoleColor.Gray;
 		//
 		// Summary:
 		//     Gets or sets the height of the buffer area.
@@ -541,6 +545,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+
+		static char [,] _buffer = new char [WindowWidth, WindowHeight];
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -549,8 +556,6 @@ namespace Terminal.Gui {
 			_buffer = new char [BufferWidth, BufferHeight];
 			SetCursorPosition (0, 0);
 		}
-
-		static char [,] _buffer = new char [WindowWidth, WindowHeight];
 
 		//
 		// Summary:
@@ -811,9 +816,9 @@ namespace Terminal.Gui {
 		public static ConsoleKeyInfo ReadKey (bool intercept)
 		{
 			if (MockKeyPresses.Count > 0) {
-				return MockKeyPresses.Pop();
+				return MockKeyPresses.Pop ();
 			} else {
-				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false,false,false);
+				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false, false, false);
 			}
 		}
 
@@ -1396,7 +1401,10 @@ namespace Terminal.Gui {
 		/// <param name="buffer"></param>
 		public static void Write (char [] buffer)
 		{
-			throw new NotImplementedException ();
+			_buffer [CursorLeft, CursorTop] = (char)0;
+			foreach (var ch in buffer) {
+				_buffer [CursorLeft, CursorTop] += ch;
+			}
 		}
 
 		//

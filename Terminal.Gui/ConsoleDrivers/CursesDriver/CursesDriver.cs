@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -61,50 +62,72 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					Curses.mvaddch (crow, ccol - 1, (int)(uint)c);
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol - 1, 1]);
-					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol + 1, 1]);
-					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					Curses.addch ((int)(uint)' ');
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					Curses.addch ((int)(uint)rune);
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-			} else
-				needMove = true;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-			ccol++;
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol - 1, 1]);
+						Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol + 1, 1]);
+						Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						Curses.addch ((int)(uint)' ');
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						Curses.addch ((int)(uint)rune);
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+				}
+			} else {
+				needMove = true;
+			}
+
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+			
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -159,12 +182,10 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
-			Curses.attrset (currentAttribute);
+			base.SetAttribute (c);
+			Curses.attrset (CurrentAttribute);
 		}
 
 		public Curses.Window window;
@@ -200,6 +221,7 @@ namespace Terminal.Gui {
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int f = (short)foreground;
 			int b = (short)background;
 			var v = colorPairs [f, b];
@@ -217,6 +239,7 @@ namespace Terminal.Gui {
 		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
 		public override void SetColors (short foreColorId, short backgroundColorId)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
 			if (!rawPairs.TryGetValue (key, out var v)) {
 				v = MakeColor (foreColorId, backgroundColorId);
@@ -617,7 +640,7 @@ namespace Terminal.Gui {
 			return keyModifiers;
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+		void ProcessInput ()
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -787,6 +810,8 @@ namespace Terminal.Gui {
 		}
 
 		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyDownHandler;
+		Action<KeyEvent> keyUpHandler;
 		Action<MouseEvent> mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -794,12 +819,14 @@ namespace Terminal.Gui {
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.keyHandler = keyHandler;
+			this.keyDownHandler = keyDownHandler;
+			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as UnixMainLoop;
 
 			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
+				ProcessInput ();
 				return true;
 			});
 
@@ -870,34 +897,18 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			ResizeScreen ();
-			UpdateOffScreen ();
-
-			//HLine = Curses.ACS_HLINE;
-			//VLine = Curses.ACS_VLINE;
-			//Stipple = Curses.ACS_CKBOARD;
-			//Diamond = Curses.ACS_DIAMOND;
-			//ULCorner = Curses.ACS_ULCORNER;
-			//LLCorner = Curses.ACS_LLCORNER;
-			//URCorner = Curses.ACS_URCORNER;
-			//LRCorner = Curses.ACS_LRCORNER;
-			//LeftTee = Curses.ACS_LTEE;
-			//RightTee = Curses.ACS_RTEE;
-			//TopTee = Curses.ACS_TTEE;
-			//BottomTee = Curses.ACS_BTEE;
-			//RightArrow = Curses.ACS_RARROW;
-			//LeftArrow = Curses.ACS_LARROW;
-			//UpArrow = Curses.ACS_UARROW;
-			//DownArrow = Curses.ACS_DARROW;
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
 
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				CreateColors ();
+				InitalizeColorSchemes ();
 			} else {
-				CreateColors (false);
+				InitalizeColorSchemes (false);
 
+				// BUGBUG: This is a hack to make the colors work on the Mac?
+				// The new Theme support overwrites these colors, so this is not needed?
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
@@ -924,6 +935,10 @@ namespace Terminal.Gui {
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
+
+			ResizeScreen ();
+			UpdateOffScreen ();
+
 		}
 
 		public override void ResizeScreen ()
@@ -950,11 +965,13 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
-			if (new CursesClipboard ().IsSupported) {
-				return false;
-			}
-			var result = BashRunner.Run ("uname -a", runCurses: false);
-			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+			// xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
+			//if (new CursesClipboard ().IsSupported) {
+			//	// If xclip is installed on Linux under WSL, this will return true.
+			//	return false;
+			//}
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
+			if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
 			return false;
@@ -1086,11 +1103,6 @@ namespace Terminal.Gui {
 			//Curses.mouseinterval (lastMouseInterval);
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
@@ -1128,26 +1140,48 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
 		{
-			Key k;
+			Key key;
 
-			if ((shift || alt || control)
-				&& keyChar - (int)Key.Space >= (uint)Key.A && keyChar - (int)Key.Space <= (uint)Key.Z) {
-				k = (Key)(keyChar - (uint)Key.Space);
+			if (consoleKey == ConsoleKey.Packet) {
+				ConsoleModifiers mod = new ConsoleModifiers ();
+				if (shift) {
+					mod |= ConsoleModifiers.Shift;
+				}
+				if (alt) {
+					mod |= ConsoleModifiers.Alt;
+				}
+				if (control) {
+					mod |= ConsoleModifiers.Control;
+				}
+				var kchar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyChar, mod, out uint ckey, out _);
+				key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)ckey, out bool mappable);
+				if (mappable) {
+					key = (Key)kchar;
+				}
 			} else {
-				k = (Key)keyChar;
+				key = (Key)keyChar;
 			}
+
+			KeyModifiers km = new KeyModifiers ();
 			if (shift) {
-				k |= Key.ShiftMask;
+				if (keyChar == 0) {
+					key |= Key.ShiftMask;
+				}
+				km.Shift = shift;
 			}
 			if (alt) {
-				k |= Key.AltMask;
+				key |= Key.AltMask;
+				km.Alt = alt;
 			}
 			if (control) {
-				k |= Key.CtrlMask;
+				key |= Key.CtrlMask;
+				km.Ctrl = control;
 			}
-			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			keyDownHandler (new KeyEvent (key, km));
+			keyHandler (new KeyEvent (key, km));
+			keyUpHandler (new KeyEvent (key, km));
 		}
 
 		public override bool GetColors (int value, out Color foreground, out Color background)
@@ -1233,134 +1267,79 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux.
+	///  This implementation uses the xclip command to access the clipboard.
+	/// </summary>	
+	/// <remarks>
+	/// If xclip is not installed, this implementation will not work.
+	/// </remarks>
 	class CursesClipboard : ClipboardBase {
 		public CursesClipboard ()
 		{
 			IsSupported = CheckSupport ();
 		}
 
+		string xclipPath = string.Empty;
 		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
 		{
 			try {
-				var result = BashRunner.Run ("which xclip", runCurses: false);
-				return result.FileExists ();
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
+				if (exitCode == 0 && result.FileExists ()) {
+					xclipPath = result;
+					return true;
+				}
 			} catch (Exception) {
 				// Permissions issue.
-				return false;
 			}
+			return false;
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
 			var tempFileName = System.IO.Path.GetTempFileName ();
+			var xclipargs = "-selection clipboard -o";
+
 			try {
-				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
-				BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
-				return System.IO.File.ReadAllText (tempFileName);
+				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+				if (exitCode == 0) {
+					if (Application.Driver is CursesDriver) {
+						Curses.raw ();
+						Curses.noecho ();
+					}
+					return System.IO.File.ReadAllText (tempFileName);
+				}
+			} catch (Exception e) {
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs}\" failed.", e);
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			// var tempFileName = System.IO.Path.GetTempFileName ();
-			// System.IO.File.WriteAllText (tempFileName, text);
-			// try {
-			// 	// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
-			// 	BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
-			// } finally {
-			// 	System.IO.File.Delete (tempFileName);
-			// }
-
-			BashRunner.Run ("xclip -selection clipboard -i", false, text);
+			var xclipargs = "-selection clipboard -i";
+			try {
+				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text, waitForOutput: false);
+				if (exitCode == 0 && Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
+			} catch (Exception e) {
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs} < {text}\" failed", e);
+			}
 		}
 	}
 
-	static class BashRunner {
-		public static string Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
-		{
-			var arguments = $"-c \"{commandLine}\"";
-
-			if (output) {
-				var errorBuilder = new System.Text.StringBuilder ();
-				var outputBuilder = new System.Text.StringBuilder ();
-
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardOutput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false,
-					}
-				}) {
-					process.Start ();
-					process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
-					process.BeginOutputReadLine ();
-					process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
-					process.BeginErrorReadLine ();
-					if (!process.DoubleWaitForExit ()) {
-						var timeoutError = $@"Process timed out. Command line: bash {arguments}.
-							Output: {outputBuilder}
-							Error: {errorBuilder}";
-						throw new Exception (timeoutError);
-					}
-					if (process.ExitCode == 0) {
-						if (runCurses && Application.Driver is CursesDriver) {
-							Curses.raw ();
-							Curses.noecho ();
-						}
-						return outputBuilder.ToString ();
-					}
-
-					var error = $@"Could not execute process. Command line: bash {arguments}.
-						Output: {outputBuilder}
-						Error: {errorBuilder}";
-					throw new Exception (error);
-				}
-			} else {
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardInput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false
-					}
-				}) {
-					process.Start ();
-					process.StandardInput.Write (inputText);
-					process.StandardInput.Close ();
-					process.WaitForExit ();
-					if (runCurses && Application.Driver is CursesDriver) {
-						Curses.raw ();
-						Curses.noecho ();
-					}
-					return inputText;
-				}
-			}
-		}
-
-		public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
-		{
-			var result = process.WaitForExit (500);
-			if (result) {
-				process.WaitForExit ();
-			}
-			return result;
-		}
-
-		public static bool FileExists (this string value)
-		{
-			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
-		}
-	}
-
+	/// <summary>
+	///  A clipboard implementation for MacOSX. 
+	///  This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
+	///  The existance of the Mac pbcopy and pbpaste commands 
+	///  is used to determine if copy/paste is supported.
+	/// </summary>	
 	class MacOSXClipboard : ClipboardBase {
 		IntPtr nsString = objc_getClass ("NSString");
 		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
@@ -1387,12 +1366,12 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which pbcopy");
-			if (!result.FileExists ()) {
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("which pbcopy", waitForOutput: true);
+			if (exitCode != 0 || !result.FileExists ()) {
 				return false;
 			}
-			result = BashRunner.Run ("which pbpaste");
-			return result.FileExists ();
+			(exitCode, result) = ClipboardProcessRunner.Bash ("which pbpaste", waitForOutput: true);
+			return exitCode == 0 && result.FileExists ();
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1435,94 +1414,77 @@ namespace Terminal.Gui {
 		static extern IntPtr sel_registerName (string selectorName);
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux, when running under WSL. 
+	///  This implementation uses the Windows clipboard to store the data, and uses Windows'
+	///  powershell.exe (launched via WSL interop services) to set/get the Windows
+	///  clipboard. 
+	/// </summary>
 	class WSLClipboard : ClipboardBase {
+		bool isSupported = false;
 		public WSLClipboard ()
 		{
-			IsSupported = CheckSupport ();
+			isSupported = CheckSupport ();
 		}
 
-		public override bool IsSupported { get; }
+		public override bool IsSupported {
+			get {
+				return isSupported = CheckSupport ();
+			}
+		}
+
+		private static string powershellPath = string.Empty;
 
 		bool CheckSupport ()
 		{
-			try {
-				var result = BashRunner.Run ("which powershell.exe");
-				return result.FileExists ();
-			} catch (System.Exception) {
-				return false;
-			}
+			if (string.IsNullOrEmpty (powershellPath)) {
+				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
+				if (exitCode > 0) {
+					(exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe", waitForOutput: true);
+				}
 
-			//var result = BashRunner.Run ("which powershell.exe");
-			//if (!result.FileExists ()) {
-			//	return false;
-			//}
-			//result = BashRunner.Run ("which clip.exe");
-			//return result.FileExists ();
+				if (exitCode == 0) {
+					powershellPath = result;
+				}
+			}
+			return !string.IsNullOrEmpty (powershellPath);
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					RedirectStandardOutput = true,
-					FileName = "powershell.exe",
-					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = false,
-					CreateNoWindow = true
-				}
-			}) {
-				powershell.Start ();
-				var result = powershell.StandardOutput.ReadToEnd ();
-				powershell.StandardOutput.Close ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
-				}
+			if (!IsSupported) {
+				return string.Empty;
+			}
+
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, "-noprofile -command \"Get-Clipboard\"");
+			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
-				if (result.EndsWith ("\r\n")) {
-					result = result.Substring (0, result.Length - 2);
+
+				if (output.EndsWith ("\r\n")) {
+					output = output.Substring (0, output.Length - 2);
 				}
-				return result;
+				return output;
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					FileName = "powershell.exe",
-					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
-				}
-			}) {
-				powershell.Start ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
-				}
+			if (!IsSupported) {
+				return;
+			}
+
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
 			}
-
-			//using (var clipExe = new System.Diagnostics.Process {
-			//	StartInfo = new System.Diagnostics.ProcessStartInfo {
-			//		FileName = "clip.exe",
-			//		RedirectStandardInput = true
-			//	}
-			//}) {
-			//	clipExe.Start ();
-			//	clipExe.StandardInput.Write (text);
-			//	clipExe.StandardInput.Close ();
-			//	clipExe.WaitForExit ();
-			//}
 		}
 	}
 }
