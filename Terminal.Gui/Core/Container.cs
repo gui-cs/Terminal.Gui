@@ -9,31 +9,69 @@ namespace Terminal.Gui {
 
 	public class Frame : View {
 
+		/// <summary>
+		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View>Bounds"/>
+		/// eanbling borders, menus, etc... 
+		/// </summary>
 		public Frame ()
 		{
 			IgnoreBorderPropertyOnRedraw = true;
 		}
 
+		/// <summary>
+		/// The Parent of this Frame (Adornment). 
+		/// </summary>
+		public View Parent { get; set; }
+
+		/// <summary>
+		/// Frames cannot be used as sub-views, so this method always throws an <see cref="InvalidOperationException"/>.
+		/// TODO: Are we sure?
+		/// </summary>
+		public override View SuperView {
+			get {
+				return null;
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
+		/// <inheritdoc/>
+		public override void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		{
+			// Frames are children of a View, not SubViews. Thus ViewToScreen will not work.
+			// To get the screen-relative coordinates of a Frame, we need to know who
+			// the Parent is
+
+			// Computes the real row, col relative to the screen.
+			var inner = Parent?.Bounds ?? Bounds;
+			rrow = row - inner.Y;
+			rcol = col - inner.X;
+
+			Parent?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
+
+		}
+
 		public virtual void OnDrawSubViews (Rect clipRect)
 		{
-		//	if (Subviews == null) {
-		//		return;
-		//	}
+			//	if (Subviews == null) {
+			//		return;
+			//	}
 
-		//	foreach (var view in Subviews) {
-		//		// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
-		//		if (view.LayoutNeeded) {
-		//			view.LayoutSubviews ();
-		//		}
-		//		if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
-		//			view.Redraw (view.Bounds);
+			//	foreach (var view in Subviews) {
+			//		// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
+			//		if (view.LayoutNeeded) {
+			//			view.LayoutSubviews ();
+			//		}
+			//		if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
+			//			view.Redraw (view.Bounds);
 
-		//			view.NeedDisplay = Rect.Empty;
-		//			// BUGBUG - v2 why does this need to be set to false?
-		//			// Shouldn't it be set when the subviews draw?
-		//			view.ChildNeedsDisplay = false;
-		//		}
-		//	}
+			//			view.NeedDisplay = Rect.Empty;
+			//			// BUGBUG - v2 why does this need to be set to false?
+			//			// Shouldn't it be set when the subviews draw?
+			//			view.ChildNeedsDisplay = false;
+			//		}
+			//	}
 
 		}
 
@@ -53,9 +91,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void Redraw (Rect bounds)
+		/// <summary>
+		/// Redraws the Frames that comprise the <see cref="Frame"/>.
+		/// </summary>
+		/// <param name="clipRect"></param>
+		public override void Redraw (Rect clipRect)
 		{
-			
+
 			//OnDrawContent (bounds);
 			//OnDrawSubViews (bounds);
 			//OnDrawContentComplete (bounds);
@@ -64,24 +106,25 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.Normal);
 			}
 
-			Thickness.Draw (Frame, (string)Data);
+			var screenBounds = ViewToScreen (Frame);
+			Thickness.Draw (screenBounds, (string)Data);
 
 			//OnDrawContent (bounds); 
 
 			if (BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
-				lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (Frame.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+				lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
 
-				lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
-				foreach (var p in lc.GenerateImage (Frame)) {
+				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
+				foreach (var p in lc.GenerateImage (screenBounds)) {
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);
 				}
 
 				if (!ustring.IsNullOrEmpty (Title)) {
-					Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
+					Driver.DrawWindowTitle (screenBounds, Title, 0, 0, 0, 0);
 				}
 			}
 		}
@@ -100,7 +143,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rectangle that describes the inner area of the frame. The Location is always 0, 0.
 		/// </summary>
-		public new Rect Bounds {
+		public Rect Bounds {
 			get {
 				if (Thickness != null) {
 					new Rect (Point.Empty, Frame.Size);
