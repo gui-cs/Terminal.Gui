@@ -1524,7 +1524,7 @@ namespace Terminal.Gui {
 			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max (0, bounds.Height - 2));
+				boundsAdjustedForBorder = Bounds;// new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (bounds.Width, bounds.Width - 2), Math.Max (bounds.Height, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1552,9 +1552,10 @@ namespace Terminal.Gui {
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-							if (view.LayoutNeeded)
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
+							}
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
