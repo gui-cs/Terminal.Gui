@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -707,14 +708,22 @@ namespace Terminal.Gui {
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
-				var rect = new Rect () {
-					X = frame.X - drawMarginFrame,
-					Y = frame.Y - drawMarginFrame,
-					Width = frame.Width + (2 * drawMarginFrame),
-					Height = frame.Height + (2 * drawMarginFrame)
-				};
+				var rect = Child.ViewToScreen (new Rect (-1, -1, Child.Frame.Width + 2, Child.Frame.Height + 2));
 				if (rect.Width > 0 && rect.Height > 0) {
-					driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
+
+					var lc = new LineCanvas ();
+
+					lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, BorderStyle);
+					lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, BorderStyle);
+					
+					lc.AddLine (new Point (rect.X, rect.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, BorderStyle);
+					lc.AddLine (new Point (rect.X + rect.Width, rect.Y), rect.Height, Orientation.Vertical, BorderStyle);
+
+					driver.SetAttribute (new Attribute (Color.Red, Color.BrightYellow));
+					
+					foreach (var p in lc.GenerateImage(rect)) {
+						AddRuneAt (driver, p.Key.X, p.Key.Y, p.Value);
+					}
 					DrawTitle (Child);
 				}
 			}

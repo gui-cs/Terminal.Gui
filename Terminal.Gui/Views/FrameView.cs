@@ -1,4 +1,4 @@
-﻿//
+//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
@@ -252,26 +252,26 @@ namespace Terminal.Gui {
 					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, Border.BorderStyle);
 				}
 
-				foreach (var subview in contentView.Subviews) {
-					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
+				//foreach (var subview in contentView.Subviews) {
+				//	lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
+				//	lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
 
-					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
+				//	lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
+				//	lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
 
-				}
+				//}
 
 				Driver.SetAttribute (ColorScheme.Normal);
+        
 				foreach(var p in lc.GenerateImage (bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
-
-
 
 				// Redraw the lines so that focus/drag symbol renders
 				foreach (var subview in contentView.Subviews) {
 					//	line.DrawSplitterSymbol ();
 				}
+
 
 				// Draw Titles over Border
 				foreach (var subview in contentView.Subviews) {
