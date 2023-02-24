@@ -92,6 +92,10 @@ namespace Terminal.Gui {
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
+			if (ScreenBuffer == IntPtr.Zero) {
+				visibility = CursorVisibility.Invisible;
+				return false;
+			}
 			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
@@ -259,6 +263,9 @@ namespace Terminal.Gui {
 			position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 			SetConsoleOutputWindow (csbi);
 			var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
+			if (!SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+			}
 			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
@@ -1453,13 +1460,13 @@ namespace Terminal.Gui {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
-
 				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
 
 				ResizeScreen ();
 				UpdateOffScreen ();
-
-				CreateColors ();
 			} catch (Win32Exception e) {
 				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
 			}
@@ -1477,15 +1484,13 @@ namespace Terminal.Gui {
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
 			if (!EnableConsoleScrolling) {
-				// ANSI ESC "[xJ" Clears part of the screen.
-				// If n is 0 (or missing), clear from cursor to end of screen.
-				// If n is 1, clear from cursor to beginning of the screen.
-				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-				Console.Out.Write ("\x1b[0J");
-
-				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+                // ANSI ESC "[xJ" Clears part of the screen.
+                // If n is 0 (or missing), clear from cursor to end of screen.
+                // If n is 1, clear from cursor to beginning of the screen.
+                // If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+                // If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+                // DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
+                Console.Out.Write ("\x1b[3J");
 			}
 		}
 
@@ -1537,8 +1542,8 @@ namespace Terminal.Gui {
 					var prevPosition = crow * Cols + (ccol - 1);
 					OutputBuffer [prevPosition].Char.UnicodeChar = c;
 					contents [crow, ccol - 1, 0] = c;
-					OutputBuffer [prevPosition].Attributes = (ushort)currentAttribute;
-					contents [crow, ccol - 1, 1] = currentAttribute;
+					OutputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
 					contents [crow, ccol - 1, 2] = 1;
 					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
 				} else {
@@ -1564,8 +1569,8 @@ namespace Terminal.Gui {
 						OutputBuffer [position].Char.UnicodeChar = (char)rune;
 						contents [crow, ccol, 0] = (int)(uint)rune;
 					}
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
-					contents [crow, ccol, 1] = currentAttribute;
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 1;
 					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 				}
@@ -1574,20 +1579,22 @@ namespace Terminal.Gui {
 			if (runeWidth < 0 || runeWidth > 0) {
 				ccol++;
 			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)currentAttribute;
+					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -1596,11 +1603,9 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
 		}
 
 		public override Attribute MakeColor (Color foreground, Color background)
@@ -1712,11 +1717,6 @@ namespace Terminal.Gui {
 			Console.Out.Write ("\x1b[?1047l");
 
 			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
 		}
 
 		/// <inheritdoc/>

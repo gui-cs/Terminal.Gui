@@ -24,7 +24,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.Driver);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.Current);
-			Assert.Throws<ArgumentNullException> (() => Application.EnableConsoleScrolling == true);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);

@@ -1,5 +1,7 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
+using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -1602,8 +1604,8 @@ Y
 					// Calling the Text constructor.
 					lbl = new Label (text);
 				}
-				lbl.ColorScheme = new ColorScheme ();
-				lbl.Redraw (lbl.Bounds);
+				Application.Top.Add (lbl);
+				Application.Top.Redraw (Application.Top.Bounds);
 
 				// should have the initial text
 				Assert.Equal ('t', driver.Contents [0, 0, 0]);
@@ -4208,6 +4210,7 @@ cccccccccccccccccccc", output);
 				v.CanFocus = true;
 				Assert.False (v.HasFocus);
 				v.SetFocus ();
+				Assert.True (v.HasFocus);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
 111111111111111111110", attributes);
@@ -4488,6 +4491,33 @@ At 0,0
                              
   A text with some long width
    A text witith two lines.  ", output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void Test_Nested_Views_With_Height_Equal_To_One ()
+		{
+			var v = new View () { Width = 11, Height = 3, ColorScheme = new ColorScheme () };
+
+			var top = new View () { Width = Dim.Fill (), Height = 1 };
+			var bottom = new View () { Width = Dim.Fill (), Height = 1, Y = 2 };
+
+			top.Add (new Label ("111"));
+			v.Add (top);
+			v.Add (new LineView (Orientation.Horizontal) { Y = 1 });
+			bottom.Add (new Label ("222"));
+			v.Add (bottom);
+
+			v.LayoutSubviews ();
+			v.Redraw (v.Bounds);
+
+
+			string looksLike =
+@"    
+111
+───────────
+222";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 	}
 }
