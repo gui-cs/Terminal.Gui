@@ -66,7 +66,7 @@ namespace Terminal.Gui.Graphs {
 				for (int x = inArea.X; x < inArea.Width; x++) {
 
 					var intersects = lines
-						.Select (l => l.Intersects (inArea.X + x, inArea.Y + y))
+						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
 
