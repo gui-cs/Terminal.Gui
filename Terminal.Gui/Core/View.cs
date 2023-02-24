@@ -2206,7 +2206,7 @@ namespace Terminal.Gui {
 					if (dim == null) {
 						newDimension = AutoSize ? autosizeDimension : superviewDimension;
 					} else {
-						newDimension = width.Anchor (superviewDimension);
+						newDimension = dim.Anchor (superviewDimension);
 						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
 					}
 					newLocation = pos.Anchor (superviewDimension - newDimension);
