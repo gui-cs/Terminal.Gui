@@ -19,8 +19,6 @@ namespace UICatalog.Scenarios {
 			var effect3D = true;
 
 			var smartPanel = new PanelView () {
-				X = Pos.Center () - 38,
-				Y = Pos.Center () - 3,
 				Width = 24,
 				Height = 13,
 				Border = new Border () {
@@ -71,9 +69,7 @@ namespace UICatalog.Scenarios {
 			//	Height = 13
 			//};
 
-			var smartView = new Label () {
-				X = Pos.Center () + 10,
-				Y = Pos.Center () + 2,
+			var smartLabel = new Label () {
 				Border = new Border () {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
@@ -88,7 +84,7 @@ namespace UICatalog.Scenarios {
 				Text = "This is a test\nwithout a \nPanelView",
 				TextAlignment = TextAlignment.Centered
 			};
-			smartView.Border.Child = smartView;
+			smartLabel.Border.Child = smartLabel;
 
 			Win.Add (new Label ("Padding:") {
 				X = Pos.Center () - 23,
@@ -105,16 +101,16 @@ namespace UICatalog.Scenarios {
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.Padding.Right,
 						smartPanel.Child.Border.Padding.Bottom);
 
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						int.Parse (e.NewText.ToString ()), smartView.Border.Padding.Right,
-						smartView.Border.Padding.Bottom);
+					smartLabel.Border.Padding = new Thickness (smartLabel.Border.Padding.Left,
+						int.Parse (e.NewText.ToString ()), smartLabel.Border.Padding.Right,
+						smartLabel.Border.Padding.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingTopEdit.Text = $"{smartView.Border.Padding.Top}";
+			paddingTopEdit.Text = $"{smartLabel.Border.Padding.Top}";
 
 			Win.Add (paddingTopEdit);
 
@@ -129,16 +125,16 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
 						smartPanel.Child.Border.Padding.Bottom);
 
-					smartView.Border.Padding = new Thickness (int.Parse (e.NewText.ToString ()),
-						smartView.Border.Padding.Top, smartView.Border.Padding.Right,
-						smartView.Border.Padding.Bottom);
+					smartLabel.Border.Padding = new Thickness (int.Parse (e.NewText.ToString ()),
+						smartLabel.Border.Padding.Top, smartLabel.Border.Padding.Right,
+						smartLabel.Border.Padding.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingLeftEdit.Text = $"{smartView.Border.Padding.Left}";
+			paddingLeftEdit.Text = $"{smartLabel.Border.Padding.Left}";
 			Win.Add (paddingLeftEdit);
 
 			var paddingRightEdit = new TextField ("") {
@@ -152,16 +148,16 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Padding.Bottom);
 
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						smartView.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
-						smartView.Border.Padding.Bottom);
+					smartLabel.Border.Padding = new Thickness (smartLabel.Border.Padding.Left,
+						smartLabel.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
+						smartLabel.Border.Padding.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingRightEdit.Text = $"{smartView.Border.Padding.Right}";
+			paddingRightEdit.Text = $"{smartLabel.Border.Padding.Right}";
 			Win.Add (paddingRightEdit);
 
 			var paddingBottomEdit = new TextField ("") {
@@ -175,8 +171,8 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
 						int.Parse (e.NewText.ToString ()));
 
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						smartView.Border.Padding.Top, smartView.Border.Padding.Right,
+					smartLabel.Border.Padding = new Thickness (smartLabel.Border.Padding.Left,
+						smartLabel.Border.Padding.Top, smartLabel.Border.Padding.Right,
 						int.Parse (e.NewText.ToString ()));
 				} catch {
 					if (!e.NewText.IsEmpty) {
@@ -184,16 +180,16 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			};
-			paddingBottomEdit.Text = $"{smartView.Border.Padding.Bottom}";
+			paddingBottomEdit.Text = $"{smartLabel.Border.Padding.Bottom}";
 			Win.Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Center () - 35,
+				X = Pos.Left(paddingLeftEdit),
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
 				smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Top);
-				smartView.Border.Padding = new Thickness (smartView.Border.Padding.Top);
+				smartLabel.Border.Padding = new Thickness (smartLabel.Border.Padding.Top);
 				if (paddingTopEdit.Text.IsEmpty) {
 					paddingTopEdit.Text = "0";
 				}
@@ -203,7 +199,7 @@ namespace UICatalog.Scenarios {
 
 			var cbUseUsePanelFrame = new CheckBox ("UsePanelFrame") {
 				X = Pos.X (replacePadding),
-				Y = Pos.Y (replacePadding) + 3,
+				Y = Pos.Y (replacePadding) + 1,
 				Checked = smartPanel.UsePanelFrame
 			};
 			cbUseUsePanelFrame.Toggled += (e) => smartPanel.UsePanelFrame = !e;
@@ -224,16 +220,16 @@ namespace UICatalog.Scenarios {
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.BorderThickness.Right,
 						smartPanel.Child.Border.BorderThickness.Bottom);
 
-					smartView.Border.BorderThickness = new Thickness (smartView.Border.BorderThickness.Left,
-						int.Parse (e.NewText.ToString ()), smartView.Border.BorderThickness.Right,
-						smartView.Border.BorderThickness.Bottom);
+					smartLabel.Border.BorderThickness = new Thickness (smartLabel.Border.BorderThickness.Left,
+						int.Parse (e.NewText.ToString ()), smartLabel.Border.BorderThickness.Right,
+						smartLabel.Border.BorderThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			borderTopEdit.Text = $"{smartView.Border.BorderThickness.Top}";
+			borderTopEdit.Text = $"{smartLabel.Border.BorderThickness.Top}";
 
 			Win.Add (borderTopEdit);
 
@@ -248,16 +244,16 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
 						smartPanel.Child.Border.BorderThickness.Bottom);
 
-					smartView.Border.BorderThickness = new Thickness (int.Parse (e.NewText.ToString ()),
-						smartView.Border.BorderThickness.Top, smartView.Border.BorderThickness.Right,
-						smartView.Border.BorderThickness.Bottom);
+					smartLabel.Border.BorderThickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						smartLabel.Border.BorderThickness.Top, smartLabel.Border.BorderThickness.Right,
+						smartLabel.Border.BorderThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			borderLeftEdit.Text = $"{smartView.Border.BorderThickness.Left}";
+			borderLeftEdit.Text = $"{smartLabel.Border.BorderThickness.Left}";
 			Win.Add (borderLeftEdit);
 
 			var borderRightEdit = new TextField ("") {
@@ -271,16 +267,16 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.BorderThickness.Top, int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.BorderThickness.Bottom);
 
-					smartView.Border.BorderThickness = new Thickness (smartView.Border.BorderThickness.Left,
-						smartView.Border.BorderThickness.Top, int.Parse (e.NewText.ToString ()),
-						smartView.Border.BorderThickness.Bottom);
+					smartLabel.Border.BorderThickness = new Thickness (smartLabel.Border.BorderThickness.Left,
+						smartLabel.Border.BorderThickness.Top, int.Parse (e.NewText.ToString ()),
+						smartLabel.Border.BorderThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			borderRightEdit.Text = $"{smartView.Border.BorderThickness.Right}";
+			borderRightEdit.Text = $"{smartLabel.Border.BorderThickness.Right}";
 			Win.Add (borderRightEdit);
 
 			var borderBottomEdit = new TextField ("") {
@@ -294,8 +290,8 @@ namespace UICatalog.Scenarios {
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
 						int.Parse (e.NewText.ToString ()));
 
-					smartView.Border.BorderThickness = new Thickness (smartView.Border.BorderThickness.Left,
-						smartView.Border.BorderThickness.Top, smartView.Border.BorderThickness.Right,
+					smartLabel.Border.BorderThickness = new Thickness (smartLabel.Border.BorderThickness.Left,
+						smartLabel.Border.BorderThickness.Top, smartLabel.Border.BorderThickness.Right,
 						int.Parse (e.NewText.ToString ()));
 				} catch {
 					if (!e.NewText.IsEmpty) {
@@ -303,16 +299,16 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			};
-			borderBottomEdit.Text = $"{smartView.Border.BorderThickness.Bottom}";
+			borderBottomEdit.Text = $"{smartLabel.Border.BorderThickness.Bottom}";
 			Win.Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Center () + 1,
+				X = Pos.Left(borderLeftEdit),
 				Y = 5
 			};
 			replaceBorder.Clicked += () => {
 				smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Top);
-				smartView.Border.BorderThickness = new Thickness (smartView.Border.BorderThickness.Top);
+				smartLabel.Border.BorderThickness = new Thickness (smartLabel.Border.BorderThickness.Top);
 				if (borderTopEdit.Text.IsEmpty) {
 					borderTopEdit.Text = "0";
 				}
@@ -328,11 +324,11 @@ namespace UICatalog.Scenarios {
 
 				X = 2,
 				Y = 1,
-				SelectedItem = (int)smartView.Border.BorderStyle
+				SelectedItem = (int)smartLabel.Border.BorderStyle
 			};
 			Win.Add (rbBorderStyle);
 
-			var cbDrawMarginFrame = new CheckBox ("Draw Margin Frame", smartView.Border.DrawMarginFrame) {
+			var cbDrawMarginFrame = new CheckBox ("Draw Margin Frame", smartLabel.Border.DrawMarginFrame) {
 				X = Pos.AnchorEnd (20),
 				Y = 0,
 				Width = 5
@@ -340,9 +336,9 @@ namespace UICatalog.Scenarios {
 			cbDrawMarginFrame.Toggled += (e) => {
 				try {
 					smartPanel.Child.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
-					smartView.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
-					if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
-						cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
+					smartLabel.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
+					if (cbDrawMarginFrame.Checked != smartLabel.Border.DrawMarginFrame) {
+						cbDrawMarginFrame.Checked = smartLabel.Border.DrawMarginFrame;
 					}
 				} catch { }
 			};
@@ -350,14 +346,14 @@ namespace UICatalog.Scenarios {
 
 			rbBorderStyle.SelectedItemChanged += (e) => {
 				smartPanel.Child.Border.BorderStyle = (BorderStyle)e.SelectedItem;
-				smartView.Border.BorderStyle = (BorderStyle)e.SelectedItem;
-				smartView.SetNeedsDisplay ();
-				if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
-					cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
+				smartLabel.Border.BorderStyle = (BorderStyle)e.SelectedItem;
+				smartLabel.SetNeedsDisplay ();
+				if (cbDrawMarginFrame.Checked != smartLabel.Border.DrawMarginFrame) {
+					cbDrawMarginFrame.Checked = smartLabel.Border.DrawMarginFrame;
 				}
 			};
 
-			var cbEffect3D = new CheckBox ("Draw 3D effects", smartView.Border.Effect3D) {
+			var cbEffect3D = new CheckBox ("Draw 3D effects", smartLabel.Border.Effect3D) {
 				X = Pos.AnchorEnd (20),
 				Y = 1,
 				Width = 5
@@ -383,15 +379,15 @@ namespace UICatalog.Scenarios {
 					smartPanel.Child.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Effect3DOffset.Y);
 
-					smartView.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
-						smartView.Border.Effect3DOffset.Y);
+					smartLabel.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
+						smartLabel.Border.Effect3DOffset.Y);
 				} catch {
 					if (!e.NewText.IsEmpty && e.NewText != CultureInfo.CurrentCulture.NumberFormat.NegativeSign) {
 						e.Cancel = true;
 					}
 				}
 			};
-			effect3DOffsetX.Text = $"{smartView.Border.Effect3DOffset.X}";
+			effect3DOffsetX.Text = $"{smartLabel.Border.Effect3DOffset.X}";
 			Win.Add (effect3DOffsetX);
 
 			Win.Add (new Label ("Y:") {
@@ -409,7 +405,7 @@ namespace UICatalog.Scenarios {
 					smartPanel.Child.Border.Effect3DOffset = new Point (smartPanel.Child.Border.Effect3DOffset.X,
 						int.Parse (e.NewText.ToString ()));
 
-					smartView.Border.Effect3DOffset = new Point (smartView.Border.Effect3DOffset.X,
+					smartLabel.Border.Effect3DOffset = new Point (smartLabel.Border.Effect3DOffset.X,
 						int.Parse (e.NewText.ToString ()));
 				} catch {
 					if (!e.NewText.IsEmpty && e.NewText != CultureInfo.CurrentCulture.NumberFormat.NegativeSign) {
@@ -417,12 +413,12 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			};
-			effect3DOffsetY.Text = $"{smartView.Border.Effect3DOffset.Y}";
+			effect3DOffsetY.Text = $"{smartLabel.Border.Effect3DOffset.Y}";
 			Win.Add (effect3DOffsetY);
 
 			cbEffect3D.Toggled += (e) => {
 				try {
-					smartPanel.Child.Border.Effect3D = smartView.Border.Effect3D = effect3DOffsetX.Enabled =
+					smartPanel.Child.Border.Effect3D = smartLabel.Border.Effect3D = effect3DOffsetX.Enabled =
 						effect3DOffsetY.Enabled = cbEffect3D.Checked;
 				} catch { }
 			};
@@ -437,10 +433,10 @@ namespace UICatalog.Scenarios {
 
 				X = 2,
 				Y = 6,
-				SelectedItem = (int)smartView.Border.Background
+				SelectedItem = (int)smartLabel.Border.Background
 			};
 			rbBackground.SelectedItemChanged += (e) => {
-				smartPanel.Child.Border.Background = smartView.Border.Background = (Color)e.SelectedItem;
+				smartPanel.Child.Border.Background = smartLabel.Border.Background = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBackground);
 
@@ -454,17 +450,21 @@ namespace UICatalog.Scenarios {
 
 				X = Pos.AnchorEnd (18),
 				Y = 6,
-				SelectedItem = (int)smartView.Border.BorderBrush
+				SelectedItem = (int)smartLabel.Border.BorderBrush
 			};
 			rbBorderBrush.SelectedItemChanged += (e) => {
-				smartPanel.Child.Border.BorderBrush = smartView.Border.BorderBrush = (Color)e.SelectedItem;
+				smartPanel.Child.Border.BorderBrush = smartLabel.Border.BorderBrush = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBorderBrush);
 
+			smartPanel.X = Pos.Left (paddingLeftEdit);
+			smartPanel.Y = Pos.Top (smartLabel);
 			Win.Add (smartPanel);
-			Win.Add (smartView);
-
+			smartLabel.X = Pos.Left (borderLeftEdit);
+			smartLabel.Y = Pos.Bottom (cbUseUsePanelFrame) + 5;
+			Win.Add (smartLabel);
 			Win.BringSubviewToFront (smartPanel);
+
 		}
 	}
 }

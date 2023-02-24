@@ -1524,8 +1524,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (_textView.AllowsReturn);
 			Assert.Equal (4, _textView.TabWidth);
 			Assert.True (_textView.AllowsTab);
-			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
-			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
+			Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
 			Assert.False (_textView.WordWrap);
 
 			_textView.WordWrap = true;
@@ -1535,8 +1535,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (_textView.AllowsReturn);
 			Assert.Equal (0, _textView.TabWidth);
 			Assert.False (_textView.AllowsTab);
-			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
-			Assert.Equal ("Dim.Absolute(1)", _textView.Height.ToString ());
+			Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
+			Assert.Equal ("Absolute(1)", _textView.Height.ToString ());
 			Assert.False (_textView.WordWrap);
 
 			_textView.WordWrap = true;
@@ -1546,8 +1546,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (_textView.AllowsReturn);
 			Assert.Equal (4, _textView.TabWidth);
 			Assert.True (_textView.AllowsTab);
-			Assert.Equal ("Dim.Absolute(30)", _textView.Width.ToString ());
-			Assert.Equal ("Dim.Absolute(10)", _textView.Height.ToString ());
+			Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
+			Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
 			Assert.False (_textView.WordWrap);
 		}
 

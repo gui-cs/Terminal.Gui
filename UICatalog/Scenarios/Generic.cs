@@ -22,13 +22,39 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			// Put your scenario code here, e.g.
-			var button = new Button ("Press me!") {
+			// Put scenario code here (in a real app, this would be the code
+			// that would setup the app before `Application.Run` is called`).
+			// With a Scenario, after UI Catalog calls `Scenario.Setup` it calls
+			// `Scenario.Run` which calls `Application.Run`.
+			// Example:
+			//var button = new Button ("Press me!") {
+			//	AutoSize = false,
+			//	X = Pos.Center (),
+			//	Y = Pos.Center (),
+			//};
+			//button.Clicked += () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No");
+			//Win.Add (button);
+
+			Win.Visible = false;
+
+			var label = new Label () {
 				X = Pos.Center (),
 				Y = Pos.Center (),
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
+					Padding = new Thickness (2),
+					BorderThickness = new Thickness (2),
+					BorderBrush = Color.Red,
+					Background = Color.BrightGreen,
+					Effect3D = true,
+					Effect3DOffset = new Point (2, -3)
+				},
+				ColorScheme = Colors.TopLevel,
+				Text = "This is a test"
 			};
-			button.Clicked += () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No");
-			Win.Add (button);
+			label.Border.Child = label;
+			Application.Top.Add (label);
+
 		}
 	}
 }
