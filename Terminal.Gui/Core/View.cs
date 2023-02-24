@@ -1521,8 +1521,10 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
+			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
+				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max (0, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1574,6 +1576,17 @@ namespace Terminal.Gui {
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		Rect GetNeedDisplay (Rect containerBounds)
+		{
+			Rect rect = NeedDisplay;
+			if (!containerBounds.IsEmpty) {
+				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
+				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
+			}
+
+			return rect;
 		}
 
 		Rect GetContainerBounds ()
