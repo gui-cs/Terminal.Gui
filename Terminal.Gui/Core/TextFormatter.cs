@@ -1190,8 +1190,8 @@ namespace Terminal.Gui {
 			for (int line = 0; line < linesFormated.Count; line++) {
 				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
-				if ((isVertical && line >= maxBounds.Left + maxBounds.Width - 1)
-					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height - 1))
+				if ((isVertical && line >= maxBounds.Left + maxBounds.Width)
+					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height))
 
 					break;
 

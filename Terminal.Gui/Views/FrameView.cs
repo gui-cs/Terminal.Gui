@@ -1,4 +1,4 @@
-﻿//
+//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
@@ -262,7 +262,8 @@ namespace Terminal.Gui {
 				//}
 
 				Driver.SetAttribute (ColorScheme.Normal);
-				foreach (var p in lc.GenerateImage (bounds)) {
+        
+				foreach(var p in lc.GenerateImage (bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
 

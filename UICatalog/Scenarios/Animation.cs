@@ -71,7 +71,7 @@ namespace UICatalog.Scenarios {
 		protected override void Dispose(bool disposing)
 		{
 			isDisposed = true;
-			base.Dispose();
+			base.Dispose(disposing);
 		}
 
 		// This is a C# port of https://github.com/andraaspar/bitmap-to-braille by Andraaspar
