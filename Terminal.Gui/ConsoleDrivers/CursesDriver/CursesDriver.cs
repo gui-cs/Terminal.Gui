@@ -767,13 +767,11 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
-			Console.Out.Flush ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
-			Console.Out.Flush ();
 		}
 
 		//int lastMouseInterval;

@@ -754,11 +754,9 @@ namespace Terminal.Gui {
 
 			//Disable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1049l");
-			Console.Out.Flush ();
 
 			//Set cursor key to cursor.
 			Console.Out.Write ("\x1b[?25h");
-			Console.Out.Flush ();
 
 			Console.Out.Close ();
 		}
@@ -784,11 +782,9 @@ namespace Terminal.Gui {
 
 			//Enable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1049h");
-			Console.Out.Flush ();
 
 			//Set cursor key to application.
 			Console.Out.Write ("\x1b[?25l");
-			Console.Out.Flush ();
 
 			Console.TreatControlCAsInput = true;
 
@@ -981,7 +977,6 @@ namespace Terminal.Gui {
 		void SetVirtualCursorPosition (int col, int row)
 		{
 			Console.Out.Write ($"\x1b[{row + 1};{col + 1}H");
-			Console.Out.Flush ();
 		}
 
 		System.Text.StringBuilder WriteAttributes (int attr)
@@ -1115,13 +1110,11 @@ namespace Terminal.Gui {
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
-			Console.Out.Flush ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
-			Console.Out.Flush ();
 		}
 
 		public override void Suspend ()
