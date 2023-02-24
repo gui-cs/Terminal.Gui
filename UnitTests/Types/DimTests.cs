@@ -37,15 +37,15 @@ namespace Terminal.Gui.TypeTests {
 		public void Sized_SetsValue ()
 		{
 			var dim = Dim.Sized (0);
-			Assert.Equal ("Dim.Absolute(0)", dim.ToString ());
+			Assert.Equal ("Absolute(0)", dim.ToString ());
 
 			int testVal = 5;
 			dim = Dim.Sized (testVal);
-			Assert.Equal ($"Dim.Absolute({testVal})", dim.ToString ());
+			Assert.Equal ($"Absolute({testVal})", dim.ToString ());
 
 			testVal = -1;
 			dim = Dim.Sized (testVal);
-			Assert.Equal ($"Dim.Absolute({testVal})", dim.ToString ());
+			Assert.Equal ($"Absolute({testVal})", dim.ToString ());
 		}
 
 		[Fact]
@@ -83,11 +83,11 @@ namespace Terminal.Gui.TypeTests {
 			var testVal = Rect.Empty;
 			testVal = Rect.Empty;
 			dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"DimView(side=Width, target=View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"DimView(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"DimView(side=Width, target=View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"DimView(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 		}
 
 		[Fact]
@@ -141,11 +141,11 @@ namespace Terminal.Gui.TypeTests {
 			var testVal = Rect.Empty;
 			testVal = Rect.Empty;
 			dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"DimView(side=Height, target=View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"DimView(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"DimView(side=Height, target=View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"DimView(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 		}
 
 		// TODO: Other Dim.Height tests (e.g. Equal?)
@@ -155,15 +155,15 @@ namespace Terminal.Gui.TypeTests {
 		{
 			var testMargin = 0;
 			var dim = Dim.Fill ();
-			Assert.Equal ($"Dim.Fill(margin={testMargin})", dim.ToString ());
+			Assert.Equal ($"Fill({testMargin})", dim.ToString ());
 
 			testMargin = 0;
 			dim = Dim.Fill (testMargin);
-			Assert.Equal ($"Dim.Fill(margin={testMargin})", dim.ToString ());
+			Assert.Equal ($"Fill({testMargin})", dim.ToString ());
 
 			testMargin = 5;
 			dim = Dim.Fill (testMargin);
-			Assert.Equal ($"Dim.Fill(margin={testMargin})", dim.ToString ());
+			Assert.Equal ($"Fill({testMargin})", dim.ToString ());
 		}
 
 
@@ -182,13 +182,13 @@ namespace Terminal.Gui.TypeTests {
 		{
 			float f = 0;
 			var dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
+			Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
 			f = 0.5F;
 			dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
+			Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
 			f = 100;
 			dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
+			Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
 		}
 
 		[Fact]
@@ -420,112 +420,111 @@ namespace Terminal.Gui.TypeTests {
 			t.Add (w);
 
 			t.Ready += () => {
-				Assert.Equal ("Dim.Absolute(100)", w.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(100)", w.Height.ToString ());
+				Assert.Equal ("Absolute(100)", w.Width.ToString ());
+				Assert.Equal ("Absolute(100)", w.Height.ToString ());
 				Assert.Equal (100, w.Frame.Width);
 				Assert.Equal (100, w.Frame.Height);
 
-				Assert.Equal ("Dim.Factor(factor=0.5, remaining=False)", f1.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
+				Assert.Equal ("Factor(0.5,False)", f1.Width.ToString ());
+				Assert.Equal ("Absolute(5)", f1.Height.ToString ());
 				Assert.Equal (49, f1.Frame.Width); // 50-1=49
 				Assert.Equal (5, f1.Frame.Height);
 
-				Assert.Equal ("Dim.Fill(margin=0)", f2.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(5)", f2.Height.ToString ());
+				Assert.Equal ("Fill(0)", f2.Width.ToString ());
+				Assert.Equal ("Absolute(5)", f2.Height.ToString ());
 				Assert.Equal (49, f2.Frame.Width); // 50-1=49
 				Assert.Equal (5, f2.Frame.Height);
-
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=0,Y=0,Width=49,Height=5}))-Dim.Absolute(2))", v1.Width.ToString ());
-				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v1.Height.ToString ());
+	
+				Assert.Equal ("Combine(DimView(Width,FrameView()({X=0,Y=0,Width=49,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (47, v1.Frame.Width); // 49-2=47
 				Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
 
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=49,Y=0,Width=49,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
-				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v2.Height.ToString ());
+				Assert.Equal ("Combine(DimView(Width,FrameView()({X=49,Y=0,Width=49,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (47, v2.Frame.Width); // 49-2=47
 				Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
 
-				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Height.ToString ());
+				Assert.Equal ("Factor(0.1,False)", v3.Width.ToString ());
+				Assert.Equal ("Factor(0.1,False)", v3.Height.ToString ());
 				Assert.Equal (9, v3.Frame.Width); // 98*10%=9
 				Assert.Equal (9, v3.Frame.Height); // 98*10%=9
 
-				Assert.Equal ("Dim.Absolute(50)", v4.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(50)", v4.Height.ToString ());
+				Assert.Equal ("Absolute(50)", v4.Width.ToString ());
+				Assert.Equal ("Absolute(50)", v4.Height.ToString ());
 				Assert.Equal (50, v4.Frame.Width);
 				Assert.Equal (50, v4.Frame.Height);
 
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=47,Height=89}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
-				Assert.Equal ("Dim.Combine(DimView(side=Height, target=Button()({X=2,Y=7,Width=47,Height=89}))-DimView(side=Height, target=Button()({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
+				Assert.Equal ("Combine(DimView(Width,Button()({X=2,Y=7,Width=47,Height=89}))-DimView(Width,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
+				Assert.Equal ("Combine(DimView(Height,Button()({X=2,Y=7,Width=47,Height=89}))-DimView(Height,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
 				Assert.Equal (38, v5.Frame.Width); // 47-9=38
 				Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
-				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Height.ToString ());
+				Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
+				Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
 				Assert.Equal (9, v6.Frame.Width); // 47*20%=9
 				Assert.Equal (18, v6.Frame.Height); // 89*20%=18
-
 
 				w.Width = 200;
 				w.Height = 200;
 				t.LayoutSubviews ();
 
-				Assert.Equal ("Dim.Absolute(200)", w.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(200)", w.Height.ToString ());
+				Assert.Equal ("Absolute(200)", w.Width.ToString ());
+				Assert.Equal ("Absolute(200)", w.Height.ToString ());
 				Assert.Equal (200, w.Frame.Width);
 				Assert.Equal (200, w.Frame.Height);
 
 				f1.Text = "Frame1";
-				Assert.Equal ("Dim.Factor(factor=0.5, remaining=False)", f1.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
+				Assert.Equal ("Factor(0.5,False)", f1.Width.ToString ());
+				Assert.Equal ("Absolute(5)", f1.Height.ToString ());
 				Assert.Equal (99, f1.Frame.Width); // 100-1=99
 				Assert.Equal (5, f1.Frame.Height);
 
 				f2.Text = "Frame2";
-				Assert.Equal ("Dim.Fill(margin=0)", f2.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(5)", f2.Height.ToString ());
+				Assert.Equal ("Fill(0)", f2.Width.ToString ());
+				Assert.Equal ("Absolute(5)", f2.Height.ToString ());
 				Assert.Equal (99, f2.Frame.Width); // 100-1=99
 				Assert.Equal (5, f2.Frame.Height);
 
 				v1.Text = "Button1";
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=0,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v1.Width.ToString ());
-				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v1.Height.ToString ());
+				Assert.Equal ("Combine(DimView(Width,FrameView()({X=0,Y=0,Width=99,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (97, v1.Frame.Width); // 99-2=97
 				Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
 				v2.Text = "Button2";
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=99,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
-				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v2.Height.ToString ());
+				Assert.Equal ("Combine(DimView(Width,FrameView()({X=99,Y=0,Width=99,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (97, v2.Frame.Width); // 99-2=97
 				Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
 				v3.Text = "Button3";
-				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Height.ToString ());
+				Assert.Equal ("Factor(0.1,False)", v3.Width.ToString ());
+				Assert.Equal ("Factor(0.1,False)", v3.Height.ToString ());
 				Assert.Equal (19, v3.Frame.Width); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
 				Assert.Equal (19, v3.Frame.Height); // 199*10%=19
 
 				v4.Text = "Button4";
 				v4.AutoSize = false;
-				Assert.Equal ("Dim.Absolute(50)", v4.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(50)", v4.Height.ToString ());
+				Assert.Equal ("Absolute(50)", v4.Width.ToString ());
+				Assert.Equal ("Absolute(50)", v4.Height.ToString ());
 				Assert.Equal (50, v4.Frame.Width);
 				Assert.Equal (50, v4.Frame.Height);
 				v4.AutoSize = true;
-				Assert.Equal ("Dim.Absolute(11)", v4.Width.ToString ());
-				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
+				Assert.Equal ("Absolute(11)", v4.Width.ToString ());
+				Assert.Equal ("Absolute(1)", v4.Height.ToString ());
 				Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute
 				Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v5.Text = "Button5";
-				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=97,Height=189}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
-				Assert.Equal ("Dim.Combine(DimView(side=Height, target=Button()({X=2,Y=7,Width=97,Height=189}))-DimView(side=Height, target=Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
+				Assert.Equal ("Combine(DimView(Width,Button()({X=2,Y=7,Width=97,Height=189}))-DimView(Width,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
+				Assert.Equal ("Combine(DimView(Height,Button()({X=2,Y=7,Width=97,Height=189}))-DimView(Height,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
 				Assert.Equal (78, v5.Frame.Width); // 97-19=78
 				Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
 				v6.Text = "Button6";
-				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Height.ToString ());
+				Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
+				Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
 				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
 				Assert.Equal (38, v6.Frame.Height); // 198-7*20=38
 			};
@@ -635,12 +634,12 @@ namespace Terminal.Gui.TypeTests {
 					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 					view.Add (label);
 					Assert.Equal ($"Label {count}", label.Text);
-					Assert.Equal ($"Pos.Absolute({count})", label.Y.ToString ());
+					Assert.Equal ($"Absolute({count})", label.Y.ToString ());
 
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 					view.Height += 1;
 					count++;
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 				}
 			};
 
@@ -1007,18 +1006,18 @@ namespace Terminal.Gui.TypeTests {
 						var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
 						view.Add (label);
 						Assert.Equal ($"Label {count}", label.Text);
-						Assert.Equal ($"Pos.Absolute({count + 1})", label.Y.ToString ());
+						Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
 						listLabels.Add (label);
 						if (count == 0) {
-							Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+							Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 							view.Height += 2;
 						} else {
-							Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+							Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 							view.Height += 1;
 						}
 						count++;
 					}
-					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
@@ -1067,12 +1066,12 @@ namespace Terminal.Gui.TypeTests {
 				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
-				Assert.Equal ($"Pos.Absolute({i})", label.Y.ToString ());
+				Assert.Equal ($"Absolute({i})", label.Y.ToString ());
 				listLabels.Add (label);
 
-				Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
+				Assert.Equal ($"Absolute({i})", view.Height.ToString ());
 				view.Height += 1;
-				Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+				Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 			}
 
 			field.KeyDown += (k) => {
@@ -1080,10 +1079,10 @@ namespace Terminal.Gui.TypeTests {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
 
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 					view.Height -= 1;
 					count--;
-					Assert.Equal ($"Dim.Absolute({count})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 				}
 			};
 
@@ -1126,17 +1125,17 @@ namespace Terminal.Gui.TypeTests {
 				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
-				Assert.Equal ($"Pos.Absolute({i + 1})", label.Y.ToString ());
+				Assert.Equal ($"Absolute({i + 1})", label.Y.ToString ());
 				listLabels.Add (label);
 
 				if (i == 0) {
-					Assert.Equal ($"Dim.Absolute({i})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({i})", view.Height.ToString ());
 					view.Height += 2;
-					Assert.Equal ($"Dim.Absolute({i + 2})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
 				} else {
-					Assert.Equal ($"Dim.Absolute({i + 1})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 					view.Height += 1;
-					Assert.Equal ($"Dim.Absolute({i + 2})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
 				}
 			}
 
@@ -1150,7 +1149,7 @@ namespace Terminal.Gui.TypeTests {
 						Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 						view.Remove (listLabels [count - 1]);
 						listLabels.RemoveAt (count - 1);
-						Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+						Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 						view.Height -= 1;
 						count--;
 						if (listLabels.Count > 0)
@@ -1158,7 +1157,7 @@ namespace Terminal.Gui.TypeTests {
 						else
 							field.Text = NStack.ustring.Empty;
 					}
-					Assert.Equal ($"Dim.Absolute({count + 1})", view.Height.ToString ());
+					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 				}
 			};
 
@@ -1218,13 +1217,13 @@ namespace Terminal.Gui.TypeTests {
 		{
 			var text = "Test";
 			var dim = Dim.Function (() => text.Length);
-			Assert.Equal ("Dim.DimFunc(4)", dim.ToString ());
+			Assert.Equal ("DimFunc(4)", dim.ToString ());
 
 			text = "New Test";
-			Assert.Equal ("Dim.DimFunc(8)", dim.ToString ());
+			Assert.Equal ("DimFunc(8)", dim.ToString ());
 
 			text = "";
-			Assert.Equal ("Dim.DimFunc(0)", dim.ToString ());
+			Assert.Equal ("DimFunc(0)", dim.ToString ());
 		}
 
 		[Fact]

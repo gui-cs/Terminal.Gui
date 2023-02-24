@@ -1532,14 +1532,15 @@ namespace Terminal.Gui {
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Clear ();
+				Rect containerBounds = GetContainerBounds ();
+				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+				TextFormatter?.Draw (ViewToScreen (boundsAdjustedForBorder), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
 				    containerBounds);
 			}
 
@@ -2193,7 +2194,7 @@ namespace Terminal.Gui {
 			//   the current Pos (View.X or View.Y)
 			//   the current Dim (View.Width or View.Height)
 			(int newLocation, int newDimension) GetNewLocationAndDimension (int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
-			{				
+			{
 				int newDimension, newLocation;
 
 				switch (pos) {
@@ -2207,9 +2208,21 @@ namespace Terminal.Gui {
 					newLocation = pos.Anchor (superviewDimension - newDimension);
 					break;
 
+				case Pos.PosCombine:
+					var combine = pos as Pos.PosCombine;
+					int left, right;
+					(left, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
+					(right, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
+					if (combine.add) {
+						newLocation = left + right;
+					} else {
+						newLocation = left - right;
+					}
+					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					break;
+
 				case Pos.PosAbsolute:
 				case Pos.PosAnchorEnd:
-				case Pos.PosCombine:
 				case Pos.PosFactor:
 				case Pos.PosFunc:
 				case Pos.PosView:
@@ -2232,19 +2245,22 @@ namespace Terminal.Gui {
 					newDimension = AutoSize ? autosize : dimension;
 					break;
 				case Dim.DimCombine combine:
-					int leftActW = CalculateNewDimension (combine.left, location, dimension, autosize);
-					int rightActW = CalculateNewDimension (combine.right, dimension, location, autosize);
+					int leftNewDim = CalculateNewDimension (combine.left, location, dimension, autosize);
+					int rightNewDim = CalculateNewDimension (combine.right, location, dimension, autosize);
 					if (combine.add) {
-						newDimension = leftActW + rightActW;
+						newDimension = leftNewDim + rightNewDim;
 					} else {
-						newDimension = leftActW - rightActW;
+						newDimension = leftNewDim - rightNewDim;
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
+					
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
+					
+				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
@@ -2442,7 +2458,7 @@ namespace Terminal.Gui {
 				// return L (a topologically sorted order)
 				return result;
 			} // TopologicalSort
-			
+
 			var ordered = TopologicalSort (nodes, edges);
 
 			foreach (var v in ordered) {
