@@ -186,8 +186,8 @@ namespace UICatalog {
 		}
 
 		/// <summary>
-		/// Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/> different than `Top`.
-		/// 
+		/// Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> 
+		/// using a <see cref="Toplevel"/> different than `Top`.
 		/// </summary>
 		/// <remarks>
 		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before returning.
