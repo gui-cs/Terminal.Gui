@@ -10,7 +10,7 @@ namespace Terminal.Gui {
 	/// with some normal escape sequences and thus, will be only considered the responses to the
 	/// requests that were registered with this object.
 	/// </remarks>
-	public class EscSequenceRequestState {
+	public class EscSeqReqStatus {
 		/// <summary>
 		/// Gets the terminating.
 		/// </summary>
@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="terminating">The terminating.</param>
 		/// <param name="numOfReq">The number of requests.</param>
-		public EscSequenceRequestState (string terminating, int numOfReq)
+		public EscSeqReqStatus (string terminating, int numOfReq)
 		{
 			Terminating = terminating;
 			NumRequests = NumOutstanding = numOfReq;
@@ -37,16 +37,16 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Manages a list of <see cref="EscSequenceRequestState"/>.
+	/// Manages a list of <see cref="EscSeqReqStatus"/>.
 	/// </summary>
 	public class EscSeqReqProc {
 		/// <summary>
-		/// Gets the <see cref="EscSequenceRequestState"/> list.
+		/// Gets the <see cref="EscSeqReqStatus"/> list.
 		/// </summary>
-		public List<EscSequenceRequestState> EscSeqReqStats { get; } = new List<EscSequenceRequestState> ();
+		public List<EscSeqReqStatus> EscSeqReqStats { get; } = new List<EscSeqReqStatus> ();
 
 		/// <summary>
-		/// Adds a new <see cref="EscSequenceRequestState"/> instance to the <see cref="EscSeqReqStats"/> list.
+		/// Adds a new <see cref="EscSeqReqStatus"/> instance to the <see cref="EscSeqReqStats"/> list.
 		/// </summary>
 		/// <param name="terminating">The terminating.</param>
 		/// <param name="numOfReq">The number of requests.</param>
@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 			lock (EscSeqReqStats) {
 				var found = EscSeqReqStats.Find (x => x.Terminating == terminating);
 				if (found == null) {
-					EscSeqReqStats.Add (new EscSequenceRequestState (terminating, numOfReq));
+					EscSeqReqStats.Add (new EscSeqReqStatus (terminating, numOfReq));
 				} else if (found != null && found.NumOutstanding < found.NumRequests) {
 					found.NumOutstanding = Math.Min (found.NumOutstanding + numOfReq, found.NumRequests);
 				}
@@ -63,7 +63,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes a <see cref="EscSequenceRequestState"/> instance from the <see cref="EscSeqReqStats"/> list.
+		/// Removes a <see cref="EscSeqReqStatus"/> instance from the <see cref="EscSeqReqStats"/> list.
 		/// </summary>
 		/// <param name="terminating">The terminating string.</param>
 		public void Remove (string terminating)
@@ -85,7 +85,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Indicates if a <see cref="EscSequenceRequestState"/> with the <paramref name="terminating"/> exist
+		/// Indicates if a <see cref="EscSeqReqStatus"/> with the <paramref name="terminating"/> exist
 		/// in the <see cref="EscSeqReqStats"/> list.
 		/// </summary>
 		/// <param name="terminating"></param>
