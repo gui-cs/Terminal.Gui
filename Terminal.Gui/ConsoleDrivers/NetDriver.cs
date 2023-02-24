@@ -1334,7 +1334,7 @@ namespace Terminal.Gui {
 		void ChangeWin (Size size)
 		{
 			winChanging = true;
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				largestBufferHeight = Math.Max (size.Height, 0);
 			} else {
 				largestBufferHeight = Math.Max (size.Height, largestBufferHeight);

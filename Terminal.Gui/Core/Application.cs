@@ -449,7 +449,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.HeightAsBuffer = HeightAsBuffer;
+				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
