@@ -21,6 +21,10 @@ namespace Terminal.Gui.Core {
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
+			var tf = dlg.Subviews [0].Subviews.OfType<FileDialog2.TextFieldWithAppendAutocomplete> ().Single();
+			tf.ClearAllSelection ();
+			tf.CursorPosition = tf.Text.Length;
+			Assert.True (tf.HasFocus);
 
 			SendSlash ();
 
@@ -44,9 +48,9 @@ namespace Terminal.Gui.Core {
 		private void SendSlash ()
 		{
 			if(Path.DirectorySeparatorChar == '/') {
-				Send ("/");
+				Send ('/', ConsoleKey.Separator, false);
 			} else {
-				Send ('\\', ConsoleKey.Separator,true);
+				Send ('\\', ConsoleKey.Separator,false);
 			}
 		}
 
