@@ -23,7 +23,7 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *View* - A base-class for implementing higher level visual/interactive Terminal.Gui elements. Implemented in the `View` base-class, which is a `Responder` and a `Container`. 
     * In v2 we will move all logic for rendering out of `View` and `Window` and into `View`.
   * *SubView* - A View that is contained in antoher view and will be rendered as part of the containing view's *ContentArea*. SubViews are added to another view via the `View.Add` method. A View may only be a SubView of a single View. 
-  * *SuperView* - The View that a *SubView* was added to. 
+  * *SuperView* - The View that is a container for SubViews. Referrs to the View another View was was added to as *SubView*. 
   * *Child View* - A view that is held by another view in a parent/child relationshiop, but is NOT a SubView. Examples of this are sub-menus of `MenuBar`. 
   * *Parent View* - A view that holds a reference to another view in a parent/child relationship, but is NOT a SuperView of the child. 
   * *Thickness* - Describes rectangle where each of the four sides can have a width. Valid width values are >= 0. The inner area of a Thickness is the sum of the widths of the four sides minus the size of the rectangle.
@@ -55,6 +55,8 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 * PanelView (done)
 * FrameView (almost done)
 * Window?
+  * *Tile*, *Tiled*, *Tiling* - Refers to a form of layout where the SubViews of a View are visually arranged such that their Frames abut each other and do not overlap. In a Tiled view arragnement there is no Z-ordering.
+  * *Overlap*, *Overlapped*, *Overlapping* - Refers to a form of layout where the SubViews of a View are visually arranged such that their Frames can overlap. In Overlap view arragements there is a Z-axis (Z-order) in addition to the X and Y dimension. The Z-order indicates which Views are shown above other views.
 
 
   ### Questions

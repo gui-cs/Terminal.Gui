@@ -17,6 +17,12 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Layout")]
 	public class ComputedLayout : Scenario {
 
+		public override void Init (ColorScheme colorScheme)
+		{
+			Application.Init ();
+			Application.Top.ColorScheme = colorScheme;
+		}
+
 		public override void Setup ()
 		{
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
@@ -30,7 +36,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error
 			};
 
-			Win.Add (horizontalRuler);
+			Application.Top.Add (horizontalRuler);
 
 			// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
 			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
@@ -44,29 +50,37 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error
 			};
 
-			Win.LayoutComplete += (a) => {
+			Application.Top.LayoutComplete += (a) => {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
-				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
+				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height*2)];
 			};
 
-			Win.Add (verticalRuler);
+			Application.Top.Add (verticalRuler);
 
-			// Demonstrate At - Absolute Layout using Pos
-			var absoluteButton = new Button ("Absolute At(2,1)") {
+			// Demonstrate At - Using Pos.At to locate a view in an absolute location
+			var atButton = new Button ("At(2,1)") {
 				X = Pos.At (2),
 				Y = Pos.At (1)
 			};
-			Win.Add (absoluteButton);
+			Application.Top.Add (atButton);
+
+			// Throw in a literal absolute - Should funciton identically to above
+			var absoluteButton = new Button ("X = 30, Y = 1") {
+				X = 30,
+				Y = 1
+			};
+			Application.Top.Add (absoluteButton);
 
 			// Demonstrate using Dim to create a window that fills the parent with a margin
 			int margin = 10;
-			var subWin = new Window ($"Centered Sub Window with {margin} character margin") {
+			var subWin = new Window () {
 				X = Pos.Center (),
 				Y = 2,
 				Width = Dim.Fill (margin),
 				Height = 7
 			};
-			Win.Add (subWin);
+			subWin.Title = $"{subWin.GetType().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			Application.Top.Add (subWin);
 
 			int i = 1;
 			string txt = "Resize the terminal to see computed layout in action.";
@@ -79,13 +93,13 @@ namespace UICatalog.Scenarios {
 			subWin.Add (labelList.ToArray ());
 
 			// #522 repro?
-			var frameView = new FrameView ($"Centered FrameView with {margin} character margin") {
-				X = Pos.Center (),
+			var frameView = new FrameView () {
+				X = 2, //Pos.Center (),
 				Y = Pos.Bottom (subWin),
-				Width = Dim.Fill (margin),
+				Width = 30,
 				Height = 7
 			};
-			Win.Add (frameView);
+			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
 			i = 1;
 			labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
@@ -94,72 +108,164 @@ namespace UICatalog.Scenarios {
 			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 			frameView.Add (labelList.ToArray ());
+			Application.Top.Add (frameView);
+
+			frameView = new FrameView () {
+				X = Pos.Right(frameView),
+				Y = Pos.Top (frameView),
+				Width = Dim.Fill(),
+				Height = 7,
+			};
+			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
+			Application.Top.Add (frameView);
 
 			// Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
 			var textView = new TextView () {
 				X = Pos.Center (),
 				Y = Pos.Percent (50),
 				Width = Dim.Percent (80),
-				Height = Dim.Percent (30),
+				Height = Dim.Percent (10),
 				ColorScheme = Colors.TopLevel,
 			};
-			textView.Text = "This text view should be half-way down the terminal,\n20% of its height, and 80% of its width.";
-			Win.Add (textView);
+			textView.Text = $"This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
+			Application.Top.Add (textView);
+
+			var oddballButton = new Button ("These buttons demo convoluted PosCombine scenarios") {
+				X = Pos.Center (),
+				Y = Pos.Bottom (textView) + 1
+			};
+			Application.Top.Add (oddballButton);
+
+			#region Issue2358
+			// Demonstrate odd-ball Combine scenarios
+			// Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
+
+			oddballButton = new Button ("Center + 0") {
+				X = Pos.Center () + 0,
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			oddballButton = new Button ("Center + 1") {
+				X = Pos.Center () + 1,
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			oddballButton = new Button ("0 + Center") {
+				X = 0 + Pos.Center (),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			oddballButton = new Button ("1 + Center") {
+				X = 1 + Pos.Center (),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
+			// The `- Pos.Percent(5)` is there so at least something is visible
+			oddballButton = new Button ("Center + Center - Percent(50)") {
+				X = Pos.Center () + Pos.Center () - Pos.Percent(50),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
+			// The `- Pos.Percent(5)` is there so at least something is visible
+			oddballButton = new Button ("Percent(50) + Center - Percent(50)") {
+				X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
+			// The `- Pos.Percent(5)` is there so at least something is visible
+			oddballButton = new Button ("Center + Percent(50) - Percent(50)") {
+				X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			#endregion
+			// This demonstrates nonsense: Same as At(0)
+			oddballButton = new Button ("Center - Center - Percent(50)") {
+				X = Pos.Center () + Pos.Center () - Pos.Percent (50),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			// This demonstrates combining Percents)
+			oddballButton = new Button ("Percent(40) + Percent(10)") {
+				X = Pos.Percent (40) + Pos.Percent(10),
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
-			var anchorButton = new Button ("Anchor End") {
-				Y = Pos.AnchorEnd (1),
+			var anchorButton = new Button ("Button using AnchorEnd") {
+				Y = Pos.AnchorEnd () - 1,
 			};
-			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 			anchorButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
-				// The call to Win.LayoutSubviews causes the Computed layout to
+				// The call to Application.Top.LayoutSubviews causes the Computed layout to
 				// get updated. 
 				anchorButton.Text += "!";
-				Win.LayoutSubviews ();
+				Application.Top.LayoutSubviews ();
 			};
-			Win.Add (anchorButton);
+			Application.Top.Add (anchorButton);
 
-
-			// Centering multiple controls horizontally. 
+			// Demonstrate AnchorEnd(n) 
 			// This is intentionally convoluted to illustrate potential bugs.
-			var bottomLabel = new Label ("This should be the 2nd to last line (Bug #xxx).") {
+			var anchorEndLabel1 = new Label ("This Label should be the 2nd to last line (AnchorEnd (2)).") {
 				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
-				Width = Dim.Fill (),
-				X = Pos.Center (),
+				Width = Dim.Fill (5),
+				X = 5,
 				Y = Pos.AnchorEnd (2)
 			};
-			Win.Add (bottomLabel);
+			Application.Top.Add (anchorEndLabel1);
 
-			// Show positioning vertically using Pos.Bottom 
+			// Demonstrate DimCombine (via AnchorEnd(n) - 1)
+			// This is intentionally convoluted to illustrate potential bugs.
+			var anchorEndLabel2 = new TextField ("This TextField should be the 3rd to last line (AnchorEnd (2) - 1).") {
+				TextAlignment = Terminal.Gui.TextAlignment.Left,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (5),
+				X = 5,
+				Y = Pos.AnchorEnd (2) - 1 // Pos.Combine
+			};
+			Application.Top.Add (anchorEndLabel2);
+
+			// Show positioning vertically using Pos.AnchorEnd via Pos.Combine
 			var leftButton = new Button ("Left") {
-				Y = Pos.AnchorEnd () - 1
+				Y = Pos.AnchorEnd () - 1 // Pos.Combine
 			};
 			leftButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
-				// The call to Win.LayoutSubviews causes the Computed layout to
+				// The call to Application.Top.LayoutSubviews causes the Computed layout to
 				// get updated. 
 				leftButton.Text += "!";
-				Win.LayoutSubviews ();
+				Application.Top.LayoutSubviews ();
 			};
 
 
 			// show positioning vertically using Pos.AnchorEnd
 			var centerButton = new Button ("Center") {
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd () - 1
+				Y = Pos.AnchorEnd (1)  // Pos.AnchorEnd(1)
 			};
 			centerButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
-				// The call to Win.LayoutSubviews causes the Computed layout to
+				// The call to Application.Top.LayoutSubviews causes the Computed layout to
 				// get updated. 
 				centerButton.Text += "!";
-				Win.LayoutSubviews ();
+				Application.Top.LayoutSubviews ();
 			};
 
 			// show positioning vertically using another window and Pos.Bottom
@@ -169,27 +275,19 @@ namespace UICatalog.Scenarios {
 			rightButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
-				// The call to Win.LayoutSubviews causes the Computed layout to
+				// The call to Application.Top.LayoutSubviews causes the Computed layout to
 				// get updated. 
 				rightButton.Text += "!";
-				Win.LayoutSubviews ();
+				Application.Top.LayoutSubviews ();
 			};
 
-			// Center three buttons with 5 spaces between them - shows PosCombine
-			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
+			// Center three buttons with 5 spaces between them
 			leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;
 			rightButton.X = Pos.Right (centerButton) + 5;
 
-			Win.Add (leftButton);
-			Win.Add (centerButton);
-			Win.Add (rightButton);
-
-			centerButton = new Button ("25% + 25%") {
-				X = Pos.Percent (25) + Pos.Percent (25),
-				Y = Pos.AnchorEnd (2)
-			};
-			Win.Add (centerButton);
-
+			Application.Top.Add (leftButton);
+			Application.Top.Add (centerButton);
+			Application.Top.Add (rightButton);
 		}
 
 		public override void Run ()

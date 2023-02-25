@@ -20,7 +20,7 @@ namespace UICatalog.Scenarios {
 
 			var smartView = new FrameView () {
 				X = Pos.Center (),
-				Y = Pos.Center () - 7,
+				Y = 0, // Y is set below 
 				Width = 40,
 				Height = 20,
 				Border = new Border () {
@@ -142,7 +142,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Center () - 35,
+				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
@@ -236,7 +236,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Center () + 1,
+				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
 			replaceBorder.Clicked += () => {
@@ -247,6 +247,8 @@ namespace UICatalog.Scenarios {
 				borderBottomEdit.Text = borderLeftEdit.Text = borderRightEdit.Text = borderTopEdit.Text;
 			};
 			Win.Add (replaceBorder);
+
+			smartView.Y = Pos.Bottom (replaceBorder) + 1;
 
 			Win.Add (new Label ("BorderStyle:"));
 
