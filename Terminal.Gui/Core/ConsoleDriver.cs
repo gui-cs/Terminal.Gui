@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// 
+	/// Indicates the RGB for true colors.
 	/// </summary>
 	public class TrueColor {
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// 
+		/// Converts true color to console color.
 		/// </summary>
 		/// <returns></returns>
 		public Color ToConsoleColor ()
@@ -504,7 +504,7 @@ namespace Terminal.Gui {
 			public bool Equals (string x, string y)
 			{
 				if (x != null && y != null) {
-					return x.ToLowerInvariant () == y.ToLowerInvariant ();
+					return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
 				}
 				return false;
 			}

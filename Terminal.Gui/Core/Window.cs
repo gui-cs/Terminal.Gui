@@ -38,6 +38,9 @@ namespace Terminal.Gui {
 				if (!OnTitleChanging (title, value)) {
 					var old = title;
 					title = value;
+					if (Border != null) {
+						Border.Title = title;
+					}
 					OnTitleChanged (old, title);
 				}
 				SetNeedsDisplay ();
@@ -192,10 +195,13 @@ namespace Terminal.Gui {
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
 					Padding = new Thickness (padding),
-					BorderBrush = ColorScheme.Normal.Background
+					Title = title
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame);
 		}
@@ -287,9 +293,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var padding = Border.GetSumThickness ();
-			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
@@ -298,7 +301,6 @@ namespace Terminal.Gui {
 			var savedClip = contentView.ClipToBounds ();
 
 			// Redraw our contentView
-			// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
 			contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
@@ -306,14 +308,7 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 
 			Driver.SetAttribute (GetNormalColor ());
-			//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-			//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
 			Border.DrawContent (this, false);
-			if (HasFocus)
-				Driver.SetAttribute (ColorScheme.HotNormal);
-			if (Border.DrawMarginFrame)
-				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <inheritdoc/>
