@@ -13,7 +13,7 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 
   * *View* - The most basic visual element in Terminal.Gui. Implemented in the `View` base-class. 
   * *SubView* - A View that is contained in antoher view and will be rendered as part of the containing view's *ContentArea*. SubViews are added to another view via the `View.Add` method. A View may only be a SubView of a single View. 
-  * *SuperView* - The View that a *SubView* was added to. 
+  * *SuperView* - The View that is a container for SubViews. Referrs to the View another View was was added to as *SubView*. 
   * *Child View* - A view that is held by another view in a parent/child relationshiop, but is NOT a SubView. Examples of this are sub-menus of `MenuBar`. 
   * *Parent View* - A view that holds a reference to another view in a parent/child relationship, but is NOT a SuperView of the child. 
   * *Thickness* - Describes how thick a rectangle is on each of the rectangle's four sides. Valid thickness values are >= 0. 
@@ -37,6 +37,8 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *Modal* - The term used when describing a View that was created using the `Application.Run(view)` or `Application.Run<T>` APIs. When a View is running as a modal, user input is restricted to just that View until `Application.Run` exits. 
   * *TopLevel* - The term used to describe a view that is both Modal and can have a MenuBar and/or StatusBar. 
   * *Window* - A View that is 
+  * *Tile*, *Tiled*, *Tiling* - Refers to a form of layout where the SubViews of a View are visually arranged such that their Frames abut each other and do not overlap. In a Tiled view arragnement there is no Z-ordering.
+  * *Overlap*, *Overlapped*, *Overlapping* - Refers to a form of layout where the SubViews of a View are visually arranged such that their Frames can overlap. In Overlap view arragements there is a Z-axis (Z-order) in addition to the X and Y dimension. The Z-order indicates which Views are shown above other views.
 
 
   ### Questions
