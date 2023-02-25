@@ -90,13 +90,18 @@ namespace Terminal.Gui {
 			};
 			this.btnOk.Clicked += this.Accept;
 			this.btnOk.KeyPress += (k) => {
-				this.NavigateIf (k, Key.CursorLeft, this.tbPath);
-				this.NavigateIf (k, Key.CursorDown, this.tableView);
+				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
+				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
 
 			this.btnCancel = new Button ("Cancel") {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.AnchorEnd (okWidth + cancelWidth),
+			};
+			this.btnCancel.KeyPress += (k) => {
+				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
+				this.NavigateIf (k, Key.CursorUp, this.tableView);
+				this.NavigateIf (k, Key.CursorRight, this.btnOk);
 			};
 			this.btnCancel.Clicked += () => {
 				Application.RequestStop ();
@@ -145,11 +150,15 @@ namespace Terminal.Gui {
 			};
 			this.tableView.KeyPress += (k) => {
 				if (this.tableView.SelectedRow <= 0) {
-					this.NavigateIf (k, Key.CursorUp, this.tbPath);
+					this.NavigateIf (k, Key.CursorUp, this.tbPath);					
 				}
 				else
 				{
-					if(this.tableView.HasFocus && 
+					if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
+						this.NavigateIf (k, Key.CursorLeft, this.treeView);
+					}
+
+					if (this.tableView.HasFocus && 
 					!k.KeyEvent.Key.HasFlag(Key.CtrlMask) &&
 					!k.KeyEvent.Key.HasFlag(Key.AltMask) &&
 					 char.IsLetterOrDigit((char)k.KeyEvent.KeyValue))
@@ -239,7 +248,27 @@ namespace Terminal.Gui {
 
 
 			this.treeView.ColorScheme = ColorSchemeDefault;
-			this.treeView.KeyDown += (k) => k.Handled = this.TreeView_KeyDown (k.KeyEvent);
+			this.treeView.KeyDown += (k) => {
+
+
+				var selected = treeView.SelectedObject;
+				if(selected != null) {
+					if (!treeView.CanExpand (selected) || treeView.IsExpanded(selected)) {
+						this.NavigateIf (k, Key.CursorRight, this.tableView);
+					}
+					else
+					if (treeView.GetObjectRow (selected) == 0) {
+						this.NavigateIf (k, Key.CursorUp, this.tbPath);
+					}
+				}
+
+				if (k.Handled) {
+					return;
+				}
+
+				k.Handled = this.TreeView_KeyDown (k.KeyEvent);
+
+				};
 
 			this.AllowsMultipleSelection = false;
 
@@ -558,6 +587,10 @@ namespace Terminal.Gui {
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 
 				to.FocusFirst ();
+				if(to == tbPath) {
+					tbPath.MoveCursorToEnd ();
+				}
+
 				keyEvent.Handled = true;
 			}
 		}
