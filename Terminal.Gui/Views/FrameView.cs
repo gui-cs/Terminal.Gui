@@ -31,6 +31,9 @@ namespace Terminal.Gui {
 			get => title;
 			set {
 				title = value;
+				if (Border != null) {
+					Border.Title = title;
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -114,10 +117,14 @@ namespace Terminal.Gui {
 			this.Title = title;
 			if (border == null) {
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single
+					BorderStyle = BorderStyle.Single,
+					Title = title
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame, views);
 		}
@@ -216,12 +223,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var padding = Border.GetSumThickness ();
-			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 				Clear ();
 			}
 
@@ -229,62 +232,11 @@ namespace Terminal.Gui {
 			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 
-			if (!IgnoreBorderPropertyOnRedraw) {
-				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
-				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				if (Border.DrawMarginFrame)
-					Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-				Driver.SetAttribute (GetNormalColor ());
-			} else {
-				var lc = new LineCanvas ();
-
-				if (Border?.BorderStyle != BorderStyle.None) {
-
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, Border.BorderStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, Border.BorderStyle);
-
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, Border.BorderStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, Border.BorderStyle);
-				}
-
-				foreach (var subview in contentView.Subviews) {
-					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Width - 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X + 1, subview.Frame.Y + 1), subview.Frame.Height - 1, Orientation.Vertical, subview.Border.BorderStyle);
-
-					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Width + 1, Orientation.Horizontal, subview.Border.BorderStyle);
-					lc.AddLine (new Point (subview.Frame.X + subview.Frame.Width, subview.Frame.Y + subview.Frame.Height), -subview.Frame.Height + 1, Orientation.Vertical, subview.Border.BorderStyle);
-
-				}
-
-				Driver.SetAttribute (ColorScheme.Normal);
-				foreach(var p in lc.GenerateImage (bounds)) {
-					AddRune (p.Key.X, p.Key.Y, p.Value);
-				}
-
-
-
-				// Redraw the lines so that focus/drag symbol renders
-				foreach (var subview in contentView.Subviews) {
-					//	line.DrawSplitterSymbol ();
-				}
-
-				// Draw Titles over Border
-				foreach (var subview in contentView.Subviews) {
-					// TODO: Use reflection to see if subview has a Title property
-					if (subview is FrameView viewWithTite) {
-						var rect = viewWithTite.Frame;
-						rect.X = rect.X + 1;
-						rect.Y = rect.Y + 2;
-						// TODO: Do focus color correctly
-						Driver.DrawWindowTitle (rect, viewWithTite.Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-					}
-				}
-			}
+			Driver.SetAttribute (GetNormalColor ());
+			Border.DrawContent (this, false);
 		}
 
 		/// <summary>
