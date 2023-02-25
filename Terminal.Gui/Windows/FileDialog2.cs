@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.AnchorEnd (okWidth + cancelWidth),
 			};
-			this.btnCancel.KeyPress += (k) => {
+			this.btnCancel.Clicked += () => {
 				Application.RequestStop ();
 			};
 
@@ -115,6 +115,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (1)
 			};
 			this.tbPath.KeyPress += (k) => {
+				ClearFeedback ();
 
 				this.NavigateIf (k, Key.CursorDown, this.tableView);
 
@@ -125,8 +126,6 @@ namespace Terminal.Gui {
 				this.AcceptIf (k, Key.Enter);
 
 				this.SuppressIfBadChar (k);
-				
-				ClearFeedback ();
 			};
 
 			this.splitContainer = new TileView () {
@@ -247,6 +246,8 @@ namespace Terminal.Gui {
 			this.UpdateNavigationVisibility ();
 
 			// Determines tab order
+			this.Add (this.btnToggleSplitterCollapse);
+			this.Add (lblFeedback);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
 			this.Add (this.lblUp);
@@ -255,8 +256,6 @@ namespace Terminal.Gui {
 			this.Add (lblPath);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
-			this.Add (this.btnToggleSplitterCollapse);
-			this.Add (lblFeedback);
 		}
 
 		private void ClearFeedback ()
@@ -711,10 +710,15 @@ namespace Terminal.Gui {
 		private void CellActivate (TableView.CellActivatedEventArgs obj)
 		{
 			var multi = this.MultiRowToStats ();
+			string reason = null;
 			if (multi.Any ()) {
-				if (multi.All (m=>this.IsCompatibleWithOpenMode(m.FileSystemInfo.FullName,out _))) {
+				if (multi.All (m=>this.IsCompatibleWithOpenMode(m.FileSystemInfo.FullName,out reason))) {
 					this.Accept (multi);
 				} else {
+					if(reason != null) {
+						lblFeedback.Text = reason;
+					}
+					
 					return;
 				}
 			}
@@ -784,29 +788,29 @@ namespace Terminal.Gui {
 			switch (this.OpenMode) {
 			case OpenMode.Directory: 
 				if(MustExist && !Directory.Exists(s)) {
-					reason = "Directory does not exist";
+					reason = "Must select an existing directory";
 					return false;
 				}
 
 				if(File.Exists (s)) {
-					reason = "You must pick a Directory";
+					reason = "File already exists with that name";
 					return false;
 				}
 				return true;
 			case OpenMode.File:
 
 				if (MustExist && !File.Exists (s)) {
-					reason = "File does not exist";
+					reason = "Must select an existing file";
 					return false;
 				}
 				if (Directory.Exists (s)) {
-					reason = "You must pick a File";
+					reason = "Directory already exists with that name";
 					return false;
 				}
 				return true;
 			case OpenMode.Mixed:
 				if (MustExist && !File.Exists (s) && !Directory.Exists (s)) {
-					reason = "File or Directory must exist";
+					reason = "Must select an existing file or directory";
 					return false;
 				}
 				return true;
@@ -858,6 +862,7 @@ namespace Terminal.Gui {
 
 				this.pushingState = false;
 			}
+			ClearFeedback ();
 		}
 
 		private void WriteStateToTableView ()
