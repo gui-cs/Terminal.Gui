@@ -22,11 +22,12 @@ namespace Terminal.Gui.Core {
 		{
 			var dlg = GetInitializedFileDialog ();
 
-			Send ('.', ConsoleKey.OemPeriod);
 			SendSlash ();
 
-			// Entering ./ replaces current text with the full path
-			Assert.Equal (Environment.CurrentDirectory + Path.DirectorySeparatorChar, dlg.Path);
+			Assert.Equal (
+				new DirectoryInfo(Environment.CurrentDirectory + Path.DirectorySeparatorChar).FullName, 
+				new DirectoryInfo(dlg.Path + Path.DirectorySeparatorChar).FullName
+				);
 
 			// continue typing the rest of the path
 			Send ("bob");
@@ -35,7 +36,7 @@ namespace Terminal.Gui.Core {
 
 			Assert.True (dlg.Canceled);
 
-			SendEnter ();
+			Send ('\n', ConsoleKey.Enter, false);
 			Assert.False (dlg.Canceled);
 			Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
 		}
@@ -91,10 +92,6 @@ namespace Terminal.Gui.Core {
 				Application.Driver.SendKeys (ch, ConsoleKey.NoName, false, false, false);
 			}
 			
-		}
-		private void SendEnter ()
-		{
-			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
 		}
 
 		[Fact,AutoInitShutdown]
