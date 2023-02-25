@@ -425,7 +425,19 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var padding = ((bounds.Width - this.Title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
+			var title = this.Title.ToString ();
+			var titleWidth = title.Sum (c => Rune.ColumnWidth (c));
+
+			if (titleWidth > bounds.Width) {
+				title = title.Substring (0, bounds.Width);
+			}
+			else {
+				if(titleWidth +2 < bounds.Width) {
+					title = '╡' + this.Title.ToString () + '╞';
+				}				
+			}			
+
+			var padding = ((bounds.Width - title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
 
 			padding = Math.Min (bounds.Width, padding);
 			padding = Math.Max (0, padding);
@@ -437,7 +449,7 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-			Driver.AddStr (this.Title);
+			Driver.AddStr (title);
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
@@ -492,13 +504,13 @@ namespace Terminal.Gui {
 			if (ustring.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
-					this.Title = " OPEN FILE ";
+					this.Title = $" OPEN {(MustExist ? "EXISTING ":"")}FILE ";
 					break;
 				case OpenMode.Directory:
-					this.Title = " OPEN DIRECTORY ";
+					this.Title = $" OPEN {(MustExist ? "EXISTING " : "")}DIRECTORY ";
 					break;
 				case OpenMode.Mixed:
-					this.Title = " OPEN ";
+					this.Title = $" OPEN {(MustExist ? "EXISTING":"")}";
 					break;
 				}
 			}
