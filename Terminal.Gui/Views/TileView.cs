@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui.Graphs;
@@ -10,29 +11,26 @@ namespace Terminal.Gui {
 	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
 	public class TileView : View {
-
 		TileView parentTileView;
 
-
 		/// <summary>
-		/// Use this field instead of Border to create an integrated
-		/// Border in which lines connect with subviews and splitters
-		/// seamlessly
+		/// The keyboard key that the user can press to toggle resizing
+		/// of splitter lines.  Mouse drag splitting is always enabled.
 		/// </summary>
-		public BorderStyle IntegratedBorder { get; set; }
+		public Key ToggleResizable { get; set; } = Key.CtrlMask | Key.F10;
 
 		/// <summary>
-		/// A single <see cref="View"/> presented in a <see cref="TileView"/>.  To create
+		/// A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create
 		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
 		/// or <see cref="TileView.InsertTile(int)"/>.
 		/// </summary>
 		public class Tile {
 			/// <summary>
-			/// The <see cref="View"/> that is showing in this <see cref="TileView"/>.
-			/// You should add new child views to this member if you want multiple 
-			/// <see cref="View"/> within the <see cref="Tile"/>.
+			/// The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>.
+			/// Add new child views to this member for multiple 
+			/// <see cref="ContentView"/>s within the <see cref="Tile"/>.
 			/// </summary>
-			public View View { get; internal set; }
+			public View ContentView { get; internal set; }
 
 			/// <summary>
 			/// Gets or Sets the minimum size you to allow when splitter resizing along
@@ -41,21 +39,103 @@ namespace Terminal.Gui {
 			public int MinSize { get; set; }
 
 			/// <summary>
-			/// The text that should be displayed above the <see cref="View"/>.  This 
+			/// The text that should be displayed above the <see cref="ContentView"/>. This 
 			/// will appear over the splitter line or border (above the view client area).
 			/// </summary>
 			/// <remarks>
-			/// Title are not rendered for root level tiles if there is no
-			/// <see cref="TileView.IntegratedBorder"/> to render into.
+			/// Title are not rendered for root level tiles 
+			/// <see cref="Border.BorderStyle"/> is <see cref="BorderStyle.None"/>.
 			///</remarks>
-			public string Title { get; set; }
+			public string Title {
+				get => _title;
+				set {
+					if (!OnTitleChanging (_title, value)) {
+						var old = _title;
+						_title = value;
+						OnTitleChanged (old, _title);
+						return;
+					}
+					_title = value;
+				}
+			}
+
+			private string _title = string.Empty;
+
+			/// <summary>
+			/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
+			/// </summary>
+			public class TitleEventArgs : EventArgs {
+				/// <summary>
+				/// The new Window Title.
+				/// </summary>
+				public ustring NewTitle { get; set; }
+
+				/// <summary>
+				/// The old Window Title.
+				/// </summary>
+				public ustring OldTitle { get; set; }
+
+				/// <summary>
+				/// Flag which allows cancelling the Title change.
+				/// </summary>
+				public bool Cancel { get; set; }
+
+				/// <summary>
+				/// Initializes a new instance of <see cref="TitleEventArgs"/>
+				/// </summary>
+				/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
+				/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
+				public TitleEventArgs (ustring oldTitle, ustring newTitle)
+				{
+					OldTitle = oldTitle;
+					NewTitle = newTitle;
+				}
+			}
+
+			/// <summary>
+			/// Called before the <see cref="Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
+			/// </summary>
+			/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
+			/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
+			/// <returns><c>true</c> if an event handler cancelled the Title change.</returns>
+			public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
+			{
+				var args = new TitleEventArgs (oldTitle, newTitle);
+				TitleChanging?.Invoke (args);
+				return args.Cancel;
+			}
+
+			/// <summary>
+			/// Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
+			/// <c>true</c> to cancel the Title change.
+			/// </summary>
+			public event Action<TitleEventArgs> TitleChanging;
+
+			/// <summary>
+			/// Called when the <see cref="Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
+			/// </summary>
+			/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
+			/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
+			public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
+			{
+				var args = new TitleEventArgs (oldTitle, newTitle);
+				TitleChanged?.Invoke (args);
+			}
+
+			/// <summary>
+			/// Event fired after the <see cref="Title"/> has been changed. 
+			/// </summary>
+			public event Action<TitleEventArgs> TitleChanged;
 
 			/// <summary>
 			/// Creates a new instance of the <see cref="Tile"/> class.
 			/// </summary>
-			internal Tile ()
+			public Tile ()
 			{
-				View = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+				ContentView = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+#if DEBUG_IDISPOSABLE
+				ContentView.Data = "Tile.ContentView";
+#endif
 				Title = string.Empty;
 				MinSize = 0;
 			}
@@ -71,7 +151,7 @@ namespace Terminal.Gui {
 		public IReadOnlyCollection<Tile> Tiles => tiles.AsReadOnly ();
 
 		/// <summary>
-		/// The splitter locations.  Note that there will be N-1 splitters where
+		/// The splitter locations. Note that there will be N-1 splitters where
 		/// N is the number of <see cref="Tiles"/>.
 		/// </summary>
 		public IReadOnlyCollection<Pos> SplitterDistances => splitterDistances.AsReadOnly ();
@@ -93,8 +173,11 @@ namespace Terminal.Gui {
 		/// <param name="tiles"></param>
 		public TileView (int tiles)
 		{
-			CanFocus = true;
 			RebuildForTileCount (tiles);
+			IgnoreBorderPropertyOnRedraw = true;
+			Border = new Border () {
+				BorderStyle = BorderStyle.None
+			};
 		}
 
 		/// <summary>
@@ -111,7 +194,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Scraps all <see cref="Tiles"/>  and creates <paramref name="count"/> new tiles
+		/// Scraps all <see cref="Tiles"/> and creates <paramref name="count"/> new tiles
 		/// in orientation <see cref="Orientation"/>
 		/// </summary>
 		/// <param name="count"></param>
@@ -119,9 +202,18 @@ namespace Terminal.Gui {
 		{
 			tiles = new List<Tile> ();
 			splitterDistances = new List<Pos> ();
+			if (splitterLines != null) {
+				foreach (var sl in splitterLines) {
+					sl.Dispose ();
+				}
+			}
 			splitterLines = new List<TileViewLineView> ();
 
 			RemoveAll ();
+			foreach (var tile in tiles) {
+				tile.ContentView.Dispose ();
+				tile.ContentView = null;
+			}
 			tiles.Clear ();
 			splitterDistances.Clear ();
 
@@ -130,8 +222,6 @@ namespace Terminal.Gui {
 			}
 
 			for (int i = 0; i < count; i++) {
-
-
 				if (i > 0) {
 					var currentPos = Pos.Percent ((100 / count) * i);
 					splitterDistances.Add (currentPos);
@@ -142,7 +232,8 @@ namespace Terminal.Gui {
 
 				var tile = new Tile ();
 				tiles.Add (tile);
-				Add (tile.View);
+				Add (tile.ContentView);
+				tile.TitleChanged += (e) => SetNeedsDisplay ();
 			}
 
 			LayoutSubviews ();
@@ -153,7 +244,6 @@ namespace Terminal.Gui {
 		/// This will also add another splitter line
 		/// </summary>
 		/// <param name="idx"></param>
-		/// <exception cref="NotImplementedException"></exception>
 		public Tile InsertTile (int idx)
 		{
 			var oldTiles = Tiles.ToArray ();
@@ -167,11 +257,13 @@ namespace Terminal.Gui {
 					var oldTile = oldTiles [i > idx ? i - 1 : i];
 
 					// remove the new empty View
-					Remove (tiles [i].View);
+					Remove (tiles [i].ContentView);
+					tiles [i].ContentView.Dispose ();
+					tiles [i].ContentView = null;
 
 					// restore old Tile and View
 					tiles [i] = oldTile;
-					Add (tiles [i].View);
+					Add (tiles [i].ContentView);
 				} else {
 					toReturn = tiles [i];
 				}
@@ -184,7 +276,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Removes a <see cref="Tiles"/> at the provided <paramref name="idx"/> from
-		/// the view.  Returns the removed tile or null if already empty.
+		/// the view. Returns the removed tile or null if already empty.
 		/// </summary>
 		/// <param name="idx"></param>
 		/// <returns></returns>
@@ -206,11 +298,13 @@ namespace Terminal.Gui {
 				var oldTile = oldTiles [oldIdx];
 
 				// remove the new empty View
-				Remove (tiles [i].View);
+				Remove (tiles [i].ContentView);
+				tiles [i].ContentView.Dispose ();
+				tiles [i].ContentView = null;
 
 				// restore old Tile and View
 				tiles [i] = oldTile;
-				Add (tiles [i].View);
+				Add (tiles [i].ContentView);
 
 			}
 			SetNeedsDisplay ();
@@ -226,7 +320,7 @@ namespace Terminal.Gui {
 		public int IndexOf (View toFind, bool recursive = false)
 		{
 			for (int i = 0; i < tiles.Count; i++) {
-				var v = tiles [i].View;
+				var v = tiles [i].ContentView;
 
 				if (v == toFind) {
 					return i;
@@ -285,14 +379,12 @@ namespace Terminal.Gui {
 			}
 
 			Setup (contentArea);
-
-
 			base.LayoutSubviews ();
 		}
 
 		/// <summary>
 		/// <para>Attempts to update the <see cref="splitterDistances"/> of line at <paramref name="idx"/>
-		/// to the new <paramref name="value"/>.  Returns false if the new position is not allowed because of
+		/// to the new <paramref name="value"/>. Returns false if the new position is not allowed because of
 		/// <see cref="Tile.MinSize"/>, location of other splitters etc.
 		/// </para>
 		/// <para>Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>)
@@ -301,7 +393,7 @@ namespace Terminal.Gui {
 		public bool SetSplitterPos (int idx, Pos value)
 		{
 			if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
-				throw new ArgumentException ($"Only Percent and Absolute values are supported.  Passed value was {value.GetType ().Name}");
+				throw new ArgumentException ($"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}");
 			}
 
 			var fullSpace = orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
@@ -316,18 +408,13 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			Driver.SetCursorVisibility (CursorVisibility.Invisible);
-			return base.OnEnter (view);
-		}
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
+
 			base.Redraw (bounds);
 
 			var lc = new LineCanvas ();
@@ -338,11 +425,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, IntegratedBorder);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, IntegratedBorder);
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, Border.BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, Border.BorderStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, IntegratedBorder);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, IntegratedBorder);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, Border.BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, Border.BorderStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -363,12 +450,14 @@ namespace Terminal.Gui {
 						length += 2;
 					}
 
-					lc.AddLine (origin, length, line.Orientation, IntegratedBorder);
+					lc.AddLine (origin, length, line.Orientation, Border.BorderStyle);
 				}
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			lc.Draw (this, bounds);
+			foreach (var p in lc.GenerateImage (bounds)) {
+				AddRune (p.Key.X, p.Key.Y, p.Value);
+			}
 
 			// Redraw the lines so that focus/drag symbol renders
 			foreach (var line in allLines) {
@@ -388,7 +477,7 @@ namespace Terminal.Gui {
 
 				// TODO: Render with focus color if focused
 
-				var title = titleToRender.GetTrimmedTitle();			
+				var title = titleToRender.GetTrimmedTitle ();
 
 				for (int i = 0; i < title.Length; i++) {
 					AddRune (renderAt.X + i, renderAt.Y, title [i]);
@@ -408,7 +497,7 @@ namespace Terminal.Gui {
 		/// <param name="numberOfPanels">The number of panels that the <see cref="Tile"/> should be split into</param>
 		/// <param name="result">The new nested <see cref="TileView"/>.</param>
 		/// <returns><see langword="true"/> if a <see cref="View"/> was converted to a new nested
-		/// <see cref="TileView"/>.  <see langword="false"/> if it was already a nested
+		/// <see cref="TileView"/>. <see langword="false"/> if it was already a nested
 		/// <see cref="TileView"/></returns>
 		public bool TrySplitTile (int idx, int numberOfPanels, out TileView result)
 		{
@@ -417,7 +506,7 @@ namespace Terminal.Gui {
 			var tile = tiles [idx];
 
 			var title = tile.Title;
-			View toMove = tile.View;
+			View toMove = tile.ContentView;
 
 			if (toMove is TileView existing) {
 				result = existing;
@@ -436,11 +525,14 @@ namespace Terminal.Gui {
 
 			// Remove the view itself and replace it with the new TileView
 			Remove (toMove);
+			toMove.Dispose ();
+			toMove = null;
+
 			Add (newContainer);
 
-			tile.View = newContainer;
+			tile.ContentView = newContainer;
 
-			var newTileView1 = newContainer.tiles [0].View;
+			var newTileView1 = newContainer.tiles [0].ContentView;
 			// Add the original content into the first view of the new container
 			foreach (var childView in childViews) {
 				newTileView1.Add (childView);
@@ -452,6 +544,30 @@ namespace Terminal.Gui {
 
 			result = newContainer;
 			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			bool focusMoved = false;
+
+			if(keyEvent.Key == ToggleResizable) {
+				foreach(var l in splitterLines) {
+
+					var iniBefore = l.IsInitialized;
+					l.IsInitialized = false;
+					l.CanFocus = !l.CanFocus;
+					l.IsInitialized = iniBefore;
+
+					if (l.CanFocus && !focusMoved) {
+						l.SetFocus ();
+						focusMoved = true;
+					}
+				}
+				return true;
+			}
+
+			return base.ProcessHotKey (keyEvent);
 		}
 
 		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
@@ -554,18 +670,18 @@ namespace Terminal.Gui {
 			foreach (var sub in v.Tiles) {
 
 				// Don't render titles for invisible stuff!
-				if (!sub.View.Visible) {
+				if (!sub.ContentView.Visible) {
 					continue;
 				}
 
-				if (sub.View is TileView subTileView) {
+				if (sub.ContentView is TileView subTileView) {
 					// Panels with sub split tiles in them can never
 					// have their Titles rendered. Instead we dive in
 					// and pull up their children as titles
 					titles.AddRange (GetAllTitlesToRenderRecursively (subTileView, depth + 1));
 				} else {
 					if (sub.Title.Length > 0) {
-						titles.Add (new TileTitleToRender (v,sub, depth));
+						titles.Add (new TileTitleToRender (v, sub, depth));
 					}
 				}
 			}
@@ -576,11 +692,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// <para>
 		/// <see langword="true"/> if <see cref="TileView"/> is nested within a parent <see cref="TileView"/>
-		/// e.g. via the <see cref="TrySplitTile"/>.  <see langword="false"/> if it is a root level <see cref="TileView"/>.
+		/// e.g. via the <see cref="TrySplitTile"/>. <see langword="false"/> if it is a root level <see cref="TileView"/>.
 		/// </para>
 		/// </summary>
 		/// <remarks>Note that manually adding one <see cref="TileView"/> to another will not result in a parent/child
-		/// relationship and both will still be considered 'root' containers.  Always use
+		/// relationship and both will still be considered 'root' containers. Always use
 		/// <see cref="TrySplitTile(int, int, out TileView)"/> if you want to subdivide a <see cref="TileView"/>.</remarks>
 		/// <returns></returns>
 		public bool IsRootTileView ()
@@ -589,8 +705,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the immediate parent <see cref="TileView"/> of this.  Note that in case
-		/// of deep nesting this might not be the root <see cref="TileView"/>.  Returns null
+		/// Returns the immediate parent <see cref="TileView"/> of this. Note that in case
+		/// of deep nesting this might not be the root <see cref="TileView"/>. Returns null
 		/// if this instance is not a nested child (created with 
 		/// <see cref="TrySplitTile(int, int, out TileView)"/>)
 		/// </summary>
@@ -641,22 +757,22 @@ namespace Terminal.Gui {
 
 			HideSplittersBasedOnTileVisibility ();
 
-			var visibleTiles = tiles.Where (t => t.View.Visible).ToArray ();
+			var visibleTiles = tiles.Where (t => t.ContentView.Visible).ToArray ();
 			var visibleSplitterLines = splitterLines.Where (l => l.Visible).ToArray ();
 
 			for (int i = 0; i < visibleTiles.Length; i++) {
 				var tile = visibleTiles [i];
 
 				if (Orientation == Orientation.Vertical) {
-					tile.View.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
-					tile.View.Y = bounds.Y;
-					tile.View.Height = bounds.Height;
-					tile.View.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
+					tile.ContentView.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
+					tile.ContentView.Y = bounds.Y;
+					tile.ContentView.Height = bounds.Height;
+					tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
 				} else {
-					tile.View.X = bounds.X;
-					tile.View.Y = i == 0 ? 0 : Pos.Bottom (visibleSplitterLines [i - 1]);
-					tile.View.Width = bounds.Width;
-					tile.View.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
+					tile.ContentView.X = bounds.X;
+					tile.ContentView.Y = i == 0 ? bounds.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
+					tile.ContentView.Width = bounds.Width;
+					tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
 			}
 		}
@@ -672,7 +788,7 @@ namespace Terminal.Gui {
 			}
 
 			for (int i = 0; i < tiles.Count; i++) {
-				if (!tiles [i].View.Visible) {
+				if (!tiles [i].ContentView.Visible) {
 
 					// when a tile is not visible, prefer hiding
 					// the splitter on it's left
@@ -737,20 +853,20 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
 			{
-				Tile.View.ViewToScreen (0, 0, out var screenCol, out var screenRow);
+				Tile.ContentView.ViewToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
 				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
 			}
 
 			internal string GetTrimmedTitle ()
 			{
-				Dim spaceDim = Tile.View.Width;
+				Dim spaceDim = Tile.ContentView.Width;
 
 				var spaceAbs = spaceDim.Anchor (Parent.Bounds.Width);
 
-				var title = Tile.Title;
+				var title = $" {Tile.Title} ";
 
-				if(title.Length > spaceAbs) {
+				if (title.Length > spaceAbs) {
 					return title.Substring (0, spaceAbs);
 				}
 
@@ -768,7 +884,7 @@ namespace Terminal.Gui {
 
 			public TileViewLineView (TileView parent, int idx)
 			{
-				CanFocus = true;
+				CanFocus = false;
 				TabStop = true;
 
 				this.Parent = parent;
@@ -833,7 +949,7 @@ namespace Terminal.Gui {
 
 			public void DrawSplitterSymbol ()
 			{
-				if (CanFocus && HasFocus) {
+				if (dragPosition != null || CanFocus) {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
@@ -843,10 +959,6 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent mouseEvent)
 			{
-				if (!CanFocus) {
-					return true;
-				}
-
 				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
 
 					// Start a Drag
@@ -980,12 +1092,23 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return IntegratedBorder != BorderStyle.None;
+			return Border?.BorderStyle != BorderStyle.None;
 		}
+
+		/// <inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			foreach (var tile in Tiles) {
+				Remove (tile.ContentView);
+				tile.ContentView.Dispose ();
+			}
+			base.Dispose (disposing);
+		}
+
 	}
 
 	/// <summary>
-	///  Provides data for <see cref="TileView"/> events.
+	/// Provides data for <see cref="TileView"/> events.
 	/// </summary>
 	public class SplitterEventArgs : EventArgs {
 
@@ -1020,7 +1143,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///  Represents a method that will handle splitter events.
+	/// Represents a method that will handle splitter events.
 	/// </summary>
 	public delegate void SplitterEventHandler (object sender, SplitterEventArgs e);
 }

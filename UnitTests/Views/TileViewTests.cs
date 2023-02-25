@@ -1,11 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
-using Terminal.Gui;
 using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests {
+namespace Terminal.Gui.ViewTests {
 	public class TileViewTests {
 
 		readonly ITestOutputHelper output;
@@ -60,7 +60,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -100,7 +100,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -141,9 +141,10 @@ namespace UnitTests {
 		public void TestTileView_Vertical_Focused_50PercentSplit ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -209,7 +210,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -254,7 +255,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -298,7 +299,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -342,7 +343,7 @@ namespace UnitTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -386,8 +387,6 @@ namespace UnitTests {
 		public void TestTileView_InsertPanelAtStart ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (0);
 
 			tileView.Redraw (tileView.Bounds);
@@ -405,8 +404,6 @@ namespace UnitTests {
 		public void TestTileView_InsertPanelMiddle ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (1);
 
 			tileView.Redraw (tileView.Bounds);
@@ -424,8 +421,6 @@ namespace UnitTests {
 		public void TestTileView_InsertPanelAtEnd ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			SetInputFocusLine (tileView);
-
 			tileView.InsertTile (2);
 
 			tileView.Redraw (tileView.Bounds);
@@ -445,7 +440,9 @@ namespace UnitTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+
+			Assert.True (line.HasFocus);
 
 			tileView.Redraw (tileView.Bounds);
 
@@ -485,9 +482,9 @@ namespace UnitTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
+			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
-			SetInputFocusLine (tileView);
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
@@ -534,15 +531,15 @@ namespace UnitTests {
 			var tileView = Get11By3TileView ();
 
 			var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
 
 
 			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosFunc", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
 			// Also not allowed because this results in a PosCombine
 			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Percent (50) - 1));
-			Assert.Equal ("Only Percent and Absolute values are supported.  Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -551,22 +548,22 @@ namespace UnitTests {
 			var tileView = GetNestedContainer2Left1Right (false);
 
 			Assert.Equal (20, tileView.Frame.Width);
-			Assert.Equal (10, tileView.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (9, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (9, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).View);
-			var left = (TileView)tileView.Tiles.ElementAt (0).View;
+			Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).ContentView);
+			var left = (TileView)tileView.Tiles.ElementAt (0).ContentView;
 			Assert.Same (left.SuperView, tileView);
 
 
-			Assert.Equal (2, left.Tiles.ElementAt (0).View.Subviews.Count);
-			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [0]);
-			Assert.IsType<Label> (left.Tiles.ElementAt (0).View.Subviews [1]);
-			var onesTop = (Label)left.Tiles.ElementAt (0).View.Subviews [0];
-			var onesBottom = (Label)left.Tiles.ElementAt (0).View.Subviews [1];
+			Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.Subviews.Count);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [0]);
+			Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [1]);
+			var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [0];
+			var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [1];
 
-			Assert.Same (left.Tiles.ElementAt (0).View, onesTop.SuperView);
-			Assert.Same (left.Tiles.ElementAt (0).View, onesBottom.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
+			Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);
 
 			Assert.Equal (10, onesTop.Frame.Width);
 			Assert.Equal (10, onesBottom.Frame.Width);
@@ -621,39 +618,39 @@ namespace UnitTests {
 
 
 			// Check X and Widths of Tiles
-			Assert.Equal (0, tileView.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (0).View.Frame.Width);
+			Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
 
-			Assert.Equal (7, tileView.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (7, tileView.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.Equal (14, tileView.Tiles.ElementAt (2).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (2).View.Frame.Width);
+			Assert.Equal (14, tileView.Tiles.ElementAt (2).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (2).ContentView.Frame.Width);
 
 
 			// Check Y and Heights of Tiles
-			Assert.Equal (0, tileView.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (0).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Height);
 
-			Assert.Equal (0, tileView.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (1).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (1).ContentView.Frame.Height);
 
-			Assert.Equal (0, tileView.Tiles.ElementAt (2).View.Frame.Y);
-			Assert.Equal (10, tileView.Tiles.ElementAt (2).View.Frame.Height);
+			Assert.Equal (0, tileView.Tiles.ElementAt (2).ContentView.Frame.Y);
+			Assert.Equal (10, tileView.Tiles.ElementAt (2).ContentView.Frame.Height);
 
 			// Check Sub containers in last panel
-			var subSplit = (TileView)tileView.Tiles.ElementAt (2).View;
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (0).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).View.Subviews.Single ());
+			var subSplit = (TileView)tileView.Tiles.ElementAt (2).ContentView;
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
-			Assert.Equal (0, subSplit.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (1).View.Frame.Width);
-			Assert.Equal (6, subSplit.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (4, subSplit.Tiles.ElementAt (1).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).View.Subviews.Single ());
+			Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
+			Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -684,39 +681,39 @@ namespace UnitTests {
 			Assert.Equal (5, tileView.Subviews.Count);
 
 			// Check X and Widths of Tiles
-			Assert.Equal (1, tileView.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (5, tileView.Tiles.ElementAt (0).View.Frame.Width);
+			Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (5, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
 
-			Assert.Equal (7, tileView.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (6, tileView.Tiles.ElementAt (1).View.Frame.Width);
+			Assert.Equal (7, tileView.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (6, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
 
-			Assert.Equal (14, tileView.Tiles.ElementAt (2).View.Frame.X);
-			Assert.Equal (5, tileView.Tiles.ElementAt (2).View.Frame.Width);
+			Assert.Equal (14, tileView.Tiles.ElementAt (2).ContentView.Frame.X);
+			Assert.Equal (5, tileView.Tiles.ElementAt (2).ContentView.Frame.Width);
 
 
 			// Check Y and Heights of Tiles
-			Assert.Equal (1, tileView.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (0).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (0).ContentView.Frame.Height);
 
-			Assert.Equal (1, tileView.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (1).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (1).ContentView.Frame.Height);
 
-			Assert.Equal (1, tileView.Tiles.ElementAt (2).View.Frame.Y);
-			Assert.Equal (8, tileView.Tiles.ElementAt (2).View.Frame.Height);
+			Assert.Equal (1, tileView.Tiles.ElementAt (2).ContentView.Frame.Y);
+			Assert.Equal (8, tileView.Tiles.ElementAt (2).ContentView.Frame.Height);
 
 			// Check Sub containers in last panel
-			var subSplit = (TileView)tileView.Tiles.ElementAt (2).View;
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.X);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (0).View.Frame.Width);
-			Assert.Equal (0, subSplit.Tiles.ElementAt (0).View.Frame.Y);
-			Assert.Equal (4, subSplit.Tiles.ElementAt (0).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).View.Subviews.Single ());
+			var subSplit = (TileView)tileView.Tiles.ElementAt (2).ContentView;
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.X);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
+			Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
+			Assert.Equal (4, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
-			Assert.Equal (0, subSplit.Tiles.ElementAt (1).View.Frame.X);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (1).View.Frame.Width);
-			Assert.Equal (5, subSplit.Tiles.ElementAt (1).View.Frame.Y);
-			Assert.Equal (3, subSplit.Tiles.ElementAt (1).View.Frame.Height);
-			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).View.Subviews.Single ());
+			Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
+			Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
+			Assert.Equal (3, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
+			Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -728,12 +725,12 @@ namespace UnitTests {
 
 			string looksLike =
 @"
-┌T1───┬T2────┬T3───┐
+┌ T1 ─┬ T2 ──┬ T3 ─┐
 │11111│222222│33333│
 │11111│222222│33333│
 │11111│222222│33333│
 │11111│222222│33333│
-│11111│222222├T4───┤
+│11111│222222├ T4 ─┤
 │11111│222222│44444│
 │11111│222222│44444│
 │11111│222222│44444│
@@ -846,19 +843,19 @@ namespace UnitTests {
 			Assert.Equal (-1, tv.IndexOf (lbl2, recursive));
 
 			// IndexOf supports looking for Tile.View
-			Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).View, recursive));
-			Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).View, recursive));
+			Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).ContentView, recursive));
+			Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).ContentView, recursive));
 
 			// IndexOf supports looking for Tile.View.Subviews
-			tv.Tiles.ElementAt (0).View.Add (lbl1);
+			tv.Tiles.ElementAt (0).ContentView.Add (lbl1);
 			Assert.Equal (0, tv.IndexOf (lbl1, recursive));
 
-			tv.Tiles.ElementAt (1).View.Add (lbl2);
+			tv.Tiles.ElementAt (1).ContentView.Add (lbl2);
 			Assert.Equal (1, tv.IndexOf (lbl2, recursive));
 
 			// IndexOf supports looking deep into subviews only when
 			// the recursive true value is passed
-			tv.Tiles.ElementAt (1).View.Add (frame);
+			tv.Tiles.ElementAt (1).ContentView.Add (frame);
 			if (recursive) {
 				Assert.Equal (1, tv.IndexOf (sub, recursive));
 			} else {
@@ -869,17 +866,22 @@ namespace UnitTests {
 		[Fact, AutoInitShutdown]
 		public void TestNestedRoots_BothRoots_BothCanHaveBorders ()
 		{
-			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView { 
+				Width = 10, 
+				Height = 5, 
+				ColorScheme = new ColorScheme (), 
+				Border = new Border () { BorderStyle = BorderStyle.Single } 
+			};
 			var tv2 = new TileView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				ColorScheme = new ColorScheme (),
-				IntegratedBorder = BorderStyle.Single,
+				Border = new Border () { BorderStyle = BorderStyle.Single },
 				Orientation = Orientation.Horizontal
 			};
 
 			Assert.True (tv.IsRootTileView ());
-			tv.Tiles.ElementAt (1).View.Add (tv2);
+			tv.Tiles.ElementAt (1).ContentView.Add (tv2);
 
 			Application.Top.Add (tv);
 			tv.BeginInit ();
@@ -887,11 +889,11 @@ namespace UnitTests {
 			tv.LayoutSubviews ();
 
 			tv.LayoutSubviews ();
-			tv.Tiles.ElementAt (1).View.LayoutSubviews ();
+			tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
 			tv2.LayoutSubviews ();
 
 			// tv2 is still considered a root because 
-			// it was manually created by API user.  That
+			// it was manually created by API user. That
 			// means it will not have its lines joined to
 			// parents and it is permitted to have a border
 			Assert.True (tv2.IsRootTileView ());
@@ -1625,11 +1627,13 @@ namespace UnitTests {
 		[Fact, AutoInitShutdown]
 		public void TestNestedNonRoots_OnlyOneRoot_OnlyRootCanHaveBorders ()
 		{
-			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView { Width = 10, Height = 5, ColorScheme = new ColorScheme (),
+				Border = new Border () { BorderStyle = BorderStyle.Single }
+			};
 
 			tv.TrySplitTile (1, 2, out var tv2);
 			tv2.ColorScheme = new ColorScheme ();
-			tv2.IntegratedBorder = BorderStyle.Single; // will not be respected
+			tv2.Border.BorderStyle = BorderStyle.Single; 
 			tv2.Orientation = Orientation.Horizontal;
 
 			Assert.True (tv.IsRootTileView ());
@@ -1640,7 +1644,7 @@ namespace UnitTests {
 			tv.LayoutSubviews ();
 
 			tv.LayoutSubviews ();
-			tv.Tiles.ElementAt (1).View.LayoutSubviews ();
+			tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
 			tv2.LayoutSubviews ();
 
 			// tv2 is not considered a root because 
@@ -1698,9 +1702,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1720,9 +1724,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1743,9 +1747,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1766,9 +1770,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1789,9 +1793,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1811,9 +1815,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1837,9 +1841,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1884,9 +1888,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1906,9 +1910,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1929,9 +1933,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1952,9 +1956,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = true;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1975,9 +1979,9 @@ namespace UnitTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = true;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -1997,9 +2001,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = true;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -2023,9 +2027,9 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			tileView.Tiles.ElementAt (0).View.Visible = false;
-			tileView.Tiles.ElementAt (1).View.Visible = false;
-			tileView.Tiles.ElementAt (2).View.Visible = false;
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
 
 			tileView.Redraw (tileView.Bounds);
@@ -2039,6 +2043,45 @@ namespace UnitTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void Test_SplitTop_WholeBottom()
+		{
+			var tileView = new TileView (2) {
+				Width = 20,
+				Height = 10,
+				Orientation = Orientation.Horizontal,
+			};
+			tileView.Border.BorderStyle = BorderStyle.Single;
+
+			Assert.True (tileView.TrySplitTile (0,2,out TileView top));
+
+			top.Tiles.ElementAt (0).ContentView.Add (new Label ("bleh"));
+			top.Tiles.ElementAt (1).ContentView.Add (new Label ("blah"));
+
+			tileView.Tiles.ElementAt (1).ContentView.Add (new Label ("Hello"));
+			tileView.ColorScheme = new ColorScheme ();
+			top.ColorScheme = new ColorScheme ();
+			tileView.LayoutSubviews ();
+
+			tileView.Redraw (tileView.Bounds);
+
+			string looksLike =
+@"
+┌─────────┬────────┐
+│bleh     │blah    │
+│         │        │
+│         │        │
+│         │        │
+├─────────┴────────┤
+│Hello             │
+│                  │
+│                  │
+└──────────────────┘";
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill()
 		{
 			var tileView = GetNestedContainer3Right1Down (true,true,1);
@@ -2046,12 +2089,12 @@ namespace UnitTests {
 
 			string looksLike =
 @"
-┌T1───┬T3────┬T2───┐
+┌ T1 ─┬ T3 ──┬ T2 ─┐
 │11111│333333│22222│
 │11111│333333│22222│
 │11111│333333│22222│
 │11111│333333│22222│
-│11111├T4────┤22222│
+│11111├ T4 ──┤22222│
 │11111│444444│22222│
 │11111│444444│22222│
 │11111│444444│22222│
@@ -2067,19 +2110,19 @@ namespace UnitTests {
 
 			tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
 
-			((TileView)tileView.Tiles.ElementAt (1).View)
+			((TileView)tileView.Tiles.ElementAt (1).ContentView)
 				.Tiles.ElementAt(1).Title = new string ('y', 100);
 
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
 @"
-┌xxxxx┬T3────┬T2───┐
+┌ xxxx┬ T3 ──┬ T2 ─┐
 │11111│333333│22222│
 │11111│333333│22222│
 │11111│333333│22222│
 │11111│333333│22222│
-│11111├yyyyyy┤22222│
+│11111├ yyyyy┤22222│
 │11111│444444│22222│
 │11111│444444│22222│
 │11111│444444│22222│
@@ -2087,7 +2130,86 @@ namespace UnitTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
+		{
+			var tv = GetTileView (20, 10);
 
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			// I've changed my mind, I want 3 tiles now
+			tv.RebuildForTileCount (3);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.Equal (1, myReusableView.DisposalCount);
+				});
+		}
+		[Fact, AutoInitShutdown]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
+		{
+			var tv = GetTileView (20, 10);
+
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			// I've changed my mind, I want 3 tiles now
+			tv.InsertTile (0);
+			tv.InsertTile (2);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.True (myReusableView.DisposalCount>=1);
+				});
+		}
+		[Theory, AutoInitShutdown]
+		[InlineData (0)]
+		[InlineData (1)]
+		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)
+		{
+			var tv = GetTileView (20, 10);
+
+			var myReusableView = new DisposeCounter ();
+
+			// I want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Equal (0, myReusableView.DisposalCount);
+
+			tv.RemoveTile (idx);
+
+			// but I still want my view in the first tile
+			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+			Assert.Multiple (
+				() => Assert.Equal (0, myReusableView.DisposalCount)
+				, () => {
+					tv.Dispose ();
+					Assert.True (myReusableView.DisposalCount >= 1);
+				});
+		}
+		private class DisposeCounter : View {
+			public int DisposalCount;
+			protected override void Dispose (bool disposing)
+			{
+				DisposalCount++;
+				base.Dispose (disposing);
+			}
+
+		}
 
 		/// <summary>
 		/// Creates a vertical orientation root container with left pane split into
@@ -2116,12 +2238,11 @@ namespace UnitTests {
 		/// <returns></returns>
 		private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2)
 		{
-			var container =
-			new TileView (3) {
+			var container =	new TileView (3) {
 				Width = 20,
-				Height = 10,
-				IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None
+				Height = 10
 			};
+			container.Border.BorderStyle = withBorder ? BorderStyle.Single : BorderStyle.None;
 
 			Assert.True (container.TrySplitTile (split, 2, out var newContainer));
 
@@ -2130,7 +2251,7 @@ namespace UnitTests {
 			int i = 0;
 			foreach (var tile in container.Tiles.Union (newContainer.Tiles)) {
 				
-				if(tile.View is TileView) {
+				if(tile.ContentView is TileView) {
 					continue;
 				}
 				i++;
@@ -2139,7 +2260,7 @@ namespace UnitTests {
 					tile.Title = "T" + i;
 				}
 
-				tile.View.Add (new TextView {
+				tile.ContentView.Add (new TextView {
 					Width = Dim.Fill (),
 					Height = Dim.Fill (),
 					Text =
@@ -2162,27 +2283,22 @@ namespace UnitTests {
 			return tileView.Subviews.OfType<LineView> ().Single ();
 		}
 
-		private void SetInputFocusLine (TileView tileView)
-		{
-			var line = GetLine (tileView);
-			line.SetFocus ();
-			Assert.True (line.HasFocus);
-		}
-
 
 		private TileView Get5x1TilesView (bool border = true)
 		{
-			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (), IntegratedBorder = BorderStyle.Single };
+			var tv = new TileView (5) { Width = 25, Height = 4, ColorScheme = new ColorScheme (),
+				Border = new Border () { BorderStyle = BorderStyle.Single }
+			};
 
 			if (!border) {
-				tv.IntegratedBorder = BorderStyle.None;
+				tv.Border.BorderStyle = BorderStyle.None;
 			}
 
-			tv.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (2).View.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (3).View.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-			tv.Tiles.ElementAt (4).View.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (2).ContentView.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (3).ContentView.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+			tv.Tiles.ElementAt (4).ContentView.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
 
 			Application.Top.Add (tv);
 			tv.BeginInit ();
@@ -2210,12 +2326,12 @@ namespace UnitTests {
 				Height = height,
 			};
 
-			container.IntegratedBorder = withBorder ? BorderStyle.Single : BorderStyle.None;
+			container.Border.BorderStyle = withBorder ? BorderStyle.Single : BorderStyle.None;
 
-			container.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-			container.Tiles.ElementAt (0).View.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
-			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-			container.Tiles.ElementAt (1).View.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+			container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+			container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
+			container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
 
 			container.Tiles.ElementAt (0).MinSize = 0;
 			container.Tiles.ElementAt (1).MinSize = 0;
