@@ -59,10 +59,12 @@ namespace Terminal.Gui {
 		private TreeView<object> treeView;
 		private TileView splitContainer;
 		private Button btnOk;
+		private Button btnCancel;
 		private Button btnToggleSplitterCollapse;
 		private Label lblForward;
 		private Label lblBack;
 		private Label lblUp;
+		private Label lblFeedback;
 
 		private CollectionNavigator collectionNavigator = new CollectionNavigator();
 
@@ -72,9 +74,11 @@ namespace Terminal.Gui {
 		public FileDialog2 ()
 		{
 			const int okWidth = 6;
+			const int cancelWidth = 10;
 
 			var lblPath = new Label (">");
 			this.btnOk = new Button ("Ok") {
+				Y = Pos.AnchorEnd(1),
 				X = Pos.AnchorEnd (okWidth)
 			};
 			this.btnOk.Clicked += this.Accept;
@@ -82,6 +86,11 @@ namespace Terminal.Gui {
 				this.NavigateIf (k, Key.CursorLeft, this.tbPath);
 				this.NavigateIf (k, Key.CursorDown, this.tableView);
 			};
+
+			this.btnCancel = new Button ("Cancel") {
+				Y = Pos.AnchorEnd (1),
+				X = Pos.AnchorEnd (okWidth + cancelWidth),
+			};			
 
 			this.lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
 			this.lblUp.Clicked += () => this.history.Up ();
@@ -93,7 +102,7 @@ namespace Terminal.Gui {
 			this.lblForward.Clicked += () => this.history.Forward ();
 			this.tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
-				Width = Dim.Fill (okWidth + 1)
+				Width = Dim.Fill (1)
 			};
 			this.tbPath.KeyPress += (k) => {
 
@@ -182,6 +191,14 @@ namespace Terminal.Gui {
 				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
 
+			lblFeedback = new Label {
+				Y = Pos.AnchorEnd (1),
+				X = Pos.Right (btnToggleSplitterCollapse) + 1,
+				ColorScheme = new ColorScheme {
+					Normal = new Attribute (Color.Red, this.ColorScheme.Normal.Background)
+				}
+			};
+
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
 			this.tableView.Style.ShowVerticalCellLines = false;
 			this.tableView.Style.ShowVerticalHeaderLines = false;
@@ -219,6 +236,7 @@ namespace Terminal.Gui {
 
 			// Determines tab order
 			this.Add (this.btnOk);
+			this.Add (this.btnCancel);
 			this.Add (this.lblUp);
 			this.Add (this.lblBack);
 			this.Add (this.lblForward);
@@ -226,6 +244,7 @@ namespace Terminal.Gui {
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 			this.Add (this.btnToggleSplitterCollapse);
+			this.Add (lblFeedback);
 		}
 
 		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
@@ -501,7 +520,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString ())) {
+			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
+				if(reason != null) {
+					lblFeedback.Text = reason;
+				}
 				return;
 			}
 
@@ -755,20 +777,30 @@ namespace Terminal.Gui {
 		{
 			return this.AllowedTypes.Any (t => t.Matches (file.Extension, true));
 		}
-
-		private bool IsCompatibleWithOpenMode (string s)
+		private bool IsCompatibleWithOpenMode (string s, out string reason)
 		{
+			reason = null;
 			if (string.IsNullOrWhiteSpace (s)) {
 				return false;
 			}
 
 			if (!this.IsCompatibleWithAllowedExtensions (s)) {
+				reason = "File does not match allowed Type(s)";
 				return false;
 			}
 
 			switch (this.OpenMode) {
-			case OpenMode.Directory: return !File.Exists (s);
-			case OpenMode.File: return !Directory.Exists (s);
+			case OpenMode.Directory: 
+				if(File.Exists (s)) {
+					reason = "You must pick a Directory";
+					return false;
+				}
+				return true;
+			case OpenMode.File: if(Directory.Exists (s)) {
+					reason = "You must pick a File";
+					return false;
+				}
+				return true;
 			case OpenMode.Mixed: return true;
 			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
 			}
