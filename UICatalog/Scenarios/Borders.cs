@@ -335,8 +335,8 @@ namespace UICatalog.Scenarios {
 			};
 			cbDrawMarginFrame.Toggled += (e) => {
 				try {
-					smartPanel.Child.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
-					smartLabel.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
+					smartPanel.Child.Border.DrawMarginFrame = cbDrawMarginFrame.Checked == true;
+					smartLabel.Border.DrawMarginFrame = cbDrawMarginFrame.Checked == true;
 					if (cbDrawMarginFrame.Checked != smartLabel.Border.DrawMarginFrame) {
 						cbDrawMarginFrame.Checked = smartLabel.Border.DrawMarginFrame;
 					}
@@ -419,7 +419,7 @@ namespace UICatalog.Scenarios {
 			cbEffect3D.Toggled += (e) => {
 				try {
 					smartPanel.Child.Border.Effect3D = smartLabel.Border.Effect3D = effect3DOffsetX.Enabled =
-						effect3DOffsetY.Enabled = cbEffect3D.Checked;
+						effect3DOffsetY.Enabled = cbEffect3D.Checked == true;
 				} catch { }
 			};
 
