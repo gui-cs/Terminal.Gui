@@ -173,7 +173,6 @@ namespace Terminal.Gui {
 		/// <param name="tiles"></param>
 		public TileView (int tiles)
 		{
-			CanFocus = true;
 			RebuildForTileCount (tiles);
 			IgnoreBorderPropertyOnRedraw = true;
 			Border = new Border () {
@@ -409,15 +408,6 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			Driver.SetCursorVisibility (CursorVisibility.Invisible);
-			if (!Tiles.Where (t => t.ContentView.HasFocus).Any ()) {
-				Tiles.FirstOrDefault ()?.ContentView.SetFocus ();
-			}
-			return base.OnEnter (view);
-		}
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
