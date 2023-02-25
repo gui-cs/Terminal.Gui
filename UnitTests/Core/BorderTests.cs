@@ -228,7 +228,12 @@ namespace Terminal.Gui.CoreTests {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
 					var rune = (Rune)driver.Contents [r, c, 0];
-					Assert.Equal (Color.Black, color.Background);
+					if (r == frame.Y - drawMarginFrame || r == frame.Bottom + drawMarginFrame - 1
+						|| c == frame.X - drawMarginFrame || c == frame.Right + drawMarginFrame - 1) {
+						Assert.Equal (Color.BrightGreen, color.Background);
+					} else {
+						Assert.Equal (Color.Black, color.Background);
+					}
 					if (c == frame.X - drawMarginFrame && r == frame.Y - drawMarginFrame) {
 						Assert.Equal (uLCorner, rune);
 					} else if (c == frame.Right && r == frame.Y - drawMarginFrame) {
@@ -457,7 +462,12 @@ namespace Terminal.Gui.CoreTests {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
 					var rune = (Rune)driver.Contents [r, c, 0];
-					Assert.Equal (Color.Black, color.Background);
+					if (r == frame.Y + sumThickness.Top || r == frame.Bottom - sumThickness.Bottom - 1
+						|| c == frame.X + sumThickness.Left || c == frame.Right - sumThickness.Right - 1) {
+						Assert.Equal (Color.BrightGreen, color.Background);
+					} else {
+						Assert.Equal (Color.Black, color.Background);
+					}
 					if (c == frame.X + sumThickness.Left && r == frame.Y + sumThickness.Top) {
 						Assert.Equal (uLCorner, rune);
 					} else if (c == frame.Right - drawMarginFrame - sumThickness.Right
