@@ -554,8 +554,11 @@ namespace Terminal.Gui {
 			if(keyEvent.Key == ToggleResizable) {
 				foreach(var l in splitterLines) {
 
+					var iniBefore = l.IsInitialized;
+					l.IsInitialized = false;
 					l.CanFocus = !l.CanFocus;
-					
+					l.IsInitialized = iniBefore;
+
 					if (l.CanFocus && !focusMoved) {
 						l.SetFocus ();
 						focusMoved = true;
