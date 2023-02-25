@@ -935,6 +935,8 @@ namespace Terminal.Gui {
 			if (dir.Parent?.Exists ?? false) {
 				this.PushState (dir.Parent, true, false);
 			}
+
+			tbPath.GenerateSuggestions (state);
 		}
 
 		private DirectoryInfo StringToDirectoryInfo (string path)
@@ -1244,7 +1246,7 @@ namespace Terminal.Gui {
 				}
 
 				// draw it like its selected even though its not
-				Driver.SetAttribute (new Attribute (Color.Black, Color.White));
+				Driver.SetAttribute (new Attribute (Color.DarkGray, Color.Black));
 				this.Move (this.Text.Length, 0);
 				Driver.AddStr (this.validFragments [this.currentFragment.Value]);
 			}
