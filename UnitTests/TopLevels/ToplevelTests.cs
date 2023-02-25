@@ -696,7 +696,7 @@ namespace Terminal.Gui.TopLevelTests {
 					((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 					MessageBox.Query ("About", "Hello Word", "Ok");
 
-				} else if (iterations == 1) 					TestHelpers.AssertDriverContentsWithFrameAre (@"
+				} else if (iterations == 1) TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                                   
 ┌ Window ──────────────────────────────┐
 │                                      │
@@ -712,7 +712,7 @@ namespace Terminal.Gui.TopLevelTests {
 │                                      │
 └──────────────────────────────────────┘
  CTRL-N New                             ", output);
-else if (iterations == 2) {
+				else if (iterations == 2) {
 					Assert.Null (Application.MouseGrabView);
 					// Grab the mouse
 					ReflectionTools.InvokePrivate (
@@ -815,8 +815,8 @@ else if (iterations == 2) {
 
 					Assert.Null (Application.MouseGrabView);
 
-				} else if (iterations == 8) 					Application.RequestStop ();
-else if (iterations == 9) 					Application.RequestStop ();
+				} else if (iterations == 8) Application.RequestStop ();
+				else if (iterations == 9) Application.RequestStop ();
 			};
 
 			Application.Run ();
@@ -956,7 +956,7 @@ else if (iterations == 9) 					Application.RequestStop ();
 
 					Assert.Null (Application.MouseGrabView);
 
-				} else if (iterations == 8) 					Application.RequestStop ();
+				} else if (iterations == 8) Application.RequestStop ();
 			};
 
 			Application.Run ();
@@ -973,6 +973,63 @@ else if (iterations == 9) 					Application.RequestStop ();
 
 			exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (10, 0));
 			Assert.Null (exception);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void OnEnter_OnLeave_Triggered_On_Application_Begin_End ()
+		{
+			var isEnter = false;
+			var isLeave = false;
+			var v = new View ();
+			v.Enter += (_) => isEnter = true;
+			v.Leave += (_) => isLeave = true;
+			var top = Application.Top;
+			top.Add (v);
+
+			Assert.False (v.CanFocus);
+			var exception = Record.Exception (() => top.OnEnter (top));
+			Assert.Null (exception);
+			exception = Record.Exception (() => top.OnLeave (top));
+			Assert.Null (exception);
+
+			v.CanFocus = true;
+			Application.Begin (top);
+
+			Assert.True (isEnter);
+			Assert.False (isLeave);
+
+			isEnter = false;
+			var d = new Dialog ();
+			var rs = Application.Begin (d);
+
+			Assert.False (isEnter);
+			Assert.True (isLeave);
+
+			isLeave = false;
+			Application.End (rs);
+
+			Assert.True (isEnter);
+			Assert.False (isLeave);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
+		{
+			var tf = new TextField ("test") { Width = 5 };
+			var view = new View () { Width = 10, Height = 10 };
+			view.Add (tf);
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			Assert.True (tf.HasFocus);
+			Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
+			Assert.Equal (CursorVisibility.Default, cursor);
+
+			view.Enabled = false;
+			Assert.False (tf.HasFocus);
+			Application.Refresh ();
+			Application.Driver.GetCursorVisibility (out cursor);
+			Assert.Equal (CursorVisibility.Invisible, cursor);
 		}
 	}
 }

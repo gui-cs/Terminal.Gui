@@ -72,6 +72,7 @@ namespace UICatalog {
 				_selectedScenario.Init (_colorScheme);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
+				_selectedScenario.Dispose ();
 				_selectedScenario = null;
 				Application.Shutdown ();
 				return;
@@ -95,6 +96,7 @@ namespace UICatalog {
 				scenario.Init (_colorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+				scenario.Dispose ();
 
 				// This call to Application.Shutdown brackets the Application.Init call
 				// made by Scenario.Init() above
@@ -163,7 +165,7 @@ namespace UICatalog {
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				ColorScheme = _colorScheme = Colors.Base;
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
