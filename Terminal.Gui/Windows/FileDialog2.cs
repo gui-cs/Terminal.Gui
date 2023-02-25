@@ -607,14 +607,21 @@ namespace Terminal.Gui {
 
 			var stats = this.RowToStats (obj.NewRow);
 
-			if (stats == null || stats.IsParent) {
+			if (stats == null) {
 				return;
+			}
+			FileSystemInfo dest;
+
+			if(stats.IsParent) {
+				dest = state.Directory;
+			} else {
+				dest = stats.FileSystemInfo;
 			}
 
 			try {
 				this.pushingState = true;
 
-				this.tbPath.SetTextTo (stats.FileSystemInfo);
+				this.tbPath.SetTextTo (dest);
 				this.state.Selected = stats;
 				this.tbPath.ClearSuggestions ();
 
