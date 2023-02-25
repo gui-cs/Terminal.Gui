@@ -115,8 +115,8 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (1),
 			};
 			this.splitContainer.SetSplitterPos(0,30);
-			this.splitContainer.IntegratedBorder = BorderStyle.None;
-			this.splitContainer.Tiles.ElementAt(0).View.Visible = false;
+			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+			this.splitContainer.Tiles.ElementAt(0).ContentView.Visible = false;
 
 			this.tableView = new TableView () {
 				Width = Dim.Fill (),
@@ -168,8 +168,8 @@ namespace Terminal.Gui {
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
 
-			this.splitContainer.Tiles.ElementAt(0).View.Add (this.treeView);
-			this.splitContainer.Tiles.ElementAt(1).View.Add (this.tableView);
+			this.splitContainer.Tiles.ElementAt(0).ContentView.Add (this.treeView);
+			this.splitContainer.Tiles.ElementAt(1).ContentView.Add (this.tableView);
 
 			this.btnToggleSplitterCollapse = new Button (">>") {
 				Y = Pos.AnchorEnd (1),
@@ -177,8 +177,8 @@ namespace Terminal.Gui {
 			this.btnToggleSplitterCollapse.Clicked += () => {
 				var tile = this.splitContainer.Tiles.ElementAt(0);
 
-				var newState = !tile.View.Visible;
-				tile.View.Visible = newState;
+				var newState = !tile.ContentView.Visible;
+				tile.ContentView.Visible = newState;
 				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
 
