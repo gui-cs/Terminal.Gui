@@ -30,6 +30,9 @@ namespace Terminal.Gui {
 			get => title;
 			set {
 				title = value;
+				if (Border != null) {
+					Border.Title = title;
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -112,10 +115,14 @@ namespace Terminal.Gui {
 			this.Title = title;
 			if (border == null) {
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single
+					BorderStyle = BorderStyle.Single,
+					Title = title
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame, views);
 		}
@@ -214,12 +221,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var padding = Border.GetSumThickness ();
-			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-
 			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 				Clear ();
 			}
 
@@ -227,16 +230,11 @@ namespace Terminal.Gui {
 			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 
 			Driver.SetAttribute (GetNormalColor ());
-			//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 			Border.DrawContent (this, false);
-			if (HasFocus)
-				Driver.SetAttribute (ColorScheme.HotNormal);
-			if (Border.DrawMarginFrame)
-				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			Driver.SetAttribute (GetNormalColor ());
 		}
 
 		/// <summary>
