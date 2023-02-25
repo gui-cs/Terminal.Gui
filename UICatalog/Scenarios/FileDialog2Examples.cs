@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "FileDialog2", Description: "Demonstrates how to the FileDialog2 class")]
 	[ScenarioCategory ("Dialogs")]
 	public class FileDialog2Examples : Scenario {
+		private CheckBox cbMustExist;
+
 		public override void Setup ()
 		{
 			var y = 1;
 			var x = 1;
+
+			cbMustExist = new CheckBox ("Must Exist") { Checked = true };
+			Win.Add (cbMustExist);
 
 			foreach(var multi in new bool [] {false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
@@ -54,6 +55,7 @@ namespace UICatalog.Scenarios {
 				var fd = new FileDialog2 {
 					AllowsMultipleSelection = isMulti,
 					OpenMode = mode,
+					MustExist = cbMustExist.Checked
 				};
 
 				if (csv) {
@@ -72,7 +74,7 @@ namespace UICatalog.Scenarios {
 					MessageBox.Query (
 						"Chosen!",
 						"You chose:" + Environment.NewLine +
-						string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m.FullName)),
+						string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
 						"Ok");
 				}
 				else{

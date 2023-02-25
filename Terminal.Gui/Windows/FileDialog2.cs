@@ -22,6 +22,13 @@ namespace Terminal.Gui {
 		private const string HeaderSize = "Size";
 		private const string HeaderModified = "Modified";
 		private const string HeaderType = "Type";
+		
+		/// <summary>
+		/// True if the file/folder must exist already to be selected.
+		/// This prevents user from entering the name of something that
+		/// doesn't exist.  Defaults to false.
+		/// </summary>
+		public bool MustExist { get; set; }
 
 		private static char [] separators = new []
 		{
@@ -90,7 +97,10 @@ namespace Terminal.Gui {
 			this.btnCancel = new Button ("Cancel") {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.AnchorEnd (okWidth + cancelWidth),
-			};			
+			};
+			this.btnCancel.KeyPress += (k) => {
+				Application.RequestStop ();
+			};
 
 			this.lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
 			this.lblUp.Clicked += () => this.history.Up ();
@@ -115,6 +125,8 @@ namespace Terminal.Gui {
 				this.AcceptIf (k, Key.Enter);
 
 				this.SuppressIfBadChar (k);
+				
+				ClearFeedback ();
 			};
 
 			this.splitContainer = new TileView () {
@@ -247,6 +259,11 @@ namespace Terminal.Gui {
 			this.Add (lblFeedback);
 		}
 
+		private void ClearFeedback ()
+		{
+			lblFeedback.Text = string.Empty;
+		}
+
 		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
 		{
 			if(tableView.Table.Rows.Count == 0)
@@ -365,7 +382,7 @@ namespace Terminal.Gui {
 		/// <see cref="AllowsMultipleSelection"/> is <see langword="false"/> or <see cref="Canceled"/>.
 		/// </summary>
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
-		public IReadOnlyList<FileSystemInfo> MultiSelected { get; private set; }
+		public IReadOnlyList<string> MultiSelected { get; private set; }
 
 
 		/// <inheritdoc/>
@@ -495,18 +512,23 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo).ToList ().AsReadOnly ();
-			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0].FullName : string.Empty;
+			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo.FullName).ToList ().AsReadOnly ();
+			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
 			this.Canceled = false;
 			Application.RequestStop ();
 		}
 		private void Accept (FileInfo f)
 		{
-			if (!this.IsCompatibleWithOpenMode (f)) {
+			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
+				lblFeedback.Text = reason;
 				return;
 			}
 
 			this.tbPath.Text = f.FullName;
+
+			if (AllowsMultipleSelection) {
+				this.MultiSelected = new List<string> { f.FullName}.AsReadOnly();
+			}
 			this.Canceled = false;
 			Application.RequestStop ();
 		}
@@ -690,7 +712,7 @@ namespace Terminal.Gui {
 		{
 			var multi = this.MultiRowToStats ();
 			if (multi.Any ()) {
-				if (multi.All (this.IsCompatibleWithOpenMode)) {
+				if (multi.All (m=>this.IsCompatibleWithOpenMode(m.FileSystemInfo.FullName,out _))) {
 					this.Accept (multi);
 				} else {
 					return;
@@ -708,36 +730,6 @@ namespace Terminal.Gui {
 
 			if (stats.FileSystemInfo is FileInfo f) {
 				this.Accept (f);
-			}
-		}
-
-		private bool IsCompatibleWithOpenMode (FileSystemInfoStats arg)
-		{
-			// don't let the user select .. thats just going to be confusing
-			if (arg.IsParent) {
-				return false;
-			}
-
-			switch (this.OpenMode) {
-			case OpenMode.Directory: return arg.IsDir ();
-			case OpenMode.File: return !arg.IsDir () && this.IsCompatibleWithOpenMode (arg.FileSystemInfo);
-			case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
-			}
-		}
-
-		private bool IsCompatibleWithOpenMode (FileSystemInfo f)
-		{
-			switch (this.OpenMode) {
-			case OpenMode.Directory: return f is DirectoryInfo;
-			case OpenMode.File:
-				if (f is FileInfo file) {
-					return this.IsCompatibleWithAllowedExtensions (file);
-				}
-
-				return false;
-			case OpenMode.Mixed: return true;
-			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
 			}
 		}
 
@@ -785,23 +777,39 @@ namespace Terminal.Gui {
 			}
 
 			if (!this.IsCompatibleWithAllowedExtensions (s)) {
-				reason = "File does not match allowed Type(s)";
+				reason = "Wrong file type";
 				return false;
 			}
 
 			switch (this.OpenMode) {
 			case OpenMode.Directory: 
+				if(MustExist && !Directory.Exists(s)) {
+					reason = "Directory does not exist";
+					return false;
+				}
+
 				if(File.Exists (s)) {
 					reason = "You must pick a Directory";
 					return false;
 				}
 				return true;
-			case OpenMode.File: if(Directory.Exists (s)) {
+			case OpenMode.File:
+
+				if (MustExist && !File.Exists (s)) {
+					reason = "File does not exist";
+					return false;
+				}
+				if (Directory.Exists (s)) {
 					reason = "You must pick a File";
 					return false;
 				}
 				return true;
-			case OpenMode.Mixed: return true;
+			case OpenMode.Mixed:
+				if (MustExist && !File.Exists (s) && !Directory.Exists (s)) {
+					reason = "File or Directory must exist";
+					return false;
+				}
+				return true;
 			default: throw new ArgumentOutOfRangeException (nameof (this.OpenMode));
 			}
 		}
