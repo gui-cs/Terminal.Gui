@@ -343,7 +343,7 @@ namespace UICatalog.Scenarios {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
-				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
+				//System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
 
@@ -365,7 +365,7 @@ namespace UICatalog.Scenarios {
 			if (!CanCloseFile ()) {
 				return;
 			}
-			var aTypes = new List<string> () { ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".*" };
+			var aTypes = new List<string> () { ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json", ".*" };
 			var d = new OpenDialog ("Open", "Choose the path where to open the file.", aTypes) { AllowsMultipleSelection = false };
 			Application.Run (d);
 

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
+using Microsoft.DotNet.PlatformAbstractions;
 using Rune = System.Rune;
 
 /// <summary>
@@ -72,6 +72,7 @@ namespace UICatalog {
 				_selectedScenario.Init (_colorScheme);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
+				_selectedScenario.Dispose ();
 				_selectedScenario = null;
 				Application.Shutdown ();
 				return;
@@ -95,6 +96,7 @@ namespace UICatalog {
 				scenario.Init (_colorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+				scenario.Dispose ();
 
 				// This call to Application.Shutdown brackets the Application.Init call
 				// made by Scenario.Init() above
@@ -150,20 +152,21 @@ namespace UICatalog {
 		class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
 			public MenuItem miHeightAsBuffer;
-	    
+
 			public FrameView LeftPane;
 			public ListView CategoryListView;
 			public FrameView RightPane;
 			public ListView ScenarioListView;
-	    
+
 			public StatusItem Capslock;
 			public StatusItem Numlock;
 			public StatusItem Scrolllock;
 			public StatusItem DriverName;
+			public StatusItem OS;
 
 			public UICatalogTopLevel ()
 			{
-				ColorScheme = _colorScheme;
+				ColorScheme = _colorScheme = Colors.Base;
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
 						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null, Key.Q | Key.CtrlMask)
@@ -177,19 +180,17 @@ namespace UICatalog {
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
-
+				
 				Capslock = new StatusItem (Key.CharMask, "Caps", null);
 				Numlock = new StatusItem (Key.CharMask, "Num", null);
 				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 				DriverName = new StatusItem (Key.CharMask, "Driver:", null);
+				OS = new StatusItem (Key.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
 					Visible = true,
 				};
 				StatusBar.Items = new StatusItem [] {
-					Capslock,
-					Numlock,
-					Scrolllock,
 					new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 						if (_selectedScenario is null){
 							// This causes GetScenarioToRun to return null
@@ -199,7 +200,7 @@ namespace UICatalog {
 							_selectedScenario.RequestStop();
 						}
 					}),
-					new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
+					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
 						LeftPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						RightPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
@@ -207,6 +208,7 @@ namespace UICatalog {
 						SetChildNeedsDisplay();
 					}),
 					DriverName,
+					OS
 				};
 
 				LeftPane = new FrameView ("Categories") {
@@ -281,6 +283,7 @@ namespace UICatalog {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
 				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
+				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {
 					_selectedScenario = null;

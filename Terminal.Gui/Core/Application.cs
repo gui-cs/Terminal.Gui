@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 	///   </para>
 	/// </remarks>
 	public static class Application {
-		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver"/> in use.
@@ -111,28 +111,33 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
+		private static bool? _heightAsBuffer;
+
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
+		/// 
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					return _heightAsBuffer.HasValue && _heightAsBuffer.Value;
 				}
 				return Driver.HeightAsBuffer;
 			}
 			set {
+				_heightAsBuffer = value;
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					return;
 				}
-				Driver.HeightAsBuffer = value;
+
+				Driver.HeightAsBuffer = _heightAsBuffer.Value;
 			}
 		}
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
+		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
@@ -147,7 +152,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -155,7 +160,7 @@ namespace Terminal.Gui {
 		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
+		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
@@ -170,7 +175,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -200,7 +205,8 @@ namespace Terminal.Gui {
 
 		static void OnQuitKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			// Duplicate the list so if it changes during enumeration we're safe
+			foreach (var top in toplevels.ToArray()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -212,7 +218,7 @@ namespace Terminal.Gui {
 		public static MainLoop MainLoop { get; private set; }
 
 		/// <summary>
-		/// Disable or enable the mouse in this <see cref="Application"/>
+		/// Disable or enable the mouse. The mouse is enabled by default.
 		/// </summary>
 		public static bool IsMouseDisabled { get; set; }
 
@@ -266,7 +272,7 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			MainLoop mainLoop;
+			readonly MainLoop mainLoop;
 
 			public MainLoopSyncContext (MainLoop mainLoop)
 			{
@@ -305,9 +311,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If set, it forces the use of the System.Console-based driver.
+		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
-		public static bool UseSystemConsole;
+		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool ForceFakeConsole;
@@ -375,14 +381,14 @@ namespace Terminal.Gui {
 				ResetState ();
 			}
 
-			// FakeDriver (for UnitTests)
+			// For UnitTests
 			if (driver != null) {
-				if (mainLoopDriver == null) {
-					throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
-				}
-				if (!(driver is FakeDriver)) {
-					throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
-				}
+				//if (mainLoopDriver == null) {
+				//	throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
+				//}
+				//if (!(driver is FakeDriver)) {
+				//	throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
+				//}
 				Driver = driver;
 			}
 
@@ -391,21 +397,38 @@ namespace Terminal.Gui {
 				if (ForceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
-					mainLoopDriver = new FakeMainLoop (() => FakeConsole.ReadKey (true));
 				} else if (UseSystemConsole) {
 					Driver = new NetDriver ();
-					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					Driver = new WindowsDriver ();
-					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
-					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
+				if (Driver == null) {
+					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+				}
 			}
+
+			if (mainLoopDriver == null) {
+				// TODO: Move this logic into ConsoleDriver
+				if (Driver is FakeDriver) {
+					mainLoopDriver = new FakeMainLoop (Driver);
+				} else if (Driver is NetDriver) {
+					mainLoopDriver = new NetMainLoop (Driver);
+				} else if (Driver is WindowsDriver) {
+					mainLoopDriver = new WindowsMainLoop (Driver);
+				} else if (Driver is CursesDriver) {
+					mainLoopDriver = new UnixMainLoop (Driver);
+				}
+				if (mainLoopDriver == null) {
+					throw new InvalidOperationException ("Init could not determine the MainLoopDriver to use.");
+				}
+			}
+
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
+				Driver.HeightAsBuffer = HeightAsBuffer;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -917,6 +940,8 @@ namespace Terminal.Gui {
 				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
+				} else if (Top != null && toplevel != Top && toplevels.Contains (Top)) {
+					Top.OnLeave (toplevel);
 				}
 				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
@@ -970,9 +995,7 @@ namespace Terminal.Gui {
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
 			if (refreshDriver) {
-				if (MdiTop != null) {
-					MdiTop.OnChildLoaded (toplevel);
-				}
+				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
 				Redraw (toplevel);
 				toplevel.PositionCursor ();
@@ -1027,6 +1050,7 @@ namespace Terminal.Gui {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
+					Current.OnEnter (Current);
 				}
 				Refresh ();
 			}
@@ -1090,12 +1114,6 @@ namespace Terminal.Gui {
 
 
 		static void Redraw (View view)
-		{
-			view.Redraw (view.Bounds);
-			Driver.Refresh ();
-		}
-
-		static void Refresh (View view)
 		{
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();

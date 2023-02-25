@@ -6,10 +6,12 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using NStack;
+
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
@@ -19,6 +21,27 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FakeDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+		public class Behaviors {
+
+			public bool UseFakeClipboard { get; internal set; }
+			public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+			public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
+
+			public Behaviors (bool useFakeClipboard = false, bool fakeClipboardAlwaysThrowsNotSupportedException = false, bool fakeClipboardIsSupportedAlwaysTrue = false)
+			{
+				UseFakeClipboard = useFakeClipboard;
+				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
+				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+
+				// double check usage is correct
+				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
+				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
+			}
+		}
+
+		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
+
 		int cols, rows, left, top;
 		public override int Cols => cols;
 		public override int Rows => rows;
@@ -26,7 +49,8 @@ namespace Terminal.Gui {
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
-		public override IClipboard Clipboard { get; }
+		private IClipboard clipboard = null;
+		public override IClipboard Clipboard => clipboard;
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -59,15 +83,19 @@ namespace Terminal.Gui {
 
 		public FakeDriver ()
 		{
-			if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-				Clipboard = new WindowsClipboard ();
-			} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				Clipboard = new MacOSXClipboard ();
+			if (FakeBehaviors.UseFakeClipboard) {
+				clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 			} else {
-				if (CursesDriver.Is_WSL_Platform ()) {
-					Clipboard = new WSLClipboard ();
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					clipboard = new WindowsClipboard ();
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					clipboard = new MacOSXClipboard ();
 				} else {
-					Clipboard = new CursesClipboard ();
+					if (CursesDriver.Is_WSL_Platform ()) {
+						clipboard = new WSLClipboard ();
+					} else {
+						clipboard = new CursesClipboard ();
+					}
 				}
 			}
 		}
@@ -103,34 +131,54 @@ namespace Terminal.Gui {
 					//MockConsole.CursorTop = crow;
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					contents [crow, ccol + 1, 2] = 1;
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					contents [crow, ccol, 0] = (int)(uint)rune;
+					if (runeWidth < 2 && ccol > 0
+					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
+
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
+
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						contents [crow, ccol + 1, 2] = 1;
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+
+					dirtyLine [crow] = true;
 				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-
-				dirtyLine [crow] = true;
-			} else
+			} else {
 				needMove = true;
+			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -141,8 +189,9 @@ namespace Terminal.Gui {
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -180,11 +229,10 @@ namespace Terminal.Gui {
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
+			// Call InitalizeColorSchemes before UpdateOffScreen as it references Colors
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
+			InitalizeColorSchemes ();
 			UpdateOffScreen ();
-
-			CreateColors ();
-
-			//MockConsole.Clear ();
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -234,7 +282,12 @@ namespace Terminal.Gui {
 						if (color != redrawColor)
 							SetColor (color);
 
-						FakeConsole.Write ((char)contents [row, col, 0]);
+						Rune rune = contents [row, col, 0];
+						if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+							FakeConsole.Write (spair);
+						} else {
+							FakeConsole.Write ((char)rune);
+						}
 						contents [row, col, 2] = 0;
 					}
 				}
@@ -250,10 +303,9 @@ namespace Terminal.Gui {
 			UpdateCursor ();
 		}
 
-		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
 		}
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -440,11 +492,6 @@ namespace Terminal.Gui {
 			keyDownHandler (new KeyEvent (map, keyModifiers));
 			keyHandler (new KeyEvent (map, keyModifiers));
 			keyUpHandler (new KeyEvent (map, keyModifiers));
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
 		}
 
 		/// <inheritdoc/>
@@ -641,6 +688,41 @@ namespace Terminal.Gui {
 		}
 
 		#endregion
+
+		public class FakeClipboard : ClipboardBase {
+			public Exception FakeException = null;
+
+			string contents = string.Empty;
+
+			bool isSupportedAlwaysFalse = false;
+
+			public override bool IsSupported => !isSupportedAlwaysFalse;
+
+			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false, bool isSupportedAlwaysFalse = false)
+			{
+				this.isSupportedAlwaysFalse = isSupportedAlwaysFalse;
+				if (fakeClipboardThrowsNotSupportedException) {
+					FakeException = new NotSupportedException ("Fake clipboard exception");
+				}
+			}
+
+			protected override string GetClipboardDataImpl ()
+			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
+				return contents;
+			}
+
+			protected override void SetClipboardDataImpl (string text)
+			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
+				contents = text;
+			}
+		}
+
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 }
