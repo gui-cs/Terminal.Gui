@@ -32,10 +32,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			Win.Add (horizontalView, verticalView);
-			verticalView.Text = $"最初の行{Environment.NewLine}二行目";
-			//Application.Top.Redraw (Application.Top.Bounds);
-
+			Win.Add (button);
 		}
 	}
 }

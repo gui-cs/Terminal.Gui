@@ -7,10 +7,14 @@ using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 
+	/// <summary>
+	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
+	/// eanbling borders, menus, etc... 
+	/// </summary>
 	public class Frame : View {
 
 		/// <summary>
-		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View>Bounds"/>
+		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 		/// eanbling borders, menus, etc... 
 		/// </summary>
 		public Frame ()
@@ -52,6 +56,10 @@ namespace Terminal.Gui {
 
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="clipRect"></param>
 		public virtual void OnDrawSubViews (Rect clipRect)
 		{
 			//	if (Subviews == null) {
@@ -74,7 +82,8 @@ namespace Terminal.Gui {
 			//	}
 
 		}
-
+		
+		/// <inheritdoc/>
 		public override void OnDrawContent (Rect viewport)
 		{
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
@@ -133,8 +142,14 @@ namespace Terminal.Gui {
 		// TODO: v2 = This is teporary; need to also enable (or not) simple way of setting 
 		// other border properties
 		// TOOD: v2 - Missing 3D effect
+		/// <summary>
+		/// 
+		/// </summary>
 		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Thickness Thickness { get; set; }
 
 		// TODO: v2 - This is confusing. It is a read-only property and actually only returns a size, so 
@@ -143,10 +158,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the rectangle that describes the inner area of the frame. The Location is always 0, 0.
 		/// </summary>
-		public Rect Bounds {
+		public override Rect Bounds {
 			get {
-				if (Thickness != null) {
-					new Rect (Point.Empty, Frame.Size);
+				if (Thickness == null) {
+					return new Rect (Point.Empty, Frame.Size);
 				}
 				// Return the frame-relative bounds 
 				return Thickness.GetInnerRect (new Rect (Point.Empty, Frame.Size));

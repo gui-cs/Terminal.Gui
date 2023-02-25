@@ -207,6 +207,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Thickness Empty => new Thickness (0);
 
+		/// <inheritdoc/>
 		public override bool Equals (object obj)
 		{
 			//Check for null and compare run-time types.
@@ -225,6 +226,7 @@ namespace Terminal.Gui {
 		}
 
 		// IEquitable
+		/// <inheritdoc/>
 		public bool Equals (Thickness other)
 		{
 			return other is not null &&
@@ -233,7 +235,8 @@ namespace Terminal.Gui {
 			       Top == other.Top &&
 			       Bottom == other.Bottom;
 		}
-
+		
+		/// <inheritdoc/>
 		public override int GetHashCode ()
 		{
 			int hashCode = 1380952125;
@@ -244,11 +247,13 @@ namespace Terminal.Gui {
 			return hashCode;
 		}
 
+		/// <inheritdoc/>
 		public static bool operator == (Thickness left, Thickness right)
 		{
 			return EqualityComparer<Thickness>.Default.Equals (left, right);
 		}
 
+		/// <inheritdoc/>
 		public static bool operator != (Thickness left, Thickness right)
 		{
 			return !(left == right);
@@ -495,7 +500,6 @@ namespace Terminal.Gui {
 		//}
 
 		/// <summary>
-		/// Invoked when any property of Border changes (except <see cref="Child"/>).
 		/// </summary>
 		public event Action<Border> BorderChanged;
 
@@ -527,7 +531,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets if a margin frame is drawn around the <see cref="Child"/> regardless the <see cref="BorderStyle"/>
 		/// </summary>
 		[JsonInclude]
 		public bool DrawMarginFrame {
@@ -545,7 +548,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the relative <see cref="Thickness"/> of a <see cref="Border"/>.
 		/// </summary>
 		[JsonInclude]
 		public Thickness BorderThickness {

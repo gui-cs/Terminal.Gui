@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NStack;
@@ -454,15 +455,62 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///// <summary>
-		///// Gets an enumerator that enumerates the subviews in this view.
-		///// </summary>
-		///// <returns>The enumerator.</returns>
-		//public IEnumerator GetEnumerator ()
-		//{
-		//	foreach (var v in InternalSubviews)
-		//		yield return v;
-		//}
+		public Frame Margin { get; set; }
+		public Frame BorderFrame { get; set; }
+		public Frame Padding { get; set; }
+
+		/// <summary>
+		/// Temporary API to support the new v2 API
+		/// </summary>
+		public void EnableFrames ()
+		{
+			IgnoreBorderPropertyOnRedraw = true;
+			Margin?.Dispose ();
+			Margin = new Frame () {
+				X = 0,
+				Y = 0,
+				Thickness = new Thickness (0),
+				ColorScheme = SuperView?.ColorScheme ?? ColorScheme,
+				// TODO: Create View.AddAdornment
+				Parent = this
+			};
+			//Margin.DiagnosticsLabel.Text = "Margin";
+
+			BorderFrame?.Dispose ();
+			BorderFrame = new Frame () {
+				X = 0,
+				Y = 0,
+				BorderStyle = BorderStyle.Single,
+				Thickness = new Thickness (0),
+				ColorScheme = ColorScheme,
+				// TODO: Create View.AddAdornment
+				Parent = this
+			};
+
+			Padding?.Dispose ();
+			Padding = new Frame () {
+				X = 0,
+				Y = 0,
+				Thickness = new Thickness (0),
+				ColorScheme = ColorScheme,
+				// TODO: Create View.AddAdornment
+				Parent = this
+			};
+		}
+
+		ustring title;
+
+		/// <summary>
+		/// The title to be displayed for this <see cref="View2"/>.
+		/// </summary>
+		/// <value>The title.</value>
+		public ustring Title {
+			get => title;
+			set {
+				title = value;
+				SetNeedsDisplay ();
+			}
+		}
 
 		LayoutStyle layoutStyle;
 
@@ -498,7 +546,7 @@ namespace Terminal.Gui {
 		/// control for tasks such as drawing on the surface of the control.
 		/// </para>
 		/// </remarks>
-		public Rect Bounds {
+		public virtual Rect Bounds {
 			get => new Rect (Point.Empty, Frame.Size);
 			set => Frame = new Rect (frame.Location, value.Size);
 		}
@@ -670,7 +718,14 @@ namespace Terminal.Gui {
 		/// Returns the container for this view, or null if this view has not been added to a container.
 		/// </summary>
 		/// <value>The super view.</value>
-		public View SuperView => container;
+		public virtual View SuperView {
+			get {
+				return container;
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of a <see cref="Terminal.Gui.LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
@@ -773,9 +828,6 @@ namespace Terminal.Gui {
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 			Border = border;
-			if (Border != null) {
-				Border.Child = this;
-			}
 			shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
@@ -1150,16 +1202,16 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + frame.Y;
-			rcol = col + frame.X;
+			rrow = row + Frame.Y;
+			rcol = col + Frame.X;
 
 			var curContainer = container;
 			while (curContainer != null) {
-				rrow += curContainer.frame.Y;
-				rcol += curContainer.frame.X;
+				rrow += curContainer.Frame.Y;
+				rcol += curContainer.Frame.X;
 				curContainer = curContainer.container;
 			}
 
@@ -1588,7 +1640,7 @@ namespace Terminal.Gui {
 			return rect;
 		}
 
-		Rect GetContainerBounds ()
+		internal Rect GetContainerBounds ()
 		{
 			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
 			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
@@ -2703,11 +2755,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get or sets whether the view will use <see cref="Terminal.Gui.Border"/> (if <see cref="Border"/> is set) to draw 
-		/// a border. If <see langword="false"/> (the default),
-		/// <see cref="View.Redraw(Rect)"/> will call <see cref="Border.DrawContent(View, bool)"/>
-		/// to draw the view's border. If <see langword="true"/> no border is drawn (and the view is expected to draw the border
-		/// itself).
 		/// </summary>
 		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; }
 
@@ -2842,8 +2889,9 @@ namespace Terminal.Gui {
 		/// <returns>The text formatter size more the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetBoundsTextFormatterSize ()
 		{
-			if (ustring.IsNullOrEmpty (TextFormatter.Text))
+			if (ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				return Bounds.Size;
+			}
 
 			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
 			    frame.Size.Height + GetHotKeySpecifierLength (false));

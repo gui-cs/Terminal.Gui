@@ -17,8 +17,9 @@ using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
+	
 	/// <summary>
-	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a border around its <see cref="View.Frame"/> with a <see cref="Title"/> at the top.
+	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a border around its <see cref="View.Frame"/> with a Title at the top.
 	/// </summary>
 	/// <remarks>
 	/// The 'client area' of a <see cref="Window"/> is a rectangle deflated by one or more rows/columns from <see cref="View.Bounds"/>. A this time there is no
