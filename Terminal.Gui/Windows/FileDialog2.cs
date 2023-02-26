@@ -504,13 +504,13 @@ namespace Terminal.Gui {
 			if (ustring.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
-					this.Title = $" OPEN {(MustExist ? "EXISTING ":"")}FILE ";
+					this.Title = $"OPEN {(MustExist ? "EXISTING ":"")}FILE";
 					break;
 				case OpenMode.Directory:
-					this.Title = $" OPEN {(MustExist ? "EXISTING " : "")}DIRECTORY ";
+					this.Title = $"OPEN {(MustExist ? "EXISTING " : "")}DIRECTORY";
 					break;
 				case OpenMode.Mixed:
-					this.Title = $" OPEN {(MustExist ? "EXISTING":"")}";
+					this.Title = $"OPEN{(MustExist ? " EXISTING":"")}";
 					break;
 				}
 			}
