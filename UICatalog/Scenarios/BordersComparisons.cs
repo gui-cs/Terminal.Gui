@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 			button.Clicked += () => MessageBox.Query (20, 7, "Hi", "I'm a Window?", "Yes", "No");
 			var label = new Label ("I'm a Window") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 3,
+				Y = Pos.Top (button) - 1
 			};
 			var tv = new TextView () {
 				Y = Pos.AnchorEnd (2),
@@ -77,7 +77,7 @@ namespace UICatalog.Scenarios {
 			button2.Clicked += () => MessageBox.Query (20, 7, "Hi", "I'm a Toplevel?", "Yes", "No");
 			var label2 = new Label ("I'm a Toplevel") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 3,
+				Y = Pos.Top (button2) - 1
 			};
 			var tv2 = new TextView () {
 				Y = Pos.AnchorEnd (2),
@@ -113,7 +113,7 @@ namespace UICatalog.Scenarios {
 			button3.Clicked += () => MessageBox.Query (20, 7, "Hi", "I'm a FrameView?", "Yes", "No");
 			var label3 = new Label ("I'm a FrameView") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 3,
+				Y = Pos.Top (button3) - 1
 			};
 			var tv3 = new TextView () {
 				Y = Pos.AnchorEnd (2),
