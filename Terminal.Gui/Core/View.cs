@@ -2319,7 +2319,7 @@ namespace Terminal.Gui {
 
 			if (edges.Any ()) {
 				(var from, var to) = edges.First ();
-				if (from != Application.Top) {
+				if (from != GetTopSuperView (to, from)) {
 					if (!ReferenceEquals (from, to)) {
 						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
 					} else {
@@ -2463,22 +2463,29 @@ namespace Terminal.Gui {
 			var ordered = TopologicalSort (nodes, edges);
 
 			foreach (var v in ordered) {
-				if (v.LayoutStyle == LayoutStyle.Computed) {
-					v.SetRelativeLayout (Frame);
-				}
-
-				v.LayoutSubviews ();
-				v.LayoutNeeded = false;
+				LayoutSubview (v, Frame);
 			}
 
-			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
-			    && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				SetRelativeLayout (SuperView.Frame);
+			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded
+			    && ordered.Count == 0 && edges.Count > 0 && LayoutStyle == LayoutStyle.Computed) {
+
+				(var _, var to) = edges.First ();
+				LayoutSubview (to, SuperView.Frame);
 			}
 
 			LayoutNeeded = false;
 
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
+		}
+
+		private void LayoutSubview (View v, Rect hostFrame)
+		{
+			if (v.LayoutStyle == LayoutStyle.Computed) {
+				v.SetRelativeLayout (hostFrame);
+			}
+
+			v.LayoutSubviews ();
+			v.LayoutNeeded = false;
 		}
 
 		ustring text;
@@ -3147,11 +3154,14 @@ namespace Terminal.Gui {
 		/// Get the top superview of a given <see cref="View"/>.
 		/// </summary>
 		/// <returns>The superview view.</returns>
-		public View GetTopSuperView ()
+		public View GetTopSuperView (View view = null, View superview = null)
 		{
-			View top = Application.Top;
-			for (var v = this?.SuperView; v != null; v = v.SuperView) {
+			View top = superview ?? Application.Top;
+			for (var v = view?.SuperView ?? (this?.SuperView); v != null; v = v.SuperView) {
 				top = v;
+				if (top == superview) {
+					break;
+				}
 			}
 
 			return top;
