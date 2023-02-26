@@ -1526,7 +1526,7 @@ namespace Terminal.Gui {
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
-				
+
 				Clear ();
 				SetChildNeedsDisplay ();
 			}
@@ -2435,7 +2435,7 @@ namespace Terminal.Gui {
 
 			if (edges.Any ()) {
 				(var from, var to) = edges.First ();
-				if (from != Application.Top) {
+				if (from != superView && from != Application.Top) {
 					if (!ReferenceEquals (from, to)) {
 						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {superView}?");
 					} else {

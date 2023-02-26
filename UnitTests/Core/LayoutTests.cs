@@ -36,6 +36,20 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact]
+		public void TopologicalSort_Does_Not_Throws_Missing_Add ()
+		{
+			var root = new View ();
+			var sub1 = new View ();
+			var sub2 = new View ();
+			sub1.Add (sub2);
+			root.Add (sub1);
+			sub2.Width = Dim.Width (root);
+
+			var exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
+		}
+
+		[Fact]
 		public void TopologicalSort_Recursive_Ref ()
 		{
 			var root = new View ();
@@ -1398,7 +1412,7 @@ Y
 
 			testView = new View () {
 				AutoSize = false,
-				X = Pos.Left(testView),
+				X = Pos.Left (testView),
 				Y = Pos.Left (testView),
 				Width = 1,
 				Height = 1
