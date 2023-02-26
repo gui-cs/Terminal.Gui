@@ -47,6 +47,10 @@ namespace Terminal.Gui.CoreTests {
 
 			var exception = Record.Exception (root.LayoutSubviews);
 			Assert.Null (exception);
+
+			sub2.Width = Dim.Width (sub1);
+			exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
 		}
 
 		[Fact]
