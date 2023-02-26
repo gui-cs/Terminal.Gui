@@ -235,7 +235,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
 			Assert.True (Application.UseSystemConsole);
 			Assert.True (Application.IsMouseDisabled);
-			Assert.True (Application.HeightAsBuffer);
+			Assert.True (Application.EnableConsoleScrolling);
 
 			//act
 			ConfigurationManager.Reset ();
@@ -248,7 +248,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 
 			// arrange
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -274,7 +274,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 
 		}
 
@@ -810,7 +810,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.B, Application.AlternateBackwardKey);
 				Assert.True (Application.UseSystemConsole);
 				Assert.True (Application.IsMouseDisabled);
-				Assert.True (Application.HeightAsBuffer);
+				Assert.True (Application.EnableConsoleScrolling);
 			}
 
 			// act

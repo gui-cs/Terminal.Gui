@@ -67,6 +67,9 @@ namespace Terminal.Gui {
 			get => title;
 			set {
 				title = value;
+				if (Border != null) {
+					Border.Title = title;
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -163,6 +166,9 @@ namespace Terminal.Gui {
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame, views);
 		}
@@ -310,7 +316,7 @@ namespace Terminal.Gui {
 				foreach (var p in lc.GenerateImage (bounds)) {
 					this.AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
-				
+
 				// Redraw the lines so that focus/drag symbol renders
 				foreach (var subview in contentView.Subviews) {
 					//	line.DrawSplitterSymbol ();

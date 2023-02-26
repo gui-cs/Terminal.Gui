@@ -335,7 +335,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
 		/// </summary>
-		[JsonInclude, JsonConverter (typeof(JsonStringEnumConverter))]
+		[JsonInclude, JsonConverter (typeof (JsonStringEnumConverter))]
 		public BorderStyle BorderStyle {
 			get => borderStyle;
 			set {

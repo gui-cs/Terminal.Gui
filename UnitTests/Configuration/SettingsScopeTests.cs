@@ -63,7 +63,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
 			Assert.True (Application.UseSystemConsole);
 			Assert.True (Application.IsMouseDisabled);
-			Assert.True (Application.HeightAsBuffer);
+			Assert.True (Application.EnableConsoleScrolling);
 		}
 
 		[Fact, AutoInitShutdown]
