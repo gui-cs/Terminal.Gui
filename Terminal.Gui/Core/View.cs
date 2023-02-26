@@ -1521,14 +1521,12 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
-			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = Bounds;// new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (bounds.Width, bounds.Width - 2), Math.Max (bounds.Height, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
-
+				
 				Clear ();
 				SetChildNeedsDisplay ();
 			}
@@ -1541,8 +1539,8 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (boundsAdjustedForBorder), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				    containerBounds);
 			}
 
@@ -1552,7 +1550,7 @@ namespace Terminal.Gui {
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
 							}
@@ -2268,12 +2266,12 @@ namespace Terminal.Gui {
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
@@ -2448,8 +2446,8 @@ namespace Terminal.Gui {
 			// return L (a topologically sorted order)
 			return result;
 		} // TopologicalSort
-		
-		
+
+
 		/// <summary>
 		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
