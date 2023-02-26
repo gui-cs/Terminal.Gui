@@ -2469,8 +2469,8 @@ namespace Terminal.Gui {
 			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded
 			    && ordered.Count == 0 && edges.Count > 0 && LayoutStyle == LayoutStyle.Computed) {
 
-				(var _, var to) = edges.First ();
-				LayoutSubview (to, SuperView.Frame);
+				(var from, var to) = edges.First ();
+				LayoutSubview (to, from.Frame);
 			}
 
 			LayoutNeeded = false;
