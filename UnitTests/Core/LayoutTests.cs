@@ -1420,5 +1420,158 @@ Y
 			Assert.Equal (6, testView.Frame.X);
 			Assert.Equal (6, testView.Frame.Y);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Y_Center_Minus_Absolute_Inside_Window_Height_Ten ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the first line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Center () - 3  // center minus 3 minus two lines top and bottom borders equal to zero (5-3-2=0)
+			};
+
+			var button = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+
+			win.Add (label, button);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 8), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=8})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 10), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+			Assert.Equal (new Rect (12, 3, 13, 1), button.Frame);
+			var expected = @"
+┌──────────────────────────────────────┐
+│    This should be the first line.    │
+│                                      │
+│                                      │
+│            [ Press me! ]             │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Y_Center_Minus_Absolute_Inside_Window_Height_Nine ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the first line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Center () - 3  // center minus 2 minus two lines top and bottom borders equal to zero (5-3-2=0)
+			};
+
+			var button = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+
+			win.Add (label, button);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 9);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 40, 9), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 9), win.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 7), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=7})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 9), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+			Assert.Equal (new Rect (12, 3, 13, 1), button.Frame);
+			var expected = @"
+┌──────────────────────────────────────┐
+│    This should be the first line.    │
+│                                      │
+│                                      │
+│            [ Press me! ]             │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Y_Center_Minus_Absolute_Inside_Window_Height_Eight ()
+		{
+			var win = new Window ();
+
+			var label = new Label ("This should be the first line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
+			};
+
+			var button = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+
+			win.Add (label, button);
+
+			var top = Application.Top;
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 40, 8), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 8), win.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 6), win.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=6})", win.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				win.Frame.Left, win.Frame.Top,
+				win.Frame.Right, win.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
+			var expected = @"
+┌──────────────────────────────────────┐
+│    This should be the first line.    │
+│                                      │
+│            [ Press me! ]             │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
 	}
 }
