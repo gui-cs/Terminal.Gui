@@ -1527,7 +1527,7 @@ namespace Terminal.Gui {
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
-				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+				Clear (GetNeedDisplay (containerBounds));
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -1573,7 +1573,7 @@ namespace Terminal.Gui {
 
 		Rect GetNeedDisplay (Rect containerBounds)
 		{
-			Rect rect = NeedDisplay;
+			Rect rect = ViewToScreen (NeedDisplay);
 			if (!containerBounds.IsEmpty) {
 				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
 				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
@@ -2214,8 +2214,7 @@ namespace Terminal.Gui {
 					newLocation = pos.Anchor (superviewDimension - newDimension);
 					break;
 
-				case Pos.PosCombine:
-					var combine = pos as Pos.PosCombine;
+				case Pos.PosCombine combine:
 					int left, right;
 					(left, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
 					(right, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
@@ -2242,7 +2241,7 @@ namespace Terminal.Gui {
 
 			// Recursively calculates the new dimension (width or height) of the given Dim given:
 			//   the current location (x or y)
-			//   the current dimennsion (width or height)
+			//   the current dimension (width or height)
 			int CalculateNewDimension (Dim d, int location, int dimension, int autosize)
 			{
 				int newDimension;
@@ -2277,11 +2276,11 @@ namespace Terminal.Gui {
 			}
 
 
-			// horiztonal
-			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, Width, autosize.Width);
+			// horizontal
+			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, width, autosize.Width);
 
 			// vertical
-			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, Height, autosize.Height);
+			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, height, autosize.Height);
 
 			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
