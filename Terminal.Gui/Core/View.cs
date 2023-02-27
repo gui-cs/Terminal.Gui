@@ -1525,7 +1525,7 @@ namespace Terminal.Gui {
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
-				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+				Clear (GetNeedDisplay (containerBounds));
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -1570,7 +1570,7 @@ namespace Terminal.Gui {
 
 		Rect GetNeedDisplay (Rect containerBounds)
 		{
-			Rect rect = NeedDisplay;
+			Rect rect = ViewToScreen (NeedDisplay);
 			if (!containerBounds.IsEmpty) {
 				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
 				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
