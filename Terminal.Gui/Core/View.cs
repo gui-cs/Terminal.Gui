@@ -1110,15 +1110,8 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			Rect containerBounds = GetContainerBounds ();
-			Rect viewBounds = Bounds;
-			if (!containerBounds.IsEmpty) {
-				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
-				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
-			}
-
-			var h = viewBounds.Height;
-			var w = viewBounds.Width;
+			var h = Frame.Height;
+			var w = Frame.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
