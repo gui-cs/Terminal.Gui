@@ -1110,15 +1110,8 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			Rect containerBounds = GetContainerBounds ();
-			Rect viewBounds = Bounds;
-			if (!containerBounds.IsEmpty) {
-				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
-				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
-			}
-
-			var h = viewBounds.Height;
-			var w = viewBounds.Width;
+			var h = Frame.Height;
+			var w = Frame.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1524,8 +1517,6 @@ namespace Terminal.Gui {
 			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max(0, bounds.Height - 2));
-				boundsAdjustedForBorder = Bounds;// new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (bounds.Width, bounds.Width - 2), Math.Max (bounds.Height, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -2269,12 +2260,12 @@ namespace Terminal.Gui {
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
@@ -2449,8 +2440,8 @@ namespace Terminal.Gui {
 			// return L (a topologically sorted order)
 			return result;
 		} // TopologicalSort
-		
-		
+
+
 		/// <summary>
 		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
