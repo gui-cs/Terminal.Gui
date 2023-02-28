@@ -362,85 +362,85 @@ namespace Terminal.Gui.ViewTests {
 			_hostView.Redraw (_hostView.Bounds);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
-			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
-			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Lines = 10;
 			_hostView.Redraw (_hostView.Bounds);
 			Assert.False (_scrollBar.ShowScrollIndicator);
 			Assert.False (_scrollBar.Visible);
-			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(0))",
+			Assert.Equal ("DimCombine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(0))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
-			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Cols = 60;
 			_hostView.Redraw (_hostView.Bounds);
 			Assert.False (_scrollBar.ShowScrollIndicator);
 			Assert.False (_scrollBar.Visible);
-			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(0))",
+			Assert.Equal ("DimCombine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(0))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
-			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Lines = 40;
 			_hostView.Redraw (_hostView.Bounds);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
-			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(0))",
+			Assert.Equal ("DimCombine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(0))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (25, _scrollBar.Bounds.Height);
 			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(0))",
+			Assert.Equal ("DimCombine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(0))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
-			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Cols = 120;
 			_hostView.Redraw (_hostView.Bounds);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
-			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("DimCombine(DimView(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-DimAbsolute(1))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
-			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+			Assert.Equal ("DimAbsolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 		}
 

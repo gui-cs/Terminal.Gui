@@ -598,10 +598,10 @@ Y
 			Assert.False (view.AutoSize);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
 			Assert.Equal (Rect.Empty, view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(0)", view.Width.ToString ());
-			Assert.Equal ("Absolute(0)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view.Height.ToString ());
 			var expected = @"
 ┌────────────────────┐
 │                    │
@@ -635,10 +635,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(11)", view.Width.ToString ());
-			Assert.Equal ("Absolute(0)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Hello World         │
@@ -672,10 +672,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 12, 1), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(11)", view.Width.ToString ());
-			Assert.Equal ("Absolute(0)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Hello Worlds        │
@@ -708,10 +708,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 11, 12), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(11)", view.Width.ToString ());
-			Assert.Equal ("Absolute(0)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │H                   │
@@ -745,10 +745,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(11)", view.Width.ToString ());
-			Assert.Equal ("Absolute(1)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │HelloWorlds         │
@@ -781,10 +781,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(11)", view.Width.ToString ());
-			Assert.Equal ("Absolute(1)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Hello World         │
@@ -821,10 +821,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(1)", view.Width.ToString ());
-			Assert.Equal ("Absolute(11)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │H                   │
@@ -857,10 +857,10 @@ Y
 			Application.Refresh ();
 
 			Assert.Equal (new Rect (0, 0, 1, 12), view.Frame);
-			Assert.Equal ("Absolute(0)", view.X.ToString ());
-			Assert.Equal ("Absolute(0)", view.Y.ToString ());
-			Assert.Equal ("Absolute(1)", view.Width.ToString ());
-			Assert.Equal ("Absolute(11)", view.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view.Y.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view.Width.ToString ());
+			Assert.Equal ("DimAbsolute(11)", view.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │H                   │
@@ -921,15 +921,15 @@ Y
 			Assert.Equal (new Size (10, 1), horizontalView.TextFormatter.Size);
 			Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
 			Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
-			Assert.Equal ("Absolute(0)", horizontalView.X.ToString ());
-			Assert.Equal ("Absolute(0)", horizontalView.Y.ToString ());
-			Assert.Equal ("Absolute(9)", horizontalView.Width.ToString ());
-			Assert.Equal ("Absolute(1)", horizontalView.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", horizontalView.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", horizontalView.Y.ToString ());
+			Assert.Equal ("DimAbsolute(9)", horizontalView.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", horizontalView.Height.ToString ());
 			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
-			Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-			Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-			Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-			Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", verticalView.X.ToString ());
+			Assert.Equal ("PosAbsolute(3)", verticalView.Y.ToString ());
+			Assert.Equal ("DimAbsolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("DimAbsolute(8)", verticalView.Height.ToString ());
 			var expected = @"
 ┌────────────────────┐
 │Finish 終           │
@@ -964,10 +964,10 @@ Y
 			Assert.True (verticalView.AutoSize);
 			// height was initialized with 8 and is kept as minimum
 			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
-			Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-			Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-			Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-			Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", verticalView.X.ToString ());
+			Assert.Equal ("PosAbsolute(3)", verticalView.Y.ToString ());
+			Assert.Equal ("DimAbsolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("DimAbsolute(8)", verticalView.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Finish 終           │
@@ -1079,28 +1079,28 @@ Y
 			Assert.False (view5.IsInitialized);
 			Assert.False (view1.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
-			Assert.Equal ("Absolute(10)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view1.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view1.Height.ToString ());
 			Assert.False (view2.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
-			Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view2.Height.ToString ());
 			Assert.False (view3.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
-			Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view3.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view3.Height.ToString ());
 			Assert.False (view4.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
-			Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view4.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view4.Height.ToString ());
 			Assert.False (view5.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
-			Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view5.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view5.Height.ToString ());
 			Assert.False (view6.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
-			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view6.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view6.Height.ToString ());
 
 			Application.Begin (Application.Top);
 
@@ -1111,28 +1111,28 @@ Y
 			Assert.True (view5.IsInitialized);
 			Assert.False (view1.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
-			Assert.Equal ("Absolute(10)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view1.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view1.Height.ToString ());
 			Assert.False (view2.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
-			Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view2.Height.ToString ());
 			Assert.False (view3.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
-			Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view3.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view3.Height.ToString ());
 			Assert.False (view4.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
-			Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view4.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view4.Height.ToString ());
 			Assert.False (view5.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
-			Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view5.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view5.Height.ToString ());
 			Assert.False (view6.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
-			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view6.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view6.Height.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1171,28 +1171,28 @@ Y
 			Assert.False (view5.IsInitialized);
 			Assert.True (view1.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view1.Frame);
-			Assert.Equal ("Absolute(10)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view1.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view1.Height.ToString ());
 			Assert.True (view2.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
-			Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view2.Height.ToString ());
 			Assert.True (view3.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
-			Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view3.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view3.Height.ToString ());
 			Assert.True (view4.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
-			Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view4.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view4.Height.ToString ());
 			Assert.True (view5.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
-			Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view5.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view5.Height.ToString ());
 			Assert.True (view6.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
-			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view6.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view6.Height.ToString ());
 
 			Application.Begin (Application.Top);
 
@@ -1203,28 +1203,28 @@ Y
 			Assert.True (view5.IsInitialized);
 			Assert.True (view1.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view1.Frame);
-			Assert.Equal ("Absolute(10)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view1.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view1.Height.ToString ());
 			Assert.True (view2.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
-			Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view2.Height.ToString ());
 			Assert.True (view3.AutoSize);
 			Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
-			Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view3.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view3.Height.ToString ());
 			Assert.True (view4.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
-			Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view4.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view4.Height.ToString ());
 			Assert.True (view5.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
-			Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view5.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view5.Height.ToString ());
 			Assert.True (view6.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
-			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Assert.Equal ("DimAbsolute(10)", view6.Width.ToString ());
+			Assert.Equal ("DimAbsolute(5)", view6.Height.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1243,17 +1243,17 @@ Y
 			Assert.True (view1.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 18, 1), view1.Frame);
-			Assert.Equal ("Absolute(0)", view1.X.ToString ());
-			Assert.Equal ("Absolute(0)", view1.Y.ToString ());
-			Assert.Equal ("Absolute(18)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(1)", view1.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.Y.ToString ());
+			Assert.Equal ("DimAbsolute(18)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view1.Height.ToString ());
 			Assert.True (view2.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 2, 17), view2.Frame);
-			Assert.Equal ("Absolute(0)", view2.X.ToString ());
-			Assert.Equal ("Absolute(0)", view2.Y.ToString ());
-			Assert.Equal ("Absolute(2)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(17)", view2.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view2.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view2.Y.ToString ());
+			Assert.Equal ("DimAbsolute(2)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(17)", view2.Height.ToString ());
 
 			view1.Frame = new Rect (0, 0, 25, 4);
 			bool firstIteration = false;
@@ -1262,10 +1262,10 @@ Y
 			Assert.True (view1.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 25, 4), view1.Frame);
-			Assert.Equal ("Absolute(0)", view1.X.ToString ());
-			Assert.Equal ("Absolute(0)", view1.Y.ToString ());
-			Assert.Equal ("Absolute(18)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(1)", view1.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.Y.ToString ());
+			Assert.Equal ("DimAbsolute(18)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(1)", view1.Height.ToString ());
 
 			view2.Frame = new Rect (0, 0, 1, 25);
 			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
@@ -1273,10 +1273,10 @@ Y
 			Assert.True (view2.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 1, 25), view2.Frame);
-			Assert.Equal ("Absolute(0)", view2.X.ToString ());
-			Assert.Equal ("Absolute(0)", view2.Y.ToString ());
-			Assert.Equal ("Absolute(2)", view2.Width.ToString ());
-			Assert.Equal ("Absolute(17)", view2.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view2.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view2.Y.ToString ());
+			Assert.Equal ("DimAbsolute(2)", view2.Width.ToString ());
+			Assert.Equal ("DimAbsolute(17)", view2.Height.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1291,10 +1291,10 @@ Y
 			Assert.Null (view1.Height);
 			top.Add (view1);
 			Assert.True (view1.IsAdded);
-			Assert.Equal ("Absolute(0)", view1.X.ToString ());
-			Assert.Equal ("Absolute(0)", view1.Y.ToString ());
-			Assert.Equal ("Absolute(0)", view1.Width.ToString ());
-			Assert.Equal ("Absolute(0)", view1.Height.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.X.ToString ());
+			Assert.Equal ("PosAbsolute(0)", view1.Y.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view1.Width.ToString ());
+			Assert.Equal ("DimAbsolute(0)", view1.Height.ToString ());
 
 			var view2 = new View () {
 				X = Pos.Center (),
@@ -1303,16 +1303,16 @@ Y
 				Height = Dim.Fill ()
 			};
 			Assert.False (view2.IsAdded);
-			Assert.Equal ("Center", view2.X.ToString ());
-			Assert.Equal ("Center", view2.Y.ToString ());
-			Assert.Equal ("Fill(0)", view2.Width.ToString ());
-			Assert.Equal ("Fill(0)", view2.Height.ToString ());
+			Assert.Equal ("PosCenter", view2.X.ToString ());
+			Assert.Equal ("PosCenter", view2.Y.ToString ());
+			Assert.Equal ("DimFill(0)", view2.Width.ToString ());
+			Assert.Equal ("DimFill(0)", view2.Height.ToString ());
 			top.Add (view2);
 			Assert.True (view2.IsAdded);
-			Assert.Equal ("Center", view2.X.ToString ());
-			Assert.Equal ("Center", view2.Y.ToString ());
-			Assert.Equal ("Fill(0)", view2.Width.ToString ());
-			Assert.Equal ("Fill(0)", view2.Height.ToString ());
+			Assert.Equal ("PosCenter", view2.X.ToString ());
+			Assert.Equal ("PosCenter", view2.Y.ToString ());
+			Assert.Equal ("DimFill(0)", view2.Width.ToString ());
+			Assert.Equal ("DimFill(0)", view2.Height.ToString ());
 		}
 
 		[Fact]
