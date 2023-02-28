@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 			var effect3D = true;
 
 			smartView.X = Pos.Center ();
-			smartView.Y = Pos.Center () + 4;
+			smartView.Y = 0;
 			smartView.Width = 40;
 			smartView.Height = 20;
 			smartView.Border = new Border () {
@@ -242,6 +242,8 @@ namespace UICatalog.Scenarios {
 				borderBottomEdit.Text = borderLeftEdit.Text = borderRightEdit.Text = borderTopEdit.Text;
 			};
 			Add (replaceBorder);
+
+			smartView.Y = Pos.Center () + 4;
 
 			Add (new Label ("BorderStyle:"));
 
