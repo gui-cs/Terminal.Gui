@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios {
 			var boc = new BordersOnContainers (
 				$"CTRL-Q to Close - Scenario: {GetName ()}",
 				"FrameView",
-				new Border.ToplevelContainer ());
+				new FrameView ());
 
 			Application.Run (boc);
 			Application.Shutdown ();
