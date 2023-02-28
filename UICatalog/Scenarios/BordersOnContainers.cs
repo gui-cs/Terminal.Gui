@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 			button.Clicked += () => MessageBox.Query (20, 7, "Hi", $"I'm a {typeName}?", "Yes", "No");
 			var label = new Label ($"I'm a {typeName}") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 2,
+				Y = Pos.Center () - 1,
 			};
 			var tf2 = new TextField ("1234567890") {
 				X = Pos.AnchorEnd (10),
