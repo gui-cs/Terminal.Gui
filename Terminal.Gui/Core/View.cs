@@ -1548,7 +1548,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentEvent
-			OnDrawContent (bounds);
+			OnDrawContent (boundsAdjustedForBorder);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
@@ -1574,7 +1574,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (bounds);
+			OnDrawContentComplete (boundsAdjustedForBorder);
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
