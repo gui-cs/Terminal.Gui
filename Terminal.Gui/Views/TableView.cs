@@ -983,9 +983,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var toggles = MultiSelectedRegions.Where (
-				m => m.Rect.Contains (selectedColumn, selectedRow)
-				&& m.IsToggled).ToArray ();
+			var toggles = GetMultiSelectedRegionsContaining(selectedColumn, selectedRow)
+							.Where(s=>s.IsToggled).ToArray ();
 
 			// Toggle it off
 			if (toggles.Any ()) {
@@ -1030,16 +1029,30 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			// Cell is also selected if in any multi selection region
-			if (MultiSelect && MultiSelectedRegions.Any (r => r.Rect.Contains (col, row)))
+			if(GetMultiSelectedRegionsContaining(col,row).Any())
+			{
 				return true;
-
-			// Cell is also selected if Y axis appears in any region (when FullRowSelect is enabled)
-			if (FullRowSelect && MultiSelect && MultiSelectedRegions.Any (r => r.Rect.Bottom > row && r.Rect.Top <= row))
-				return true;
+			}
 
 			return row == SelectedRow &&
 					(col == SelectedColumn || FullRowSelect);
+		}
+
+		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining(int col, int row)
+		{
+			if(!MultiSelect)
+			{
+				return Enumerable.Empty<TableSelection>();
+			}
+		
+			if(FullRowSelect)
+			{
+				return MultiSelectedRegions.Where (r => r.Rect.Bottom > row && r.Rect.Top <= row);
+			}
+			else
+			{
+				return MultiSelectedRegions.Where (r => r.Rect.Contains (col, row));
+			}
 		}
 
 		/// <summary>
