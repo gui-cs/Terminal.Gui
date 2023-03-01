@@ -1521,6 +1521,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
+			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
 				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max(0, bounds.Height - 2));
