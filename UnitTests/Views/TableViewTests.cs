@@ -1580,6 +1580,42 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal(0,selectedCell.X);
 			Assert.Equal(0,selectedCell.Y);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn_FullRowSelect ()
+		{
+			// 2 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.FullRowSelect = true;
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			// Toggle Select Cell 0,0
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			// Go Down
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+
+			var m = tableView.MultiSelectedRegions.Single();
+			Assert.True(m.IsToggled);
+			Assert.Equal(0,m.Origin.X);
+			Assert.Equal(0,m.Origin.Y);
+
+			//First row toggled and Second row active = 12 selected cells
+			Assert.Equal(12,tableView.GetAllSelectedCells().Count());
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp });
+			
+			Assert.Single(tableView.MultiSelectedRegions.Where(r=>r.IsToggled));
+
+			// Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			Assert.Empty(tableView.MultiSelectedRegions.Where(r=>r.IsToggled));
+
+		}
 		
 		[Theory, AutoInitShutdown]
 		[InlineData(new object[] { true,true })]

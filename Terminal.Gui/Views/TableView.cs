@@ -915,15 +915,15 @@ namespace Terminal.Gui {
 		{
 			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
 			{
-				yield break;				
+				return Enumerable.Empty<Point>();				
 			}
 
 			EnsureValidSelection ();
 
+			var toReturn = new HashSet<Point>();
+
 			// If there are one or more rectangular selections
 			if (MultiSelect && MultiSelectedRegions.Any ()) {
-
-				var toReturn = new HashSet<Point>();
 
 				// Quiz any cells for whether they are selected.  For performance we only need to check those between the top left and lower right vertex of selection regions
 				var yMin = MultiSelectedRegions.Min (r => r.Rect.Top);
@@ -939,29 +939,23 @@ namespace Terminal.Gui {
 						}
 					}
 				}
+			} 
 
-				toReturn.Add(new Point(SelectedColumn,SelectedRow));
 
-				foreach(var p in toReturn)
-				{
-					yield return p;
+			// if there are no region selections then it is just the active cell
+
+			// if we are selecting the full row
+			if (FullRowSelect) {
+				// all cells in active row are selected
+				for (int x = 0; x < Table.Columns.Count; x++) {
+					toReturn.Add(new Point (x, SelectedRow));
 				}
-
 			} else {
-
-				// if there are no region selections then it is just the active cell
-
-				// if we are selecting the full row
-				if (FullRowSelect) {
-					// all cells in active row are selected
-					for (int x = 0; x < Table.Columns.Count; x++) {
-						yield return new Point (x, SelectedRow);
-					}
-				} else {
-					// Not full row select and no multi selections
-					yield return new Point (SelectedColumn, SelectedRow);
-				}
+				// Not full row select and no multi selections
+				toReturn.Add(new Point (SelectedColumn, SelectedRow));
 			}
+
+			return toReturn;		
 		}
 
 		/// <summary>
