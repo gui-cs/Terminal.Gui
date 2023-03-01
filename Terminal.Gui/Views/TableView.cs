@@ -987,8 +987,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var toggles = GetMultiSelectedRegionsContaining(selectedColumn, selectedRow)
-							.Where(s=>s.IsToggled).ToArray ();
+			var regions = GetMultiSelectedRegionsContaining(selectedColumn, selectedRow).ToArray();
+			var toggles = regions.Where(s=>s.IsToggled).ToArray ();
 
 			// Toggle it off
 			if (toggles.Any ()) {
@@ -1001,10 +1001,23 @@ namespace Terminal.Gui {
 						MultiSelectedRegions.Push (region);
 				}
 			} else {
-				// Toggle it on
-				MultiSelectedRegions.Push (
-				CreateTableSelection (selectedColumn, SelectedRow, selectedColumn, selectedRow, true)
-				);
+				
+				// user is toggling selection within a rectangular
+				// select.  So toggle the full region
+				if(regions.Any())
+				{
+					foreach(var r in regions)
+					{
+						r.IsToggled = true;
+					}
+				}
+				else{
+					// Toggle on a single cell selection
+					MultiSelectedRegions.Push (
+					CreateTableSelection (selectedColumn, SelectedRow, selectedColumn, selectedRow, true)
+					);
+				}
+
 			}
 		}
 
